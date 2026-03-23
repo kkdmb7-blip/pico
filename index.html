@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PICO · 미니앱 디렉토리</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Sans:wght@400;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
@@ -57,13 +57,20 @@
   }
 
   .logo {
-    font-family: 'Syne', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-weight: 800;
     font-size: 22px;
-    letter-spacing: -0.5px;
+    letter-spacing: -1.5px;
     color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
-  .logo span { color: var(--accent2); }
+  .logo-dot {
+    color: var(--accent2);
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
 
   .nav-right { display: flex; align-items: center; gap: 12px; }
 
@@ -671,7 +678,9 @@
 
 <!-- NAV -->
 <nav>
-  <div class="logo">PICO</div>
+  <div class="logo">
+    <span class="logo-dot">●</span>pico
+  </div>
   <div class="nav-right">
     <button class="btn btn-ghost" onclick="openSubmitModal()" id="submitBtn" style="display:none">+ 앱 등록</button>
     <div id="authArea">
