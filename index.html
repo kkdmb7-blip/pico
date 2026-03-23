@@ -852,6 +852,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 let currentUser = null
 let currentApp = null
 let allApps = []
+let _loadAppsSeq = 0
 let selectedStar = 0
 let sortBy = 'rating'
 let filterCat = ''
@@ -972,12 +973,11 @@ async function deleteMyApp(appId, btn) {
     const { error } = await db.from('picoapp_apps').delete().eq('id', appId).eq('author_id', currentUser.id)
     if (error) throw error
     btn.closest('div[style]').remove()
-    allApps = allApps.filter(function(a) { return a.id !== appId })
-    renderApps(allApps)
     showToast('앱이 삭제됐어요')
     const title = document.getElementById('myAppsTitle')
     const remaining = document.querySelectorAll('#myAppsList > div').length
     title.textContent = '내 앱 (' + remaining + '개)'
+    loadApps() // 현재 filterCat 기준으로 메인 그리드 재조회
   } catch(e) {
     console.error('삭제 실패:', e)
     btn.disabled = false
@@ -1020,6 +1020,7 @@ function updateAuthUI() {
 
 // ── APPS ────────────────────────────────────────────────
 async function loadApps() {
+  const seq = ++_loadAppsSeq
   document.getElementById('appGrid').innerHTML = `<div class="loading"><div class="spinner"></div><p>불러오는 중...</p></div>`
   try {
     let query = db.from('picoapp_apps').select('*')
@@ -1029,10 +1030,12 @@ async function loadApps() {
     else query = query.order('created_at', { ascending: false })
 
     const { data, error } = await query
+    if (seq !== _loadAppsSeq) return // 더 최근 호출이 있으면 무시
     if (error) { console.error('loadApps Supabase error:', error); throw error; }
     allApps = data || []
     renderApps(allApps)
   } catch(e) {
+    if (seq !== _loadAppsSeq) return
     console.error(e)
     document.getElementById('appGrid').innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>앱을 불러오지 못했어요</p></div>`
   }
