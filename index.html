@@ -970,8 +970,9 @@ async function deleteMyApp(appId, btn) {
   btn.disabled = true
   btn.textContent = '...'
   try {
-    const { error } = await db.from('picoapp_apps').delete().eq('id', appId).eq('author_id', currentUser.id)
+    const { data: deleted, error } = await db.from('picoapp_apps').delete().eq('id', appId).eq('author_id', currentUser.id).select()
     if (error) throw error
+    if (!deleted || deleted.length === 0) throw new Error('삭제 권한이 없거나 RLS 정책 미설정')
     btn.closest('div[style]').remove()
     showToast('앱이 삭제됐어요')
     const title = document.getElementById('myAppsTitle')
