@@ -818,7 +818,60 @@
           <label>아이콘 이모지</label>
           <input type="text" id="f-icon" placeholder="🚀 (이모지 하나)">
         </div>
+        <div class="form-group">
+          <label>썸네일 이미지 URL</label>
+          <input type="url" id="f-thumb" placeholder="https://i.imgur.com/xxx.png (선택사항)">
+        </div>
         <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;" onclick="submitApp()">등록하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;">앱 수정하기</div>
+      <button class="modal-close" onclick="closeModal('editModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="e-id">
+      <div class="submit-form">
+        <div class="form-group">
+          <label>앱 이름 *</label>
+          <input type="text" id="e-name" placeholder="ex. 오늘의 타로">
+        </div>
+        <div class="form-group">
+          <label>앱 설명 *</label>
+          <textarea id="e-desc" placeholder="앱을 간단히 소개해 주세요"></textarea>
+        </div>
+        <div class="form-group">
+          <label>앱 URL *</label>
+          <input type="url" id="e-url" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>카테고리 *</label>
+          <select id="e-cat">
+            <option value="">선택하세요</option>
+            <option value="운세/사주">🔮 운세/사주</option>
+            <option value="유틸">🛠️ 유틸</option>
+            <option value="게임">🎮 게임</option>
+            <option value="데이터/시각화">📊 데이터/시각화</option>
+            <option value="크리에이티브">🎨 크리에이티브</option>
+            <option value="소통">💬 소통</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>아이콘 이모지</label>
+          <input type="text" id="e-icon" placeholder="🚀 (이모지 하나)">
+        </div>
+        <div class="form-group">
+          <label>썸네일 이미지 URL</label>
+          <input type="url" id="e-thumb" placeholder="https://i.imgur.com/xxx.png (선택사항)">
+        </div>
+        <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;" onclick="saveEdit()">저장하기</button>
       </div>
     </div>
   </div>
@@ -1096,6 +1149,7 @@ function renderApps(apps) {
       <div class="card-footer">
         <span class="card-author">by ${app.author_name || '익명'}</span>
         <div style="display:flex;gap:6px;align-items:center">
+          ${currentUser && app.author_id === currentUser.id ? `<button onclick="event.stopPropagation();openEditModal(${app.id})" style="padding:3px 8px;background:none;border:1px solid #7b5ea744;border-radius:5px;color:#a98fd4;font-size:11px;cursor:pointer">수정</button>` : ''}
           ${isAdmin() ? `<button onclick="event.stopPropagation();adminDeleteApp(${app.id},this)" style="padding:3px 8px;background:none;border:1px solid #ff6b6b44;border-radius:5px;color:#ff6b6b;font-size:11px;cursor:pointer">삭제</button>` : ''}
           <a href="${app.url}" target="_blank" class="card-link" onclick="event.stopPropagation()">열기 →</a>
         </div>
@@ -1245,27 +1299,63 @@ async function submitApp() {
   const url = document.getElementById('f-url').value.trim()
   const cat = document.getElementById('f-cat').value
   const icon = document.getElementById('f-icon').value.trim() || '🚀'
+  const thumbnail_url = document.getElementById('f-thumb').value.trim() || null
 
   if (!name || !desc || !url || !cat) return showToast('모든 필드를 입력해 주세요')
 
   try {
     const { error } = await db.from('picoapp_apps').insert({
-      name, description: desc, url, category: cat, icon,
+      name, description: desc, url, category: cat, icon, thumbnail_url,
       author_id: currentUser.id,
       author_name: currentUser.name
     })
     if (error) throw error
     showToast('피코에 등록됐어요! 🎉')
     closeModal('submitModal')
-    // 폼 초기화
-    document.getElementById('f-name').value = ''
-    document.getElementById('f-desc').value = ''
-    document.getElementById('f-url').value = ''
-    document.getElementById('f-cat').value = ''
-    document.getElementById('f-icon').value = ''
+    ;['f-name','f-desc','f-url','f-cat','f-icon','f-thumb'].forEach(id => { document.getElementById(id).value = '' })
     await loadApps()
   } catch(e) {
     showToast('등록 중 오류가 났어요')
+    console.error(e)
+  }
+}
+
+function openEditModal(appId) {
+  if (!currentUser) return
+  const app = allApps.find(a => a.id === appId)
+  if (!app) return
+  document.getElementById('e-id').value = app.id
+  document.getElementById('e-name').value = app.name || ''
+  document.getElementById('e-desc').value = app.description || ''
+  document.getElementById('e-url').value = app.url || ''
+  document.getElementById('e-cat').value = app.category || ''
+  document.getElementById('e-icon').value = app.icon || ''
+  document.getElementById('e-thumb').value = app.thumbnail_url || ''
+  openModal('editModal')
+}
+
+async function saveEdit() {
+  const id = parseInt(document.getElementById('e-id').value)
+  const name = document.getElementById('e-name').value.trim()
+  const desc = document.getElementById('e-desc').value.trim()
+  const url = document.getElementById('e-url').value.trim()
+  const cat = document.getElementById('e-cat').value
+  const icon = document.getElementById('e-icon').value.trim() || '🚀'
+  const thumbnail_url = document.getElementById('e-thumb').value.trim() || null
+
+  if (!name || !desc || !url || !cat) return showToast('모든 필드를 입력해 주세요')
+
+  try {
+    const { error } = await db.from('picoapp_apps')
+      .update({ name, description: desc, url, category: cat, icon, thumbnail_url })
+      .eq('id', id)
+      .eq('author_id', currentUser.id)
+    if (error) throw error
+    showToast('수정됐어요!')
+    closeModal('editModal')
+    await loadApps()
+  } catch(e) {
+    showToast('수정 중 오류가 났어요')
     console.error(e)
   }
 }
