@@ -125,7 +125,7 @@
   /* ─── HERO ─── */
   .hero {
     position: relative;
-    padding: 80px 24px 60px;
+    padding: 32px 24px 24px;
     text-align: center;
     overflow: hidden;
   }
@@ -166,13 +166,13 @@
   /* ─── SEARCH ─── */
   .search-wrap {
     max-width: 560px;
-    margin: 0 auto 48px;
+    margin: 0 auto 24px;
     position: relative;
   }
 
   .search-wrap input {
     width: 100%;
-    padding: 16px 56px 16px 20px;
+    padding: 12px 56px 12px 20px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -844,12 +844,15 @@ const SUPABASE_URL = 'https://afktkixkbcirsknahbmx.supabase.co'
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFma3RraXhrYmNpcnNrbmFoYm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MDQzMDIsImV4cCI6MjA4ODI4MDMwMn0.rxmiOZAYZ2VH8KQv2nBR4eEo1DN95F5pU6Iv5zQz9Y4'
 const KAKAO_REST_KEY = '51b4f87ad9cfd6312c176ad34eb62025'
 const SITE_URL = window.location.origin
+// 관리자: 주영님 카카오 로그인 후 콘솔에서 currentUser.id 확인 후 추가
+const ADMIN_IDS = ['주영']  // 로그인 후 실제 kakao_XXXXXXX ID로 교체 가능
 
 // ── INIT ────────────────────────────────────────────────
 const { createClient } = supabase
 const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 let currentUser = null
+function isAdmin() { return currentUser && (ADMIN_IDS.includes(currentUser.id) || ADMIN_IDS.includes(currentUser.name)) }
 let currentApp = null
 let allApps = []
 let _loadAppsSeq = 0
@@ -964,6 +967,28 @@ function closeMyApps() {
   document.getElementById('myAppsModal').style.display = 'none'
 }
 
+async function adminDeleteApp(appId, btn) {
+  if (!isAdmin()) return
+  if (!confirm('관리자 권한으로 이 앱을 삭제할까요?')) return
+  btn.disabled = true
+  btn.textContent = '...'
+  try {
+    const { error } = await db.from('picoapp_apps').delete().eq('id', appId)
+    if (error) throw error
+    allApps = allApps.filter(a => a.id !== appId)
+    renderApps(allApps.filter(a =>
+      (!filterCat || a.category === filterCat) &&
+      (!searchQuery || a.name.includes(searchQuery) || a.description.includes(searchQuery))
+    ))
+    showToast('앱이 삭제됐어요 (관리자)')
+  } catch(e) {
+    console.error('관리자 삭제 실패:', e)
+    btn.disabled = false
+    btn.textContent = '삭제'
+    showToast('삭제 실패: ' + (e.message || '오류'))
+  }
+}
+
 async function deleteMyApp(appId, btn) {
   if (!currentUser) return
   if (!confirm('이 앱을 삭제할까요?')) return
@@ -1070,7 +1095,10 @@ function renderApps(apps) {
       </div>
       <div class="card-footer">
         <span class="card-author">by ${app.author_name || '익명'}</span>
-        <a href="${app.url}" target="_blank" class="card-link" onclick="event.stopPropagation()">열기 →</a>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${isAdmin() ? `<button onclick="event.stopPropagation();adminDeleteApp(${app.id},this)" style="padding:3px 8px;background:none;border:1px solid #ff6b6b44;border-radius:5px;color:#ff6b6b;font-size:11px;cursor:pointer">삭제</button>` : ''}
+          <a href="${app.url}" target="_blank" class="card-link" onclick="event.stopPropagation()">열기 →</a>
+        </div>
       </div>
     </div>
   `).join('')
