@@ -768,6 +768,17 @@
         </div>
       </div>
 
+      <!-- Request -->
+      <div id="requestSection" style="margin-bottom:20px;">
+        <div id="requestBtnArea"></div>
+        <div id="requestFormArea" style="display:none;">
+          <div class="comment-form" style="margin-top:10px;">
+            <textarea id="requestText" placeholder="기능 추가나 수정 요청을 남겨주세요"></textarea>
+            <button class="comment-submit" onclick="submitRequest()">요청 보내기</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Comments -->
       <div class="comments-section">
         <div class="comments-label">
@@ -874,6 +885,17 @@
         <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;" onclick="saveEdit()">저장하기</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- REQUESTS MODAL -->
+<div id="requestsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:24px;width:90%;max-width:480px;max-height:75vh;display:flex;flex-direction:column;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 id="requestsModalTitle" style="margin:0;font-size:16px;color:#e0d0ff;">📬 개발자 요청</h3>
+      <button onclick="closeRequestsModal()" style="background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div id="requestsList" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;"></div>
   </div>
 </div>
 
@@ -1113,6 +1135,7 @@ async function loadApps() {
     if (error) { console.error('loadApps Supabase error:', error); throw error; }
     allApps = data || []
     renderApps(allApps)
+    loadRequestBadges()
   } catch(e) {
     if (seq !== _loadAppsSeq) return
     console.error(e)
@@ -1131,7 +1154,7 @@ function renderApps(apps) {
   }
 
   grid.innerHTML = apps.map((app, i) => `
-    <div class="app-card" style="animation-delay:${i*0.05}s" onclick="openApp(${app.id})">
+    <div class="app-card" data-app-id="${app.id}" style="animation-delay:${i*0.05}s" onclick="openApp(${app.id})">
       <div class="card-thumb">
         ${app.thumbnail_url ? `<img src="${app.thumbnail_url}" alt="" onerror="this.parentElement.innerHTML='<span>${app.icon||'🚀'}</span>'">` : `<span>${app.icon || '🚀'}</span>`}
       </div>
@@ -1149,7 +1172,7 @@ function renderApps(apps) {
       <div class="card-footer">
         <span class="card-author">by ${app.author_name || '익명'}</span>
         <div style="display:flex;gap:6px;align-items:center">
-          ${currentUser && app.author_id === currentUser.id ? `<button onclick="event.stopPropagation();openEditModal(${app.id})" style="padding:3px 8px;background:none;border:1px solid #7b5ea744;border-radius:5px;color:#a98fd4;font-size:11px;cursor:pointer">수정</button>` : ''}
+          ${currentUser && app.author_id === currentUser.id ? `<button onclick="event.stopPropagation();openEditModal(${app.id})" style="padding:3px 8px;background:none;border:1px solid #7b5ea744;border-radius:5px;color:#a98fd4;font-size:11px;cursor:pointer">수정</button><button id="req-badge-${app.id}" onclick="event.stopPropagation();openRequestsModal(${app.id})" style="display:none;padding:3px 8px;background:#7b5ea7;border:none;border-radius:5px;color:#fff;font-size:11px;cursor:pointer"></button>` : ''}
           ${isAdmin() ? `<button onclick="event.stopPropagation();adminDeleteApp(${app.id},this)" style="padding:3px 8px;background:none;border:1px solid #ff6b6b44;border-radius:5px;color:#ff6b6b;font-size:11px;cursor:pointer">삭제</button>` : ''}
           <a href="${app.url}" target="_blank" class="card-link" onclick="event.stopPropagation()">열기 →</a>
         </div>
@@ -1195,8 +1218,115 @@ async function openApp(id) {
     document.getElementById('ratingSection').style.display = 'none'
   }
 
+  // 요청 버튼
+  const reqBtnArea = document.getElementById('requestBtnArea')
+  document.getElementById('requestFormArea').style.display = 'none'
+  if (currentUser) {
+    reqBtnArea.innerHTML = `<button onclick="toggleRequestForm()" style="background:none;border:1px solid #7b5ea744;border-radius:8px;padding:8px 14px;color:#a98fd4;font-size:13px;cursor:pointer;width:100%;">💬 개발자에게 요청</button>`
+  } else {
+    reqBtnArea.innerHTML = `<div style="text-align:center;padding:8px;color:var(--muted);font-size:13px;"><a onclick="kakaoLogin()" style="color:#a98fd4;cursor:pointer;">카카오 로그인</a> 후 요청을 남길 수 있어요</div>`
+  }
+
   await loadComments(id)
   openModal('detailModal')
+}
+
+function toggleRequestForm() {
+  const area = document.getElementById('requestFormArea')
+  area.style.display = area.style.display === 'none' ? 'block' : 'none'
+}
+
+async function submitRequest() {
+  const textEl = document.getElementById('requestText')
+  const message = textEl?.value.trim()
+  if (!message) return showToast('요청 내용을 입력해 주세요')
+  if (!currentUser) return kakaoLogin()
+
+  try {
+    const { error } = await db.from('picoapp_requests').insert({
+      app_id: currentApp.id,
+      app_name: currentApp.name,
+      from_user_id: currentUser.id,
+      from_user_name: currentUser.name,
+      message,
+      is_read: false
+    })
+    if (error) throw error
+    showToast('요청이 전달됐어요! 📬')
+    textEl.value = ''
+    document.getElementById('requestFormArea').style.display = 'none'
+  } catch(e) {
+    showToast('요청 전송 중 오류가 났어요')
+    console.error(e)
+  }
+}
+
+async function loadRequestBadges() {
+  if (!currentUser) return
+  try {
+    const myAppIds = allApps.filter(a => a.author_id === currentUser.id).map(a => a.id)
+    if (!myAppIds.length) return
+    const { data } = await db.from('picoapp_requests')
+      .select('app_id')
+      .in('app_id', myAppIds)
+      .eq('is_read', false)
+    if (!data) return
+    const counts = {}
+    data.forEach(r => { counts[r.app_id] = (counts[r.app_id] || 0) + 1 })
+    Object.entries(counts).forEach(([appId, cnt]) => {
+      const badge = document.getElementById(`req-badge-${appId}`)
+      if (badge) { badge.textContent = `📬 ${cnt}`; badge.style.display = 'inline-block' }
+    })
+  } catch(e) { console.error(e) }
+}
+
+async function openRequestsModal(appId) {
+  const app = allApps.find(a => a.id === appId)
+  document.getElementById('requestsModalTitle').textContent = `📬 ${app?.name || ''} 요청`
+  const list = document.getElementById('requestsList')
+  list.innerHTML = '<div style="color:var(--muted);font-size:13px;">불러오는 중...</div>'
+  document.getElementById('requestsModal').style.display = 'flex'
+
+  const { data } = await db.from('picoapp_requests')
+    .select('*')
+    .eq('app_id', appId)
+    .order('created_at', { ascending: false })
+
+  const requests = data || []
+  if (!requests.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">아직 요청이 없어요</div>'
+    return
+  }
+  list.innerHTML = requests.map(r => `
+    <div id="req-item-${r.id}" style="background:#16162a;border:1px solid ${r.is_read ? '#2a2a3a' : '#7b5ea755'};border-radius:10px;padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div>
+          <div style="font-size:12px;color:#a98fd4;margin-bottom:4px;">${r.from_user_name || '익명'} · ${new Date(r.created_at).toLocaleDateString('ko-KR')}</div>
+          <div style="font-size:13px;color:#e0d0ff;line-height:1.6;">${r.message}</div>
+        </div>
+        ${!r.is_read ? `<button onclick="markRequestRead(${r.id},${appId})" style="flex-shrink:0;padding:4px 10px;background:none;border:1px solid #7b5ea7;border-radius:6px;color:#a98fd4;font-size:11px;cursor:pointer;">읽음</button>` : '<span style="flex-shrink:0;font-size:11px;color:var(--muted);">읽음</span>'}
+      </div>
+    </div>
+  `).join('')
+}
+
+async function markRequestRead(requestId, appId) {
+  await db.from('picoapp_requests').update({ is_read: true }).eq('id', requestId)
+  const item = document.getElementById(`req-item-${requestId}`)
+  if (item) {
+    item.style.borderColor = '#2a2a3a'
+    const btn = item.querySelector('button')
+    if (btn) btn.outerHTML = '<span style="flex-shrink:0;font-size:11px;color:var(--muted);">읽음</span>'
+  }
+  const badge = document.getElementById(`req-badge-${appId}`)
+  if (badge) {
+    const cur = parseInt(badge.textContent.replace(/\D/g,'')) - 1
+    if (cur <= 0) { badge.style.display = 'none' } else { badge.textContent = `📬 ${cur}` }
+  }
+}
+
+function closeRequestsModal() {
+  document.getElementById('requestsModal').style.display = 'none'
 }
 
 // ── RATING ──────────────────────────────────────────────
