@@ -694,6 +694,7 @@
       <div id="avatarMenu" style="display:none;position:absolute;top:44px;right:0;background:#1e1e2e;border:1px solid #333;border-radius:12px;padding:8px;min-width:160px;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,0.4);">
         <div id="avatarMenuName" style="padding:8px 12px;font-size:13px;color:#aaa;border-bottom:1px solid #333;margin-bottom:4px;"></div>
         <button id="myAppsBtn" onclick="showMyApps()" style="width:100%;padding:8px 12px;background:none;border:none;color:#e0d0ff;font-size:14px;text-align:left;cursor:pointer;border-radius:8px;" onmouseover="this.style.background='#1a1a2e'" onmouseout="this.style.background='none'">내 앱</button>
+        <button id="adminRequestsBtn" onclick="openAdminRequestsModal()" style="display:none;width:100%;padding:8px 12px;background:none;border:none;color:#e8b86d;font-size:14px;text-align:left;cursor:pointer;border-radius:8px;" onmouseover="this.style.background='#1a1a2e'" onmouseout="this.style.background='none'">📬 전체 요청 <span id="adminUnreadBadge" style="display:none;background:#7b5ea7;color:#fff;font-size:11px;border-radius:10px;padding:1px 7px;margin-left:4px;"></span></button>
         <button onclick="logout()" style="width:100%;padding:8px 12px;background:none;border:none;color:#ff6b6b;font-size:14px;text-align:left;cursor:pointer;border-radius:8px;" onmouseover="this.style.background='#2a1a1a'" onmouseout="this.style.background='none'">로그아웃</button>
       </div>
     </div>
@@ -919,6 +920,17 @@
   </div>
 </div>
 
+<!-- ADMIN REQUESTS MODAL -->
+<div id="adminRequestsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:24px;width:90%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="margin:0;font-size:16px;color:#e8b86d;">📬 전체 요청 목록</h3>
+      <button onclick="closeAdminRequestsModal()" style="background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div id="adminRequestsList" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1120,6 +1132,7 @@ function updateAuthUI() {
     }
     const menuName = document.getElementById('avatarMenuName')
     if (menuName) menuName.textContent = currentUser.name || '사용자'
+    loadAdminUnreadBadge()
   } else {
     authArea.style.display = 'block'
     userArea.style.display = 'none'
@@ -1345,6 +1358,76 @@ async function markRequestRead(requestId, appId) {
 
 function closeRequestsModal() {
   document.getElementById('requestsModal').style.display = 'none'
+}
+
+// ── ADMIN REQUESTS ──────────────────────────────────────
+async function loadAdminUnreadBadge() {
+  if (!isAdmin()) return
+  const btn = document.getElementById('adminRequestsBtn')
+  if (btn) btn.style.display = 'block'
+  const { data } = await db.from('picoapp_requests').select('id').eq('status', 'unread')
+  const cnt = data?.length || 0
+  const badge = document.getElementById('adminUnreadBadge')
+  if (badge) {
+    if (cnt > 0) { badge.textContent = cnt; badge.style.display = 'inline-block' }
+    else badge.style.display = 'none'
+  }
+}
+
+async function openAdminRequestsModal() {
+  if (!isAdmin()) return
+  document.getElementById('avatarMenu').style.display = 'none'
+  const modal = document.getElementById('adminRequestsModal')
+  const list = document.getElementById('adminRequestsList')
+  modal.style.display = 'flex'
+  list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">불러오는 중...</div>'
+
+  const { data, error } = await db.from('picoapp_requests')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error || !data?.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">요청이 없어요</div>'
+    return
+  }
+
+  list.innerHTML = data.map(r => `
+    <div id="admin-req-${r.id}" style="background:#16162a;border:1px solid ${r.status === 'read' ? '#2a2a3a' : '#7b5ea755'};border-radius:10px;padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap;">
+            <span style="font-size:12px;background:#7b5ea722;border:1px solid #7b5ea744;border-radius:6px;padding:2px 8px;color:#a98fd4;">${r.app_name || '앱'}</span>
+            <span style="font-size:11px;color:var(--muted);">${r.from_user_name || '익명'} · ${new Date(r.created_at).toLocaleDateString('ko-KR')}</span>
+            ${r.status !== 'read' ? '<span style="font-size:11px;background:#7b5ea7;color:#fff;border-radius:6px;padding:1px 6px;">미읽음</span>' : '<span style="font-size:11px;color:var(--muted);">읽음</span>'}
+          </div>
+          <div style="font-size:13px;color:#e0d0ff;line-height:1.6;">${r.message}</div>
+        </div>
+        ${r.status !== 'read' ? `<button onclick="adminMarkRead(${r.id})" style="flex-shrink:0;padding:4px 10px;background:none;border:1px solid #7b5ea7;border-radius:6px;color:#a98fd4;font-size:11px;cursor:pointer;">읽음</button>` : ''}
+      </div>
+    </div>
+  `).join('')
+}
+
+async function adminMarkRead(requestId) {
+  await db.from('picoapp_requests').update({ status: 'read' }).eq('id', requestId)
+  const item = document.getElementById(`admin-req-${requestId}`)
+  if (item) {
+    item.style.borderColor = '#2a2a3a'
+    item.querySelector('button')?.remove()
+    const badge = item.querySelector('span[style*="background:#7b5ea7;color:#fff"]')
+    if (badge) badge.outerHTML = '<span style="font-size:11px;color:var(--muted);">읽음</span>'
+  }
+  // 상단 뱃지 차감
+  const b = document.getElementById('adminUnreadBadge')
+  if (b) {
+    const cur = parseInt(b.textContent || '0') - 1
+    if (cur <= 0) b.style.display = 'none'
+    else b.textContent = cur
+  }
+}
+
+function closeAdminRequestsModal() {
+  document.getElementById('adminRequestsModal').style.display = 'none'
 }
 
 // ── RATING ──────────────────────────────────────────────
