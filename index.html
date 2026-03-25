@@ -227,6 +227,34 @@
     color: #fff;
   }
 
+  /* ─── KEYWORD TAGS ─── */
+  .keyword-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 560px;
+    margin: 0 auto 8px;
+  }
+  .kw-tag {
+    padding: 5px 13px;
+    border-radius: 100px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans KR', sans-serif;
+    white-space: nowrap;
+  }
+  .kw-tag:hover { background: var(--surface2); color: var(--text); }
+  .kw-tag.active {
+    background: rgba(123,94,167,0.2);
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+
   /* ─── TOOLBAR ─── */
   .toolbar {
     display: flex;
@@ -709,6 +737,17 @@
     <input type="text" id="searchInput" placeholder="앱 이름이나 설명으로 검색..." oninput="handleSearch()">
     <span class="search-icon">🔍</span>
   </div>
+  <div class="keyword-tags" id="keywordTags">
+    <button class="kw-tag" onclick="toggleTag('운세')">🔮 #운세</button>
+    <button class="kw-tag" onclick="toggleTag('사주')">✨ #사주</button>
+    <button class="kw-tag" onclick="toggleTag('유틸')">🛠️ #유틸</button>
+    <button class="kw-tag" onclick="toggleTag('게임')">🎮 #게임</button>
+    <button class="kw-tag" onclick="toggleTag('생산성')">📈 #생산성</button>
+    <button class="kw-tag" onclick="toggleTag('감성')">💜 #감성</button>
+    <button class="kw-tag" onclick="toggleTag('데이터')">📊 #데이터</button>
+    <button class="kw-tag" onclick="toggleTag('재미')">😄 #재미</button>
+    <button class="kw-tag" onclick="toggleTag('소통')">💬 #소통</button>
+  </div>
 </div>
 
 <!-- CATEGORIES -->
@@ -935,6 +974,7 @@ let selectedStar = 0
 let sortBy = 'rating'
 let filterCat = ''
 let searchQuery = ''
+let selectedTags = []
 
 // ── AUTH ────────────────────────────────────────────────
 async function checkAuth() {
@@ -1133,7 +1173,14 @@ async function loadApps() {
     const { data, error } = await query
     if (seq !== _loadAppsSeq) return // 더 최근 호출이 있으면 무시
     if (error) { console.error('loadApps Supabase error:', error); throw error; }
-    allApps = data || []
+    let apps = data || []
+    if (selectedTags.length > 0) {
+      apps = apps.filter(app => {
+        const text = `${app.name} ${app.description || ''} ${app.category || ''}`.toLowerCase()
+        return selectedTags.every(tag => text.includes(tag.toLowerCase()))
+      })
+    }
+    allApps = apps
     renderApps(allApps)
     loadRequestBadges()
   } catch(e) {
@@ -1248,8 +1295,7 @@ async function submitRequest() {
       app_name: currentApp.name,
       from_user_id: currentUser.id,
       from_user_name: currentUser.name,
-      message,
-      is_read: false
+      message
     })
     if (error) throw error
     showToast('요청이 전달됐어요! 📬')
@@ -1269,7 +1315,7 @@ async function loadRequestBadges() {
     const { data } = await db.from('picoapp_requests')
       .select('app_id')
       .in('app_id', myAppIds)
-      .eq('is_read', false)
+      .eq('status', 'unread')
     if (!data) return
     const counts = {}
     data.forEach(r => { counts[r.app_id] = (counts[r.app_id] || 0) + 1 })
@@ -1298,20 +1344,20 @@ async function openRequestsModal(appId) {
     return
   }
   list.innerHTML = requests.map(r => `
-    <div id="req-item-${r.id}" style="background:#16162a;border:1px solid ${r.is_read ? '#2a2a3a' : '#7b5ea755'};border-radius:10px;padding:14px;">
+    <div id="req-item-${r.id}" style="background:#16162a;border:1px solid ${r.status === 'read' ? '#2a2a3a' : '#7b5ea755'};border-radius:10px;padding:14px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
         <div>
           <div style="font-size:12px;color:#a98fd4;margin-bottom:4px;">${r.from_user_name || '익명'} · ${new Date(r.created_at).toLocaleDateString('ko-KR')}</div>
           <div style="font-size:13px;color:#e0d0ff;line-height:1.6;">${r.message}</div>
         </div>
-        ${!r.is_read ? `<button onclick="markRequestRead(${r.id},${appId})" style="flex-shrink:0;padding:4px 10px;background:none;border:1px solid #7b5ea7;border-radius:6px;color:#a98fd4;font-size:11px;cursor:pointer;">읽음</button>` : '<span style="flex-shrink:0;font-size:11px;color:var(--muted);">읽음</span>'}
+        ${r.status !== 'read' ? `<button onclick="markRequestRead(${r.id},${appId})" style="flex-shrink:0;padding:4px 10px;background:none;border:1px solid #7b5ea7;border-radius:6px;color:#a98fd4;font-size:11px;cursor:pointer;">읽음</button>` : '<span style="flex-shrink:0;font-size:11px;color:var(--muted);">읽음</span>'}
       </div>
     </div>
   `).join('')
 }
 
 async function markRequestRead(requestId, appId) {
-  await db.from('picoapp_requests').update({ is_read: true }).eq('id', requestId)
+  await db.from('picoapp_requests').update({ status: 'read' }).eq('id', requestId)
   const item = document.getElementById(`req-item-${requestId}`)
   if (item) {
     item.style.borderColor = '#2a2a3a'
@@ -1495,6 +1541,21 @@ function filterCategory(cat) {
   filterCat = cat
   document.querySelectorAll('.cat-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.cat === cat)
+  })
+  loadApps()
+}
+
+function toggleTag(tag) {
+  const idx = selectedTags.indexOf(tag)
+  if (idx >= 0) {
+    selectedTags.splice(idx, 1)
+  } else {
+    if (selectedTags.length >= 3) return
+    selectedTags.push(tag)
+  }
+  document.querySelectorAll('.kw-tag').forEach(b => {
+    const m = b.getAttribute('onclick').match(/toggleTag\('(.+?)'\)/)
+    if (m) b.classList.toggle('active', selectedTags.includes(m[1]))
   })
   loadApps()
 }
