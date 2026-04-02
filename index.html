@@ -462,6 +462,8 @@
   .saju-form-group select option { background: #1c1c28; }
   .saju-form-group input:focus,
   .saju-form-group select:focus { border-color: #7b5ea7; }
+  .saju-date-row { display: flex; gap: 8px; }
+  .saju-date-row select { flex: 1; }
   .saju-gender-row { display: flex; gap: 10px; }
   .saju-gender-btn {
     flex: 1;
@@ -683,7 +685,11 @@
       <p class="saju-modal-sub">생년월일을 입력하면 사주 8자를 바로 확인할 수 있어요</p>
       <div class="saju-form-group">
         <label>생년월일</label>
-        <input type="date" id="sajuBirth" max="2015-12-31">
+        <div class="saju-date-row">
+          <select id="sajuYear"><option value="">년</option></select>
+          <select id="sajuMonth"><option value="">월</option></select>
+          <select id="sajuDay"><option value="">일</option></select>
+        </div>
       </div>
       <div class="saju-form-group">
         <label>태어난 시간</label>
@@ -759,9 +765,39 @@
 // ── SAJU MODAL ───────────────────────────────────────────
 var _sajuGender = 'M';
 
+function initSajuDateSelects() {
+  var yEl = document.getElementById('sajuYear');
+  var mEl = document.getElementById('sajuMonth');
+  var dEl = document.getElementById('sajuDay');
+  if (yEl.options.length > 1) return; // 이미 초기화됨
+  var curY = new Date().getFullYear();
+  for (var y = curY - 5; y >= 1930; y--) {
+    var o = document.createElement('option'); o.value = y; o.textContent = y + '년'; yEl.appendChild(o);
+  }
+  for (var mo = 1; mo <= 12; mo++) {
+    var o = document.createElement('option'); o.value = mo; o.textContent = mo + '월'; mEl.appendChild(o);
+  }
+  function updateDays() {
+    var yv = parseInt(yEl.value) || 2000;
+    var mv = parseInt(mEl.value) || 1;
+    var maxD = new Date(yv, mv, 0).getDate();
+    var cur = parseInt(dEl.value);
+    dEl.innerHTML = '<option value="">일</option>';
+    for (var dd = 1; dd <= maxD; dd++) {
+      var o = document.createElement('option'); o.value = dd; o.textContent = dd + '일';
+      if (dd === cur) o.selected = true;
+      dEl.appendChild(o);
+    }
+  }
+  yEl.addEventListener('change', updateDays);
+  mEl.addEventListener('change', updateDays);
+  updateDays();
+}
+
 function openSajuModal() {
   document.getElementById('sajuOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  initSajuDateSelects();
   showSajuForm();
 }
 function closeSajuModal() {
@@ -779,8 +815,11 @@ function showSajuForm() {
 }
 
 async function submitSaju() {
-  var birthVal = document.getElementById('sajuBirth').value;
-  if (!birthVal) { alert('생년월일을 입력해주세요.'); return; }
+  var y = document.getElementById('sajuYear').value;
+  var m = document.getElementById('sajuMonth').value;
+  var d = document.getElementById('sajuDay').value;
+  if (!y || !m || !d) { alert('생년월일을 모두 선택해주세요.'); return; }
+  var birthVal = y + '-' + m.padStart(2,'0') + '-' + d.padStart(2,'0');
   var hourVal = document.getElementById('sajuHour').value;
   var hour = hourVal === 'unknown' ? 12 : parseInt(hourVal);
   var birthISO = birthVal + 'T' + String(hour).padStart(2,'0') + ':00:00';
