@@ -421,11 +421,11 @@ function selCal(c) {
   const hE=document.getElementById('f_hh');
   const mE=document.getElementById('f_mm');
   hE.innerHTML='';
-  for(let h=0;h<24;h++) hE.add(new Option(h+'시', h));
-  hE.value=12;
+  for(let h=0;h<24;h++) hE.add(new Option(h+'시', String(h)));
+  hE.value='12';
   mE.innerHTML='';
-  for(let m=0;m<60;m+=5) mE.add(new Option(String(m).padStart(2,'0')+'분', m));
-  mE.value=0;
+  for(let m=0;m<60;m+=5){const ml=m<10?'0'+m:''+m; mE.add(new Option(ml+'분', String(m)));}
+  mE.value='0';
 })();
 
 function toggleTimeUnknown(cb){
