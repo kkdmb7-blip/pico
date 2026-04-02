@@ -659,10 +659,11 @@
       </div>
       <div class="saju-form-group">
         <label>태어난 시간</label>
-        <div style="display:flex;align-items:center;gap:10px">
-          <input type="time" id="sajuTime" value="12:00" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 16px;color:#e8e0f0;font-size:15px;outline:none;color-scheme:dark">
-          <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:13px;color:rgba(255,255,255,0.45);cursor:pointer;flex-shrink:0">
-            <input type="checkbox" id="sajuTimeUnknown" onchange="document.getElementById('sajuTime').disabled=this.checked" style="accent-color:#c9a84c"> 모름
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="sajuHour" style="flex:1.2;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;-webkit-appearance:none;appearance:none"></select>
+          <select id="sajuMinute" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;-webkit-appearance:none;appearance:none"></select>
+          <label style="display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:13px;color:rgba(255,255,255,0.45);cursor:pointer;flex-shrink:0">
+            <input type="checkbox" id="sajuTimeUnknown" onchange="toggleSajuTime(this)" style="accent-color:#c9a84c"> 모름
           </label>
         </div>
       </div>
@@ -740,10 +741,24 @@ function initSajuDateSelects() {
   updateDays();
 }
 
+function initSajuTimeSelects() {
+  var hE = document.getElementById('sajuHour');
+  var mE = document.getElementById('sajuMinute');
+  if (hE.options.length) return;
+  for (var h=0; h<24; h++) hE.add(new Option(h+'시', h));
+  hE.value = 12;
+  for (var m=0; m<60; m+=5) mE.add(new Option(String(m).padStart(2,'0')+'분', m));
+  mE.value = 0;
+}
+function toggleSajuTime(cb) {
+  document.getElementById('sajuHour').disabled = cb.checked;
+  document.getElementById('sajuMinute').disabled = cb.checked;
+}
 function openSajuModal() {
   document.getElementById('sajuOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   initSajuDateSelects();
+  initSajuTimeSelects();
   document.getElementById('sajuForm').style.display = 'block';
 }
 function closeSajuModal() {
@@ -761,11 +776,9 @@ function submitSaju() {
   var m = document.getElementById('sajuMonth').value;
   var d = document.getElementById('sajuDay').value;
   if (!y || !m || !d) { alert('생년월일을 모두 선택해주세요.'); return; }
-  var timeEl = document.getElementById('sajuTime');
   var timeUnknown = document.getElementById('sajuTimeUnknown').checked;
-  var timeVal = (timeUnknown || !timeEl.value) ? '12:00' : timeEl.value;
-  var hour = parseInt(timeVal.split(':')[0]);
-  var minute = parseInt(timeVal.split(':')[1]);
+  var hour = timeUnknown ? 12 : parseInt(document.getElementById('sajuHour').value);
+  var minute = timeUnknown ? 0 : parseInt(document.getElementById('sajuMinute').value);
   var gender = _sajuGender === 'M' ? 'male' : 'female';
   var p = new URLSearchParams({ year: y, month: m, day: d, hour: hour, minute: minute, gender: gender, midnightType: 0 });
   window.location.href = 'saju.html?' + p.toString();

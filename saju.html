@@ -185,10 +185,11 @@
 
   <div style="margin-bottom:16px">
     <label class="f-label">태어난 시간</label>
-    <div style="display:flex;align-items:center;gap:10px">
-      <input type="time" id="f_h" class="f-select" value="12:00" style="flex:1;color-scheme:dark">
-      <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:13px;color:rgba(255,255,255,0.5);cursor:pointer;flex-shrink:0">
-        <input type="checkbox" id="f_unknown" onchange="document.getElementById('f_h').disabled=this.checked" style="accent-color:#7b5ea7"> 모름
+    <div style="display:flex;gap:6px;align-items:center">
+      <select id="f_hh" class="f-select" style="flex:1.2"></select>
+      <select id="f_mm" class="f-select" style="flex:1"></select>
+      <label style="display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:13px;color:rgba(255,255,255,0.5);cursor:pointer;flex-shrink:0">
+        <input type="checkbox" id="f_unknown" onchange="toggleTimeUnknown(this)" style="accent-color:#7b5ea7"> 모름
       </label>
     </div>
   </div>
@@ -415,14 +416,31 @@ function selCal(c) {
   updDays();
 })();
 
+// 시·분 드롭다운 초기화
+(function initTimeSelects(){
+  const hE=document.getElementById('f_hh');
+  const mE=document.getElementById('f_mm');
+  hE.innerHTML='';
+  for(let h=0;h<24;h++) hE.add(new Option(h+'시', h));
+  hE.value=12;
+  mE.innerHTML='';
+  for(let m=0;m<60;m+=5) mE.add(new Option(String(m).padStart(2,'0')+'분', m));
+  mE.value=0;
+})();
+
+function toggleTimeUnknown(cb){
+  document.getElementById('f_hh').disabled=cb.checked;
+  document.getElementById('f_mm').disabled=cb.checked;
+}
+
 function doSubmit() {
   const y=document.getElementById('f_y').value;
   const m=document.getElementById('f_m').value;
   const d=document.getElementById('f_d').value;
   if(!y||!m||!d){alert('생년월일을 모두 선택해주세요.');return;}
   const unknown=document.getElementById('f_unknown').checked;
-  const timeVal=(unknown||!document.getElementById('f_h').value)?'12:00':document.getElementById('f_h').value;
-  const [hh,mm]=timeVal.split(':');
+  const hh=unknown?12:parseInt(document.getElementById('f_hh').value);
+  const mm=unknown?0:parseInt(document.getElementById('f_mm').value);
   const name=document.getElementById('f_name').value.trim();
   const p=new URLSearchParams({year:y,month:m,day:d,hour:hh,minute:mm,gender:_gender==='M'?'male':'female',calendar:_cal});
   if(name) p.set('name',name);
