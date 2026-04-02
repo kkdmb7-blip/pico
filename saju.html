@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>사주 분석 | 피코랩</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #0d0d14; color: #e8e8f0; }
+    .hanja { font-family: 'Noto Serif KR', serif; }
+
+    /* glassmorphism */
+    .glass {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+    }
+    .glass-sm {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+    }
+
+    /* 오행 배경 */
+    .bg-wood  { background: #00C853; color: #052e13; }
+    .bg-fire  { background: #FF1744; color: #fff; }
+    .bg-earth { background: #FFD600; color: #1a1200; }
+    .bg-metal { background: #E0E0E0; color: #1a1a1a; }
+    .bg-water { background: #1565C0; color: #fff; }
+
+    /* 오행 텍스트 */
+    .tc-wood  { color: #00C853; }
+    .tc-fire  { color: #FF5252; }
+    .tc-earth { color: #FFD600; }
+    .tc-metal { color: #BDBDBD; }
+    .tc-water { color: #64B5F6; }
+
+    /* pillar */
+    .pillar-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 8px 4px;
+      text-align: center;
+      min-width: 0;
+    }
+    .pillar-card.is-day { border-color: rgba(123,94,167,0.5); background: rgba(123,94,167,0.06); }
+    .hanja-box {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+      margin: 0 auto 3px;
+      line-height: 1;
+    }
+    @media (max-width: 360px) {
+      .hanja-box { width: 38px; height: 38px; font-size: 1.3rem; border-radius: 6px; }
+    }
+
+    /* accordion */
+    .acc-body { overflow: hidden; transition: max-height 0.35s ease; }
+    .acc-body.open  { max-height: 3000px; }
+    .acc-body.shut  { max-height: 0; }
+    .acc-icon { transition: transform 0.3s; display: inline-block; }
+    .acc-icon.open { transform: rotate(180deg); }
+
+    /* badge */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 9px; border-radius: 20px; font-size: 12px; line-height: 1.5;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    }
+    .badge-ham   { background: rgba(0,200,83,0.12);  border: 1px solid rgba(0,200,83,0.3);  color: #69F0AE; }
+    .badge-chung { background: rgba(255,23,68,0.12);  border: 1px solid rgba(255,23,68,0.3); color: #FF5252; }
+    .badge-hyung { background: rgba(255,214,0,0.12);  border: 1px solid rgba(255,214,0,0.3); color: #FFD740; }
+    .badge-hae   { background: rgba(100,181,246,0.12);border: 1px solid rgba(100,181,246,0.3);color: #82B1FF; }
+    .badge-pa    { background: rgba(200,200,200,0.08);border: 1px solid rgba(200,200,200,0.15);color: #9E9E9E; }
+
+    /* luck scroll */
+    .luck-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
+    .luck-scroll::-webkit-scrollbar { display: none; }
+    .luck-card { scroll-snap-align: center; flex-shrink: 0; width: 76px; border-radius: 12px; padding: 10px 6px; text-align: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+    .luck-card.active { border-color: #7b5ea7; background: rgba(123,94,167,0.18); }
+
+    /* yun grid */
+    .yun-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .yun-cell { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 8px 4px; text-align: center; }
+    .yun-cell.now { border-color: #7b5ea7; background: rgba(123,94,167,0.15); }
+
+    /* form */
+    .f-select {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 10px;
+      color: #e8e8f0;
+      padding: 11px 12px;
+      font-size: 14px;
+      font-family: 'Noto Sans KR', sans-serif;
+      appearance: none;
+    }
+    .f-select:focus { outline: none; border-color: #7b5ea7; }
+    .f-select option { background: #1c1c28; }
+    .f-label { display: block; font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 6px; letter-spacing: 0.05em; }
+    .g-btn {
+      flex: 1; padding: 11px; border-radius: 10px; font-size: 14px;
+      background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.13);
+      color: rgba(255,255,255,0.45); cursor: pointer; transition: all 0.2s;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    .g-btn.on { background: rgba(123,94,167,0.28); border-color: #7b5ea7; color: #fff; }
+    .main-btn {
+      width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700;
+      background: linear-gradient(135deg, #7b5ea7, #5e3d8a);
+      color: #fff; border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    }
+    .main-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { width: 38px; height: 38px; border: 3px solid rgba(255,255,255,0.08); border-top-color: #7b5ea7; border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+    /* five bar */
+    .five-bar-bg { height: 7px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+    .five-bar-fill { height: 100%; border-radius: 10px; transition: width 0.7s ease; }
+
+    /* fixed bottom */
+    .fixed-bottom {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+      background: rgba(13,13,20,0.94); backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    }
+    .cta-btn {
+      display: block; width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #7b5ea7, #5a3a88);
+      border-radius: 14px; text-align: center; font-size: 16px; font-weight: 700;
+      color: #fff; text-decoration: none;
+      box-shadow: 0 4px 22px rgba(123,94,167,0.45);
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    .cta-btn:active { opacity: 0.9; }
+  </style>
+</head>
+<body class="min-h-screen pb-24">
+
+<!-- nav -->
+<nav style="display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.05)">
+  <a href="/" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none">← 피코랩</a>
+  <span style="margin-left:auto;font-size:13px;color:rgba(255,255,255,0.25)">四柱 分析</span>
+</nav>
+
+<!-- ═══ 폼 ═══ -->
+<div id="S_form" style="max-width:440px;margin:0 auto;padding:28px 18px 40px">
+  <h1 class="hanja" style="font-size:26px;font-weight:700;text-align:center;margin-bottom:6px">四柱 分析</h1>
+  <p style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:28px">생년월일시를 입력하면 사주 8자를 바로 분석합니다</p>
+
+  <div style="margin-bottom:16px">
+    <label class="f-label">이름 (선택)</label>
+    <input id="f_name" type="text" placeholder="홍길동" class="f-select" style="appearance:auto">
+  </div>
+
+  <div style="margin-bottom:16px">
+    <label class="f-label">양력 / 음력</label>
+    <div style="display:flex;gap:8px">
+      <button class="g-btn on" id="cal_solar" onclick="selCal('solar')">양력</button>
+      <button class="g-btn"    id="cal_lunar" onclick="selCal('lunar')">음력</button>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px">
+    <label class="f-label">생년월일</label>
+    <div style="display:flex;gap:6px">
+      <select id="f_y" class="f-select" style="flex:1.4"></select>
+      <select id="f_m" class="f-select" style="flex:1"></select>
+      <select id="f_d" class="f-select" style="flex:0.9"></select>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px">
+    <label class="f-label">태어난 시간</label>
+    <select id="f_h" class="f-select">
+      <option value="unknown">모름 (정오 기준)</option>
+      <option value="23">자시 子 23:00–01:00</option>
+      <option value="1">축시 丑 01:00–03:00</option>
+      <option value="3">인시 寅 03:00–05:00</option>
+      <option value="5">묘시 卯 05:00–07:00</option>
+      <option value="7">진시 辰 07:00–09:00</option>
+      <option value="9">사시 巳 09:00–11:00</option>
+      <option value="11">오시 午 11:00–13:00</option>
+      <option value="13">미시 未 13:00–15:00</option>
+      <option value="15">신시 申 15:00–17:00</option>
+      <option value="17">유시 酉 17:00–19:00</option>
+      <option value="19">술시 戌 19:00–21:00</option>
+      <option value="21">해시 亥 21:00–23:00</option>
+    </select>
+  </div>
+
+  <div style="margin-bottom:24px">
+    <label class="f-label">성별</label>
+    <div style="display:flex;gap:8px">
+      <button class="g-btn on" id="g_M" onclick="selGender('M')">남성 ♂</button>
+      <button class="g-btn"    id="g_F" onclick="selGender('F')">여성 ♀</button>
+    </div>
+  </div>
+
+  <button class="main-btn" id="f_submit" onclick="doSubmit()">사주 분석하기</button>
+  <div id="f_err" style="display:none;margin-top:12px;background:rgba(255,23,68,0.12);border:1px solid rgba(255,23,68,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#FF5252"></div>
+</div>
+
+<!-- ═══ 로딩 ═══ -->
+<div id="S_load" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh">
+  <div class="spin" style="margin-bottom:20px"></div>
+  <p style="font-size:13px;color:rgba(255,255,255,0.35)">사주를 분석하는 중...</p>
+</div>
+
+<!-- ═══ 결과 ═══ -->
+<div id="S_result" style="display:none;max-width:440px;margin:0 auto;padding:16px 14px 40px">
+
+  <!-- 프로필 헤더 -->
+  <div class="glass" id="R_profile" style="padding:18px;margin-bottom:12px"></div>
+
+  <!-- 사주 원국 -->
+  <div class="glass" style="margin-bottom:10px;overflow:hidden">
+    <button onclick="togAcc('acc_pillar')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+      <span>🀄 사주 원국</span><span class="acc-icon open" id="ico_acc_pillar">▾</span>
+    </button>
+    <div class="acc-body open" id="acc_pillar">
+      <div style="padding:0 12px 14px">
+        <div id="R_pillars" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px"></div>
+        <div id="R_relations"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 오행 분포 -->
+  <div class="glass" style="margin-bottom:10px;overflow:hidden">
+    <button onclick="togAcc('acc_five')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+      <span>☯ 오행 분포</span><span class="acc-icon open" id="ico_acc_five">▾</span>
+    </button>
+    <div class="acc-body open" id="acc_five">
+      <div id="R_five" style="padding:0 16px 14px"></div>
+    </div>
+  </div>
+
+  <!-- 격국 · 용신 -->
+  <div class="glass" style="margin-bottom:10px;overflow:hidden">
+    <button onclick="togAcc('acc_geok')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+      <span>⚖ 격국 · 용신</span><span class="acc-icon open" id="ico_acc_geok">▾</span>
+    </button>
+    <div class="acc-body open" id="acc_geok">
+      <div id="R_geok" style="padding:0 12px 14px"></div>
+    </div>
+  </div>
+
+  <!-- 대운 -->
+  <div class="glass" style="margin-bottom:10px;overflow:hidden">
+    <button onclick="togAcc('acc_luck')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+      <span>🌊 대운 흐름</span><span class="acc-icon open" id="ico_acc_luck">▾</span>
+    </button>
+    <div class="acc-body open" id="acc_luck">
+      <div style="padding:0 12px 14px">
+        <div class="luck-scroll" id="R_luck"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 세운 · 월운 -->
+  <div class="glass" style="margin-bottom:10px;overflow:hidden">
+    <button onclick="togAcc('acc_yun')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+      <span>📅 세운 · 월운</span><span class="acc-icon open" id="ico_acc_yun">▾</span>
+    </button>
+    <div class="acc-body open" id="acc_yun">
+      <div id="R_yun" style="padding:0 12px 14px"></div>
+    </div>
+  </div>
+
+  <!-- 행운 정보 -->
+  <div class="glass" style="margin-bottom:10px;overflow:hidden">
+    <button onclick="togAcc('acc_johu')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+      <span>🍀 행운 · 조후</span><span class="acc-icon" id="ico_acc_johu">▾</span>
+    </button>
+    <div class="acc-body shut" id="acc_johu">
+      <div id="R_johu" style="padding:0 12px 14px"></div>
+    </div>
+  </div>
+
+  <!-- 다시 분석 -->
+  <div style="text-align:center;margin-top:16px">
+    <button onclick="location.href=location.pathname" style="background:none;border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:9px 20px;color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">다시 분석하기</button>
+  </div>
+</div>
+
+<!-- ═══ 하단 고정 버튼 ═══ -->
+<div class="fixed-bottom">
+  <a href="https://kkdmb7-blip.github.io/memox/" class="cta-btn">AI 운세 상담 받기 🔮</a>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// 상수 테이블
+// ═══════════════════════════════════════════════════
+const STEMS    = ['갑','을','병','정','무','기','경','신','임','계'];
+const BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+const STEM_H   = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BRANCH_H = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const STEM_EL  = ['목','목','화','화','토','토','금','금','수','수'];
+const BRANCH_EL= ['수','토','목','목','토','화','화','토','금','금','토','수'];
+
+const EL_BG_CSS = { 목:'bg-wood', 화:'bg-fire', 토:'bg-earth', 금:'bg-metal', 수:'bg-water' };
+const EL_TC_CSS = { 목:'tc-wood', 화:'tc-fire', 토:'tc-earth', 금:'tc-metal', 수:'tc-water' };
+const EL_HEX    = { 목:'#00C853', 화:'#FF1744', 토:'#FFD600', 금:'#E0E0E0', 수:'#1565C0' };
+const EL_NAME   = { 목:'木', 화:'火', 토:'土', 금:'金', 수:'水' };
+const EN_EL     = { wood:'목', fire:'화', earth:'토', metal:'금', water:'수' };
+
+// 십성 계산
+const PRODUCE = {목:'화',화:'토',토:'금',금:'수',수:'목'};
+const CONTROL = {목:'토',화:'금',토:'수',금:'목',수:'화'};
+function sipseong(dayIdx, tIdx) {
+  if (dayIdx === tIdx) return '';
+  const b = STEM_EL[dayIdx], t = STEM_EL[tIdx], sy = (dayIdx%2)===(tIdx%2);
+  if (t===b)           return sy?'비견':'겁재';
+  if (t===PRODUCE[b])  return sy?'식신':'상관';
+  if (t===CONTROL[b])  return sy?'편재':'정재';
+  if (CONTROL[t]===b)  return sy?'편관':'정관';
+  if (PRODUCE[t]===b)  return sy?'편인':'정인';
+  return '';
+}
+
+// 지장간 (지지 인덱스 → 천간 인덱스 배열)
+const JJG = [
+  [9],       // 자: 계
+  [5,9,7],   // 축: 기계신
+  [0,2,4],   // 인: 갑병무
+  [1],       // 묘: 을
+  [4,1,9],   // 진: 무을계
+  [2,4,6],   // 사: 병무경
+  [3,5],     // 오: 정기
+  [5,3,1],   // 미: 기정을
+  [6,8,4],   // 신: 경임무
+  [7],       // 유: 신
+  [4,7,3],   // 술: 무신정
+  [8,0,4],   // 해: 임갑무
+];
+
+// 12운성
+const W12 = ['장생','목욕','관대','건록','제왕','쇠','병','사','묘','절','태','양'];
+const W_START = [11,6,2,9,2,9,5,0,8,3]; // 장생 지지 인덱스
+const W_YANG  = [1,0,1,0,1,0,1,0,1,0];  // 1=순행
+function woonseong(si, bi) {
+  const s = W_START[si], fw = W_YANG[si];
+  return W12[fw ? (bi-s+12)%12 : (s-bi+12)%12];
+}
+
+// 납음오행
+const NAPEUM = [
+  '해중금','노중화','대림목','노방토','검봉금','산두화',
+  '간하수','성두토','백납금','양류목','천중수','옥상토',
+  '벽력화','송백목','장류수','사중금','산하화','평지목',
+  '벽상토','금박금','복등화','천하수','대역토','차천금',
+  '상자목','대계수','사중토','천상화','석류목','대해수'
+];
+function cycleIdx(si, bi) {
+  for (let k=0;k<6;k++){const c=si+k*10; if(c%12===bi) return c;} return 0;
+}
+function napeum(si, bi) { return NAPEUM[Math.floor(cycleIdx(si,bi)/2)]; }
+
+// 연간지
+function yearPillar(yr) {
+  const i=((yr-4)%60+60)%60;
+  return {si:i%10,bi:i%12};
+}
+
+// 월간지 (양력 월)
+const M_BRANCH = [1,2,3,4,5,6,7,8,9,10,11,0]; // 1월~12월 지지 인덱스
+const M_BASE   = [2,4,6,8,0]; // 년간 %5 → 인월 천간 인덱스
+const M_OFFSET = [11,0,1,2,3,4,5,6,7,8,9,10]; // 1월~12월 offset
+function monthPillar(yearSi, mo) { // mo: 1-12
+  const bi = M_BRANCH[mo-1];
+  const si = (M_BASE[yearSi%5] + M_OFFSET[mo-1]) % 10;
+  return {si, bi};
+}
+
+// ═══════════════════════════════════════════════════
+// 폼 상태
+// ═══════════════════════════════════════════════════
+let _gender = 'M', _cal = 'solar';
+
+function selGender(g) {
+  _gender = g;
+  document.getElementById('g_M').className='g-btn'+(g==='M'?' on':'');
+  document.getElementById('g_F').className='g-btn'+(g==='F'?' on':'');
+}
+function selCal(c) {
+  _cal = c;
+  document.getElementById('cal_solar').className='g-btn'+(c==='solar'?' on':'');
+  document.getElementById('cal_lunar').className='g-btn'+(c==='lunar'?' on':'');
+}
+
+// 날짜 드롭다운 초기화
+(function initDateSelects(){
+  const yE=document.getElementById('f_y');
+  const mE=document.getElementById('f_m');
+  const dE=document.getElementById('f_d');
+  const cy=new Date().getFullYear();
+  yE.innerHTML='<option value="">년</option>';
+  for(let y=cy-5;y>=1930;y--){const o=new Option(y+'년',y);yE.add(o);}
+  mE.innerHTML='<option value="">월</option>';
+  for(let m=1;m<=12;m++){const o=new Option(m+'월',m);mE.add(o);}
+  function updDays(){
+    const yv=parseInt(yE.value)||2000, mv=parseInt(mE.value)||1;
+    const max=new Date(yv,mv,0).getDate(), cur=parseInt(dE.value)||0;
+    dE.innerHTML='<option value="">일</option>';
+    for(let d=1;d<=max;d++){const o=new Option(d+'일',d);if(d===cur)o.selected=true;dE.add(o);}
+  }
+  yE.addEventListener('change',updDays);
+  mE.addEventListener('change',updDays);
+  updDays();
+})();
+
+function doSubmit() {
+  const y=document.getElementById('f_y').value;
+  const m=document.getElementById('f_m').value;
+  const d=document.getElementById('f_d').value;
+  if(!y||!m||!d){alert('생년월일을 모두 선택해주세요.');return;}
+  const h=document.getElementById('f_h').value;
+  const name=document.getElementById('f_name').value.trim();
+  const birth=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const p=new URLSearchParams({birth,hour:h,gender:_gender==='M'?'male':'female',calendar:_cal});
+  if(name) p.set('name',name);
+  location.search='?'+p.toString();
+}
+
+// ═══════════════════════════════════════════════════
+// 아코디언
+// ═══════════════════════════════════════════════════
+function togAcc(id) {
+  const body=document.getElementById(id);
+  const ico=document.getElementById('ico_'+id);
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  body.classList.toggle('shut', isOpen);
+  if(ico){ico.classList.toggle('open',!isOpen);}
+}
+
+// ═══════════════════════════════════════════════════
+// URL 파라미터
+// ═══════════════════════════════════════════════════
+const UP  = new URLSearchParams(location.search);
+const pBirth = UP.get('birth');
+const pHour  = UP.get('hour')  || 'unknown';
+const pGender= UP.get('gender')|| 'male';
+const pCal   = UP.get('calendar')||'solar';
+const pName  = UP.get('name')  || '';
+
+if (pBirth) {
+  document.getElementById('S_form').style.display='none';
+  document.getElementById('S_load').style.display='flex';
+  fetchSaju();
+}
+
+// ═══════════════════════════════════════════════════
+// API 호출
+// ═══════════════════════════════════════════════════
+async function fetchSaju() {
+  const hour = pHour==='unknown' ? 12 : parseInt(pHour);
+  const birthISO = `${pBirth}T${String(hour).padStart(2,'0')}:00:00`;
+  try {
+    const res = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({birth:birthISO,gender:pGender,calendar:pCal})
+    });
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+    document.getElementById('S_load').style.display='none';
+    document.getElementById('S_result').style.display='block';
+    renderAll(data);
+  } catch(e) {
+    document.getElementById('S_load').style.display='none';
+    const fe=document.getElementById('f_err');
+    fe.textContent='오류: '+(e.message||'계산 중 문제가 발생했습니다.');
+    fe.style.display='block';
+    document.getElementById('S_form').style.display='block';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// 렌더링 메인
+// ═══════════════════════════════════════════════════
+function renderAll(data) {
+  // 4주 파싱: [시,일,월,년] 순서
+  const pk = ['hour','day','month','year'];
+  const pls = pk.map(k => {
+    const str = data.summary.pillars[k];
+    const si = STEMS.indexOf(str[0]);
+    const bi = BRANCHES.indexOf(str[1]);
+    return {str, si, bi, sStemEl:STEM_EL[si], sBranEl:BRANCH_EL[bi]};
+  });
+  const dayP = pls[1]; // 일주
+
+  renderProfile(data);
+  renderPillars(data, pls, dayP);
+  renderRelations(data);
+  renderFive(data);
+  renderGeok(data);
+  renderLuck(data);
+  renderYun(data);
+  renderJohu(data);
+}
+
+// ─── 프로필 헤더 ─────────────────────────────────
+function renderProfile(data) {
+  const parts = pBirth.split('-');
+  const byear = parseInt(parts[0]);
+  const cy = new Date().getFullYear();
+  const ageKor = cy - byear + 1;
+  const ageMan = cy - byear;
+  const hourNum = pHour==='unknown' ? null : parseInt(pHour);
+  const isYajasi = hourNum === 23;
+  const calTxt = pCal==='solar'?'양력':'음력';
+  const gTxt = pGender==='male'?'남':'여';
+  const hTxt = pHour==='unknown'?'시간 미입력':`${pHour}시`;
+  const note = data._note || '';
+
+  const namePart = pName
+    ? `<span style="font-size:20px;font-weight:700">${pName}</span>`
+    : `<span style="font-size:13px;color:rgba(255,255,255,0.3)">이름 미입력</span>`;
+
+  document.getElementById('R_profile').innerHTML=`
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+      <div>
+        ${namePart}
+        <div style="margin-top:4px;font-size:12px;color:rgba(255,255,255,0.4)">${calTxt} ${pBirth} · ${hTxt} · ${gTxt}성</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:24px;font-weight:700;line-height:1">${ageKor}<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.4)">세</span></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3)">만 ${ageMan}세</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+      ${isYajasi?'<span class="badge" style="color:#FFD740;border-color:rgba(255,214,0,0.3);background:rgba(255,214,0,0.1)">⚡ 야자시</span>':''}
+      ${note?`<span class="badge" style="color:#82B1FF;border-color:rgba(130,177,255,0.3);background:rgba(130,177,255,0.08)">🔧 ${note}</span>`:''}
+      <span class="badge">${data.summary.zodiac}띠</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <span class="badge" style="background:rgba(123,94,167,0.2);border-color:rgba(123,94,167,0.4);color:#CE93D8">${data.summary.strength}</span>
+      <span class="badge">${data.geokguk.geok_kor}</span>
+      <span class="badge">용신 ${data.yongshin.primary_kor}</span>
+      <span class="badge">희신 ${data.yongshin.secondary_kor}</span>
+    </div>
+  `;
+}
+
+// ─── 사주 원국 4주 ────────────────────────────────
+function renderPillars(data, pls, dayP) {
+  const LABELS = ['시주','일주','월주','년주'];
+  let html = '';
+
+  pls.forEach((pl,i) => {
+    const isDay = i===1;
+    const sip  = isDay ? '<span style="color:#CE93D8">일간</span>' :
+                  (sipseong(dayP.si, pl.si) || '&nbsp;');
+    const jjg  = JJG[pl.bi];
+    const jjgKor = jjg.map(ji=>STEMS[ji]).join('·');
+    const jjgSip = jjg.map(ji=>{
+      const s=sipseong(dayP.si,ji);
+      return s?`<span style="font-size:9px;color:rgba(255,255,255,0.35)">${s}</span>`:'';
+    }).join('');
+    const woon = woonseong(dayP.si, pl.bi);
+    const nap  = napeum(pl.si, pl.bi);
+
+    // 각 지지가 관계에 포함되는지
+    const bch = BRANCHES[pl.bi];
+    const rel = data.branch_relations_kor;
+    const myRels = [
+      ...(rel.clashes   ||[]).filter(r=>r.includes(bch)).map(r=>`<span style="font-size:10px;color:#FF5252">${r}</span>`),
+      ...(rel.harmonies ||[]).filter(r=>r.includes(bch)).map(r=>`<span style="font-size:10px;color:#69F0AE">${r}</span>`),
+      ...(rel.punishments||[]).filter(r=>r.includes(bch)).map(r=>`<span style="font-size:10px;color:#FFD740">${r}</span>`),
+      ...(rel.harms     ||[]).filter(r=>r.includes(bch)).map(r=>`<span style="font-size:10px;color:#82B1FF">${r}</span>`),
+      ...(rel.breaks    ||[]).filter(r=>r.includes(bch)).map(r=>`<span style="font-size:10px;color:#9E9E9E">${r}</span>`),
+    ].join(' ');
+
+    html += `
+    <div class="pillar-card${isDay?' is-day':''}">
+      <div style="font-size:10px;color:rgba(255,255,255,0.28);margin-bottom:4px">${LABELS[i]}</div>
+      <div style="font-size:11px;min-height:16px;margin-bottom:4px">${sip}</div>
+      <div class="hanja-box ${EL_BG_CSS[pl.sStemEl]}">${STEM_H[pl.si]}</div>
+      <div class="hanja-box ${EL_BG_CSS[pl.sBranEl]}">${BRANCH_H[pl.bi]}</div>
+      <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.45)">${jjgKor}</div>
+      <div style="min-height:14px">${jjgSip}</div>
+      <div style="margin-top:5px;font-size:10px;color:rgba(255,255,255,0.5);font-weight:600">${woon}</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;line-height:1.3">${nap}</div>
+      <div style="margin-top:5px;min-height:14px;line-height:1.4">${myRels}</div>
+    </div>`;
+  });
+
+  document.getElementById('R_pillars').innerHTML = html;
+}
+
+// ─── 형충회합 summary ────────────────────────────
+function renderRelations(data) {
+  const rel = data.branch_relations_kor;
+  const all = [
+    ...(rel.harmonies   ||[]).map(s=>`<span class="badge badge-ham">${s}</span>`),
+    ...(rel.clashes     ||[]).map(s=>`<span class="badge badge-chung">${s}</span>`),
+    ...(rel.punishments ||[]).map(s=>`<span class="badge badge-hyung">${s}</span>`),
+    ...(rel.harms       ||[]).map(s=>`<span class="badge badge-hae">${s}</span>`),
+    ...(rel.breaks      ||[]).map(s=>`<span class="badge badge-pa">${s}</span>`),
+  ];
+  document.getElementById('R_relations').innerHTML = all.length
+    ? `<div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:10px">
+         <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:6px">형충회합해파</div>
+         <div style="display:flex;flex-wrap:wrap;gap:5px">${all.join('')}</div>
+       </div>`
+    : `<div style="font-size:12px;color:rgba(255,255,255,0.25);padding-top:8px">형충회합 없음</div>`;
+}
+
+// ─── 오행 분포도 ──────────────────────────────────
+function renderFive(data) {
+  const fp = data.five_pct;
+  const items=[
+    {k:'wood', kor:'木', el:'목', pct:fp.wood},
+    {k:'fire', kor:'火', el:'화', pct:fp.fire},
+    {k:'earth',kor:'土', el:'토', pct:fp.earth},
+    {k:'metal',kor:'金', el:'금', pct:fp.metal},
+    {k:'water',kor:'水', el:'수', pct:fp.water},
+  ];
+  let html='';
+  items.forEach(it=>{
+    html+=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <span class="hanja ${EL_TC_CSS[it.el]}" style="font-size:16px;font-weight:700;width:18px;flex-shrink:0">${it.kor}</span>
+      <div class="five-bar-bg" style="flex:1">
+        <div class="five-bar-fill" style="width:${it.pct}%;background:${EL_HEX[it.el]}"></div>
+      </div>
+      <span style="font-size:13px;color:rgba(255,255,255,0.55);width:38px;text-align:right;flex-shrink:0">${it.pct}%</span>
+    </div>`;
+  });
+  document.getElementById('R_five').innerHTML=html;
+}
+
+// ─── 격국 · 용신 ─────────────────────────────────
+function renderGeok(data) {
+  const g=data.geokguk, y=data.yongshin, l=data.lucky, t=data.tonggeun;
+  const priEl = EN_EL[y.primary]||'목';
+  const secEl = EN_EL[y.secondary]||'화';
+
+  document.getElementById('R_geok').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div class="glass-sm" style="padding:12px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">격국</div>
+        <div style="font-weight:700;color:#FFD740">${g.geok_kor}</div>
+      </div>
+      <div class="glass-sm" style="padding:12px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">신강/신약</div>
+        <div style="font-weight:700;color:#CE93D8">${data.summary.strength}</div>
+      </div>
+      <div class="glass-sm" style="padding:12px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">용신</div>
+        <div class="hanja ${EL_TC_CSS[priEl]}" style="font-weight:700;font-size:17px">${EL_NAME[priEl]}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5)">${y.primary_kor}</div>
+      </div>
+      <div class="glass-sm" style="padding:12px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">희신</div>
+        <div class="hanja ${EL_TC_CSS[secEl]}" style="font-weight:700;font-size:17px">${EL_NAME[secEl]}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5)">${y.secondary_kor}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+      <div class="glass-sm" style="padding:10px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3)">행운 숫자</div>
+        <div style="font-weight:700;font-size:20px;color:#69F0AE">${l.good_num}</div>
+      </div>
+      <div class="glass-sm" style="padding:10px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3)">행운 방향</div>
+        <div style="font-weight:700;color:#82B1FF">${l.good_dir}</div>
+      </div>
+      <div class="glass-sm" style="padding:10px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3)">통근 천간</div>
+        <div class="hanja" style="font-weight:700;color:#FFD740">${(t.stems_with_root||[]).join(' ')||'—'}</div>
+      </div>
+    </div>
+  `;
+}
+
+// ─── 대운 ─────────────────────────────────────────
+function renderLuck(data) {
+  const cy = new Date().getFullYear();
+  let html = '';
+  (data.big_luck||[]).forEach(lk=>{
+    const yRange = lk.year_range.split(/[–\-]/);
+    const ys = parseInt(yRange[0]), ye = parseInt(yRange[1]);
+    const isNow = cy>=ys && cy<=ye;
+    const si = STEMS.indexOf(lk.stem_kor);
+    const bi = BRANCHES.indexOf(lk.branch_kor);
+    const bEl = bi>=0 ? BRANCH_EL[bi] : '목';
+
+    html+=`
+    <div class="luck-card${isNow?' active':''}">
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:3px">${lk.age_range}</div>
+      <div class="hanja ${EL_TC_CSS[lk.element]}" style="font-size:22px;font-weight:700;line-height:1.1">${lk.stem_kor}</div>
+      <div class="hanja ${EL_TC_CSS[bEl]}"       style="font-size:22px;font-weight:700;line-height:1.1">${lk.branch_kor}</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:4px">${ys}~</div>
+      ${isNow?'<div style="font-size:10px;color:#CE93D8;font-weight:600;margin-top:3px">현재</div>':''}
+    </div>`;
+  });
+  document.getElementById('R_luck').innerHTML = html;
+  // 현재 대운 스크롤
+  setTimeout(()=>{
+    const cur=document.querySelector('.luck-card.active');
+    if(cur) cur.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  },400);
+}
+
+// ─── 세운 · 월운 ─────────────────────────────────
+function renderYun(data) {
+  const cy = new Date().getFullYear();
+  const cm = new Date().getMonth()+1;
+
+  // 세운 ±3년
+  let seunHtml=`<div style="margin-bottom:16px">
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">세운 (연간)</div>
+    <div class="yun-grid">`;
+  for(let y=cy-2;y<=cy+4;y++){
+    const yp=yearPillar(y);
+    const isCur=y===cy;
+    const byear=parseInt(pBirth.split('-')[0]);
+    const age=y-byear+1;
+    seunHtml+=`<div class="yun-cell${isCur?' now':''}">
+      <div style="font-size:10px;color:rgba(255,255,255,0.3)">${y}</div>
+      <div class="hanja ${EL_TC_CSS[STEM_EL[yp.si]]}" style="font-size:15px;font-weight:700">${STEM_H[yp.si]}</div>
+      <div class="hanja ${EL_TC_CSS[BRANCH_EL[yp.bi]]}" style="font-size:15px;font-weight:700">${BRANCH_H[yp.bi]}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.25)">${age}세</div>
+    </div>`;
+  }
+  seunHtml+='</div></div>';
+
+  // 월운 현재 연도 12개월
+  const cyp=yearPillar(cy);
+  let wolunHtml=`<div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">월운 (${cy}년)</div>
+    <div class="yun-grid">`;
+  for(let mo=1;mo<=12;mo++){
+    const mp=monthPillar(cyp.si,mo);
+    const isCur=mo===cm;
+    wolunHtml+=`<div class="yun-cell${isCur?' now':''}">
+      <div style="font-size:10px;color:rgba(255,255,255,0.3)">${mo}월</div>
+      <div class="hanja ${EL_TC_CSS[STEM_EL[mp.si]]}" style="font-size:15px;font-weight:700">${STEM_H[mp.si]}</div>
+      <div class="hanja ${EL_TC_CSS[BRANCH_EL[mp.bi]]}" style="font-size:15px;font-weight:700">${BRANCH_H[mp.bi]}</div>
+    </div>`;
+  }
+  wolunHtml+='</div></div>';
+
+  document.getElementById('R_yun').innerHTML=seunHtml+wolunHtml;
+}
+
+// ─── 행운 · 조후 ──────────────────────────────────
+function renderJohu(data) {
+  const j=data.johu, l=data.lucky, zc=data.zodiac_compatibility||[];
+  const tK={cold:'한(寒)',warm:'온(溫)',hot:'열(熱)',cool:'양(凉)'};
+  const hK={wet:'습(濕)',damp:'담',arid:'조(燥)',dry:'건(乾)'};
+  const topZ=zc.map((z,i)=>({...z,i})).filter(z=>z.score>=75).sort((a,b)=>b.score-a.score).slice(0,3);
+
+  document.getElementById('R_johu').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div class="glass-sm" style="padding:12px">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3)">월지 기온</div>
+        <div style="font-weight:700;color:#FFAB40;margin-top:4px">${tK[j.temperature]||j.temperature}</div>
+      </div>
+      <div class="glass-sm" style="padding:12px">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3)">월지 습도</div>
+        <div style="font-weight:700;color:#82B1FF;margin-top:4px">${hK[j.humidity]||j.humidity}</div>
+      </div>
+    </div>
+    <div class="glass-sm" style="padding:12px;margin-bottom:8px">
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:6px">조후 필요 오행</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${(j.needs_kor||[]).map(n=>`<span class="badge">${n}</span>`).join('')}
+      </div>
+    </div>
+    <div class="glass-sm" style="padding:12px;margin-bottom:8px">
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:6px">행운 정보</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge">🍀 행운 숫자 <b style="margin-left:4px">${l.good_num}</b></span>
+        <span class="badge">🧭 ${l.good_dir} 방향 길</span>
+        <span class="badge" style="color:rgba(255,255,255,0.4)">⚠ ${l.bad_dir} 방향 흉</span>
+      </div>
+    </div>
+    ${topZ.length?`
+    <div class="glass-sm" style="padding:12px">
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:6px">잘 맞는 띠</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${topZ.map(z=>`<span class="badge" style="color:#69F0AE;border-color:rgba(105,240,174,0.3);background:rgba(105,240,174,0.08)">${z.animal}띠 · ${z.grade}</span>`).join('')}
+      </div>
+    </div>`:''}
+  `;
+}
+</script>
+</body>
+</html>
