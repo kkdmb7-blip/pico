@@ -610,7 +610,7 @@
   <div class="section-label">PICO Lab의 5중 교차검증 시스템</div>
   <h2 class="section-title">5,000년 인류의 지혜를<br><em>AI가 동시에 교차 분석합니다</em></h2>
   <div class="why-grid">
-    <div class="why-card" onclick="location.href='saju.html'" style="cursor:pointer;">
+    <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
       <div class="why-icon">🏛️</div>
       <h3>사주 (四柱)</h3>
       <p>인생의 설계도, 기질의 뿌리. 태어난 연·월·일·시의 네 기둥이 만드는 운명의 지도.</p>
@@ -709,6 +709,13 @@
           <option value="21">해시 (21:00~23:00)</option>
         </select>
       </div>
+      <div class="saju-form-group" id="sajuYajasiRow" style="display:none">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal">
+          <input type="checkbox" id="sajuYajasi" style="width:15px;height:15px;accent-color:#7b5ea7;cursor:pointer">
+          야자시 (夜子時) 적용
+        </label>
+        <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">23:00~00:00을 당일 자시로 처리합니다</p>
+      </div>
       <div class="saju-form-group">
         <label>성별</label>
         <div class="saju-gender-row">
@@ -716,18 +723,7 @@
           <button class="saju-gender-btn" id="genderF" onclick="selectGender('F')">여성 ♀</button>
         </div>
       </div>
-      <button class="saju-submit-btn" id="sajuSubmitBtn" onclick="submitSaju()">사주 보기 🔮</button>
-    </div>
-
-    <!-- 결과 화면 -->
-    <div class="saju-result" id="sajuResult">
-      <button class="saju-back-btn" onclick="showSajuForm()">← 다시 입력</button>
-      <h3 style="margin-bottom:6px;">나의 사주 8자</h3>
-      <p class="saju-modal-sub" id="sajuResultSub"></p>
-      <div class="saju-pillars" id="sajuPillars"></div>
-      <div class="saju-strength" id="sajuStrengthBox"></div>
-      <div class="saju-five" id="sajuFiveBox"></div>
-      <a href="https://kkdmb7-blip.github.io/memox/" class="saju-cta-btn" target="_blank">✨ AI 운세 상담 받기</a>
+      <button class="saju-submit-btn" id="sajuSubmitBtn" onclick="submitSaju()">사주 보기 ✦</button>
     </div>
   </div>
 </div>
@@ -798,7 +794,12 @@ function openSajuModal() {
   document.getElementById('sajuOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   initSajuDateSelects();
-  showSajuForm();
+  document.getElementById('sajuForm').style.display = 'block';
+  document.getElementById('sajuHour').onchange = function() {
+    var row = document.getElementById('sajuYajasiRow');
+    row.style.display = this.value === '23' ? 'block' : 'none';
+    if (this.value !== '23') document.getElementById('sajuYajasi').checked = false;
+  };
 }
 function closeSajuModal() {
   document.getElementById('sajuOverlay').classList.remove('open');
@@ -809,97 +810,20 @@ function selectGender(g) {
   document.getElementById('genderM').classList.toggle('active', g === 'M');
   document.getElementById('genderF').classList.toggle('active', g === 'F');
 }
-function showSajuForm() {
-  document.getElementById('sajuForm').style.display = 'block';
-  document.getElementById('sajuResult').classList.remove('show');
-}
 
-async function submitSaju() {
+function submitSaju() {
   var y = document.getElementById('sajuYear').value;
   var m = document.getElementById('sajuMonth').value;
   var d = document.getElementById('sajuDay').value;
   if (!y || !m || !d) { alert('생년월일을 모두 선택해주세요.'); return; }
-  var birthVal = y + '-' + m.padStart(2,'0') + '-' + d.padStart(2,'0');
   var hourVal = document.getElementById('sajuHour').value;
   var hour = hourVal === 'unknown' ? 12 : parseInt(hourVal);
-  var birthISO = birthVal + 'T' + String(hour).padStart(2,'0') + ':00:00';
-
-  var btn = document.getElementById('sajuSubmitBtn');
-  btn.disabled = true; btn.textContent = '계산 중...';
-
-  try {
-    var res = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ birth: birthISO, gender: _sajuGender === 'M' ? 'male' : 'female', calendar: 'solar' })
-    });
-    var data = await res.json();
-    if (data.error) throw new Error(data.error);
-    renderSajuResult(data, birthVal);
-  } catch(e) {
-    alert('계산 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
-  } finally {
-    btn.disabled = false; btn.textContent = '사주 보기 🔮';
-  }
+  var gender = _sajuGender === 'M' ? 'male' : 'female';
+  var midnight = (document.getElementById('sajuYajasi') && document.getElementById('sajuYajasi').checked) ? 1 : 0;
+  var p = new URLSearchParams({ year: y, month: m, day: d, hour: hour, gender: gender, midnightType: midnight });
+  window.location.href = 'saju.html?' + p.toString();
 }
 
-function renderSajuResult(data, birthVal) {
-  var EL_COLOR = { 목: '#4ade80', 화: '#f87171', 토: '#facc15', 금: '#d4af37', 수: '#60a5fa' };
-  var EL_BG    = { 목: 'rgba(74,222,128,0.12)', 화: 'rgba(248,113,113,0.12)', 토: 'rgba(250,204,21,0.12)', 금: 'rgba(212,175,55,0.12)', 수: 'rgba(96,165,250,0.12)' };
-  var STEMS_EL = { 갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수' };
-  var LABELS   = ['년주', '월주', '일주', '시주'];
-  var pillars  = data.summary && data.summary.pillars;
-
-  // 부제
-  document.getElementById('sajuResultSub').textContent =
-    birthVal + ' 생  ' + (_sajuGender === 'M' ? '남성' : '여성') +
-    (data.summary && data.summary.zodiac ? '  띠: ' + data.summary.zodiac : '');
-
-  // 4주 8자 카드
-  var pillarHTML = '';
-  ['year','month','day','hour'].forEach(function(key, i) {
-    var chars = (pillars && pillars[key]) ? pillars[key].split('') : ['?','?'];
-    var stem = chars[0] || '?', branch = chars[1] || '?';
-    var el = STEMS_EL[stem] || '토';
-    var col = EL_COLOR[el] || '#aaa', bg = EL_BG[el] || 'transparent';
-    pillarHTML +=
-      '<div class="saju-pillar">' +
-        '<div class="saju-pillar-label">' + LABELS[i] + '</div>' +
-        '<div class="saju-hanja" style="color:' + col + '">' +
-          '<span>' + stem + '</span><span>' + branch + '</span>' +
-        '</div>' +
-        '<div class="saju-elem-tag" style="color:' + col + ';background:' + bg + '">' + el + '</div>' +
-      '</div>';
-  });
-  document.getElementById('sajuPillars').innerHTML = pillarHTML;
-
-  // 신강/신약
-  var strength = (data.summary && data.summary.strength) || '';
-  var sColor = strength.includes('신강') ? '#4ade80' : strength.includes('신약') ? '#f87171' : '#e8b86d';
-  document.getElementById('sajuStrengthBox').innerHTML =
-    '<span class="saju-strength-label">일간 강약</span>' +
-    '<span class="saju-strength-val" style="color:' + sColor + '">' + (strength || '–') + '</span>';
-
-  // 오행 비율 막대
-  var five = data.five_pct || {};
-  var EL_ORDER = ['목','화','토','금','수'];
-  var barsHTML = '<div class="saju-five-label">오행 비율</div><div class="saju-five-bars">';
-  EL_ORDER.forEach(function(el) {
-    var pct = Math.round((five[el] || 0) * 100);
-    barsHTML +=
-      '<div class="saju-bar-row">' +
-        '<div class="saju-bar-name" style="color:' + (EL_COLOR[el]||'#aaa') + '">' + el + '</div>' +
-        '<div class="saju-bar-track"><div class="saju-bar-fill" style="width:' + pct + '%;background:' + (EL_COLOR[el]||'#aaa') + '"></div></div>' +
-        '<div class="saju-bar-pct">' + pct + '%</div>' +
-      '</div>';
-  });
-  barsHTML += '</div>';
-  document.getElementById('sajuFiveBox').innerHTML = barsHTML;
-
-  // 화면 전환
-  document.getElementById('sajuForm').style.display = 'none';
-  document.getElementById('sajuResult').classList.add('show');
-}
 </script>
 </body>
 </html>

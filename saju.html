@@ -453,11 +453,16 @@ function togAcc(id) {
 // URL 파라미터
 // ═══════════════════════════════════════════════════
 const UP  = new URLSearchParams(location.search);
-const pBirth = UP.get('birth');
-const pHour  = UP.get('hour')  || 'unknown';
-const pGender= UP.get('gender')|| 'male';
-const pCal   = UP.get('calendar')||'solar';
-const pName  = UP.get('name')  || '';
+const pYear  = UP.get('year');
+const pMonth = UP.get('month');
+const pDay   = UP.get('day');
+const pHour  = UP.get('hour') || '12';
+const pGender= UP.get('gender') || 'male';
+const pMidnight = parseInt(UP.get('midnightType') || '0');
+const pName  = UP.get('name') || '';
+const pBirth = (pYear && pMonth && pDay)
+  ? pYear + '-' + String(pMonth).padStart(2,'0') + '-' + String(pDay).padStart(2,'0')
+  : null;
 
 if (pBirth) {
   document.getElementById('S_form').style.display='none';
@@ -469,13 +474,13 @@ if (pBirth) {
 // API 호출
 // ═══════════════════════════════════════════════════
 async function fetchSaju() {
-  const hour = pHour==='unknown' ? 12 : parseInt(pHour);
+  const hour = parseInt(pHour);
   const birthISO = `${pBirth}T${String(hour).padStart(2,'0')}:00:00`;
   try {
     const res = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({birth:birthISO,gender:pGender,calendar:pCal})
+      body:JSON.stringify({birth:birthISO,gender:pGender,calendar:'solar',midnightType:pMidnight})
     });
     const data = await res.json();
     if(data.error) throw new Error(data.error);
@@ -522,11 +527,10 @@ function renderProfile(data) {
   const cy = new Date().getFullYear();
   const ageKor = cy - byear + 1;
   const ageMan = cy - byear;
-  const hourNum = pHour==='unknown' ? null : parseInt(pHour);
+  const hourNum = parseInt(pHour);
   const isYajasi = hourNum === 23;
-  const calTxt = pCal==='solar'?'양력':'음력';
   const gTxt = pGender==='male'?'남':'여';
-  const hTxt = pHour==='unknown'?'시간 미입력':`${pHour}시`;
+  const hTxt = `${pHour}시`;
   const note = data._note || '';
 
   const namePart = pName
@@ -537,7 +541,7 @@ function renderProfile(data) {
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
       <div>
         ${namePart}
-        <div style="margin-top:4px;font-size:12px;color:rgba(255,255,255,0.4)">${calTxt} ${pBirth} · ${hTxt} · ${gTxt}성</div>
+        <div style="margin-top:4px;font-size:12px;color:rgba(255,255,255,0.4)">양력 ${pBirth} · ${hTxt} · ${gTxt}성</div>
       </div>
       <div style="text-align:right">
         <div style="font-size:24px;font-weight:700;line-height:1">${ageKor}<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.4)">세</span></div>
