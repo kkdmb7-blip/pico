@@ -185,21 +185,25 @@
 
   <div style="margin-bottom:16px">
     <label class="f-label">태어난 시간</label>
-    <select id="f_h" class="f-select">
-      <option value="unknown">모름 (정오 기준)</option>
-      <option value="0">자시 子 23:30–01:30</option>
-      <option value="2">축시 丑 01:30–03:30</option>
-      <option value="4">인시 寅 03:30–05:30</option>
-      <option value="6">묘시 卯 05:30–07:30</option>
-      <option value="8">진시 辰 07:30–09:30</option>
-      <option value="10">사시 巳 09:30–11:30</option>
-      <option value="12">오시 午 11:30–13:30</option>
-      <option value="14">미시 未 13:30–15:30</option>
-      <option value="16">신시 申 15:30–17:30</option>
-      <option value="18">유시 酉 17:30–19:30</option>
-      <option value="20">술시 戌 19:30–21:30</option>
-      <option value="22">해시 亥 21:30–23:30</option>
-    </select>
+    <div style="display:flex;gap:6px;align-items:center">
+      <select id="f_hh" class="f-select" style="flex:1.1">
+        <option value="unknown">시 모름</option>
+        <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
+        <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
+        <option value="6">6시</option><option value="7">7시</option><option value="8">8시</option>
+        <option value="9">9시</option><option value="10">10시</option><option value="11">11시</option>
+        <option value="12" selected>12시</option><option value="13">13시</option><option value="14">14시</option>
+        <option value="15">15시</option><option value="16">16시</option><option value="17">17시</option>
+        <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
+        <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
+      </select>
+      <select id="f_mm" class="f-select" style="flex:1">
+        <option value="0" selected>00분</option><option value="5">05분</option><option value="10">10분</option>
+        <option value="15">15분</option><option value="20">20분</option><option value="25">25분</option>
+        <option value="30">30분</option><option value="35">35분</option><option value="40">40분</option>
+        <option value="45">45분</option><option value="50">50분</option><option value="55">55분</option>
+      </select>
+    </div>
   </div>
 
   <div style="margin-bottom:24px">
@@ -429,10 +433,12 @@ function doSubmit() {
   const m=document.getElementById('f_m').value;
   const d=document.getElementById('f_d').value;
   if(!y||!m||!d){alert('생년월일을 모두 선택해주세요.');return;}
-  const h=document.getElementById('f_h').value;
+  const hv=document.getElementById('f_hh').value;
+  const mv=document.getElementById('f_mm').value;
+  const hour=hv==='unknown'?'12':hv;
+  const minute=mv||'0';
   const name=document.getElementById('f_name').value.trim();
-  const birth=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-  const p=new URLSearchParams({birth,hour:h,gender:_gender==='M'?'male':'female',calendar:_cal});
+  const p=new URLSearchParams({year:y,month:m,day:d,hour,minute,gender:_gender==='M'?'male':'female',calendar:_cal});
   if(name) p.set('name',name);
   location.search='?'+p.toString();
 }
@@ -457,6 +463,7 @@ const pYear  = UP.get('year');
 const pMonth = UP.get('month');
 const pDay   = UP.get('day');
 const pHour  = UP.get('hour') || '12';
+const pMinute= UP.get('minute') || '0';
 const pGender= UP.get('gender') || 'male';
 const pMidnight = parseInt(UP.get('midnightType') || '0');
 const pName  = UP.get('name') || '';
@@ -475,7 +482,8 @@ if (pBirth) {
 // ═══════════════════════════════════════════════════
 async function fetchSaju() {
   const hour = parseInt(pHour);
-  const birthISO = `${pBirth}T${String(hour).padStart(2,'0')}:00:00`;
+  const minute = parseInt(pMinute) || 0;
+  const birthISO = `${pBirth}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:00`;
   try {
     const res = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test',{
       method:'POST',
