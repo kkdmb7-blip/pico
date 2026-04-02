@@ -672,16 +672,272 @@
     .modal { border-radius: 20px 20px 0 0; }
     .modal-overlay { align-items: flex-end; padding: 0; }
   }
+
+  /* ── STARS ── */
+  #starCanvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0;
+    animation: twinkle var(--dur, 3s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.4); }
+    50% { opacity: var(--max-op, 0.7); transform: scale(1); }
+  }
+
+  /* ── NAV extra ── */
+  .nav-start-btn {
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), #a07fd4);
+    color: #fff;
+    border: none;
+    font-family: 'Noto Sans KR', sans-serif;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-start-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(123,94,167,0.4); }
+
+  /* ── SECTION COMMON ── */
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 48px;
+  }
+  .section-title em { font-style: normal; color: var(--accent2); }
+
+  /* ── WHY SECTION ── */
+  .section-why {
+    padding: 96px 24px 80px;
+    max-width: 960px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .why-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 24px;
+    transition: all 0.3s;
+  }
+  .why-card:hover {
+    border-color: var(--accent);
+    background: var(--surface2);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(123,94,167,0.15);
+  }
+  .why-icon { font-size: 36px; margin-bottom: 16px; }
+  .why-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .why-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  /* ── SERVICES SECTION ── */
+  .section-services {
+    padding: 80px 24px;
+    max-width: 960px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .service-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 36px 28px;
+    text-decoration: none;
+    color: var(--text);
+    text-align: left;
+    position: relative;
+    transition: all 0.3s;
+    display: block;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top left, rgba(123,94,167,0.12) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .service-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.3); }
+  .service-card:hover::before { opacity: 1; }
+  .service-icon { font-size: 40px; margin-bottom: 16px; }
+  .service-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: rgba(123,94,167,0.2);
+    border: 1px solid rgba(123,94,167,0.4);
+    color: #c4a8e8;
+    margin-bottom: 14px;
+  }
+  .service-badge-premium {
+    background: rgba(232,184,109,0.15);
+    border-color: rgba(232,184,109,0.4);
+    color: var(--accent2);
+  }
+  .service-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .service-card p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+  .service-cta { font-size: 14px; font-weight: 700; color: var(--accent2); }
+
+  /* ── CTA SECTION ── */
+  .section-cta {
+    padding: 96px 24px 112px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .cta-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(123,94,167,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .section-cta h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .section-cta p { color: var(--muted); font-size: 15px; margin-bottom: 36px; position: relative; }
+  .btn-cta {
+    display: inline-block;
+    padding: 16px 40px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(135deg, var(--accent), #a07fd4);
+    color: #fff;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+    position: relative;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(123,94,167,0.45); }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── APPS SECTION LABEL ── */
+  .apps-section-header {
+    padding: 64px 24px 0;
+    max-width: 960px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .apps-section-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .apps-section-header p { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  footer a { color: var(--accent2); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .why-grid { grid-template-columns: 1fr; gap: 14px; }
+    .service-grid { grid-template-columns: 1fr; gap: 14px; }
+    .section-why, .section-services { padding: 64px 20px 48px; }
+    .section-cta { padding: 64px 20px 80px; }
+  }
 </style>
 </head>
 <body>
 
+<div id="starCanvas"></div>
+
 <!-- NAV -->
 <nav>
   <div class="logo">
-    <span class="logo-dot">●</span>pico
+    <span class="logo-dot">●</span>PICO Lab
   </div>
   <div class="nav-right">
+    <a href="https://kkdmb7-blip.github.io/memox/" class="nav-start-btn" target="_blank">서비스 시작하기</a>
     <button class="btn btn-ghost" onclick="openSubmitModal()" id="submitBtn" style="display:none">+ 앱 등록</button>
     <div id="authArea">
       <button class="btn btn-kakao" onclick="kakaoLogin()">
@@ -710,6 +966,72 @@
     <input type="text" id="searchInput" placeholder="앱 이름, 설명, 키워드로 검색..." oninput="handleSearch()">
     <span class="search-icon">🔍</span>
   </div>
+</div>
+
+<!-- WHY PICOLAB -->
+<section class="section-why">
+  <div class="section-label">왜 피코랩인가</div>
+  <h2 class="section-title">별들의 언어로<br><em>운명을 읽습니다</em></h2>
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-icon">🌌</div>
+      <h3>5,000년의 데이터</h3>
+      <p>수천 년 인류의 관측과 기록이 담긴 고대 지혜를 현대 AI로 해석합니다.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🔯</div>
+      <h3>세 학문의 통합</h3>
+      <p>사주팔자 · 서양 점성술 · 베딕 점성술 — 세 가지 시스템이 하나의 통찰로.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">✨</div>
+      <h3>AI 기반 정밀 분석</h3>
+      <p>최신 AI가 수백만 가지 변수를 실시간으로 계산해 당신만의 운세를 만듭니다.</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SERVICES -->
+<section class="section-services">
+  <div class="section-label">서비스</div>
+  <h2 class="section-title">피코랩의 서비스</h2>
+  <div class="service-grid">
+    <a href="https://kkdmb7-blip.github.io/memox/" class="service-card" target="_blank">
+      <div class="service-icon">🔮</div>
+      <div class="service-badge">무료 체험</div>
+      <h3>포르투나 AI 상담</h3>
+      <p>사주·점성·베딕을 통합한 AI 운세 챗봇. 매일 3번 무료로 질문하세요.</p>
+      <div class="service-cta">지금 시작하기 →</div>
+    </a>
+    <a href="https://fortuna-silk.vercel.app" class="service-card" target="_blank">
+      <div class="service-icon">📋</div>
+      <div class="service-badge service-badge-premium">프리미엄</div>
+      <h3>정밀 리포트</h3>
+      <p>출생 차트 기반 심층 분석 리포트. 당신의 운명 설계도를 확인하세요.</p>
+      <div class="service-cta">리포트 보기 →</div>
+    </a>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CTA -->
+<section class="section-cta">
+  <div class="cta-glow"></div>
+  <h2>지금 바로 시작하세요</h2>
+  <p>무료로 체험하고, 당신의 별자리가 말하는 이야기를 들어보세요</p>
+  <a href="https://kkdmb7-blip.github.io/memox/" class="btn-cta" target="_blank">서비스 시작하기</a>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- APPS SECTION HEADER -->
+<div class="apps-section-header">
+  <div class="section-label">미니앱 디렉토리</div>
+  <h2>작지만 강한 앱들</h2>
+  <p>누구나 만들고 공유하는 미니 웹</p>
 </div>
 
 <!-- CATEGORIES -->
@@ -930,6 +1252,13 @@
     <div id="adminRequestsList" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;"></div>
   </div>
 </div>
+
+<footer>
+  <div>© 2026 PICO Lab. All rights reserved.</div>
+  <div>
+    <a href="http://pf.kakao.com/_krjxjn" target="_blank">💬 카카오 채널 고객센터</a>
+  </div>
+</footer>
 
 <div class="toast" id="toast"></div>
 
@@ -1645,6 +1974,28 @@ function showToast(msg) {
   t.classList.add('show')
   setTimeout(() => t.classList.remove('show'), 2500)
 }
+
+// ── STARS ────────────────────────────────────────────────
+(function() {
+  var canvas = document.getElementById('starCanvas');
+  for (var i = 0; i < 50; i++) {
+    var s = document.createElement('div');
+    s.className = 'star';
+    var size = Math.random() * 2.5 + 0.8;
+    var dur  = (Math.random() * 4 + 2).toFixed(2);
+    var delay = (Math.random() * 6).toFixed(2);
+    var op  = (Math.random() * 0.5 + 0.3).toFixed(2);
+    s.style.cssText =
+      'width:' + size + 'px;' +
+      'height:' + size + 'px;' +
+      'left:' + (Math.random() * 100).toFixed(2) + '%;' +
+      'top:' + (Math.random() * 100).toFixed(2) + '%;' +
+      '--dur:' + dur + 's;' +
+      '--delay:-' + delay + 's;' +
+      '--max-op:' + op + ';';
+    canvas.appendChild(s);
+  }
+})();
 
 // ── START ────────────────────────────────────────────────
 checkAuth()
