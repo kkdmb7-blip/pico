@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PICO · 미니앱 디렉토리</title>
+<title>PICO Lab · AI 운세 플랫폼</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Sans:wght@400;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg: #0a0a0f;
@@ -16,7 +15,6 @@
     --accent2: #e8b86d;
     --text: #f0f0f5;
     --muted: #6b6b85;
-    --card-hover: #1f1f2e;
     --radius: 16px;
   }
 
@@ -41,7 +39,27 @@
     opacity: 0.4;
   }
 
-  /* ─── NAV ─── */
+  /* ── STARS ── */
+  #starCanvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0;
+    animation: twinkle var(--dur, 3s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.4); }
+    50% { opacity: var(--max-op, 0.7); transform: scale(1); }
+  }
+
+  /* ── NAV ── */
   nav {
     position: sticky;
     top: 0;
@@ -66,635 +84,8 @@
     align-items: center;
     gap: 5px;
   }
-  .logo-dot {
-    color: var(--accent2);
-    font-size: 10px;
-    margin-bottom: 2px;
-  }
+  .logo-dot { color: var(--accent2); font-size: 10px; margin-bottom: 2px; }
 
-  .nav-right { display: flex; align-items: center; gap: 12px; }
-
-  .btn {
-    padding: 8px 18px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-    font-family: 'Noto Sans KR', sans-serif;
-  }
-  .btn-ghost {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-  }
-  .btn-ghost:hover { background: var(--surface); color: var(--text); }
-
-  .btn-primary {
-    background: var(--accent);
-    color: #fff;
-  }
-  .btn-primary:hover { background: #9370c4; transform: translateY(-1px); }
-
-  .btn-kakao {
-    background: #FEE500;
-    color: #191919;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-  }
-  .btn-kakao:hover { background: #f5db00; transform: translateY(-1px); }
-
-  .user-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    overflow: hidden;
-  }
-  .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-  /* ─── HERO ─── */
-  .hero {
-    position: relative;
-    padding: 32px 24px 24px;
-    text-align: center;
-    overflow: hidden;
-  }
-
-  .hero-glow {
-    position: absolute;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 600px;
-    height: 400px;
-    background: radial-gradient(ellipse, rgba(123,94,167,0.25) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .hero h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(36px, 6vw, 64px);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -1px;
-    margin-bottom: 16px;
-    position: relative;
-  }
-
-  .hero h1 em {
-    font-style: normal;
-    color: var(--accent2);
-  }
-
-  .hero p {
-    color: var(--muted);
-    font-size: 14px;
-    margin-bottom: 40px;
-    position: relative;
-  }
-
-  /* ─── SEARCH ─── */
-  .search-wrap {
-    max-width: 560px;
-    margin: 0 auto 24px;
-    position: relative;
-  }
-
-  .search-wrap input {
-    width: 100%;
-    padding: 12px 56px 12px 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-size: 15px;
-    font-family: 'Noto Sans KR', sans-serif;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .search-wrap input::placeholder { color: var(--muted); }
-  .search-wrap input:focus { border-color: var(--accent); }
-
-  .search-icon {
-    position: absolute;
-    right: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted);
-    font-size: 18px;
-    pointer-events: none;
-  }
-
-  /* ─── CATEGORIES ─── */
-  .categories {
-    display: flex;
-    gap: 8px;
-    padding: 0 24px 32px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-  .categories::-webkit-scrollbar { display: none; }
-
-  .cat-btn {
-    padding: 8px 16px;
-    border-radius: 100px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-    font-family: 'Noto Sans KR', sans-serif;
-  }
-  .cat-btn:hover { background: var(--surface2); color: var(--text); }
-  .cat-btn.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
-
-  /* ─── TOOLBAR ─── */
-  .toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .result-count { font-size: 13px; color: var(--muted); }
-
-  .sort-wrap { display: flex; gap: 8px; }
-  .sort-btn {
-    padding: 6px 14px;
-    border-radius: 8px;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 12px;
-    cursor: pointer;
-    font-family: 'Noto Sans KR', sans-serif;
-    transition: all 0.2s;
-  }
-  .sort-btn.active { background: var(--surface2); color: var(--text); border-color: var(--accent); }
-
-  /* ─── GRID ─── */
-  .grid {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 0 24px 80px;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .app-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    animation: fadeUp 0.3s ease both;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .app-card:hover {
-    background: var(--card-hover);
-    border-color: var(--accent);
-    transform: translateX(3px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(123,94,167,0.2);
-  }
-
-  .card-thumb {
-    width: 56px;
-    height: 56px;
-    min-width: 56px;
-    background: linear-gradient(135deg, var(--surface2), var(--bg));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    margin: 10px 0 10px 12px;
-    border-radius: 10px;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-
-  .card-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 10px;
-  }
-
-  .card-body {
-    flex: 1;
-    padding: 10px 12px;
-    min-width: 0;
-  }
-
-  .card-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 3px;
-  }
-
-  .card-cat {
-    font-size: 10px;
-    color: var(--accent2);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-
-  .card-stars {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 11px;
-    color: var(--accent2);
-  }
-  .card-stars span { color: var(--muted); font-size: 10px; }
-
-  .card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 2px;
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .card-desc {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .card-footer {
-    padding: 0 14px 0 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-
-  .card-author { font-size: 11px; color: var(--muted); }
-
-  .card-link {
-    font-size: 12px;
-    color: var(--accent);
-    font-weight: 600;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .card-link:hover { color: #9370c4; }
-
-  /* ─── MODAL ─── */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(8px);
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    width: 100%;
-    max-width: 600px;
-    max-height: 85vh;
-    overflow-y: auto;
-    transform: translateY(20px);
-    transition: transform 0.25s;
-  }
-  .modal-overlay.open .modal { transform: translateY(0); }
-
-  .modal-header {
-    padding: 24px 24px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-
-  .modal-close {
-    background: var(--surface2);
-    border: none;
-    color: var(--muted);
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .modal-close:hover { background: var(--border); color: var(--text); }
-
-  .modal-body { padding: 20px 24px 24px; }
-
-  .modal-thumb {
-    width: 72px;
-    height: 72px;
-    border-radius: 16px;
-    background: var(--surface2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    margin-bottom: 16px;
-    overflow: hidden;
-  }
-  .modal-thumb img { width: 100%; height: 100%; object-fit: cover; }
-
-  .modal-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px;
-    font-weight: 800;
-    margin-bottom: 8px;
-  }
-
-  .modal-desc {
-    color: var(--muted);
-    font-size: 14px;
-    line-height: 1.7;
-    margin-bottom: 20px;
-  }
-
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-
-  .btn-visit {
-    flex: 1;
-    padding: 12px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Noto Sans KR', sans-serif;
-    text-decoration: none;
-    text-align: center;
-    transition: background 0.2s;
-  }
-  .btn-visit:hover { background: #9370c4; }
-
-  /* Star Rating */
-  .rating-section { margin-bottom: 24px; }
-  .rating-label { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: var(--muted); }
-
-  .stars-input { display: flex; gap: 6px; }
-  .star-btn {
-    font-size: 28px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--border);
-    transition: color 0.15s, transform 0.1s;
-    line-height: 1;
-  }
-  .star-btn.active { color: var(--accent2); }
-  .star-btn:hover { transform: scale(1.15); }
-
-  /* Comments */
-  .comments-section { }
-  .comments-label {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .comments-count {
-    background: var(--surface2);
-    padding: 2px 8px;
-    border-radius: 100px;
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  .comment-form { margin-bottom: 20px; }
-  .comment-form textarea {
-    width: 100%;
-    padding: 12px 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-size: 13px;
-    font-family: 'Noto Sans KR', sans-serif;
-    resize: none;
-    outline: none;
-    height: 80px;
-    transition: border-color 0.2s;
-    margin-bottom: 8px;
-  }
-  .comment-form textarea:focus { border-color: var(--accent); }
-
-  .comment-submit {
-    padding: 8px 18px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Noto Sans KR', sans-serif;
-  }
-  .comment-submit:hover { background: #9370c4; }
-
-  .login-prompt {
-    padding: 16px;
-    background: var(--surface2);
-    border-radius: 12px;
-    text-align: center;
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 20px;
-  }
-  .login-prompt a {
-    color: var(--accent2);
-    cursor: pointer;
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .comment-list { display: flex; flex-direction: column; gap: 12px; }
-
-  .comment-item {
-    background: var(--surface2);
-    border-radius: 12px;
-    padding: 12px 14px;
-  }
-
-  .comment-author {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--accent2);
-    margin-bottom: 4px;
-  }
-  .comment-text { font-size: 13px; color: var(--text); line-height: 1.6; }
-  .comment-date { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-  /* Submit App Modal */
-  .submit-form { display: flex; flex-direction: column; gap: 14px; }
-  .form-group label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    width: 100%;
-    padding: 12px 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-size: 14px;
-    font-family: 'Noto Sans KR', sans-serif;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .form-group input:focus,
-  .form-group textarea:focus,
-  .form-group select:focus { border-color: var(--accent); }
-  .form-group select option { background: var(--surface2); }
-  .form-group textarea { height: 90px; resize: none; }
-
-  /* Empty state */
-  .empty-state {
-    grid-column: 1/-1;
-    text-align: center;
-    padding: 80px 24px;
-    color: var(--muted);
-  }
-  .empty-state .icon { font-size: 32px; margin-bottom: 16px; }
-  .empty-state p { font-size: 15px; }
-
-  /* Loading */
-  .loading {
-    grid-column: 1/-1;
-    text-align: center;
-    padding: 80px;
-    color: var(--muted);
-  }
-
-  .spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 16px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 20px;
-    font-size: 14px;
-    z-index: 999;
-    transition: transform 0.3s;
-    white-space: nowrap;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  @media (max-width: 600px) {
-    .hero h1 { font-size: 32px; }
-    .app-card { flex-direction: row; }
-    .card-thumb { margin: 8px 0 8px 10px; }
-    .modal { border-radius: 20px 20px 0 0; }
-    .modal-overlay { align-items: flex-end; padding: 0; }
-  }
-
-  /* ── STARS ── */
-  #starCanvas {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-  .star {
-    position: absolute;
-    background: #fff;
-    border-radius: 50%;
-    opacity: 0;
-    animation: twinkle var(--dur, 3s) ease-in-out infinite;
-    animation-delay: var(--delay, 0s);
-  }
-  @keyframes twinkle {
-    0%, 100% { opacity: 0; transform: scale(0.4); }
-    50% { opacity: var(--max-op, 0.7); transform: scale(1); }
-  }
-
-  /* ── NAV extra ── */
   .nav-start-btn {
     padding: 8px 18px;
     border-radius: 10px;
@@ -710,6 +101,77 @@
     white-space: nowrap;
   }
   .nav-start-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(123,94,167,0.4); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    padding: 96px 24px 80px;
+    text-align: center;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .hero-glow {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(123,94,167,0.28) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(40px, 7vw, 72px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent2); }
+  .hero p {
+    color: var(--muted);
+    font-size: 16px;
+    margin-bottom: 40px;
+    position: relative;
+  }
+  .hero-btns {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .btn-cta-hero {
+    display: inline-block;
+    padding: 15px 36px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(135deg, var(--accent), #a07fd4);
+    color: #fff;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-cta-hero:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(123,94,167,0.45); }
+  .btn-ghost-hero {
+    display: inline-block;
+    padding: 15px 36px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: transparent;
+    color: var(--muted);
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+  }
+  .btn-ghost-hero:hover { background: var(--surface); color: var(--text); }
 
   /* ── SECTION COMMON ── */
   .section-label {
@@ -884,23 +346,6 @@
     z-index: 1;
   }
 
-  /* ── APPS SECTION LABEL ── */
-  .apps-section-header {
-    padding: 64px 24px 0;
-    max-width: 960px;
-    margin: 0 auto;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-  }
-  .apps-section-header h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(24px, 3vw, 36px);
-    font-weight: 800;
-    margin-bottom: 8px;
-  }
-  .apps-section-header p { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
-
   /* ── FOOTER ── */
   footer {
     border-top: 1px solid var(--border);
@@ -924,6 +369,7 @@
     .service-grid { grid-template-columns: 1fr; gap: 14px; }
     .section-why, .section-services { padding: 64px 20px 48px; }
     .section-cta { padding: 64px 20px 80px; }
+    .hero { padding: 72px 20px 60px; }
   }
 </style>
 </head>
@@ -936,35 +382,17 @@
   <div class="logo">
     <span class="logo-dot">●</span>PICO Lab
   </div>
-  <div class="nav-right">
-    <a href="https://kkdmb7-blip.github.io/memox/" class="nav-start-btn" target="_blank">서비스 시작하기</a>
-    <button class="btn btn-ghost" onclick="openSubmitModal()" id="submitBtn" style="display:none">+ 앱 등록</button>
-    <div id="authArea">
-      <button class="btn btn-kakao" onclick="kakaoLogin()">
-        <svg width="16" height="15" viewBox="0 0 16 15" fill="none"><path d="M8 0C3.582 0 0 2.82 0 6.3c0 2.24 1.49 4.21 3.75 5.33l-.96 3.57 4.17-2.77c.33.05.67.07 1.04.07 4.418 0 8-2.82 8-6.3S12.418 0 8 0z" fill="#191919"/></svg>
-        카카오 로그인
-      </button>
-    </div>
-    <div id="userArea" style="display:none; align-items:center; gap:10px; position:relative;">
-      <div class="user-avatar" id="userAvatar" onclick="toggleAvatarMenu()">U</div>
-      <div id="avatarMenu" style="display:none;position:absolute;top:44px;right:0;background:#1e1e2e;border:1px solid #333;border-radius:12px;padding:8px;min-width:160px;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,0.4);">
-        <div id="avatarMenuName" style="padding:8px 12px;font-size:13px;color:#aaa;border-bottom:1px solid #333;margin-bottom:4px;"></div>
-        <button id="myAppsBtn" onclick="showMyApps()" style="width:100%;padding:8px 12px;background:none;border:none;color:#e0d0ff;font-size:14px;text-align:left;cursor:pointer;border-radius:8px;" onmouseover="this.style.background='#1a1a2e'" onmouseout="this.style.background='none'">내 앱</button>
-        <button id="adminRequestsBtn" onclick="openAdminRequestsModal()" style="display:none;width:100%;padding:8px 12px;background:none;border:none;color:#e8b86d;font-size:14px;text-align:left;cursor:pointer;border-radius:8px;" onmouseover="this.style.background='#1a1a2e'" onmouseout="this.style.background='none'">📬 전체 요청 <span id="adminUnreadBadge" style="display:none;background:#7b5ea7;color:#fff;font-size:11px;border-radius:10px;padding:1px 7px;margin-left:4px;"></span></button>
-        <button onclick="logout()" style="width:100%;padding:8px 12px;background:none;border:none;color:#ff6b6b;font-size:14px;text-align:left;cursor:pointer;border-radius:8px;" onmouseover="this.style.background='#2a1a1a'" onmouseout="this.style.background='none'">로그아웃</button>
-      </div>
-    </div>
-  </div>
+  <a href="https://kkdmb7-blip.github.io/memox/" class="nav-start-btn" target="_blank">서비스 시작하기</a>
 </nav>
 
 <!-- HERO -->
 <div class="hero">
   <div class="hero-glow"></div>
-  <h1>작지만 강한 앱들<br><em>피코에서 발견하세요</em></h1>
-  <p>누구나 만들고 공유하는 미니 웹</p>
-  <div class="search-wrap">
-    <input type="text" id="searchInput" placeholder="앱 이름, 설명, 키워드로 검색..." oninput="handleSearch()">
-    <span class="search-icon">🔍</span>
+  <h1>별들이 말하는<br><em>당신의 이야기</em></h1>
+  <p>사주 · 점성술 · 베딕 — 세 가지 지혜를 하나의 AI로</p>
+  <div class="hero-btns">
+    <a href="https://kkdmb7-blip.github.io/memox/" class="btn-cta-hero" target="_blank">무료로 시작하기 🔮</a>
+    <a href="https://fortuna-silk.vercel.app" class="btn-ghost-hero" target="_blank">정밀 리포트 보기</a>
   </div>
 </div>
 
@@ -1025,234 +453,6 @@
   <a href="https://kkdmb7-blip.github.io/memox/" class="btn-cta" target="_blank">서비스 시작하기</a>
 </section>
 
-<div class="section-divider"></div>
-
-<!-- APPS SECTION HEADER -->
-<div class="apps-section-header">
-  <div class="section-label">미니앱 디렉토리</div>
-  <h2>작지만 강한 앱들</h2>
-  <p>누구나 만들고 공유하는 미니 웹</p>
-</div>
-
-<!-- CATEGORIES -->
-<div class="categories" id="categoryBar">
-  <button class="cat-btn active" onclick="filterCategory('')" data-cat="">전체</button>
-  <button class="cat-btn" onclick="filterCategory('운세/사주')" data-cat="운세/사주">🔮 운세/사주</button>
-  <button class="cat-btn" onclick="filterCategory('유틸')" data-cat="유틸">🛠️ 유틸</button>
-  <button class="cat-btn" onclick="filterCategory('게임')" data-cat="게임">🎮 게임</button>
-  <button class="cat-btn" onclick="filterCategory('데이터/시각화')" data-cat="데이터/시각화">📊 데이터/시각화</button>
-  <button class="cat-btn" onclick="filterCategory('크리에이티브')" data-cat="크리에이티브">🎨 크리에이티브</button>
-  <button class="cat-btn" onclick="filterCategory('소통')" data-cat="소통">💬 소통</button>
-  <button class="cat-btn" onclick="filterCategory('기타')" data-cat="기타">기타</button>
-</div>
-
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <span class="result-count" id="resultCount">로딩 중...</span>
-  <div class="sort-wrap">
-    <button class="sort-btn active" onclick="setSort('rating')" id="sort-rating">⭐ 별점순</button>
-    <button class="sort-btn" onclick="setSort('created_at')" id="sort-created_at">🕐 최신순</button>
-  </div>
-</div>
-
-<!-- GRID -->
-<div class="grid" id="appGrid">
-  <div class="loading"><div class="spinner"></div><p>앱 불러오는 중...</p></div>
-</div>
-
-<!-- APP DETAIL MODAL -->
-<div class="modal-overlay" id="detailModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div></div>
-      <button class="modal-close" onclick="closeModal('detailModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-thumb" id="modalThumb">🚀</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
-        <div class="modal-title" id="modalTitle"></div>
-        <div class="card-stars" id="modalStars" style="font-size:15px;"></div>
-      </div>
-      <div class="card-cat" id="modalCat" style="margin-bottom:10px;"></div>
-      <div class="modal-desc" id="modalDesc"></div>
-      <div class="modal-actions">
-        <a id="modalLink" href="#" target="_blank" class="btn-visit">앱 열기 →</a>
-      </div>
-
-      <!-- Star Rating -->
-      <div class="rating-section" id="ratingSection">
-        <div class="rating-label">별점 남기기</div>
-        <div class="stars-input" id="starsInput">
-          <button class="star-btn" data-val="1" onclick="selectStar(1)">★</button>
-          <button class="star-btn" data-val="2" onclick="selectStar(2)">★</button>
-          <button class="star-btn" data-val="3" onclick="selectStar(3)">★</button>
-          <button class="star-btn" data-val="4" onclick="selectStar(4)">★</button>
-          <button class="star-btn" data-val="5" onclick="selectStar(5)">★</button>
-        </div>
-      </div>
-
-      <!-- Request -->
-      <div id="requestSection" style="margin-bottom:20px;">
-        <div id="requestBtnArea"></div>
-        <div id="requestFormArea" style="display:none;">
-          <div class="comment-form" style="margin-top:10px;">
-            <textarea id="requestText" placeholder="기능 추가나 수정 요청을 남겨주세요"></textarea>
-            <button class="comment-submit" onclick="submitRequest()">요청 보내기</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Comments -->
-      <div class="comments-section">
-        <div class="comments-label">
-          댓글 <span class="comments-count" id="commentsCount">0</span>
-        </div>
-        <div id="commentFormArea"></div>
-        <div class="comment-list" id="commentList"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SUBMIT MODAL -->
-<div class="modal-overlay" id="submitModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;">앱 등록하기</div>
-      <button class="modal-close" onclick="closeModal('submitModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="submit-form">
-        <div class="form-group">
-          <label>앱 이름 *</label>
-          <input type="text" id="f-name" placeholder="ex. 오늘의 타로">
-        </div>
-        <div class="form-group">
-          <label>앱 설명 *</label>
-          <textarea id="f-desc" placeholder="앱을 간단히 소개해 주세요"></textarea>
-        </div>
-        <div class="form-group">
-          <label>앱 URL *</label>
-          <input type="url" id="f-url" placeholder="https://...">
-        </div>
-        <div class="form-group">
-          <label>카테고리 *</label>
-          <select id="f-cat">
-            <option value="">선택하세요</option>
-            <option value="운세/사주">🔮 운세/사주</option>
-            <option value="유틸">🛠️ 유틸</option>
-            <option value="게임">🎮 게임</option>
-            <option value="데이터/시각화">📊 데이터/시각화</option>
-            <option value="크리에이티브">🎨 크리에이티브</option>
-            <option value="소통">💬 소통</option>
-            <option value="기타">기타</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>아이콘 이모지</label>
-          <input type="text" id="f-icon" placeholder="🚀 (이모지 하나)">
-        </div>
-        <div class="form-group">
-          <label>썸네일 이미지 URL</label>
-          <input type="url" id="f-thumb" placeholder="https://i.imgur.com/xxx.png (선택사항)">
-        </div>
-        <div class="form-group">
-          <label>키워드 <span style="font-size:11px;color:var(--muted);">(최대 3개, 콤마로 구분)</span></label>
-          <input type="text" id="f-keywords" placeholder="사주, 운명, 점성학">
-        </div>
-        <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;" onclick="submitApp()">등록하기</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT MODAL -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;">앱 수정하기</div>
-      <button class="modal-close" onclick="closeModal('editModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="e-id">
-      <div class="submit-form">
-        <div class="form-group">
-          <label>앱 이름 *</label>
-          <input type="text" id="e-name" placeholder="ex. 오늘의 타로">
-        </div>
-        <div class="form-group">
-          <label>앱 설명 *</label>
-          <textarea id="e-desc" placeholder="앱을 간단히 소개해 주세요"></textarea>
-        </div>
-        <div class="form-group">
-          <label>앱 URL *</label>
-          <input type="url" id="e-url" placeholder="https://...">
-        </div>
-        <div class="form-group">
-          <label>카테고리 *</label>
-          <select id="e-cat">
-            <option value="">선택하세요</option>
-            <option value="운세/사주">🔮 운세/사주</option>
-            <option value="유틸">🛠️ 유틸</option>
-            <option value="게임">🎮 게임</option>
-            <option value="데이터/시각화">📊 데이터/시각화</option>
-            <option value="크리에이티브">🎨 크리에이티브</option>
-            <option value="소통">💬 소통</option>
-            <option value="기타">기타</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>아이콘 이모지</label>
-          <input type="text" id="e-icon" placeholder="🚀 (이모지 하나)">
-        </div>
-        <div class="form-group">
-          <label>썸네일 이미지 URL</label>
-          <input type="url" id="e-thumb" placeholder="https://i.imgur.com/xxx.png (선택사항)">
-        </div>
-        <div class="form-group">
-          <label>키워드 <span style="font-size:11px;color:var(--muted);">(최대 3개, 콤마로 구분)</span></label>
-          <input type="text" id="e-keywords" placeholder="사주, 운명, 점성학">
-        </div>
-        <button class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;" onclick="saveEdit()">저장하기</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- REQUESTS MODAL -->
-<div id="requestsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
-  <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:24px;width:90%;max-width:480px;max-height:75vh;display:flex;flex-direction:column;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h3 id="requestsModalTitle" style="margin:0;font-size:16px;color:#e0d0ff;">📬 개발자 요청</h3>
-      <button onclick="closeRequestsModal()" style="background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;">✕</button>
-    </div>
-    <div id="requestsList" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;"></div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<!-- MY APPS MODAL -->
-<div id="myAppsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
-  <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:24px;width:90%;max-width:480px;max-height:70vh;display:flex;flex-direction:column;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h3 id="myAppsTitle" style="margin:0;font-size:16px;color:#e0d0ff;">내 앱</h3>
-      <button onclick="closeMyApps()" style="background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;">✕</button>
-    </div>
-    <div id="myAppsList" style="overflow-y:auto;flex:1;"></div>
-  </div>
-</div>
-
-<!-- ADMIN REQUESTS MODAL -->
-<div id="adminRequestsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
-  <div style="background:#1a1a2e;border:1px solid #333;border-radius:16px;padding:24px;width:90%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h3 style="margin:0;font-size:16px;color:#e8b86d;">📬 전체 요청 목록</h3>
-      <button onclick="closeAdminRequestsModal()" style="background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;">✕</button>
-    </div>
-    <div id="adminRequestsList" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;"></div>
-  </div>
-</div>
-
 <footer>
   <div>© 2026 PICO Lab. All rights reserved.</div>
   <div>
@@ -1260,746 +460,28 @@
   </div>
 </footer>
 
-<div class="toast" id="toast"></div>
-
 <script>
-// ── CONFIG ──────────────────────────────────────────────
-const SUPABASE_URL = 'https://afktkixkbcirsknahbmx.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFma3RraXhrYmNpcnNrbmFoYm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MDQzMDIsImV4cCI6MjA4ODI4MDMwMn0.rxmiOZAYZ2VH8KQv2nBR4eEo1DN95F5pU6Iv5zQz9Y4'
-const KAKAO_REST_KEY = '51b4f87ad9cfd6312c176ad34eb62025'
-const SITE_URL = window.location.origin
-// 관리자: 주영님 카카오 로그인 후 콘솔에서 currentUser.id 확인 후 추가
-const ADMIN_IDS = ['kakao_4783626781']
-
-// ── INIT ────────────────────────────────────────────────
-const { createClient } = supabase
-const db = createClient(SUPABASE_URL, SUPABASE_KEY)
-
-let currentUser = null
-function isAdmin() { return currentUser && (ADMIN_IDS.includes(currentUser.id) || ADMIN_IDS.includes(currentUser.name)) }
-let currentApp = null
-let allApps = []
-let _loadAppsSeq = 0
-let selectedStar = 0
-let sortBy = 'rating'
-let filterCat = ''
-let searchQuery = ''
-
-// ── AUTH ────────────────────────────────────────────────
-async function checkAuth() {
-  const stored = localStorage.getItem('pico_user')
-  if (stored) {
-    currentUser = JSON.parse(stored)
-    updateAuthUI()
-  }
-
-  // Kakao callback 처리
-  const params = new URLSearchParams(window.location.search)
-  const code = params.get('code')
-  if (code) {
-    history.replaceState({}, '', window.location.pathname)
-    await handleKakaoCallback(code)
-  }
-}
-
-function kakaoLogin() {
-  const redirect = encodeURIComponent(SITE_URL)
-  window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_REST_KEY}&redirect_uri=${redirect}&response_type=code`
-}
-
-async function handleKakaoCallback(code) {
-  try {
-    // Cloudflare Worker로 토큰 교환
-    const res = await fetch('https://fortuna.kkdmb7.workers.dev/kakao-token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, redirect_uri: SITE_URL })
-    })
-    const data = await res.json()
-    if (data.access_token) {
-      const profileRes = await fetch('https://kapi.kakao.com/v2/user/me', {
-        headers: { Authorization: `Bearer ${data.access_token}` }
-      })
-      const profile = await profileRes.json()
-      currentUser = {
-        id: 'kakao_' + profile.id,
-        name: profile.kakao_account?.profile?.nickname || '카카오 사용자',
-        avatar: profile.kakao_account?.profile?.profile_image_url || null
-      }
-      localStorage.setItem('pico_user', JSON.stringify(currentUser))
-      updateAuthUI()
-      showToast('로그인 됐어요! 👋')
-    }
-  } catch(e) {
-    // Worker 연동 전 임시 처리
-    currentUser = { id: 'kakao_guest_' + Date.now(), name: '카카오 사용자', avatar: null }
-    localStorage.setItem('pico_user', JSON.stringify(currentUser))
-    updateAuthUI()
-    showToast('로그인 됐어요! 👋')
-  }
-}
-
-function toggleAvatarMenu() {
-  const menu = document.getElementById('avatarMenu')
-  if (!menu) return
-  menu.style.display = menu.style.display === 'none' ? 'block' : 'none'
-}
-
-document.addEventListener('click', function(e) {
-  const menu = document.getElementById('avatarMenu')
-  const avatar = document.getElementById('userAvatar')
-  if (menu && avatar && !avatar.contains(e.target) && !menu.contains(e.target)) {
-    menu.style.display = 'none'
-  }
-})
-
-async function showMyApps() {
-  if (!currentUser) return
-  const menu = document.getElementById('avatarMenu')
-  if (menu) menu.style.display = 'none'
-  const modal = document.getElementById('myAppsModal')
-  const list = document.getElementById('myAppsList')
-  const title = document.getElementById('myAppsTitle')
-  modal.style.display = 'flex'
-  list.innerHTML = '<p style="color:#aaa;font-size:13px;text-align:center;padding:16px;">불러오는 중...</p>'
-  try {
-    const { data, error } = await db.from('picoapp_apps').select('*').eq('author_id', currentUser.id).order('created_at', { ascending: false })
-    if (error) throw error
-    const apps = data || []
-    title.textContent = '내 앱 (' + apps.length + '개)'
-    if (!apps.length) {
-      list.innerHTML = '<p style="color:#aaa;font-size:13px;text-align:center;padding:16px;">등록한 앱이 없어요</p>'
-      return
-    }
-    list.innerHTML = apps.map(function(app) {
-      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #2a2a3e;">' +
-        '<span style="font-size:24px;">' + (app.icon || '🚀') + '</span>' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div style="font-size:14px;color:#e0d0ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + app.name + '</div>' +
-          '<div style="font-size:11px;color:#666;margin-top:2px;">' + app.category + '</div>' +
-        '</div>' +
-        '<button onclick="deleteMyApp(' + app.id + ', this)" style="padding:4px 10px;background:none;border:1px solid #ff6b6b44;border-radius:6px;color:#ff6b6b;font-size:12px;cursor:pointer;flex-shrink:0;">삭제</button>' +
-      '</div>'
-    }).join('')
-  } catch(e) {
-    console.error('내 앱 로드 실패:', e)
-    list.innerHTML = '<p style="color:#ff6b6b;font-size:13px;text-align:center;padding:16px;">불러오기 실패</p>'
-  }
-}
-
-function closeMyApps() {
-  document.getElementById('myAppsModal').style.display = 'none'
-}
-
-async function adminDeleteApp(appId, btn) {
-  if (!isAdmin()) return
-  if (!confirm('관리자 권한으로 이 앱을 삭제할까요?')) return
-  btn.disabled = true
-  btn.textContent = '...'
-  try {
-    const { error } = await db.from('picoapp_apps').delete().eq('id', appId)
-    if (error) throw error
-    allApps = allApps.filter(a => a.id !== appId)
-    renderApps(allApps.filter(a =>
-      (!filterCat || a.category === filterCat) &&
-      (!searchQuery || a.name.includes(searchQuery) || a.description.includes(searchQuery))
-    ))
-    showToast('앱이 삭제됐어요 (관리자)')
-  } catch(e) {
-    console.error('관리자 삭제 실패:', e)
-    btn.disabled = false
-    btn.textContent = '삭제'
-    showToast('삭제 실패: ' + (e.message || '오류'))
-  }
-}
-
-async function deleteMyApp(appId, btn) {
-  if (!currentUser) return
-  if (!confirm('이 앱을 삭제할까요?')) return
-  btn.disabled = true
-  btn.textContent = '...'
-  try {
-    const { data: deleted, error } = await db.from('picoapp_apps').delete().eq('id', appId).eq('author_id', currentUser.id).select()
-    if (error) throw error
-    if (!deleted || deleted.length === 0) throw new Error('삭제 권한이 없거나 RLS 정책 미설정')
-    btn.closest('div[style]').remove()
-    showToast('앱이 삭제됐어요')
-    const title = document.getElementById('myAppsTitle')
-    const remaining = document.querySelectorAll('#myAppsList > div').length
-    title.textContent = '내 앱 (' + remaining + '개)'
-    loadApps() // 현재 filterCat 기준으로 메인 그리드 재조회
-  } catch(e) {
-    console.error('삭제 실패:', e)
-    btn.disabled = false
-    btn.textContent = '삭제'
-    showToast('삭제 실패: ' + (e.message || '오류'))
-  }
-}
-
-function logout() {
-  const menu = document.getElementById('avatarMenu')
-  if (menu) menu.style.display = 'none'
-  currentUser = null
-  localStorage.removeItem('pico_user')
-  updateAuthUI()
-  showToast('로그아웃 됐어요')
-}
-
-function updateAuthUI() {
-  const authArea = document.getElementById('authArea')
-  const userArea = document.getElementById('userArea')
-  const submitBtn = document.getElementById('submitBtn')
-  const avatar = document.getElementById('userAvatar')
-
-  if (currentUser) {
-    authArea.style.display = 'none'
-    userArea.style.display = 'flex'
-    submitBtn.style.display = 'block'
-    avatar.textContent = currentUser.name?.[0] || 'U'
-    if (currentUser.avatar) {
-      avatar.innerHTML = `<img src="${currentUser.avatar}" alt="">`
-    }
-    const menuName = document.getElementById('avatarMenuName')
-    if (menuName) menuName.textContent = currentUser.name || '사용자'
-    loadAdminUnreadBadge()
-  } else {
-    authArea.style.display = 'block'
-    userArea.style.display = 'none'
-    submitBtn.style.display = 'none'
-  }
-}
-
-// ── APPS ────────────────────────────────────────────────
-async function loadApps() {
-  const seq = ++_loadAppsSeq
-  document.getElementById('appGrid').innerHTML = `<div class="loading"><div class="spinner"></div><p>불러오는 중...</p></div>`
-  try {
-    let query = db.from('picoapp_apps').select('*')
-    if (filterCat) query = query.eq('category', filterCat)
-    if (sortBy === 'rating') query = query.order('rating', { ascending: false })
-    else query = query.order('created_at', { ascending: false })
-
-    const { data, error } = await query
-    if (seq !== _loadAppsSeq) return // 더 최근 호출이 있으면 무시
-    if (error) { console.error('loadApps Supabase error:', error); throw error; }
-    let apps = data || []
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase()
-      apps = apps.filter(app => {
-        const kws = (app.keywords || []).map(k => k.toLowerCase())
-        return (
-          app.name.toLowerCase().includes(q) ||
-          (app.description || '').toLowerCase().includes(q) ||
-          kws.some(k => k.includes(q))
-        )
-      })
-    }
-    allApps = apps
-    renderApps(allApps)
-    loadRequestBadges()
-  } catch(e) {
-    if (seq !== _loadAppsSeq) return
-    console.error(e)
-    document.getElementById('appGrid').innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>앱을 불러오지 못했어요</p></div>`
-  }
-}
-
-function renderApps(apps) {
-  const grid = document.getElementById('appGrid')
-  const count = document.getElementById('resultCount')
-  count.textContent = `앱 ${apps.length}개`
-
-  if (!apps.length) {
-    grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>검색 결과가 없어요</p></div>`
-    return
-  }
-
-  grid.innerHTML = apps.map((app, i) => `
-    <div class="app-card" data-app-id="${app.id}" style="animation-delay:${i*0.05}s" onclick="openApp(${app.id})">
-      <div class="card-thumb">
-        ${app.thumbnail_url ? `<img src="${app.thumbnail_url}" alt="" onerror="this.parentElement.innerHTML='<span>${app.icon||'🚀'}</span>'">` : `<span>${app.icon || '🚀'}</span>`}
-      </div>
-      <div class="card-body">
-        <div class="card-meta">
-          <span class="card-cat">${app.category}</span>
-          <div class="card-stars">
-            ★ ${app.rating > 0 ? Number(app.rating).toFixed(1) : '—'}
-            <span>(${app.review_count || 0})</span>
-          </div>
-        </div>
-        <div class="card-title">${app.name}</div>
-        <div class="card-desc">${app.description}</div>
-      </div>
-      <div class="card-footer">
-        <span class="card-author">by ${app.author_name || '익명'}</span>
-        <div style="display:flex;gap:6px;align-items:center">
-          ${currentUser && app.author_id === currentUser.id ? `<button onclick="event.stopPropagation();openEditModal(${app.id})" style="padding:3px 8px;background:none;border:1px solid #7b5ea744;border-radius:5px;color:#a98fd4;font-size:11px;cursor:pointer">수정</button><button id="req-badge-${app.id}" onclick="event.stopPropagation();openRequestsModal(${app.id})" style="display:none;padding:3px 8px;background:#7b5ea7;border:none;border-radius:5px;color:#fff;font-size:11px;cursor:pointer"></button>` : ''}
-          ${isAdmin() ? `<button onclick="event.stopPropagation();adminDeleteApp(${app.id},this)" style="padding:3px 8px;background:none;border:1px solid #ff6b6b44;border-radius:5px;color:#ff6b6b;font-size:11px;cursor:pointer">삭제</button>` : ''}
-          <a href="${app.url}" target="_blank" class="card-link" onclick="event.stopPropagation()">열기 →</a>
-        </div>
-      </div>
-    </div>
-  `).join('')
-}
-
-async function openApp(id) {
-  const app = allApps.find(a => a.id === id)
-  if (!app) return
-
-  currentApp = app
-  selectedStar = 0
-
-  document.getElementById('modalTitle').textContent = app.name
-  document.getElementById('modalDesc').textContent = app.description
-  document.getElementById('modalCat').textContent = app.category
-  document.getElementById('modalLink').href = app.url
-  document.getElementById('modalThumb').innerHTML = app.thumbnail_url
-    ? `<img src="${app.thumbnail_url}" alt="" onerror="this.parentElement.textContent='${app.icon||'🚀'}'">` 
-    : app.icon || '🚀'
-  document.getElementById('modalStars').innerHTML =
-    `★ ${app.rating > 0 ? Number(app.rating).toFixed(1) : '—'} <span style="color:var(--muted);font-size:12px">(${app.review_count || 0})</span>`
-
-  document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'))
-
-  const formArea = document.getElementById('commentFormArea')
-  if (currentUser) {
-    formArea.innerHTML = `
-      <div class="comment-form">
-        <textarea id="commentText" placeholder="이 앱 어떠셨나요?"></textarea>
-        <button class="comment-submit" onclick="submitComment()">댓글 남기기</button>
-      </div>
-    `
-    document.getElementById('ratingSection').style.display = 'block'
-  } else {
-    formArea.innerHTML = `
-      <div class="login-prompt">
-        <a onclick="kakaoLogin()">카카오 로그인</a> 후 댓글과 별점을 남길 수 있어요
-      </div>
-    `
-    document.getElementById('ratingSection').style.display = 'none'
-  }
-
-  // 요청 버튼
-  const reqBtnArea = document.getElementById('requestBtnArea')
-  document.getElementById('requestFormArea').style.display = 'none'
-  if (currentUser) {
-    reqBtnArea.innerHTML = `<button onclick="toggleRequestForm()" style="background:none;border:1px solid #7b5ea744;border-radius:8px;padding:8px 14px;color:#a98fd4;font-size:13px;cursor:pointer;width:100%;">💬 개발자에게 요청</button>`
-  } else {
-    reqBtnArea.innerHTML = `<div style="text-align:center;padding:8px;color:var(--muted);font-size:13px;"><a onclick="kakaoLogin()" style="color:#a98fd4;cursor:pointer;">카카오 로그인</a> 후 요청을 남길 수 있어요</div>`
-  }
-
-  await loadComments(id)
-  openModal('detailModal')
-}
-
-function toggleRequestForm() {
-  const area = document.getElementById('requestFormArea')
-  area.style.display = area.style.display === 'none' ? 'block' : 'none'
-}
-
-async function submitRequest() {
-  const textEl = document.getElementById('requestText')
-  const message = textEl?.value.trim()
-  if (!message) return showToast('요청 내용을 입력해 주세요')
-  if (!currentUser) return kakaoLogin()
-
-  try {
-    const { error } = await db.from('picoapp_requests').insert({
-      app_id: currentApp.id,
-      app_name: currentApp.name,
-      from_user_id: currentUser.id,
-      from_user_name: currentUser.name,
-      message
-    })
-    if (error) throw error
-    showToast('요청이 전달됐어요! 📬')
-    textEl.value = ''
-    document.getElementById('requestFormArea').style.display = 'none'
-  } catch(e) {
-    showToast('요청 전송 중 오류가 났어요')
-    console.error(e)
-  }
-}
-
-async function loadRequestBadges() {
-  if (!currentUser) return
-  try {
-    const myAppIds = allApps.filter(a => a.author_id === currentUser.id).map(a => a.id)
-    if (!myAppIds.length) return
-    const { data } = await db.from('picoapp_requests')
-      .select('app_id')
-      .in('app_id', myAppIds)
-      .eq('status', 'unread')
-    if (!data) return
-    const counts = {}
-    data.forEach(r => { counts[r.app_id] = (counts[r.app_id] || 0) + 1 })
-    Object.entries(counts).forEach(([appId, cnt]) => {
-      const badge = document.getElementById(`req-badge-${appId}`)
-      if (badge) { badge.textContent = `📬 ${cnt}`; badge.style.display = 'inline-block' }
-    })
-  } catch(e) { console.error(e) }
-}
-
-async function openRequestsModal(appId) {
-  const app = allApps.find(a => a.id === appId)
-  document.getElementById('requestsModalTitle').textContent = `📬 ${app?.name || ''} 요청`
-  const list = document.getElementById('requestsList')
-  list.innerHTML = '<div style="color:var(--muted);font-size:13px;">불러오는 중...</div>'
-  document.getElementById('requestsModal').style.display = 'flex'
-
-  const { data } = await db.from('picoapp_requests')
-    .select('*')
-    .eq('app_id', appId)
-    .order('created_at', { ascending: false })
-
-  const requests = data || []
-  if (!requests.length) {
-    list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">아직 요청이 없어요</div>'
-    return
-  }
-  list.innerHTML = requests.map(r => `
-    <div id="req-item-${r.id}" style="background:#16162a;border:1px solid ${r.status === 'read' ? '#2a2a3a' : '#7b5ea755'};border-radius:10px;padding:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-        <div>
-          <div style="font-size:12px;color:#a98fd4;margin-bottom:4px;">${r.from_user_name || '익명'} · ${new Date(r.created_at).toLocaleDateString('ko-KR')}</div>
-          <div style="font-size:13px;color:#e0d0ff;line-height:1.6;">${r.message}</div>
-        </div>
-        ${r.status !== 'read' ? `<button onclick="markRequestRead(${r.id},${appId})" style="flex-shrink:0;padding:4px 10px;background:none;border:1px solid #7b5ea7;border-radius:6px;color:#a98fd4;font-size:11px;cursor:pointer;">읽음</button>` : '<span style="flex-shrink:0;font-size:11px;color:var(--muted);">읽음</span>'}
-      </div>
-    </div>
-  `).join('')
-}
-
-async function markRequestRead(requestId, appId) {
-  await db.from('picoapp_requests').update({ status: 'read' }).eq('id', requestId)
-  const item = document.getElementById(`req-item-${requestId}`)
-  if (item) {
-    item.style.borderColor = '#2a2a3a'
-    const btn = item.querySelector('button')
-    if (btn) btn.outerHTML = '<span style="flex-shrink:0;font-size:11px;color:var(--muted);">읽음</span>'
-  }
-  const badge = document.getElementById(`req-badge-${appId}`)
-  if (badge) {
-    const cur = parseInt(badge.textContent.replace(/\D/g,'')) - 1
-    if (cur <= 0) { badge.style.display = 'none' } else { badge.textContent = `📬 ${cur}` }
-  }
-}
-
-function closeRequestsModal() {
-  document.getElementById('requestsModal').style.display = 'none'
-}
-
-// ── ADMIN REQUESTS ──────────────────────────────────────
-async function loadAdminUnreadBadge() {
-  if (!isAdmin()) return
-  const btn = document.getElementById('adminRequestsBtn')
-  if (btn) btn.style.display = 'block'
-  const { data } = await db.from('picoapp_requests').select('id').eq('status', 'unread')
-  const cnt = data?.length || 0
-  const badge = document.getElementById('adminUnreadBadge')
-  if (badge) {
-    if (cnt > 0) { badge.textContent = cnt; badge.style.display = 'inline-block' }
-    else badge.style.display = 'none'
-  }
-}
-
-async function openAdminRequestsModal() {
-  if (!isAdmin()) return
-  document.getElementById('avatarMenu').style.display = 'none'
-  const modal = document.getElementById('adminRequestsModal')
-  const list = document.getElementById('adminRequestsList')
-  modal.style.display = 'flex'
-  list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">불러오는 중...</div>'
-
-  const { data, error } = await db.from('picoapp_requests')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error || !data?.length) {
-    list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">요청이 없어요</div>'
-    return
-  }
-
-  list.innerHTML = data.map(r => `
-    <div id="admin-req-${r.id}" style="background:#16162a;border:1px solid ${r.status === 'read' ? '#2a2a3a' : '#7b5ea755'};border-radius:10px;padding:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-        <div style="flex:1;min-width:0;">
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap;">
-            <span style="font-size:12px;background:#7b5ea722;border:1px solid #7b5ea744;border-radius:6px;padding:2px 8px;color:#a98fd4;">${r.app_name || '앱'}</span>
-            <span style="font-size:11px;color:var(--muted);">${r.from_user_name || '익명'} · ${new Date(r.created_at).toLocaleDateString('ko-KR')}</span>
-            ${r.status !== 'read' ? '<span style="font-size:11px;background:#7b5ea7;color:#fff;border-radius:6px;padding:1px 6px;">미읽음</span>' : '<span style="font-size:11px;color:var(--muted);">읽음</span>'}
-          </div>
-          <div style="font-size:13px;color:#e0d0ff;line-height:1.6;">${r.message}</div>
-        </div>
-        ${r.status !== 'read' ? `<button onclick="adminMarkRead(${r.id})" style="flex-shrink:0;padding:4px 10px;background:none;border:1px solid #7b5ea7;border-radius:6px;color:#a98fd4;font-size:11px;cursor:pointer;">읽음</button>` : ''}
-      </div>
-    </div>
-  `).join('')
-}
-
-async function adminMarkRead(requestId) {
-  await db.from('picoapp_requests').update({ status: 'read' }).eq('id', requestId)
-  const item = document.getElementById(`admin-req-${requestId}`)
-  if (item) {
-    item.style.borderColor = '#2a2a3a'
-    item.querySelector('button')?.remove()
-    const badge = item.querySelector('span[style*="background:#7b5ea7;color:#fff"]')
-    if (badge) badge.outerHTML = '<span style="font-size:11px;color:var(--muted);">읽음</span>'
-  }
-  // 상단 뱃지 차감
-  const b = document.getElementById('adminUnreadBadge')
-  if (b) {
-    const cur = parseInt(b.textContent || '0') - 1
-    if (cur <= 0) b.style.display = 'none'
-    else b.textContent = cur
-  }
-}
-
-function closeAdminRequestsModal() {
-  document.getElementById('adminRequestsModal').style.display = 'none'
-}
-
-// ── RATING ──────────────────────────────────────────────
-function selectStar(val) {
-  if (!currentUser) { kakaoLogin(); return; }
-  selectedStar = val
-  document.querySelectorAll('.star-btn').forEach(b => {
-    b.classList.toggle('active', parseInt(b.dataset.val) <= val)
-  })
-  submitRating(val)
-}
-
-async function submitRating(val) {
-  try {
-    const { error } = await db.from('picoapp_ratings').upsert({
-      app_id: currentApp.id,
-      user_id: currentUser.id,
-      rating: val
-    }, { onConflict: 'app_id,user_id' })
-    if (error) throw error
-    showToast(`별점 ${val}점을 남겼어요 ⭐`)
-    // 모달 별점 새로고침
-    const { data } = await db.from('picoapp_apps').select('rating,review_count').eq('id', currentApp.id).single()
-    if (data) {
-      currentApp.rating = data.rating
-      currentApp.review_count = data.review_count
-      document.getElementById('modalStars').innerHTML =
-        `★ ${Number(data.rating).toFixed(1)} <span style="color:var(--muted);font-size:12px">(${data.review_count})</span>`
-    }
-  } catch(e) {
-    showToast('별점 저장 중 오류가 났어요')
-    console.error(e)
-  }
-}
-
-// ── COMMENTS ────────────────────────────────────────────
-async function loadComments(appId) {
-  try {
-    const { data, error } = await db
-      .from('picoapp_comments')
-      .select('*')
-      .eq('app_id', appId)
-      .order('created_at', { ascending: false })
-    if (error) throw error
-
-    const comments = data || []
-    document.getElementById('commentsCount').textContent = comments.length
-    const list = document.getElementById('commentList')
-
-    if (!comments.length) {
-      list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">첫 댓글을 남겨보세요!</div>`
-      return
-    }
-
-    list.innerHTML = comments.map(c => `
-      <div class="comment-item">
-        <div class="comment-author">${c.author_name || '익명'}</div>
-        <div class="comment-text">${c.text}</div>
-        <div class="comment-date">${new Date(c.created_at).toLocaleDateString('ko-KR')}</div>
-      </div>
-    `).join('')
-  } catch(e) {
-    console.error(e)
-  }
-}
-
-async function submitComment() {
-  const textEl = document.getElementById('commentText')
-  const text = textEl?.value.trim()
-  if (!text) return showToast('댓글을 입력해 주세요')
-  if (!currentUser) return kakaoLogin()
-
-  try {
-    const { error } = await db.from('picoapp_comments').insert({
-      app_id: currentApp.id,
-      user_id: currentUser.id,
-      author_name: currentUser.name,
-      author_avatar: currentUser.avatar,
-      text
-    })
-    if (error) throw error
-    showToast('댓글이 등록됐어요!')
-    textEl.value = ''
-    await loadComments(currentApp.id)
-  } catch(e) {
-    showToast('댓글 등록 중 오류가 났어요')
-    console.error(e)
-  }
-}
-
-// ── SUBMIT APP ───────────────────────────────────────────
-function openSubmitModal() {
-  if (!currentUser) return kakaoLogin()
-  openModal('submitModal')
-}
-
-async function submitApp() {
-  const name = document.getElementById('f-name').value.trim()
-  const desc = document.getElementById('f-desc').value.trim()
-  const url = document.getElementById('f-url').value.trim()
-  const cat = document.getElementById('f-cat').value
-  const icon = document.getElementById('f-icon').value.trim() || '🚀'
-  const thumbnail_url = document.getElementById('f-thumb').value.trim() || null
-  const keywords = document.getElementById('f-keywords').value.trim()
-    .split(',').map(k => k.trim()).filter(k => k).slice(0, 3)
-
-  if (!name || !desc || !url || !cat) return showToast('모든 필드를 입력해 주세요')
-
-  try {
-    const { error } = await db.from('picoapp_apps').insert({
-      name, description: desc, url, category: cat, icon, thumbnail_url, keywords,
-      author_id: currentUser.id,
-      author_name: currentUser.name
-    })
-    if (error) throw error
-    showToast('피코에 등록됐어요! 🎉')
-    closeModal('submitModal')
-    ;['f-name','f-desc','f-url','f-cat','f-icon','f-thumb','f-keywords'].forEach(id => { document.getElementById(id).value = '' })
-    await loadApps()
-  } catch(e) {
-    showToast('등록 중 오류가 났어요')
-    console.error(e)
-  }
-}
-
-function openEditModal(appId) {
-  if (!currentUser) return
-  const app = allApps.find(a => a.id === appId)
-  if (!app) return
-  document.getElementById('e-id').value = app.id
-  document.getElementById('e-name').value = app.name || ''
-  document.getElementById('e-desc').value = app.description || ''
-  document.getElementById('e-url').value = app.url || ''
-  document.getElementById('e-cat').value = app.category || ''
-  document.getElementById('e-icon').value = app.icon || ''
-  document.getElementById('e-thumb').value = app.thumbnail_url || ''
-  document.getElementById('e-keywords').value = (app.keywords || []).join(', ')
-  openModal('editModal')
-}
-
-async function saveEdit() {
-  const id = parseInt(document.getElementById('e-id').value)
-  const name = document.getElementById('e-name').value.trim()
-  const desc = document.getElementById('e-desc').value.trim()
-  const url = document.getElementById('e-url').value.trim()
-  const cat = document.getElementById('e-cat').value
-  const icon = document.getElementById('e-icon').value.trim() || '🚀'
-  const thumbnail_url = document.getElementById('e-thumb').value.trim() || null
-  const keywords = document.getElementById('e-keywords').value.trim()
-    .split(',').map(k => k.trim()).filter(k => k).slice(0, 3)
-
-  if (!name || !desc || !url || !cat) return showToast('모든 필드를 입력해 주세요')
-
-  try {
-    const { error } = await db.from('picoapp_apps')
-      .update({ name, description: desc, url, category: cat, icon, thumbnail_url, keywords })
-      .eq('id', id)
-      .eq('author_id', currentUser.id)
-    if (error) throw error
-    showToast('수정됐어요!')
-    closeModal('editModal')
-    await loadApps()
-  } catch(e) {
-    showToast('수정 중 오류가 났어요')
-    console.error(e)
-  }
-}
-
-// ── FILTER / SEARCH ──────────────────────────────────────
-function filterCategory(cat) {
-  filterCat = cat
-  document.querySelectorAll('.cat-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.cat === cat)
-  })
-  loadApps()
-}
-
-let searchTimer
-function handleSearch() {
-  clearTimeout(searchTimer)
-  searchTimer = setTimeout(() => {
-    searchQuery = document.getElementById('searchInput').value.trim()
-    loadApps()
-  }, 300)
-}
-
-function setSort(by) {
-  sortBy = by
-  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'))
-  document.getElementById(`sort-${by}`).classList.add('active')
-  loadApps()
-}
-
-// ── MODAL ────────────────────────────────────────────────
-function openModal(id) {
-  document.getElementById(id).classList.add('open')
-  document.body.style.overflow = 'hidden'
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open')
-  document.body.style.overflow = ''
-}
-
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => {
-    if (e.target === el) closeModal(el.id)
-  })
-})
-
-// ── TOAST ────────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast')
-  t.textContent = msg
-  t.classList.add('show')
-  setTimeout(() => t.classList.remove('show'), 2500)
-}
-
 // ── STARS ────────────────────────────────────────────────
 (function() {
   var canvas = document.getElementById('starCanvas');
   for (var i = 0; i < 50; i++) {
     var s = document.createElement('div');
     s.className = 'star';
-    var size = Math.random() * 2.5 + 0.8;
-    var dur  = (Math.random() * 4 + 2).toFixed(2);
+    var size  = Math.random() * 2.5 + 0.8;
+    var dur   = (Math.random() * 4 + 2).toFixed(2);
     var delay = (Math.random() * 6).toFixed(2);
-    var op  = (Math.random() * 0.5 + 0.3).toFixed(2);
+    var op    = (Math.random() * 0.5 + 0.3).toFixed(2);
     s.style.cssText =
-      'width:' + size + 'px;' +
+      'width:'  + size + 'px;' +
       'height:' + size + 'px;' +
-      'left:' + (Math.random() * 100).toFixed(2) + '%;' +
-      'top:' + (Math.random() * 100).toFixed(2) + '%;' +
-      '--dur:' + dur + 's;' +
+      'left:'   + (Math.random() * 100).toFixed(2) + '%;' +
+      'top:'    + (Math.random() * 100).toFixed(2) + '%;' +
+      '--dur:'    + dur   + 's;' +
       '--delay:-' + delay + 's;' +
-      '--max-op:' + op + ';';
+      '--max-op:' + op    + ';';
     canvas.appendChild(s);
   }
 })();
-
-// ── START ────────────────────────────────────────────────
-checkAuth()
-loadApps()
 </script>
 </body>
 </html>
