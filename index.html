@@ -384,7 +384,200 @@
     .section-why, .section-services { padding: 64px 20px 48px; }
     .section-cta { padding: 64px 20px 80px; }
     .hero { padding: 72px 20px 60px; }
+    .saju-pillars { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .saju-pillar { padding: 16px 10px; }
+    .saju-hanja { font-size: 28px; }
   }
+
+  /* ── SAJU MODAL ── */
+  .saju-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .saju-overlay.open { display: flex; }
+  .saju-modal {
+    background: #13131a;
+    border: 1px solid #2a2a3d;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 32px 28px;
+    position: relative;
+    animation: modalIn 0.25s ease;
+  }
+  @keyframes modalIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .saju-modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: #1c1c28;
+    border: none;
+    color: #6b6b85;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .saju-modal-close:hover { color: #f0f0f5; }
+  .saju-modal h3 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .saju-modal-sub { font-size: 13px; color: #6b6b85; margin-bottom: 24px; }
+  .saju-form-group { margin-bottom: 16px; }
+  .saju-form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b6b85;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 7px;
+  }
+  .saju-form-group input,
+  .saju-form-group select {
+    width: 100%;
+    padding: 11px 14px;
+    background: #1c1c28;
+    border: 1px solid #2a2a3d;
+    border-radius: 10px;
+    color: #f0f0f5;
+    font-size: 14px;
+    font-family: 'Noto Sans KR', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+  .saju-form-group select option { background: #1c1c28; }
+  .saju-form-group input:focus,
+  .saju-form-group select:focus { border-color: #7b5ea7; }
+  .saju-gender-row { display: flex; gap: 10px; }
+  .saju-gender-btn {
+    flex: 1;
+    padding: 10px;
+    background: #1c1c28;
+    border: 1px solid #2a2a3d;
+    border-radius: 10px;
+    color: #6b6b85;
+    font-size: 14px;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .saju-gender-btn.active { background: rgba(123,94,167,0.2); border-color: #7b5ea7; color: #f0f0f5; }
+  .saju-submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #7b5ea7, #a07fd4);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .saju-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(123,94,167,0.4); }
+  .saju-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* 결과 화면 */
+  .saju-result { display: none; }
+  .saju-result.show { display: block; }
+  .saju-pillars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .saju-pillar {
+    background: #1c1c28;
+    border: 1px solid #2a2a3d;
+    border-radius: 14px;
+    padding: 18px 10px;
+    text-align: center;
+  }
+  .saju-pillar-label { font-size: 10px; color: #6b6b85; letter-spacing: 1px; margin-bottom: 10px; font-weight: 600; }
+  .saju-hanja { font-size: 34px; font-family: 'Noto Serif KR', serif; font-weight: 700; line-height: 1.3; }
+  .saju-hanja span { display: block; }
+  .saju-elem-tag {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  .saju-strength {
+    background: #1c1c28;
+    border: 1px solid #2a2a3d;
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .saju-strength-label { font-size: 12px; color: #6b6b85; flex-shrink: 0; }
+  .saju-strength-val { font-size: 16px; font-weight: 700; font-family: 'Noto Serif KR', serif; }
+  .saju-five {
+    background: #1c1c28;
+    border: 1px solid #2a2a3d;
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+  }
+  .saju-five-label { font-size: 11px; color: #6b6b85; margin-bottom: 10px; font-weight: 600; }
+  .saju-five-bars { display: flex; flex-direction: column; gap: 7px; }
+  .saju-bar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .saju-bar-name { width: 28px; flex-shrink: 0; font-weight: 600; }
+  .saju-bar-track { flex: 1; background: #0a0a0f; border-radius: 100px; height: 7px; overflow: hidden; }
+  .saju-bar-fill { height: 100%; border-radius: 100px; transition: width 0.6s ease; }
+  .saju-bar-pct { width: 32px; text-align: right; color: #6b6b85; flex-shrink: 0; }
+  .saju-cta-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #7b5ea7, #a07fd4);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .saju-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(123,94,167,0.4); }
+  .saju-back-btn {
+    background: none;
+    border: none;
+    color: #6b6b85;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    margin-bottom: 16px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .saju-back-btn:hover { color: #f0f0f5; }
 </style>
 </head>
 <body>
@@ -415,10 +608,11 @@
   <div class="section-label">PICO Lab의 5중 교차검증 시스템</div>
   <h2 class="section-title">5,000년 인류의 지혜를<br><em>AI가 동시에 교차 분석합니다</em></h2>
   <div class="why-grid">
-    <div class="why-card">
+    <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
       <div class="why-icon">🏛️</div>
       <h3>사주 (四柱)</h3>
       <p>인생의 설계도, 기질의 뿌리. 태어난 연·월·일·시의 네 기둥이 만드는 운명의 지도.</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">무료 체험해보기 →</div>
     </div>
     <div class="why-card">
       <div class="why-icon">🌟</div>
@@ -478,6 +672,60 @@
   <a href="https://kkdmb7-blip.github.io/memox/" class="btn-cta" target="_blank">서비스 시작하기</a>
 </section>
 
+<!-- SAJU MODAL -->
+<div class="saju-overlay" id="sajuOverlay" onclick="if(event.target===this)closeSajuModal()">
+  <div class="saju-modal">
+    <button class="saju-modal-close" onclick="closeSajuModal()">✕</button>
+
+    <!-- 입력 폼 -->
+    <div id="sajuForm">
+      <h3>🏛️ 만세력 체험</h3>
+      <p class="saju-modal-sub">생년월일을 입력하면 사주 8자를 바로 확인할 수 있어요</p>
+      <div class="saju-form-group">
+        <label>생년월일</label>
+        <input type="date" id="sajuBirth" max="2015-12-31">
+      </div>
+      <div class="saju-form-group">
+        <label>태어난 시간</label>
+        <select id="sajuHour">
+          <option value="unknown">모름 (정오 기준)</option>
+          <option value="23">자시 (23:00~01:00)</option>
+          <option value="1">축시 (01:00~03:00)</option>
+          <option value="3">인시 (03:00~05:00)</option>
+          <option value="5">묘시 (05:00~07:00)</option>
+          <option value="7">진시 (07:00~09:00)</option>
+          <option value="9">사시 (09:00~11:00)</option>
+          <option value="11">오시 (11:00~13:00)</option>
+          <option value="13">미시 (13:00~15:00)</option>
+          <option value="15">신시 (15:00~17:00)</option>
+          <option value="17">유시 (17:00~19:00)</option>
+          <option value="19">술시 (19:00~21:00)</option>
+          <option value="21">해시 (21:00~23:00)</option>
+        </select>
+      </div>
+      <div class="saju-form-group">
+        <label>성별</label>
+        <div class="saju-gender-row">
+          <button class="saju-gender-btn active" id="genderM" onclick="selectGender('M')">남성 ♂</button>
+          <button class="saju-gender-btn" id="genderF" onclick="selectGender('F')">여성 ♀</button>
+        </div>
+      </div>
+      <button class="saju-submit-btn" id="sajuSubmitBtn" onclick="submitSaju()">사주 보기 🔮</button>
+    </div>
+
+    <!-- 결과 화면 -->
+    <div class="saju-result" id="sajuResult">
+      <button class="saju-back-btn" onclick="showSajuForm()">← 다시 입력</button>
+      <h3 style="margin-bottom:6px;">나의 사주 8자</h3>
+      <p class="saju-modal-sub" id="sajuResultSub"></p>
+      <div class="saju-pillars" id="sajuPillars"></div>
+      <div class="saju-strength" id="sajuStrengthBox"></div>
+      <div class="saju-five" id="sajuFiveBox"></div>
+      <a href="https://kkdmb7-blip.github.io/memox/" class="saju-cta-btn" target="_blank">✨ AI 운세 상담 받기</a>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div>© 2026 PICO Lab. All rights reserved.</div>
   <div>
@@ -507,6 +755,112 @@
     canvas.appendChild(s);
   }
 })();
+
+// ── SAJU MODAL ───────────────────────────────────────────
+var _sajuGender = 'M';
+
+function openSajuModal() {
+  document.getElementById('sajuOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  showSajuForm();
+}
+function closeSajuModal() {
+  document.getElementById('sajuOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function selectGender(g) {
+  _sajuGender = g;
+  document.getElementById('genderM').classList.toggle('active', g === 'M');
+  document.getElementById('genderF').classList.toggle('active', g === 'F');
+}
+function showSajuForm() {
+  document.getElementById('sajuForm').style.display = 'block';
+  document.getElementById('sajuResult').classList.remove('show');
+}
+
+async function submitSaju() {
+  var birthVal = document.getElementById('sajuBirth').value;
+  if (!birthVal) { alert('생년월일을 입력해주세요.'); return; }
+  var hourVal = document.getElementById('sajuHour').value;
+  var hour = hourVal === 'unknown' ? 12 : parseInt(hourVal);
+  var birthISO = birthVal + 'T' + String(hour).padStart(2,'0') + ':00:00';
+
+  var btn = document.getElementById('sajuSubmitBtn');
+  btn.disabled = true; btn.textContent = '계산 중...';
+
+  try {
+    var res = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ birth: birthISO, gender: _sajuGender === 'M' ? 'male' : 'female', calendar: 'solar' })
+    });
+    var data = await res.json();
+    if (data.error) throw new Error(data.error);
+    renderSajuResult(data, birthVal);
+  } catch(e) {
+    alert('계산 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
+  } finally {
+    btn.disabled = false; btn.textContent = '사주 보기 🔮';
+  }
+}
+
+function renderSajuResult(data, birthVal) {
+  var EL_COLOR = { 목: '#4ade80', 화: '#f87171', 토: '#facc15', 금: '#d4af37', 수: '#60a5fa' };
+  var EL_BG    = { 목: 'rgba(74,222,128,0.12)', 화: 'rgba(248,113,113,0.12)', 토: 'rgba(250,204,21,0.12)', 금: 'rgba(212,175,55,0.12)', 수: 'rgba(96,165,250,0.12)' };
+  var STEMS_EL = { 갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수' };
+  var LABELS   = ['년주', '월주', '일주', '시주'];
+  var pillars  = data.summary && data.summary.pillars;
+
+  // 부제
+  document.getElementById('sajuResultSub').textContent =
+    birthVal + ' 생  ' + (_sajuGender === 'M' ? '남성' : '여성') +
+    (data.summary && data.summary.zodiac ? '  띠: ' + data.summary.zodiac : '');
+
+  // 4주 8자 카드
+  var pillarHTML = '';
+  ['year','month','day','hour'].forEach(function(key, i) {
+    var chars = (pillars && pillars[key]) ? pillars[key].split('') : ['?','?'];
+    var stem = chars[0] || '?', branch = chars[1] || '?';
+    var el = STEMS_EL[stem] || '토';
+    var col = EL_COLOR[el] || '#aaa', bg = EL_BG[el] || 'transparent';
+    pillarHTML +=
+      '<div class="saju-pillar">' +
+        '<div class="saju-pillar-label">' + LABELS[i] + '</div>' +
+        '<div class="saju-hanja" style="color:' + col + '">' +
+          '<span>' + stem + '</span><span>' + branch + '</span>' +
+        '</div>' +
+        '<div class="saju-elem-tag" style="color:' + col + ';background:' + bg + '">' + el + '</div>' +
+      '</div>';
+  });
+  document.getElementById('sajuPillars').innerHTML = pillarHTML;
+
+  // 신강/신약
+  var strength = (data.summary && data.summary.strength) || '';
+  var sColor = strength.includes('신강') ? '#4ade80' : strength.includes('신약') ? '#f87171' : '#e8b86d';
+  document.getElementById('sajuStrengthBox').innerHTML =
+    '<span class="saju-strength-label">일간 강약</span>' +
+    '<span class="saju-strength-val" style="color:' + sColor + '">' + (strength || '–') + '</span>';
+
+  // 오행 비율 막대
+  var five = data.five_pct || {};
+  var EL_ORDER = ['목','화','토','금','수'];
+  var barsHTML = '<div class="saju-five-label">오행 비율</div><div class="saju-five-bars">';
+  EL_ORDER.forEach(function(el) {
+    var pct = Math.round((five[el] || 0) * 100);
+    barsHTML +=
+      '<div class="saju-bar-row">' +
+        '<div class="saju-bar-name" style="color:' + (EL_COLOR[el]||'#aaa') + '">' + el + '</div>' +
+        '<div class="saju-bar-track"><div class="saju-bar-fill" style="width:' + pct + '%;background:' + (EL_COLOR[el]||'#aaa') + '"></div></div>' +
+        '<div class="saju-bar-pct">' + pct + '%</div>' +
+      '</div>';
+  });
+  barsHTML += '</div>';
+  document.getElementById('sajuFiveBox').innerHTML = barsHTML;
+
+  // 화면 전환
+  document.getElementById('sajuForm').style.display = 'none';
+  document.getElementById('sajuResult').classList.add('show');
+}
 </script>
 </body>
 </html>
