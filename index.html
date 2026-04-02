@@ -206,6 +206,17 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
   }
+  /* 5번째 카드 중앙 정렬 */
+  .why-grid .why-card:nth-child(4) { grid-column: 1 / 2; margin-left: auto; width: 100%; }
+  .why-grid .why-card:nth-child(5) { grid-column: 2 / 3; margin-right: auto; width: 100%; }
+  .why-tagline {
+    margin-top: 40px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--accent2);
+    letter-spacing: 0.3px;
+    line-height: 1.6;
+  }
   .why-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -365,7 +376,10 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
-    .why-grid { grid-template-columns: 1fr; gap: 14px; }
+    .why-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .why-grid .why-card:nth-child(4),
+    .why-grid .why-card:nth-child(5) { grid-column: auto; margin: 0; width: 100%; }
+    .why-grid .why-card:nth-child(5) { grid-column: 1 / -1; max-width: calc(50% - 7px); margin: 0 auto; }
     .service-grid { grid-template-columns: 1fr; gap: 14px; }
     .section-why, .section-services { padding: 64px 20px 48px; }
     .section-cta { padding: 64px 20px 80px; }
@@ -398,25 +412,36 @@
 
 <!-- WHY PICOLAB -->
 <section class="section-why">
-  <div class="section-label">왜 피코랩인가</div>
-  <h2 class="section-title">별들의 언어로<br><em>운명을 읽습니다</em></h2>
+  <div class="section-label">PICO Lab의 5중 교차검증 시스템</div>
+  <h2 class="section-title">5,000년 인류의 지혜를<br><em>AI가 동시에 교차 분석합니다</em></h2>
   <div class="why-grid">
     <div class="why-card">
-      <div class="why-icon">🌌</div>
-      <h3>5,000년의 데이터</h3>
-      <p>수천 년 인류의 관측과 기록이 담긴 고대 지혜를 현대 AI로 해석합니다.</p>
+      <div class="why-icon">🏛️</div>
+      <h3>사주 (四柱)</h3>
+      <p>인생의 설계도, 기질의 뿌리. 태어난 연·월·일·시의 네 기둥이 만드는 운명의 지도.</p>
     </div>
     <div class="why-card">
-      <div class="why-icon">🔯</div>
-      <h3>세 학문의 통합</h3>
-      <p>사주팔자 · 서양 점성술 · 베딕 점성술 — 세 가지 시스템이 하나의 통찰로.</p>
+      <div class="why-icon">🌟</div>
+      <h3>서양 점성술</h3>
+      <p>심리적 동기와 운의 타이밍. 행성의 위치가 드러내는 내면의 패턴과 흐름.</p>
     </div>
     <div class="why-card">
-      <div class="why-icon">✨</div>
-      <h3>AI 기반 정밀 분석</h3>
-      <p>최신 AI가 수백만 가지 변수를 실시간으로 계산해 당신만의 운세를 만듭니다.</p>
+      <div class="why-icon">🕉️</div>
+      <h3>베딕 점성술</h3>
+      <p>카르마와 세부 운의 변화. 달의 별자리(낙샤트라)로 읽는 정밀한 운의 리듬.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">⭐</div>
+      <h3>자미두수 (紫微斗數)</h3>
+      <p>인생 12궁 배치도. 별의 배열로 삶의 영역별 운세와 인연의 구조를 분석합니다.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🗺️</div>
+      <h3>기문둔갑 (奇門遁甲)</h3>
+      <p>전략적 행동 지침. 시간과 공간의 에너지를 계산해 최적의 선택 시점을 제시합니다.</p>
     </div>
   </div>
+  <p class="why-tagline">5가지가 모두 같은 방향을 가리킬 때, 그것이 진짜 운명입니다.</p>
 </section>
 
 <div class="section-divider"></div>
