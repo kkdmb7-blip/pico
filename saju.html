@@ -185,13 +185,21 @@
 
   <div style="margin-bottom:16px">
     <label class="f-label">태어난 시간</label>
-    <div style="display:flex;gap:6px;align-items:center">
-      <select id="f_hh" class="f-select" style="flex:1.2"></select>
-      <select id="f_mm" class="f-select" style="flex:1"></select>
-      <label style="display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:13px;color:rgba(255,255,255,0.5);cursor:pointer;flex-shrink:0">
-        <input type="checkbox" id="f_unknown" onchange="toggleTimeUnknown(this)" style="accent-color:#7b5ea7"> 모름
-      </label>
-    </div>
+    <select id="f_h" class="f-select">
+      <option value="unknown">모름 (정오 기준)</option>
+      <option value="0">자시 子 23:30–01:30</option>
+      <option value="2">축시 丑 01:30–03:30</option>
+      <option value="4">인시 寅 03:30–05:30</option>
+      <option value="6">묘시 卯 05:30–07:30</option>
+      <option value="8">진시 辰 07:30–09:30</option>
+      <option value="10">사시 巳 09:30–11:30</option>
+      <option value="12">오시 午 11:30–13:30</option>
+      <option value="14">미시 未 13:30–15:30</option>
+      <option value="16">신시 申 15:30–17:30</option>
+      <option value="18">유시 酉 17:30–19:30</option>
+      <option value="20">술시 戌 19:30–21:30</option>
+      <option value="22">해시 亥 21:30–23:30</option>
+    </select>
   </div>
 
   <div style="margin-bottom:24px">
@@ -416,33 +424,15 @@ function selCal(c) {
   updDays();
 })();
 
-// 시·분 드롭다운 초기화
-(function initTimeSelects(){
-  const hE=document.getElementById('f_hh');
-  const mE=document.getElementById('f_mm');
-  hE.innerHTML='';
-  for(let h=0;h<24;h++) hE.add(new Option(h+'시', String(h)));
-  hE.value='12';
-  mE.innerHTML='';
-  for(let m=0;m<60;m+=5){const ml=m<10?'0'+m:''+m; mE.add(new Option(ml+'분', String(m)));}
-  mE.value='0';
-})();
-
-function toggleTimeUnknown(cb){
-  document.getElementById('f_hh').disabled=cb.checked;
-  document.getElementById('f_mm').disabled=cb.checked;
-}
-
 function doSubmit() {
   const y=document.getElementById('f_y').value;
   const m=document.getElementById('f_m').value;
   const d=document.getElementById('f_d').value;
   if(!y||!m||!d){alert('생년월일을 모두 선택해주세요.');return;}
-  const unknown=document.getElementById('f_unknown').checked;
-  const hh=unknown?12:parseInt(document.getElementById('f_hh').value);
-  const mm=unknown?0:parseInt(document.getElementById('f_mm').value);
+  const h=document.getElementById('f_h').value;
   const name=document.getElementById('f_name').value.trim();
-  const p=new URLSearchParams({year:y,month:m,day:d,hour:hh,minute:mm,gender:_gender==='M'?'male':'female',calendar:_cal});
+  const birth=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const p=new URLSearchParams({birth,hour:h,gender:_gender==='M'?'male':'female',calendar:_cal});
   if(name) p.set('name',name);
   location.search='?'+p.toString();
 }
@@ -467,13 +457,12 @@ const pYear  = UP.get('year');
 const pMonth = UP.get('month');
 const pDay   = UP.get('day');
 const pHour  = UP.get('hour') || '12';
-const pMinute= UP.get('minute') || '0';
 const pGender= UP.get('gender') || 'male';
 const pMidnight = parseInt(UP.get('midnightType') || '0');
 const pName  = UP.get('name') || '';
 const pBirth = (pYear && pMonth && pDay)
   ? pYear + '-' + String(pMonth).padStart(2,'0') + '-' + String(pDay).padStart(2,'0')
-  : UP.get('birth') || null;
+  : null;
 
 if (pBirth) {
   document.getElementById('S_form').style.display='none';
@@ -486,8 +475,7 @@ if (pBirth) {
 // ═══════════════════════════════════════════════════
 async function fetchSaju() {
   const hour = parseInt(pHour);
-  const minute = parseInt(pMinute);
-  const birthISO = `${pBirth}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:00`;
+  const birthISO = `${pBirth}T${String(hour).padStart(2,'0')}:00:00`;
   try {
     const res = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test',{
       method:'POST',
@@ -539,8 +527,10 @@ function renderProfile(data) {
   const cy = new Date().getFullYear();
   const ageKor = cy - byear + 1;
   const ageMan = cy - byear;
+  const hourNum = parseInt(pHour);
+  const isYajasi = hourNum === 23;
   const gTxt = pGender==='male'?'남':'여';
-  const hTxt = `${String(parseInt(pHour)).padStart(2,'0')}:${String(parseInt(pMinute)).padStart(2,'0')}`;
+  const hTxt = `${pHour}시`;
   const note = data._note || '';
 
   const namePart = pName
