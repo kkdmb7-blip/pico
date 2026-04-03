@@ -621,10 +621,11 @@
       <h3>자미두수 (紫微斗數)</h3>
       <p>인생 12궁 배치도. 별의 배열로 삶의 영역별 운세와 인연의 구조를 분석합니다.</p>
     </div>
-    <div class="why-card">
+    <div class="why-card" onclick="openQimenModal()" style="cursor:pointer;">
       <div class="why-icon">🗺️</div>
       <h3>기문둔갑 (奇門遁甲)</h3>
       <p>전략적 행동 지침. 시간과 공간의 에너지를 계산해 최적의 선택 시점을 제시합니다.</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">포국반 체험해보기 →</div>
     </div>
   </div>
   <p class="why-tagline">5가지가 모두 같은 방향을 가리킬 때, 그것이 진짜 운명입니다.</p>
@@ -690,6 +691,42 @@
       </div>
       <button class="saju-submit-btn" id="sajuSubmitBtn" onclick="submitSaju()">사주 보기 ✦</button>
     </div>
+  </div>
+</div>
+
+<!-- QIMEN MODAL -->
+<div class="saju-overlay" id="qimenOverlay" onclick="if(event.target===this)closeQimenModal()">
+  <div class="saju-modal">
+    <button class="saju-modal-close" onclick="closeQimenModal()">✕</button>
+    <h3>🗺️ 기문둔갑 포국반</h3>
+    <p class="saju-modal-sub">날짜와 시간을 입력하면 9궁 포국을 즉시 확인할 수 있어요</p>
+
+    <div class="saju-form-group">
+      <label>날짜</label>
+      <div class="saju-date-row">
+        <select id="qmYear"></select>
+        <select id="qmMonth"></select>
+        <select id="qmDay"></select>
+      </div>
+    </div>
+
+    <div class="saju-form-group">
+      <label>시간</label>
+      <div style="display:flex;gap:8px;">
+        <select id="qmHour" style="flex:1;"></select>
+        <select id="qmMinute" style="flex:1;"></select>
+      </div>
+    </div>
+
+    <div class="saju-form-group">
+      <label>판 종류</label>
+      <div class="saju-gender-row">
+        <button class="saju-gender-btn active" id="qmBtnSiga" onclick="selectQimenType('siga')">시가기문 (時家)</button>
+        <button class="saju-gender-btn"        id="qmBtnIlga" onclick="selectQimenType('ilga')">일가기문 (日家)</button>
+      </div>
+    </div>
+
+    <button class="saju-submit-btn" onclick="submitQimen()">기문 보기 ✦</button>
   </div>
 </div>
 
@@ -781,6 +818,85 @@ function selectGender(g) {
   _sajuGender = g;
   document.getElementById('genderM').classList.toggle('active', g === 'M');
   document.getElementById('genderF').classList.toggle('active', g === 'F');
+}
+
+// ── QIMEN MODAL ──────────────────────────────────────────
+var _qimenType = 'siga';
+
+function openQimenModal() {
+  var now = new Date();
+  _qimenType = 'siga';
+  document.getElementById('qmBtnSiga').classList.add('active');
+  document.getElementById('qmBtnIlga').classList.remove('active');
+
+  // 연도
+  var yEl = document.getElementById('qmYear');
+  if (yEl.options.length === 0) {
+    for (var y = now.getFullYear() - 5; y <= now.getFullYear() + 1; y++) {
+      var o = document.createElement('option'); o.value = y; o.textContent = y + '년'; yEl.appendChild(o);
+    }
+  }
+  yEl.value = now.getFullYear();
+
+  // 월
+  var mEl = document.getElementById('qmMonth');
+  if (mEl.options.length === 0) {
+    for (var mo = 1; mo <= 12; mo++) {
+      var o = document.createElement('option'); o.value = mo; o.textContent = mo + '월'; mEl.appendChild(o);
+    }
+  }
+  mEl.value = now.getMonth() + 1;
+
+  // 일
+  var dEl = document.getElementById('qmDay');
+  if (dEl.options.length === 0) {
+    for (var d = 1; d <= 31; d++) {
+      var o = document.createElement('option'); o.value = d; o.textContent = d + '일'; dEl.appendChild(o);
+    }
+  }
+  dEl.value = now.getDate();
+
+  // 시
+  var hEl = document.getElementById('qmHour');
+  if (hEl.options.length === 0) {
+    for (var h = 0; h <= 23; h++) {
+      var o = document.createElement('option'); o.value = h; o.textContent = String(h).padStart(2,'0') + '시'; hEl.appendChild(o);
+    }
+  }
+  hEl.value = now.getHours();
+
+  // 분
+  var minEl = document.getElementById('qmMinute');
+  if (minEl.options.length === 0) {
+    for (var mi = 0; mi <= 59; mi++) {
+      var o = document.createElement('option'); o.value = mi; o.textContent = String(mi).padStart(2,'0') + '분'; minEl.appendChild(o);
+    }
+  }
+  minEl.value = now.getMinutes();
+
+  document.getElementById('qimenOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeQimenModal() {
+  document.getElementById('qimenOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function selectQimenType(t) {
+  _qimenType = t;
+  document.getElementById('qmBtnSiga').classList.toggle('active', t === 'siga');
+  document.getElementById('qmBtnIlga').classList.toggle('active', t === 'ilga');
+}
+
+function submitQimen() {
+  var year   = document.getElementById('qmYear').value;
+  var month  = document.getElementById('qmMonth').value;
+  var day    = document.getElementById('qmDay').value;
+  var hour   = document.getElementById('qmHour').value;
+  var minute = document.getElementById('qmMinute').value;
+  var p = new URLSearchParams({ year: year, month: month, day: day, hour: hour, minute: minute, type: _qimenType });
+  window.location.href = 'qimen.html?' + p.toString();
 }
 
 function submitSaju() {
