@@ -328,9 +328,9 @@
   <!-- 행운 정보 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
     <button onclick="togAcc('acc_johu')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
-      <span>🍀 행운 · 억부</span><span class="acc-icon" id="ico_acc_johu">▾</span>
+      <span>🍀 행운</span><span class="acc-icon open" id="ico_acc_johu">▾</span>
     </button>
-    <div class="acc-body shut" id="acc_johu">
+    <div class="acc-body open" id="acc_johu">
       <div id="R_johu" style="padding:0 12px 14px"></div>
     </div>
   </div>
@@ -983,18 +983,6 @@ function renderJohu(data) {
   const luckyEl = priEl;
 
   document.getElementById('R_johu').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3)">억부용신</div>
-        <div class="hanja ${EL_TC_CSS[priEl]}" style="font-weight:700;font-size:20px;margin-top:4px">${EL_NAME[priEl]}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.45)">${y.primary_kor}</div>
-      </div>
-      <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3)">억부희신</div>
-        <div class="hanja ${EL_TC_CSS[secEl]}" style="font-weight:700;font-size:20px;margin-top:4px">${EL_NAME[secEl]}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.45)">${y.secondary_kor}</div>
-      </div>
-    </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px">
       <div class="glass-sm" style="padding:10px;text-align:center">
         <div style="font-size:10px;color:rgba(255,255,255,0.3)">행운 숫자</div>
