@@ -259,6 +259,69 @@
     color: var(--accent2); font-family: 'Noto Serif KR', serif;
   }
 
+  /* ── 해석 카드 ── */
+  .interp-wrap {
+    display: none; margin-bottom: 20px;
+  }
+  .interp-wrap.visible { display: block; }
+  .interp-section-title {
+    font-size: 11px; color: var(--muted); letter-spacing: 0.5px;
+    text-transform: uppercase; font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .interp-free {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px;
+    margin-bottom: 12px;
+  }
+  .interp-rows { display: flex; flex-direction: column; gap: 14px; }
+  .interp-row { display: flex; gap: 12px; align-items: flex-start; }
+  .interp-key {
+    font-size: 11px; color: var(--muted); font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    min-width: 68px; padding-top: 1px;
+  }
+  .interp-val { font-size: 14px; color: var(--text); line-height: 1.6; flex: 1; }
+  .interp-summary {
+    margin-top: 16px; padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 15px; color: var(--text);
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 400; line-height: 1.8;
+  }
+  .interp-geok-badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 5px; margin-right: 6px;
+    vertical-align: middle;
+  }
+  .badge-대길 { background: rgba(255,215,0,0.15); color: #FFD700; border: 1px solid rgba(255,215,0,0.3); }
+  .badge-길   { background: rgba(0,200,83,0.12);  color: #00C853; border: 1px solid rgba(0,200,83,0.25); }
+  .badge-흉   { background: rgba(255,109,0,0.12); color: #FF6D00; border: 1px solid rgba(255,109,0,0.25); }
+  .badge-대흉 { background: rgba(255,23,68,0.12); color: #FF1744; border: 1px solid rgba(255,23,68,0.25); }
+  .interp-paid {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    opacity: 0.7;
+  }
+  .interp-paid-left { display: flex; flex-direction: column; gap: 4px; }
+  .interp-paid-title {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .lock-icon { font-size: 14px; opacity: 0.8; }
+  .interp-paid-desc { font-size: 12px; color: var(--muted); }
+  .btn-paid {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 22px; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); cursor: not-allowed;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 700;
+    white-space: nowrap;
+  }
+
   /* ── AI BUTTON ── */
   .action-row {
     display: none; justify-content: center; gap: 12px;
@@ -434,6 +497,23 @@
     </div>
   </div>
 
+  <div class="interp-wrap" id="interp-wrap">
+    <div class="interp-section-title">포국 해석</div>
+    <div class="interp-free" id="interp-free">
+      <div class="interp-rows" id="interp-rows"></div>
+      <div class="interp-summary" id="interp-summary"></div>
+    </div>
+    <div class="interp-paid">
+      <div class="interp-paid-left">
+        <div class="interp-paid-title">
+          <span class="lock-icon">🔒</span> AI 심층 분석
+        </div>
+        <div class="interp-paid-desc">격국 전체 해설 · 시간대별 행동 전략 · 맞춤 조언 · 운세 종합 리포트</div>
+      </div>
+      <button class="btn-paid" disabled>곧 출시 예정</button>
+    </div>
+  </div>
+
   <div class="action-row" id="action-row">
     <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" class="btn-ai">
       ✦ AI 운세 상담하기
@@ -441,6 +521,7 @@
   </div>
 </main>
 
+<script src="qimen_geokguk.js"></script>
 <script>
 // 낙서 배치: 행×열
 const LAKSHO = [[4,9,2],[3,5,7],[8,1,6]];
@@ -492,6 +573,7 @@ function hideResults() {
   setVisible('grid-wrap', false);
   setVisible('bestdir-box', false);
   setVisible('zhifu-bar', false);
+  setVisible('interp-wrap', false);
   setVisible('action-row', false);
   hasResult = false;
 }
@@ -586,6 +668,9 @@ function renderResult(data) {
   document.getElementById('zf-door').textContent = data.직사문 || '-';
   setVisible('zhifu-bar', true);
 
+  // 해석 카드
+  renderInterp(data);
+
   setVisible('action-row', true);
   hasResult = true;
 }
@@ -673,6 +758,82 @@ function renderBestDir(data) {
   });
 
   setVisible('bestdir-box', rows.children.length > 0);
+}
+
+function renderInterp(data) {
+  const matched = (typeof checkGeokguk === 'function') ? checkGeokguk(data) : [];
+  const rows    = document.getElementById('interp-rows');
+  const summary = document.getElementById('interp-summary');
+  rows.innerHTML = '';
+  summary.textContent = '';
+
+  // 최적 방향: 生門/開門 궁 방위
+  const 길방 = [];
+  ['生', '開'].forEach(door => {
+    Object.entries(data.palaces).forEach(([n, p]) => {
+      if (p.팔문 === door) 길방.push(GONG_DIR[parseInt(n)] + '(' + door + '門)');
+    });
+  });
+
+  // 최적 시간대: 직사문 기준
+  const doorTimeMap = {
+    '生':'오전 5~7시(寅), 오전 11~13시(午)',
+    '開':'오전 3~5시(丑), 오후 19~21시(戌)',
+    '休':'오전 23~01시(子), 오전 1~3시(丑)',
+    '景':'오전 11~13시(午), 오후 13~15시(未)',
+  };
+  const 최적시간 = doorTimeMap[data.직사문] || '生門·開門 배치 시간대';
+
+  // 추천행동·주의사항 합산
+  const 추천Set = new Set();
+  const 주의Set = new Set();
+  matched.forEach(g => {
+    if (g.추천행동) g.추천행동.split(',').forEach(a => 추천Set.add(a.trim()));
+    if (g.주의)     주의Set.add(g.주의);
+  });
+
+  // 격국 배지
+  const 격국텍스트 = matched.length
+    ? matched.map(g =>
+        '<span class="interp-geok-badge badge-' + g.길흉 + '">' + g.길흉 + '</span>' + g.name
+      ).join(' &nbsp;')
+    : '매칭된 특수 격국 없음 — 평국(平局)';
+
+  const rowData = [
+    { key: '격국',    val: 격국텍스트, html: true },
+    { key: '최적방향', val: 길방.length ? 길방.join(' · ') : '해당 없음' },
+    { key: '최적시간', val: 최적시간 },
+    { key: '추천행동', val: 추천Set.size ? [...추천Set].join(', ') : '정상적인 일과 진행' },
+    { key: '주의사항', val: 주의Set.size ? [...주의Set].join(' / ') : '특이 사항 없음' },
+  ];
+
+  rowData.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'interp-row';
+    const key = document.createElement('div');
+    key.className = 'interp-key';
+    key.textContent = r.key;
+    const val = document.createElement('div');
+    val.className = 'interp-val';
+    if (r.html) val.innerHTML = r.val; else val.textContent = r.val;
+    row.appendChild(key);
+    row.appendChild(val);
+    rows.appendChild(row);
+  });
+
+  // 한줄 요약
+  if (matched.length) {
+    summary.textContent = matched[0].요약;
+  } else {
+    const 직사문명 = {
+      '生':'생기', '開':'왕성한 활동', '休':'안정', '景':'밝은 기운',
+      '傷':'주의', '杜':'막힘', '驚':'긴장', '死':'침체'
+    };
+    summary.textContent = '직사문 ' + (data.직사문 || '') + '門 — ' +
+      (직사문명[data.직사문] || '보통') + '의 기운이 흐르는 날입니다.';
+  }
+
+  setVisible('interp-wrap', true);
 }
 
 // 별 생성
