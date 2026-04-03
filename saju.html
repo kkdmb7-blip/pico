@@ -327,7 +327,6 @@ const EN_EL     = { wood:'목', fire:'화', earth:'토', metal:'금', water:'수
 const PRODUCE = {목:'화',화:'토',토:'금',금:'수',수:'목'};
 const CONTROL = {목:'토',화:'금',토:'수',금:'목',수:'화'};
 function sipseong(dayIdx, tIdx) {
-  if (dayIdx === tIdx) return '';
   const b = STEM_EL[dayIdx], t = STEM_EL[tIdx], sy = (dayIdx%2)===(tIdx%2);
   if (t===b)           return sy?'비견':'겁재';
   if (t===PRODUCE[b])  return sy?'식신':'상관';
@@ -577,19 +576,32 @@ function renderPillars(data, pls, dayP) {
 
   pls.forEach((pl,i) => {
     const isDay = i===1;
-    const sip  = isDay ? '<span style="color:#CE93D8">일간</span>' :
-                  (sipseong(dayP.si, pl.si) || '&nbsp;');
-    const jjg  = JJG[pl.bi];
-    const jjgKor = jjg.map(ji=>STEMS[ji]).join('·');
-    const jjgSip = jjg.map(ji=>{
-      const s=sipseong(dayP.si,ji);
-      return s?`<span style="font-size:9px;color:rgba(255,255,255,0.35)">${s}</span>`:'';
-    }).join('');
-    const woon = woonseong(dayP.si, pl.bi);
-    const nap  = napeum(pl.si, pl.bi);
 
-    // 각 지지가 관계에 포함되는지
-    const bch = BRANCHES[pl.bi];
+    // 천간 십성 (상단)
+    const stemSip = isDay
+      ? '<span style="color:#CE93D8">일간</span>'
+      : `<span>${sipseong(dayP.si, pl.si) || '&nbsp;'}</span>`;
+
+    // 지지 안전 처리
+    const bIdx = pl.bi >= 0 ? pl.bi : 0;
+    const bEl  = BRANCH_EL[bIdx] || '토';
+
+    // 지장간: 이름+십성 쌍으로
+    const jjg = JJG[bIdx] || [];
+    const jjgHTML = jjg.map(ji => {
+      const name = STEMS[ji] || '';
+      const sip  = sipseong(dayP.si, ji);
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:1px">
+        <span style="font-size:11px;color:rgba(255,255,255,0.6)">${name}</span>
+        <span style="font-size:9px;color:rgba(255,255,255,0.35);white-space:nowrap">${sip||'—'}</span>
+      </div>`;
+    }).join('');
+
+    const woon = woonseong(dayP.si, bIdx);
+    const nap  = napeum(pl.si, bIdx);
+
+    // 형충회합
+    const bch = BRANCHES[bIdx];
     const rel = data.branch_relations_kor;
     const myRels = [
       ...(rel.clashes   ||[]).filter(r=>r.includes(bch)).map(r=>`<span style="font-size:10px;color:#FF5252">${r}</span>`),
@@ -602,12 +614,11 @@ function renderPillars(data, pls, dayP) {
     html += `
     <div class="pillar-card${isDay?' is-day':''}">
       <div style="font-size:10px;color:rgba(255,255,255,0.28);margin-bottom:4px">${LABELS[i]}</div>
-      <div style="font-size:11px;min-height:16px;margin-bottom:4px">${sip}</div>
-      <div class="hanja-box ${EL_BG_CSS[pl.sStemEl]}">${STEM_H[pl.si]}</div>
-      <div class="hanja-box ${EL_BG_CSS[pl.sBranEl]}">${BRANCH_H[pl.bi]}</div>
-      <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.45)">${jjgKor}</div>
-      <div style="min-height:14px">${jjgSip}</div>
-      <div style="margin-top:5px;font-size:10px;color:rgba(255,255,255,0.5);font-weight:600">${woon}</div>
+      <div style="font-size:11px;min-height:16px;margin-bottom:4px;color:rgba(255,255,255,0.6)">${stemSip}</div>
+      <div class="hanja-box ${EL_BG_CSS[pl.sStemEl]||''}">${STEM_H[pl.si]||'?'}</div>
+      <div class="hanja-box ${EL_BG_CSS[bEl]||''}">${BRANCH_H[bIdx]||'?'}</div>
+      <div style="margin-top:8px;display:flex;justify-content:center;gap:4px;flex-wrap:wrap">${jjgHTML}</div>
+      <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.5);font-weight:600">${woon}</div>
       <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;line-height:1.3">${nap}</div>
       <div style="margin-top:5px;min-height:14px;line-height:1.4">${myRels}</div>
     </div>`;
