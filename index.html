@@ -675,20 +675,23 @@
       <p>인생의 설계도, 기질의 뿌리. 태어난 연·월·일·시의 네 기둥이 만드는 운명의 지도.</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">무료 체험해보기 →</div>
     </div>
-    <div class="why-card">
+    <div class="why-card" onclick="openBirthModal('astro')" style="cursor:pointer;">
       <div class="why-icon">🌟</div>
       <h3>서양 점성술</h3>
       <p>심리적 동기와 운의 타이밍. 행성의 위치가 드러내는 내면의 패턴과 흐름.</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
-    <div class="why-card">
+    <div class="why-card" onclick="openBirthModal('vedic')" style="cursor:pointer;">
       <div class="why-icon">🕉️</div>
       <h3>베딕 점성술</h3>
       <p>카르마와 세부 운의 변화. 달의 별자리(낙샤트라)로 읽는 정밀한 운의 리듬.</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
-    <div class="why-card">
+    <div class="why-card" onclick="openBirthModal('ziwei')" style="cursor:pointer;">
       <div class="why-icon">⭐</div>
       <h3>자미두수 (紫微斗數)</h3>
       <p>인생 12궁 배치도. 별의 배열로 삶의 영역별 운세와 인연의 구조를 분석합니다.</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openQimenModal()" style="cursor:pointer;">
       <div class="why-icon">🗺️</div>
@@ -788,6 +791,45 @@
     </div>
 
     <button class="saju-submit-btn" onclick="submitQimen()">기문 보기 ✦</button>
+  </div>
+</div>
+
+<!-- BIRTH MODAL (점성술/베딕/자미두수 공용) -->
+<div class="saju-overlay" id="birthOverlay" onclick="if(event.target===this)closeBirthModal()">
+  <div class="saju-modal">
+    <button class="saju-modal-close" onclick="closeBirthModal()">✕</button>
+    <h3 id="birthModalTitle">🌟 서양 점성술</h3>
+    <p class="saju-modal-sub">생년월일을 입력하면 바로 확인할 수 있어요</p>
+    <div class="saju-form-group">
+      <label>생년월일</label>
+      <div class="saju-date-row">
+        <select id="birthYear"><option value="">년</option></select>
+        <select id="birthMonth"><option value="">월</option></select>
+        <select id="birthDay"><option value="">일</option></select>
+      </div>
+    </div>
+    <div class="saju-form-group">
+      <label>태어난 시간</label>
+      <select id="birthHour" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none">
+        <option value="unknown">시 모름</option>
+        <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
+        <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
+        <option value="6">6시</option><option value="7">7시</option><option value="8">8시</option>
+        <option value="9">9시</option><option value="10">10시</option><option value="11">11시</option>
+        <option value="12" selected>12시</option><option value="13">13시</option><option value="14">14시</option>
+        <option value="15">15시</option><option value="16">16시</option><option value="17">17시</option>
+        <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
+        <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
+      </select>
+    </div>
+    <div class="saju-form-group">
+      <label>성별</label>
+      <div class="saju-gender-row">
+        <button class="saju-gender-btn active" id="birthGenderM" onclick="selectBirthGender('M')">남성 ♂</button>
+        <button class="saju-gender-btn" id="birthGenderF" onclick="selectBirthGender('F')">여성 ♀</button>
+      </div>
+    </div>
+    <button class="saju-submit-btn" onclick="submitBirth()">바로 보기 ✦</button>
   </div>
 </div>
 
@@ -1006,6 +1048,89 @@ function submitQimen() {
   var minute = document.getElementById('qmMinute').value;
   var p = new URLSearchParams({ year: year, month: month, day: day, hour: hour, minute: minute, type: 'siga' });
   window.location.href = 'qimen.html?' + p.toString();
+}
+
+// ── BIRTH MODAL (점성술/베딕/자미두수) ──────────────────
+var _birthMode = 'astro';
+var _birthGender = 'M';
+
+var BIRTH_CONFIG = {
+  astro:  { title: '🌟 서양 점성술', url: 'https://fortuna-silk.vercel.app', extra: {} },
+  vedic:  { title: '🕉️ 베딕 점성술', url: 'https://kkdmb7-blip.github.io/memox/', extra: { mode: 'vedic' } },
+  ziwei:  { title: '⭐ 자미두수',     url: 'https://kkdmb7-blip.github.io/memox/', extra: { mode: 'ziwei' } },
+};
+
+function initBirthSelects() {
+  var yEl = document.getElementById('birthYear');
+  if (yEl.options.length > 1) return;
+  var curY = new Date().getFullYear();
+  for (var y = curY; y >= 1930; y--) {
+    var o = document.createElement('option'); o.value = y; o.textContent = y + '년'; yEl.appendChild(o);
+  }
+  var mEl = document.getElementById('birthMonth');
+  for (var mo = 1; mo <= 12; mo++) {
+    var o = document.createElement('option'); o.value = mo; o.textContent = mo + '월'; mEl.appendChild(o);
+  }
+  var dEl = document.getElementById('birthDay');
+  function updateBirthDays() {
+    var yv = parseInt(yEl.value) || 2000;
+    var mv = parseInt(mEl.value) || 1;
+    var maxD = new Date(yv, mv, 0).getDate();
+    var cur = parseInt(dEl.value);
+    dEl.innerHTML = '<option value="">일</option>';
+    for (var dd = 1; dd <= maxD; dd++) {
+      var o = document.createElement('option'); o.value = dd; o.textContent = dd + '일';
+      if (dd === cur) o.selected = true;
+      dEl.appendChild(o);
+    }
+  }
+  yEl.addEventListener('change', updateBirthDays);
+  mEl.addEventListener('change', updateBirthDays);
+  updateBirthDays();
+}
+
+function openBirthModal(mode) {
+  _birthMode = mode;
+  document.getElementById('birthModalTitle').textContent = BIRTH_CONFIG[mode].title;
+  document.getElementById('birthOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  initBirthSelects();
+  try {
+    var p = JSON.parse(localStorage.getItem('pico_profile'));
+    if (p) {
+      if (p.year)  document.getElementById('birthYear').value  = p.year;
+      if (p.month) document.getElementById('birthMonth').value = p.month;
+      if (p.day)   document.getElementById('birthDay').value   = p.day;
+      if (p.hour != null) document.getElementById('birthHour').value = String(p.hour);
+      selectBirthGender(p.gender || 'M');
+    }
+  } catch(e) {}
+}
+
+function closeBirthModal() {
+  document.getElementById('birthOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function selectBirthGender(g) {
+  _birthGender = g;
+  document.getElementById('birthGenderM').classList.toggle('active', g === 'M');
+  document.getElementById('birthGenderF').classList.toggle('active', g === 'F');
+}
+
+function submitBirth() {
+  var year  = document.getElementById('birthYear').value;
+  var month = document.getElementById('birthMonth').value;
+  var day   = document.getElementById('birthDay').value;
+  if (!year || !month || !day) { alert('생년월일을 모두 선택해주세요.'); return; }
+  var hour   = document.getElementById('birthHour').value;
+  var gender = _birthGender === 'M' ? 'male' : 'female';
+  var cfg = BIRTH_CONFIG[_birthMode];
+  var p = new URLSearchParams(cfg.extra);
+  p.set('year', year); p.set('month', month); p.set('day', day);
+  if (hour !== 'unknown') p.set('hour', hour);
+  p.set('gender', gender);
+  window.location.href = cfg.url + '?' + p.toString();
 }
 
 // ── AUTH & KAKAO ─────────────────────────────────────────
