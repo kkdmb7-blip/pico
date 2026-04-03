@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기문둔갑 포국반 · PICO Lab</title>
+<meta name="description" content="기문둔갑 시가·일가 포국반. 날짜와 시각을 입력하면 9궁 포국 결과를 즉시 확인할 수 있습니다.">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c28;
+    --border: #2a2a3d;
+    --accent: #7b5ea7;
+    --accent2: #e8b86d;
+    --text: #f0f0f5;
+    --muted: #6b6b85;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+  #starCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0;
+    animation: twinkle var(--dur, 3s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.4); }
+    50% { opacity: var(--max-op, 0.7); transform: scale(1); }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 700; font-size: 22px;
+    letter-spacing: -0.5px; color: var(--text);
+    display: flex; align-items: center; gap: 5px;
+    text-decoration: none;
+  }
+  .logo-dot { color: var(--accent2); font-size: 10px; margin-bottom: 2px; }
+  .nav-btn {
+    padding: 8px 18px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), #a07fd4);
+    color: #fff; border: none;
+    font-family: 'Noto Sans KR', sans-serif;
+    text-decoration: none; transition: all 0.2s; white-space: nowrap;
+  }
+  .nav-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(123,94,167,0.4); }
+
+  /* ── MAIN ── */
+  .main {
+    position: relative; z-index: 1;
+    max-width: 860px; margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+  .page-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700; text-align: center;
+    margin-bottom: 8px; letter-spacing: -0.5px;
+  }
+  .page-title em { font-style: normal; color: var(--accent2); }
+  .page-sub {
+    text-align: center; color: var(--muted);
+    font-size: 14px; margin-bottom: 36px;
+  }
+
+  /* ── INPUT FORM ── */
+  .form-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+    margin-bottom: 20px;
+  }
+  .form-row {
+    display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label {
+    font-size: 11px; color: var(--muted); font-weight: 600;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .form-group input {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif; font-size: 15px;
+    padding: 9px 12px; width: 80px;
+    transition: border-color 0.2s;
+  }
+  .form-group input.w-sm { width: 64px; }
+  .form-group input:focus { outline: none; border-color: var(--accent); }
+  .form-group input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .btn-fetch {
+    padding: 10px 24px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #a07fd4);
+    color: #fff; border: none; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; font-weight: 700;
+    transition: all 0.2s; white-space: nowrap;
+    align-self: flex-end; height: 40px;
+  }
+  .btn-fetch:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(123,94,167,0.4); }
+  .btn-fetch:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .type-toggle {
+    display: flex; gap: 0; margin-top: 16px;
+    background: var(--surface2); border-radius: 10px;
+    padding: 4px; width: fit-content;
+    border: 1px solid var(--border);
+  }
+  .type-btn {
+    padding: 7px 22px; border-radius: 7px;
+    border: none; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px; font-weight: 600;
+    transition: all 0.2s;
+    background: transparent; color: var(--muted);
+  }
+  .type-btn.active {
+    background: linear-gradient(135deg, var(--accent), #a07fd4);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(123,94,167,0.4);
+  }
+  .type-btn:hover:not(.active) { color: var(--text); }
+
+  /* ── META BAR ── */
+  .meta-bar {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 24px;
+    display: none; gap: 8px 24px; flex-wrap: wrap;
+    align-items: center; margin-bottom: 16px;
+  }
+  .meta-bar.visible { display: flex; }
+  .meta-item { display: flex; flex-direction: column; gap: 3px; }
+  .meta-label { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+  .meta-value {
+    font-size: 16px; font-weight: 700; color: var(--text);
+    font-family: 'Noto Serif KR', serif;
+  }
+  .meta-value.yang { color: #FF1744; }
+  .meta-value.eum  { color: #64b5f6; }
+  .meta-divider { width: 1px; height: 36px; background: var(--border); }
+
+  /* ── 9궁 GRID ── */
+  .grid-wrap {
+    display: none;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .grid-wrap.visible { display: block; }
+  .grid-title {
+    padding: 12px 20px 10px;
+    font-size: 12px; color: var(--muted); letter-spacing: 0.5px;
+    text-transform: uppercase; border-bottom: 1px solid var(--border);
+  }
+  .qm-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    border-left: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+  }
+  .palace {
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 10px 10px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 5px;
+    min-height: 140px; position: relative;
+    transition: background 0.2s;
+  }
+  .palace.zhifu {
+    background: rgba(123,94,167,0.07);
+  }
+  .palace-num {
+    position: absolute; top: 8px; left: 10px;
+    font-size: 10px; color: var(--muted);
+    font-weight: 600;
+  }
+  .zhifu-badge {
+    position: absolute; top: 7px; right: 8px;
+    font-size: 10px; color: var(--accent2);
+    font-weight: 700; letter-spacing: 0;
+  }
+  .palace-star {
+    font-size: 11px; color: var(--muted);
+    text-align: center; margin-top: 8px;
+    white-space: nowrap;
+  }
+  .palace-shen {
+    font-size: 11px; color: var(--accent);
+    text-align: center; font-weight: 600;
+  }
+  .palace-stem {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 28px; font-weight: 700;
+    line-height: 1; text-align: center;
+    padding: 5px 12px; border-radius: 8px;
+    border: 1.5px solid currentColor;
+    margin: 2px 0;
+  }
+  .stem-목 { color: #00C853; background: rgba(0,200,83,0.08); }
+  .stem-화 { color: #FF1744; background: rgba(255,23,68,0.08); }
+  .stem-토 { color: #FFD600; background: rgba(255,214,0,0.08); }
+  .stem-금 { color: #e8e8e8; background: rgba(232,232,232,0.06); }
+  .stem-수 { color: #64b5f6; background: rgba(100,181,246,0.08); }
+  .stem-unknown { color: var(--muted); background: rgba(107,107,133,0.08); }
+  .palace-door {
+    font-size: 12px; font-weight: 700;
+    color: var(--text); text-align: center;
+  }
+
+  /* ── 직부 BAR ── */
+  .zhifu-bar {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 24px;
+    display: none; gap: 24px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 24px;
+  }
+  .zhifu-bar.visible { display: flex; }
+  .zhifu-item { display: flex; gap: 8px; align-items: center; }
+  .zhifu-label { font-size: 12px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+  .zhifu-val {
+    font-size: 15px; font-weight: 700;
+    color: var(--accent2); font-family: 'Noto Serif KR', serif;
+  }
+
+  /* ── AI BUTTON ── */
+  .action-row {
+    display: none; justify-content: center; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .action-row.visible { display: flex; }
+  .btn-ai {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 32px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent2), #c9914a);
+    color: #000; border: none; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; font-weight: 700;
+    transition: all 0.2s; text-decoration: none;
+  }
+  .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(232,184,109,0.35); }
+
+  /* ── STATUS ── */
+  .status-msg {
+    text-align: center; padding: 36px;
+    color: var(--muted); font-size: 15px;
+    display: none;
+  }
+  .status-msg.visible { display: block; }
+  .status-msg.err { color: #FF1744; }
+  .spinner {
+    display: inline-block; width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle; margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .palace { min-height: 118px; padding: 12px 6px 8px; gap: 3px; }
+    .palace-stem { font-size: 22px; padding: 4px 8px; }
+    .palace-star { font-size: 10px; }
+    .palace-shen { font-size: 10px; }
+    .palace-door { font-size: 11px; }
+    .form-group input { font-size: 14px; }
+    .meta-divider { display: none; }
+  }
+</style>
+</head>
+<body>
+<div id="starCanvas"></div>
+
+<nav>
+  <a href="/" class="logo">PICO<span class="logo-dot">●</span>Lab</a>
+  <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" class="nav-btn">AI 운세 상담</a>
+</nav>
+
+<main class="main">
+  <h1 class="page-title">기문둔갑 <em>포국반</em></h1>
+  <p class="page-sub">날짜와 시각을 입력하면 시가·일가 기문둔갑 포국을 즉시 확인합니다.</p>
+
+  <div class="form-card">
+    <div class="form-row">
+      <div class="form-group">
+        <label>연도</label>
+        <input type="number" id="inp-year" placeholder="2024">
+      </div>
+      <div class="form-group">
+        <label>월</label>
+        <input type="number" id="inp-month" placeholder="1" min="1" max="12" class="w-sm">
+      </div>
+      <div class="form-group">
+        <label>일</label>
+        <input type="number" id="inp-day" placeholder="1" min="1" max="31" class="w-sm">
+      </div>
+      <div class="form-group">
+        <label>시</label>
+        <input type="number" id="inp-hour" placeholder="0" min="0" max="23" class="w-sm" value="0">
+      </div>
+      <div class="form-group">
+        <label>분</label>
+        <input type="number" id="inp-minute" placeholder="0" min="0" max="59" class="w-sm" value="0">
+      </div>
+      <button class="btn-fetch" id="btn-fetch" onclick="doFetch()">포국 보기</button>
+    </div>
+    <div class="type-toggle">
+      <button class="type-btn active" id="btn-siga" onclick="setType('siga')">시가기문</button>
+      <button class="type-btn"        id="btn-ilga" onclick="setType('ilga')">일가기문</button>
+    </div>
+  </div>
+
+  <div class="status-msg" id="status"></div>
+
+  <div class="meta-bar" id="meta-bar">
+    <div class="meta-item">
+      <div class="meta-label">음양둔</div>
+      <div class="meta-value" id="m-duntype"></div>
+    </div>
+    <div class="meta-divider"></div>
+    <div class="meta-item">
+      <div class="meta-label">절기</div>
+      <div class="meta-value" id="m-jieqi"></div>
+    </div>
+    <div class="meta-divider"></div>
+    <div class="meta-item">
+      <div class="meta-label">원</div>
+      <div class="meta-value" id="m-won"></div>
+    </div>
+    <div class="meta-divider"></div>
+    <div class="meta-item">
+      <div class="meta-label">국수</div>
+      <div class="meta-value" id="m-guk"></div>
+    </div>
+    <div class="meta-divider"></div>
+    <div class="meta-item">
+      <div class="meta-label">일주</div>
+      <div class="meta-value" id="m-ilju"></div>
+    </div>
+  </div>
+
+  <div class="grid-wrap" id="grid-wrap">
+    <div class="grid-title">9궁 포국 &nbsp;·&nbsp; 낙서 배치</div>
+    <div class="qm-grid" id="qm-grid"></div>
+  </div>
+
+  <div class="zhifu-bar" id="zhifu-bar">
+    <div class="zhifu-item">
+      <span class="zhifu-label">직부궁</span>
+      <span class="zhifu-val" id="zf-gong"></span>
+    </div>
+    <div class="zhifu-item">
+      <span class="zhifu-label">직부성</span>
+      <span class="zhifu-val" id="zf-star"></span>
+    </div>
+    <div class="zhifu-item">
+      <span class="zhifu-label">직사문</span>
+      <span class="zhifu-val" id="zf-door"></span>
+    </div>
+  </div>
+
+  <div class="action-row" id="action-row">
+    <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" class="btn-ai">
+      ✦ AI 운세 상담하기
+    </a>
+  </div>
+</main>
+
+<script>
+// 낙서 배치: 행×열
+const LAKSHO = [[4,9,2],[3,5,7],[8,1,6]];
+
+// 오행 분류 (六儀 + 三奇)
+const STEM_OHAENG = {
+  '甲':'목','乙':'목','丙':'화','丁':'화',
+  '戊':'토','己':'토','庚':'금','辛':'금',
+  '壬':'수','癸':'수'
+};
+
+let currentType = 'siga';
+let hasResult = false;
+
+function setType(t, silent) {
+  currentType = t;
+  document.getElementById('btn-siga').classList.toggle('active', t === 'siga');
+  document.getElementById('btn-ilga').classList.toggle('active', t === 'ilga');
+  if (!silent && hasResult) doFetch();
+}
+
+function showStatus(msg, isErr) {
+  const el = document.getElementById('status');
+  el.innerHTML = isErr ? msg : '<span class="spinner"></span>' + msg;
+  el.className = 'status-msg visible' + (isErr ? ' err' : '');
+}
+function hideStatus() {
+  document.getElementById('status').className = 'status-msg';
+}
+function setVisible(id, v) {
+  document.getElementById(id).classList.toggle('visible', v);
+}
+function hideResults() {
+  setVisible('meta-bar', false);
+  setVisible('grid-wrap', false);
+  setVisible('zhifu-bar', false);
+  setVisible('action-row', false);
+  hasResult = false;
+}
+
+async function doFetch() {
+  const year   = parseInt(document.getElementById('inp-year').value);
+  const month  = parseInt(document.getElementById('inp-month').value);
+  const day    = parseInt(document.getElementById('inp-day').value);
+  const hour   = parseInt(document.getElementById('inp-hour').value) || 0;
+  const minute = parseInt(document.getElementById('inp-minute').value) || 0;
+
+  if (!year || !month || !day) {
+    showStatus('연도, 월, 일을 입력해주세요.', true);
+    return;
+  }
+
+  const fetchBtn = document.getElementById('btn-fetch');
+  fetchBtn.disabled = true;
+  showStatus('포국 계산 중…', false);
+  hideResults();
+
+  const sp = new URLSearchParams({
+    year, month, day, hour, minute, type: currentType
+  });
+  history.replaceState(null, '', '?' + sp.toString());
+
+  try {
+    const res = await fetch('https://fortuna.kkdmb7.workers.dev/qimen?' + sp.toString());
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      throw new Error('HTTP ' + res.status + (txt ? ': ' + txt : ''));
+    }
+    const data = await res.json();
+    hideStatus();
+    renderResult(data);
+  } catch (e) {
+    showStatus('포국 계산 오류: ' + e.message, true);
+    console.error(e);
+  } finally {
+    fetchBtn.disabled = false;
+  }
+}
+
+function renderResult(data) {
+  const meta = data.meta;
+
+  // 메타 정보
+  const dunEl = document.getElementById('m-duntype');
+  dunEl.textContent = meta.음양둔;
+  dunEl.className   = 'meta-value ' + (meta.음양둔 === '양둔' ? 'yang' : 'eum');
+  document.getElementById('m-jieqi').textContent = meta.절기;
+  document.getElementById('m-won').textContent   = meta.원;
+  document.getElementById('m-guk').textContent   = meta.국수 + '국';
+  document.getElementById('m-ilju').textContent  = meta.일주;
+  setVisible('meta-bar', true);
+
+  // 9궁 그리드
+  const grid = document.getElementById('qm-grid');
+  grid.innerHTML = '';
+  LAKSHO.forEach(row => {
+    row.forEach(n => {
+      const palace = data.palaces[String(n)];
+      const isZhifu = n === data.직부궁;
+      grid.appendChild(buildCell(n, palace, isZhifu));
+    });
+  });
+  setVisible('grid-wrap', true);
+
+  // 직부 정보
+  document.getElementById('zf-gong').textContent = data.직부궁 + '궁';
+  document.getElementById('zf-star').textContent = data.직부성 || '-';
+  document.getElementById('zf-door').textContent = data.직사문 || '-';
+  setVisible('zhifu-bar', true);
+
+  setVisible('action-row', true);
+  hasResult = true;
+}
+
+function buildCell(n, p, isZhifu) {
+  const cell = document.createElement('div');
+  cell.className = 'palace' + (isZhifu ? ' zhifu' : '');
+
+  // 궁 번호
+  const numEl = document.createElement('div');
+  numEl.className = 'palace-num';
+  numEl.textContent = n + '궁';
+  cell.appendChild(numEl);
+
+  // 직부 표시
+  if (isZhifu) {
+    const badge = document.createElement('div');
+    badge.className = 'zhifu-badge';
+    badge.textContent = '★直';
+    cell.appendChild(badge);
+  }
+
+  // 구성 (Nine Stars)
+  const starEl = document.createElement('div');
+  starEl.className = 'palace-star';
+  starEl.textContent = p.구성 || '';
+  cell.appendChild(starEl);
+
+  // 팔신
+  const shenEl = document.createElement('div');
+  shenEl.className = 'palace-shen';
+  shenEl.textContent = p.팔신 || '';
+  cell.appendChild(shenEl);
+
+  // 지반 천간 — 오행 색상
+  const stem = (p.지반 || '').trim();
+  const ohaeng = STEM_OHAENG[stem[0]] || 'unknown';
+  const stemEl = document.createElement('div');
+  stemEl.className = 'palace-stem stem-' + ohaeng;
+  stemEl.textContent = stem || '—';
+  cell.appendChild(stemEl);
+
+  // 팔문
+  const doorEl = document.createElement('div');
+  doorEl.className = 'palace-door';
+  doorEl.textContent = p.팔문 ? p.팔문 + '門' : '';
+  cell.appendChild(doorEl);
+
+  return cell;
+}
+
+// 별 생성
+(function initStars() {
+  const canvas = document.getElementById('starCanvas');
+  for (let i = 0; i < 50; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2 + 1;
+    s.style.cssText = [
+      'width:'  + sz + 'px',
+      'height:' + sz + 'px',
+      'left:'   + (Math.random() * 100) + '%',
+      'top:'    + (Math.random() * 100) + '%',
+      '--dur:'    + (2 + Math.random() * 4) + 's',
+      '--delay:'  + (Math.random() * 5) + 's',
+      '--max-op:' + (0.3 + Math.random() * 0.5),
+    ].join(';');
+    canvas.appendChild(s);
+  }
+})();
+
+// URL 파라미터 → 초기값 설정 및 자동 조회
+(function initFromUrl() {
+  const p = new URLSearchParams(location.search);
+  const year = p.get('year'), month = p.get('month'), day = p.get('day');
+  const hour = p.get('hour'), minute = p.get('minute'), type = p.get('type');
+  if (year)   document.getElementById('inp-year').value   = year;
+  if (month)  document.getElementById('inp-month').value  = month;
+  if (day)    document.getElementById('inp-day').value    = day;
+  if (hour != null)   document.getElementById('inp-hour').value   = hour;
+  if (minute != null) document.getElementById('inp-minute').value = minute;
+  if (type === 'ilga') setType('ilga', true);
+  if (year && month && day) doFetch();
+})();
+</script>
+</body>
+</html>
