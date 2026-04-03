@@ -207,9 +207,14 @@
     font-weight: 600;
   }
   .zhifu-badge {
-    position: absolute; top: 7px; right: 8px;
+    position: absolute; top: 20px; right: 8px;
     font-size: 10px; color: var(--accent2);
     font-weight: 700; letter-spacing: 0;
+  }
+  .palace-dir {
+    position: absolute; top: 7px; right: 8px;
+    font-size: 9px; color: var(--muted); font-weight: 600;
+    pointer-events: none;
   }
   .palace-star {
     font-size: 11px; color: var(--muted);
@@ -288,6 +293,32 @@
     vertical-align: middle; margin-right: 8px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── 최길 방향 박스 ── */
+  .bestdir-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 20px;
+    display: none; margin-bottom: 16px;
+  }
+  .bestdir-box.visible { display: block; }
+  .bestdir-title {
+    font-size: 11px; color: var(--muted); letter-spacing: 0.5px;
+    text-transform: uppercase; margin-bottom: 10px; font-weight: 600;
+  }
+  .bestdir-rows { display: flex; flex-wrap: wrap; gap: 8px; }
+  .bestdir-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 12px;
+  }
+  .bestdir-chip.travel { border-left: 2px solid var(--accent); }
+  .bestdir-dir {
+    font-size: 14px; font-weight: 700;
+    font-family: 'Noto Serif KR', serif;
+  }
+  .bestdir-chip:not(.travel) .bestdir-dir { color: #FFD700; }
+  .bestdir-chip.travel .bestdir-dir { color: var(--accent); }
+  .bestdir-info { font-size: 11px; color: var(--muted); }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
@@ -383,6 +414,11 @@
     <div class="qm-grid" id="qm-grid"></div>
   </div>
 
+  <div class="bestdir-box" id="bestdir-box">
+    <div class="bestdir-title">오늘의 최길 방향</div>
+    <div class="bestdir-rows" id="bestdir-rows"></div>
+  </div>
+
   <div class="zhifu-bar" id="zhifu-bar">
     <div class="zhifu-item">
       <span class="zhifu-label">직부궁</span>
@@ -416,6 +452,19 @@ const STEM_OHAENG = {
   '壬':'수','癸':'수'
 };
 
+// 궁 → 방위
+const GONG_DIR = {
+  1:'북', 2:'남서', 3:'동', 4:'남동', 5:'중앙', 6:'북서', 7:'서', 8:'북동', 9:'남'
+};
+
+// 팔문 → 길흉 색상
+const DOOR_COLOR = {
+  '生':'#FFD700', '開':'#FFD700',
+  '休':'#00C853', '景':'#00C853',
+  '傷':'#FF6D00', '杜':'#FF6D00', '驚':'#FF6D00',
+  '死':'#FF1744'
+};
+
 let currentType = 'siga';
 let hasResult = false;
 
@@ -441,6 +490,7 @@ function setVisible(id, v) {
 function hideResults() {
   setVisible('meta-bar', false);
   setVisible('grid-wrap', false);
+  setVisible('bestdir-box', false);
   setVisible('zhifu-bar', false);
   setVisible('action-row', false);
   hasResult = false;
@@ -527,6 +577,9 @@ function renderResult(data) {
   });
   setVisible('grid-wrap', true);
 
+  // 최길 방향
+  renderBestDir(data);
+
   // 직부 정보
   document.getElementById('zf-gong').textContent = data.직부궁 + '궁';
   document.getElementById('zf-star').textContent = data.직부성 || '-';
@@ -546,6 +599,12 @@ function buildCell(n, p, isZhifu) {
   numEl.className = 'palace-num';
   numEl.textContent = n + '궁';
   cell.appendChild(numEl);
+
+  // 방위 배지 (우상단)
+  const dirEl = document.createElement('div');
+  dirEl.className = 'palace-dir';
+  dirEl.textContent = GONG_DIR[n] || '';
+  cell.appendChild(dirEl);
 
   // 직부 표시
   if (isZhifu) {
@@ -575,13 +634,45 @@ function buildCell(n, p, isZhifu) {
   stemEl.textContent = stem || '—';
   cell.appendChild(stemEl);
 
-  // 팔문
+  // 팔문 (길흉 색상 적용)
   const doorEl = document.createElement('div');
   doorEl.className = 'palace-door';
   doorEl.textContent = p.팔문 ? p.팔문 + '門' : '';
+  if (p.팔문 && DOOR_COLOR[p.팔문]) doorEl.style.color = DOOR_COLOR[p.팔문];
   cell.appendChild(doorEl);
 
   return cell;
+}
+
+function renderBestDir(data) {
+  const rows = document.getElementById('bestdir-rows');
+  rows.innerHTML = '';
+
+  // 生門/開門 길방
+  ['生', '開'].forEach(door => {
+    Object.entries(data.palaces).forEach(([n, p]) => {
+      if (p.팔문 === door) {
+        const chip = document.createElement('div');
+        chip.className = 'bestdir-chip';
+        chip.innerHTML = '<span class="bestdir-dir">' + GONG_DIR[parseInt(n)] + '</span>'
+          + '<span class="bestdir-info">' + door + '門 · ' + (p.구성 || '') + '</span>';
+        rows.appendChild(chip);
+      }
+    });
+  });
+
+  // 六合 역마방
+  Object.entries(data.palaces).forEach(([n, p]) => {
+    if (p.팔신 === '六合') {
+      const chip = document.createElement('div');
+      chip.className = 'bestdir-chip travel';
+      chip.innerHTML = '<span class="bestdir-dir">' + GONG_DIR[parseInt(n)] + '</span>'
+        + '<span class="bestdir-info">역마 · 六合</span>';
+      rows.appendChild(chip);
+    }
+  });
+
+  setVisible('bestdir-box', rows.children.length > 0);
 }
 
 // 별 생성
