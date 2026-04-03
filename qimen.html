@@ -462,14 +462,20 @@
       <button class="btn-fetch" id="btn-fetch" onclick="doFetch()">포국 보기</button>
     </div>
     <div class="type-toggle">
-      <button class="type-btn active" id="btn-siga"    onclick="setType('siga')">시가기문</button>
-      <button class="type-btn"        id="btn-ilga"    onclick="setType('ilga')">일가기문</button>
-      <button class="type-btn"        id="btn-wolga"   onclick="setType('wolga')">월가기문</button>
-      <button class="type-btn"        id="btn-nyeonga" onclick="setType('nyeonga')">연가기문</button>
+      <button class="type-btn"        id="btn-wonmyong" onclick="setType('wonmyong')">원명국</button>
+      <button class="type-btn active" id="btn-siga"     onclick="setType('siga')">시가기문</button>
+      <button class="type-btn"        id="btn-ilga"     onclick="setType('ilga')">일가기문</button>
+      <button class="type-btn"        id="btn-wolga"    onclick="setType('wolga')">월가기문</button>
+      <button class="type-btn"        id="btn-nyeonga"  onclick="setType('nyeonga')">연가기문</button>
     </div>
   </div>
 
   <div class="status-msg" id="status"></div>
+
+  <div id="wonmyong-notice" style="display:none;background:rgba(123,94,167,0.1);border:1px solid rgba(123,94,167,0.3);border-radius:12px;padding:12px 20px;margin-bottom:16px;">
+    <div id="wonmyong-date-label" style="font-size:13px;font-weight:700;color:var(--accent2);">📅 원명국</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px;">이 판은 태어난 순간의 고정된 기운입니다.</div>
+  </div>
 
   <div class="meta-bar" id="meta-bar">
     <div class="meta-item">
@@ -583,12 +589,30 @@ const DOOR_COLOR = {
 
 let currentType = 'siga';
 let hasResult = false;
+let _birthDateParams = null;
 
 function setType(t, silent) {
   currentType = t;
-  ['siga','ilga','wolga','nyeonga'].forEach(id => {
+  ['wonmyong','siga','ilga','wolga','nyeonga'].forEach(id => {
     document.getElementById('btn-' + id).classList.toggle('active', t === id);
   });
+  // 원명국 전환: 공지 표시 + 폼에 생년월일 채우기
+  const notice = document.getElementById('wonmyong-notice');
+  if (t === 'wonmyong' && _birthDateParams) {
+    const bp = _birthDateParams;
+    const hStr = (bp.hour != null && bp.hour !== '')
+      ? ' ' + String(bp.hour).padStart(2,'0') + ':' + String(bp.minute||0).padStart(2,'0') : '';
+    document.getElementById('wonmyong-date-label').textContent =
+      '📅 원명국 · ' + bp.year + '.' + String(bp.month).padStart(2,'0') + '.' + String(bp.day).padStart(2,'0') + hStr;
+    document.getElementById('inp-year').value   = bp.year   || '';
+    document.getElementById('inp-month').value  = bp.month  || '';
+    document.getElementById('inp-day').value    = bp.day    || '';
+    document.getElementById('inp-hour').value   = bp.hour   || 0;
+    document.getElementById('inp-minute').value = bp.minute || 0;
+    notice.style.display = 'block';
+  } else {
+    notice.style.display = 'none';
+  }
   if (!silent && hasResult) doFetch();
 }
 
@@ -675,13 +699,13 @@ async function doFetch() {
   showStatus('포국 계산 중…', false);
   hideResults();
 
-  const sp = new URLSearchParams({
-    year, month, day, hour, minute, type: currentType
-  });
-  history.replaceState(null, '', '?' + sp.toString());
+  // URL: wonmyong 유지 / API: wonmyong → siga
+  const apiType = currentType === 'wonmyong' ? 'siga' : currentType;
+  history.replaceState(null, '', '?' + new URLSearchParams({year, month, day, hour, minute, type: currentType}).toString());
+  const apiSp = new URLSearchParams({year, month, day, hour, minute, type: apiType});
 
   try {
-    const res = await fetch('https://fortuna.kkdmb7.workers.dev/qimen?' + sp.toString());
+    const res = await fetch('https://fortuna.kkdmb7.workers.dev/qimen?' + apiSp.toString());
     if (!res.ok) {
       const txt = await res.text().catch(() => '');
       throw new Error('HTTP ' + res.status + (txt ? ': ' + txt : ''));
@@ -948,12 +972,16 @@ function renderInterp(data) {
   const p = new URLSearchParams(location.search);
   const year = p.get('year'), month = p.get('month'), day = p.get('day');
   const hour = p.get('hour'), minute = p.get('minute'), type = p.get('type');
+  // 생년월일 파라미터 저장 (원명국 탭에서 재사용)
+  if (year && month && day) {
+    _birthDateParams = { year, month, day, hour: hour||'0', minute: minute||'0' };
+  }
   if (year)   document.getElementById('inp-year').value   = year;
   if (month)  document.getElementById('inp-month').value  = month;
   if (day)    document.getElementById('inp-day').value    = day;
   if (hour != null)   document.getElementById('inp-hour').value   = hour;
   if (minute != null) document.getElementById('inp-minute').value = minute;
-  if (['ilga','wolga','nyeonga'].includes(type)) setType(type, true);
+  if (['ilga','wolga','nyeonga','wonmyong'].includes(type)) setType(type, true);
   if (year && month && day) doFetch();
 })();
 </script>
