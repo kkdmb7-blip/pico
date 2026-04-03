@@ -671,12 +671,7 @@
             <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
             <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
           </select>
-          <select id="sajuMinute" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none">
-            <option value="0" selected>00분</option><option value="5">05분</option><option value="10">10분</option>
-            <option value="15">15분</option><option value="20">20분</option><option value="25">25분</option>
-            <option value="30">30분</option><option value="35">35분</option><option value="40">40분</option>
-            <option value="45">45분</option><option value="50">50분</option><option value="55">55분</option>
-          </select>
+          <select id="sajuMinute" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none"></select>
         </div>
       </div>
       <div id="sajuYajasiRow" style="display:none;margin-bottom:16px">
@@ -758,6 +753,12 @@ function initSajuDateSelects() {
   yEl.addEventListener('change', updateDays);
   mEl.addEventListener('change', updateDays);
   updateDays();
+  var minEl = document.getElementById('sajuMinute');
+  if (minEl.options.length === 0) {
+    for (var mi = 0; mi <= 59; mi++) {
+      var o = document.createElement('option'); o.value = mi; o.textContent = String(mi).padStart(2,'0') + '분'; minEl.appendChild(o);
+    }
+  }
 }
 
 function openSajuModal() {
