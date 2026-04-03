@@ -510,7 +510,7 @@
         </div>
         <div class="interp-paid-desc">격국 전체 해설 · 시간대별 행동 전략 · 맞춤 조언 · 운세 종합 리포트</div>
       </div>
-      <button class="btn-paid" disabled>곧 출시 예정</button>
+      <button class="btn-paid" onclick="alert('준비 중입니다. 곧 오픈될 예정이에요! 🔮')">🔒 AI 정밀 해석 받기 🔮<br><span style="font-size:10px;font-weight:400;opacity:0.7">질문권 1개 사용</span></button>
     </div>
   </div>
 
@@ -800,11 +800,11 @@ function renderInterp(data) {
     : '매칭된 특수 격국 없음 — 평국(平局)';
 
   const rowData = [
-    { key: '격국',    val: 격국텍스트, html: true },
-    { key: '최적방향', val: 길방.length ? 길방.join(' · ') : '해당 없음' },
-    { key: '최적시간', val: 최적시간 },
-    { key: '추천행동', val: 추천Set.size ? [...추천Set].join(', ') : '정상적인 일과 진행' },
-    { key: '주의사항', val: 주의Set.size ? [...주의Set].join(' / ') : '특이 사항 없음' },
+    { key: '格局',      val: 격국텍스트, html: true },
+    { key: '🧭 방향',   val: 길방.length ? 길방.join(' · ') : '해당 없음' },
+    { key: '⏰ 시간',   val: 최적시간 },
+    { key: '💼 행동',   val: 추천Set.size ? [...추천Set].join(', ') : '정상적인 일과 진행' },
+    { key: '⚠️ 주의',  val: 주의Set.size ? [...주의Set].join(' / ') : '특이 사항 없음' },
   ];
 
   rowData.forEach(r => {
@@ -822,16 +822,13 @@ function renderInterp(data) {
   });
 
   // 한줄 요약
-  if (matched.length) {
-    summary.textContent = matched[0].요약;
-  } else {
-    const 직사문명 = {
-      '生':'생기', '開':'왕성한 활동', '休':'안정', '景':'밝은 기운',
-      '傷':'주의', '杜':'막힘', '驚':'긴장', '死':'침체'
-    };
-    summary.textContent = '직사문 ' + (data.직사문 || '') + '門 — ' +
-      (직사문명[data.직사문] || '보통') + '의 기운이 흐르는 날입니다.';
-  }
+  const 직사문명 = {
+    '生':'생기', '開':'왕성한 활동', '休':'안정', '景':'밝은 기운',
+    '傷':'주의', '杜':'막힘', '驚':'긴장', '死':'침체'
+  };
+  summary.innerHTML = '<span style="font-size:13px;color:var(--muted);font-family:\'Noto Sans KR\',sans-serif;font-weight:700;letter-spacing:0.5px;">📝 요약&nbsp;&nbsp;</span>'
+    + (matched.length ? matched[0].요약
+      : '직사문 ' + (data.직사문 || '') + '門 — ' + (직사문명[data.직사문] || '보통') + '의 기운이 흐르는 날입니다.');
 
   setVisible('interp-wrap', true);
 }

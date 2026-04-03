@@ -947,7 +947,7 @@ function openQimenModal() {
   // 연도
   var yEl = document.getElementById('qmYear');
   if (yEl.options.length === 0) {
-    for (var y = now.getFullYear() - 5; y <= now.getFullYear() + 1; y++) {
+    for (var y = 2030; y >= 1930; y--) {
       var o = document.createElement('option'); o.value = y; o.textContent = y + '년'; yEl.appendChild(o);
     }
   }
