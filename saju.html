@@ -83,15 +83,24 @@
     .badge-pa    { background: rgba(200,200,200,0.08);border: 1px solid rgba(200,200,200,0.15);color: #9E9E9E; }
 
     /* luck scroll */
-    .luck-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
+    .luck-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
     .luck-scroll::-webkit-scrollbar { display: none; }
-    .luck-card { scroll-snap-align: center; flex-shrink: 0; width: 76px; border-radius: 12px; padding: 10px 6px; text-align: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+    .luck-card {
+      scroll-snap-align: center; flex-shrink: 0; width: 58px;
+      border-radius: 10px; padding: 8px 4px; text-align: center;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    }
+    .luck-card:active { opacity: 0.8; }
     .luck-card.active { border-color: #7b5ea7; background: rgba(123,94,167,0.18); }
+    .luck-card.selected { border-color: #e8b86d; background: rgba(232,184,109,0.12); }
 
     /* yun grid */
     .yun-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-    .yun-cell { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 8px 4px; text-align: center; }
+    .yun-cell { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 8px 4px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+    .yun-cell:active { opacity: 0.8; }
     .yun-cell.now { border-color: #7b5ea7; background: rgba(123,94,167,0.15); }
+    .yun-cell.selected { border-color: #e8b86d; background: rgba(232,184,109,0.12); }
 
     /* form */
     .f-select {
@@ -281,7 +290,10 @@
       <span>📅 세운 · 월운</span><span class="acc-icon open" id="ico_acc_yun">▾</span>
     </button>
     <div class="acc-body open" id="acc_yun">
-      <div id="R_yun" style="padding:0 12px 14px"></div>
+      <div style="padding:0 12px 14px">
+        <div id="R_seun"></div>
+        <div id="R_wolun"></div>
+      </div>
     </div>
   </div>
 
@@ -719,74 +731,122 @@ function renderGeok(data) {
 }
 
 // ─── 대운 ─────────────────────────────────────────
+let _bigLuckData = [];
+
 function renderLuck(data) {
+  _bigLuckData = data.big_luck || [];
   const cy = new Date().getFullYear();
   let html = '';
-  (data.big_luck||[]).forEach(lk=>{
+  let nowIdx = 0;
+
+  _bigLuckData.forEach((lk, idx) => {
     const yRange = lk.year_range.split(/[–\-]/);
     const ys = parseInt(yRange[0]), ye = parseInt(yRange[1]);
     const isNow = cy>=ys && cy<=ye;
-    const si = STEMS.indexOf(lk.stem_kor);
+    if (isNow) nowIdx = idx;
     const bi = BRANCHES.indexOf(lk.branch_kor);
     const bEl = bi>=0 ? BRANCH_EL[bi] : '목';
+    const stemH = STEM_H[STEMS.indexOf(lk.stem_kor)] || lk.stem_kor;
+    const branH = bi>=0 ? BRANCH_H[bi] : lk.branch_kor;
 
     html+=`
-    <div class="luck-card${isNow?' active':''}">
-      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:3px">${lk.age_range}</div>
-      <div class="hanja ${EL_TC_CSS[lk.element]}" style="font-size:22px;font-weight:700;line-height:1.1">${lk.stem_kor}</div>
-      <div class="hanja ${EL_TC_CSS[bEl]}"       style="font-size:22px;font-weight:700;line-height:1.1">${lk.branch_kor}</div>
-      <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:4px">${ys}~</div>
-      ${isNow?'<div style="font-size:10px;color:#CE93D8;font-weight:600;margin-top:3px">현재</div>':''}
+    <div class="luck-card${isNow?' active':''}" onclick="selectDaeun(${idx})">
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:2px">${lk.age_range}</div>
+      <div class="hanja-box ${EL_BG_CSS[lk.element]||''}" style="width:34px;height:34px;font-size:1.1rem;margin:2px auto">${stemH}</div>
+      <div class="hanja-box ${EL_BG_CSS[bEl]||''}"       style="width:34px;height:34px;font-size:1.1rem;margin:2px auto">${branH}</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:3px">${ys}~</div>
+      ${isNow?'<div style="font-size:9px;color:#CE93D8;font-weight:600;margin-top:2px">현재</div>':''}
     </div>`;
   });
+
   document.getElementById('R_luck').innerHTML = html;
-  // 현재 대운 스크롤
   setTimeout(()=>{
     const cur=document.querySelector('.luck-card.active');
     if(cur) cur.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+    selectDaeun(nowIdx);
   },400);
 }
 
-// ─── 세운 · 월운 ─────────────────────────────────
-function renderYun(data) {
+function selectDaeun(idx) {
+  document.querySelectorAll('.luck-card').forEach((el,i)=>{
+    el.classList.toggle('selected', i===idx && !el.classList.contains('active'));
+  });
+  const lk = _bigLuckData[idx];
+  if (!lk) return;
+  const yRange = lk.year_range.split(/[–\-]/);
+  const ys = parseInt(yRange[0]), ye = parseInt(yRange[1]);
+  renderSeun(ys, ye);
+}
+
+// ─── 세운 ─────────────────────────────────────────
+let _selectedSeunYear = new Date().getFullYear();
+
+function renderSeun(ys, ye) {
   const cy = new Date().getFullYear();
+  const byear = parseInt(pBirth.split('-')[0]);
+  let html = `<div style="margin-bottom:14px">
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">세운 (${ys}~${ye})</div>
+    <div class="yun-grid">`;
+  for (let y=ys; y<=ye; y++) {
+    const yp = yearPillar(y);
+    const isCur = y===cy;
+    const age = y-byear+1;
+    const stemH = STEM_H[yp.si], branH = BRANCH_H[yp.bi];
+    html+=`<div class="yun-cell${isCur?' now':''}" onclick="selectSeun(${y})">
+      <div style="font-size:9px;color:rgba(255,255,255,0.3)">${y}</div>
+      <div class="hanja-box ${EL_BG_CSS[STEM_EL[yp.si]]||''}" style="width:30px;height:30px;font-size:1rem;margin:2px auto">${stemH}</div>
+      <div class="hanja-box ${EL_BG_CSS[BRANCH_EL[yp.bi]]||''}" style="width:30px;height:30px;font-size:1rem;margin:2px auto">${branH}</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.25)">${age}세</div>
+    </div>`;
+  }
+  html += '</div></div>';
+  document.getElementById('R_seun').innerHTML = html;
+  // 현재 연도 선택 처리
+  selectSeun(_selectedSeunYear >= ys && _selectedSeunYear <= ye ? _selectedSeunYear : cy >= ys && cy <= ye ? cy : ys);
+}
+
+function selectSeun(y) {
+  _selectedSeunYear = y;
+  document.querySelectorAll('#R_seun .yun-cell').forEach(el=>{
+    const yr = parseInt(el.querySelector('div').textContent);
+    el.classList.toggle('selected', yr===y);
+  });
+  renderWolun(y);
+}
+
+// ─── 월운 ─────────────────────────────────────────
+function renderWolun(y) {
   const cm = new Date().getMonth()+1;
-
-  // 세운 ±3년
-  let seunHtml=`<div style="margin-bottom:16px">
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">세운 (연간)</div>
+  const cy = new Date().getFullYear();
+  const cyp = yearPillar(y);
+  let html = `<div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">월운 (${y}년)</div>
     <div class="yun-grid">`;
-  for(let y=cy-2;y<=cy+4;y++){
-    const yp=yearPillar(y);
-    const isCur=y===cy;
-    const byear=parseInt(pBirth.split('-')[0]);
-    const age=y-byear+1;
-    seunHtml+=`<div class="yun-cell${isCur?' now':''}">
-      <div style="font-size:10px;color:rgba(255,255,255,0.3)">${y}</div>
-      <div class="hanja ${EL_TC_CSS[STEM_EL[yp.si]]}" style="font-size:15px;font-weight:700">${STEM_H[yp.si]}</div>
-      <div class="hanja ${EL_TC_CSS[BRANCH_EL[yp.bi]]}" style="font-size:15px;font-weight:700">${BRANCH_H[yp.bi]}</div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.25)">${age}세</div>
+  for (let mo=1; mo<=12; mo++) {
+    const mp = monthPillar(cyp.si, mo);
+    const isCur = mo===cm && y===cy;
+    html+=`<div class="yun-cell${isCur?' now':''}">
+      <div style="font-size:9px;color:rgba(255,255,255,0.3)">${mo}월</div>
+      <div class="hanja-box ${EL_BG_CSS[STEM_EL[mp.si]]||''}" style="width:30px;height:30px;font-size:1rem;margin:2px auto">${STEM_H[mp.si]}</div>
+      <div class="hanja-box ${EL_BG_CSS[BRANCH_EL[mp.bi]]||''}" style="width:30px;height:30px;font-size:1rem;margin:2px auto">${BRANCH_H[mp.bi]}</div>
     </div>`;
   }
-  seunHtml+='</div></div>';
+  html += '</div></div>';
+  document.getElementById('R_wolun').innerHTML = html;
+}
 
-  // 월운 현재 연도 12개월
-  const cyp=yearPillar(cy);
-  let wolunHtml=`<div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">월운 (${cy}년)</div>
-    <div class="yun-grid">`;
-  for(let mo=1;mo<=12;mo++){
-    const mp=monthPillar(cyp.si,mo);
-    const isCur=mo===cm;
-    wolunHtml+=`<div class="yun-cell${isCur?' now':''}">
-      <div style="font-size:10px;color:rgba(255,255,255,0.3)">${mo}월</div>
-      <div class="hanja ${EL_TC_CSS[STEM_EL[mp.si]]}" style="font-size:15px;font-weight:700">${STEM_H[mp.si]}</div>
-      <div class="hanja ${EL_TC_CSS[BRANCH_EL[mp.bi]]}" style="font-size:15px;font-weight:700">${BRANCH_H[mp.bi]}</div>
-    </div>`;
+// ─── 세운·월운 초기화 (renderAll에서 호출) ─────────
+function renderYun(data) {
+  // 초기값: 현재 연도 포함 대운 범위로 세운 표시 (renderLuck 이후 호출)
+  const cy = new Date().getFullYear();
+  const lk = _bigLuckData.find(l=>{
+    const yr = l.year_range.split(/[–\-]/);
+    return cy>=parseInt(yr[0]) && cy<=parseInt(yr[1]);
+  }) || _bigLuckData[0];
+  if (lk) {
+    const yr = lk.year_range.split(/[–\-]/);
+    renderSeun(parseInt(yr[0]), parseInt(yr[1]));
   }
-  wolunHtml+='</div></div>';
-
-  document.getElementById('R_yun').innerHTML=seunHtml+wolunHtml;
 }
 
 // ─── 행운 · 조후 ──────────────────────────────────
