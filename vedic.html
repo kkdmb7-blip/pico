@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베딕 점성술 · PICO Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a0f; --surface:#13131a; --surface2:#1c1c28;
+    --border:#2a2a3d; --accent:#7b5ea7; --accent2:#e8b86d;
+    --text:#f0f0f5; --muted:#6b6b85; --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4;}
+  #starCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
+  .star{position:absolute;background:#fff;border-radius:50%;opacity:0;animation:twinkle var(--dur,3s) ease-in-out infinite;animation-delay:var(--delay,0s);}
+  @keyframes twinkle{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:var(--max-op,.7);transform:scale(1)}}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:'Noto Serif KR',serif;font-weight:700;font-size:22px;letter-spacing:-.5px;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:5px;}
+  .logo-dot{color:var(--accent2);font-size:10px;margin-bottom:2px;}
+  .nav-btn{padding:8px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,var(--accent),#a07fd4);color:#fff;border:none;font-family:'Noto Sans KR',sans-serif;text-decoration:none;transition:all .2s;white-space:nowrap;}
+  .nav-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(123,94,167,.4);}
+
+  /* MAIN */
+  .main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:40px 20px 80px;}
+  .page-title{font-family:'Noto Serif KR',serif;font-size:clamp(26px,5vw,40px);font-weight:700;text-align:center;margin-bottom:6px;letter-spacing:-.5px;}
+  .page-title em{font-style:normal;color:var(--accent2);}
+  .page-sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:32px;}
+
+  /* STATUS */
+  .status-msg{text-align:center;padding:48px 24px;color:var(--muted);font-size:15px;display:none;}
+  .status-msg.visible{display:block;}
+  .status-msg.err{color:#FF1744;}
+  .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* SECTION CARD */
+  .section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;display:none;}
+  .section-card.visible{display:block;}
+  .section-label{font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:16px;}
+
+  /* BIG 3 */
+  .big3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .big3-card{border-radius:12px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;border:1.5px solid;text-align:center;}
+  .big3-icon{font-size:22px;}
+  .big3-role{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+  .big3-sym{font-size:26px;line-height:1;}
+  .big3-sign{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;line-height:1.3;}
+  .big3-sub{font-size:11px;color:var(--muted);}
+
+  /* PLANET TABLE */
+  .planet-table{width:100%;border-collapse:collapse;}
+  .planet-table th{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);}
+  .planet-table td{padding:9px 10px;font-size:13px;border-bottom:1px solid rgba(42,42,61,.5);vertical-align:middle;}
+  .planet-table tr:last-child td{border-bottom:none;}
+  .planet-name{font-weight:600;}
+  .sign-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;font-size:12px;font-weight:700;border:1px solid;}
+  .bindu-bar{display:inline-flex;gap:2px;align-items:center;}
+  .bindu{width:7px;height:7px;border-radius:50%;}
+  .bindu.on{background:var(--accent2);}
+  .bindu.off{background:rgba(255,255,255,.1);}
+
+  /* DASHA TIMELINE */
+  .dasha-wrap{display:flex;flex-direction:column;gap:12px;}
+  .dasha-row{padding:14px 18px;border-radius:12px;background:var(--surface2);}
+  .dasha-tag{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .dasha-planet{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--accent2);margin-bottom:4px;}
+  .dasha-date{font-size:12px;color:var(--muted);}
+  .dasha-remain{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(123,94,167,.15);color:var(--accent);border:1px solid rgba(123,94,167,.3);}
+  .dasha-next{font-size:12px;color:var(--muted);padding:10px 14px;border-radius:8px;border:1px dashed var(--border);margin-top:4px;}
+
+  /* YOGA LIST */
+  .yoga-list{display:flex;flex-direction:column;gap:8px;}
+  .yoga-row{padding:12px 16px;border-radius:10px;background:var(--surface2);display:flex;align-items:flex-start;gap:12px;}
+  .yoga-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+  .yoga-길{background:rgba(0,200,83,.12);color:#00C853;border:1px solid rgba(0,200,83,.25);}
+  .yoga-흉{background:rgba(255,23,68,.12);color:#FF1744;border:1px solid rgba(255,23,68,.25);}
+  .yoga-혼합{background:rgba(255,109,0,.12);color:#FF6D00;border:1px solid rgba(255,109,0,.25);}
+  .yoga-강화{background:rgba(123,94,167,.15);color:var(--accent);border:1px solid rgba(123,94,167,.3);}
+  .yoga-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
+  .yoga-desc{font-size:12px;color:var(--muted);}
+
+  /* INTERP TABS */
+  .interp-tabs{display:flex;gap:0;margin-bottom:16px;background:var(--surface2);border-radius:10px;padding:4px;border:1px solid var(--border);width:fit-content;flex-wrap:wrap;}
+  .interp-tab{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:600;background:transparent;color:var(--muted);transition:all .2s;white-space:nowrap;}
+  .interp-tab.active{background:linear-gradient(135deg,var(--accent),#a07fd4);color:#fff;box-shadow:0 2px 8px rgba(123,94,167,.4);}
+  .interp-tab:hover:not(.active){color:var(--text);}
+  .interp-panel{display:none;}
+  .interp-panel.active{display:block;}
+  .interp-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .interp-sym{font-size:34px;line-height:1;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1.5px solid;flex-shrink:0;}
+  .interp-name{font-family:'Noto Serif KR',serif;font-size:19px;font-weight:700;margin-bottom:2px;}
+  .interp-role{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+  .interp-text{font-size:14px;color:var(--text);line-height:1.85;}
+  .dasha-interp{padding:16px;border-radius:12px;background:var(--surface2);border-left:3px solid var(--accent2);}
+  .dasha-interp-title{font-size:16px;font-weight:700;color:var(--accent2);margin-bottom:8px;}
+  .dasha-interp-text{font-size:14px;color:var(--text);line-height:1.8;}
+
+  /* PAID / ACTION */
+  .paid-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;opacity:.75;margin-bottom:12px;}
+  .paid-left{display:flex;flex-direction:column;gap:4px;}
+  .paid-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;}
+  .paid-desc{font-size:12px;color:var(--muted);}
+  .btn-paid{display:inline-flex;flex-direction:column;align-items:center;padding:10px 20px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;}
+  .btn-memox{display:inline-flex;align-items:center;gap:8px;padding:13px 32px;border-radius:14px;background:linear-gradient(135deg,var(--accent2),#c9914a);color:#000;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;text-decoration:none;transition:all .2s;}
+  .btn-memox:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(232,184,109,.35);}
+  .action-row{display:none;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:8px;}
+  .action-row.visible{display:flex;}
+
+  /* ELEMENT COLORS */
+  .el-화{color:#FF6B6B;border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.07);}
+  .el-지{color:#A8D5A2;border-color:rgba(168,213,162,.4);background:rgba(168,213,162,.07);}
+  .el-풍{color:#FFE66D;border-color:rgba(255,230,109,.4);background:rgba(255,230,109,.07);}
+  .el-수{color:#74B9FF;border-color:rgba(116,185,255,.4);background:rgba(116,185,255,.07);}
+
+  @media(max-width:600px){
+    .big3-grid{gap:8px;}
+    .big3-sign{font-size:13px;}
+    .big3-sym{font-size:20px;}
+    .planet-table td,.planet-table th{padding:7px 6px;font-size:11px;}
+    .interp-tab{padding:6px 9px;font-size:11px;}
+  }
+</style>
+</head>
+<body>
+<div id="starCanvas"></div>
+
+<nav>
+  <a href="/" class="logo">PICO<span class="logo-dot">●</span>Lab</a>
+  <a href="https://kkdmb7-blip.github.io/memox/?mode=vedic" target="_blank" class="nav-btn">AI 베딕 상담</a>
+</nav>
+
+<div id="profile-bar-root"></div>
+<script src="profile-bar.js"></script>
+
+<main class="main">
+  <h1 class="page-title">베딕 <em>점성술</em></h1>
+  <p class="page-sub" id="page-sub">출생 시각 기준 사이드리얼 행성 배치 분석</p>
+
+  <div class="status-msg" id="status"><span class="spinner"></span>베딕 차트 계산 중…</div>
+
+  <!-- BIG 3 -->
+  <div class="section-card" id="card-big3">
+    <div class="section-label">핵심 3요소</div>
+    <div class="big3-grid" id="big3-grid"></div>
+  </div>
+
+  <!-- PLANET TABLE -->
+  <div class="section-card" id="card-planets">
+    <div class="section-label">행성 배치 (사이드리얼)</div>
+    <table class="planet-table">
+      <thead>
+        <tr>
+          <th>행성</th>
+          <th>라시 (별자리)</th>
+          <th>하우스</th>
+          <th>나바암샤 D9</th>
+          <th>아슈타카바르가</th>
+        </tr>
+      </thead>
+      <tbody id="planet-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- DASHA TIMELINE -->
+  <div class="section-card" id="card-dasha">
+    <div class="section-label">다샤 타임라인 (Vimshottari)</div>
+    <div class="dasha-wrap" id="dasha-wrap"></div>
+  </div>
+
+  <!-- YOGAS -->
+  <div class="section-card" id="card-yoga">
+    <div class="section-label">요가 (Yogas)</div>
+    <div class="yoga-list" id="yoga-list"></div>
+  </div>
+
+  <!-- INTERPRETATION -->
+  <div class="section-card" id="card-interp">
+    <div class="section-label">현대어 해석</div>
+    <div class="interp-tabs">
+      <button class="interp-tab active" onclick="showTab('moon')">🌙 달 라시</button>
+      <button class="interp-tab" onclick="showTab('nak')">⭐ 낙샤트라</button>
+      <button class="interp-tab" onclick="showTab('dasha')">⏳ 다샤</button>
+    </div>
+    <div id="panel-moon"  class="interp-panel active"></div>
+    <div id="panel-nak"   class="interp-panel"></div>
+    <div id="panel-dasha" class="interp-panel"></div>
+  </div>
+
+  <!-- PAID + ACTION -->
+  <div class="section-card" id="card-action">
+    <div class="paid-card">
+      <div class="paid-left">
+        <div class="paid-title">🔒 AI 심층 분석</div>
+        <div class="paid-desc">낙샤트라 전체 해설 · 다샤 전략 · 카르마 분석 · 맞춤 운세 리포트</div>
+      </div>
+      <button class="btn-paid" onclick="alert('AI 심층 분석은 곧 오픈됩니다! 🔮')">
+        🔒 AI 정밀 해석 받기 🔮<br>
+        <span style="font-size:10px;font-weight:400;opacity:.7">질문권 1개 사용</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="action-row" id="action-row">
+    <a href="https://kkdmb7-blip.github.io/memox/?mode=vedic" target="_blank" class="btn-memox">
+      ✦ AI 베딕 상담하기
+    </a>
+  </div>
+</main>
+
+<script>
+// ── 데이터 ────────────────────────────────────────────────
+const RASHI_SYM = {
+  '양자리':'♈','황소자리':'♉','쌍둥이자리':'♊','게자리':'♋',
+  '사자자리':'♌','처녀자리':'♍','천칭자리':'♎','전갈자리':'♏',
+  '사수자리':'♐','염소자리':'♑','물병자리':'♒','물고기자리':'♓'
+};
+const RASHI_EL = {
+  '양자리':'화','사자자리':'화','사수자리':'화',
+  '황소자리':'지','처녀자리':'지','염소자리':'지',
+  '쌍둥이자리':'풍','천칭자리':'풍','물병자리':'풍',
+  '게자리':'수','전갈자리':'수','물고기자리':'수'
+};
+const PLANET_ICON = { '태양':'☀️','달':'🌙','화성':'♂','수성':'☿','목성':'♃','금성':'♀','토성':'♄' };
+const DASHA_ORDER = ['케투','금성','태양','달','화성','라후','목성','토성','수성'];
+const DASHA_YEARS = { '케투':7,'금성':20,'태양':6,'달':10,'화성':7,'라후':18,'목성':16,'토성':19,'수성':17 };
+
+// ── 달 라시 해석 ──────────────────────────────────────────
+const MOON_INTERP = {
+  '양자리':    '감정이 즉각적이고 강렬합니다. 빠르게 불붙고 빠르게 식는 열정형. 직관적 용기로 두려움 없이 행동합니다.',
+  '황소자리':  '정서적 안정을 깊이 갈망합니다. 변화에 천천히 적응하며 꾸준하고 헌신적인 감정을 줍니다.',
+  '쌍둥이자리':'감정이 다변하고 지적입니다. 대화와 소통으로 감정을 해소하며, 다양한 관계에서 활력을 얻습니다.',
+  '게자리':    '감정이 풍부하고 직관력이 탁월합니다. 달이 자사인에 위치해 모성적 돌봄과 깊은 공감 능력이 있습니다.',
+  '사자자리':  '따뜻하고 관대한 감정 표현. 인정과 사랑받을 때 충만함을 느끼며 주변을 밝게 만드는 힘이 있습니다.',
+  '처녀자리':  '감정을 분석하고 실용적으로 처리합니다. 섬세하게 배려하지만 걱정이 많고 완벽을 추구합니다.',
+  '천칭자리':  '관계 속에서 감정적 균형을 찾습니다. 조화와 아름다움을 통해 정서적 충족을 얻습니다.',
+  '전갈자리':  '감정이 깊고 강렬하며 숨김이 있습니다. 한번 믿으면 절대적으로 헌신하고 직관력이 예리합니다.',
+  '사수자리':  '자유롭고 낙관적인 감정 패턴. 철학적 사유와 모험에서 정서적 충만함을 얻습니다.',
+  '염소자리':  '감정 표현이 절제되고 책임감 있습니다. 신뢰를 쌓는 데 시간이 걸리지만 깊이 있는 헌신을 합니다.',
+  '물병자리':  '감정보다 이성이 앞섭니다. 독립심이 강하고 인류애적 감정으로 더 넓은 세계를 향해 열려 있습니다.',
+  '물고기자리':'감정이 바다처럼 깊고 넓습니다. 공감 능력이 탁월하고 영적 세계와 직관에 민감합니다.'
+};
+
+// ── 낙샤트라 해석 ─────────────────────────────────────────
+const NAK_INTERP = {
+  '아쉬위니':       '말의 신 아쉬위니 쿠마라의 별. 치유, 속도, 새로운 시작의 에너지. 개척자적 기질과 빠른 행동력이 특징입니다.',
+  '바라니':         '야마(죽음의 신)의 별. 변화와 카르마를 다루는 힘. 강한 의지력과 창조·파괴의 순환을 이해합니다.',
+  '크리티카':       '불의 신 아그니의 별. 정화와 판단력. 예리한 비판 능력과 변혁적 에너지를 지닙니다.',
+  '로히니':         '창조의 신 브라마의 별. 풍요, 미, 창의성. 예술적 재능과 물질적 풍요를 향한 강한 열망이 있습니다.',
+  '므리가쉬라':     '소마(달)의 별. 탐구와 여행. 끊임없이 무언가를 찾아 나서는 지적 호기심과 섬세한 감수성입니다.',
+  '아르드라':       '루드라(폭풍)의 별. 변혁과 혼돈 속의 성장. 고통을 통해 더 깊은 지혜를 얻는 강인한 영혼입니다.',
+  '푸나르바수':     '아디티(무한)의 별. 재생과 회복. 낙관적이고 관대하며 어떤 역경에서도 다시 일어서는 힘이 있습니다.',
+  '푸쉬야':         '토성과 목성의 별. 양육과 성장. 타인을 돌보는 능력이 탁월하고 영적 헌신이 깊습니다.',
+  '아쉬레샤':       '나가(뱀)의 별. 직관과 신비로운 지식. 깊은 통찰력과 변혁적 치유의 힘을 지닙니다.',
+  '마가':           '조상신의 별. 전통, 권위, 카르마. 강한 리더십과 조상으로부터 이어지는 왕적 자질을 지닙니다.',
+  '푸르바팔구니':   '바가(풍요)의 별. 즐거움, 창의성, 휴식. 예술적 재능과 낭만적 기질로 삶의 아름다움을 즐깁니다.',
+  '우타라팔구니':   '아리아만의 별. 친절, 후원, 파트너십. 타인과의 협력을 통해 빛을 발하고 관계에 충실합니다.',
+  '하스타':         '달의 별. 손재주, 지혜, 실용성. 뛰어난 손 기술과 실용적 지혜로 어떤 일이든 능숙하게 처리합니다.',
+  '치트라':         '비슈바카르마(우주 건축가)의 별. 창의성과 아름다움. 뛰어난 심미안과 예술적 능력을 지닙니다.',
+  '스바티':         '바유(바람)의 별. 독립성과 자유. 유연하고 개방적이며 지식과 교류를 통해 성장합니다.',
+  '비샤카':         '인드라·아그니의 별. 목적과 의지. 목표를 향해 집요하게 나아가는 강한 추진력과 경쟁심이 있습니다.',
+  '아누라다':       '미트라(우정)의 별. 우정, 헌신, 영적 탐구. 충성스럽고 사람들과 깊은 유대를 형성합니다.',
+  '지에쉬타':       '인드라의 별. 보호, 용기, 위엄. 어려운 상황에서 지도자 역할을 하며 강한 책임감을 발휘합니다.',
+  '물라':           '니리티(파괴)의 별. 근원 탐구, 변혁. 진실의 뿌리를 파고드는 집요함과 변혁적 에너지가 있습니다.',
+  '푸르바아샤다':   '물의 신 아파스의 별. 정화, 승리, 자신감. 불굴의 정신으로 역경을 이겨내는 힘을 지닙니다.',
+  '우타라아샤다':   '비스베데바의 별. 최종 승리, 인내. 묵묵히 노력해 결국 목표를 이루는 지구력이 특징입니다.',
+  '쉬라바나':       '비슈누(유지자)의 별. 학습, 경청, 연결. 지식을 흡수하고 사람들을 연결하는 특별한 능력이 있습니다.',
+  '다니쉬타':       '바수(부)의 별. 부와 리듬. 음악적 재능과 집단 속에서 빛나는 사교성, 물질적 번영의 기운입니다.',
+  '샤타비샤':       '바루나(물)의 별. 치유, 신비, 진실 탐구. 독립적이고 신비로우며 비전통적 방식으로 세상을 봅니다.',
+  '푸르바바드라파다':'아지에카파다의 별. 불꽃, 열정, 양극성. 강렬한 내면의 불로 혁신적 변혁을 이끕니다.',
+  '우타라바드라파다':'아히르부드냐의 별. 깊이, 지혜, 연민. 깊은 내면의 지혜와 우주의 섭리를 이해하는 영혼입니다.',
+  '레바티':         '푸샨(여행자)의 별. 풍요, 완성, 영적 여행. 과거를 완성하고 새로운 여정을 시작하는 전환점입니다.'
+};
+
+// ── 다샤 해석 ────────────────────────────────────────────
+const DASHA_INTERP = {
+  '케투':  '내면화와 영적 각성의 시기 (7년). 물질적 집착을 내려놓고 진정한 본질을 탐구합니다. 과거 카르마를 정산하며 직관이 강해집니다.',
+  '금성':  '사랑, 예술, 풍요의 황금기 (20년). 관계와 미적 감각이 꽃피는 시기. 풍요로운 물질과 깊은 인연이 찾아옵니다.',
+  '태양':  '자아 확립과 리더십의 시기 (6년). 권위와 인정을 통해 자신을 드러냅니다. 아버지나 권위자와의 관계가 중요해집니다.',
+  '달':    '감정과 직관, 가정의 시기 (10년). 내면의 욕구와 가족 관계가 중심이 됩니다. 여성성과 모성적 에너지가 강해집니다.',
+  '화성':  '행동과 에너지, 도전의 시기 (7년). 결단력 있는 행동으로 목표를 달성합니다. 경쟁과 갈등을 통해 성장합니다.',
+  '라후':  '변화와 열망, 세계화의 시기 (18년). 낯선 것에서 기회를 발견하는 변혁의 때. 집착과 욕망이 강해지지만 새로운 세계가 열립니다.',
+  '목성':  '지혜와 성장, 행운의 시기 (16년). 스승을 만나고 내면이 확장됩니다. 영적·물질적 풍요가 함께 오는 축복의 시기입니다.',
+  '토성':  '책임과 카르마 정산의 시기 (19년). 인내와 노력이 결실을 맺습니다. 늦지만 반드시 오는 성숙과 진정한 성공의 과정입니다.',
+  '수성':  '소통과 학습, 비즈니스의 시기 (17년). 지식과 아이디어로 성과를 만듭니다. 지적 능력과 언어 능력이 꽃피는 때입니다.'
+};
+
+// ── helpers ───────────────────────────────────────────────
+function elCls(sign) { return 'el-' + (RASHI_EL[sign] || '풍'); }
+function sym(sign)   { return RASHI_SYM[sign] || '✦'; }
+function setVisible(id, v) { document.getElementById(id).classList.toggle('visible', v); }
+
+function showTab(tab) {
+  document.querySelectorAll('.interp-tab').forEach((b,i) => {
+    b.classList.toggle('active', ['moon','nak','dasha'][i] === tab);
+  });
+  ['moon','nak','dasha'].forEach(t => {
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+  });
+}
+
+function remainText(endDate) {
+  const ms = new Date(endDate) - Date.now();
+  if (ms <= 0) return '종료됨';
+  const days = Math.floor(ms / 86400000);
+  if (days > 365) return Math.floor(days / 365) + '년 ' + Math.floor((days % 365) / 30) + '개월 남음';
+  if (days > 30)  return Math.floor(days / 30) + '개월 남음';
+  return days + '일 남음';
+}
+
+function nextDasha(currentPlanet) {
+  const idx = DASHA_ORDER.indexOf(currentPlanet);
+  if (idx < 0) return null;
+  const next = DASHA_ORDER[(idx + 1) % 9];
+  return { planet: next, years: DASHA_YEARS[next] };
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function renderBig3(d) {
+  const grid = document.getElementById('big3-grid');
+  grid.innerHTML = '';
+  const items = [
+    { icon:'🌙', role:'달 라시',   sign: d.moonSign,   sub: '감정·직관' },
+    { icon:'⭐', role:'낙샤트라',  sign: d.nakshatra,  sub: '파다 ' + (d.nakshatraPada || '') + ' · 달의 별자리' },
+    { icon:'↑',  role:'상승궁(라그나)', sign: d.ascendant, sub: '외적 인상' },
+  ];
+  items.forEach(({ icon, role, sign, sub }) => {
+    // nakshatra doesn't have a RASHI element
+    const ec = RASHI_EL[sign] ? elCls(sign) : 'el-풍';
+    const card = document.createElement('div');
+    card.className = 'big3-card ' + ec;
+    card.innerHTML =
+      '<div class="big3-icon">' + icon + '</div>' +
+      '<div class="big3-role">' + role + '</div>' +
+      '<div class="big3-sym">' + (RASHI_SYM[sign] || '✦') + '</div>' +
+      '<div class="big3-sign">' + sign + '</div>' +
+      '<div class="big3-sub">' + sub + '</div>';
+    grid.appendChild(card);
+  });
+}
+
+function renderPlanets(d) {
+  const tbody = document.getElementById('planet-tbody');
+  tbody.innerHTML = '';
+  const order = ['태양','달','화성','수성','목성','금성','토성'];
+  order.forEach(name => {
+    const p = (d.planets || []).find(x => x.name === name);
+    if (!p) return;
+    const ec = elCls(p.sign);
+    const nav = d.navamsa && d.navamsa[name] ? d.navamsa[name] : '—';
+    const avg = d.ashtakavarga && d.ashtakavarga[name] != null ? d.ashtakavarga[name] : null;
+    const binduHtml = avg != null ?
+      '<div class="bindu-bar">' + Array.from({length:8},(_,i)=>`<div class="bindu ${i<avg?'on':'off'}"></div>`).join('') + ' <span style="font-size:11px;color:var(--muted);margin-left:2px">' + avg + '</span></div>' : '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><span class="planet-name">' + (PLANET_ICON[name]||'') + ' ' + name + '</span></td>' +
+      '<td><span class="sign-chip ' + ec + '">' + sym(p.sign) + ' ' + p.sign + '</span></td>' +
+      '<td>' + (p.house != null ? p.house + '하우스' : '—') + '</td>' +
+      '<td><span class="sign-chip ' + elCls(nav) + '" style="opacity:.8">' + sym(nav) + ' ' + nav + '</span></td>' +
+      '<td>' + binduHtml + '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function renderDasha(d) {
+  const wrap = document.getElementById('dasha-wrap');
+  wrap.innerHTML = '';
+
+  // 마하다샤
+  const maha = d.currentDasha;
+  if (maha) {
+    const mahaDiv = document.createElement('div');
+    mahaDiv.className = 'dasha-row';
+    const next = nextDasha(maha.planet);
+    mahaDiv.innerHTML =
+      '<div class="dasha-tag">마하다샤 (Mahadasha)</div>' +
+      '<div class="dasha-planet">' + maha.planet + ' 다샤</div>' +
+      '<div class="dasha-date">~ ' + maha.endDate + ' 종료</div>' +
+      '<div class="dasha-remain">' + remainText(maha.endDate) + '</div>' +
+      (next ? '<div class="dasha-next">다음: ' + next.planet + ' 다샤 (' + next.years + '년) 예정</div>' : '');
+    wrap.appendChild(mahaDiv);
+  }
+
+  // 안타르다샤
+  const antar = d.antardasha;
+  if (antar) {
+    const antarDiv = document.createElement('div');
+    antarDiv.className = 'dasha-row';
+    antarDiv.innerHTML =
+      '<div class="dasha-tag">안타르다샤 (Antardasha) — 현재 하위 다샤</div>' +
+      '<div class="dasha-planet" style="font-size:18px;color:var(--accent)">' + antar.planet + '</div>' +
+      '<div class="dasha-date">' + antar.start + ' ~ ' + antar.end + '</div>' +
+      '<div class="dasha-remain">' + remainText(antar.end) + '</div>';
+    wrap.appendChild(antarDiv);
+  }
+}
+
+function renderYogas(yogas) {
+  const list = document.getElementById('yoga-list');
+  list.innerHTML = '';
+  if (!yogas || yogas.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:8px">특수 요가가 감지되지 않았습니다.</div>';
+    return;
+  }
+  yogas.forEach(y => {
+    const row = document.createElement('div');
+    row.className = 'yoga-row';
+    row.innerHTML =
+      '<span class="yoga-badge yoga-' + (y.effect||'길') + '">' + (y.effect||'길') + '</span>' +
+      '<div><div class="yoga-name">' + y.name + '</div><div class="yoga-desc">' + y.desc + '</div></div>';
+    list.appendChild(row);
+  });
+}
+
+function renderInterp(d) {
+  // 달 라시
+  const moonPanel = document.getElementById('panel-moon');
+  const moonSign = d.moonSign || '';
+  const ec = elCls(moonSign);
+  moonPanel.innerHTML =
+    '<div class="interp-header">' +
+      '<div class="interp-sym ' + ec + '">' + sym(moonSign) + '</div>' +
+      '<div><div class="interp-name">' + moonSign + '</div>' +
+      '<div class="interp-role">달 라시 · 감정·직관 패턴</div></div>' +
+    '</div>' +
+    '<div class="interp-text">' + (MOON_INTERP[moonSign] || '해당 라시 해석을 준비 중입니다.') + '</div>';
+
+  // 낙샤트라
+  const nakPanel = document.getElementById('panel-nak');
+  const nak = d.nakshatra || '';
+  nakPanel.innerHTML =
+    '<div class="interp-header">' +
+      '<div class="interp-sym el-풍" style="font-size:24px">⭐</div>' +
+      '<div><div class="interp-name">' + nak + '</div>' +
+      '<div class="interp-role">낙샤트라 · 파다 ' + (d.nakshatraPada||'') + ' · 달의 별자리</div></div>' +
+    '</div>' +
+    '<div class="interp-text">' + (NAK_INTERP[nak] || '해당 낙샤트라 해석을 준비 중입니다.') + '</div>';
+
+  // 다샤
+  const dashaPanel = document.getElementById('panel-dasha');
+  const planet = d.currentDasha?.planet || '';
+  dashaPanel.innerHTML =
+    '<div class="dasha-interp">' +
+      '<div class="dasha-interp-title">' + planet + ' 마하다샤</div>' +
+      '<div class="dasha-interp-text">' + (DASHA_INTERP[planet] || '해당 다샤 해석을 준비 중입니다.') + '</div>' +
+    '</div>' +
+    (d.antardasha ? '<div class="dasha-interp" style="margin-top:10px;border-left-color:var(--accent);">' +
+      '<div class="dasha-interp-title" style="color:var(--accent)">안타르다샤: ' + d.antardasha.planet + '</div>' +
+      '<div class="dasha-interp-text" style="font-size:13px">' + (DASHA_INTERP[d.antardasha.planet] || '') + '</div>' +
+      '</div>' : '');
+}
+
+// ── FETCH ─────────────────────────────────────────────────
+async function loadVedic(year, month, day, hour, gender) {
+  const status = document.getElementById('status');
+  status.className = 'status-msg visible';
+  status.innerHTML = '<span class="spinner"></span>베딕 차트 계산 중…';
+
+  const sp = new URLSearchParams({ year, month, day, hour, tz: 9, lat: 37.5665, lon: 126.978, gender });
+  try {
+    const res = await fetch('https://fortuna.kkdmb7.workers.dev/vedic?' + sp.toString());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+    if (d.error) throw new Error(d.error);
+
+    status.className = 'status-msg';
+    renderBig3(d);
+    setVisible('card-big3', true);
+    renderPlanets(d);
+    setVisible('card-planets', true);
+    renderDasha(d);
+    setVisible('card-dasha', true);
+    renderYogas(d.yogas);
+    setVisible('card-yoga', true);
+    renderInterp(d);
+    setVisible('card-interp', true);
+    setVisible('card-action', true);
+    setVisible('action-row', true);
+  } catch(e) {
+    status.className = 'status-msg visible err';
+    status.textContent = '차트 로드 오류: ' + e.message;
+  }
+}
+
+// ── STARS ─────────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('starCanvas');
+  for (let i = 0; i < 50; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2 + 1;
+    s.style.cssText = [
+      'width:' + sz + 'px','height:' + sz + 'px',
+      'left:' + (Math.random()*100) + '%','top:' + (Math.random()*100) + '%',
+      '--dur:' + (2+Math.random()*4) + 's','--delay:' + (Math.random()*5) + 's',
+      '--max-op:' + (0.3+Math.random()*0.5)
+    ].join(';');
+    canvas.appendChild(s);
+  }
+})();
+
+// ── INIT ──────────────────────────────────────────────────
+(function() {
+  const p = new URLSearchParams(location.search);
+  const year  = parseInt(p.get('year'));
+  const month = parseInt(p.get('month'));
+  const day   = parseInt(p.get('day'));
+  const hRaw  = p.get('hour');
+  const hour  = (hRaw && hRaw !== 'unknown') ? parseInt(hRaw) : 12;
+  const gender = p.get('gender') || 'male';
+
+  if (!year || !month || !day) {
+    const s = document.getElementById('status');
+    s.className = 'status-msg visible err';
+    s.textContent = 'URL에 생년월일 파라미터가 없습니다. (year, month, day 필수)';
+    return;
+  }
+
+  document.getElementById('page-sub').textContent =
+    year + '년 ' + month + '월 ' + day + '일 ' +
+    (hRaw && hRaw !== 'unknown' ? String(hour).padStart(2,'0') + '시' : '시간 미상') +
+    ' · 사이드리얼 계산';
+
+  loadVedic(year, month, day, hour, gender);
+})();
+</script>
+</body>
+</html>

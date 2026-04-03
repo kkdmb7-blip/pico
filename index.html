@@ -613,6 +613,17 @@
     font-family: 'Noto Sans KR', sans-serif;
   }
   .btn-logout:hover { color: var(--text); border-color: var(--muted); }
+  .btn-profiles {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .btn-profiles:hover { color: var(--text); border-color: var(--accent); }
 
   /* ── PROFILE MODAL ── */
   .profile-overlay {
@@ -658,6 +669,7 @@
     <div id="userArea" style="display:none;">
       <img id="userAvatar" class="user-avatar" src="" alt="">
       <span id="userNameDisplay"></span>
+      <button class="btn-profiles" onclick="openProfilesModal()">👥 프로필</button>
       <button class="btn-logout" onclick="logout()">로그아웃</button>
     </div>
   </div>
@@ -830,6 +842,77 @@
       </div>
     </div>
     <button class="saju-submit-btn" onclick="submitBirth()">바로 보기 ✦</button>
+  </div>
+</div>
+
+<!-- PROFILES MANAGEMENT MODAL -->
+<div class="profile-overlay" id="profilesOverlay">
+  <div class="profile-modal" style="max-width:440px;">
+    <h3>👥 프로필 관리</h3>
+    <p>저장된 프로필로 각 페이지를 빠르게 조회합니다 (최대 10명)</p>
+
+    <!-- My Profile -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--accent2);text-transform:uppercase;margin-bottom:8px;">내 프로필</div>
+      <div id="pm-me-section" style="background:rgba(123,94,167,0.1);border:1px solid rgba(123,94,167,0.25);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="openProfileModal();closeProfilesModal();">
+        <span id="pm-me-label" style="font-size:14px;color:var(--text);">설정되지 않음</span>
+        <span style="font-size:12px;color:var(--accent);">편집 →</span>
+      </div>
+    </div>
+
+    <!-- Additional Profiles -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--accent2);text-transform:uppercase;margin-bottom:8px;">추가 프로필</div>
+      <div id="pm-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+      <button id="pm-add-btn" onclick="toggleAddProfileForm()" style="width:100%;margin-top:8px;background:rgba(255,255,255,0.04);border:1px dashed var(--border);border-radius:10px;padding:11px;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">+ 새 프로필 추가</button>
+    </div>
+
+    <!-- Add Form -->
+    <div id="pm-add-form" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px;">새 프로필 추가</div>
+      <div class="saju-form-group">
+        <label>이름</label>
+        <input type="text" id="pm-name" placeholder="이름 입력" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 12px;color:#e8e0f0;font-size:14px;outline:none;font-family:'Noto Sans KR',sans-serif;">
+      </div>
+      <div class="saju-form-group">
+        <label>생년월일</label>
+        <div class="saju-date-row">
+          <select id="pm-year"><option value="">년</option></select>
+          <select id="pm-month"><option value="">월</option></select>
+          <select id="pm-day"><option value="">일</option></select>
+        </div>
+      </div>
+      <div class="saju-form-group">
+        <label>태어난 시간</label>
+        <div style="display:flex;gap:8px;">
+          <select id="pm-hour" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 12px;color:#e8e0f0;font-size:14px;outline:none;">
+            <option value="unknown">시 모름</option>
+            <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
+            <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
+            <option value="6">6시</option><option value="7">7시</option><option value="8">8시</option>
+            <option value="9">9시</option><option value="10">10시</option><option value="11">11시</option>
+            <option value="12" selected>12시</option><option value="13">13시</option><option value="14">14시</option>
+            <option value="15">15시</option><option value="16">16시</option><option value="17">17시</option>
+            <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
+            <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
+          </select>
+          <select id="pm-minute" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 12px;color:#e8e0f0;font-size:14px;outline:none;"></select>
+        </div>
+      </div>
+      <div class="saju-form-group">
+        <label>성별</label>
+        <div class="saju-gender-row">
+          <button class="saju-gender-btn active" id="pm-genderM" onclick="selectPmGender('male')">남성 ♂</button>
+          <button class="saju-gender-btn" id="pm-genderF" onclick="selectPmGender('female')">여성 ♀</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="saju-submit-btn" onclick="saveNewProfile()" style="flex:1;">저장</button>
+        <button onclick="toggleAddProfileForm()" style="flex:0.4;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:13px;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">취소</button>
+      </div>
+    </div>
+
+    <button class="saju-submit-btn" onclick="closeProfilesModal()" style="background:rgba(255,255,255,0.06);color:var(--muted);">닫기</button>
   </div>
 </div>
 
@@ -1056,7 +1139,7 @@ var _birthGender = 'M';
 
 var BIRTH_CONFIG = {
   astro:  { title: '🌟 서양 점성술', url: 'astro.html', extra: {} },
-  vedic:  { title: '🕉️ 베딕 점성술', url: 'https://kkdmb7-blip.github.io/memox/', extra: { mode: 'vedic' } },
+  vedic:  { title: '🕉️ 베딕 점성술', url: 'vedic.html', extra: {} },
   ziwei:  { title: '⭐ 자미두수',     url: 'https://kkdmb7-blip.github.io/memox/', extra: { mode: 'ziwei' } },
 };
 
@@ -1286,6 +1369,7 @@ function saveProfile() {
     gender: _profileGender
   };
   localStorage.setItem('pico_profile', JSON.stringify(profile));
+  syncMyProfileToProfiles(profile);
   closeProfileModal();
 }
 
@@ -1301,6 +1385,160 @@ function submitSaju() {
   var midnight = (document.getElementById('sajuYajasi') && document.getElementById('sajuYajasi').checked) ? 1 : 0;
   var p = new URLSearchParams({ year: y, month: m, day: d, hour: hour, minute: minute, gender: gender, midnightType: midnight });
   window.location.href = 'saju.html?' + p.toString();
+}
+
+// ── PROFILES MANAGEMENT ──────────────────────────────────
+var _pmGender = 'male';
+var _pmAddInited = false;
+
+function openProfilesModal() {
+  renderProfilesModal();
+  document.getElementById('profilesOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeProfilesModal() {
+  document.getElementById('profilesOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function getProfiles() {
+  try { return JSON.parse(localStorage.getItem('pico_profiles')) || []; } catch(e) { return []; }
+}
+
+function saveProfiles(list) {
+  localStorage.setItem('pico_profiles', JSON.stringify(list));
+}
+
+function genId() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+function renderProfilesModal() {
+  // My profile
+  var me = null;
+  try { me = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+  var meLabel = document.getElementById('pm-me-label');
+  if (me && me.year) {
+    meLabel.textContent = (me.name || '나') + ' · ' + me.year + '.' + String(me.month).padStart(2,'0') + '.' + String(me.day).padStart(2,'0') + ' · ' + (me.gender === 'M' ? '남' : '여');
+  } else {
+    meLabel.textContent = '설정되지 않음 (클릭하여 입력)';
+  }
+
+  // Other profiles list
+  var list = getProfiles().filter(function(p) { return !p.isMe; });
+  var listEl = document.getElementById('pm-list');
+  listEl.innerHTML = '';
+  if (list.length === 0) {
+    listEl.innerHTML = '<div style="font-size:13px;color:var(--muted);text-align:center;padding:12px;">저장된 추가 프로필이 없습니다</div>';
+  } else {
+    list.forEach(function(p) {
+      var div = document.createElement('div');
+      div.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;';
+      var bdate = p.birth_date ? p.birth_date.replace(/-/g, '.') : '';
+      var gender = p.gender === 'male' ? '남' : '여';
+      div.innerHTML =
+        '<span style="font-size:14px;color:var(--text);">' + (p.name || '이름없음') + ' · ' + bdate + ' · ' + gender + '</span>' +
+        '<button onclick="deleteProfile(\'' + p.id + '\')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:0 4px;">×</button>';
+      listEl.appendChild(div);
+    });
+  }
+
+  // Add btn visibility
+  var allProfiles = getProfiles().filter(function(p) { return !p.isMe; });
+  document.getElementById('pm-add-btn').style.display = allProfiles.length >= 10 ? 'none' : '';
+}
+
+function deleteProfile(id) {
+  var list = getProfiles().filter(function(p) { return p.id !== id; });
+  saveProfiles(list);
+  renderProfilesModal();
+}
+
+function toggleAddProfileForm() {
+  var form = document.getElementById('pm-add-form');
+  var showing = form.style.display !== 'none';
+  form.style.display = showing ? 'none' : 'block';
+  if (!showing && !_pmAddInited) {
+    _pmAddInited = true;
+    var yEl = document.getElementById('pm-year');
+    var curY = new Date().getFullYear();
+    for (var y = curY; y >= 1930; y--) {
+      var o = document.createElement('option'); o.value = y; o.textContent = y + '년'; yEl.appendChild(o);
+    }
+    var mEl = document.getElementById('pm-month');
+    for (var mo = 1; mo <= 12; mo++) {
+      var o = document.createElement('option'); o.value = mo; o.textContent = mo + '월'; mEl.appendChild(o);
+    }
+    var dEl = document.getElementById('pm-day');
+    function updatePmDays() {
+      var yv = parseInt(yEl.value) || 2000, mv = parseInt(mEl.value) || 1;
+      var maxD = new Date(yv, mv, 0).getDate(), cur = parseInt(dEl.value);
+      dEl.innerHTML = '<option value="">일</option>';
+      for (var dd = 1; dd <= maxD; dd++) {
+        var o = document.createElement('option'); o.value = dd; o.textContent = dd + '일';
+        if (dd === cur) o.selected = true;
+        dEl.appendChild(o);
+      }
+    }
+    yEl.addEventListener('change', updatePmDays);
+    mEl.addEventListener('change', updatePmDays);
+    updatePmDays();
+    var minEl = document.getElementById('pm-minute');
+    for (var mi = 0; mi <= 59; mi++) {
+      var o = document.createElement('option'); o.value = mi; o.textContent = String(mi).padStart(2,'0') + '분'; minEl.appendChild(o);
+    }
+  }
+}
+
+function selectPmGender(g) {
+  _pmGender = g;
+  document.getElementById('pm-genderM').classList.toggle('active', g === 'male');
+  document.getElementById('pm-genderF').classList.toggle('active', g === 'female');
+}
+
+function saveNewProfile() {
+  var name  = document.getElementById('pm-name').value.trim();
+  var year  = document.getElementById('pm-year').value;
+  var month = document.getElementById('pm-month').value;
+  var day   = document.getElementById('pm-day').value;
+  if (!year || !month || !day) { alert('생년월일을 모두 선택해주세요.'); return; }
+  var hour   = document.getElementById('pm-hour').value;
+  var minute = document.getElementById('pm-minute').value;
+  var list = getProfiles();
+  var others = list.filter(function(p) { return !p.isMe; });
+  if (others.length >= 10) { alert('최대 10명까지 저장할 수 있습니다.'); return; }
+  var newP = {
+    id: genId(),
+    name: name || '이름없음',
+    birth_date: year + '-' + String(parseInt(month)).padStart(2,'0') + '-' + String(parseInt(day)).padStart(2,'0'),
+    birth_time: hour === 'unknown' ? 'unknown' : String(parseInt(hour)).padStart(2,'0') + ':' + String(parseInt(minute) || 0).padStart(2,'0'),
+    gender: _pmGender,
+    isMe: false
+  };
+  list.push(newP);
+  saveProfiles(list);
+  document.getElementById('pm-add-form').style.display = 'none';
+  document.getElementById('pm-name').value = '';
+  renderProfilesModal();
+}
+
+// Sync pico_profile to pico_profiles isMe entry
+function syncMyProfileToProfiles(profile) {
+  var list = getProfiles();
+  var idx = list.findIndex(function(p) { return p.isMe; });
+  var hour = profile.hour === 'unknown' ? 'unknown' : String(parseInt(profile.hour) || 0).padStart(2,'0') + ':' + String(profile.minute || 0).padStart(2,'0');
+  var entry = {
+    id: 'me',
+    name: profile.name || '나',
+    birth_date: profile.year + '-' + String(profile.month).padStart(2,'0') + '-' + String(profile.day).padStart(2,'0'),
+    birth_time: hour,
+    gender: profile.gender === 'M' ? 'male' : 'female',
+    isMe: true
+  };
+  if (idx >= 0) list[idx] = entry;
+  else list.unshift(entry);
+  saveProfiles(list);
 }
 
 checkAuth();
