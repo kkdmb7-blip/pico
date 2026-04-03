@@ -496,6 +496,7 @@ async function fetchSaju() {
     if(data.error) throw new Error(data.error);
     document.getElementById('S_load').style.display='none';
     document.getElementById('S_result').style.display='block';
+    window.scrollTo(0,0);
     renderAll(data);
   } catch(e) {
     document.getElementById('S_load').style.display='none';
