@@ -352,6 +352,9 @@ const JJG = [
   [8,0,4],   // 해: 임갑무
 ];
 
+// 지지 본기 천간 인덱스 (자~해)
+const BRANCH_MAIN_STEM = [9,5,0,1,4,2,3,5,6,7,4,8];
+
 // 12운성
 const W12 = ['장생','목욕','관대','건록','제왕','쇠','병','사','묘','절','태','양'];
 const W_START = [11,6,2,9,2,9,5,0,8,3]; // 장생 지지 인덱스
@@ -577,10 +580,8 @@ function renderPillars(data, pls, dayP) {
   pls.forEach((pl,i) => {
     const isDay = i===1;
 
-    // 천간 십성 (상단)
-    const stemSip = isDay
-      ? '<span style="color:#CE93D8">일간</span>'
-      : `<span>${sipseong(dayP.si, pl.si) || '&nbsp;'}</span>`;
+    // 천간 십성 (상단) — 일간도 비견으로 표시
+    const stemSip = `<span style="${isDay?'color:#CE93D8':''}">${sipseong(dayP.si, pl.si) || '&nbsp;'}</span>`;
 
     // 지지 안전 처리
     const bIdx = pl.bi >= 0 ? pl.bi : 0;
@@ -617,7 +618,8 @@ function renderPillars(data, pls, dayP) {
       <div style="font-size:11px;min-height:16px;margin-bottom:4px;color:rgba(255,255,255,0.6)">${stemSip}</div>
       <div class="hanja-box ${EL_BG_CSS[pl.sStemEl]||''}">${STEM_H[pl.si]||'?'}</div>
       <div class="hanja-box ${EL_BG_CSS[bEl]||''}">${BRANCH_H[bIdx]||'?'}</div>
-      <div style="margin-top:8px;display:flex;justify-content:center;gap:4px;flex-wrap:wrap">${jjgHTML}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px">${sipseong(dayP.si, BRANCH_MAIN_STEM[bIdx]) || '&nbsp;'}</div>
+      <div style="margin-top:6px;display:flex;justify-content:center;gap:4px;flex-wrap:wrap">${jjgHTML}</div>
       <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.5);font-weight:600">${woon}</div>
       <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;line-height:1.3">${nap}</div>
       <div style="margin-top:5px;min-height:14px;line-height:1.4">${myRels}</div>
