@@ -718,14 +718,6 @@
       </div>
     </div>
 
-    <div class="saju-form-group">
-      <label>판 종류</label>
-      <div class="saju-gender-row">
-        <button class="saju-gender-btn active" id="qmBtnSiga" onclick="selectQimenType('siga')">시가기문 (時家)</button>
-        <button class="saju-gender-btn"        id="qmBtnIlga" onclick="selectQimenType('ilga')">일가기문 (日家)</button>
-      </div>
-    </div>
-
     <button class="saju-submit-btn" onclick="submitQimen()">기문 보기 ✦</button>
   </div>
 </div>
@@ -821,13 +813,8 @@ function selectGender(g) {
 }
 
 // ── QIMEN MODAL ──────────────────────────────────────────
-var _qimenType = 'siga';
-
 function openQimenModal() {
   var now = new Date();
-  _qimenType = 'siga';
-  document.getElementById('qmBtnSiga').classList.add('active');
-  document.getElementById('qmBtnIlga').classList.remove('active');
 
   // 연도
   var yEl = document.getElementById('qmYear');
@@ -883,19 +870,13 @@ function closeQimenModal() {
   document.body.style.overflow = '';
 }
 
-function selectQimenType(t) {
-  _qimenType = t;
-  document.getElementById('qmBtnSiga').classList.toggle('active', t === 'siga');
-  document.getElementById('qmBtnIlga').classList.toggle('active', t === 'ilga');
-}
-
 function submitQimen() {
   var year   = document.getElementById('qmYear').value;
   var month  = document.getElementById('qmMonth').value;
   var day    = document.getElementById('qmDay').value;
   var hour   = document.getElementById('qmHour').value;
   var minute = document.getElementById('qmMinute').value;
-  var p = new URLSearchParams({ year: year, month: month, day: day, hour: hour, minute: minute, type: _qimenType });
+  var p = new URLSearchParams({ year: year, month: month, day: day, hour: hour, minute: minute, type: 'siga' });
   window.location.href = 'qimen.html?' + p.toString();
 }
 
