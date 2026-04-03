@@ -328,7 +328,7 @@
   <!-- 행운 정보 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
     <button onclick="togAcc('acc_johu')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
-      <span>🍀 행운 · 조후</span><span class="acc-icon" id="ico_acc_johu">▾</span>
+      <span>🍀 행운 · 억부</span><span class="acc-icon" id="ico_acc_johu">▾</span>
     </button>
     <div class="acc-body shut" id="acc_johu">
       <div id="R_johu" style="padding:0 12px 14px"></div>
@@ -632,8 +632,7 @@ function renderProfile(data) {
     <div style="display:flex;flex-wrap:wrap;gap:6px">
       <span class="badge" style="background:rgba(123,94,167,0.2);border-color:rgba(123,94,167,0.4);color:#CE93D8">${data.summary.strength}</span>
       <span class="badge">${data.geokguk.geok_kor}</span>
-      <span class="badge">용신 ${data.yongshin.primary_kor}</span>
-      <span class="badge">희신 ${data.yongshin.secondary_kor}</span>
+      ${(data.johu.needs_kor||[]).map((n,i)=>`<span class="badge" style="color:#FFAB40;border-color:rgba(255,171,64,0.35);background:rgba(255,171,64,0.08)">${i===0?'조후용신':'조후희신'} ${n}</span>`).join('')}
     </div>
   `;
 }
@@ -741,7 +740,27 @@ function renderFive(data) {
 
 // ─── 격국 · 용신 ─────────────────────────────────
 function renderGeok(data) {
-  const g=data.geokguk, y=data.yongshin, l=data.lucky, t=data.tonggeun;
+  const g=data.geokguk, y=data.yongshin, j=data.johu, t=data.tonggeun;
+
+  // 계절 판단 (월지 기준)
+  const monthBranch = BRANCHES.indexOf(data.summary.pillars.month[1]);
+  const WINTER=[11,0,1], SUMMER=[5,6,7], SPRING=[2,3,4], AUTUMN=[8,9,10];
+  let season, weight, priority;
+  if (WINTER.includes(monthBranch)||SUMMER.includes(monthBranch)) {
+    season = WINTER.includes(monthBranch) ? '겨울' : '여름';
+    weight = '조후 70%'; priority = '조후';
+  } else {
+    season = SPRING.includes(monthBranch) ? '봄' : '가을';
+    weight = '억부 80%'; priority = '억부';
+  }
+
+  // 조후용신 (johu.needs → 첫번째가 용신)
+  const johuEl1 = EN_EL[j.needs[0]]||'화';
+  const johuEl2 = EN_EL[j.needs[1]]||'목';
+  const johuKor1 = (j.needs_kor||[])[0]||'';
+  const johuKor2 = (j.needs_kor||[])[1]||'';
+
+  // 억부용신
   const priEl = EN_EL[y.primary]||'목';
   const secEl = EN_EL[y.secondary]||'화';
 
@@ -755,30 +774,40 @@ function renderGeok(data) {
         <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">신강/신약</div>
         <div style="font-weight:700;color:#CE93D8">${data.summary.strength}</div>
       </div>
+    </div>
+    <div style="background:rgba(255,171,64,0.06);border:1px solid rgba(255,171,64,0.2);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.7">
+      📅 <b style="color:#FFAB40">${season}생</b> → <b style="color:#FFAB40">${weight}</b> 우선 적용
+      &nbsp;·&nbsp; <span style="color:rgba(255,255,255,0.4)">"조후 = 귀(貴) · 억부 = 부(富)"</span>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">☀️ 조후용신 (기후·환경)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div class="glass-sm" style="padding:12px;text-align:center;border-color:rgba(255,171,64,0.25)">
+        <div style="font-size:10px;color:rgba(255,171,64,0.6);margin-bottom:4px">조후용신</div>
+        <div class="hanja ${EL_TC_CSS[johuEl1]}" style="font-weight:700;font-size:17px">${EL_NAME[johuEl1]}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5)">${johuKor1}</div>
+      </div>
+      <div class="glass-sm" style="padding:12px;text-align:center;border-color:rgba(255,171,64,0.15)">
+        <div style="font-size:10px;color:rgba(255,171,64,0.4);margin-bottom:4px">조후희신</div>
+        <div class="hanja ${EL_TC_CSS[johuEl2]}" style="font-weight:700;font-size:17px">${johuKor2?EL_NAME[johuEl2]:'—'}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5)">${johuKor2}</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">⚖️ 억부용신 (강약·균형)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">용신</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">억부용신</div>
         <div class="hanja ${EL_TC_CSS[priEl]}" style="font-weight:700;font-size:17px">${EL_NAME[priEl]}</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.5)">${y.primary_kor}</div>
       </div>
       <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">희신</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">억부희신</div>
         <div class="hanja ${EL_TC_CSS[secEl]}" style="font-weight:700;font-size:17px">${EL_NAME[secEl]}</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.5)">${y.secondary_kor}</div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
-      <div class="glass-sm" style="padding:10px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3)">행운 숫자</div>
-        <div style="font-weight:700;font-size:20px;color:#69F0AE">${l.good_num}</div>
-      </div>
-      <div class="glass-sm" style="padding:10px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3)">행운 방향</div>
-        <div style="font-weight:700;color:#82B1FF">${l.good_dir}</div>
-      </div>
-      <div class="glass-sm" style="padding:10px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3)">통근 천간</div>
-        <div class="hanja" style="font-weight:700;color:#FFD740">${(t.stems_with_root||[]).join(' ')||'—'}</div>
-      </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">📌 통근 천간</div>
+    <div class="glass-sm" style="padding:10px;text-align:center">
+      <div class="hanja" style="font-weight:700;font-size:16px;color:#FFD740;letter-spacing:6px">${(t.stems_with_root||[]).join(' ')||'—'}</div>
     </div>
   `;
 }
@@ -943,36 +972,41 @@ function renderYun(data) {
   }
 }
 
-// ─── 행운 · 조후 ──────────────────────────────────
+// ─── 행운 · 억부 ──────────────────────────────────
 function renderJohu(data) {
-  const j=data.johu, l=data.lucky, zc=data.zodiac_compatibility||[];
-  const tK={cold:'한(寒)',warm:'온(溫)',hot:'열(熱)',cool:'양(凉)'};
-  const hK={wet:'습(濕)',damp:'담',arid:'조(燥)',dry:'건(乾)'};
+  const y=data.yongshin, l=data.lucky, j=data.johu, zc=data.zodiac_compatibility||[];
+  const priEl = EN_EL[y.primary]||'목';
+  const secEl = EN_EL[y.secondary]||'화';
   const topZ=zc.map((z,i)=>({...z,i})).filter(z=>z.score>=75).sort((a,b)=>b.score-a.score).slice(0,3);
+
+  // 억부용신 기반 행운 오행
+  const luckyEl = priEl;
 
   document.getElementById('R_johu').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <div class="glass-sm" style="padding:12px">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3)">월지 기온</div>
-        <div style="font-weight:700;color:#FFAB40;margin-top:4px">${tK[j.temperature]||j.temperature}</div>
+      <div class="glass-sm" style="padding:12px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3)">억부용신</div>
+        <div class="hanja ${EL_TC_CSS[priEl]}" style="font-weight:700;font-size:20px;margin-top:4px">${EL_NAME[priEl]}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.45)">${y.primary_kor}</div>
       </div>
-      <div class="glass-sm" style="padding:12px">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3)">월지 습도</div>
-        <div style="font-weight:700;color:#82B1FF;margin-top:4px">${hK[j.humidity]||j.humidity}</div>
-      </div>
-    </div>
-    <div class="glass-sm" style="padding:12px;margin-bottom:8px">
-      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:6px">조후 필요 오행</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        ${(j.needs_kor||[]).map(n=>`<span class="badge">${n}</span>`).join('')}
+      <div class="glass-sm" style="padding:12px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3)">억부희신</div>
+        <div class="hanja ${EL_TC_CSS[secEl]}" style="font-weight:700;font-size:20px;margin-top:4px">${EL_NAME[secEl]}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.45)">${y.secondary_kor}</div>
       </div>
     </div>
-    <div class="glass-sm" style="padding:12px;margin-bottom:8px">
-      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:6px">행운 정보</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span class="badge">🍀 행운 숫자 <b style="margin-left:4px">${l.good_num}</b></span>
-        <span class="badge">🧭 ${l.good_dir} 방향 길</span>
-        <span class="badge" style="color:rgba(255,255,255,0.4)">⚠ ${l.bad_dir} 방향 흉</span>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px">
+      <div class="glass-sm" style="padding:10px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3)">행운 숫자</div>
+        <div style="font-weight:700;font-size:20px;color:#69F0AE">${l.good_num}</div>
+      </div>
+      <div class="glass-sm" style="padding:10px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3)">길한 방향</div>
+        <div style="font-weight:700;color:#82B1FF">${l.good_dir}</div>
+      </div>
+      <div class="glass-sm" style="padding:10px;text-align:center">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3)">흉한 방향</div>
+        <div style="font-weight:700;color:rgba(255,255,255,0.3)">${l.bad_dir}</div>
       </div>
     </div>
     ${topZ.length?`
