@@ -762,7 +762,10 @@ function renderLuck(data) {
   document.getElementById('R_luck').innerHTML = html;
   setTimeout(()=>{
     const cur=document.querySelector('.luck-card.active');
-    if(cur) cur.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+    if(cur){
+      const scroll=document.getElementById('R_luck');
+      scroll.scrollLeft=cur.offsetLeft-scroll.offsetWidth/2+cur.offsetWidth/2;
+    }
     selectDaeun(nowIdx);
   },400);
 }
