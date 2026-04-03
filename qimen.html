@@ -383,6 +383,36 @@
   .bestdir-chip.travel .bestdir-dir { color: var(--accent); }
   .bestdir-info { font-size: 11px; color: var(--muted); }
 
+  /* ── 사주 8자 바 ── */
+  .saju-bar {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 24px;
+    display: none; margin-bottom: 16px;
+  }
+  .saju-bar.visible { display: block; }
+  .saju-bar-title {
+    font-size: 11px; color: var(--muted); letter-spacing: 0.5px;
+    text-transform: uppercase; margin-bottom: 14px; font-weight: 600;
+  }
+  .saju-pillars {
+    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+  }
+  .saju-pillar {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    flex: 1; min-width: 64px; max-width: 96px;
+  }
+  .saju-pillar-label {
+    font-size: 11px; color: var(--muted); font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .saju-pillar-chars {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 26px; font-weight: 700; line-height: 1;
+    padding: 6px 10px; border-radius: 8px;
+    border: 1.5px solid currentColor; text-align: center;
+    width: 100%;
+  }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
     .palace { min-height: 118px; padding: 12px 6px 8px; gap: 3px; }
@@ -470,6 +500,11 @@
       <div class="meta-label" id="m-ganzhi-label"></div>
       <div class="meta-value" id="m-ganzhi"></div>
     </div>
+  </div>
+
+  <div class="saju-bar" id="saju-bar">
+    <div class="saju-bar-title">사주 8자</div>
+    <div class="saju-pillars" id="saju-pillars"></div>
   </div>
 
   <div class="grid-wrap" id="grid-wrap">
@@ -570,12 +605,57 @@ function setVisible(id, v) {
 }
 function hideResults() {
   setVisible('meta-bar', false);
+  setVisible('saju-bar', false);
   setVisible('grid-wrap', false);
   setVisible('bestdir-box', false);
   setVisible('zhifu-bar', false);
   setVisible('interp-wrap', false);
   setVisible('action-row', false);
   hasResult = false;
+}
+
+// ── 사주 8자 ─────────────────────────────────────────────
+const KOR_STEM   = {갑:'甲',을:'乙',병:'丙',정:'丁',무:'戊',기:'己',경:'庚',신:'辛',임:'壬',계:'癸'};
+const KOR_BRANCH = {자:'子',축:'丑',인:'寅',묘:'卯',진:'辰',사:'巳',오:'午',미:'未',신:'申',유:'酉',술:'戌',해:'亥'};
+const STEM_COLOR = {甲:'#00C853',乙:'#00C853',丙:'#FF1744',丁:'#FF1744',戊:'#FFD600',己:'#FFD600',庚:'#e8e8e8',辛:'#e8e8e8',壬:'#64b5f6',癸:'#64b5f6'};
+const STEM_BG    = {甲:'rgba(0,200,83,0.08)',乙:'rgba(0,200,83,0.08)',丙:'rgba(255,23,68,0.08)',丁:'rgba(255,23,68,0.08)',戊:'rgba(255,214,0,0.08)',己:'rgba(255,214,0,0.08)',庚:'rgba(232,232,232,0.06)',辛:'rgba(232,232,232,0.06)',壬:'rgba(100,181,246,0.08)',癸:'rgba(100,181,246,0.08)'};
+
+function korPillarToHan(s) {
+  if (!s || s.length < 2) return { han: '??', stem: '' };
+  const stem   = KOR_STEM[s[0]]   || s[0];
+  const branch = KOR_BRANCH[s[1]] || s[1];
+  return { han: stem + branch, stem };
+}
+
+async function fetchSaju(year, month, day, hour, minute) {
+  try {
+    const sp = new URLSearchParams({ year, month, day, hour: hour||0, minute: minute||0, gender: 'male' });
+    const res = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test?' + sp.toString());
+    if (!res.ok) return;
+    const data = await res.json();
+    const pillars = data.summary?.pillars;
+    if (!pillars) return;
+
+    const order = [
+      { label: '시주', key: 'hour' },
+      { label: '일주', key: 'day' },
+      { label: '월주', key: 'month' },
+      { label: '년주', key: 'year' },
+    ];
+    const container = document.getElementById('saju-pillars');
+    container.innerHTML = '';
+    order.forEach(({ label, key }) => {
+      const { han, stem } = korPillarToHan(pillars[key]);
+      const color = STEM_COLOR[stem] || 'var(--muted)';
+      const bg    = STEM_BG[stem]    || 'rgba(107,107,133,0.08)';
+      const div = document.createElement('div');
+      div.className = 'saju-pillar';
+      div.innerHTML = '<div class="saju-pillar-label">' + label + '</div>'
+        + '<div class="saju-pillar-chars" style="color:' + color + ';background:' + bg + ';border-color:' + color + ';">' + han + '</div>';
+      container.appendChild(div);
+    });
+    setVisible('saju-bar', true);
+  } catch(e) { console.error('사주 로드 오류', e); }
 }
 
 async function doFetch() {
@@ -619,6 +699,16 @@ async function doFetch() {
 
 function renderResult(data) {
   const meta = data.meta;
+
+  // 사주 8자 (URL에 날짜 있을 때)
+  const _y = parseInt(document.getElementById('inp-year').value);
+  const _m = parseInt(document.getElementById('inp-month').value);
+  const _d = parseInt(document.getElementById('inp-day').value);
+  if (_y && _m && _d) {
+    fetchSaju(_y, _m, _d,
+      parseInt(document.getElementById('inp-hour').value)   || 0,
+      parseInt(document.getElementById('inp-minute').value) || 0);
+  }
 
   // 메타 정보
   const dunEl = document.getElementById('m-duntype');
