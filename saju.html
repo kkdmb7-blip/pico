@@ -580,8 +580,10 @@ function renderPillars(data, pls, dayP) {
   pls.forEach((pl,i) => {
     const isDay = i===1;
 
-    // 천간 십성 (상단) — 일간도 비견으로 표시
-    const stemSip = `<span style="${isDay?'color:#CE93D8':''}">${sipseong(dayP.si, pl.si) || '&nbsp;'}</span>`;
+    // 천간 십성 (상단)
+    const stemSip = isDay
+      ? '<span style="color:#CE93D8">일간</span>'
+      : `<span>${sipseong(dayP.si, pl.si) || '&nbsp;'}</span>`;
 
     // 지지 안전 처리
     const bIdx = pl.bi >= 0 ? pl.bi : 0;
