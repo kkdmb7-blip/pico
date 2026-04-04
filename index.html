@@ -782,9 +782,76 @@
   }
   .profile-modal h3 { font-family: 'Noto Serif KR', sans-serif; font-size: 20px; margin-bottom: 6px; }
   .profile-modal > p { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+
+/* ── TAROT INTRO MODAL ── */
+#tarotIntroOverlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(5,4,12,0.92);
+  backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 32px;
+}
+#tarotIntroOverlay.active { display: flex; }
+.tarot-shuffle {
+  position: relative; width: 120px; height: 160px;
+}
+.tarot-shuffle .tc {
+  position: absolute; bottom: 0; left: 50%;
+  width: 72px; height: 120px;
+  background: linear-gradient(135deg, #2a1a4a 0%, #1a0f30 100%);
+  border: 1.5px solid #8e7dff55;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(142,125,255,0.18);
+  transform-origin: bottom center;
+  animation: tcShuffle 1.2s ease-out forwards;
+}
+.tarot-shuffle .tc::after {
+  content: '✦';
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: #8e7dff88;
+}
+.tarot-shuffle .tc:nth-child(1) { animation-delay: 0s;   --rx: -28deg; --tx: -44px; }
+.tarot-shuffle .tc:nth-child(2) { animation-delay: 0.1s; --rx: 0deg;   --tx: -36px; z-index:1; }
+.tarot-shuffle .tc:nth-child(3) { animation-delay: 0.2s; --rx: 28deg;  --tx: -28px; z-index:2; }
+@keyframes tcShuffle {
+  0%   { transform: translateX(-50%) rotate(0deg) translateY(0); opacity:0; }
+  30%  { opacity: 1; }
+  100% { transform: translateX(calc(-50% + var(--tx))) rotate(var(--rx)) translateY(-10px); opacity:1; }
+}
+.tarot-intro-text {
+  font-family: 'Noto Serif KR', serif;
+  font-size: clamp(15px, 4vw, 20px);
+  color: #e8e0f8;
+  text-align: center;
+  line-height: 1.7;
+  letter-spacing: 0.3px;
+  animation: fadeInUp 0.6s 0.4s both;
+}
+.tarot-intro-sub {
+  font-size: 12px; color: #8e7dff99;
+  animation: fadeInUp 0.6s 0.8s both;
+}
+@keyframes fadeInUp {
+  from { opacity:0; transform: translateY(12px); }
+  to   { opacity:1; transform: translateY(0); }
+}
 </style>
 </head>
 <body>
+
+<!-- TAROT INTRO MODAL -->
+<div id="tarotIntroOverlay">
+  <div class="tarot-shuffle">
+    <div class="tc"></div>
+    <div class="tc"></div>
+    <div class="tc"></div>
+  </div>
+  <div class="tarot-intro-text">오늘 가장 궁금한 것을<br>마음속으로 떠올리세요 🔮</div>
+  <div class="tarot-intro-sub">잠시 후 타로가 시작됩니다…</div>
+</div>
+
 
 <div id="starCanvas"></div>
 
@@ -898,7 +965,7 @@
       <p>중화권 CEO들이 의사결정에 쓰는 시공간 최적화 전략 엔진. 언제, 어느 방향으로 움직여야 유리한지 계산합니다.</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
-    <div class="why-card" onclick="window.open('https://kkdmb7-blip.github.io/memox/','_blank')" style="cursor:pointer;">
+    <div class="why-card" onclick="openTarotIntro()" style="cursor:pointer;">
       <div class="why-icon">🔮</div>
       <h3>타로카드</h3>
       <p>78장의 상징 체계로 읽는 무의식의 언어. 오늘의 카드가 전하는 메시지를 확인하세요.</p>
@@ -1230,6 +1297,14 @@ function initSajuDateSelects() {
       var o = document.createElement('option'); o.value = mi; o.textContent = String(mi).padStart(2,'0') + '분'; minEl.appendChild(o);
     }
   }
+}
+
+function openTarotIntro() {
+  const overlay = document.getElementById('tarotIntroOverlay');
+  overlay.classList.add('active');
+  setTimeout(function() {
+    window.location.href = 'https://kkdmb7-blip.github.io/memox/?mode=tarot';
+  }, 2200);
 }
 
 function openSajuModal() {
