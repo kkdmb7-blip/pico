@@ -308,7 +308,7 @@
   <!-- 대운 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
     <button onclick="togAcc('acc_luck')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
-      <span>🌊 대운 흐름</span><span class="acc-icon open" id="ico_acc_luck">▾</span>
+      <span>🌊 대운 흐름 <span style="font-size:11px;font-weight:400;opacity:0.45">10년 단위 운세 주기</span></span><span class="acc-icon open" id="ico_acc_luck">▾</span>
     </button>
     <div class="acc-body open" id="acc_luck">
       <div style="padding:0 12px 14px">
@@ -463,6 +463,13 @@ function monthPillar(yearSi, mo) { // mo: 1-12
 // 폼 상태
 // ═══════════════════════════════════════════════════
 let _gender = 'M', _cal = 'solar';
+
+const SIP_DESC = {
+  '비견':'나와 같은 기운 · 동료·경쟁','겁재':'욕심·라이벌·겁탈','식신':'표현·재능·식복',
+  '상관':'창의·언변·반항기','편재':'변동재물·사교','정재':'안정재물·성실',
+  '편관':'압박·도전·칠살','정관':'명예·규범·직위','편인':'특수재능·고독',
+  '정인':'학문·모성·보호'
+};
 
 function selGender(g) {
   _gender = g;
@@ -655,7 +662,7 @@ function renderPillars(data, pls, dayP) {
     // 천간 십성 (상단)
     const stemSip = isDay
       ? '<span style="color:#CE93D8">일간</span>'
-      : `<span>${sipseong(dayP.si, pl.si) || '&nbsp;'}</span>`;
+      : `<span title="${SIP_DESC[sipseong(dayP.si, pl.si)]||''}">${sipseong(dayP.si, pl.si) || '&nbsp;'}</span>`;
 
     // 지지 안전 처리
     const bIdx = pl.bi >= 0 ? pl.bi : 0;
@@ -668,7 +675,7 @@ function renderPillars(data, pls, dayP) {
       const sip  = sipseong(dayP.si, ji);
       return `<div style="display:flex;flex-direction:column;align-items:center;gap:1px">
         <span style="font-size:11px;color:rgba(255,255,255,0.6)">${name}</span>
-        <span style="font-size:9px;color:rgba(255,255,255,0.35);white-space:nowrap">${sip||'—'}</span>
+        <span style="font-size:9px;color:rgba(255,255,255,0.35);white-space:nowrap" title="${SIP_DESC[sip]||''}">${sip||'—'}</span>
       </div>`;
     }).join('');
 
@@ -692,7 +699,7 @@ function renderPillars(data, pls, dayP) {
       <div style="font-size:11px;min-height:16px;margin-bottom:4px;color:rgba(255,255,255,0.6)">${stemSip}</div>
       <div class="hanja-box ${EL_BG_CSS[pl.sStemEl]||''}">${STEM_H[pl.si]||'?'}</div>
       <div class="hanja-box ${EL_BG_CSS[bEl]||''}">${BRANCH_H[bIdx]||'?'}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px">${sipseong(dayP.si, BRANCH_MAIN_STEM[bIdx]) || '&nbsp;'}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px" title="${SIP_DESC[sipseong(dayP.si, BRANCH_MAIN_STEM[bIdx])]||''}">${sipseong(dayP.si, BRANCH_MAIN_STEM[bIdx]) || '&nbsp;'}</div>
       <div style="margin-top:6px;display:flex;justify-content:center;gap:4px;flex-wrap:wrap">${jjgHTML}</div>
       <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.5);font-weight:600">${woon}</div>
       <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;line-height:1.3">${nap}</div>
@@ -776,10 +783,12 @@ function renderGeok(data) {
       <div class="glass-sm" style="padding:12px;text-align:center">
         <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">격국</div>
         <div style="font-weight:700;color:#FFD740">${g.geok_kor}</div>
+        <div style="font-size:9px;opacity:0.5;margin-top:3px">사주 구조 유형</div>
       </div>
       <div class="glass-sm" style="padding:12px;text-align:center">
         <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">신강/신약</div>
         <div style="font-weight:700;color:#CE93D8">${data.summary.strength}</div>
+        <div style="font-size:9px;opacity:0.5;margin-top:3px">일간 에너지의 강약</div>
       </div>
     </div>
     <div style="background:rgba(255,171,64,0.06);border:1px solid rgba(255,171,64,0.2);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.7">
@@ -789,12 +798,12 @@ function renderGeok(data) {
     <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">☀️ 조후용신 (기후·환경)</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <div class="glass-sm" style="padding:12px;text-align:center;border-color:rgba(255,171,64,0.25)">
-        <div style="font-size:10px;color:rgba(255,171,64,0.6);margin-bottom:4px">조후용신</div>
+        <div style="font-size:10px;color:rgba(255,171,64,0.6);margin-bottom:4px">조후용신<span style="display:block;font-size:9px;opacity:0.55;font-weight:400;letter-spacing:0">기후 불균형 보완 기운</span></div>
         <div class="hanja ${EL_TC_CSS[johuEl1]}" style="font-weight:700;font-size:17px">${EL_NAME[johuEl1]}</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.5)">${johuKor1}</div>
       </div>
       <div class="glass-sm" style="padding:12px;text-align:center;border-color:rgba(255,171,64,0.15)">
-        <div style="font-size:10px;color:rgba(255,171,64,0.4);margin-bottom:4px">조후희신</div>
+        <div style="font-size:10px;color:rgba(255,171,64,0.4);margin-bottom:4px">조후희신<span style="display:block;font-size:9px;opacity:0.55;font-weight:400;letter-spacing:0">조후용신을 보조</span></div>
         <div class="hanja ${EL_TC_CSS[johuEl2]}" style="font-weight:700;font-size:17px">${johuKor2?EL_NAME[johuEl2]:'—'}</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.5)">${johuKor2}</div>
       </div>
@@ -802,12 +811,12 @@ function renderGeok(data) {
     <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">⚖️ 억부용신 (강약·균형)</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">억부용신</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">억부용신<span style="display:block;font-size:9px;opacity:0.55;font-weight:400;letter-spacing:0">일간 강약 균형 기운</span></div>
         <div class="hanja ${EL_TC_CSS[priEl]}" style="font-weight:700;font-size:17px">${EL_NAME[priEl]}</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.5)">${y.primary_kor}</div>
       </div>
       <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">억부희신</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">억부희신<span style="display:block;font-size:9px;opacity:0.55;font-weight:400;letter-spacing:0">용신을 보조하는 기운</span></div>
         <div class="hanja ${EL_TC_CSS[secEl]}" style="font-weight:700;font-size:17px">${EL_NAME[secEl]}</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.5)">${y.secondary_kor}</div>
       </div>
@@ -891,7 +900,7 @@ function renderSeun(ys, ye) {
   const cy = new Date().getFullYear();
   const byear = parseInt(pBirth.split('-')[0]);
   let html = `<div style="margin-bottom:14px">
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">세운 (${ys}~${ye})</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">세운 (${ys}~${ye}) <span style="font-size:9px;opacity:0.5">1년 단위 흐름</span></div>
     <div class="yun-grid">`;
   for (let y=ys; y<=ye; y++) {
     const yp = yearPillar(y);

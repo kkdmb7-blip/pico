@@ -522,7 +522,7 @@
   </div>
 
   <div class="bestdir-box" id="bestdir-box">
-    <div class="bestdir-title">오늘의 최길 방향</div>
+    <div class="bestdir-title">오늘의 최길 방향 <span style="font-size:10px;font-weight:400;opacity:0.55">生門·開門이 있는 방위가 유리합니다</span></div>
     <div class="bestdir-rows" id="bestdir-rows"></div>
   </div>
 
@@ -582,6 +582,24 @@ const GONG_DIR = {
   1:'북', 2:'남서', 3:'동', 4:'남동', 5:'중앙', 6:'북서', 7:'서', 8:'북동', 9:'남'
 };
 
+// 구성(九星) 의미
+const STAR_DESC = {
+  '天蓬':'수(水) · 주군·지도자 기운','天芮':'토(土) · 질병·장애 기운','天衝':'목(木) · 투쟁·활동 기운',
+  '天輔':'목(木) · 문창·지혜 길성','天禽':'토(土) · 중앙·균형','天心':'금(金) · 의술·길성',
+  '天柱':'금(金) · 파괴·절손 기운','天任':'토(土) · 안정·길성','天英':'화(火) · 허영·소모 기운'
+};
+// 팔신(八神) 의미
+const SHEN_DESC = {
+  '値符':'천간 직부·보호 에너지','螣蛇':'불안·놀람·기이한 사건','太陰':'음모·은밀·여성 에너지',
+  '六合':'합작·파트너십·행운','白虎':'살기·사고·충돌','玄武':'사기·절도·어둠',
+  '九地':'잠복·대기·안정','九天':'성취·소원·비상'
+};
+// 팔문(八門) 의미
+const DOOR_DESC = {
+  '生':'生門 · 새로운 시작·생기·길문','開':'開門 · 왕성한 활동·개운·길문',
+  '休':'休門 · 안정·휴식·길문','景':'景門 · 밝은 기운·문서','傷':'傷門 · 주의·손상·흉문',
+  '杜':'杜門 · 막힘·정체','驚':'驚門 · 긴장·놀람','死':'死門 · 침체·소멸·흉문'
+};
 // 팔문 → 길흉 색상
 const DOOR_COLOR = {
   '生':'#FFD700', '開':'#FFD700',
@@ -820,12 +838,14 @@ function buildCell(n, p, isZhifu) {
   const starEl = document.createElement('div');
   starEl.className = 'palace-star';
   starEl.textContent = p.구성 || '';
+  if (p.구성 && STAR_DESC[p.구성]) starEl.title = STAR_DESC[p.구성];
   cell.appendChild(starEl);
 
   // 팔신
   const shenEl = document.createElement('div');
   shenEl.className = 'palace-shen';
   shenEl.textContent = p.팔신 || '';
+  if (p.팔신 && SHEN_DESC[p.팔신]) shenEl.title = SHEN_DESC[p.팔신];
   cell.appendChild(shenEl);
 
   // 지반 천간 — 오행 색상
@@ -841,6 +861,7 @@ function buildCell(n, p, isZhifu) {
   doorEl.className = 'palace-door';
   doorEl.textContent = p.팔문 ? p.팔문 + '門' : '';
   if (p.팔문 && DOOR_COLOR[p.팔문]) doorEl.style.color = DOOR_COLOR[p.팔문];
+  if (p.팔문 && DOOR_DESC[p.팔문]) doorEl.title = DOOR_DESC[p.팔문];
   cell.appendChild(doorEl);
 
   return cell;

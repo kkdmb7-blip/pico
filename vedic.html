@@ -121,7 +121,9 @@
     .big3-grid{gap:8px;}
     .big3-sign{font-size:13px;}
     .big3-sym{font-size:20px;}
-    .planet-table td,.planet-table th{padding:7px 6px;font-size:11px;}
+    .planet-table td,.planet-table th{padding:6px 5px;font-size:11px;white-space:nowrap;}
+    .planet-table .col-d9{display:none;}
+    .sign-chip{font-size:11px;padding:2px 5px;}
     .interp-tab{padding:6px 9px;font-size:11px;}
   }
 </style>
@@ -158,7 +160,7 @@
           <th>행성</th>
           <th>라시 (별자리)</th>
           <th>하우스</th>
-          <th>나바암샤 D9</th>
+          <th class="col-d9">나바암샤 D9</th>
           <th>아슈타카바르가</th>
         </tr>
       </thead>
@@ -168,13 +170,13 @@
 
   <!-- DASHA TIMELINE -->
   <div class="section-card" id="card-dasha">
-    <div class="section-label">다샤 타임라인 (Vimshottari)</div>
+    <div class="section-label">다샤 타임라인 (Vimshottari) <span style="font-size:9px;opacity:0.6;text-transform:none;font-weight:400;letter-spacing:0">· 어느 행성의 주기를 살고 있는지 보여줍니다</span></div>
     <div class="dasha-wrap" id="dasha-wrap"></div>
   </div>
 
   <!-- YOGAS -->
   <div class="section-card" id="card-yoga">
-    <div class="section-label">요가 (Yogas)</div>
+    <div class="section-label">요가 (Yogas) <span style="font-size:9px;opacity:0.6;text-transform:none;font-weight:400;letter-spacing:0">· 특수 행성 배치가 만들어내는 길흉 패턴</span></div>
     <div class="yoga-list" id="yoga-list"></div>
   </div>
 
@@ -343,6 +345,10 @@ function renderBig3(d) {
   });
 }
 
+const PLANET_ROLE_KO = {
+  '태양':'자아·정체성·생명력','달':'감정·본능·어머니','화성':'행동·욕구·열정',
+  '수성':'사고·소통·이동','목성':'확장·행운·지혜','금성':'사랑·미·재물','토성':'책임·제한·카르마'
+};
 function renderPlanets(d) {
   const tbody = document.getElementById('planet-tbody');
   tbody.innerHTML = '';
@@ -357,10 +363,10 @@ function renderPlanets(d) {
       '<div class="bindu-bar">' + Array.from({length:8},(_,i)=>`<div class="bindu ${i<avg?'on':'off'}"></div>`).join('') + ' <span style="font-size:11px;color:var(--muted);margin-left:2px">' + avg + '</span></div>' : '—';
     const tr = document.createElement('tr');
     tr.innerHTML =
-      '<td><span class="planet-name">' + (PLANET_ICON[name]||'') + ' ' + name + '</span></td>' +
+      '<td><span class="planet-name" title="' + (PLANET_ROLE_KO[name]||'') + '">' + (PLANET_ICON[name]||'') + ' ' + name + '</span></td>' +
       '<td><span class="sign-chip ' + ec + '">' + sym(p.sign) + ' ' + p.sign + '</span></td>' +
       '<td>' + (p.house != null ? p.house + '하우스' : '—') + '</td>' +
-      '<td><span class="sign-chip ' + elCls(nav) + '" style="opacity:.8">' + sym(nav) + ' ' + nav + '</span></td>' +
+      '<td class="col-d9"><span class="sign-chip ' + elCls(nav) + '" style="opacity:.8">' + sym(nav) + ' ' + nav + '</span></td>' +
       '<td>' + binduHtml + '</td>';
     tbody.appendChild(tr);
   });
@@ -377,7 +383,7 @@ function renderDasha(d) {
     mahaDiv.className = 'dasha-row';
     const next = nextDasha(maha.planet);
     mahaDiv.innerHTML =
-      '<div class="dasha-tag">마하다샤 (Mahadasha)</div>' +
+      '<div class="dasha-tag">마하다샤 (Mahadasha) <span style="font-size:9px;opacity:0.6;text-transform:none;font-weight:400">· 현재 운세 대주기</span></div>' +
       '<div class="dasha-planet">' + maha.planet + ' 다샤</div>' +
       '<div class="dasha-date">~ ' + maha.endDate + ' 종료</div>' +
       '<div class="dasha-remain">' + remainText(maha.endDate) + '</div>' +

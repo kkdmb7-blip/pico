@@ -472,6 +472,12 @@ const BIG3_DESC = {
   '달궁':   '감정·무의식 패턴',
   '상승궁': '타인에게 보이는 첫인상',
 };
+const PLANET_ROLE = {
+  Sun:'자아·정체성·생명력', Moon:'감정·본능·어머니', Mercury:'사고·소통·이동',
+  Venus:'사랑·미·재물', Mars:'행동·욕구·열정', Jupiter:'확장·행운·지혜',
+  Saturn:'책임·제한·카르마', Uranus:'혁신·변화·자유', Neptune:'직관·이상·환상',
+  Ascendant:'첫인상·외적 태도', Midheaven:'사회적 목표·명성'
+};
 const ASPECT_DESC_KO = {
   Conjunction:'강렬한 결합·융합', Sextile:'부드러운 기회', Square:'긴장·성장의 과제',
   Trine:'재능·자연스러운 흐름', Opposition:'균형 요구·통합의 과제',
@@ -511,7 +517,7 @@ function renderPlanets(planets) {
     const ec = elClass(p.sign);
     const tr = el('tr');
     tr.innerHTML =
-      '<td><span class="planet-name">' + (PLANET_ICON[name] || '') + ' ' + (PLANET_KO[name] || name) + (p.isRetro === 'true' ? ' <span class="retro-badge">Rx</span>' : '') + '</span></td>' +
+      '<td><span class="planet-name" title="' + (PLANET_ROLE[name]||'') + '">' + (PLANET_ICON[name] || '') + ' ' + (PLANET_KO[name] || name) + (p.isRetro === 'true' ? ' <span class="retro-badge">Rx</span>' : '') + '</span></td>' +
       '<td><span class="sign-chip ' + ec + '">' + (SIGN_SYM[p.sign]||'') + ' ' + (SIGN_KO[p.sign]||p.sign) + '</span></td>' +
       '<td>' + p.normDegree.toFixed(2) + '°</td>' +
       '<td>' + (p.house != null ? p.house + '하우스' : '—') + '</td>';
@@ -531,7 +537,7 @@ function renderAspects(aspects) {
       '<span class="aspect-type ' + (benefic ? 'asp-好' : 'asp-凶') + '" title="' + (ASPECT_DESC_KO[a.type]||'') + '">' + (ASPECT_KO[a.type] || a.type) + '</span>' +
       '<span class="aspect-planets">' + (PLANET_KO[a.planet1]||a.planet1) + ' × ' + (PLANET_KO[a.planet2]||a.planet2) + '</span>' +
       '<span class="aspect-orb">orb ' + a.orb + '°</span>' +
-      '<span style="font-size:10px;color:var(--muted);display:block;margin-top:3px">' + (ASPECT_DESC_KO[a.type]||'') + '</span>';
+      '<span style="font-size:10px;color:var(--muted);margin-left:auto;white-space:nowrap">' + (ASPECT_DESC_KO[a.type]||'') + '</span>';
     list.appendChild(row);
   });
   if (sorted.length === 0) list.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:12px">분석된 어스펙트가 없습니다.</div>';
