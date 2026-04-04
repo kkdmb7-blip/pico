@@ -1904,11 +1904,12 @@ async function syncProfilesFromServer(kakaoId) {
     var me = merged.find(function(p) { return p.isMe; });
     if (me) {
       var parts = (me.birth_date || '').split('-');
-      var timeParts = (me.birth_time || '0:0').split(':');
+      var timeParts = (me.birth_time && me.birth_time !== 'unknown') ? me.birth_time.split(':') : null;
       localStorage.setItem('pico_profile', JSON.stringify({
         name: me.name,
         year: parseInt(parts[0]), month: parseInt(parts[1]), day: parseInt(parts[2]),
-        hour: me.birth_time || '0', minute: parseInt(timeParts[1] || 0),
+        hour: timeParts ? String(parseInt(timeParts[0])) : 'unknown',
+        minute: timeParts ? parseInt(timeParts[1] || 0) : 0,
         gender: (me.gender === 'male' || me.gender === 'M') ? 'M' : 'F'
       }));
     }
