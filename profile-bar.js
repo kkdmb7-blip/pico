@@ -176,7 +176,7 @@
 
     var othersBtn = document.createElement('button');
     othersBtn.style.cssText = profiles.length > 0 ? BTN_GHOST : BTN_GHOST + ';opacity:0.5;';
-    othersBtn.textContent = '👥 다른 사람 ' + (profiles.length > 0 ? '▾' : '(없음)');
+    othersBtn.textContent = '👥 저장된 프로필 ' + (profiles.length > 0 ? '▾' : '(없음)');
 
     var dd = document.createElement('div');
     dd.style.cssText = DD_STYLE;
@@ -279,13 +279,18 @@
         '</div>',
       '</div>',
 
-      // Hour
+      // Hour + Minute
       '<div style="margin-bottom:14px;">',
         '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">태어난 시간</label>',
-        '<select id="pb-hour" style="width:100%;' + selectStyle() + '">',
-          '<option value="unknown">시 모름</option>',
-          Array.from({length:24},function(_,i){return '<option value="'+i+'" '+(i===12?'selected':'')+'>'+i+'시</option>';}).join(''),
-        '</select>',
+        '<div style="display:flex;gap:6px;">',
+          '<select id="pb-hour" style="flex:1.1;' + selectStyle() + '">',
+            '<option value="unknown">시 모름</option>',
+            Array.from({length:24},function(_,i){return '<option value="'+i+'" '+(i===12?'selected':'')+'>'+i+'시</option>';}).join(''),
+          '</select>',
+          '<select id="pb-minute" style="flex:0.9;' + selectStyle() + '">',
+            [0,5,10,15,20,25,30,35,40,45,50,55].map(function(m){return '<option value="'+m+'">'+(m<10?'0':'')+m+'분</option>';}).join(''),
+          '</select>',
+        '</div>',
       '</div>',
 
       // Gender
@@ -329,6 +334,8 @@
     if (dEl) { dEl.innerHTML = '<option value="">일</option>'; }
     var hEl = document.getElementById('pb-hour');
     if (hEl) hEl.value = 'unknown';
+    var minEl = document.getElementById('pb-minute');
+    if (minEl) minEl.value = '0';
     document.body.style.overflow = 'hidden';
   }
 
@@ -390,12 +397,13 @@
     var day   = document.getElementById('pb-day').value;
     if (!year || !month || !day) { alert('생년월일을 모두 선택해주세요.'); return; }
     var hour = document.getElementById('pb-hour').value;
+    var minute = document.getElementById('pb-minute') ? parseInt(document.getElementById('pb-minute').value) || 0 : 0;
     var name = (document.getElementById('pb-name') || {}).value || '';
     var p = {};
     p.year  = parseInt(year);
     p.month = parseInt(month);
     p.day   = parseInt(day);
-    if (hour !== 'unknown') { p.hour = parseInt(hour); p.minute = 0; }
+    if (hour !== 'unknown') { p.hour = parseInt(hour); p.minute = minute; }
     p.gender = _niGender;
     window._pbCloseNew();
     var params = profileToParams(p);
