@@ -284,11 +284,11 @@
         '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">태어난 시간</label>',
         '<div style="display:flex;gap:6px;">',
           '<select id="pb-hour" style="flex:1.1;' + selectStyle() + '">',
-            '<option value="unknown">시 모름</option>',
-            Array.from({length:24},function(_,i){return '<option value="'+i+'" '+(i===12?'selected':'')+'>'+i+'시</option>';}).join(''),
+            '<option value="unknown" selected>시 모름</option>',
+            Array.from({length:24},function(_,i){return '<option value="'+i+'">'+i+'시</option>';}).join(''),
           '</select>',
           '<select id="pb-minute" style="flex:0.9;' + selectStyle() + '">',
-            [0,5,10,15,20,25,30,35,40,45,50,55].map(function(m){return '<option value="'+m+'">'+(m<10?'0':'')+m+'분</option>';}).join(''),
+            Array.from({length:60},function(_,i){return '<option value="'+i+'"'+(i===0?' selected':'')+'>'+String(i).padStart(2,'0')+'분</option>';}).join(''),
           '</select>',
         '</div>',
       '</div>',
@@ -333,9 +333,9 @@
     if (mEl) mEl.value = '';
     if (dEl) { dEl.innerHTML = '<option value="">일</option>'; }
     var hEl = document.getElementById('pb-hour');
-    if (hEl) hEl.value = 'unknown';
+    if (hEl) hEl.selectedIndex = 0;
     var minEl = document.getElementById('pb-minute');
-    if (minEl) minEl.value = '0';
+    if (minEl) minEl.selectedIndex = 0;
     document.body.style.overflow = 'hidden';
   }
 
