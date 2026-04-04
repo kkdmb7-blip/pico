@@ -692,7 +692,7 @@
   .btn-kakao:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(254,229,0,0.3); }
   .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
   #userArea { display: flex; align-items: center; gap: 10px; }
-  #userNameDisplay { font-size: 13px; color: var(--text); }
+  #userNameDisplay { font-size: 13px; color: var(--text); max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .btn-logout {
     background: none;
     border: 1px solid var(--border);
