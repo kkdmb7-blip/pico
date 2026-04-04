@@ -2021,11 +2021,20 @@ async function syncProfilesFromServer(kakaoId) {
     if (me) {
       var parts = (me.birth_date || '').split('-');
       var timeParts = (me.birth_time && me.birth_time !== 'unknown') ? me.birth_time.split(':') : null;
+      var serverHour = timeParts ? String(parseInt(timeParts[0])) : 'unknown';
+      var serverMinute = timeParts ? parseInt(timeParts[1] || 0) : 0;
+      // 서버 시간이 unknown이면 로컬에 저장된 시간 보존
+      var existingLocal = null;
+      try { existingLocal = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+      var finalHour = (serverHour === 'unknown' && existingLocal && existingLocal.hour !== 'unknown')
+        ? existingLocal.hour : serverHour;
+      var finalMinute = (serverHour === 'unknown' && existingLocal && existingLocal.hour !== 'unknown')
+        ? (existingLocal.minute || 0) : serverMinute;
       localStorage.setItem('pico_profile', JSON.stringify({
         name: me.name,
         year: parseInt(parts[0]), month: parseInt(parts[1]), day: parseInt(parts[2]),
-        hour: timeParts ? String(parseInt(timeParts[0])) : 'unknown',
-        minute: timeParts ? parseInt(timeParts[1] || 0) : 0,
+        hour: finalHour,
+        minute: finalMinute,
         gender: (me.gender === 'male' || me.gender === 'M') ? 'M' : 'F'
       }));
     }
