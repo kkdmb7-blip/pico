@@ -1067,19 +1067,54 @@ function openSajuShareCard() {
   _sajuCanvas = null;
   var d = _sajuData;
 
-  // 일주
-  var dayPillar = (d.summary && d.summary.pillars && d.summary.pillars.day) || '';
+  // 4주 파싱
+  var pillars = d.summary && d.summary.pillars;
+  var keys = ['year','month','day','hour'];
+  var labels = ['년','월','일','시'];
+  function parsePillar(str) {
+    if (!str) return null;
+    var si = STEMS.indexOf(str[0]);
+    var bi = BRANCHES.indexOf(str[1]);
+    return {
+      stemKor: str[0], stemH: si>=0?STEM_H[si]:'', stemEl: si>=0?STEM_EL[si]:'',
+      branKor: str[1], branH: bi>=0?BRANCH_H[bi]:'', branEl: bi>=0?BRANCH_EL[bi]:''
+    };
+  }
+  var EL_COLOR = { 목:'#4cde8c', 화:'#ff6b6b', 토:'#f7c948', 금:'#d0d0d0', 수:'#5b9eff' };
+
   // 용신
+  var EN_EL_MAP = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
   var yongshin = '';
   if (d.yongshin && d.yongshin.primary) {
-    var EN_EL_MAP = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
     yongshin = EN_EL_MAP[d.yongshin.primary] || d.yongshin.primary;
     if (d.yongshin.secondary) yongshin += '·' + (EN_EL_MAP[d.yongshin.secondary] || d.yongshin.secondary);
   }
-  // 신강/신약
   var strength = (d.summary && d.summary.strength) || '';
-  // 이름
   var name = pName || '';
+
+  // 4주 셀 HTML 생성
+  var pillarsHtml = '<div style="display:flex;gap:10px;justify-content:center;width:100%;">';
+  keys.forEach(function(k, i) {
+    var p = pillars ? parsePillar(pillars[k]) : null;
+    var stemC = p ? (EL_COLOR[p.stemEl] || '#ede6f8') : '#ede6f8';
+    var branC = p ? (EL_COLOR[p.branEl] || '#ede6f8') : '#ede6f8';
+    // 일주 강조
+    var isDay = k === 'day';
+    var border = isDay ? '2px solid #c9a84c' : '1px solid rgba(255,255,255,0.1)';
+    var bg = isDay ? 'rgba(201,168,76,0.1)' : 'rgba(255,255,255,0.04)';
+    pillarsHtml +=
+      '<div style="flex:1;display:flex;flex-direction:column;align-items:center;background:'+bg+';border:'+border+';border-radius:14px;padding:14px 0 12px;">' +
+        '<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:12px;letter-spacing:1px;">'+labels[i]+'</div>' +
+        (p ?
+          '<div style="font-size:36px;font-family:serif;color:'+stemC+';line-height:1;margin-bottom:4px;">'+p.stemH+'</div>' +
+          '<div style="font-size:12px;color:'+stemC+';opacity:0.7;margin-bottom:14px;">'+p.stemKor+'</div>' +
+          '<div style="width:28px;height:1px;background:rgba(255,255,255,0.1);margin-bottom:14px;"></div>' +
+          '<div style="font-size:36px;font-family:serif;color:'+branC+';line-height:1;margin-bottom:4px;">'+p.branH+'</div>' +
+          '<div style="font-size:12px;color:'+branC+';opacity:0.7;">'+p.branKor+'</div>'
+        : '<div style="font-size:24px;color:rgba(255,255,255,0.2);">–</div>') +
+      '</div>';
+  });
+  pillarsHtml += '</div>';
 
   var card = document.createElement('div');
   card.id = '_sajuCardEl';
@@ -1088,7 +1123,7 @@ function openSajuShareCard() {
     'width:540px','height:960px',
     'background:linear-gradient(160deg,#0a0a0f 0%,#1a1a2e 60%,#0f1f3d 100%)',
     'display:flex','flex-direction:column','align-items:center','justify-content:center',
-    'padding:80px 56px','box-sizing:border-box',
+    'padding:60px 40px','box-sizing:border-box',
     'font-family:\'Noto Sans KR\',sans-serif','overflow:hidden'
   ].join(';');
 
@@ -1100,22 +1135,29 @@ function openSajuShareCard() {
   });
 
   card.innerHTML = stars +
-    '<div style="position:relative;z-index:1;text-align:center;margin-bottom:40px;">' +
+    // 로고
+    '<div style="position:relative;z-index:1;text-align:center;margin-bottom:32px;">' +
       '<div style="font-size:12px;letter-spacing:0.35em;color:#c9a84c;font-weight:700;margin-bottom:8px;">● FORTUNA</div>' +
       '<div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:0 auto;"></div>' +
     '</div>' +
-    '<div style="position:relative;z-index:1;text-align:center;">' +
-      '<div style="font-size:11px;letter-spacing:0.2em;color:rgba(201,168,76,0.7);margin-bottom:20px;">사주 분석 결과</div>' +
-      (name ? '<div style="font-size:16px;color:rgba(255,255,255,0.7);margin-bottom:20px;">'+name+'님</div>' : '') +
-      '<div style="font-size:15px;color:rgba(255,255,255,0.55);margin-bottom:10px;">나는</div>' +
-      '<div style="font-size:40px;font-weight:700;color:#ede6f8;margin-bottom:8px;font-family:serif;">'+dayPillar+'</div>' +
-      '<div style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:28px;">일간</div>' +
-      (yongshin ? '<div style="font-size:15px;color:rgba(255,255,255,0.55);margin-bottom:8px;">용신은</div><div style="font-size:32px;font-weight:700;color:#e8b86d;margin-bottom:24px;">'+yongshin+'</div>' : '') +
-      (strength ? '<div style="display:inline-block;padding:8px 22px;background:rgba(123,94,167,0.25);border:1px solid rgba(123,94,167,0.4);border-radius:100px;font-size:14px;color:#ce93d8;">'+strength+'</div>' : '') +
+    // 이름 + 라벨
+    '<div style="position:relative;z-index:1;text-align:center;margin-bottom:24px;">' +
+      (name ? '<div style="font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:6px;">'+name+'님의</div>' : '') +
+      '<div style="font-size:11px;letter-spacing:0.25em;color:rgba(201,168,76,0.8);">사주 원국 四柱</div>' +
     '</div>' +
-    '<div style="position:relative;z-index:1;text-align:center;margin-top:48px;">' +
-      '<div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:0 auto 14px;"></div>' +
-      '<div style="font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.08em;">picolab.kr에서 무료로 확인하세요</div>' +
+    // 4주 그리드
+    '<div style="position:relative;z-index:1;width:100%;margin-bottom:28px;">' +
+      pillarsHtml +
+    '</div>' +
+    // 용신 / 강약
+    '<div style="position:relative;z-index:1;display:flex;gap:10px;justify-content:center;margin-bottom:32px;">' +
+      (strength ? '<div style="padding:8px 18px;background:rgba(123,94,167,0.2);border:1px solid rgba(123,94,167,0.4);border-radius:100px;font-size:13px;color:#ce93d8;">'+strength+'</div>' : '') +
+      (yongshin ? '<div style="padding:8px 18px;background:rgba(232,184,109,0.12);border:1px solid rgba(232,184,109,0.35);border-radius:100px;font-size:13px;color:#e8b86d;">용신 '+yongshin+'</div>' : '') +
+    '</div>' +
+    // 푸터
+    '<div style="position:relative;z-index:1;text-align:center;">' +
+      '<div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:0 auto 12px;"></div>' +
+      '<div style="font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.08em;">picolab.kr에서 무료로 확인하세요</div>' +
     '</div>';
 
   document.body.appendChild(card);
