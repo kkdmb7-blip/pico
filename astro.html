@@ -160,7 +160,9 @@
   /* ASPECTS */
   .aspect-list { display: flex; flex-direction: column; gap: 8px; }
   .aspect-row {
-    display: flex; align-items: center; gap: 10px;
+    display: grid;
+    grid-template-columns: 46px 1fr 58px;
+    align-items: center; gap: 8px;
     padding: 10px 14px; border-radius: 10px;
     background: var(--surface2); font-size: 13px;
   }
@@ -168,12 +170,12 @@
   .aspect-malefic { border-left: 3px solid #FF6D00; }
   .aspect-type {
     font-size: 11px; font-weight: 700; padding: 2px 7px;
-    border-radius: 5px; white-space: nowrap;
+    border-radius: 5px; white-space: nowrap; text-align: center;
   }
   .asp-好 { background: rgba(0,200,83,0.12); color:#00C853; border:1px solid rgba(0,200,83,0.25); }
   .asp-凶 { background: rgba(255,109,0,0.12); color:#FF6D00; border:1px solid rgba(255,109,0,0.25); }
-  .aspect-planets { flex: 1; font-weight: 600; }
-  .aspect-orb { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .aspect-planets { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .aspect-orb { font-size: 11px; color: var(--muted); white-space: nowrap; text-align: right; }
 
   /* INTERPRETATION CARDS */
   .interp-tabs { display: flex; gap: 0; margin-bottom: 16px;
@@ -535,9 +537,8 @@ function renderAspects(aspects) {
     const row = el('div', 'aspect-row ' + (benefic ? 'aspect-benefic' : 'aspect-malefic'));
     row.innerHTML =
       '<span class="aspect-type ' + (benefic ? 'asp-好' : 'asp-凶') + '" title="' + (ASPECT_DESC_KO[a.type]||'') + '">' + (ASPECT_KO[a.type] || a.type) + '</span>' +
-      '<span class="aspect-planets">' + (PLANET_KO[a.planet1]||a.planet1) + ' × ' + (PLANET_KO[a.planet2]||a.planet2) + '</span>' +
-      '<span class="aspect-orb">orb ' + a.orb + '°</span>' +
-      '<span style="font-size:10px;color:var(--muted);margin-left:auto;white-space:nowrap">' + (ASPECT_DESC_KO[a.type]||'') + '</span>';
+      '<span class="aspect-planets" title="' + (ASPECT_DESC_KO[a.type]||'') + '">' + (PLANET_KO[a.planet1]||a.planet1) + ' × ' + (PLANET_KO[a.planet2]||a.planet2) + '</span>' +
+      '<span class="aspect-orb">orb ' + a.orb + '°</span>';
     list.appendChild(row);
   });
   if (sorted.length === 0) list.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:12px">분석된 어스펙트가 없습니다.</div>';
