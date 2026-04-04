@@ -1058,7 +1058,7 @@
     <h3>🗺️ 기문둔갑 포국반</h3>
     <p class="saju-modal-sub">날짜와 시간을 입력하면 9궁 포국을 즉시 확인할 수 있어요</p>
     <div class="modal-profile-row">
-      <button class="modal-profile-btn" onclick="fillQimenFromMine()">내 성별 불러오기</button>
+      <button class="modal-profile-btn" onclick="fillQimenFromMine()">내 정보</button>
       <select class="modal-profile-select" id="qimenProfileSelect" onchange="fillQimenFromSaved(this.value)">
         <option value="">저장된 프로필</option>
       </select>
@@ -1067,20 +1067,32 @@
     <div class="saju-form-group">
       <label>날짜</label>
       <div class="saju-date-row">
-        <select id="qmYear"></select>
-        <select id="qmMonth"></select>
-        <select id="qmDay"></select>
+        <select id="qmYear"><option value="">년</option></select>
+        <select id="qmMonth"><option value="">월</option></select>
+        <select id="qmDay"><option value="">일</option></select>
       </div>
     </div>
-
     <div class="saju-form-group">
       <label>시간</label>
-      <div style="display:flex;gap:8px;">
-        <select id="qmHour" style="flex:1;"></select>
-        <select id="qmMinute" style="flex:1;"></select>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="qmHour" style="flex:1.1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none">
+          <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
+          <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
+          <option value="6">6시</option><option value="7">7시</option><option value="8">8시</option>
+          <option value="9">9시</option><option value="10">10시</option><option value="11">11시</option>
+          <option value="12" selected>12시</option><option value="13">13시</option><option value="14">14시</option>
+          <option value="15">15시</option><option value="16">16시</option><option value="17">17시</option>
+          <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
+          <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
+        </select>
+        <select id="qmMinute" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none">
+          <option value="0">0분</option><option value="5">5분</option><option value="10">10분</option>
+          <option value="15">15분</option><option value="20">20분</option><option value="25">25분</option>
+          <option value="30">30분</option><option value="35">35분</option><option value="40">40분</option>
+          <option value="45">45분</option><option value="50">50분</option><option value="55">55분</option>
+        </select>
       </div>
     </div>
-
     <div class="saju-form-group">
       <label>성별</label>
       <div class="saju-gender-row">
@@ -1469,51 +1481,34 @@ function selectGender(g) {
 // ── QIMEN MODAL ──────────────────────────────────────────
 function openQimenModal() {
   var now = new Date();
+  var cy = now.getFullYear();
 
-  // 연도
   var yEl = document.getElementById('qmYear');
-  if (yEl.options.length === 0) {
-    for (var y = 2030; y >= 1930; y--) {
+  if (yEl.options.length <= 1) {
+    for (var y = cy + 5; y >= 1930; y--) {
       var o = document.createElement('option'); o.value = y; o.textContent = y + '년'; yEl.appendChild(o);
     }
   }
-  yEl.value = now.getFullYear();
+  yEl.value = cy;
 
-  // 월
   var mEl = document.getElementById('qmMonth');
-  if (mEl.options.length === 0) {
+  if (mEl.options.length <= 1) {
     for (var mo = 1; mo <= 12; mo++) {
       var o = document.createElement('option'); o.value = mo; o.textContent = mo + '월'; mEl.appendChild(o);
     }
   }
   mEl.value = now.getMonth() + 1;
 
-  // 일
   var dEl = document.getElementById('qmDay');
-  if (dEl.options.length === 0) {
+  if (dEl.options.length <= 1) {
     for (var d = 1; d <= 31; d++) {
       var o = document.createElement('option'); o.value = d; o.textContent = d + '일'; dEl.appendChild(o);
     }
   }
   dEl.value = now.getDate();
 
-  // 시
-  var hEl = document.getElementById('qmHour');
-  if (hEl.options.length === 0) {
-    for (var h = 0; h <= 23; h++) {
-      var o = document.createElement('option'); o.value = h; o.textContent = String(h).padStart(2,'0') + '시'; hEl.appendChild(o);
-    }
-  }
-  hEl.value = now.getHours();
-
-  // 분
-  var minEl = document.getElementById('qmMinute');
-  if (minEl.options.length === 0) {
-    for (var mi = 0; mi <= 59; mi++) {
-      var o = document.createElement('option'); o.value = mi; o.textContent = String(mi).padStart(2,'0') + '분'; minEl.appendChild(o);
-    }
-  }
-  minEl.value = now.getMinutes();
+  document.getElementById('qmHour').value = now.getHours();
+  document.getElementById('qmMinute').value = 0;
 
   document.getElementById('qimenProfileSelect').value = '';
   _populateProfileSelect('qimenProfileSelect');
