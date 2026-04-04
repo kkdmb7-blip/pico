@@ -1105,7 +1105,14 @@ function openSajuShareCard() {
   footer.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,0.28);letter-spacing:0.08em;">picolab.kr에서 무료로 확인하세요</div>';
   card.appendChild(footer);
 
-  document.body.appendChild(card);
+  // html2canvas는 flexbox align-items:center를 잘못 렌더링 → line-height 방식으로 변환
+  card.querySelectorAll('.hanja-box').forEach(function(el) {
+    el.style.display = 'block';
+    el.style.textAlign = 'center';
+    el.style.lineHeight = '44px';
+    el.style.paddingTop = '0';
+    el.style.paddingBottom = '0';
+  });
 
   document.body.appendChild(card);
 
