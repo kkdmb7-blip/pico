@@ -2042,7 +2042,7 @@ function syncMyProfileToProfiles(profile) {
   saveProfiles(list);
 }
 
-checkAuth();
+// checkAuth는 score.js 로드 후 실행 (onload에서 호출)
 
 // ── INDEX MINI SCORE ─────────────────────────────
 function _scoreColor(s) {
@@ -2161,6 +2161,6 @@ async function loadMiniScore() {
   }
 }
 </script>
-<script src="score.js?v=2" onload="if(!localStorage.getItem('pico_user'))loadMiniScore()"></script>
+<script src="score.js?v=2" onload="checkAuth()"></script>
 </body>
 </html>
