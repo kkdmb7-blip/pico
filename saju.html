@@ -1107,6 +1107,33 @@ function openSajuShareCard() {
 
   document.body.appendChild(card);
 
+  // html2canvas가 getComputedStyle 호출 전에 flex 레이아웃을 block으로 교체
+  // → 메인 문서 head에 스코프된 style 삽입 (캡처 완료 후 제거)
+  var _capStyle = document.createElement('style');
+  _capStyle.id = '_sajuCapStyle';
+  _capStyle.textContent = [
+    '#_sajuCardEl .hanja-box {',
+    '  display: block !important;',
+    '  line-height: 44px !important;',
+    '  text-align: center !important;',
+    '  padding: 0 !important;',
+    '}',
+    '#_sajuCardEl .badge {',
+    '  display: inline-block !important;',
+    '}',
+    // jjgHTML 컬럼 (flex-direction:column) → block으로
+    '#_sajuCardEl [style*="flex-direction:column"],',
+    '#_sajuCardEl [style*="flex-direction: column"] {',
+    '  display: block !important;',
+    '}'
+  ].join('\n');
+  document.head.appendChild(_capStyle);
+
+  function _removeCap() {
+    var s = document.getElementById('_sajuCapStyle');
+    if (s) document.head.removeChild(s);
+  }
+
   var modal = document.getElementById('sajuShareModal');
   var preview = document.getElementById('sajuSharePreview');
   var loading = document.getElementById('sajuShareLoading');
@@ -1118,35 +1145,20 @@ function openSajuShareCard() {
   html2canvas(card, {
     scale: 2,
     useCORS: true,
-    backgroundColor: '#0d0d14',
-    onclone: function(clonedDoc) {
-      // html2canvas는 computed style을 inline으로 복사하므로 stylesheet 주입 대신
-      // setProperty('important') API로 직접 inline !important 설정
-      clonedDoc.querySelectorAll('.hanja-box').forEach(function(el) {
-        // inline style에 명시된 height 또는 기본 44px 사용
-        var h = el.style.height ? parseInt(el.style.height) : 44;
-        if (!h || isNaN(h)) h = 44;
-        el.style.setProperty('display', 'block', 'important');
-        el.style.setProperty('line-height', h + 'px', 'important');
-        el.style.setProperty('height', h + 'px', 'important');
-        el.style.setProperty('text-align', 'center', 'important');
-        el.style.setProperty('padding', '0', 'important');
-        el.style.setProperty('align-items', 'initial', 'important');
-        el.style.setProperty('justify-content', 'initial', 'important');
-      });
-    }
+    backgroundColor: '#0d0d14'
   }).then(function(canvas) {
+    _removeCap();
     var el = document.getElementById('_sajuCardEl');
     if (el) document.body.removeChild(el);
     _sajuCanvas = canvas;
     var img = document.createElement('img');
     img.src = canvas.toDataURL('image/png');
     img.style.cssText = 'width:100%;height:auto;display:block;';
-    // 모달 미리보기 비율 조정 (고정 aspect-ratio 제거)
     preview.style.height = 'auto';
     preview.innerHTML = ''; preview.appendChild(img);
     loading.style.display = 'none'; actions.style.display = 'flex';
   }).catch(function() {
+    _removeCap();
     var el = document.getElementById('_sajuCardEl');
     if (el) document.body.removeChild(el);
     loading.textContent = '카드 생성 실패 😢';
