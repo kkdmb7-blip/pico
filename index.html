@@ -877,8 +877,8 @@
     <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
       <div class="why-icon">🏛️</div>
       <h3>사주 (四柱)</h3>
-      <p>인생의 설계도, 기질의 뿌리. 태어난 연·월·일·시의 네 기둥이 만드는 운명의 지도.</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">무료 체험해보기 →</div>
+      <p>인생의 설계도,<br>기질의 뿌리. 태어난<br>연·월·일·시의<br>네 기둥이 만드는<br>운명의 지도.</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openBirthModal('astro')" style="cursor:pointer;">
       <div class="why-icon">🌟</div>
@@ -889,23 +889,23 @@
     <div class="why-card" onclick="openBirthModal('vedic')" style="cursor:pointer;">
       <div class="why-icon">🕉️</div>
       <h3>베딕 점성술</h3>
-      <p>카르마와 세부 운의 변화. 달의 별자리(낙샤트라)로 읽는 정밀한 운의 리듬.</p>
+      <p>카르마와 세부 운의 변화. 달의 별자리(낙샤트라)로 읽는<br>정밀한 운의 리듬.</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openBirthModal('ziwei')" style="cursor:pointer;">
       <div class="why-icon">⭐</div>
-      <h3>자미두수 (紫微斗數)</h3>
-      <p>인생 12궁 배치도. 별의 배열로 삶의 영역별 운세와 인연의 구조를 분석합니다.</p>
+      <h3>자미두수<br>紫微斗數</h3>
+      <p>인생 12궁 배치도. 별의 배열로 삶의 영역별 운세와 인연의<br>구조를 분석합니다.</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openQimenModal()" style="cursor:pointer;">
       <div class="why-icon">🗺️</div>
-      <h3>기문둔갑 (奇門遁甲)</h3>
+      <h3>기문둔갑<br>奇門遁甲</h3>
       <p>중화권 CEO들이 의사결정에 쓰는 시공간 최적화 전략 엔진. 언제, 어느 방향으로 움직여야 유리한지 계산합니다.</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">포국반 체험해보기 →</div>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
   </div>
-  <p class="why-tagline">5가지가 모두 같은 방향을 가리킬 때, 그것이 진짜 운명입니다.</p>
+  <p class="why-tagline">5가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
 </section>
 
 <div class="section-divider"></div>
@@ -914,7 +914,7 @@
 <section class="section-cta">
   <div class="cta-glow"></div>
   <h2>지금 바로 시작하세요</h2>
-  <p>무료로 체험하고, 당신의 별자리가 말하는 이야기를 들어보세요</p>
+  <p>무료로 체험하고,<br>당신의 별자리가 말하는 이야기를 들어보세요</p>
   <a href="https://kkdmb7-blip.github.io/memox/" class="btn-cta" target="_blank">지금 나의 운명 확인하기 🔮</a>
 </section>
 
@@ -1879,7 +1879,7 @@ async function loadMiniScore() {
   }
 
   var summaryEl = document.getElementById('scoreSummaryText');
-  if (summaryEl) summaryEl.textContent = result.summary;
+  if (summaryEl) summaryEl.innerHTML = result.summary;
 
   // 자세히 보기 링크에 프로필 파라미터 추가
   var detailLink = document.getElementById('scoreDetailLink');

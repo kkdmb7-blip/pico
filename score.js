@@ -247,7 +247,7 @@ function _makeSummary(final, overall) {
   const bi = SCORE_DOMAIN_INFO[best], wi = SCORE_DOMAIN_INFO[worst];
 
   if (overall >= 78) return `오늘은 매우 좋은 흐름입니다. 특히 ${bi.emoji} ${bi.label}(${final[best]}점)에서 강한 기운이 흐릅니다. 적극적으로 행동하기 좋은 날!`;
-  if (overall >= 65) return `긍정적인 에너지가 흐르는 날입니다. ${bi.emoji} ${bi.label}을 중심으로 움직이면 성과를 낼 수 있습니다.`;
+  if (overall >= 65) return `긍정적인 에너지가 흐르는 날입니다.<br>${bi.emoji} ${bi.label}을 중심으로 움직이면 성과를 낼 수 있습니다.`;
   if (overall >= 52) return `평온한 하루입니다. ${bi.emoji} ${bi.label}(${final[best]}점)은 양호하지만 ${wi.emoji} ${wi.label}(${final[worst]}점) 쪽은 무리하지 않는 게 좋습니다.`;
   if (overall >= 40) return `다소 조심스러운 날입니다. ${wi.emoji} ${wi.label}(${final[worst]}점) 분야에서는 신중히 판단하세요.`;
   return `오늘은 차분하게 지내는 것이 좋습니다. 중요한 결정이나 도전적인 행동은 내일로 미루는 것을 권장합니다.`;
