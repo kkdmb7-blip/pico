@@ -1105,15 +1105,6 @@ function openSajuShareCard() {
   footer.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,0.28);letter-spacing:0.08em;">picolab.kr에서 무료로 확인하세요</div>';
   card.appendChild(footer);
 
-  // html2canvas는 flexbox align-items:center를 잘못 렌더링 → line-height 방식으로 변환
-  card.querySelectorAll('.hanja-box').forEach(function(el) {
-    el.style.display = 'block';
-    el.style.textAlign = 'center';
-    el.style.lineHeight = '44px';
-    el.style.paddingTop = '0';
-    el.style.paddingBottom = '0';
-  });
-
   document.body.appendChild(card);
 
   var modal = document.getElementById('sajuShareModal');
@@ -1124,7 +1115,17 @@ function openSajuShareCard() {
   modal.style.display = 'flex';
   document.addEventListener('keydown', _sajuEsc);
 
-  html2canvas(card, { scale:2, useCORS:true, backgroundColor:'#0d0d14' }).then(function(canvas) {
+  html2canvas(card, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#0d0d14',
+    onclone: function(clonedDoc) {
+      // html2canvas 내부 클론에 스타일 주입 — flex align-items:center 버그 우회
+      var s = clonedDoc.createElement('style');
+      s.textContent = '.hanja-box { display: block !important; line-height: 44px !important; padding-top: 0 !important; padding-bottom: 0 !important; text-align: center !important; font-size: 26px !important; }';
+      clonedDoc.head.appendChild(s);
+    }
+  }).then(function(canvas) {
     var el = document.getElementById('_sajuCardEl');
     if (el) document.body.removeChild(el);
     _sajuCanvas = canvas;
