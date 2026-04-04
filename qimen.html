@@ -987,6 +987,8 @@ function renderInterp(data) {
   if (['ilga','wolga','nyeonga','wonmyong'].includes(type)) setType(type, true);
   if (year && month && day) doFetch();
 })();
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', function() { window.location.href = '/'; });
 </script>
 </body>
 </html>

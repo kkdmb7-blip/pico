@@ -527,6 +527,8 @@ async function loadVedic(year, month, day, hour, gender) {
 
   loadVedic(year, month, day, hour, gender);
 })();
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', function() { window.location.href = '/'; });
 </script>
 </body>
 </html>

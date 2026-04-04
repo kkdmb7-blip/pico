@@ -506,6 +506,8 @@ async function run() {
 }
 
 run();
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', function() { window.location.href = '/'; });
 </script>
 </body>
 </html>
