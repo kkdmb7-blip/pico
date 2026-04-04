@@ -294,7 +294,6 @@
           <th>별자리</th>
           <th>도수</th>
           <th>하우스</th>
-          <th></th>
         </tr>
       </thead>
       <tbody id="planet-tbody"></tbody>
@@ -502,11 +501,10 @@ function renderPlanets(planets) {
     const ec = elClass(p.sign);
     const tr = el('tr');
     tr.innerHTML =
-      '<td><span class="planet-name">' + (PLANET_ICON[name] || '') + ' ' + (PLANET_KO[name] || name) + '</span></td>' +
+      '<td><span class="planet-name">' + (PLANET_ICON[name] || '') + ' ' + (PLANET_KO[name] || name) + (p.isRetro === 'true' ? ' <span class="retro-badge">Rx</span>' : '') + '</span></td>' +
       '<td><span class="sign-chip ' + ec + '">' + (SIGN_SYM[p.sign]||'') + ' ' + (SIGN_KO[p.sign]||p.sign) + '</span></td>' +
       '<td>' + p.normDegree.toFixed(2) + '°</td>' +
-      '<td>' + (p.house != null ? p.house + '하우스' : '—') + '</td>' +
-      '<td>' + (p.isRetro === 'true' ? '<span class="retro-badge">역행 Rx</span>' : '') + '</td>';
+      '<td>' + (p.house != null ? p.house + '하우스' : '—') + '</td>';
     tbody.appendChild(tr);
   });
 }
