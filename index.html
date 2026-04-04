@@ -374,6 +374,93 @@
   footer a { color: var(--accent2); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
 
+  /* ── SCORE SECTION ── */
+  .section-score {
+    padding: 80px 24px 72px;
+    max-width: 960px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .score-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .score-mini-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 12px 16px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: default;
+  }
+  .score-mini-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  }
+  .score-mini-emoji { font-size: 22px; margin-bottom: 8px; }
+  .score-mini-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+  .score-mini-gauge {
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .score-mini-fill {
+    height: 100%; border-radius: 100px; width: 0%;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+  .score-mini-num {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px; font-weight: 700; line-height: 1;
+  }
+  .score-loading-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; padding: 32px 0; color: var(--muted); font-size: 13px;
+  }
+  .score-loading-spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--surface2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spinSm 0.8s linear infinite;
+  }
+  @keyframes spinSm { to { transform: rotate(360deg); } }
+  .score-bottom-row {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .score-overall-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 100px; padding: 8px 18px;
+    font-size: 14px;
+  }
+  .score-overall-num {
+    font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 700;
+  }
+  .score-summary-text {
+    font-size: 13px; color: var(--muted); flex: 1; line-height: 1.55;
+  }
+  .score-detail-btn {
+    display: inline-block; padding: 9px 20px;
+    background: linear-gradient(135deg, var(--accent), #a07fd4);
+    color: #fff; border-radius: 10px; text-decoration: none;
+    font-size: 13px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .score-detail-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(123,94,167,0.4); }
+  .score-login-prompt {
+    text-align: center; padding: 32px 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+  .score-login-prompt p { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
     .why-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
@@ -387,6 +474,10 @@
     .saju-pillars { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .saju-pillar { padding: 16px 10px; }
     .saju-hanja { font-size: 28px; }
+    .score-mini-grid { grid-template-columns: repeat(3, 1fr); }
+    .score-mini-grid .score-mini-card:nth-child(4) { grid-column: 1/2; margin-left: auto; width: 100%; }
+    .score-mini-grid .score-mini-card:nth-child(5) { grid-column: 2/3; }
+    .score-bottom-row { flex-direction: column; align-items: flex-start; }
   }
 
   /* ── SAJU MODAL ── */
@@ -675,6 +766,40 @@
   </div>
 </nav>
 
+
+<!-- TODAY SCORE -->
+<section class="section-score" id="scoreSectionWrap">
+  <div class="section-label">5대 운세 교차 분석</div>
+  <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:24px;">오늘의 <em>운세 점수</em></h2>
+
+  <!-- 로그인 전 -->
+  <div id="scoreLoginPrompt" class="score-login-prompt">
+    <p>카카오 로그인 후 생년월일을 등록하면<br>매일 업데이트되는 5분야 운세 점수를 확인할 수 있습니다.</p>
+    <button class="btn-cta-hero" onclick="kakaoLogin()" style="font-size:13px;padding:10px 24px;">카카오로 시작하기</button>
+  </div>
+
+  <!-- 로딩 -->
+  <div id="scoreLoadingRow" class="score-loading-row" style="display:none;">
+    <div class="score-loading-spinner"></div>
+    <span>운세 점수 계산 중…</span>
+  </div>
+
+  <!-- 결과 -->
+  <div id="scoreMiniResult" style="display:none;">
+    <div class="score-mini-grid" id="scoreMiniGrid"></div>
+    <div class="score-bottom-row">
+      <div class="score-overall-chip">
+        <span>종합</span>
+        <span class="score-overall-num" id="scoreOverallNum">–</span>
+        <span style="font-size:12px;color:var(--muted);">점</span>
+      </div>
+      <div class="score-summary-text" id="scoreSummaryText"></div>
+      <a class="score-detail-btn" id="scoreDetailLink" href="score.html">자세히 보기 →</a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
 
 <!-- WHY PICOLAB -->
 <section class="section-why">
@@ -1573,6 +1698,115 @@ function syncMyProfileToProfiles(profile) {
 }
 
 checkAuth();
+
+// ── INDEX MINI SCORE ─────────────────────────────
+function _scoreColor(s) {
+  if (s >= 80) return '#e8b86d';
+  if (s >= 60) return '#4caf82';
+  if (s >= 40) return '#5b8dee';
+  return '#e05c6a';
+}
+
+async function loadMiniScore() {
+  var profile = null;
+  try { profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+
+  if (!profile || !profile.year) {
+    // 비로그인/프로필없음 → 로그인 프롬프트 표시
+    document.getElementById('scoreLoginPrompt').style.display = '';
+    document.getElementById('scoreLoadingRow').style.display  = 'none';
+    document.getElementById('scoreMiniResult').style.display  = 'none';
+    return;
+  }
+
+  // 프로필 있음 → 계산
+  document.getElementById('scoreLoginPrompt').style.display = 'none';
+  document.getElementById('scoreLoadingRow').style.display  = 'flex';
+  document.getElementById('scoreMiniResult').style.display  = 'none';
+
+  var result;
+  try {
+    result = await calcFortuneScore(profile);
+  } catch(e) {
+    document.getElementById('scoreLoadingRow').style.display = 'none';
+    document.getElementById('scoreLoginPrompt').style.display = '';
+    document.getElementById('scoreLoginPrompt').querySelector('p').textContent = '점수 계산 중 오류가 발생했습니다. 새로고침 해주세요.';
+    return;
+  }
+
+  document.getElementById('scoreLoadingRow').style.display  = 'none';
+  document.getElementById('scoreMiniResult').style.display  = 'block';
+
+  var domainOrder = ['money','love','health','wisdom','travel'];
+  var domainInfo  = {
+    money:{emoji:'💼',label:'재물/사업'}, love:{emoji:'❤️',label:'관계/연애'},
+    health:{emoji:'🏃',label:'건강/활력'}, wisdom:{emoji:'🧠',label:'학업/창의'},
+    travel:{emoji:'🌍',label:'이동/변화'},
+  };
+
+  var grid = document.getElementById('scoreMiniGrid');
+  grid.innerHTML = '';
+  domainOrder.forEach(function(d, i) {
+    var info = domainInfo[d];
+    var sc   = result.final[d];
+    var col  = _scoreColor(sc);
+    var card = document.createElement('div');
+    card.className = 'score-mini-card';
+    card.innerHTML =
+      '<div class="score-mini-emoji">' + info.emoji + '</div>' +
+      '<div class="score-mini-label">' + info.label + '</div>' +
+      '<div class="score-mini-gauge"><div class="score-mini-fill" id="mfill_' + d + '" style="background:' + col + ';"></div></div>' +
+      '<div class="score-mini-num" id="mnum_' + d + '" style="color:' + col + ';">0</div>';
+    grid.appendChild(card);
+
+    // 애니메이션
+    setTimeout(function() {
+      var fillEl = document.getElementById('mfill_' + d);
+      var numEl  = document.getElementById('mnum_' + d);
+      if (fillEl) fillEl.style.width = sc + '%';
+      if (numEl) {
+        var start = performance.now();
+        (function step(now) {
+          var prog = Math.min((now - start) / 1100, 1);
+          var eased = 1 - Math.pow(1 - prog, 3);
+          numEl.textContent = Math.round(sc * eased);
+          if (prog < 1) requestAnimationFrame(step);
+        })(start);
+      }
+    }, i * 80 + 50);
+  });
+
+  // 종합
+  var overallEl = document.getElementById('scoreOverallNum');
+  if (overallEl) {
+    overallEl.style.color = _scoreColor(result.overall);
+    var ov = result.overall;
+    var s2 = performance.now();
+    (function step2(now) {
+      var prog = Math.min((now - s2) / 1200, 1);
+      var eased = 1 - Math.pow(1 - prog, 3);
+      overallEl.textContent = Math.round(ov * eased);
+      if (prog < 1) requestAnimationFrame(step2);
+    })(s2);
+  }
+
+  var summaryEl = document.getElementById('scoreSummaryText');
+  if (summaryEl) summaryEl.textContent = result.summary;
+
+  // 자세히 보기 링크에 프로필 파라미터 추가
+  var detailLink = document.getElementById('scoreDetailLink');
+  if (detailLink && profile) {
+    var p = new URLSearchParams({
+      year: profile.year, month: profile.month, day: profile.day,
+      hour: profile.hour || 'unknown',
+      minute: profile.minute || 0,
+      gender: profile.gender === 'M' ? 'male' : (profile.gender || 'male'),
+    });
+    if (profile.name) p.set('name', profile.name);
+    detailLink.href = 'score.html?' + p.toString();
+  }
+}
 </script>
+<script src="score.js" onload="loadMiniScore()"></script>
 </body>
 </html>
