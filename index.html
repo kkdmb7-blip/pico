@@ -907,10 +907,7 @@
   </script>
 
   <!-- 로그인 전 -->
-  <div id="scoreLoginPrompt" class="score-login-prompt">
-    <p>카카오 로그인 후 생년월일을 등록하면<br>매일 업데이트되는 5분야 운세 점수를 확인할 수 있습니다.</p>
-    <button class="btn-cta-hero" onclick="kakaoLogin()" style="font-size:13px;padding:10px 24px;">카카오로 시작하기</button>
-  </div>
+  <div id="scoreLoginPrompt" class="score-login-prompt"></div>
 
   <!-- 로딩 -->
   <div id="scoreLoadingRow" class="score-loading-row" style="display:none;">
@@ -2016,10 +2013,19 @@ async function loadMiniScore() {
   try { profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
 
   if (!profile || !profile.year) {
-    // 비로그인/프로필없음 → 로그인 프롬프트 표시
-    document.getElementById('scoreLoginPrompt').style.display = '';
-    document.getElementById('scoreLoadingRow').style.display  = 'none';
-    document.getElementById('scoreMiniResult').style.display  = 'none';
+    var prompt = document.getElementById('scoreLoginPrompt');
+    prompt.style.display = '';
+    document.getElementById('scoreLoadingRow').style.display = 'none';
+    document.getElementById('scoreMiniResult').style.display = 'none';
+    // 로그인 여부에 따라 다른 안내
+    var isLoggedIn = !!localStorage.getItem('pico_user');
+    if (isLoggedIn) {
+      prompt.innerHTML = '<p>생년월일 프로필을 등록하면<br>매일 업데이트되는 5분야 운세 점수를 확인할 수 있습니다.</p>' +
+        '<button class="btn-cta-hero" onclick="openProfileModal()" style="font-size:13px;padding:10px 24px;">프로필 등록하기</button>';
+    } else {
+      prompt.innerHTML = '<p>카카오 로그인 후 생년월일을 등록하면<br>매일 업데이트되는 5분야 운세 점수를 확인할 수 있습니다.</p>' +
+        '<button class="btn-cta-hero" onclick="kakaoLogin()" style="font-size:13px;padding:10px 24px;">카카오로 시작하기</button>';
+    }
     return;
   }
 
