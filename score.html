@@ -174,7 +174,7 @@ nav {
 .breakdown-mini-row  { display:flex; align-items:center; gap:5px; width:100%; min-width:0; }
 .breakdown-mini-emoji { font-size:10px; flex-shrink:0; }
 .breakdown-mini-track { flex:1; background:var(--surface2); height:4px; border-radius:100px; overflow:hidden; }
-.breakdown-mini-fill  { display:block; height:4px; border-radius:100px; }
+.breakdown-mini-fill  { display:block; height:4px; border-radius:100px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
 .breakdown-mini-num   { font-size:9px; color:var(--muted); width:22px; text-align:right; flex-shrink:0; }
 
 /* LOADING */
@@ -423,7 +423,7 @@ function renderBreakdown(scores) {
   ];
   const grid = document.getElementById('breakdownGrid');
   grid.innerHTML = '';
-  srcs.forEach(src => {
+  srcs.forEach((src, si) => {
     const sc = scores[src.key] || {};
     const card = document.createElement('div');
     card.className = 'breakdown-card';
@@ -433,7 +433,7 @@ function renderBreakdown(scores) {
       return `<div class="breakdown-mini-row">
         <span class="breakdown-mini-emoji">${SCORE_DOMAIN_INFO[d].emoji}</span>
         <div class="breakdown-mini-track">
-          <div class="breakdown-mini-fill" style="width:${v}%;background:${c};"></div>
+          <div class="breakdown-mini-fill" data-val="${v}" data-color="${c}" style="width:0%;background:${c};"></div>
         </div>
         <span class="breakdown-mini-num">${v}</span>
       </div>`;
@@ -443,6 +443,11 @@ function renderBreakdown(scores) {
       <div class="breakdown-mini-bars">${barsHtml}</div>
     `;
     grid.appendChild(card);
+    setTimeout(() => {
+      card.querySelectorAll('.breakdown-mini-fill').forEach(el => {
+        el.style.width = el.getAttribute('data-val') + '%';
+      });
+    }, si * 60 + 80);
   });
 }
 
