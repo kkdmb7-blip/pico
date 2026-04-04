@@ -829,7 +829,7 @@
 <!-- TODAY SCORE -->
 <section class="section-score" id="scoreSectionWrap">
   <div class="section-label">5대 운세 교차 분석</div>
-  <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;">오늘의 <em>운세 점수</em></h2>
+  <h2 class="section-title" id="mainScoreTitle" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;">오늘의 <em>운세 점수</em></h2>
   <p id="scoreTodayDate" style="font-size:14px;color:var(--muted);margin-bottom:24px;"></p>
   <script>
     (function(){
@@ -1512,6 +1512,7 @@ document.addEventListener('click', function() { closeHamburger(); });
 function updateAuthUI() {
   var btnKakao = document.getElementById('btnKakao');
   var userArea = document.getElementById('userArea');
+  var titleEl = document.getElementById('mainScoreTitle');
   if (currentUser) {
     btnKakao.style.display = 'none';
     userArea.style.display = 'flex';
@@ -1519,9 +1520,17 @@ function updateAuthUI() {
     var av = document.getElementById('userAvatar');
     if (currentUser.avatar) { av.src = currentUser.avatar; av.style.display = ''; }
     else { av.style.display = 'none'; }
+    if (titleEl && currentUser.name) {
+      titleEl.innerHTML = currentUser.name + '님의 <em>오늘의 운세 점수</em>';
+    }
   } else {
     btnKakao.style.display = '';
     userArea.style.display = 'none';
+    var p = null;
+    try { p = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+    if (titleEl && p && p.name) {
+      titleEl.innerHTML = p.name + '님의 <em>오늘의 운세 점수</em>';
+    }
   }
 }
 
