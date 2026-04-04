@@ -1430,14 +1430,22 @@ function fillBirthFromSaved(json) {
   var n = _normalizeProfile(JSON.parse(json));
   if (n) _fillModalFields(n, 'birth');
 }
+function _fillQimenProfile(n) {
+  if (!n) return;
+  if (n.year)   document.getElementById('qmYear').value  = n.year;
+  if (n.month)  document.getElementById('qmMonth').value = n.month;
+  if (n.day)    document.getElementById('qmDay').value   = n.day;
+  if (n.hour && n.hour !== 'unknown') document.getElementById('qmHour').value = n.hour;
+  document.getElementById('qmMinute').value = n.minute || 0;
+  selectQimenGender(n.gender || 'M');
+}
 function fillQimenFromMine() {
   var n = _normalizeProfile(JSON.parse(localStorage.getItem('pico_profile') || 'null'));
-  if (n) selectQimenGender(n.gender);
+  _fillQimenProfile(n);
 }
 function fillQimenFromSaved(json) {
   if (!json) return;
-  var n = _normalizeProfile(JSON.parse(json));
-  if (n) selectQimenGender(n.gender);
+  _fillQimenProfile(_normalizeProfile(JSON.parse(json)));
 }
 
 function openSajuModal() {
@@ -1522,11 +1530,11 @@ function closeQimenModal() {
 }
 function clearQimenForm() {
   var now = new Date();
-  document.getElementById('qmYear').value = now.getFullYear();
+  document.getElementById('qmYear').value  = now.getFullYear();
   document.getElementById('qmMonth').value = now.getMonth() + 1;
-  document.getElementById('qmDay').value = now.getDate();
-  document.getElementById('qmHour').value = now.getHours();
-  document.getElementById('qmMinute').value = '';
+  document.getElementById('qmDay').value   = now.getDate();
+  document.getElementById('qmHour').value  = now.getHours();
+  document.getElementById('qmMinute').value = 0;
   document.getElementById('qimenProfileSelect').value = '';
   selectQimenGender('M');
 }
