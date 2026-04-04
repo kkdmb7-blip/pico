@@ -494,7 +494,7 @@ async function run() {
   // 종합
   document.getElementById('overallNum').style.color = overallColor;
   document.getElementById('overallLabel').textContent = getTag(overall);
-  document.getElementById('overallSummary').textContent = summary;
+  document.getElementById('overallSummary').innerHTML = summary;
   animateCount(document.getElementById('overallNum'), overall, 1400);
   animateRing(overall, overallColor);
 

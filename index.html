@@ -206,9 +206,6 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
   }
-  /* 5번째 카드 중앙 정렬 */
-  .why-grid .why-card:nth-child(4) { grid-column: 1 / 2; margin-left: auto; width: 100%; }
-  .why-grid .why-card:nth-child(5) { grid-column: 2 / 3; margin-right: auto; width: 100%; }
   .why-tagline {
     margin-top: 40px;
     font-size: 15px;
@@ -464,9 +461,6 @@
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
     .why-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .why-grid .why-card:nth-child(4),
-    .why-grid .why-card:nth-child(5) { grid-column: auto; margin: 0; width: 100%; }
-    .why-grid .why-card:nth-child(5) { grid-column: 1 / -1; max-width: calc(50% - 7px); margin: 0 auto; }
     .service-grid { grid-template-columns: 1fr; gap: 14px; }
     .section-why, .section-services { padding: 64px 20px 48px; }
     .section-cta { padding: 64px 20px 80px; }
@@ -871,7 +865,7 @@
 
 <!-- WHY PICOLAB -->
 <section class="section-why">
-  <div class="section-label">PICO Lab의 5중 교차검증 시스템</div>
+  <div class="section-label">PICO Lab의 6중 교차검증 시스템</div>
   <h2 class="section-title" style="font-size:clamp(24px,3.8vw,44px)">5,000년 인류의 지혜를<br><em>AI가 동시에 교차 분석합니다</em></h2>
   <div class="why-grid">
     <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
@@ -904,8 +898,14 @@
       <p>중화권 CEO들이 의사결정에 쓰는 시공간 최적화 전략 엔진. 언제, 어느 방향으로 움직여야 유리한지 계산합니다.</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
+    <div class="why-card" onclick="window.open('https://kkdmb7-blip.github.io/memox/','_blank')" style="cursor:pointer;">
+      <div class="why-icon">🔮</div>
+      <h3>타로카드</h3>
+      <p>78장의 상징 체계로 읽는 무의식의 언어. 오늘의 카드가 전하는 메시지를 확인하세요.</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+    </div>
   </div>
-  <p class="why-tagline">5가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
+  <p class="why-tagline">6가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
 </section>
 
 <div class="section-divider"></div>
