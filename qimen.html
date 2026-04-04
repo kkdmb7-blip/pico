@@ -217,13 +217,12 @@
     pointer-events: none;
   }
   .palace-star {
-    font-size: 11px; color: var(--muted);
+    display: flex; gap: 2px; justify-content: center;
     text-align: center; margin-top: 8px;
-    white-space: nowrap;
   }
   .palace-shen {
-    font-size: 11px; color: var(--accent);
-    text-align: center; font-weight: 600;
+    display: flex; gap: 2px; justify-content: center;
+    text-align: center;
   }
   .palace-stem {
     font-family: 'Noto Serif KR', serif;
@@ -240,8 +239,8 @@
   .stem-수 { color: #64b5f6; background: rgba(100,181,246,0.08); }
   .stem-unknown { color: var(--muted); background: rgba(107,107,133,0.08); }
   .palace-door {
-    font-size: 12px; font-weight: 700;
-    color: var(--text); text-align: center;
+    display: flex; gap: 2px; justify-content: center;
+    text-align: center;
   }
 
   /* ── 직부 BAR ── */
@@ -415,11 +414,11 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
-    .palace { min-height: 118px; padding: 12px 6px 8px; gap: 3px; }
+    .palace { min-height: 118px; padding: 12px 4px 8px; gap: 3px; }
     .palace-stem { font-size: 22px; padding: 4px 8px; }
-    .palace-star { font-size: 10px; }
-    .palace-shen { font-size: 10px; }
-    .palace-door { font-size: 11px; }
+    .palace-star span, .palace-shen span, .palace-door span {
+      width: 18px !important; height: 18px !important; font-size: 11px !important;
+    }
     .form-group input { font-size: 14px; }
     .meta-divider { display: none; }
   }
@@ -607,6 +606,27 @@ const DOOR_COLOR = {
   '傷':'#FF6D00', '杜':'#FF6D00', '驚':'#FF6D00',
   '死':'#FF1744'
 };
+
+// 오행별 글자 색상·배경
+const EL_COLOR = {목:'#00C853',화:'#FF5252',토:'#FFD740',금:'#d4d4d4',수:'#64b5f6'};
+const EL_BG    = {목:'rgba(0,200,83,0.12)',화:'rgba(255,23,68,0.12)',토:'rgba(255,214,0,0.12)',금:'rgba(212,212,212,0.08)',수:'rgba(100,181,246,0.12)'};
+// 구성·팔신·팔문 오행
+const STAR_EL = {'天蓬':'수','天芮':'토','天衝':'목','天輔':'목','天禽':'토','天心':'금','天柱':'금','天任':'토','天英':'화'};
+const SHEN_EL = {'値符':'토','螣蛇':'화','太陰':'금','六合':'목','白虎':'금','玄武':'수','九地':'토','九天':'금'};
+const DOOR_EL = {'生':'목','傷':'목','杜':'목','景':'화','死':'토','開':'금','驚':'금','休':'수'};
+
+function charBox(ch, el) {
+  const c = EL_COLOR[el] || 'rgba(255,255,255,0.5)';
+  const b = EL_BG[el]    || 'rgba(255,255,255,0.04)';
+  return '<span style="display:inline-flex;align-items:center;justify-content:center;' +
+    'width:22px;height:22px;border-radius:5px;font-size:13px;font-weight:700;' +
+    'font-family:\'Noto Serif KR\',serif;color:' + c + ';background:' + b +
+    ';border:1px solid ' + c + ';margin:0 1px">' + ch + '</span>';
+}
+function charBoxes(str, el) {
+  if (!str) return '';
+  return [...str].map(ch => charBox(ch, el)).join('');
+}
 
 let currentType = 'siga';
 let hasResult = false;
@@ -837,14 +857,14 @@ function buildCell(n, p, isZhifu) {
   // 구성 (Nine Stars)
   const starEl = document.createElement('div');
   starEl.className = 'palace-star';
-  starEl.textContent = p.구성 || '';
+  starEl.innerHTML = charBoxes(p.구성, STAR_EL[p.구성]);
   if (p.구성 && STAR_DESC[p.구성]) starEl.title = STAR_DESC[p.구성];
   cell.appendChild(starEl);
 
   // 팔신
   const shenEl = document.createElement('div');
   shenEl.className = 'palace-shen';
-  shenEl.textContent = p.팔신 || '';
+  shenEl.innerHTML = charBoxes(p.팔신, SHEN_EL[p.팔신]);
   if (p.팔신 && SHEN_DESC[p.팔신]) shenEl.title = SHEN_DESC[p.팔신];
   cell.appendChild(shenEl);
 
@@ -856,12 +876,14 @@ function buildCell(n, p, isZhifu) {
   stemEl.textContent = stem || '—';
   cell.appendChild(stemEl);
 
-  // 팔문 (길흉 색상 적용)
+  // 팔문 (한자 박스 + 오행 색상)
   const doorEl = document.createElement('div');
   doorEl.className = 'palace-door';
-  doorEl.textContent = p.팔문 ? p.팔문 + '門' : '';
-  if (p.팔문 && DOOR_COLOR[p.팔문]) doorEl.style.color = DOOR_COLOR[p.팔문];
-  if (p.팔문 && DOOR_DESC[p.팔문]) doorEl.title = DOOR_DESC[p.팔문];
+  if (p.팔문) {
+    const del = DOOR_EL[p.팔문];
+    doorEl.innerHTML = charBoxes(p.팔문 + '門', del);
+    if (DOOR_DESC[p.팔문]) doorEl.title = DOOR_DESC[p.팔문];
+  }
   cell.appendChild(doorEl);
 
   return cell;
