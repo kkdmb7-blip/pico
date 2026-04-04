@@ -1451,6 +1451,7 @@ function fillQimenFromSaved(json) {
 function openSajuModal() {
   document.getElementById('sajuOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  history.pushState({ modal: 'saju' }, '');
   initSajuDateSelects();
   document.getElementById('sajuForm').style.display = 'block';
   document.getElementById('sajuHour').onchange = function() {
@@ -1522,6 +1523,7 @@ function openQimenModal() {
   _populateProfileSelect('qimenProfileSelect');
   document.getElementById('qimenOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  history.pushState({ modal: 'qimen' }, '');
 }
 
 function closeQimenModal() {
@@ -1606,6 +1608,7 @@ function openBirthModal(mode) {
   document.getElementById('birthModalTitle').textContent = BIRTH_CONFIG[mode].title;
   document.getElementById('birthOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  history.pushState({ modal: 'birth' }, '');
   initBirthSelects();
   document.getElementById('birthName').value = '';
   document.getElementById('birthYear').value = '';
@@ -2048,6 +2051,13 @@ function syncMyProfileToProfiles(profile) {
   else list.unshift(entry);
   saveProfiles(list);
 }
+
+// 뒤로가기로 모달 닫기
+window.addEventListener('popstate', function(e) {
+  if (document.getElementById('sajuOverlay').classList.contains('open'))  { closeSajuModal(); return; }
+  if (document.getElementById('qimenOverlay').classList.contains('open')) { closeQimenModal(); return; }
+  if (document.getElementById('birthOverlay').classList.contains('open')) { closeBirthModal(); return; }
+});
 
 // checkAuth는 score.js 로드 후 실행 (onload에서 호출)
 
