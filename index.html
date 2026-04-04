@@ -927,6 +927,11 @@
       </div>
       <a class="score-detail-btn" id="scoreDetailLink" href="score.html">자세히 보기 →</a>
     </div>
+    <!-- 친구 공유 버튼 -->
+    <div style="text-align:center;margin-top:20px;padding:14px 16px;background:rgba(123,94,167,0.08);border:1px solid rgba(123,94,167,0.25);border-radius:14px;">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">친구 초대하면 질문권 1개 지급 🎁</div>
+      <button onclick="shareMainKakao()" style="display:inline-flex;align-items:center;gap:8px;padding:11px 28px;background:#fee500;color:#3c1e1e;border:none;border-radius:100px;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;">카카오톡으로 친구에게 공유하기</button>
+    </div>
   </div>
 </section>
 
@@ -1774,6 +1779,24 @@ function checkAuth() {
   if (code) {
     history.replaceState({}, '', window.location.pathname);
     handleKakaoCallback(code);
+  }
+}
+
+function shareMainKakao() {
+  var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
+  var text = '🔮 포르투나 운세 - 사주·기문·점성·베딕·자미 5개 엔진 교차 분석!\n\n오늘 내 운세 점수가 궁금하면 확인해봐 👇\n무료로 바로 볼 수 있어!';
+  try {
+    if (window.Kakao && window.Kakao.isInitialized && window.Kakao.isInitialized()) {
+      Kakao.Share.sendDefault({ objectType:'text', text:text,
+        link:{ mobileWebUrl:pageUrl, webUrl:pageUrl },
+        buttons:[{ title:'무료로 확인하기 🔮', link:{ mobileWebUrl:pageUrl, webUrl:pageUrl } }] });
+    } else {
+      navigator.clipboard && navigator.clipboard.writeText(text+'\n'+pageUrl)
+        .then(function() { alert('클립보드에 복사됐어요! 카카오톡에 붙여넣어 주세요 📋'); });
+    }
+  } catch(e) {
+    navigator.clipboard && navigator.clipboard.writeText(text+'\n'+pageUrl)
+      .then(function() { alert('클립보드에 복사됐어요! 카카오톡에 붙여넣어 주세요 📋'); });
   }
 }
 
