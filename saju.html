@@ -596,7 +596,9 @@ async function fetchSaju() {
     document.getElementById('S_load').style.display='none';
     document.getElementById('S_result').style.display='block';
     window.scrollTo(0,0);
+    _sajuData = data;
     renderAll(data);
+    document.getElementById('sajuShareBtnWrap').style.display = 'block';
   } catch(e) {
     document.getElementById('S_load').style.display='none';
     const fe=document.getElementById('f_err');
@@ -1183,13 +1185,6 @@ function copySajuLink() {
   navigator.clipboard && navigator.clipboard.writeText(url);
 }
 
-// renderAll 후 공유 버튼 표시
-var _origRenderAll = renderAll;
-function renderAll(data) {
-  _sajuData = data;
-  _origRenderAll(data);
-  document.getElementById('sajuShareBtnWrap').style.display = 'block';
-}
 
 // 카카오 SDK 초기화
 (function() {
