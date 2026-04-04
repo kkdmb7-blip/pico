@@ -405,11 +405,11 @@
     letter-spacing: 0.3px;
   }
   .saju-pillar-chars {
-    font-family: 'Noto Serif KR', serif;
-    font-size: 26px; font-weight: 700; line-height: 1;
-    padding: 6px 10px; border-radius: 8px;
-    border: 1.5px solid currentColor; text-align: center;
-    width: 100%;
+    display: flex; gap: 3px; justify-content: center;
+  }
+  .saju-pillar-chars span {
+    width: 28px !important; height: 28px !important; font-size: 16px !important;
+    border-radius: 7px !important;
   }
 
   /* ── RESPONSIVE ── */
@@ -682,14 +682,11 @@ function hideResults() {
 // ── 사주 8자 ─────────────────────────────────────────────
 const KOR_STEM   = {갑:'甲',을:'乙',병:'丙',정:'丁',무:'戊',기:'己',경:'庚',신:'辛',임:'壬',계:'癸'};
 const KOR_BRANCH = {자:'子',축:'丑',인:'寅',묘:'卯',진:'辰',사:'巳',오:'午',미:'未',신:'申',유:'酉',술:'戌',해:'亥'};
-const STEM_COLOR = {甲:'#00C853',乙:'#00C853',丙:'#FF1744',丁:'#FF1744',戊:'#FFD600',己:'#FFD600',庚:'#e8e8e8',辛:'#e8e8e8',壬:'#64b5f6',癸:'#64b5f6'};
-const STEM_BG    = {甲:'rgba(0,200,83,0.08)',乙:'rgba(0,200,83,0.08)',丙:'rgba(255,23,68,0.08)',丁:'rgba(255,23,68,0.08)',戊:'rgba(255,214,0,0.08)',己:'rgba(255,214,0,0.08)',庚:'rgba(232,232,232,0.06)',辛:'rgba(232,232,232,0.06)',壬:'rgba(100,181,246,0.08)',癸:'rgba(100,181,246,0.08)'};
+const BRANCH_EL  = {子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수'};
 
 function korPillarToHan(s) {
-  if (!s || s.length < 2) return { han: '??', stem: '' };
-  const stem   = KOR_STEM[s[0]]   || s[0];
-  const branch = KOR_BRANCH[s[1]] || s[1];
-  return { han: stem + branch, stem };
+  if (!s || s.length < 2) return { stem: '?', branch: '?' };
+  return { stem: KOR_STEM[s[0]] || s[0], branch: KOR_BRANCH[s[1]] || s[1] };
 }
 
 async function fetchSaju(year, month, day, hour, minute) {
@@ -710,13 +707,13 @@ async function fetchSaju(year, month, day, hour, minute) {
     const container = document.getElementById('saju-pillars');
     container.innerHTML = '';
     order.forEach(({ label, key }) => {
-      const { han, stem } = korPillarToHan(pillars[key]);
-      const color = STEM_COLOR[stem] || 'var(--muted)';
-      const bg    = STEM_BG[stem]    || 'rgba(107,107,133,0.08)';
+      const { stem, branch } = korPillarToHan(pillars[key]);
+      const stemEl   = charBox(stem,   STEM_OHAENG[stem]   || '');
+      const branchEl = charBox(branch, BRANCH_EL[branch]   || '');
       const div = document.createElement('div');
       div.className = 'saju-pillar';
       div.innerHTML = '<div class="saju-pillar-label">' + label + '</div>'
-        + '<div class="saju-pillar-chars" style="color:' + color + ';background:' + bg + ';border-color:' + color + ';">' + han + '</div>';
+        + '<div class="saju-pillar-chars">' + stemEl + branchEl + '</div>';
       container.appendChild(div);
     });
     setVisible('saju-bar', true);
