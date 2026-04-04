@@ -85,6 +85,8 @@
     /* luck scroll */
     .luck-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
     .luck-scroll::-webkit-scrollbar { display: none; }
+    .luck-scroll { cursor: grab; }
+    .luck-scroll.dragging { cursor: grabbing; scroll-snap-type: none; }
     .luck-card {
       scroll-snap-align: center; flex-shrink: 0; width: 58px;
       border-radius: 10px; padding: 8px 4px; text-align: center;
@@ -855,6 +857,20 @@ function renderLuck(data) {
     }
     selectDaeun(nowIdx);
   },400);
+
+  // 데스크탑 마우스 드래그 스크롤
+  const luckEl = document.getElementById('R_luck');
+  let isDragging=false, startX, startScrollLeft;
+  luckEl.addEventListener('mousedown', e=>{
+    isDragging=true; startX=e.pageX; startScrollLeft=luckEl.scrollLeft;
+    luckEl.classList.add('dragging');
+  });
+  document.addEventListener('mouseup', ()=>{ isDragging=false; luckEl.classList.remove('dragging'); });
+  document.addEventListener('mousemove', e=>{
+    if(!isDragging) return;
+    e.preventDefault();
+    luckEl.scrollLeft = startScrollLeft - (e.pageX - startX);
+  });
 }
 
 function selectDaeun(idx) {
