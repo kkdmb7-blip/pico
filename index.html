@@ -1395,7 +1395,12 @@ function openTarotIntro() {
   }, 2200);
 }
 
+
 // ── 궁합 모달 ────────────────────────────────────────────────────────
+var _ghPartnerGender = '';
+var _ghMyProfile = null;
+var MONTH_STEM_BASE = [2,4,6,8,0];
+
 function _populateGhSelect(selId, type) {
   var el = document.getElementById(selId);
   if (!el) return;
@@ -1409,22 +1414,49 @@ function _populateGhSelect(selId, type) {
   }
 }
 
+function selectGhPartnerGender(g) {
+  _ghPartnerGender = g;
+  [['M','ghPgMale'],['F','ghPgFemale'],['','ghPgNone']].forEach(function(pair) {
+    var el = document.getElementById(pair[1]);
+    if (!el) return;
+    if (pair[0] === g) {
+      el.style.borderColor = '#ff8ab0'; el.style.background = 'rgba(255,138,176,0.12)'; el.style.color = '#ff8ab0';
+    } else if (pair[0] === '') {
+      el.style.borderColor = 'rgba(201,168,76,0.4)'; el.style.background = 'rgba(201,168,76,0.08)'; el.style.color = '#c9a84c';
+    } else {
+      el.style.borderColor = 'rgba(255,255,255,0.15)'; el.style.background = 'rgba(255,255,255,0.04)'; el.style.color = 'rgba(255,255,255,0.55)';
+    }
+  });
+}
+
 function openGunghapModal() {
-  _populateGhSelect('ghMyYear','year'); _populateGhSelect('ghMyMonth','month'); _populateGhSelect('ghMyDay','day');
+  _ghPartnerGender = '';
+  selectGhPartnerGender('');
   _populateGhSelect('ghPartnerYear','year'); _populateGhSelect('ghPartnerMonth','month'); _populateGhSelect('ghPartnerDay','day');
-  // pico_profile 자동입력
+  document.getElementById('ghPartnerName').value = '';
+  _ghMyProfile = null;
   try {
     var pp = JSON.parse(localStorage.getItem('pico_profile'));
     if (pp) {
-      var y, m, d;
-      if (pp.birth_date) { var pts = pp.birth_date.split('-'); y = pts[0]; m = parseInt(pts[1]); d = parseInt(pts[2]); }
-      else if (pp.year) { y = pp.year; m = pp.month; d = pp.day; }
-      else if (pp.birth_year) { y = pp.birth_year; m = pp.birth_month; d = pp.birth_day; }
-      if (y) document.getElementById('ghMyYear').value = y;
-      if (m) document.getElementById('ghMyMonth').value = m;
-      if (d) document.getElementById('ghMyDay').value = d;
+      var y, m, d, hour = 12, gender = 'male', name = '';
+      if (pp.birth_date) { var pts = pp.birth_date.split('-'); y = parseInt(pts[0]); m = parseInt(pts[1]); d = parseInt(pts[2]); }
+      else if (pp.year) { y = parseInt(pp.year); m = parseInt(pp.month); d = parseInt(pp.day); }
+      if (pp.hour !== undefined && pp.hour !== 'unknown') hour = parseInt(pp.hour);
+      gender = pp.gender || 'male';
+      name = pp.name || '';
+      if (y && m && d) _ghMyProfile = { name: name, year: y, month: m, day: d, hour: hour, gender: gender };
     }
   } catch(e) {}
+  var infoEl = document.getElementById('ghMyInfoText');
+  if (infoEl) {
+    if (_ghMyProfile) {
+      var gTxt = _ghMyProfile.gender === 'female' ? '여성' : '남성';
+      infoEl.innerHTML = '<span style="color:#e8e0f0;font-weight:600;">' + (_ghMyProfile.name || '나') + '</span>'
+        + '&nbsp;&nbsp;<span style="color:rgba(255,255,255,0.4);">' + _ghMyProfile.year + '년 ' + _ghMyProfile.month + '월 ' + _ghMyProfile.day + '일 · ' + gTxt + '</span>';
+    } else {
+      infoEl.innerHTML = '<span style="color:#f87171;">프로필을 먼저 설정해주세요 (사주 분석 메뉴에서 입력)</span>';
+    }
+  }
   document.getElementById('gunghapOverlay').style.display = 'flex';
 }
 
@@ -1432,22 +1464,145 @@ function closeGunghapModal() {
   document.getElementById('gunghapOverlay').style.display = 'none';
 }
 
-function submitGunghap() {
-  var myY = document.getElementById('ghMyYear').value;
-  var myM = document.getElementById('ghMyMonth').value;
-  var myD = document.getElementById('ghMyDay').value;
-  var pName = document.getElementById('ghPartnerName').value.trim();
-  var pY = document.getElementById('ghPartnerYear').value;
-  var pM = document.getElementById('ghPartnerMonth').value;
-  var pD = document.getElementById('ghPartnerDay').value;
-  if (!myY || !myM || !myD) { alert('내 생년월일을 입력해주세요.'); return; }
-  if (!pY || !pM || !pD) { alert('상대방 생년월일을 입력해주세요.'); return; }
-  var url = 'https://kkdmb7-blip.github.io/memox/?mode=gunghap'
-    + '&my_year=' + myY + '&my_month=' + myM + '&my_day=' + myD
-    + '&partner_name=' + encodeURIComponent(pName)
-    + '&partner_year=' + pY + '&partner_month=' + pM + '&partner_day=' + pD;
-  window.location.href = url;
+function closeGunghapResult() {
+  var el = document.getElementById('gunghapResultOverlay');
+  if (el) el.style.display = 'none';
 }
+
+function _calcSaju(year, month, day, hour) {
+  var STEMS    = ['갑','을','병','정','무','기','경','신','임','계'];
+  var BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+  var ZODIAC   = ['쥐','소','호랑이','토끼','용','뱀','말','양','원숭이','닭','개','돼지'];
+  var STEM_H   = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var BRANCH_H = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var STEM_EL  = ['목','목','화','화','토','토','금','금','수','수'];
+  var BRANCH_EL= ['수','토','목','목','토','화','화','토','금','금','토','수'];
+  var EL_BG    = { '목':'#00C853', '화':'#FF1744', '토':'#FFD600', '금':'#E0E0E0', '수':'#1565C0' };
+  var EL_TC    = { '목':'#052e13', '화':'#ffffff', '토':'#1a1200', '금':'#1a1a1a', '수':'#ffffff' };
+  var JEOLGI   = [[1,6,1],[2,4,2],[3,6,3],[4,5,4],[5,6,5],[6,6,6],[7,7,7],[8,8,8],[9,8,9],[10,8,10],[11,7,11],[12,7,0]];
+  var birthMs  = Date.UTC(year, month-1, day);
+  var mbi = 1;
+  for (var ji=0; ji<JEOLGI.length; ji++) { if (birthMs >= Date.UTC(year, JEOLGI[ji][0]-1, JEOLGI[ji][1])) mbi = JEOLGI[ji][2]; }
+  var sy = (birthMs < Date.UTC(year,1,4)) ? year-1 : year;
+  var yi = ((sy-4)%60+60)%60, ySi = yi%10, yBi = yi%12;
+  var mOrd = [2,3,4,5,6,7,8,9,10,11,0,1].indexOf(mbi);
+  var mSi  = ((MONTH_STEM_BASE[ySi%5]+mOrd)%10+10)%10;
+  var di   = (((Math.round((birthMs-Date.UTC(2024,1,10))/86400000))+40)%60+60)%60;
+  var dSi  = di%10, dBi = di%12;
+  var hBi  = (hour===23)?0:Math.floor((hour+1)/2)%12;
+  var hSi  = (([0,2,4,6,8][dSi%5]+hBi)%10+10)%10;
+  var JJG  = [
+    [['수',6],['',0],['',0]],[['토',6],['수',2],['금',2]],[['목',6],['화',2],['토',2]],[['목',6],['목',4],['',0]],
+    [['토',6],['목',2],['수',2]],[['화',6],['토',2],['금',2]],[['화',6],['토',2],['화',2]],[['토',6],['화',2],['목',2]],
+    [['금',6],['수',2],['토',2]],[['금',6],['금',4],['',0]],[['토',6],['금',2],['화',2]],[['수',6],['목',2],['토',2]]
+  ];
+  var elPt={목:0,화:0,토:0,금:0,수:0};
+  [ySi,mSi,dSi,hSi].forEach(function(i){elPt[STEM_EL[i]]+=10;});
+  [yBi,mbi,dBi,hBi].forEach(function(bi){ JJG[bi].forEach(function(p){if(p[0])elPt[p[0]]+=p[1];}); });
+  var tot=Object.values(elPt).reduce(function(a,b){return a+b;},0);
+  var fivePct={}; Object.keys(elPt).forEach(function(k){fivePct[k]=Math.round(elPt[k]/tot*100);});
+  var dEl=STEM_EL[dSi], PE={목:'수',화:'목',토:'화',금:'토',수:'금'}, supPt=0;
+  [ySi,mSi,hSi].forEach(function(i){if(STEM_EL[i]===dEl||STEM_EL[i]===PE[dEl])supPt+=10;});
+  [yBi,mbi,dBi,hBi].forEach(function(bi){JJG[bi].forEach(function(p){if(p[0]===dEl||p[0]===PE[dEl])supPt+=p[1];});});
+  var str=supPt/tot>=0.55?'신강':supPt/tot>=0.35?'중화':'신약';
+  return {
+    pillars:{year:STEMS[ySi]+BRANCHES[yBi],month:STEMS[mSi]+BRANCHES[mbi],day:STEMS[dSi]+BRANCHES[dBi],hour:STEMS[hSi]+BRANCHES[hBi]},
+    zodiac:ZODIAC[yBi], dayEl:dEl, strength:str, fivePct:fivePct,
+    stemH:{year:STEM_H[ySi],month:STEM_H[mSi],day:STEM_H[dSi],hour:STEM_H[hSi]},
+    branchH:{year:BRANCH_H[yBi],month:BRANCH_H[mbi],day:BRANCH_H[dBi],hour:BRANCH_H[hBi]},
+    stemEl:{year:STEM_EL[ySi],month:STEM_EL[mSi],day:STEM_EL[dSi],hour:STEM_EL[hSi]},
+    branchEl:{year:BRANCH_EL[yBi],month:BRANCH_EL[mbi],day:BRANCH_EL[dBi],hour:BRANCH_EL[hBi]},
+    EL_BG:EL_BG, EL_TC:EL_TC
+  };
+}
+
+function _sajuMiniCard(saju, label, name, gender) {
+  var EL_BG=saju.EL_BG, EL_TC=saju.EL_TC;
+  function box(h,bg,tc){ return '<div style="width:36px;height:36px;border-radius:6px;background:'+bg+';text-align:center;line-height:36px;font-family:\'Noto Serif KR\',serif;font-size:18px;font-weight:700;color:'+tc+';margin:0 auto 2px;">'+h+'</div>'; }
+  var order=['hour','day','month','year'], labs=['시','일','월','년'];
+  var cols=order.map(function(k,i){
+    return '<div style="text-align:center;">'
+      +'<div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:3px;">'+labs[i]+'</div>'
+      +box(saju.stemH[k],EL_BG[saju.stemEl[k]]||'#333',EL_TC[saju.stemEl[k]]||'#fff')
+      +box(saju.branchH[k],EL_BG[saju.branchEl[k]]||'#333',EL_TC[saju.branchEl[k]]||'#fff')
+      +'</div>';
+  }).join('');
+  var gText=gender==='F'?'여성':gender==='M'?'남성':'';
+  var fp=saju.fivePct;
+  return '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 10px;">'
+    +'<div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:4px;">'+label+'</div>'
+    +'<div style="font-size:13px;font-weight:700;color:#e8e0f0;margin-bottom:8px;">'+(name||label)
+    +(gText?' <span style="font-size:10px;color:rgba(255,255,255,0.35);">'+gText+'</span>':'')+' <span style="font-size:10px;color:rgba(255,255,255,0.35);">'+saju.zodiac+'띠</span></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">'+cols+'</div>'
+    +'<div style="margin-top:8px;font-size:10px;color:rgba(255,255,255,0.4);">일간 '+saju.dayEl+' · '+saju.strength+'<br>목'+fp.목+'%·화'+fp.화+'%·토'+fp.토+'%·금'+fp.금+'%·수'+fp.수+'%</div>'
+    +'</div>';
+}
+
+async function submitGunghap() {
+  if (!_ghMyProfile) { alert('프로필이 없습니다.\n사주 분석 메뉴에서 먼저 생년월일을 입력해주세요.'); return; }
+  var pName = document.getElementById('ghPartnerName').value.trim();
+  var pY = parseInt(document.getElementById('ghPartnerYear').value);
+  var pM = parseInt(document.getElementById('ghPartnerMonth').value);
+  var pD = parseInt(document.getElementById('ghPartnerDay').value);
+  if (!pY || !pM || !pD) { alert('상대방 생년월일을 입력해주세요.'); return; }
+
+  closeGunghapModal();
+
+  var resultOverlay = document.getElementById('gunghapResultOverlay');
+  var namesEl = document.getElementById('ghResultNames');
+  var cardsEl = document.getElementById('ghResultCards');
+  var aiEl    = document.getElementById('ghResultAI');
+  var myName  = _ghMyProfile.name || '나';
+  var pNameDisp = pName || '상대방';
+  if (namesEl) namesEl.textContent = myName + ' ❤ ' + pNameDisp;
+  if (cardsEl) cardsEl.innerHTML = '';
+  if (aiEl) aiEl.innerHTML = '<span style="color:rgba(255,255,255,0.4);">✦ 궁합을 분석하고 있어요...</span>';
+  if (resultOverlay) resultOverlay.style.display = 'flex';
+
+  var myH = (_ghMyProfile.hour !== 'unknown' && _ghMyProfile.hour != null) ? parseInt(_ghMyProfile.hour) : 12;
+  var mySaju = _calcSaju(_ghMyProfile.year, _ghMyProfile.month, _ghMyProfile.day, myH);
+  var pSaju  = _calcSaju(pY, pM, pD, 12);
+  var myGender = _ghMyProfile.gender === 'female' ? 'F' : 'M';
+  if (cardsEl) cardsEl.innerHTML = _sajuMiniCard(mySaju,'나',myName,myGender) + _sajuMiniCard(pSaju,'상대방',pNameDisp,_ghPartnerGender);
+
+  var myGTxt = myGender==='F'?'여성':'남성';
+  var pGTxt  = _ghPartnerGender==='F'?'여성':_ghPartnerGender==='M'?'남성':'';
+  var fp1=mySaju.fivePct, fp2=pSaju.fivePct;
+  var prompt = '【궁합 요청】\n'
+    +myName+'('+myGTxt+'): 년주 '+mySaju.pillars.year+' 월주 '+mySaju.pillars.month+' 일주 '+mySaju.pillars.day+' 시주 '+mySaju.pillars.hour
+    +' / 띠 '+mySaju.zodiac+' / 일간 '+mySaju.dayEl+' / '+mySaju.strength
+    +' / 오행 목'+fp1.목+'% 화'+fp1.화+'% 토'+fp1.토+'% 금'+fp1.금+'% 수'+fp1.수+'%\n'
+    +pNameDisp+(pGTxt?'('+pGTxt+')':'')+': 년주 '+pSaju.pillars.year+' 월주 '+pSaju.pillars.month+' 일주 '+pSaju.pillars.day+' 시주 '+pSaju.pillars.hour
+    +' / 띠 '+pSaju.zodiac+' / 일간 '+pSaju.dayEl+' / '+pSaju.strength
+    +' / 오행 목'+fp2.목+'% 화'+fp2.화+'% 토'+fp2.토+'% 금'+fp2.금+'% 수'+fp2.수+'%\n\n'
+    +'두 사람의 사주를 바탕으로 궁합을 분석해주세요. 일간 오행의 상생/상극, 오행 균형, 성격 조화, 갈등 가능성, 보완점을 구체적으로 설명해주세요.';
+  var systemMsg = '당신은 사주명리학 전문가입니다. 두 사람의 사주로 궁합을 따뜻하고 구체적으로 설명합니다. 헤더(##,###)와 표는 사용하지 않습니다. **볼드**는 핵심 키워드에 3~5개만 사용하세요. 긍정적인 면과 주의할 점을 균형 있게 알려주세요.';
+
+  try {
+    var user = currentUser || window._fortunaUser;
+    if (!user) {
+      if (aiEl) aiEl.innerHTML = '로그인 후 AI 궁합 해석을 이용할 수 있어요. 위의 사주 비교는 로그인 없이도 확인 가능합니다.';
+      return;
+    }
+    var res = await fetch('https://fortuna-silk.vercel.app/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: user.id, messages: [{ role: 'user', content: prompt }], system_prompt: systemMsg })
+    });
+    if (!res.ok) {
+      var err = await res.json().catch(function(){return{};});
+      if (err.error === 'limit_exceeded') { if (aiEl) aiEl.textContent = '오늘 사용량을 모두 소진했어요. 내일 다시 시도해주세요.'; return; }
+      throw new Error(err.error || res.status);
+    }
+    var data = await res.json();
+    var reply = data.reply || '';
+    reply = reply.replace(/\*\*(.+?)\*\*/g, '<strong style="color:#ff8ab0;">$1</strong>');
+    if (aiEl) aiEl.innerHTML = reply || '해석을 불러오지 못했어요.';
+  } catch(e) {
+    if (aiEl) aiEl.textContent = '오류가 발생했어요: ' + e.message;
+  }
+}
+
 
 // pico_profiles 항목을 공통 {name,year,month,day,hour,minute,gender} 형태로 변환
 function _normalizeProfile(p) {
