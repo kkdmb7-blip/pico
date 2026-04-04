@@ -1120,10 +1120,20 @@ function openSajuShareCard() {
     useCORS: true,
     backgroundColor: '#0d0d14',
     onclone: function(clonedDoc) {
-      // html2canvas 내부 클론에 스타일 주입 — flex align-items:center 버그 우회
-      var s = clonedDoc.createElement('style');
-      s.textContent = '.hanja-box { display: block !important; line-height: 44px !important; padding-top: 0 !important; padding-bottom: 0 !important; text-align: center !important; font-size: 26px !important; }';
-      clonedDoc.head.appendChild(s);
+      // html2canvas는 computed style을 inline으로 복사하므로 stylesheet 주입 대신
+      // setProperty('important') API로 직접 inline !important 설정
+      clonedDoc.querySelectorAll('.hanja-box').forEach(function(el) {
+        // inline style에 명시된 height 또는 기본 44px 사용
+        var h = el.style.height ? parseInt(el.style.height) : 44;
+        if (!h || isNaN(h)) h = 44;
+        el.style.setProperty('display', 'block', 'important');
+        el.style.setProperty('line-height', h + 'px', 'important');
+        el.style.setProperty('height', h + 'px', 'important');
+        el.style.setProperty('text-align', 'center', 'important');
+        el.style.setProperty('padding', '0', 'important');
+        el.style.setProperty('align-items', 'initial', 'important');
+        el.style.setProperty('justify-content', 'initial', 'important');
+      });
     }
   }).then(function(canvas) {
     var el = document.getElementById('_sajuCardEl');
