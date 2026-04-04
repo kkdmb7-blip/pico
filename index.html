@@ -829,7 +829,16 @@
 <!-- TODAY SCORE -->
 <section class="section-score" id="scoreSectionWrap">
   <div class="section-label">5대 운세 교차 분석</div>
-  <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:24px;">오늘의 <em>운세 점수</em></h2>
+  <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;">오늘의 <em>운세 점수</em></h2>
+  <p id="scoreTodayDate" style="font-size:14px;color:var(--muted);margin-bottom:24px;"></p>
+  <script>
+    (function(){
+      var d = new Date();
+      var days = ['일','월','화','수','목','금','토'];
+      document.getElementById('scoreTodayDate').textContent =
+        d.getFullYear() + '년 ' + (d.getMonth()+1) + '월 ' + d.getDate() + '일 (' + days[d.getDay()] + ')';
+    })();
+  </script>
 
   <!-- 로그인 전 -->
   <div id="scoreLoginPrompt" class="score-login-prompt">
