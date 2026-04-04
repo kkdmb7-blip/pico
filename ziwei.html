@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>자미두수 명반 | 피코랩</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c28;
+      --border: #2a2a3d;
+      --accent: #7b5ea7;
+      --accent2: #e8b86d;
+      --text: #f0f0f5;
+      --muted: #6b6b85;
+      --radius: 16px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+    .star {
+      position: fixed;
+      background: #fff;
+      border-radius: 50%;
+      opacity: 0;
+      animation: twinkle var(--dur, 3s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+      z-index: 0;
+      pointer-events: none;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(0.4); }
+      50% { opacity: var(--max-op, 0.7); transform: scale(1); }
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { font-family: 'Noto Serif KR', serif; font-weight: 700; font-size: 20px; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent2); }
+    .back-btn {
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      color: var(--muted); padding: 6px 14px; border-radius: 8px;
+      font-size: 13px; cursor: pointer; text-decoration: none;
+      transition: color .2s;
+    }
+    .back-btn:hover { color: var(--text); }
+
+    /* MAIN */
+    main { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 32px 16px 80px; }
+
+    /* LOADING */
+    #loading {
+      text-align: center; padding: 80px 20px; color: var(--muted);
+    }
+    .loader {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 3px solid var(--border); border-top-color: var(--accent2);
+      animation: spin 1s linear infinite; margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ERROR */
+    #error { display: none; text-align: center; padding: 60px 20px; }
+    .error-icon { font-size: 40px; margin-bottom: 12px; }
+    .error-msg { color: var(--muted); font-size: 15px; }
+
+    /* CONTENT */
+    #content { display: none; }
+
+    /* 핵심 정보 */
+    .hero {
+      background: linear-gradient(135deg, rgba(123,94,167,0.15) 0%, rgba(232,184,109,0.08) 100%);
+      border: 1px solid rgba(232,184,109,0.2);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .hero-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 13px; color: var(--accent2);
+      letter-spacing: 0.15em; margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+    .hero-badges {
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    }
+    .hero-badge {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; padding: 12px 20px;
+      min-width: 110px;
+    }
+    .hero-badge-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .hero-badge-value {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 20px; font-weight: 700; color: var(--accent2);
+    }
+
+    /* 섹션 타이틀 */
+    .section-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 15px; font-weight: 700;
+      color: var(--accent2); letter-spacing: 0.08em;
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::after {
+      content: ''; flex: 1;
+      height: 1px; background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    /* 12궁 그리드 */
+    .palace-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) {
+      .palace-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+    }
+    @media (max-width: 400px) {
+      .palace-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .palace-cell {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 8px;
+      min-height: 120px;
+      position: relative;
+      transition: border-color .2s;
+    }
+    .palace-cell:hover { border-color: rgba(123,94,167,0.4); }
+    .palace-cell.is-self {
+      border-color: rgba(232,184,109,0.5);
+      background: rgba(232,184,109,0.06);
+    }
+    .palace-cell.is-body {
+      border-color: rgba(123,94,167,0.5);
+      background: rgba(123,94,167,0.06);
+    }
+    .palace-cell.is-self.is-body {
+      border-color: rgba(232,184,109,0.6);
+      background: linear-gradient(135deg, rgba(232,184,109,0.08), rgba(123,94,167,0.08));
+    }
+
+    .palace-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 6px;
+    }
+    .palace-name {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 12px; font-weight: 700; color: var(--text);
+    }
+    .palace-badges { display: flex; gap: 3px; }
+    .badge-self {
+      font-size: 11px; color: var(--accent2);
+      background: rgba(232,184,109,0.15);
+      border-radius: 4px; padding: 1px 4px;
+      font-weight: 700;
+    }
+    .badge-body {
+      font-size: 11px; color: #a78bfa;
+      background: rgba(167,139,250,0.15);
+      border-radius: 4px; padding: 1px 4px;
+      font-weight: 700;
+    }
+
+    .palace-stem-branch {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 11px; color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .palace-stars {
+      display: flex; flex-wrap: wrap; gap: 3px;
+    }
+    .star-tag {
+      font-size: 10px; padding: 2px 5px; border-radius: 4px;
+      background: rgba(123,94,167,0.2); color: #c4b5fd;
+    }
+    .star-tag.major {
+      background: rgba(232,184,109,0.15); color: var(--accent2);
+      font-weight: 600;
+    }
+    .palace-age {
+      position: absolute; bottom: 6px; right: 8px;
+      font-size: 9px; color: var(--muted);
+    }
+
+    /* 현재 운세 */
+    .fortune-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 480px) { .fortune-row { grid-template-columns: 1fr; } }
+
+    .fortune-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+    .fortune-card-label {
+      font-size: 11px; color: var(--muted); letter-spacing: 0.08em;
+      margin-bottom: 8px; text-transform: uppercase;
+    }
+    .fortune-card-value {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 18px; font-weight: 700; color: var(--text);
+      margin-bottom: 4px;
+    }
+    .fortune-card-sub { font-size: 12px; color: var(--muted); }
+    .fortune-card-stars { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+
+    /* 해석 카드 */
+    .interp-grid {
+      display: grid; grid-template-columns: 1fr; gap: 10px;
+      margin-bottom: 28px;
+    }
+    .interp-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .interp-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .interp-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .interp-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+    /* 하단 버튼 */
+    .action-row {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .btn-primary {
+      flex: 1; min-width: 140px;
+      background: linear-gradient(135deg, var(--accent), #9b7fcc);
+      color: #fff; border: none; border-radius: 12px;
+      padding: 14px 20px; font-size: 15px; font-weight: 700;
+      cursor: pointer; text-align: center; text-decoration: none;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: opacity .2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-locked {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); color: var(--muted);
+      position: relative; cursor: default;
+    }
+    .btn-locked::after {
+      content: '🔒'; margin-left: 4px;
+    }
+    .btn-locked .lock-badge {
+      position: absolute; top: -8px; right: -8px;
+      background: var(--accent2); color: #000;
+      font-size: 9px; font-weight: 700; padding: 2px 6px;
+      border-radius: 10px;
+    }
+    .btn-secondary {
+      flex: 1; min-width: 140px;
+      background: rgba(232,184,109,0.1);
+      border: 1px solid rgba(232,184,109,0.3);
+      color: var(--accent2); border-radius: 12px;
+      padding: 14px 20px; font-size: 15px; font-weight: 700;
+      cursor: pointer; text-align: center; text-decoration: none;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background .2s;
+    }
+    .btn-secondary:hover { background: rgba(232,184,109,0.18); }
+  </style>
+</head>
+<body>
+
+<!-- 별 배경 (JS로 생성) -->
+
+<nav>
+  <a href="index.html" class="logo">PICO<span>Lab</span></a>
+  <a href="index.html" class="back-btn">← 돌아가기</a>
+</nav>
+
+<main>
+  <!-- 로딩 -->
+  <div id="loading">
+    <div class="loader"></div>
+    <p>자미두수 명반을 계산하는 중...</p>
+  </div>
+
+  <!-- 에러 -->
+  <div id="error">
+    <div class="error-icon">⚠️</div>
+    <p class="error-msg" id="errorMsg">명반을 불러오지 못했어요. 다시 시도해주세요.</p>
+    <br>
+    <a href="index.html" class="back-btn" style="display:inline-block;margin-top:12px;">← 메인으로</a>
+  </div>
+
+  <!-- 결과 -->
+  <div id="content">
+
+    <!-- 상단 핵심 정보 -->
+    <div class="hero">
+      <div class="hero-title">⭐ 자미두수 명반 紫微斗數</div>
+      <div class="hero-badges">
+        <div class="hero-badge">
+          <div class="hero-badge-label">명주성</div>
+          <div class="hero-badge-value" id="destinyMaster">—</div>
+        </div>
+        <div class="hero-badge">
+          <div class="hero-badge-label">신주성</div>
+          <div class="hero-badge-value" id="bodyMaster">—</div>
+        </div>
+        <div class="hero-badge">
+          <div class="hero-badge-label">오행국</div>
+          <div class="hero-badge-value" id="element">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12궁 명반 -->
+    <div class="section-title">12궁 명반 배치</div>
+    <div class="palace-grid" id="palaceGrid"></div>
+
+    <!-- 현재 운세 -->
+    <div class="section-title">현재 운세</div>
+    <div class="fortune-row">
+      <div class="fortune-card">
+        <div class="fortune-card-label">현재 대한 大限</div>
+        <div class="fortune-card-value" id="decadeName">—</div>
+        <div class="fortune-card-sub" id="decadeAge"></div>
+        <div class="fortune-card-stars" id="decadeStars"></div>
+      </div>
+      <div class="fortune-card">
+        <div class="fortune-card-label">올해 유년궁 流年</div>
+        <div class="fortune-card-value" id="yearPalace">—</div>
+        <div class="fortune-card-sub" id="yearStem"></div>
+      </div>
+    </div>
+
+    <!-- 해석 카드 -->
+    <div class="section-title">명반 해석</div>
+    <div class="interp-grid" id="interpGrid"></div>
+
+    <!-- 하단 버튼 -->
+    <div class="action-row">
+      <div class="btn-primary btn-locked">
+        AI 심층 분석 🔮
+        <span class="lock-badge">PREMIUM</span>
+      </div>
+      <a class="btn-secondary" id="consultBtn" href="#">
+        AI 운세 상담 ✦
+      </a>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ── 별 배경 ──────────────────────────────────────────────
+(function() {
+  for (var i = 0; i < 60; i++) {
+    var s = document.createElement('div');
+    s.className = 'star';
+    var size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = [
+      'width:' + size + 'px', 'height:' + size + 'px',
+      'left:' + (Math.random() * 100) + '%',
+      'top:' + (Math.random() * 100) + '%',
+      '--dur:' + (Math.random() * 4 + 2) + 's',
+      '--delay:' + (Math.random() * 4) + 's',
+      '--max-op:' + (Math.random() * 0.5 + 0.2)
+    ].join(';');
+    document.body.appendChild(s);
+  }
+})();
+
+// ── 명궁 주성별 해석 ─────────────────────────────────────
+var SOUL_INTERP = {
+  '자미': '제왕의 별. 독립심 강하고 리더십 탁월. 주변의 도움을 받으며 인생 큰 그림을 그리는 타입.',
+  '천기': '지략의 별. 변화에 민감하고 분석력 뛰어남. 기획·전략·조언자 역할에서 빛남.',
+  '태양': '빛의 별. 사회적 명예와 공공성 강조. 대인관계 넓고 외향적이며 리더로 추앙받음.',
+  '무곡': '재물의 별. 결단력과 실행력이 강함. 금전적 성취 지향, 군인·사업가 기질.',
+  '천동': '복록의 별. 낙천적이고 감성 풍부. 안정과 편안함을 추구하며 예술적 감수성 높음.',
+  '염정': '관록의 별. 욕망과 원칙 사이의 균형. 정치·법·예술 분야에서 두각을 나타냄.',
+  '천부': '재고(財庫)의 별. 안정적 자산 축적 능력. 신중하고 보수적이나 내실 강함.',
+  '태음': '달의 별. 감성적·직관적. 여성성과 모성, 부동산·재물 인연이 깊음.',
+  '탐랑': '욕망의 별. 다재다능하고 매력적. 예술·사교·이성 인연 강하며 늦게 꽃피는 타입.',
+  '거문': '암성(暗星). 구설·언변 강함. 학문·종교·상담 분야에서 두드러짐. 늦은 성공.',
+  '천상': '인덕의 별. 성실하고 책임감 강함. 보좌 역할에 어울리며 조직 내 신임 두터움.',
+  '천량': '수성(壽星). 노련하고 지혜롭. 의료·법·교육 분야 적합. 나이 들수록 빛남.',
+  '칠살': '장군의 별. 돌파력과 추진력 탁월. 역경을 뚫고 나가는 힘. 강한 변화와 개혁.',
+  '파군': '개혁의 별. 혁신적이고 틀을 깨는 힘. 기존 것을 부수고 새로 세우는 창조적 파괴자.',
+};
+
+// 대한 흐름 해석
+function decadeInterp(palaceName, stars) {
+  var base = {
+    '명궁': '자신의 에너지와 정체성이 전면에 드러나는 시기. 독립과 자아 확립의 운.',
+    '재백궁': '재물 운이 집중되는 시기. 수입·투자·자산 변화가 크게 나타남.',
+    '관록궁': '커리어와 사회적 성취가 부각되는 시기. 승진·창업·전직의 기회.',
+    '부처궁': '인연과 파트너십의 변화. 결혼·이별·동업 등 대인관계가 핵심.',
+    '자녀궁': '창조·표현·자녀 관련 운. 새로운 프로젝트 시작이나 후진 양성.',
+    '노복궁': '인맥과 협력자의 운. 좋은 동료를 만나거나 배신을 주의할 시기.',
+    '전택궁': '부동산·가정·환경 변화. 이사·매매·가족 관계 변화.',
+    '복덕궁': '내면의 충족과 영적 성장. 취미·여행·정신적 안정이 중요한 시기.',
+    '부모궁': '윗사람·사회 관계·문서 운. 계약·시험·공공 기관과의 인연.',
+    '형제궁': '형제·친구·동료와의 관계 변화. 협력과 경쟁이 공존하는 시기.',
+    '질액궁': '건강 관리와 체력 점검이 필요한 시기. 정신·신체 균형에 집중.',
+    '천이궁': '이동과 변화의 운. 해외·출장·환경 변화로 새 기회를 얻음.',
+  };
+  return base[palaceName] || '변화와 성장의 기운이 가득한 시기입니다.';
+}
+
+// 궁별 한줄 해석
+function palaceInterp(name, stars) {
+  var major = stars[0] || '';
+  var interps = {
+    '재백궁': major ? (major + '이(가) 재백궁을 지키며 재물 흐름을 주도. ') : '' ,
+    '관록궁': major ? (major + '의 기운으로 커리어의 방향이 결정됨. ') : '',
+    '부처궁': major ? ('이성 인연과 파트너십에 ' + major + '의 에너지가 흐름. ') : '',
+  };
+  var base = {
+    '재백궁': '재물 흐름과 수입 구조를 나타냅니다.',
+    '관록궁': '직업·사업·사회적 성취의 방향을 보여줍니다.',
+    '부처궁': '이성 인연과 파트너십의 질을 나타냅니다.',
+  };
+  return (interps[name] || '') + (base[name] || '');
+}
+
+// ── 메인 로직 ─────────────────────────────────────────────
+var p = new URLSearchParams(location.search);
+var year   = p.get('year');
+var month  = p.get('month');
+var day    = p.get('day');
+var hour   = p.get('hour') || '0';
+var gender = p.get('gender') || 'female';
+var name   = p.get('name') || '';
+
+// AI 상담 버튼 링크
+document.getElementById('consultBtn').href =
+  'https://kkdmb7-blip.github.io/memox/?mode=ziwei' +
+  '&year=' + year + '&month=' + month + '&day=' + day +
+  '&hour=' + hour + '&gender=' + gender;
+
+if (!year || !month || !day) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('error').style.display = 'block';
+  document.getElementById('errorMsg').textContent = 'URL 파라미터(year, month, day)가 필요합니다.';
+} else {
+  var apiUrl = 'https://fortuna.kkdmb7.workers.dev/ziwei?year=' + year +
+    '&month=' + month + '&day=' + day + '&hour=' + hour +
+    '&gender=' + gender + '&isLunar=false&isLeap=false';
+
+  fetch(apiUrl)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) throw new Error(data.error);
+      render(data);
+    })
+    .catch(function(e) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('errorMsg').textContent = '오류: ' + e.message;
+    });
+}
+
+function render(d) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+
+  // 핵심 정보
+  document.getElementById('destinyMaster').textContent = d.destinyMaster || '—';
+  document.getElementById('bodyMaster').textContent    = d.bodyMaster    || '—';
+  document.getElementById('element').textContent       = d.element       || '—';
+
+  // 12궁 그리드
+  var grid = document.getElementById('palaceGrid');
+  (d.palaces || []).forEach(function(pal) {
+    var cell = document.createElement('div');
+    cell.className = 'palace-cell' +
+      (pal.isSelf ? ' is-self' : '') +
+      (pal.isBody ? ' is-body' : '');
+
+    var selfBadge = pal.isSelf ? '<span class="badge-self">★명</span>' : '';
+    var bodyBadge = pal.isBody ? '<span class="badge-body">◎신</span>' : '';
+
+    var majorHTML = (pal.majorStars || []).map(function(s) {
+      return '<span class="star-tag major">' + s + '</span>';
+    }).join('');
+    var minorHTML = (pal.minorStars || []).slice(0, 3).map(function(s) {
+      return '<span class="star-tag">' + s + '</span>';
+    }).join('');
+
+    cell.innerHTML =
+      '<div class="palace-header">' +
+        '<div class="palace-name">' + (pal.name || '') + '</div>' +
+        '<div class="palace-badges">' + selfBadge + bodyBadge + '</div>' +
+      '</div>' +
+      '<div class="palace-stem-branch">' + (pal.heavenlyStem || '') + (pal.earthlyBranch || '') + '</div>' +
+      '<div class="palace-stars">' + majorHTML + minorHTML + '</div>' +
+      (pal.ageRange ? '<div class="palace-age">' + pal.ageRange + '</div>' : '');
+
+    grid.appendChild(cell);
+  });
+
+  // 현재 대한
+  var dec = d.currentDecade;
+  if (dec) {
+    document.getElementById('decadeName').textContent = dec.name || '—';
+    document.getElementById('decadeAge').textContent  = dec.ageRange || '';
+    var decStars = document.getElementById('decadeStars');
+    (dec.stars || []).forEach(function(s) {
+      var t = document.createElement('span');
+      t.className = 'star-tag major'; t.textContent = s;
+      decStars.appendChild(t);
+    });
+  }
+
+  // 유년
+  var yr = d.currentYear;
+  if (yr) {
+    document.getElementById('yearPalace').textContent = yr.palace || '—';
+    document.getElementById('yearStem').textContent   =
+      (yr.heavenlyStem || '') + (yr.earthlyBranch || '') + ' ' + (yr.year || '') + '년';
+  }
+
+  // 해석 카드
+  var interps = document.getElementById('interpGrid');
+
+  // 명궁 주성 해석
+  var soul = d.soulPalace || (d.palaces || []).find(function(p) { return p.isSelf; });
+  var soulStar = soul && soul.majorStars && soul.majorStars[0];
+  var soulText = soulStar
+    ? (SOUL_INTERP[soulStar] || soulStar + '이(가) 명궁에 위치. 강한 개성과 운명의 별.')
+    : '명궁 정보를 확인 중입니다.';
+  addInterp(interps, '☀️', '명궁 · ' + (soulStar || '주성'), soulText);
+
+  // 대한 흐름 해석
+  if (dec && dec.name) {
+    addInterp(interps, '🌊', '현재 대한 흐름', decadeInterp(dec.name, dec.stars || []));
+  }
+
+  // 재백·관록·부처 요약
+  var findPal = function(n) {
+    return (d.palaces || []).find(function(p) { return p.name === n || p.name === n + '궁'; });
+  };
+  var jaebaek = findPal('재백궁') || findPal('재백');
+  var gwanrok = findPal('관록궁') || findPal('관록');
+  var bucheo  = findPal('부처궁') || findPal('부처');
+
+  if (jaebaek) addInterp(interps, '💰', '재백궁 (재물)', palaceInterp('재백궁', jaebaek.majorStars || []) || ((jaebaek.majorStars || []).join(', ') || '별 없음') + ' — 재물의 흐름을 주관합니다.');
+  if (gwanrok) addInterp(interps, '🏆', '관록궁 (직업)', palaceInterp('관록궁', gwanrok.majorStars || []) || ((gwanrok.majorStars || []).join(', ') || '별 없음') + ' — 사회적 성취와 직업의 방향.');
+  if (bucheo)  addInterp(interps, '💑', '부처궁 (인연)', palaceInterp('부처궁', bucheo.majorStars || [])  || ((bucheo.majorStars || []).join(', ')  || '별 없음') + ' — 이성 인연과 파트너십.');
+}
+
+function addInterp(container, icon, label, text) {
+  var card = document.createElement('div');
+  card.className = 'interp-card';
+  card.innerHTML =
+    '<div class="interp-icon">' + icon + '</div>' +
+    '<div>' +
+      '<div class="interp-label">' + label + '</div>' +
+      '<div class="interp-text">' + text + '</div>' +
+    '</div>';
+  container.appendChild(card);
+}
+</script>
+</body>
+</html>
