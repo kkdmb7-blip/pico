@@ -263,6 +263,12 @@
       '<h3 style="font-family:\'Noto Serif KR\',serif;font-size:18px;margin-bottom:6px;">새로 입력</h3>',
       '<p style="font-size:13px;color:#6b6b85;margin-bottom:20px;">직접 생년월일을 입력하여 조회합니다</p>',
 
+      // Name
+      '<div style="margin-bottom:14px;">',
+        '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">이름 (선택)</label>',
+        '<input id="pb-name" type="text" placeholder="홍길동" style="width:100%;box-sizing:border-box;' + selectStyle() + '" />',
+      '</div>',
+
       // Birth date
       '<div style="margin-bottom:14px;">',
         '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">생년월일</label>',
@@ -312,6 +318,17 @@
     updateGenderBtns();
     _overlay.style.display = 'flex';
     initNewInputSelects();
+    // Reset all fields
+    var nameEl = document.getElementById('pb-name');
+    if (nameEl) nameEl.value = '';
+    var yEl = document.getElementById('pb-year');
+    var mEl = document.getElementById('pb-month');
+    var dEl = document.getElementById('pb-day');
+    if (yEl) yEl.value = '';
+    if (mEl) mEl.value = '';
+    if (dEl) { dEl.innerHTML = '<option value="">일</option>'; }
+    var hEl = document.getElementById('pb-hour');
+    if (hEl) hEl.value = 'unknown';
     document.body.style.overflow = 'hidden';
   }
 
@@ -373,6 +390,7 @@
     var day   = document.getElementById('pb-day').value;
     if (!year || !month || !day) { alert('생년월일을 모두 선택해주세요.'); return; }
     var hour = document.getElementById('pb-hour').value;
+    var name = (document.getElementById('pb-name') || {}).value || '';
     var p = {};
     p.year  = parseInt(year);
     p.month = parseInt(month);
@@ -380,7 +398,15 @@
     if (hour !== 'unknown') { p.hour = parseInt(hour); p.minute = 0; }
     p.gender = _niGender;
     window._pbCloseNew();
-    window.location.href = buildUrl(profileToParams(p));
+    var params = profileToParams(p);
+    var cur = new URLSearchParams(window.location.search);
+    ['year', 'month', 'day', 'hour', 'minute', 'gender'].forEach(function (k) {
+      if (params[k] != null) cur.set(k, params[k]);
+      else cur.delete(k);
+    });
+    if (name.trim()) cur.set('name', name.trim());
+    else cur.delete('name');
+    window.location.href = window.location.pathname + '?' + cur.toString();
   };
 
   // ── Init ───────────────────────────────────────────────

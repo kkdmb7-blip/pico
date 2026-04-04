@@ -1003,6 +1003,7 @@
         <select class="modal-profile-select" id="sajuProfileSelect" onchange="fillSajuFromSaved(this.value)">
           <option value="">저장된 프로필 선택</option>
         </select>
+        <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#e8b86d;" onclick="clearSajuForm()">새로 입력</button>
       </div>
       <div class="saju-form-group">
         <label>이름 (선택)</label>
@@ -1063,6 +1064,7 @@
       <select class="modal-profile-select" id="qimenProfileSelect" onchange="fillQimenFromSaved(this.value)">
         <option value="">저장된 프로필 성별 선택</option>
       </select>
+      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#e8b86d;" onclick="clearQimenForm()">새로 입력</button>
     </div>
     <div class="saju-form-group">
       <label>날짜</label>
@@ -1103,6 +1105,7 @@
       <select class="modal-profile-select" id="birthProfileSelect" onchange="fillBirthFromSaved(this.value)">
         <option value="">저장된 프로필 선택</option>
       </select>
+      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#e8b86d;" onclick="clearBirthForm()">새로 입력</button>
     </div>
     <div class="saju-form-group">
       <label>이름 (선택)</label>
@@ -1449,6 +1452,16 @@ function closeSajuModal() {
   document.getElementById('sajuOverlay').classList.remove('open');
   document.body.style.overflow = '';
 }
+function clearSajuForm() {
+  document.getElementById('sajuName').value = '';
+  document.getElementById('sajuYear').value = '';
+  document.getElementById('sajuMonth').value = '';
+  document.getElementById('sajuDay').value = '';
+  document.getElementById('sajuHour').value = 'unknown';
+  document.getElementById('sajuYajasiRow').style.display = 'none';
+  document.getElementById('sajuProfileSelect').value = '';
+  selectGender('M');
+}
 function selectGender(g) {
   _sajuGender = g;
   document.getElementById('genderM').classList.toggle('active', g === 'M');
@@ -1513,6 +1526,16 @@ function openQimenModal() {
 function closeQimenModal() {
   document.getElementById('qimenOverlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+function clearQimenForm() {
+  var now = new Date();
+  document.getElementById('qmYear').value = now.getFullYear();
+  document.getElementById('qmMonth').value = now.getMonth() + 1;
+  document.getElementById('qmDay').value = now.getDate();
+  document.getElementById('qmHour').value = now.getHours();
+  document.getElementById('qmMinute').value = '';
+  document.getElementById('qimenProfileSelect').value = '';
+  selectQimenGender('M');
 }
 
 function selectQimenGender(g) {
@@ -1595,6 +1618,15 @@ function openBirthModal(mode) {
 function closeBirthModal() {
   document.getElementById('birthOverlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+function clearBirthForm() {
+  document.getElementById('birthName').value = '';
+  document.getElementById('birthYear').value = '';
+  document.getElementById('birthMonth').value = '';
+  document.getElementById('birthDay').value = '';
+  document.getElementById('birthHour').value = 'unknown';
+  document.getElementById('birthProfileSelect').value = '';
+  selectBirthGender('M');
 }
 
 function selectBirthGender(g) {
