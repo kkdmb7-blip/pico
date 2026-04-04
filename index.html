@@ -973,6 +973,12 @@
       <p>78장의 상징 체계로 읽는 무의식의 언어. 오늘의 카드가 전하는 메시지를 확인하세요.</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
+    <div class="why-card" onclick="openGunghapModal()" style="cursor:pointer;border-color:rgba(255,130,170,0.25);">
+      <div class="why-icon">💕</div>
+      <h3>궁합</h3>
+      <p>사주·점성·자미두수로 보는 우리의 인연</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+    </div>
   </div>
   <p class="why-tagline">6가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
 </section>
@@ -1101,6 +1107,41 @@
       </div>
     </div>
     <button class="saju-submit-btn" onclick="submitQimen()">기문 보기 ✦</button>
+  </div>
+</div>
+
+<!-- GUNGHAP MODAL -->
+<div class="saju-overlay" id="gunghapOverlay" onclick="if(event.target===this)closeGunghapModal()">
+  <div class="saju-modal">
+    <button class="saju-modal-close" onclick="closeGunghapModal()">✕</button>
+    <h3>💕 궁합 보기</h3>
+    <p class="saju-modal-sub">사주·점성술·자미두수로 우리의 인연을 분석해 드려요</p>
+
+    <div style="font-size:12px;font-weight:700;color:var(--accent2);letter-spacing:1px;margin-bottom:10px;">내 정보</div>
+    <div class="saju-form-group">
+      <label>내 생년월일</label>
+      <div class="saju-date-row">
+        <select id="ghMyYear"><option value="">년</option></select>
+        <select id="ghMyMonth"><option value="">월</option></select>
+        <select id="ghMyDay"><option value="">일</option></select>
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:#ff8ab0;letter-spacing:1px;margin:18px 0 10px;">상대방 정보</div>
+    <div class="saju-form-group">
+      <label>이름 (선택)</label>
+      <input type="text" id="ghPartnerName" placeholder="상대방 이름" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Sans KR',sans-serif;">
+    </div>
+    <div class="saju-form-group">
+      <label>상대방 생년월일</label>
+      <div class="saju-date-row">
+        <select id="ghPartnerYear"><option value="">년</option></select>
+        <select id="ghPartnerMonth"><option value="">월</option></select>
+        <select id="ghPartnerDay"><option value="">일</option></select>
+      </div>
+    </div>
+
+    <button class="saju-submit-btn" onclick="submitGunghap()" style="background:linear-gradient(135deg,#c2185b,#e91e8c);">궁합 보기 ✦</button>
   </div>
 </div>
 
@@ -1347,6 +1388,60 @@ function openTarotIntro() {
   setTimeout(function() {
     window.location.href = 'tarot.html';
   }, 2200);
+}
+
+// ── 궁합 모달 ────────────────────────────────────────────────────────
+function _populateGhSelect(selId, type) {
+  var el = document.getElementById(selId);
+  if (!el) return;
+  el.innerHTML = '<option value="">' + (type === 'year' ? '년' : type === 'month' ? '월' : '일') + '</option>';
+  if (type === 'year') {
+    for (var y = new Date().getFullYear(); y >= 1930; y--) { var o = document.createElement('option'); o.value = y; o.textContent = y + '년'; el.appendChild(o); }
+  } else if (type === 'month') {
+    for (var m = 1; m <= 12; m++) { var o = document.createElement('option'); o.value = m; o.textContent = m + '월'; el.appendChild(o); }
+  } else {
+    for (var d = 1; d <= 31; d++) { var o = document.createElement('option'); o.value = d; o.textContent = d + '일'; el.appendChild(o); }
+  }
+}
+
+function openGunghapModal() {
+  _populateGhSelect('ghMyYear','year'); _populateGhSelect('ghMyMonth','month'); _populateGhSelect('ghMyDay','day');
+  _populateGhSelect('ghPartnerYear','year'); _populateGhSelect('ghPartnerMonth','month'); _populateGhSelect('ghPartnerDay','day');
+  // pico_profile 자동입력
+  try {
+    var pp = JSON.parse(localStorage.getItem('pico_profile'));
+    if (pp) {
+      var y, m, d;
+      if (pp.birth_date) { var pts = pp.birth_date.split('-'); y = pts[0]; m = parseInt(pts[1]); d = parseInt(pts[2]); }
+      else if (pp.year) { y = pp.year; m = pp.month; d = pp.day; }
+      else if (pp.birth_year) { y = pp.birth_year; m = pp.birth_month; d = pp.birth_day; }
+      if (y) document.getElementById('ghMyYear').value = y;
+      if (m) document.getElementById('ghMyMonth').value = m;
+      if (d) document.getElementById('ghMyDay').value = d;
+    }
+  } catch(e) {}
+  document.getElementById('gunghapOverlay').style.display = 'flex';
+}
+
+function closeGunghapModal() {
+  document.getElementById('gunghapOverlay').style.display = 'none';
+}
+
+function submitGunghap() {
+  var myY = document.getElementById('ghMyYear').value;
+  var myM = document.getElementById('ghMyMonth').value;
+  var myD = document.getElementById('ghMyDay').value;
+  var pName = document.getElementById('ghPartnerName').value.trim();
+  var pY = document.getElementById('ghPartnerYear').value;
+  var pM = document.getElementById('ghPartnerMonth').value;
+  var pD = document.getElementById('ghPartnerDay').value;
+  if (!myY || !myM || !myD) { alert('내 생년월일을 입력해주세요.'); return; }
+  if (!pY || !pM || !pD) { alert('상대방 생년월일을 입력해주세요.'); return; }
+  var url = 'https://kkdmb7-blip.github.io/memox/?mode=gunghap'
+    + '&my_year=' + myY + '&my_month=' + myM + '&my_day=' + myD
+    + '&partner_name=' + encodeURIComponent(pName)
+    + '&partner_year=' + pY + '&partner_month=' + pM + '&partner_day=' + pD;
+  window.location.href = url;
 }
 
 // pico_profiles 항목을 공통 {name,year,month,day,hour,minute,gender} 형태로 변환
