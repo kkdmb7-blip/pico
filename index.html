@@ -1520,8 +1520,10 @@ function updateAuthUI() {
     var av = document.getElementById('userAvatar');
     if (currentUser.avatar) { av.src = currentUser.avatar; av.style.display = ''; }
     else { av.style.display = 'none'; }
-    if (titleEl && currentUser.name) {
-      titleEl.innerHTML = currentUser.name + '님의 <em>오늘의 운세 점수</em>';
+    var profileName = null;
+    try { var pp = JSON.parse(localStorage.getItem('pico_profile')); profileName = pp && pp.name; } catch(e) {}
+    if (titleEl && (profileName || currentUser.name)) {
+      titleEl.innerHTML = (profileName || currentUser.name) + '님의 <em>오늘의 운세 점수</em>';
     }
   } else {
     btnKakao.style.display = '';
