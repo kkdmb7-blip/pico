@@ -6,7 +6,6 @@
 <title>기문둔갑 포국반 · FORTUNA</title>
 <meta name="description" content="기문둔갑 시가·일가 포국반. 날짜와 시각을 입력하면 9궁 포국 결과를 즉시 확인할 수 있습니다.">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
-<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root {
@@ -1170,15 +1169,11 @@ function shareQimenKakao() {
   var bestDirText = bestDirs.length ? bestDirs.join('·') : '분석 결과 확인';
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
   var text = '🧭 오늘 포르투나 기문둔갑 최길 방향\n\n'+bestDirText+'\n\n나도 확인해봐 👇';
-  try {
-    if (window.Kakao && window.Kakao.isInitialized && window.Kakao.isInitialized()) {
-      Kakao.Share.sendDefault({ objectType:'text', text:text,
-        link:{ mobileWebUrl:pageUrl, webUrl:pageUrl },
-        buttons:[{ title:'무료로 확인하기 🔮', link:{ mobileWebUrl:pageUrl, webUrl:pageUrl } }] });
-    } else {
-      navigator.clipboard && navigator.clipboard.writeText(text+'\n'+pageUrl);
-    }
-  } catch(e) {}
+  if (navigator.share) {
+    navigator.share({ title: 'FORTUNA 기문둔갑', text: text, url: pageUrl }).catch(function(){});
+  } else {
+    navigator.clipboard && navigator.clipboard.writeText(text+'\n'+pageUrl);
+  }
   closeQimenShareModal();
 }
 
@@ -1186,13 +1181,6 @@ function copyQimenLink() {
   var url = 'https://picolab.kr?utm_source=share&utm_medium=link';
   navigator.clipboard && navigator.clipboard.writeText(url);
 }
-
-// 카카오 SDK 초기화
-(function() {
-  if (window.Kakao && !window.Kakao.isInitialized()) {
-    try { window.Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {}
-  }
-})();
 </script>
 </body>
 </html>

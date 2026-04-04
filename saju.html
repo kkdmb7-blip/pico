@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -1168,15 +1167,11 @@ function shareSajuKakao() {
   var yongshin = d.yongshin ? (EN_EL_MAP[d.yongshin.primary]||d.yongshin.primary||'') : '';
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
   var text = '🔮 포르투나 사주 분석\n\n일주: '+dayPillar+(yongshin ? '\n용신: '+yongshin : '')+(d.summary&&d.summary.strength?'\n'+d.summary.strength:'')+'\n\n나도 확인해봐 👇';
-  try {
-    if (window.Kakao && window.Kakao.isInitialized && window.Kakao.isInitialized()) {
-      Kakao.Share.sendDefault({ objectType:'text', text:text,
-        link:{ mobileWebUrl:pageUrl, webUrl:pageUrl },
-        buttons:[{ title:'무료로 확인하기 🔮', link:{ mobileWebUrl:pageUrl, webUrl:pageUrl } }] });
-    } else {
-      navigator.clipboard && navigator.clipboard.writeText(text+'\n'+pageUrl);
-    }
-  } catch(e) {}
+  if (navigator.share) {
+    navigator.share({ title: 'FORTUNA 사주 분석', text: text, url: pageUrl }).catch(function(){});
+  } else {
+    navigator.clipboard && navigator.clipboard.writeText(text+'\n'+pageUrl);
+  }
   closeSajuShareModal();
 }
 
@@ -1184,14 +1179,6 @@ function copySajuLink() {
   var url = 'https://picolab.kr?utm_source=share&utm_medium=link';
   navigator.clipboard && navigator.clipboard.writeText(url);
 }
-
-
-// 카카오 SDK 초기화
-(function() {
-  if (window.Kakao && !window.Kakao.isInitialized()) {
-    try { window.Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {}
-  }
-})();
 
 // 모달 배경 클릭 닫기
 document.getElementById('sajuShareModal').addEventListener('click', function(e) {
