@@ -275,6 +275,15 @@ async function calcFortuneScore(profile) {
   const now  = new Date();
   const ny   = now.getFullYear(), nm = now.getMonth() + 1, nd = now.getDate();
   const nh   = now.getHours(), nmin = now.getMinutes();
+  const todayStr = `${ny}.${String(nm).padStart(2,'0')}.${String(nd).padStart(2,'0')}`;
+
+  // 오늘 캐시 확인
+  const cacheKey = `pico_score_${year}_${month}_${day}_${gender}_${todayStr}`;
+  try {
+    const cached = JSON.parse(localStorage.getItem(cacheKey));
+    if (cached && cached.today === todayStr) return cached;
+  } catch(e) {}
+
   const g    = (gender === 'M' || gender === 'male') ? 'male' : 'female';
   const hNum = (hour === 'unknown' || hour == null || hour === '') ? 12 : parseInt(hour);
   const mNum = parseInt(minute) || 0;
@@ -313,7 +322,10 @@ async function calcFortuneScore(profile) {
   const final   = _combine(scores);
   const overall = _clamp(Object.values(final).reduce((a, b) => a + b, 0) / SCORE_DOMAINS.length);
   const summary = _makeSummary(final, overall);
-  const today   = `${ny}.${String(nm).padStart(2,'0')}.${String(nd).padStart(2,'0')}`;
+  const result  = { final, scores, overall, summary, today: todayStr, rawData: { saju, qimen, astro, vedic, ziwei } };
 
-  return { final, scores, overall, summary, today, rawData: { saju, qimen, astro, vedic, ziwei } };
+  // 오늘 결과 캐싱
+  try { localStorage.setItem(cacheKey, JSON.stringify(result)); } catch(e) {}
+
+  return result;
 }
