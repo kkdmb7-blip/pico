@@ -1529,11 +1529,10 @@ function closeQimenModal() {
   document.body.style.overflow = '';
 }
 function clearQimenForm() {
-  var now = new Date();
-  document.getElementById('qmYear').value  = now.getFullYear();
-  document.getElementById('qmMonth').value = now.getMonth() + 1;
-  document.getElementById('qmDay').value   = now.getDate();
-  document.getElementById('qmHour').value  = now.getHours();
+  document.getElementById('qmYear').value   = '';
+  document.getElementById('qmMonth').value  = '';
+  document.getElementById('qmDay').value    = '';
+  document.getElementById('qmHour').value   = 12;
   document.getElementById('qmMinute').value = 0;
   document.getElementById('qimenProfileSelect').value = '';
   selectQimenGender('M');
