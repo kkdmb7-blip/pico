@@ -1066,74 +1066,6 @@ function openSajuShareCard() {
   if (!_sajuData) return;
   _sajuCanvas = null;
 
-  // 실제 렌더링된 프로필 + 사주원국 DOM 캡처
-  var profileEl  = document.getElementById('R_profile');
-  var pillarsWrap = document.getElementById('acc_pillar');
-
-  var card = document.createElement('div');
-  card.id = '_sajuCardEl';
-  card.style.cssText = [
-    'position:fixed','left:-9999px','top:0',
-    'width:440px',
-    'background:#0d0d14',
-    'padding:24px 20px 32px','box-sizing:border-box',
-    'font-family:\'Noto Sans KR\',sans-serif'
-  ].join(';');
-
-  // 로고 헤더
-  var header = document.createElement('div');
-  header.style.cssText = 'text-align:center;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:16px;';
-  header.innerHTML = '<div style="font-size:11px;letter-spacing:0.35em;color:#c9a84c;font-weight:700;">● FORTUNA</div>';
-  card.appendChild(header);
-
-  // 프로필 복사
-  if (profileEl) {
-    var profileClone = profileEl.cloneNode(true);
-    profileClone.style.marginBottom = '12px';
-    card.appendChild(profileClone);
-  }
-
-  // 사주원국 복사
-  if (pillarsWrap) {
-    var pillarsClone = pillarsWrap.cloneNode(true);
-    card.appendChild(pillarsClone);
-  }
-
-  // 푸터
-  var footer = document.createElement('div');
-  footer.style.cssText = 'text-align:center;margin-top:20px;';
-  footer.innerHTML = '<div style="font-size:10px;color:rgba(255,255,255,0.28);letter-spacing:0.08em;">picolab.kr에서 무료로 확인하세요</div>';
-  card.appendChild(footer);
-
-  document.body.appendChild(card);
-
-  // html2canvas가 getComputedStyle 호출 전에 flex 레이아웃을 block으로 교체
-  // → 메인 문서 head에 스코프된 style 삽입 (캡처 완료 후 제거)
-  var _capStyle = document.createElement('style');
-  _capStyle.id = '_sajuCapStyle';
-  _capStyle.textContent = [
-    '#_sajuCardEl .hanja-box {',
-    '  display: block !important;',
-    '  line-height: 44px !important;',
-    '  text-align: center !important;',
-    '  padding: 0 !important;',
-    '}',
-    '#_sajuCardEl .badge {',
-    '  display: inline-block !important;',
-    '}',
-    // jjgHTML 컬럼 (flex-direction:column) → block으로
-    '#_sajuCardEl [style*="flex-direction:column"],',
-    '#_sajuCardEl [style*="flex-direction: column"] {',
-    '  display: block !important;',
-    '}'
-  ].join('\n');
-  document.head.appendChild(_capStyle);
-
-  function _removeCap() {
-    var s = document.getElementById('_sajuCapStyle');
-    if (s) document.head.removeChild(s);
-  }
-
   var modal = document.getElementById('sajuShareModal');
   var preview = document.getElementById('sajuSharePreview');
   var loading = document.getElementById('sajuShareLoading');
@@ -1142,25 +1074,208 @@ function openSajuShareCard() {
   modal.style.display = 'flex';
   document.addEventListener('keydown', _sajuEsc);
 
-  html2canvas(card, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: '#0d0d14'
-  }).then(function(canvas) {
-    _removeCap();
-    var el = document.getElementById('_sajuCardEl');
-    if (el) document.body.removeChild(el);
-    _sajuCanvas = canvas;
+  // Canvas 2D로 직접 그리기 — html2canvas flex 버그 완전 우회
+  var d = _sajuData;
+  var pk = ['hour','day','month','year'];
+  var LABELS = ['시주','일주','월주','년주'];
+  var EL_BG = { 목:'#00C853', 화:'#FF1744', 토:'#FFD600', 금:'#E0E0E0', 수:'#1565C0' };
+  var EL_TC = { 목:'#052e13', 화:'#ffffff', 토:'#1a1200', 금:'#1a1a1a', 수:'#ffffff' };
+
+  var pls = pk.map(function(k) {
+    var str = d.summary.pillars[k] || '';
+    var si = STEMS.indexOf(str[0]);
+    var bi = BRANCHES.indexOf(str[1]);
+    return { si: si, bi: bi, sEl: STEM_EL[si] || '수', bEl: BRANCH_EL[bi] || '수' };
+  });
+
+  var rel = d.branch_relations_kor || {};
+  var allTags = [
+    ...(rel.harmonies   ||[]).map(function(s){return{t:s,c:'#69F0AE',bg:'rgba(0,200,83,0.15)',bd:'rgba(0,200,83,0.4)'};}),
+    ...(rel.clashes     ||[]).map(function(s){return{t:s,c:'#FF5252',bg:'rgba(255,23,68,0.15)',bd:'rgba(255,23,68,0.4)'};}),
+    ...(rel.punishments ||[]).map(function(s){return{t:s,c:'#FFD740',bg:'rgba(255,214,0,0.15)',bd:'rgba(255,214,0,0.4)'};}),
+    ...(rel.harms       ||[]).map(function(s){return{t:s,c:'#82B1FF',bg:'rgba(100,181,246,0.15)',bd:'rgba(100,181,246,0.4)'};}),
+    ...(rel.breaks      ||[]).map(function(s){return{t:s,c:'#9E9E9E',bg:'rgba(200,200,200,0.1)',bd:'rgba(200,200,200,0.2)'};})
+  ];
+
+  document.fonts.ready.then(function() {
+    var SC = 2;          // HiDPI scale
+    var W  = 400;        // 논리 너비 px
+    var PAD = 20;
+    var TAG_H = 24, TAG_PX = 10, TAG_GAP = 5, TAG_FONT = '11px "Noto Sans KR"';
+    var HBOX = 48;       // 한자 박스 크기
+    var COL_GAP = 6;
+    var colW = Math.floor((W - PAD*2 - COL_GAP*3) / 4);
+    var PILLAR_H = 8 + 14 + HBOX + 6 + HBOX + 6; // 카드 내부 높이
+
+    // 태그 행 수 사전 계산
+    var measureCv = document.createElement('canvas');
+    var mCtx = measureCv.getContext('2d');
+    mCtx.font = TAG_FONT;
+    var tagMaxW = W - PAD*2;
+    var tagRowX = 0, tagRows = allTags.length > 0 ? 1 : 0;
+    allTags.forEach(function(tag){
+      var tw = mCtx.measureText(tag.t).width + TAG_PX*2;
+      if(tagRowX + tw > tagMaxW && tagRowX > 0){ tagRows++; tagRowX = 0; }
+      tagRowX += tw + TAG_GAP;
+    });
+
+    var H_HEADER  = 54;
+    var H_PROFILE = 84;
+    var H_PILLARS = PILLAR_H;
+    var H_RELS    = allTags.length > 0 ? (18 + tagRows*(TAG_H+TAG_GAP)) : 0;
+    var H_FOOTER  = 40;
+    var SECTION_GAP = 16;
+    var totalH = PAD + H_HEADER + SECTION_GAP + H_PROFILE + SECTION_GAP + H_PILLARS
+               + (H_RELS > 0 ? SECTION_GAP + H_RELS : 0) + SECTION_GAP + H_FOOTER + PAD;
+
+    var cv = document.createElement('canvas');
+    cv.width  = W * SC;
+    cv.height = totalH * SC;
+    var ctx = cv.getContext('2d');
+    ctx.scale(SC, SC);
+
+    // 둥근 사각형 경로 헬퍼
+    function rr(x,y,w,h,r){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);
+      ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+      ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+      ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+      ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+      ctx.closePath();
+    }
+
+    // ── 배경 ──
+    ctx.fillStyle = '#0d0d14';
+    ctx.fillRect(0, 0, W, totalH);
+
+    var y = PAD;
+
+    // ── 헤더: FORTUNA ──
+    ctx.fillStyle = '#c9a84c';
+    ctx.font = 'bold 12px "Noto Sans KR"';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('● F O R T U N A', W/2, y+18);
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(PAD,y+36); ctx.lineTo(W-PAD,y+36); ctx.stroke();
+    y += H_HEADER + SECTION_GAP;
+
+    // ── 프로필 ──
+    var name = pName || '이름 미입력';
+    ctx.fillStyle = '#e8e8f0';
+    ctx.font = 'bold 20px "Noto Sans KR"';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(name, PAD, y+12);
+
+    var byear = parseInt((pBirth||'2000-01-01').split('-')[0]);
+    ctx.font = 'bold 16px "Noto Sans KR"';
+    ctx.textAlign = 'right';
+    ctx.fillText((new Date().getFullYear()-byear+1)+'세', W-PAD, y+12);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.font = '11px "Noto Sans KR"';
+    ctx.textAlign = 'left';
+    ctx.fillText('양력 '+(pBirth||'')+'  ·  '+pHour+'시 '+(pMinute||0)+'분  ·  '+(pGender==='male'?'남성':'여성'), PAD, y+32);
+
+    // 배지 (띠, 신강/신약)
+    var badges = [(d.summary.zodiac||'')+'띠', d.summary.strength||''].filter(function(s){return s && s!=='띠';});
+    var bx = PAD;
+    ctx.font = '10px "Noto Sans KR"';
+    badges.forEach(function(txt){
+      var tw = ctx.measureText(txt).width + 14;
+      ctx.fillStyle = 'rgba(255,255,255,0.07)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 0.5;
+      rr(bx, y+48, tw, 20, 10); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.65)';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(txt, bx+tw/2, y+58);
+      bx += tw+6;
+    });
+    y += H_PROFILE + SECTION_GAP;
+
+    // ── 4주 ──
+    pls.forEach(function(pl, i){
+      var cx = PAD + i*(colW+COL_GAP);
+      var isDay = (i===1);
+      ctx.fillStyle = isDay ? 'rgba(123,94,167,0.06)' : 'rgba(255,255,255,0.03)';
+      ctx.strokeStyle = isDay ? 'rgba(123,94,167,0.5)' : 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = isDay ? 1 : 0.5;
+      rr(cx, y, colW, PILLAR_H, 10); ctx.fill(); ctx.stroke();
+
+      var mx = cx + colW/2;
+      var iy = y + 8;
+
+      // 레이블
+      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.font = '9px "Noto Sans KR"';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(LABELS[i], mx, iy+7);
+      iy += 14;
+
+      // 천간 박스
+      var hx = mx - HBOX/2;
+      ctx.fillStyle = EL_BG[pl.sEl]||'#333';
+      rr(hx, iy, HBOX, HBOX, 7); ctx.fill();
+      ctx.fillStyle = EL_TC[pl.sEl]||'#fff';
+      ctx.font = 'bold 26px "Noto Serif KR"';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(STEM_H[pl.si]||'?', mx, iy+HBOX/2);
+      iy += HBOX+6;
+
+      // 지지 박스
+      ctx.fillStyle = EL_BG[pl.bEl]||'#333';
+      rr(hx, iy, HBOX, HBOX, 7); ctx.fill();
+      ctx.fillStyle = EL_TC[pl.bEl]||'#fff';
+      ctx.font = 'bold 26px "Noto Serif KR"';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(BRANCH_H[pl.bi]||'?', mx, iy+HBOX/2);
+    });
+    y += H_PILLARS;
+
+    // ── 형충회합해파 태그 ──
+    if(allTags.length > 0){
+      y += SECTION_GAP;
+      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.font = '10px "Noto Sans KR"';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText('형충회합해파', PAD, y+9);
+      y += 18;
+
+      var tx = PAD, ty = y;
+      ctx.font = TAG_FONT;
+      allTags.forEach(function(tag){
+        var tw = ctx.measureText(tag.t).width + TAG_PX*2;
+        if(tx+tw > W-PAD && tx > PAD){ tx=PAD; ty+=TAG_H+TAG_GAP; }
+        ctx.fillStyle = tag.bg;
+        ctx.strokeStyle = tag.bd;
+        ctx.lineWidth = 0.5;
+        rr(tx, ty, tw, TAG_H, 12); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = tag.c;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(tag.t, tx+tw/2, ty+TAG_H/2);
+        tx += tw+TAG_GAP;
+      });
+      y = ty + TAG_H;
+    }
+
+    // ── 푸터 ──
+    y += SECTION_GAP;
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.font = '10px "Noto Sans KR"';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('picolab.kr에서 무료로 확인하세요', W/2, y+16);
+
+    _sajuCanvas = cv;
     var img = document.createElement('img');
-    img.src = canvas.toDataURL('image/png');
+    img.src = cv.toDataURL('image/png');
     img.style.cssText = 'width:100%;height:auto;display:block;';
     preview.style.height = 'auto';
     preview.innerHTML = ''; preview.appendChild(img);
     loading.style.display = 'none'; actions.style.display = 'flex';
-  }).catch(function() {
-    _removeCap();
-    var el = document.getElementById('_sajuCardEl');
-    if (el) document.body.removeChild(el);
+  }).catch(function(){
     loading.textContent = '카드 생성 실패 😢';
   });
 }
