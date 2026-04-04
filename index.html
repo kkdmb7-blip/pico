@@ -521,9 +521,9 @@
   }
   .saju-modal-sub { font-size: 13px; color: #6b6b85; margin-bottom: 18px; word-break: keep-all; }
   .modal-profile-row { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
-  .modal-profile-btn { background:rgba(142,125,255,0.12); border:1px solid rgba(142,125,255,0.3); color:#b8b0f0; border-radius:8px; padding:7px 13px; font-size:12px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; }
-  .modal-profile-btn:hover { background:rgba(142,125,255,0.22); }
-  .modal-profile-select { flex:1; min-width:0; background:rgba(255,255,255,0.04); border:1px solid rgba(142,125,255,0.25); border-radius:8px; padding:7px 10px; color:#b8b0f0; font-size:12px; outline:none; font-family:'Noto Sans KR',sans-serif; }
+  .modal-profile-btn { background:rgba(142,125,255,0.13); border:1px solid rgba(142,125,255,0.35); color:#c4b8ff; border-radius:20px; padding:7px 16px; font-size:12px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; transition:background 0.15s; }
+  .modal-profile-btn:hover { background:rgba(142,125,255,0.25); }
+  .modal-profile-select { flex:1; min-width:0; background:#1a1826; border:1px solid rgba(142,125,255,0.3); border-radius:20px; padding:7px 14px; color:#c4b8ff; font-size:12px; outline:none; font-family:'Noto Sans KR',sans-serif; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238e7dff'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:28px; }
   .saju-form-group { margin-bottom: 16px; }
   .saju-form-group label {
     display: block;
@@ -1336,6 +1336,33 @@ function openTarotIntro() {
   }, 2200);
 }
 
+// pico_profiles 항목을 공통 {name,year,month,day,hour,minute,gender} 형태로 변환
+function _normalizeProfile(p) {
+  if (!p) return null;
+  var year, month, day, hour = 'unknown', minute = 0;
+  // pico_profiles 형태: birth_date="1990-03-15", birth_time="12:00"
+  if (p.birth_date) {
+    var parts = p.birth_date.split('-');
+    year = parseInt(parts[0]); month = parseInt(parts[1]); day = parseInt(parts[2]);
+  } else {
+    year = p.year; month = p.month; day = p.day;
+  }
+  if (p.birth_time && p.birth_time !== 'unknown') {
+    var tp = p.birth_time.split(':');
+    hour = String(parseInt(tp[0]));
+    minute = String(parseInt(tp[1]) || 0);
+  } else if (p.birth_time === 'unknown') {
+    hour = 'unknown'; minute = '0';
+  } else {
+    hour = (p.hour != null) ? String(p.hour) : 'unknown';
+    minute = (p.minute != null) ? String(p.minute) : '0';
+  }
+  var g = p.gender;
+  if (g === 'male') g = 'M';
+  else if (g === 'female') g = 'F';
+  return { name: p.name || '', year: year, month: month, day: day, hour: hour, minute: minute, gender: g || 'M' };
+}
+
 function _populateProfileSelect(selectId) {
   var sel = document.getElementById(selectId);
   if (!sel) return;
@@ -1343,78 +1370,61 @@ function _populateProfileSelect(selectId) {
   try {
     var profiles = JSON.parse(localStorage.getItem('pico_profiles')) || [];
     profiles.forEach(function(p) {
+      var n = _normalizeProfile(p);
       var o = document.createElement('option');
       o.value = JSON.stringify(p);
-      o.textContent = (p.name || '이름없음') + ' · ' + (p.year || '') + '.' + String(p.month||'').padStart(2,'0') + '.' + String(p.day||'').padStart(2,'0');
+      var gLabel = (n.gender === 'M') ? '남' : '여';
+      var dateStr = n.year ? n.year + '년 ' + n.month + '월 ' + n.day + '일' : '';
+      o.textContent = (p.name || '이름없음') + (dateStr ? ' · ' + dateStr : '') + ' · ' + gLabel;
       sel.appendChild(o);
     });
   } catch(e) {}
 }
 
+function _fillModalFields(norm, prefix) {
+  // prefix: 'saju', 'birth'
+  var nameEl   = document.getElementById(prefix + 'Name');
+  var yearEl   = document.getElementById(prefix + 'Year');
+  var monthEl  = document.getElementById(prefix + 'Month');
+  var dayEl    = document.getElementById(prefix + 'Day');
+  var hourEl   = document.getElementById(prefix + 'Hour');
+  var minuteEl = document.getElementById(prefix + 'Minute');
+  if (nameEl)   nameEl.value   = norm.name || '';
+  if (yearEl && norm.year)   yearEl.value   = norm.year;
+  if (monthEl && norm.month) monthEl.value  = norm.month;
+  if (dayEl && norm.day)     dayEl.value    = norm.day;
+  if (hourEl)   hourEl.value   = norm.hour;
+  if (minuteEl) minuteEl.value = norm.minute;
+  var gFn = (prefix === 'saju') ? selectGender : selectBirthGender;
+  gFn(norm.gender);
+}
+
 function fillSajuFromMine() {
-  try {
-    var p = JSON.parse(localStorage.getItem('pico_profile'));
-    if (!p) return;
-    document.getElementById('sajuName').value = p.name || '';
-    if (p.year)  document.getElementById('sajuYear').value  = p.year;
-    if (p.month) document.getElementById('sajuMonth').value = p.month;
-    if (p.day)   document.getElementById('sajuDay').value   = p.day;
-    document.getElementById('sajuHour').value = (p.hour != null) ? String(p.hour) : 'unknown';
-    document.getElementById('sajuMinute').value = p.minute != null ? String(p.minute) : '0';
-    if (p.gender) selectGender(p.gender);
-  } catch(e) {}
+  var n = _normalizeProfile(JSON.parse(localStorage.getItem('pico_profile') || 'null'));
+  if (n) _fillModalFields(n, 'saju');
 }
 function fillSajuFromSaved(json) {
   if (!json) return;
-  try {
-    var p = JSON.parse(json);
-    document.getElementById('sajuName').value = p.name || '';
-    if (p.year)  document.getElementById('sajuYear').value  = p.year;
-    if (p.month) document.getElementById('sajuMonth').value = p.month;
-    if (p.day)   document.getElementById('sajuDay').value   = p.day;
-    document.getElementById('sajuHour').value = (p.hour != null) ? String(p.hour) : 'unknown';
-    document.getElementById('sajuMinute').value = p.minute != null ? String(p.minute) : '0';
-    if (p.gender) selectGender(p.gender === 'male' || p.gender === 'M' ? 'M' : 'F');
-  } catch(e) {}
+  var n = _normalizeProfile(JSON.parse(json));
+  if (n) _fillModalFields(n, 'saju');
 }
 function fillBirthFromMine() {
-  try {
-    var p = JSON.parse(localStorage.getItem('pico_profile'));
-    if (!p) return;
-    document.getElementById('birthName').value = p.name || '';
-    if (p.year)  document.getElementById('birthYear').value  = p.year;
-    if (p.month) document.getElementById('birthMonth').value = p.month;
-    if (p.day)   document.getElementById('birthDay').value   = p.day;
-    document.getElementById('birthHour').value = (p.hour != null) ? String(p.hour) : 'unknown';
-    document.getElementById('birthMinute').value = p.minute != null ? String(p.minute) : '0';
-    if (p.gender) selectBirthGender(p.gender);
-  } catch(e) {}
+  var n = _normalizeProfile(JSON.parse(localStorage.getItem('pico_profile') || 'null'));
+  if (n) _fillModalFields(n, 'birth');
 }
 function fillBirthFromSaved(json) {
   if (!json) return;
-  try {
-    var p = JSON.parse(json);
-    document.getElementById('birthName').value = p.name || '';
-    if (p.year)  document.getElementById('birthYear').value  = p.year;
-    if (p.month) document.getElementById('birthMonth').value = p.month;
-    if (p.day)   document.getElementById('birthDay').value   = p.day;
-    document.getElementById('birthHour').value = (p.hour != null) ? String(p.hour) : 'unknown';
-    document.getElementById('birthMinute').value = p.minute != null ? String(p.minute) : '0';
-    if (p.gender) selectBirthGender(p.gender === 'male' || p.gender === 'M' ? 'M' : 'F');
-  } catch(e) {}
+  var n = _normalizeProfile(JSON.parse(json));
+  if (n) _fillModalFields(n, 'birth');
 }
 function fillQimenFromMine() {
-  try {
-    var p = JSON.parse(localStorage.getItem('pico_profile'));
-    if (p && p.gender) selectQimenGender(p.gender === 'male' || p.gender === 'M' ? 'M' : 'F');
-  } catch(e) {}
+  var n = _normalizeProfile(JSON.parse(localStorage.getItem('pico_profile') || 'null'));
+  if (n) selectQimenGender(n.gender);
 }
 function fillQimenFromSaved(json) {
   if (!json) return;
-  try {
-    var p = JSON.parse(json);
-    if (p.gender) selectQimenGender(p.gender === 'male' || p.gender === 'M' ? 'M' : 'F');
-  } catch(e) {}
+  var n = _normalizeProfile(JSON.parse(json));
+  if (n) selectQimenGender(n.gender);
 }
 
 function openSajuModal() {
