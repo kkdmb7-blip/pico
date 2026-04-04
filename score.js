@@ -278,7 +278,8 @@ async function calcFortuneScore(profile) {
   const todayStr = `${ny}.${String(nm).padStart(2,'0')}.${String(nd).padStart(2,'0')}`;
 
   // 오늘 캐시 확인
-  const cacheKey = `pico_score_${year}_${month}_${day}_${gender}_${todayStr}`;
+  const genderKey = (gender === 'M' || gender === 'male') ? 'M' : 'F';
+  const cacheKey = `pico_score_${year}_${month}_${day}_${genderKey}_${todayStr}`;
   try {
     const cached = JSON.parse(localStorage.getItem(cacheKey));
     if (cached && cached.today === todayStr) return cached;
