@@ -264,7 +264,7 @@ nav {
     <!-- 헤더 -->
     <div class="score-header">
       <div class="score-date" id="scoreDateLabel"></div>
-      <h1 class="score-title">오늘의 운세 점수</h1>
+      <h1 class="score-title" id="scoreTitle">오늘의 운세 점수</h1>
       <p class="score-subtitle" id="scoreProfileName"></p>
     </div>
 
@@ -482,6 +482,7 @@ async function run() {
   // 헤더
   document.getElementById('scoreDateLabel').textContent = today + ' 운세 점수';
   if (profile.name) {
+    document.getElementById('scoreTitle').textContent = profile.name + '님의 오늘의 운세 점수';
     document.getElementById('scoreProfileName').textContent = profile.name + ' 님의 오늘 운세';
   }
 
