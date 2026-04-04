@@ -167,14 +167,14 @@ nav {
 .breakdown-card {
   background:var(--surface); border:1px solid var(--border);
   border-radius:12px; padding:14px 10px 12px;
-  text-align:center;
+  text-align:center; min-width:0;
 }
 .breakdown-src  { font-size:10px; color:var(--muted); margin-bottom:8px; font-weight:600; letter-spacing:0.3px; }
-.breakdown-mini-bars { display:flex; flex-direction:column; gap:4px; }
-.breakdown-mini-row  { display:flex; align-items:center; gap:5px; }
+.breakdown-mini-bars { display:flex; flex-direction:column; gap:4px; width:100%; }
+.breakdown-mini-row  { display:flex; align-items:center; gap:5px; width:100%; min-width:0; }
 .breakdown-mini-emoji { font-size:10px; flex-shrink:0; }
 .breakdown-mini-track { flex:1; background:var(--surface2); height:4px; border-radius:100px; overflow:hidden; }
-.breakdown-mini-fill  { height:100%; border-radius:100px; }
+.breakdown-mini-fill  { display:block; height:4px; border-radius:100px; }
 .breakdown-mini-num   { font-size:9px; color:var(--muted); width:22px; text-align:right; flex-shrink:0; }
 
 /* LOADING */
