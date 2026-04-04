@@ -174,7 +174,7 @@ nav {
 .breakdown-mini-row  { display:flex; align-items:center; gap:5px; width:100%; min-width:0; }
 .breakdown-mini-emoji { font-size:10px; flex-shrink:0; }
 .breakdown-mini-track { flex:1; background:var(--surface2); height:4px; border-radius:100px; overflow:hidden; }
-.breakdown-mini-fill  { display:block; height:4px; border-radius:100px; }
+.breakdown-mini-fill  { display:block; height:4px; border-radius:100px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
 .breakdown-mini-num   { font-size:9px; color:var(--muted); width:22px; text-align:right; flex-shrink:0; }
 
 /* LOADING */
@@ -264,7 +264,7 @@ nav {
     <!-- 헤더 -->
     <div class="score-header">
       <div class="score-date" id="scoreDateLabel"></div>
-      <h1 class="score-title">오늘의 운세 점수</h1>
+      <h1 class="score-title" id="scoreTitle">오늘의 운세 점수</h1>
       <p class="score-subtitle" id="scoreProfileName"></p>
     </div>
 
@@ -304,7 +304,7 @@ nav {
   </div><!-- /resultWrap -->
 </div>
 
-<script src="score.js"></script>
+<script src="score.js?v=2"></script>
 <script>
 const WORKER_BASE_S = 'https://fortuna.kkdmb7.workers.dev';
 
@@ -421,27 +421,19 @@ function renderBreakdown(scores) {
     { key:'vedic', label:'베딕', badge:'🕉️' },
     { key:'ziwei', label:'자미', badge:'⭐' },
   ];
-  const COLOR_MAP = { gold:'#e8b86d', green:'#4caf82', blue:'#5b8dee', red:'#e05c6a' };
-  function hexColor(score) {
-    if (score >= 80) return COLOR_MAP.gold;
-    if (score >= 60) return COLOR_MAP.green;
-    if (score >= 40) return COLOR_MAP.blue;
-    return COLOR_MAP.red;
-  }
   const grid = document.getElementById('breakdownGrid');
   grid.innerHTML = '';
-  srcs.forEach(src => {
+  srcs.forEach((src, si) => {
     const sc = scores[src.key] || {};
     const card = document.createElement('div');
     card.className = 'breakdown-card';
     const barsHtml = SCORE_DOMAINS.map(d => {
-      const v = sc[d] != null ? sc[d] : 50;
-      const c = hexColor(v);
-      const pct = Math.max(1, Math.min(100, v));
+      const v = sc[d] || 50;
+      const c = getColor(v);
       return `<div class="breakdown-mini-row">
         <span class="breakdown-mini-emoji">${SCORE_DOMAIN_INFO[d].emoji}</span>
         <div class="breakdown-mini-track">
-          <div style="height:4px;width:${pct}%;background:${c};border-radius:100px;"></div>
+          <div class="breakdown-mini-fill" data-val="${v}" data-color="${c}" style="width:0%;background:${c};"></div>
         </div>
         <span class="breakdown-mini-num">${v}</span>
       </div>`;
@@ -451,6 +443,11 @@ function renderBreakdown(scores) {
       <div class="breakdown-mini-bars">${barsHtml}</div>
     `;
     grid.appendChild(card);
+    setTimeout(() => {
+      card.querySelectorAll('.breakdown-mini-fill').forEach(el => {
+        el.style.width = el.getAttribute('data-val') + '%';
+      });
+    }, si * 60 + 80);
   });
 }
 
@@ -490,13 +487,14 @@ async function run() {
   // 헤더
   document.getElementById('scoreDateLabel').textContent = today + ' 운세 점수';
   if (profile.name) {
+    document.getElementById('scoreTitle').textContent = profile.name + '님의 오늘의 운세 점수';
     document.getElementById('scoreProfileName').textContent = profile.name + ' 님의 오늘 운세';
   }
 
   // 종합
   document.getElementById('overallNum').style.color = overallColor;
   document.getElementById('overallLabel').textContent = getTag(overall);
-  document.getElementById('overallSummary').textContent = summary;
+  document.getElementById('overallSummary').innerHTML = summary;
   animateCount(document.getElementById('overallNum'), overall, 1400);
   animateRing(overall, overallColor);
 

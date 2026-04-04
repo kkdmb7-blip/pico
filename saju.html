@@ -541,6 +541,12 @@ const pBirth = (pYear && pMonth && pDay)
   ? pYear + '-' + String(pMonth).padStart(2,'0') + '-' + String(pDay).padStart(2,'0')
   : null;
 
+// 뒤로가기 시 앱 종료 방지 — 항상 메인 페이지로 이동
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', function() {
+  window.location.href = '../';
+});
+
 if (pBirth) {
   document.getElementById('S_form').style.display='none';
   document.getElementById('S_load').style.display='flex';
@@ -609,7 +615,7 @@ function renderProfile(data) {
   const hourNum = parseInt(pHour);
   const isYajasi = hourNum === 23;
   const gTxt = pGender==='male'?'남':'여';
-  const hTxt = `${pHour}시`;
+  const hTxt = `${pHour}시 ${pMinute || 0}분`;
   const note = data._note || '';
 
   const namePart = pName

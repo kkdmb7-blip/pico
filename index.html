@@ -206,9 +206,6 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
   }
-  /* 5번째 카드 중앙 정렬 */
-  .why-grid .why-card:nth-child(4) { grid-column: 1 / 2; margin-left: auto; width: 100%; }
-  .why-grid .why-card:nth-child(5) { grid-column: 2 / 3; margin-right: auto; width: 100%; }
   .why-tagline {
     margin-top: 40px;
     font-size: 15px;
@@ -464,9 +461,6 @@
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
     .why-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .why-grid .why-card:nth-child(4),
-    .why-grid .why-card:nth-child(5) { grid-column: auto; margin: 0; width: 100%; }
-    .why-grid .why-card:nth-child(5) { grid-column: 1 / -1; max-width: calc(50% - 7px); margin: 0 auto; }
     .service-grid { grid-template-columns: 1fr; gap: 14px; }
     .section-why, .section-services { padding: 64px 20px 48px; }
     .section-cta { padding: 64px 20px 80px; }
@@ -525,7 +519,11 @@
     font-weight: 700;
     margin-bottom: 6px;
   }
-  .saju-modal-sub { font-size: 13px; color: #6b6b85; margin-bottom: 24px; }
+  .saju-modal-sub { font-size: 13px; color: #6b6b85; margin-bottom: 18px; word-break: keep-all; }
+  .modal-profile-row { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+  .modal-profile-btn { background:rgba(142,125,255,0.13); border:1px solid rgba(142,125,255,0.35); color:#c4b8ff; border-radius:20px; padding:7px 16px; font-size:12px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif; white-space:nowrap; transition:background 0.15s; }
+  .modal-profile-btn:hover { background:rgba(142,125,255,0.25); }
+  .modal-profile-select { flex:1; min-width:0; background:#1a1826; border:1px solid rgba(142,125,255,0.3); border-radius:20px; padding:7px 14px; color:#c4b8ff; font-size:12px; outline:none; font-family:'Noto Sans KR',sans-serif; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238e7dff'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:28px; }
   .saju-form-group { margin-bottom: 16px; }
   .saju-form-group label {
     display: block;
@@ -788,16 +786,84 @@
   }
   .profile-modal h3 { font-family: 'Noto Serif KR', sans-serif; font-size: 20px; margin-bottom: 6px; }
   .profile-modal > p { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+
+/* ── TAROT INTRO MODAL ── */
+#tarotIntroOverlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(5,4,12,0.92);
+  backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 32px;
+}
+#tarotIntroOverlay.active { display: flex; }
+.tarot-shuffle {
+  position: relative; width: 120px; height: 160px;
+}
+.tarot-shuffle .tc {
+  position: absolute; bottom: 0; left: 50%;
+  width: 72px; height: 120px;
+  background: linear-gradient(135deg, #2a1a4a 0%, #1a0f30 100%);
+  border: 1.5px solid #8e7dff55;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(142,125,255,0.18);
+  transform-origin: bottom center;
+  animation: tcShuffle 1.2s ease-out forwards;
+}
+.tarot-shuffle .tc::after {
+  content: '✦';
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: #8e7dff88;
+}
+.tarot-shuffle .tc:nth-child(1) { animation-delay: 0s;   --rx: -28deg; --tx: -44px; }
+.tarot-shuffle .tc:nth-child(2) { animation-delay: 0.1s; --rx: 0deg;   --tx: -36px; z-index:1; }
+.tarot-shuffle .tc:nth-child(3) { animation-delay: 0.2s; --rx: 28deg;  --tx: -28px; z-index:2; }
+@keyframes tcShuffle {
+  0%   { transform: translateX(-50%) rotate(0deg) translateY(0); opacity:0; }
+  30%  { opacity: 1; }
+  100% { transform: translateX(calc(-50% + var(--tx))) rotate(var(--rx)) translateY(-10px); opacity:1; }
+}
+.tarot-intro-text {
+  font-family: 'Noto Serif KR', serif;
+  font-size: clamp(15px, 4vw, 20px);
+  color: #e8e0f8;
+  text-align: center;
+  line-height: 1.7;
+  letter-spacing: 0.3px;
+  animation: fadeInUp 0.6s 0.4s both;
+}
+.tarot-intro-sub {
+  font-size: 12px; color: #8e7dff99;
+  animation: fadeInUp 0.6s 0.8s both;
+}
+@keyframes fadeInUp {
+  from { opacity:0; transform: translateY(12px); }
+  to   { opacity:1; transform: translateY(0); }
+}
 </style>
 </head>
 <body>
+
+<!-- TAROT INTRO MODAL -->
+<div id="tarotIntroOverlay">
+  <div class="tarot-shuffle">
+    <div class="tc"></div>
+    <div class="tc"></div>
+    <div class="tc"></div>
+  </div>
+  <div class="tarot-intro-text">오늘 가장 궁금한 것을<br>마음속으로 떠올리세요 🔮</div>
+  <div class="tarot-intro-sub">잠시 후 타로가 시작됩니다…</div>
+</div>
+
 
 <div id="starCanvas"></div>
 
 <!-- NAV -->
 <nav>
-  <div class="logo">
-    <span class="logo-dot">●</span>PICO Lab
+  <div class="logo" style="flex-direction:column;align-items:flex-start;gap:1px;">
+    <div style="display:flex;align-items:center;gap:5px;"><span class="logo-dot">●</span>FORTUNA</div>
+    <div style="font-size:10px;font-weight:400;color:var(--muted);letter-spacing:0;">AI 운세 상담 · 사주 · 점성 · 기문둔갑</div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <button class="btn-kakao" id="btnKakao" onclick="kakaoLogin()">
@@ -829,7 +895,7 @@
 <!-- TODAY SCORE -->
 <section class="section-score" id="scoreSectionWrap">
   <div class="section-label">5대 운세 교차 분석</div>
-  <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;">오늘의 <em>운세 점수</em></h2>
+  <h2 class="section-title" id="mainScoreTitle" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;">오늘의 <em>운세 점수</em></h2>
   <p id="scoreTodayDate" style="font-size:14px;color:var(--muted);margin-bottom:24px;"></p>
   <script>
     (function(){
@@ -871,14 +937,14 @@
 
 <!-- WHY PICOLAB -->
 <section class="section-why">
-  <div class="section-label">PICO Lab의 5중 교차검증 시스템</div>
+  <div class="section-label">PICO Lab의 6중 교차검증 시스템</div>
   <h2 class="section-title" style="font-size:clamp(24px,3.8vw,44px)">5,000년 인류의 지혜를<br><em>AI가 동시에 교차 분석합니다</em></h2>
   <div class="why-grid">
     <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
       <div class="why-icon">🏛️</div>
       <h3>사주 (四柱)</h3>
-      <p>인생의 설계도, 기질의 뿌리. 태어난 연·월·일·시의 네 기둥이 만드는 운명의 지도.</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">무료 체험해보기 →</div>
+      <p>인생의 설계도,<br>기질의 뿌리. 태어난<br>연·월·일·시의<br>네 기둥이 만드는<br>운명의 지도.</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openBirthModal('astro')" style="cursor:pointer;">
       <div class="why-icon">🌟</div>
@@ -889,23 +955,29 @@
     <div class="why-card" onclick="openBirthModal('vedic')" style="cursor:pointer;">
       <div class="why-icon">🕉️</div>
       <h3>베딕 점성술</h3>
-      <p>카르마와 세부 운의 변화. 달의 별자리(낙샤트라)로 읽는 정밀한 운의 리듬.</p>
+      <p>카르마와 세부 운의 변화. 달의 별자리(낙샤트라)로 읽는<br>정밀한 운의 리듬.</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openBirthModal('ziwei')" style="cursor:pointer;">
       <div class="why-icon">⭐</div>
-      <h3>자미두수 (紫微斗數)</h3>
-      <p>인생 12궁 배치도. 별의 배열로 삶의 영역별 운세와 인연의 구조를 분석합니다.</p>
+      <h3>자미두수<br>紫微斗數</h3>
+      <p>인생 12궁 배치도. 별의 배열로 삶의 영역별 운세와 인연의<br>구조를 분석합니다.</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openQimenModal()" style="cursor:pointer;">
       <div class="why-icon">🗺️</div>
-      <h3>기문둔갑 (奇門遁甲)</h3>
+      <h3>기문둔갑<br>奇門遁甲</h3>
       <p>중화권 CEO들이 의사결정에 쓰는 시공간 최적화 전략 엔진. 언제, 어느 방향으로 움직여야 유리한지 계산합니다.</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">포국반 체험해보기 →</div>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+    </div>
+    <div class="why-card" onclick="openTarotIntro()" style="cursor:pointer;">
+      <div class="why-icon">🔮</div>
+      <h3>타로카드</h3>
+      <p>78장의 상징 체계로 읽는 무의식의 언어. 오늘의 카드가 전하는 메시지를 확인하세요.</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
   </div>
-  <p class="why-tagline">5가지가 모두 같은 방향을 가리킬 때, 그것이 진짜 운명입니다.</p>
+  <p class="why-tagline">6가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
 </section>
 
 <div class="section-divider"></div>
@@ -914,7 +986,7 @@
 <section class="section-cta">
   <div class="cta-glow"></div>
   <h2>지금 바로 시작하세요</h2>
-  <p>무료로 체험하고, 당신의 별자리가 말하는 이야기를 들어보세요</p>
+  <p>무료로 체험하고,<br>당신의 별자리가 말하는 이야기를 들어보세요</p>
   <a href="https://kkdmb7-blip.github.io/memox/" class="btn-cta" target="_blank">지금 나의 운명 확인하기 🔮</a>
 </section>
 
@@ -925,8 +997,19 @@
 
     <!-- 입력 폼 -->
     <div id="sajuForm">
-      <h3>🏛️ 만세력 체험</h3>
+      <h3>🏛️ 만세력 보기</h3>
       <p class="saju-modal-sub">생년월일을 입력하면 사주 8자를 바로 확인할 수 있어요</p>
+      <div class="modal-profile-row">
+        <button class="modal-profile-btn" onclick="fillSajuFromMine()">내 정보</button>
+        <select class="modal-profile-select" id="sajuProfileSelect" onchange="fillSajuFromSaved(this.value)">
+          <option value="">저장된 프로필</option>
+        </select>
+        <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#e8b86d;" onclick="clearSajuForm()">새로 입력</button>
+      </div>
+      <div class="saju-form-group">
+        <label>이름 (선택)</label>
+        <input type="text" id="sajuName" placeholder="이름 입력" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Sans KR',sans-serif;">
+      </div>
       <div class="saju-form-group">
         <label>생년월일</label>
         <div class="saju-date-row">
@@ -977,7 +1060,13 @@
     <button class="saju-modal-close" onclick="closeQimenModal()">✕</button>
     <h3>🗺️ 기문둔갑 포국반</h3>
     <p class="saju-modal-sub">날짜와 시간을 입력하면 9궁 포국을 즉시 확인할 수 있어요</p>
-
+    <div class="modal-profile-row">
+      <button class="modal-profile-btn" onclick="fillQimenFromMine()">내 성별 불러오기</button>
+      <select class="modal-profile-select" id="qimenProfileSelect" onchange="fillQimenFromSaved(this.value)">
+        <option value="">저장된 프로필</option>
+      </select>
+      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#e8b86d;" onclick="clearQimenForm()">새로 입력</button>
+    </div>
     <div class="saju-form-group">
       <label>날짜</label>
       <div class="saju-date-row">
@@ -1012,6 +1101,17 @@
     <button class="saju-modal-close" onclick="closeBirthModal()">✕</button>
     <h3 id="birthModalTitle">🌟 서양 점성술</h3>
     <p class="saju-modal-sub">생년월일을 입력하면 바로 확인할 수 있어요</p>
+    <div class="modal-profile-row">
+      <button class="modal-profile-btn" onclick="fillBirthFromMine()">내 정보</button>
+      <select class="modal-profile-select" id="birthProfileSelect" onchange="fillBirthFromSaved(this.value)">
+        <option value="">저장된 프로필</option>
+      </select>
+      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#e8b86d;" onclick="clearBirthForm()">새로 입력</button>
+    </div>
+    <div class="saju-form-group">
+      <label>이름 (선택)</label>
+      <input type="text" id="birthName" placeholder="이름 입력" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Sans KR',sans-serif;">
+    </div>
     <div class="saju-form-group">
       <label>생년월일</label>
       <div class="saju-date-row">
@@ -1165,7 +1265,7 @@
 </div>
 
 <footer>
-  <div>© 2026 PICO Lab. All rights reserved.</div>
+  <div>© 2026 PICO Lab · AI 운세 연구소</div>
   <div>
     <a href="http://pf.kakao.com/_krjxjn" target="_blank">💬 카카오 채널 고객센터</a>
   </div>
@@ -1232,6 +1332,105 @@ function initSajuDateSelects() {
   }
 }
 
+function openTarotIntro() {
+  const overlay = document.getElementById('tarotIntroOverlay');
+  overlay.classList.add('active');
+  setTimeout(function() {
+    window.location.href = 'tarot.html';
+  }, 2200);
+}
+
+// pico_profiles 항목을 공통 {name,year,month,day,hour,minute,gender} 형태로 변환
+function _normalizeProfile(p) {
+  if (!p) return null;
+  var year, month, day, hour = 'unknown', minute = 0;
+  // pico_profiles 형태: birth_date="1990-03-15", birth_time="12:00"
+  if (p.birth_date) {
+    var parts = p.birth_date.split('-');
+    year = parseInt(parts[0]); month = parseInt(parts[1]); day = parseInt(parts[2]);
+  } else {
+    year = p.year; month = p.month; day = p.day;
+  }
+  if (p.birth_time && p.birth_time !== 'unknown') {
+    var tp = p.birth_time.split(':');
+    hour = String(parseInt(tp[0]));
+    minute = String(parseInt(tp[1]) || 0);
+  } else if (p.birth_time === 'unknown') {
+    hour = 'unknown'; minute = '0';
+  } else {
+    hour = (p.hour != null) ? String(p.hour) : 'unknown';
+    minute = (p.minute != null) ? String(p.minute) : '0';
+  }
+  var g = p.gender;
+  if (g === 'male') g = 'M';
+  else if (g === 'female') g = 'F';
+  return { name: p.name || '', year: year, month: month, day: day, hour: hour, minute: minute, gender: g || 'M' };
+}
+
+function _populateProfileSelect(selectId) {
+  var sel = document.getElementById(selectId);
+  if (!sel) return;
+  while (sel.options.length > 1) sel.remove(1);
+  try {
+    var profiles = JSON.parse(localStorage.getItem('pico_profiles')) || [];
+    profiles.forEach(function(p) {
+      var n = _normalizeProfile(p);
+      var o = document.createElement('option');
+      o.value = JSON.stringify(p);
+      var gLabel = (n.gender === 'M') ? '남' : '여';
+      var dateStr = n.year ? n.year + '년 ' + n.month + '월 ' + n.day + '일' : '';
+      o.textContent = (p.name || '이름없음') + (dateStr ? ' · ' + dateStr : '') + ' · ' + gLabel;
+      sel.appendChild(o);
+    });
+  } catch(e) {}
+}
+
+function _fillModalFields(norm, prefix) {
+  // prefix: 'saju', 'birth'
+  var nameEl   = document.getElementById(prefix + 'Name');
+  var yearEl   = document.getElementById(prefix + 'Year');
+  var monthEl  = document.getElementById(prefix + 'Month');
+  var dayEl    = document.getElementById(prefix + 'Day');
+  var hourEl   = document.getElementById(prefix + 'Hour');
+  var minuteEl = document.getElementById(prefix + 'Minute');
+  if (nameEl)   nameEl.value   = norm.name || '';
+  if (yearEl && norm.year)   yearEl.value   = norm.year;
+  if (monthEl && norm.month) monthEl.value  = norm.month;
+  if (dayEl && norm.day)     dayEl.value    = norm.day;
+  if (hourEl)   hourEl.value   = norm.hour;
+  if (minuteEl) minuteEl.value = norm.minute;
+  var gFn = (prefix === 'saju') ? selectGender : selectBirthGender;
+  gFn(norm.gender);
+}
+
+function fillSajuFromMine() {
+  var n = _normalizeProfile(JSON.parse(localStorage.getItem('pico_profile') || 'null'));
+  if (n) _fillModalFields(n, 'saju');
+}
+function fillSajuFromSaved(json) {
+  if (!json) return;
+  var n = _normalizeProfile(JSON.parse(json));
+  if (n) _fillModalFields(n, 'saju');
+}
+function fillBirthFromMine() {
+  var n = _normalizeProfile(JSON.parse(localStorage.getItem('pico_profile') || 'null'));
+  if (n) _fillModalFields(n, 'birth');
+}
+function fillBirthFromSaved(json) {
+  if (!json) return;
+  var n = _normalizeProfile(JSON.parse(json));
+  if (n) _fillModalFields(n, 'birth');
+}
+function fillQimenFromMine() {
+  var n = _normalizeProfile(JSON.parse(localStorage.getItem('pico_profile') || 'null'));
+  if (n) selectQimenGender(n.gender);
+}
+function fillQimenFromSaved(json) {
+  if (!json) return;
+  var n = _normalizeProfile(JSON.parse(json));
+  if (n) selectQimenGender(n.gender);
+}
+
 function openSajuModal() {
   document.getElementById('sajuOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1243,24 +1442,26 @@ function openSajuModal() {
     row.style.display = isNight ? 'block' : 'none';
     if (!isNight) document.getElementById('sajuYajasi').checked = false;
   };
-  // pre-fill from pico_profile when logged in
-  if (currentUser) {
-    try {
-      var p = JSON.parse(localStorage.getItem('pico_profile'));
-      if (p) {
-        if (p.year)  document.getElementById('sajuYear').value  = p.year;
-        if (p.month) document.getElementById('sajuMonth').value = p.month;
-        if (p.day)   document.getElementById('sajuDay').value   = p.day;
-        if (p.hour != null) document.getElementById('sajuHour').value = String(p.hour);
-        if (p.minute != null) document.getElementById('sajuMinute').value = String(p.minute);
-        if (p.gender) selectGender(p.gender);
-      }
-    } catch(e) {}
-  }
+  document.getElementById('sajuName').value = '';
+  document.getElementById('sajuYear').value = '';
+  document.getElementById('sajuMonth').value = '';
+  document.getElementById('sajuDay').value = '';
+  document.getElementById('sajuProfileSelect').value = '';
+  _populateProfileSelect('sajuProfileSelect');
 }
 function closeSajuModal() {
   document.getElementById('sajuOverlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+function clearSajuForm() {
+  document.getElementById('sajuName').value = '';
+  document.getElementById('sajuYear').value = '';
+  document.getElementById('sajuMonth').value = '';
+  document.getElementById('sajuDay').value = '';
+  document.getElementById('sajuHour').value = 'unknown';
+  document.getElementById('sajuYajasiRow').style.display = 'none';
+  document.getElementById('sajuProfileSelect').value = '';
+  selectGender('M');
 }
 function selectGender(g) {
   _sajuGender = g;
@@ -1317,11 +1518,8 @@ function openQimenModal() {
   }
   minEl.value = now.getMinutes();
 
-  try {
-    var qp = JSON.parse(localStorage.getItem('pico_profile'));
-    if (qp && qp.gender) selectQimenGender(qp.gender);
-  } catch(e) {}
-
+  document.getElementById('qimenProfileSelect').value = '';
+  _populateProfileSelect('qimenProfileSelect');
   document.getElementById('qimenOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1329,6 +1527,16 @@ function openQimenModal() {
 function closeQimenModal() {
   document.getElementById('qimenOverlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+function clearQimenForm() {
+  var now = new Date();
+  document.getElementById('qmYear').value = now.getFullYear();
+  document.getElementById('qmMonth').value = now.getMonth() + 1;
+  document.getElementById('qmDay').value = now.getDate();
+  document.getElementById('qmHour').value = now.getHours();
+  document.getElementById('qmMinute').value = '';
+  document.getElementById('qimenProfileSelect').value = '';
+  selectQimenGender('M');
 }
 
 function selectQimenGender(g) {
@@ -1400,22 +1608,26 @@ function openBirthModal(mode) {
   document.getElementById('birthOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   initBirthSelects();
-  try {
-    var p = JSON.parse(localStorage.getItem('pico_profile'));
-    if (p) {
-      if (p.year)  document.getElementById('birthYear').value  = p.year;
-      if (p.month) document.getElementById('birthMonth').value = p.month;
-      if (p.day)   document.getElementById('birthDay').value   = p.day;
-      if (p.hour != null) document.getElementById('birthHour').value = String(p.hour);
-      if (p.minute != null) document.getElementById('birthMinute').value = String(p.minute);
-      selectBirthGender(p.gender || 'M');
-    }
-  } catch(e) {}
+  document.getElementById('birthName').value = '';
+  document.getElementById('birthYear').value = '';
+  document.getElementById('birthMonth').value = '';
+  document.getElementById('birthDay').value = '';
+  document.getElementById('birthProfileSelect').value = '';
+  _populateProfileSelect('birthProfileSelect');
 }
 
 function closeBirthModal() {
   document.getElementById('birthOverlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+function clearBirthForm() {
+  document.getElementById('birthName').value = '';
+  document.getElementById('birthYear').value = '';
+  document.getElementById('birthMonth').value = '';
+  document.getElementById('birthDay').value = '';
+  document.getElementById('birthHour').value = 'unknown';
+  document.getElementById('birthProfileSelect').value = '';
+  selectBirthGender('M');
 }
 
 function selectBirthGender(g) {
@@ -1437,6 +1649,8 @@ function submitBirth() {
   p.set('year', year); p.set('month', month); p.set('day', day);
   if (hour !== 'unknown') { p.set('hour', hour); p.set('minute', minute || 0); }
   p.set('gender', gender);
+  var bName = document.getElementById('birthName').value.trim();
+  if (bName) p.set('name', bName);
   window.location.href = cfg.url + '?' + p.toString();
 }
 
@@ -1512,6 +1726,7 @@ document.addEventListener('click', function() { closeHamburger(); });
 function updateAuthUI() {
   var btnKakao = document.getElementById('btnKakao');
   var userArea = document.getElementById('userArea');
+  var titleEl = document.getElementById('mainScoreTitle');
   if (currentUser) {
     btnKakao.style.display = 'none';
     userArea.style.display = 'flex';
@@ -1519,9 +1734,19 @@ function updateAuthUI() {
     var av = document.getElementById('userAvatar');
     if (currentUser.avatar) { av.src = currentUser.avatar; av.style.display = ''; }
     else { av.style.display = 'none'; }
+    var profileName = null;
+    try { var pp = JSON.parse(localStorage.getItem('pico_profile')); profileName = pp && pp.name; } catch(e) {}
+    if (titleEl && (profileName || currentUser.name)) {
+      titleEl.innerHTML = (profileName || currentUser.name) + '님의 <em>오늘의 운세 점수</em>';
+    }
   } else {
     btnKakao.style.display = '';
     userArea.style.display = 'none';
+    var p = null;
+    try { p = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+    if (titleEl && p && p.name) {
+      titleEl.innerHTML = p.name + '님의 <em>오늘의 운세 점수</em>';
+    }
   }
 }
 
@@ -1617,6 +1842,8 @@ function submitSaju() {
   var gender = _sajuGender === 'M' ? 'male' : 'female';
   var midnight = (document.getElementById('sajuYajasi') && document.getElementById('sajuYajasi').checked) ? 1 : 0;
   var p = new URLSearchParams({ year: y, month: m, day: d, hour: hour, minute: minute, gender: gender, midnightType: midnight });
+  var sName = document.getElementById('sajuName').value.trim();
+  if (sName) p.set('name', sName);
   window.location.href = 'saju.html?' + p.toString();
 }
 
@@ -1868,7 +2095,7 @@ async function loadMiniScore() {
   }
 
   var summaryEl = document.getElementById('scoreSummaryText');
-  if (summaryEl) summaryEl.textContent = result.summary;
+  if (summaryEl) summaryEl.innerHTML = result.summary;
 
   // 자세히 보기 링크에 프로필 파라미터 추가
   var detailLink = document.getElementById('scoreDetailLink');
@@ -1884,6 +2111,6 @@ async function loadMiniScore() {
   }
 }
 </script>
-<script src="score.js" onload="loadMiniScore()"></script>
+<script src="score.js?v=2" onload="loadMiniScore()"></script>
 </body>
 </html>

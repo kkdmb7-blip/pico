@@ -247,7 +247,7 @@ function _makeSummary(final, overall) {
   const bi = SCORE_DOMAIN_INFO[best], wi = SCORE_DOMAIN_INFO[worst];
 
   if (overall >= 78) return `오늘은 매우 좋은 흐름입니다. 특히 ${bi.emoji} ${bi.label}(${final[best]}점)에서 강한 기운이 흐릅니다. 적극적으로 행동하기 좋은 날!`;
-  if (overall >= 65) return `긍정적인 에너지가 흐르는 날입니다. ${bi.emoji} ${bi.label}을 중심으로 움직이면 성과를 낼 수 있습니다.`;
+  if (overall >= 65) return `긍정적인 에너지가 흐르는 날입니다.<br>${bi.emoji} ${bi.label}을 중심으로 움직이면 성과를 낼 수 있습니다.`;
   if (overall >= 52) return `평온한 하루입니다. ${bi.emoji} ${bi.label}(${final[best]}점)은 양호하지만 ${wi.emoji} ${wi.label}(${final[worst]}점) 쪽은 무리하지 않는 게 좋습니다.`;
   if (overall >= 40) return `다소 조심스러운 날입니다. ${wi.emoji} ${wi.label}(${final[worst]}점) 분야에서는 신중히 판단하세요.`;
   return `오늘은 차분하게 지내는 것이 좋습니다. 중요한 결정이나 도전적인 행동은 내일로 미루는 것을 권장합니다.`;
@@ -275,6 +275,16 @@ async function calcFortuneScore(profile) {
   const now  = new Date();
   const ny   = now.getFullYear(), nm = now.getMonth() + 1, nd = now.getDate();
   const nh   = now.getHours(), nmin = now.getMinutes();
+  const todayStr = `${ny}.${String(nm).padStart(2,'0')}.${String(nd).padStart(2,'0')}`;
+
+  // 오늘 캐시 확인
+  const genderKey = (gender === 'M' || gender === 'male') ? 'M' : 'F';
+  const cacheKey = `pico_score_${year}_${month}_${day}_${genderKey}_${todayStr}`;
+  try {
+    const cached = JSON.parse(localStorage.getItem(cacheKey));
+    if (cached && cached.today === todayStr) return cached;
+  } catch(e) {}
+
   const g    = (gender === 'M' || gender === 'male') ? 'male' : 'female';
   const hNum = (hour === 'unknown' || hour == null || hour === '') ? 12 : parseInt(hour);
   const mNum = parseInt(minute) || 0;
@@ -313,7 +323,10 @@ async function calcFortuneScore(profile) {
   const final   = _combine(scores);
   const overall = _clamp(Object.values(final).reduce((a, b) => a + b, 0) / SCORE_DOMAINS.length);
   const summary = _makeSummary(final, overall);
-  const today   = `${ny}.${String(nm).padStart(2,'0')}.${String(nd).padStart(2,'0')}`;
+  const result  = { final, scores, overall, summary, today: todayStr, rawData: { saju, qimen, astro, vedic, ziwei } };
 
-  return { final, scores, overall, summary, today, rawData: { saju, qimen, astro, vedic, ziwei } };
+  // 오늘 결과 캐싱
+  try { localStorage.setItem(cacheKey, JSON.stringify(result)); } catch(e) {}
+
+  return result;
 }

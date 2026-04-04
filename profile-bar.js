@@ -176,7 +176,7 @@
 
     var othersBtn = document.createElement('button');
     othersBtn.style.cssText = profiles.length > 0 ? BTN_GHOST : BTN_GHOST + ';opacity:0.5;';
-    othersBtn.textContent = '👥 다른 사람 ' + (profiles.length > 0 ? '▾' : '(없음)');
+    othersBtn.textContent = '👥 저장된 프로필 ' + (profiles.length > 0 ? '▾' : '(없음)');
 
     var dd = document.createElement('div');
     dd.style.cssText = DD_STYLE;
@@ -263,6 +263,12 @@
       '<h3 style="font-family:\'Noto Serif KR\',serif;font-size:18px;margin-bottom:6px;">새로 입력</h3>',
       '<p style="font-size:13px;color:#6b6b85;margin-bottom:20px;">직접 생년월일을 입력하여 조회합니다</p>',
 
+      // Name
+      '<div style="margin-bottom:14px;">',
+        '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">이름 (선택)</label>',
+        '<input id="pb-name" type="text" placeholder="홍길동" style="width:100%;box-sizing:border-box;' + selectStyle() + '" />',
+      '</div>',
+
       // Birth date
       '<div style="margin-bottom:14px;">',
         '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">생년월일</label>',
@@ -273,13 +279,18 @@
         '</div>',
       '</div>',
 
-      // Hour
+      // Hour + Minute
       '<div style="margin-bottom:14px;">',
         '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">태어난 시간</label>',
-        '<select id="pb-hour" style="width:100%;' + selectStyle() + '">',
-          '<option value="unknown">시 모름</option>',
-          Array.from({length:24},function(_,i){return '<option value="'+i+'" '+(i===12?'selected':'')+'>'+i+'시</option>';}).join(''),
-        '</select>',
+        '<div style="display:flex;gap:6px;">',
+          '<select id="pb-hour" style="flex:1.1;' + selectStyle() + '">',
+            '<option value="unknown" selected>시 모름</option>',
+            Array.from({length:24},function(_,i){return '<option value="'+i+'">'+i+'시</option>';}).join(''),
+          '</select>',
+          '<select id="pb-minute" style="flex:0.9;' + selectStyle() + '">',
+            Array.from({length:60},function(_,i){return '<option value="'+i+'"'+(i===0?' selected':'')+'>'+String(i).padStart(2,'0')+'분</option>';}).join(''),
+          '</select>',
+        '</div>',
       '</div>',
 
       // Gender
@@ -312,6 +323,19 @@
     updateGenderBtns();
     _overlay.style.display = 'flex';
     initNewInputSelects();
+    // Reset all fields
+    var nameEl = document.getElementById('pb-name');
+    if (nameEl) nameEl.value = '';
+    var yEl = document.getElementById('pb-year');
+    var mEl = document.getElementById('pb-month');
+    var dEl = document.getElementById('pb-day');
+    if (yEl) yEl.value = '';
+    if (mEl) mEl.value = '';
+    if (dEl) { dEl.innerHTML = '<option value="">일</option>'; }
+    var hEl = document.getElementById('pb-hour');
+    if (hEl) hEl.selectedIndex = 0;
+    var minEl = document.getElementById('pb-minute');
+    if (minEl) minEl.selectedIndex = 0;
     document.body.style.overflow = 'hidden';
   }
 
@@ -373,14 +397,24 @@
     var day   = document.getElementById('pb-day').value;
     if (!year || !month || !day) { alert('생년월일을 모두 선택해주세요.'); return; }
     var hour = document.getElementById('pb-hour').value;
+    var minute = document.getElementById('pb-minute') ? parseInt(document.getElementById('pb-minute').value) || 0 : 0;
+    var name = (document.getElementById('pb-name') || {}).value || '';
     var p = {};
     p.year  = parseInt(year);
     p.month = parseInt(month);
     p.day   = parseInt(day);
-    if (hour !== 'unknown') { p.hour = parseInt(hour); p.minute = 0; }
+    if (hour !== 'unknown') { p.hour = parseInt(hour); p.minute = minute; }
     p.gender = _niGender;
     window._pbCloseNew();
-    window.location.href = buildUrl(profileToParams(p));
+    var params = profileToParams(p);
+    var cur = new URLSearchParams(window.location.search);
+    ['year', 'month', 'day', 'hour', 'minute', 'gender'].forEach(function (k) {
+      if (params[k] != null) cur.set(k, params[k]);
+      else cur.delete(k);
+    });
+    if (name.trim()) cur.set('name', name.trim());
+    else cur.delete('name');
+    window.location.href = window.location.pathname + '?' + cur.toString();
   };
 
   // ── Init ───────────────────────────────────────────────
