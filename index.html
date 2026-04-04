@@ -1660,7 +1660,14 @@ var _profileGender = 'M';
 function checkAuth() {
   try {
     var stored = localStorage.getItem('pico_user');
-    if (stored) { currentUser = JSON.parse(stored); updateAuthUI(); }
+    if (stored) {
+      currentUser = JSON.parse(stored);
+      updateAuthUI();
+      // 페이지 로드 시 서버 프로필 동기화
+      syncProfilesFromServer(currentUser.id).then(function() {
+        loadMiniScore();
+      });
+    }
   } catch(e) {}
   var params = new URLSearchParams(window.location.search);
   var code = params.get('code');
@@ -1699,8 +1706,12 @@ function handleKakaoCallback(code) {
     };
     localStorage.setItem('pico_user', JSON.stringify(currentUser));
     updateAuthUI();
-    var existing = localStorage.getItem('pico_profile');
-    if (!existing) openProfileModal();
+    // 서버에서 프로필 동기화 후, 프로필 없으면 등록 모달
+    syncProfilesFromServer(currentUser.id).then(function() {
+      var existing = localStorage.getItem('pico_profile');
+      if (!existing) openProfileModal();
+      else loadMiniScore();
+    });
   })
   .catch(function(e) { console.error('kakao auth error', e); });
 }
@@ -1865,6 +1876,43 @@ function getProfiles() {
 
 function saveProfiles(list) {
   localStorage.setItem('pico_profiles', JSON.stringify(list));
+  // 서버에도 동기화
+  var user = null;
+  try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+  if (user && user.id) {
+    fetch(WORKER_BASE + '/profiles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kakao_id: user.id, profiles: list })
+    }).catch(function(e) { console.warn('프로필 서버 저장 실패', e); });
+  }
+}
+
+async function syncProfilesFromServer(kakaoId) {
+  try {
+    var res = await fetch(WORKER_BASE + '/profiles?kakao_id=' + encodeURIComponent(kakaoId));
+    var data = await res.json();
+    if (!data.profiles || !data.profiles.length) return;
+    var local = getProfiles();
+    // 서버 우선으로 병합 (id 중복 제거)
+    var merged = [...data.profiles];
+    local.forEach(function(lp) {
+      if (!merged.find(function(sp) { return sp.id === lp.id; })) merged.push(lp);
+    });
+    localStorage.setItem('pico_profiles', JSON.stringify(merged));
+    // pico_profile (isMe) 도 업데이트
+    var me = merged.find(function(p) { return p.isMe; });
+    if (me) {
+      var parts = (me.birth_date || '').split('-');
+      var timeParts = (me.birth_time || '0:0').split(':');
+      localStorage.setItem('pico_profile', JSON.stringify({
+        name: me.name,
+        year: parseInt(parts[0]), month: parseInt(parts[1]), day: parseInt(parts[2]),
+        hour: me.birth_time || '0', minute: parseInt(timeParts[1] || 0),
+        gender: (me.gender === 'male' || me.gender === 'M') ? 'M' : 'F'
+      }));
+    }
+  } catch(e) { console.warn('프로필 서버 로드 실패', e); }
 }
 
 function genId() {
@@ -2117,6 +2165,6 @@ async function loadMiniScore() {
   }
 }
 </script>
-<script src="score.js?v=2" onload="loadMiniScore()"></script>
+<script src="score.js?v=2" onload="if(!localStorage.getItem('pico_user'))loadMiniScore()"></script>
 </body>
 </html>
