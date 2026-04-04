@@ -224,6 +224,38 @@ nav {
 }
 .weight-chip strong { color:var(--text); }
 
+/* FEEDBACK */
+.feedback-box {
+  text-align:center; padding:20px 24px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; margin-top:8px;
+}
+.feedback-q { font-size:13px; color:var(--muted); margin-bottom:14px; }
+.fb-btns { display:flex; gap:10px; justify-content:center; }
+.btn-fb {
+  padding:10px 22px; border-radius:10px; font-size:14px; font-weight:700;
+  cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all 0.2s; border:1px solid;
+}
+.btn-fb-yes { background:rgba(76,175,130,0.1); color:#4caf82; border-color:#4caf82; }
+.btn-fb-no  { background:rgba(224,92,106,0.1); color:var(--red); border-color:var(--red); }
+.btn-fb-yes:hover { background:rgba(76,175,130,0.2); }
+.btn-fb-no:hover  { background:rgba(224,92,106,0.2); }
+.login-nudge {
+  display:none; text-align:center; padding:16px 24px;
+  background:rgba(123,94,167,0.08); border:1px solid rgba(123,94,167,0.22);
+  border-radius:12px; margin-top:10px;
+}
+.login-nudge p { font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:10px; }
+.toast {
+  position:fixed; bottom:24px; left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:#1e1e2a; border:1px solid var(--accent);
+  border-radius:12px; padding:11px 22px;
+  font-size:14px; font-weight:600; opacity:0;
+  transition:all 0.3s; z-index:9999; white-space:nowrap; pointer-events:none;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
 /* RESPONSIVE */
 @media (max-width:600px) {
   .main-wrap { padding:28px 16px 60px; }
@@ -299,6 +331,21 @@ nav {
     <div class="breakdown-section">
       <div class="breakdown-title">엔진별 세부 점수</div>
       <div class="breakdown-grid" id="breakdownGrid"></div>
+    </div>
+
+    <!-- 피드백 -->
+    <div class="feedback-box" id="feedbackSection">
+      <p class="feedback-q">오늘 이 점수가 실제와 맞았나요?</p>
+      <div class="fb-btns" id="feedbackBtns">
+        <button class="btn-fb btn-fb-yes" onclick="sendFeedback('yes')">👍 맞았어요</button>
+        <button class="btn-fb btn-fb-no"  onclick="sendFeedback('no')">👎 달랐어요</button>
+      </div>
+    </div>
+
+    <!-- 로그인 넛지 -->
+    <div class="login-nudge" id="loginNudge">
+      <p>💾 이 결과를 저장하고 매일 받아보려면?</p>
+      <a href="/" style="display:inline-block;padding:8px 20px;background:linear-gradient(135deg,var(--accent),#a07fd4);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;font-family:'Noto Sans KR',sans-serif">카카오로 저장하기</a>
     </div>
 
   </div><!-- /resultWrap -->
@@ -451,6 +498,63 @@ function renderBreakdown(scores) {
   });
 }
 
+// ── 피드백 ───────────────────────────────────────────────
+let _scoreResult = null;
+
+function _todayKST() {
+  return new Date(Date.now() + 9*60*60*1000).toISOString().slice(0,10);
+}
+
+function initFeedback(today) {
+  if (localStorage.getItem('score_feedback_' + today)) {
+    document.getElementById('feedbackBtns').innerHTML =
+      '<div style="font-size:15px;color:var(--accent2)">소중한 피드백 감사해요 🙏</div>';
+  }
+}
+
+function showLoginNudge() {
+  if (!localStorage.getItem('pico_user')) {
+    document.getElementById('loginNudge').style.display = 'block';
+  }
+}
+
+async function sendFeedback(fb) {
+  const today = _todayKST();
+  const key = 'score_feedback_' + today;
+  if (localStorage.getItem(key)) return;
+  localStorage.setItem(key, fb);
+  document.getElementById('feedbackBtns').innerHTML =
+    '<div style="font-size:15px;color:var(--accent2)">소중한 피드백 감사해요 🙏</div>';
+  showToast('소중한 피드백 감사해요 🙏');
+  const user = (() => { try { return JSON.parse(localStorage.getItem('pico_user')); } catch(e) { return null; } })();
+  const uid = (user && user.id) ? user.id : ('anon_' + Math.random().toString(36).slice(2,10));
+  try {
+    await fetch('https://fortuna.kkdmb7.workers.dev/score-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: uid, date: today,
+        score: _scoreResult ? _scoreResult.overall : 0,
+        domain_scores: _scoreResult ? _scoreResult.final : {},
+        feedback: fb,
+        engines_used: ['saju','qimen','astro','vedic','ziwei']
+      })
+    });
+  } catch(e) {}
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_toast'; t.className = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
 // 메인 실행
 async function run() {
   const profile = getProfileFromUrl() || getStoredProfile();
@@ -481,6 +585,7 @@ async function run() {
   document.getElementById('loadingWrap').style.display = 'none';
   document.getElementById('resultWrap').style.display  = 'block';
 
+  _scoreResult = result;
   const { final, scores, overall, summary, today } = result;
   const overallColor = getColor(overall);
 
@@ -503,6 +608,10 @@ async function run() {
 
   // 세부 분석
   renderBreakdown(scores);
+
+  // 피드백 초기화 + 로그인 넛지
+  initFeedback(today);
+  showLoginNudge();
 }
 
 run();

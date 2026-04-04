@@ -2078,15 +2078,21 @@ async function loadMiniScore() {
     prompt.style.display = '';
     document.getElementById('scoreLoadingRow').style.display = 'none';
     document.getElementById('scoreMiniResult').style.display = 'none';
-    // 로그인 여부에 따라 다른 안내
-    var isLoggedIn = !!localStorage.getItem('pico_user');
-    if (isLoggedIn) {
-      prompt.innerHTML = '<p>이 기기에서 처음이시군요!<br>생년월일을 등록하면 운세 점수를 바로 확인할 수 있어요.</p>' +
-        '<button class="btn-cta-hero" onclick="openProfileModal()" style="font-size:13px;padding:10px 24px;">생년월일 등록하기</button>';
-    } else {
-      prompt.innerHTML = '<p>카카오 로그인 후 생년월일을 등록하면<br>매일 업데이트되는 5분야 운세 점수를 확인할 수 있습니다.</p>' +
-        '<button class="btn-cta-hero" onclick="kakaoLogin()" style="font-size:13px;padding:10px 24px;">카카오로 시작하기</button>';
-    }
+    // 로그인 없이 바로 체험 가능
+    prompt.innerHTML =
+      '<p style="margin-bottom:14px">생년월일을 입력하면 바로 오늘의 운세 점수를 확인할 수 있어요</p>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px">' +
+        '<input type="number" id="quickYear" placeholder="출생년도" min="1930" max="2010"' +
+          ' style="width:110px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
+          'border-radius:8px;color:var(--text);font-family:\'Noto Sans KR\',sans-serif;font-size:14px;-webkit-appearance:none">' +
+        '<input type="number" id="quickMonth" placeholder="월" min="1" max="12"' +
+          ' style="width:64px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
+          'border-radius:8px;color:var(--text);font-family:\'Noto Sans KR\',sans-serif;font-size:14px;-webkit-appearance:none">' +
+        '<input type="number" id="quickDay" placeholder="일" min="1" max="31"' +
+          ' style="width:64px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
+          'border-radius:8px;color:var(--text);font-family:\'Noto Sans KR\',sans-serif;font-size:14px;-webkit-appearance:none">' +
+      '</div>' +
+      '<button class="btn-cta-hero" onclick="goScoreQuick()" style="font-size:13px;padding:10px 24px;">운세 점수 바로 보기 →</button>';
     return;
   }
 
@@ -2179,5 +2185,14 @@ async function loadMiniScore() {
 }
 </script>
 <script src="score.js?v=2" onload="checkAuth()"></script>
+<script>
+function goScoreQuick() {
+  var y = (document.getElementById('quickYear')  || {}).value;
+  var m = (document.getElementById('quickMonth') || {}).value;
+  var d = (document.getElementById('quickDay')   || {}).value;
+  if (!y || !m || !d) { alert('생년월일을 모두 입력해주세요.'); return; }
+  window.location.href = 'score.html?' + new URLSearchParams({ year: y, month: m, day: d }).toString();
+}
+</script>
 </body>
 </html>
