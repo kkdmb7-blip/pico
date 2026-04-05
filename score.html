@@ -398,7 +398,7 @@ nav {
 
     <!-- 공유 버튼 -->
     <div class="share-btn-wrap" id="shareBtnWrap" style="display:none;">
-      <button class="btn-share-card" onclick="openScoreShareCard()">🔗 결과 공유하기</button>
+      <button class="btn-share-card" id="scoreKakaoBtn" onclick="shareScoreDirectKakao()" style="background:#fee500;color:#3c1e1e;box-shadow:0 4px 16px rgba(254,229,0,0.3);">🟡 카카오톡 공유</button>
     </div>
 
     <!-- 로그인 넛지 -->
@@ -737,6 +737,50 @@ function downloadScoreCard() {
     var a = document.createElement('a'); a.download = 'fortuna_score.png'; a.href = url; a.click();
     setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
     showToast('📸 카드가 저장됐어요!');
+  }, 'image/png');
+}
+
+function shareScoreDirectKakao() {
+  var btn = document.getElementById('scoreKakaoBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ 생성 중...'; }
+  var overall = _scoreResult ? _scoreResult.overall : 0;
+  var today = _scoreResult ? _scoreResult.today : '';
+  var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
+  var text = '🔮 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n재물/관계/건강/학업/이동 5개 분야 종합\n나도 확인해봐 👇';
+  try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
+
+  if (!_ssmCanvas) {
+    openScoreShareCard();
+    var wait = setInterval(function() {
+      if (_ssmCanvas) {
+        clearInterval(wait);
+        _doShareCanvas(btn, text, pageUrl);
+      }
+    }, 200);
+    setTimeout(function() { clearInterval(wait); if (btn) { btn.disabled=false; btn.textContent='🟡 카카오톡 공유'; } }, 8000);
+  } else {
+    _doShareCanvas(btn, text, pageUrl);
+  }
+}
+
+function _doShareCanvas(btn, text, pageUrl) {
+  if (btn) { btn.disabled=false; btn.textContent='🟡 카카오톡 공유'; }
+  document.getElementById('scoreShareModal').style.display = 'none';
+  if (!_ssmCanvas) {
+    if (navigator.share) { navigator.share({ title:'FORTUNA 운세점수', text:text, url:pageUrl }).catch(function(){}); }
+    else { showToast('📋 링크 복사됨!'); }
+    return;
+  }
+  _ssmCanvas.toBlob(function(blob) {
+    if (!blob) { showToast('이미지 생성 실패'); return; }
+    var file = new File([blob], 'fortuna_score.png', { type:'image/png' });
+    if (navigator.canShare && navigator.canShare({ files:[file] })) {
+      navigator.share({ files:[file], text:text, url:pageUrl }).catch(function(){});
+    } else if (navigator.share) {
+      navigator.share({ title:'FORTUNA 운세점수', text:text, url:pageUrl }).catch(function(){});
+    } else {
+      showToast('📋 링크 복사됨!');
+    }
   }, 'image/png');
 }
 
