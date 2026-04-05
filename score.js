@@ -279,7 +279,12 @@ async function calcFortuneScore(profile) {
 
   // 오늘 캐시 확인
   const genderKey = (gender === 'M' || gender === 'male') ? 'M' : 'F';
-  const cacheKey = `pico_score_${year}_${month}_${day}_${genderKey}_${todayStr}`;
+  // 시(時) 블록 정규화 (캐시 키용)
+  const _shiStarts = [23,1,3,5,7,9,11,13,15,17,19,21];
+  const _shiH = _shiStarts.reduce(function(prev, cur) {
+    return ((nh - cur + 24) % 24) < ((nh - prev + 24) % 24) ? cur : prev;
+  });
+  const cacheKey = `pico_score_${year}_${month}_${day}_${genderKey}_${todayStr}_shi${_shiH}`;
   try {
     const cached = JSON.parse(localStorage.getItem(cacheKey));
     if (cached && cached.today === todayStr) return cached;
@@ -290,13 +295,20 @@ async function calcFortuneScore(profile) {
   const mNum = parseInt(minute) || 0;
   const birthISO = `${year}-${String(parseInt(month)).padStart(2,'0')}-${String(parseInt(day)).padStart(2,'0')}T${String(hNum).padStart(2,'0')}:${String(mNum).padStart(2,'0')}:00`;
 
+  // 기문은 한국 전통 시(時) 블록 기준으로 정규화 (2시간 단위)
+  // 자(23)·축(1)·인(3)·묘(5)·진(7)·사(9)·오(11)·미(13)·신(15)·유(17)·술(19)·해(21)
+  const SHI_STARTS = [23,1,3,5,7,9,11,13,15,17,19,21];
+  const qimenH = SHI_STARTS.reduce(function(prev, cur) {
+    return ((nh - cur + 24) % 24) < ((nh - prev + 24) % 24) ? cur : prev;
+  });
+
   const [sajuR, qimenR, astroR, vedicR, ziweiR] = await Promise.allSettled([
     fetch(`${SCORE_WORKER}/saju-test`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ birth: birthISO, gender: g, calendar: 'solar', midnightType: 0 })
     }).then(r => r.json()),
-    fetch(`${SCORE_WORKER}/qimen?year=${ny}&month=${nm}&day=${nd}&hour=${nh}&minute=${nmin}&type=siga`).then(r => r.json()),
+    fetch(`${SCORE_WORKER}/qimen?year=${ny}&month=${nm}&day=${nd}&hour=${qimenH}&minute=0&type=siga`).then(r => r.json()),
     fetch(`${SCORE_WORKER}/astro`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
