@@ -190,6 +190,21 @@ function _scoreVedic(data) {
     for (const d of SCORE_DOMAINS) out[d] = _clamp(out[d] + eff);
   });
 
+  // Hora 보너스
+  const _HORA_BONUS = {
+    'Jupiter': { money:+10, wisdom:+15 },
+    'Venus':   { love:+15,  money:+10 },
+    'Sun':     { money:+15, health:+10 },
+    'Moon':    { love:+10,  health:+10 },
+    'Mars':    { health:+10, travel:+15 },
+    'Mercury': { wisdom:+15, money:+10 },
+    'Saturn':  { money:-5, love:-5, health:-5, wisdom:-5, travel:-5 },
+  };
+  if (data.hora && _HORA_BONUS[data.hora]) {
+    for (const [d, v] of Object.entries(_HORA_BONUS[data.hora]))
+      if (SCORE_DOMAINS.includes(d)) out[d] = _clamp(out[d] + v);
+  }
+
   for (const d of SCORE_DOMAINS) out[d] = _clamp(out[d]);
   return out;
 }
