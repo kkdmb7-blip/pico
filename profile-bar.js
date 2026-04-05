@@ -23,6 +23,7 @@
   function profileToParams(p) {
     var r = {};
     if (!p) return r;
+    if (p.name) r.name = p.name;
     if (p.year) {
       // pico_profile format: {year, month, day, hour, minute, gender:'M'|'F'}
       r.year   = p.year;
@@ -52,8 +53,8 @@
    */
   function buildUrl(profileParams) {
     var cur = new URLSearchParams(window.location.search);
-    ['year', 'month', 'day', 'hour', 'minute', 'gender'].forEach(function (k) {
-      if (profileParams[k] != null) cur.set(k, profileParams[k]);
+    ['year', 'month', 'day', 'hour', 'minute', 'gender', 'name'].forEach(function (k) {
+      if (profileParams[k] != null && profileParams[k] !== '') cur.set(k, profileParams[k]);
       else cur.delete(k);
     });
     return window.location.pathname + '?' + cur.toString();
