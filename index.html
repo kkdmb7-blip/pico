@@ -1982,21 +1982,27 @@ function closeGunghapShareModal() {
 }
 
 function shareGunghapKakao() {
+  if (!_ghCanvas) return;
   var myName = window._ghLastMyName || '나';
   var pName  = window._ghLastPName  || '상대방';
   var score  = calcGunghapScore(window._ghLastMySaju, window._ghLastPSaju);
-  var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
   var text = '💕 FORTUNA 궁합 결과\n\n'
     + myName + ' ❤ ' + pName + '\n'
-    + '궁합 점수: ' + score.total + '점\n'
-    + score.comment + '\n\n'
-    + '나도 확인해봐 👇';
-  if (navigator.share) {
-    navigator.share({ title: 'FORTUNA 궁합', text: text, url: pageUrl }).catch(function(){});
-  } else {
-    navigator.clipboard && navigator.clipboard.writeText(text + '\n' + pageUrl);
-    alert('클립보드에 복사했어요!');
-  }
+    + '궁합 점수: ' + score.total + '점  ' + score.comment + '\n\n'
+    + '나도 확인해봐 👇\nhttps://picolab.kr';
+  _ghCanvas.toBlob(function(blob) {
+    var file = new File([blob], 'fortuna_gunghap.png', { type: 'image/png' });
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], text: text }).catch(function(e) {
+        if (e.name !== 'AbortError') { navigator.clipboard && navigator.clipboard.writeText(text); alert('클립보드에 복사했어요!'); }
+      });
+    } else if (navigator.share) {
+      navigator.share({ title: 'FORTUNA 궁합', text: text, url: 'https://picolab.kr' }).catch(function(){});
+    } else {
+      navigator.clipboard && navigator.clipboard.writeText(text);
+      alert('클립보드에 복사했어요!');
+    }
+  }, 'image/png');
   closeGunghapShareModal();
 }
 

@@ -1296,18 +1296,25 @@ function downloadSajuCard() {
 }
 
 function shareSajuKakao() {
-  if (!_sajuData) return;
-  var d = _sajuData;
+  if (!_sajuCanvas) return;
+  var d = _sajuData || {};
   var dayPillar = (d.summary && d.summary.pillars && d.summary.pillars.day) || '';
   var EN_EL_MAP = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
   var yongshin = d.yongshin ? (EN_EL_MAP[d.yongshin.primary]||d.yongshin.primary||'') : '';
-  var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '🔮 포르투나 사주 분석\n\n일주: '+dayPillar+(yongshin ? '\n용신: '+yongshin : '')+(d.summary&&d.summary.strength?'\n'+d.summary.strength:'')+'\n\n나도 확인해봐 👇';
-  if (navigator.share) {
-    navigator.share({ title: 'FORTUNA 사주 분석', text: text, url: pageUrl }).catch(function(){});
-  } else {
-    navigator.clipboard && navigator.clipboard.writeText(text+'\n'+pageUrl);
-  }
+  var text = '🔮 포르투나 사주 분석\n\n일주: '+dayPillar+(yongshin?'\n용신: '+yongshin:'')+(d.summary&&d.summary.strength?'\n'+d.summary.strength:'')+'\n\n나도 확인해봐 👇\nhttps://picolab.kr';
+  _sajuCanvas.toBlob(function(blob) {
+    var file = new File([blob], 'fortuna_saju.png', { type: 'image/png' });
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], text: text }).catch(function(e) {
+        if (e.name !== 'AbortError') { navigator.clipboard && navigator.clipboard.writeText(text); alert('클립보드에 복사했어요!'); }
+      });
+    } else if (navigator.share) {
+      navigator.share({ title: 'FORTUNA 사주 분석', text: text, url: 'https://picolab.kr' }).catch(function(){});
+    } else {
+      navigator.clipboard && navigator.clipboard.writeText(text);
+      alert('클립보드에 복사했어요!');
+    }
+  }, 'image/png');
   closeSajuShareModal();
 }
 
