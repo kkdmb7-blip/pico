@@ -1327,6 +1327,20 @@ function copySajuLink() {
 document.getElementById('sajuShareModal').addEventListener('click', function(e) {
   if (e.target === this) closeSajuShareModal();
 });
+
+// ── 스크롤 위치 저장/복원 ──────────────────────────────
+(function() {
+  var saved = sessionStorage.getItem('picoSajuScrollY');
+  if (saved) { window.scrollTo(0, parseInt(saved, 10)); sessionStorage.removeItem('picoSajuScrollY'); }
+  var _st;
+  window.addEventListener('scroll', function() {
+    clearTimeout(_st);
+    _st = setTimeout(function() { sessionStorage.setItem('picoSajuScrollY', String(Math.round(window.scrollY))); }, 200);
+  }, { passive: true });
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') sessionStorage.setItem('picoSajuScrollY', String(Math.round(window.scrollY)));
+  });
+})();
 </script>
 </body>
 </html>

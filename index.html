@@ -2944,6 +2944,32 @@ function goScoreQuick() {
   if (!y || !m || !d) { alert('생년월일을 모두 입력해주세요.'); return; }
   window.location.href = 'score.html?' + new URLSearchParams({ year: y, month: m, day: d }).toString();
 }
+
+// ── 스크롤 위치 저장/복원 ──────────────────────────────
+(function() {
+  // 복원
+  var saved = sessionStorage.getItem('picoScrollY');
+  if (saved) {
+    window.scrollTo(0, parseInt(saved, 10));
+    sessionStorage.removeItem('picoScrollY');
+  }
+
+  // 저장 (debounce)
+  var _st;
+  window.addEventListener('scroll', function() {
+    clearTimeout(_st);
+    _st = setTimeout(function() {
+      sessionStorage.setItem('picoScrollY', String(Math.round(window.scrollY)));
+    }, 200);
+  }, { passive: true });
+
+  // 앱 백그라운드 전환 직전에도 저장
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      sessionStorage.setItem('picoScrollY', String(Math.round(window.scrollY)));
+    }
+  });
+})();
 </script>
 </body>
 </html>
