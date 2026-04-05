@@ -1769,9 +1769,10 @@ function _drawGunghapCard(cb) {
   var mySaju = window._ghLastMySaju, pSaju = window._ghLastPSaju;
   if (!mySaju || !pSaju) { if(cb)cb(null); return; }
 
-  var myName = window._ghLastMyName || '나';
-  var pName  = window._ghLastPName  || '상대방';
-  var score  = calcGunghapScore(mySaju, pSaju);
+  var myName   = window._ghLastMyName   || '나';
+  var pName    = window._ghLastPName    || '상대방';
+  var myGender = window._ghLastMyGender || 'M';
+  var score    = calcGunghapScore(mySaju, pSaju);
 
   var STEMS    = ['갑','을','병','정','무','기','경','신','임','계'];
   var BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
@@ -1782,37 +1783,65 @@ function _drawGunghapCard(cb) {
   var EL_BG    = { 목:'#00C853', 화:'#FF1744', 토:'#FFD600', 금:'#E0E0E0', 수:'#1565C0' };
   var EL_TC    = { 목:'#052e13', 화:'#ffffff', 토:'#1a1200', 금:'#1a1a1a', 수:'#ffffff' };
 
+  // 실제 화면의 _sajuMiniCard와 동일한 순서: hour/day/month/year
+  var ORDER = ['hour','day','month','year'];
+  var LABS  = ['시','일','월','년'];
+
   function getPillars(saju) {
-    var pk = ['hour','day','month','year'];
-    return pk.map(function(k) {
+    return ORDER.map(function(k) {
       var str = saju.pillars[k] || '';
       var si = STEMS.indexOf(str[0]);
       var bi = BRANCHES.indexOf(str[1]);
-      return { si: si, bi: bi, sEl: STEM_EL[si] || '수', bEl: BRANCH_EL[bi] || '수' };
+      return {
+        si: si, bi: bi,
+        sEl: saju.stemEl[k]   || STEM_EL[si]   || '수',
+        bEl: saju.branchEl[k] || BRANCH_EL[bi] || '수',
+        sH:  saju.stemH[k]    || STEM_H[si]    || '?',
+        bH:  saju.branchH[k]  || BRANCH_H[bi]  || '?'
+      };
     });
   }
 
   document.fonts.ready.then(function() {
-    var SC  = 2;
-    var W   = 360;
-    var PAD = 18;
-    var HBOX = 34;
-    var COL_GAP = 4;
-    var colW = Math.floor((W/2 - PAD - COL_GAP*1.5 - 12) / 4);
-    var PILLAR_H = 6 + 12 + HBOX + 4 + HBOX + 6;
+    var SC   = 2;
+    var W    = 360;
+    var PAD  = 16;
+    var GAP  = 12;
+    var HBOX = 30;   // 실제 화면과 동일: 30px 박스
 
-    // 높이 계산
-    var H_HEADER   = 44;
-    var H_SCORE    = 70;
-    var H_BAR      = 22;
-    var H_COMMENT  = 22;
-    var H_DETAIL   = 48;
-    var H_CARDS    = PILLAR_H + 40;  // 두 사람 사주 카드
-    var H_FOOTER   = 36;
-    var GAP = 12;
-    var totalH = PAD + H_HEADER + GAP + H_SCORE + H_BAR + H_COMMENT + GAP + H_DETAIL + GAP + H_CARDS + GAP + H_FOOTER + PAD;
+    // 사주 미니카드 1개 높이 계산 (실제 화면과 동일 구조)
+    // 라벨(10px+3mb) + 이름행(12px+6mb) + 4열(8px라벨+2mb + 30px박스+2mb + 30px박스) + 오행텍스트(9px+6mt)
+    var CARD_PAD = 10;
+    var CARD_LABEL_H = 13;   // label + margin
+    var CARD_NAME_H  = 18;   // name row + margin
+    var CARD_COL_H   = 8 + 2 + HBOX + 2 + HBOX;  // 열 헤더 + 천간 + 지지
+    var CARD_FP_H    = 6 + 14; // margin + 오행% 텍스트
+    var CARD_H = CARD_PAD + CARD_LABEL_H + CARD_NAME_H + CARD_COL_H + CARD_FP_H + CARD_PAD;
 
-    var cv  = document.createElement('canvas');
+    var cardW = (W - PAD*2 - 8) / 2;
+
+    // 세부 점수 카드 높이
+    var DETAIL_H = 48;
+
+    // 헤더 + 이름 + 점수 + bar + comment + gap + 2카드 + gap + 3세부 + gap + footer + 여백
+    var H_HEADER  = 44;
+    var H_NAMES   = 20;
+    var H_SCORE   = 62;
+    var H_BAR     = 20;
+    var H_COMMENT = 24;
+    var H_FOOTER  = 36;
+
+    var totalH = PAD
+      + H_HEADER + GAP
+      + H_NAMES  + GAP
+      + H_SCORE
+      + H_BAR
+      + H_COMMENT + GAP
+      + CARD_H    + GAP
+      + DETAIL_H  + GAP
+      + H_FOOTER  + PAD;
+
+    var cv = document.createElement('canvas');
     cv.width  = W * SC;
     cv.height = totalH * SC;
     var ctx = cv.getContext('2d');
@@ -1827,52 +1856,135 @@ function _drawGunghapCard(cb) {
       ctx.closePath();
     }
 
-    // 배경
+    // ── 배경
     ctx.fillStyle = '#0d0d14';
     ctx.fillRect(0, 0, W, totalH);
 
     var y = PAD;
 
-    // 헤더
+    // ── 헤더: FORTUNA
     ctx.fillStyle = '#c9a84c';
-    ctx.font = 'bold 11px "Noto Sans KR"';
+    ctx.font = 'bold 12px "Noto Sans KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('● F O R T U N A  궁합', W/2, y+14);
+    ctx.fillText('● F O R T U N A', W/2, y+14);
     ctx.strokeStyle = 'rgba(255,255,255,0.08)';
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(PAD, y+28); ctx.lineTo(W-PAD, y+28); ctx.stroke();
     y += H_HEADER + GAP;
 
-    // 점수
-    var scoreColor = score.total >= 70 ? '#ff8ab0' : score.total >= 55 ? '#ffb3c6' : '#e8e0f0';
-    ctx.fillStyle = scoreColor;
-    ctx.font = 'bold 52px "Noto Sans KR"';
+    // ── 이름 행: "나 ❤ 상대방"
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.font = '12px "Noto Sans KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(String(score.total), W/2, y + H_SCORE/2 - 4);
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillText(myName + '  ❤  ' + pName, W/2, y + H_NAMES/2);
+    y += H_NAMES + GAP;
+
+    // ── 점수 (48px, 실제화면과 동일)
+    ctx.fillStyle = '#ff8ab0';
+    ctx.font = '900 48px "Noto Sans KR"';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(score.total), W/2, y + 28);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
     ctx.font = '11px "Noto Sans KR"';
-    ctx.fillText('/ 100점', W/2, y + H_SCORE - 8);
+    ctx.fillText('/ 100점', W/2, y + 54);
     y += H_SCORE;
 
-    // 게이지 바
-    var barW = W - PAD*2;
+    // ── 게이지 바 (height:8px, 실제와 동일)
+    var barW = W - PAD*2 - 8;
     ctx.fillStyle = 'rgba(255,255,255,0.06)';
-    rr(PAD, y, barW, 8, 4); ctx.fill();
+    rr(PAD+4, y, barW, 8, 4); ctx.fill();
     var fillW = Math.round(barW * score.total / 100);
-    var grad = ctx.createLinearGradient(PAD, 0, PAD+fillW, 0);
+    var grad = ctx.createLinearGradient(PAD+4, 0, PAD+4+fillW, 0);
     grad.addColorStop(0, '#c2185b'); grad.addColorStop(1, '#ff8ab0');
     ctx.fillStyle = grad;
-    rr(PAD, y, fillW, 8, 4); ctx.fill();
+    rr(PAD+4, y, fillW, 8, 4); ctx.fill();
     y += H_BAR;
 
-    // 코멘트
+    // ── 코멘트 (14px bold #f5e0ec)
     ctx.fillStyle = '#f5e0ec';
-    ctx.font = 'bold 13px "Noto Sans KR"';
+    ctx.font = 'bold 14px "Noto Sans KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(score.comment, W/2, y + H_COMMENT/2);
     y += H_COMMENT + GAP;
 
-    // 세부 점수 3칸
+    // ── 사주 미니카드 2개 (실제 화면 _sajuMiniCard 구조 그대로)
+    var sajuList = [
+      { saju: mySaju, label: '나',    name: myName, gender: myGender },
+      { saju: pSaju,  label: '상대방', name: pName,  gender: _ghPartnerGender || '' }
+    ];
+
+    sajuList.forEach(function(item, ci) {
+      var cx = PAD + ci*(cardW+8);
+      var cy = y;
+      var saju = item.saju;
+
+      // 카드 배경
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      rr(cx, cy, cardW, CARD_H, 10); ctx.fill(); ctx.stroke();
+
+      var iy = cy + CARD_PAD;
+
+      // 라벨 (10px, dim)
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.font = '10px "Noto Sans KR"';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(item.label, cx+8, iy+5);
+      iy += CARD_LABEL_H;
+
+      // 이름 + 성별 + 띠 (12px bold)
+      ctx.fillStyle = '#e8e0f0';
+      ctx.font = 'bold 12px "Noto Sans KR"';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      var maxNameW = cardW - 16;
+      ctx.fillText(item.name || item.label, cx+8, iy+6, maxNameW);
+      iy += CARD_NAME_H;
+
+      // 4열 (시일월년)
+      var pls = getPillars(saju);
+      var colW4 = Math.floor((cardW - 16) / 4);
+      pls.forEach(function(pl, i) {
+        var px = cx + 8 + i * colW4;
+        var py = iy;
+
+        // 열 라벨 (8px)
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = '8px "Noto Sans KR"';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(LABS[i], px + colW4/2, py + 4);
+        py += 10;
+
+        // 천간 박스 30×30
+        var bx = px + colW4/2 - HBOX/2;
+        ctx.fillStyle = EL_BG[pl.sEl] || '#333';
+        rr(bx, py, HBOX, HBOX, 5); ctx.fill();
+        ctx.fillStyle = EL_TC[pl.sEl] || '#fff';
+        ctx.font = 'bold 15px "Noto Serif KR"';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(pl.sH, bx + HBOX/2, py + HBOX/2);
+        py += HBOX + 2;
+
+        // 지지 박스 30×30
+        ctx.fillStyle = EL_BG[pl.bEl] || '#333';
+        rr(bx, py, HBOX, HBOX, 5); ctx.fill();
+        ctx.fillStyle = EL_TC[pl.bEl] || '#fff';
+        ctx.font = 'bold 15px "Noto Serif KR"';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(pl.bH, bx + HBOX/2, py + HBOX/2);
+      });
+
+      // 오행% 텍스트 (9px, dim) — 실제화면과 동일
+      var fp = saju.fivePct;
+      iy += CARD_COL_H + 6;
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = '9px "Noto Sans KR"';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(saju.dayEl+' · '+saju.strength+'  목'+fp.목+'·화'+fp.화+'·토'+fp.토+'·금'+fp.금+'·수'+fp.수, cx+8, iy+5, cardW-16);
+    });
+    y += CARD_H + GAP;
+
+    // ── 세부 점수 3칸 (실제 화면과 동일)
     var dLabels = ['오행 조화','띠 궁합','계절 조화'];
     var dScores = [score.oScore, score.tScore, score.sScore];
     var dW = (W - PAD*2 - 8) / 3;
@@ -1881,72 +1993,19 @@ function _drawGunghapCard(cb) {
       ctx.fillStyle = 'rgba(255,255,255,0.04)';
       ctx.strokeStyle = 'rgba(255,255,255,0.08)';
       ctx.lineWidth = 0.5;
-      rr(dx, y, dW, H_DETAIL, 8); ctx.fill(); ctx.stroke();
+      rr(dx, y, dW, DETAIL_H, 8); ctx.fill(); ctx.stroke();
       ctx.fillStyle = 'rgba(255,255,255,0.35)';
       ctx.font = '9px "Noto Sans KR"';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(lbl, dx+dW/2, y+12);
+      ctx.fillText(lbl, dx+dW/2, y+14);
       ctx.fillStyle = '#ff8ab0';
-      ctx.font = 'bold 20px "Noto Sans KR"';
-      ctx.fillText(String(dScores[i]), dx+dW/2, y+32);
+      ctx.font = 'bold 18px "Noto Sans KR"';
+      ctx.fillText(String(dScores[i]), dx+dW/2, y+34);
     });
-    y += H_DETAIL + GAP;
+    y += DETAIL_H + GAP;
 
-    // 이름
-    ctx.fillStyle = 'rgba(255,255,255,0.25)';
-    ctx.font = '10px "Noto Sans KR"';
-    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-    ctx.fillText(myName, PAD+8, y+10);
-    ctx.textAlign = 'right';
-    ctx.fillText(pName, W-PAD-8, y+10);
-    ctx.fillStyle = 'rgba(255,138,176,0.6)';
-    ctx.font = '12px "Noto Sans KR"';
-    ctx.textAlign = 'center';
-    ctx.fillText('❤', W/2, y+10);
-    y += 22;
-
-    // 두 사람 사주 미니카드 나란히
-    var cardW = (W - PAD*2 - 8) / 2;
-    [mySaju, pSaju].forEach(function(saju, ci) {
-      var cx = PAD + ci*(cardW+8);
-      ctx.fillStyle = 'rgba(255,255,255,0.03)';
-      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-      ctx.lineWidth = 0.5;
-      rr(cx, y, cardW, PILLAR_H, 8); ctx.fill(); ctx.stroke();
-
-      var pls = getPillars(saju);
-      var LABELS_PL = ['시','일','월','년'];
-      var innerColW = Math.floor((cardW - 12) / 4);
-      pls.forEach(function(pl, i) {
-        var px = cx + 6 + i*(innerColW);
-        var py = y + 6;
-        // 레이블
-        ctx.fillStyle = 'rgba(255,255,255,0.25)';
-        ctx.font = '7px "Noto Sans KR"';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(LABELS_PL[i], px+innerColW/2, py+5);
-        py += 12;
-        // 천간 박스
-        ctx.fillStyle = EL_BG[pl.sEl]||'#333';
-        rr(px+1, py, innerColW-2, HBOX, 5); ctx.fill();
-        ctx.fillStyle = EL_TC[pl.sEl]||'#fff';
-        ctx.font = 'bold 17px "Noto Serif KR"';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(STEM_H[pl.si]||'?', px+innerColW/2, py+HBOX/2);
-        py += HBOX+4;
-        // 지지 박스
-        ctx.fillStyle = EL_BG[pl.bEl]||'#333';
-        rr(px+1, py, innerColW-2, HBOX, 5); ctx.fill();
-        ctx.fillStyle = EL_TC[pl.bEl]||'#fff';
-        ctx.font = 'bold 17px "Noto Serif KR"';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(BRANCH_H[pl.bi]||'?', px+innerColW/2, py+HBOX/2);
-      });
-    });
-    y += PILLAR_H + GAP;
-
-    // 푸터
-    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    // ── 푸터
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
     ctx.font = '10px "Noto Sans KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('picolab.kr에서 무료로 확인하세요', W/2, y+14);
