@@ -844,6 +844,10 @@ function renderResult(data) {
 
   setVisible('action-row', true);
   hasResult = true;
+
+  // 공유 카드용 데이터 저장
+  _qimenData = data;
+  document.getElementById('qimenShareBtnWrap').style.display = 'block';
 }
 
 function buildCell(n, p, isZhifu) {
@@ -1054,12 +1058,6 @@ var _qimenCanvas = null;
 var _qimenData = null;
 var GONG_DIR_LOCAL = {1:'북',2:'남서',3:'동',4:'동남',5:'중앙',6:'북서',7:'서',8:'북동',9:'남'};
 
-var _origRenderResult = renderResult;
-function renderResult(data) {
-  _qimenData = data;
-  _origRenderResult(data);
-  document.getElementById('qimenShareBtnWrap').style.display = 'block';
-}
 
 function openQimenShareCard() {
   if (!_qimenData) return;
