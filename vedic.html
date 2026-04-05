@@ -595,41 +595,35 @@ function _drawVedicCard(cb) {
   ctx.font='400 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.35)';ctx.fillText(dateStr,W/2,y);y+=26;
   drawLine(y,200,0.5);y+=42;
 
-  // ── 달 라시 히어로 카드
-  var moonElC=EL_C2[RASHI_EL2[d.moonSign]]||'#A8D5A2';
-  var moonCardH=250;
-  ctx.fillStyle='rgba(255,255,255,0.04)';fRR(PAD,y,W-PAD*2,moonCardH,20);
-  ctx.strokeStyle=(moonElC||'#A8D5A2')+'55';ctx.lineWidth=2;sRR(PAD,y,W-PAD*2,moonCardH,20);
-  ctx.font='60px serif';ctx.fillStyle='rgba(255,255,255,0.9)';ctx.fillText('🌙',W/2,y+72);
-  ctx.font='600 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText('달 라시 · Moon Sign',W/2,y+112);
-  ctx.font='700 54px "Noto Sans KR",sans-serif';ctx.fillStyle=(moonElC||'#A8D5A2');ctx.fillText(d.moonSign||'–',W/2,y+178);
-  ctx.font='400 26px serif';ctx.fillStyle='rgba(255,255,255,0.3)';
-  ctx.fillText((RASHI_SYM2[d.moonSign]||'')+' · '+(RASHI_EL2[d.moonSign]||''),W/2,y+218);
-  y+=moonCardH+32;
-
-  // ── 낙샤트라 카드 (NAK_INTERP 포함)
+  // ── 달 라시 / 낙샤트라 / 상승궁 — 동일 크기 3카드
   var nakText=NAK_INTERP[d.nakshatra]||'';
-  var nakCardH=nakText?340:180;
-  ctx.fillStyle='rgba(255,255,255,0.04)';fRR(PAD,y,W-PAD*2,nakCardH,20);
-  ctx.strokeStyle='rgba(232,184,109,0.4)';ctx.lineWidth=2;sRR(PAD,y,W-PAD*2,nakCardH,20);
-  ctx.font='600 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';
-  ctx.fillText('⭐ 낙샤트라'+(d.nakshatraPada?' · 파다 '+d.nakshatraPada:''),W/2,y+48);
-  ctx.font='700 50px "Noto Sans KR",sans-serif';ctx.fillStyle='#e8b86d';ctx.fillText(d.nakshatra||'–',W/2,y+110);
-  if(nakText){
-    ctx.font='400 25px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';
-    fillWrapped(nakText,W/2,y+158,W-PAD*2-80,38);
-  }
-  y+=nakCardH+32;
+  var cH=260;
+  var cards3=[
+    {icon:'🌙',role:'달 라시 · Moon Sign',sign:d.moonSign,sub:(RASHI_SYM2[d.moonSign]||'')+' · '+(RASHI_EL2[d.moonSign]||''),color:EL_C2[RASHI_EL2[d.moonSign]]||'#A8D5A2',border:'55'},
+    {icon:'⭐',role:'낙샤트라'+(d.nakshatraPada?' · 파다 '+d.nakshatraPada:''),sign:d.nakshatra||'–',sub:'',color:'#e8b86d',border:'66'},
+    {icon:'↑',role:'상승궁 · Ascendant',sign:d.ascendant||'–',sub:(RASHI_SYM2[d.ascendant]||'')+' · '+(RASHI_EL2[d.ascendant]||''),color:EL_C2[RASHI_EL2[d.ascendant]]||'#74B9FF',border:'44'},
+  ];
+  cards3.forEach(function(c){
+    ctx.fillStyle='rgba(255,255,255,0.04)';fRR(PAD,y,W-PAD*2,cH,20);
+    ctx.strokeStyle=(c.color||'#A8D5A2')+c.border;ctx.lineWidth=2;sRR(PAD,y,W-PAD*2,cH,20);
+    ctx.font='56px serif';ctx.fillStyle='rgba(255,255,255,0.9)';ctx.fillText(c.icon,W/2,y+68);
+    ctx.font='600 21px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText(c.role,W/2,y+106);
+    ctx.font='700 52px "Noto Sans KR",sans-serif';ctx.fillStyle=(c.color||'#A8D5A2');ctx.fillText(c.sign,W/2,y+174);
+    if(c.sub){ctx.font='400 24px serif';ctx.fillStyle='rgba(255,255,255,0.28)';ctx.fillText(c.sub,W/2,y+216);}
+    y+=cH+24;
+  });
 
-  // ── 상승궁 컴팩트 카드
-  var ascElC=EL_C2[RASHI_EL2[d.ascendant]]||'#74B9FF';
-  var ascCardH=140;
-  ctx.fillStyle='rgba(255,255,255,0.04)';fRR(PAD,y,W-PAD*2,ascCardH,20);
-  ctx.strokeStyle=(ascElC||'#74B9FF')+'44';ctx.lineWidth=2;sRR(PAD,y,W-PAD*2,ascCardH,20);
-  ctx.font='600 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText('↑ 상승궁 · Ascendant',W/2,y+42);
-  ctx.font='700 44px "Noto Sans KR",sans-serif';ctx.fillStyle=(ascElC||'#74B9FF');ctx.fillText(d.ascendant||'–',W/2,y+100);
-  ctx.font='400 26px serif';ctx.fillStyle='rgba(255,255,255,0.25)';ctx.fillText(RASHI_SYM2[d.ascendant]||'',W/2,y+126);
-  y+=ascCardH+32;
+  // ── 낙샤트라 해석 카드
+  if(nakText){
+    var nakInterpH=nakText?300:0;
+    ctx.fillStyle='rgba(232,184,109,0.06)';fRR(PAD,y,W-PAD*2,nakInterpH,20);
+    ctx.strokeStyle='rgba(232,184,109,0.3)';ctx.lineWidth=1.5;sRR(PAD,y,W-PAD*2,nakInterpH,20);
+    ctx.font='600 21px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(232,184,109,0.7)';
+    ctx.fillText('✦ '+(d.nakshatra||'')+' 낙샤트라 해석',W/2,y+46);
+    ctx.font='400 25px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';
+    fillWrapped(nakText,W/2,y+88,W-PAD*2-80,38);
+    y+=nakInterpH+28;
+  }
 
   // ── 다샤
   drawLine(y,180,0.3);y+=44;
