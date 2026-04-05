@@ -371,14 +371,9 @@
     <div class="interp-grid" id="interpGrid"></div>
 
     <!-- 하단 버튼 -->
-    <div class="action-row">
-      <div class="btn-primary btn-locked">
-        AI 심층 분석 🔮
-        <span class="lock-badge">PREMIUM</span>
-      </div>
-      <a class="btn-secondary" id="consultBtn" href="#">
-        AI 운세 상담 ✦
-      </a>
+    <div id="ziweiShareBtnWrap" style="display:none;padding:20px 0 32px;flex-direction:column;align-items:center;gap:10px;">
+      <button id="ziweiKakaoBtn" onclick="shareZiweiKakao()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;letter-spacing:-0.3px;">⭐ 카카오톡 공유</button>
+      <a id="consultBtn" href="#" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;">✦ AI 운세 상담하기</a>
     </div>
 
   </div>
@@ -580,6 +575,11 @@ function render(d) {
   if (jaebaek) addInterp(interps, '💰', '재백궁 (재물)', palaceInterp('재백궁', jaebaek.majorStars || []) || ((jaebaek.majorStars || []).join(', ') || '별 없음') + ' — 재물의 흐름을 주관합니다.');
   if (gwanrok) addInterp(interps, '🏆', '관록궁 (직업)', palaceInterp('관록궁', gwanrok.majorStars || []) || ((gwanrok.majorStars || []).join(', ') || '별 없음') + ' — 사회적 성취와 직업의 방향.');
   if (bucheo)  addInterp(interps, '💑', '부처궁 (인연)', palaceInterp('부처궁', bucheo.majorStars || [])  || ((bucheo.majorStars || []).join(', ')  || '별 없음') + ' — 이성 인연과 파트너십.');
+
+  // 공유 버튼 표시
+  window._ziweiData = d;
+  var wrap = document.getElementById('ziweiShareBtnWrap');
+  wrap.style.display = 'flex';
 }
 
 function addInterp(container, icon, label, text) {
@@ -592,6 +592,151 @@ function addInterp(container, icon, label, text) {
       '<div class="interp-text">' + text + '</div>' +
     '</div>';
   container.appendChild(card);
+}
+
+// ── 공유 카드 ─────────────────────────────────────────────
+function _ziweiShowToast(msg) {
+  var t = document.getElementById('_ziweiToast');
+  if (!t) {
+    t = document.createElement('div'); t.id = '_ziweiToast';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#e8e0f0;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._tid); t._tid = setTimeout(function(){ t.style.opacity='0'; }, 2500);
+}
+
+function _drawZiweiCard(cb) {
+  var d = window._ziweiData;
+  if (!d) { cb(null); return; }
+
+  var today = new Date(Date.now() + 9*3600000);
+  var dateStr = today.getUTCFullYear()+'년 '+(today.getUTCMonth()+1)+'월 '+today.getUTCDate()+'일';
+
+  var W = 1080, H = 1920;
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+
+  var bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#0a0a15'); bg.addColorStop(0.5,'#150a2a'); bg.addColorStop(1,'#0a1520');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  [[8,12],[20,35],[38,8],[55,22],[72,10],[85,28],[6,52],[18,68],[32,80],[50,60],[66,78],[82,48],[90,65],[14,90],[44,45],[78,35],[60,90],[25,15],[92,82],[48,30],[35,55],[15,42],[70,25]].forEach(function(s){
+    ctx.beginPath(); ctx.arc(s[0]/100*W, s[1]/100*H, ((s[0]*3+s[1])%3)+1.5, 0, Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,'+(0.25+((s[0]+s[1])%5)*0.1)+')'; ctx.fill();
+  });
+
+  ctx.textAlign='center';
+  var drawLine=function(cy,w2,alpha){
+    var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0);
+    lg.addColorStop(0,'transparent'); lg.addColorStop(0.5,'rgba(201,168,76,'+alpha+')'); lg.addColorStop(1,'transparent');
+    ctx.strokeStyle=lg; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(W/2-w2,cy); ctx.lineTo(W/2+w2,cy); ctx.stroke();
+  };
+
+  var y=120;
+  ctx.font='700 40px "Noto Sans KR",sans-serif'; ctx.fillStyle='#e8b86d';
+  ctx.fillText('FORTUNA', W/2, y);
+  y+=32; ctx.font='400 26px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(232,184,109,0.65)';
+  ctx.fillText('자미두수 명반', W/2, y);
+  y+=36; ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.45)';
+  ctx.fillText(dateStr, W/2, y);
+  y+=30; drawLine(y,180,0.5);
+
+  // 핵심 3개 배지
+  y+=50;
+  ctx.font='700 28px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText('⭐ 핵심 명반 정보', W/2, y);
+  var badges=[
+    {label:'명주성', val:d.destinyMaster||'—'},
+    {label:'신주성', val:d.bodyMaster||'—'},
+    {label:'오행국', val:d.element||'—'},
+  ];
+  var bW=280, bH=160, bGap=20;
+  var totalBW=badges.length*bW+(badges.length-1)*bGap;
+  var bx0=W/2-totalBW/2;
+  y+=34;
+  badges.forEach(function(b,i){
+    var bx2=bx0+i*(bW+bGap);
+    ctx.fillStyle='rgba(232,184,109,0.07)';
+    ctx.beginPath(); ctx.roundRect(bx2,y,bW,bH,14); ctx.fill();
+    ctx.strokeStyle='rgba(232,184,109,0.3)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.roundRect(bx2,y,bW,bH,14); ctx.stroke();
+    ctx.font='400 20px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.fillText(b.label, bx2+bW/2, y+46);
+    ctx.font='700 34px "Noto Serif KR",serif'; ctx.fillStyle='#e8b86d';
+    ctx.fillText(b.val, bx2+bW/2, y+110);
+  });
+
+  // 현재 대한
+  y+=bH+50; drawLine(y,180,0.4); y+=44;
+  ctx.font='700 28px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText('🌊 현재 대한 大限', W/2, y); y+=44;
+  var dec2=d.currentDecade;
+  if(dec2){
+    ctx.font='700 40px "Noto Serif KR",serif'; ctx.fillStyle='#e8b86d';
+    ctx.fillText(dec2.name||'—', W/2, y); y+=36;
+    ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.fillText(dec2.ageRange||'', W/2, y); y+=44;
+    if(dec2.stars && dec2.stars.length){
+      var stW=140, stH=48, stGap=10;
+      var totalStW=Math.min(dec2.stars.length,4)*stW+(Math.min(dec2.stars.length,4)-1)*stGap;
+      var stx0=W/2-totalStW/2;
+      dec2.stars.slice(0,4).forEach(function(s,i){
+        var sx2=stx0+i*(stW+stGap);
+        ctx.fillStyle='rgba(232,184,109,0.12)';
+        ctx.beginPath(); ctx.roundRect(sx2,y,stW,stH,8); ctx.fill();
+        ctx.strokeStyle='rgba(232,184,109,0.3)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.roundRect(sx2,y,stW,stH,8); ctx.stroke();
+        ctx.font='700 22px "Noto Serif KR",serif'; ctx.fillStyle='#e8b86d';
+        ctx.fillText(s, sx2+stW/2, y+33);
+      });
+      y+=stH+16;
+    }
+  }
+
+  // 명궁 명반
+  y+=10; drawLine(y,180,0.3); y+=44;
+  ctx.font='700 28px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText('🏠 명궁 주성', W/2, y); y+=44;
+  var soul2=(d.palaces||[]).find(function(p){return p.isSelf;});
+  if(soul2 && soul2.majorStars && soul2.majorStars.length){
+    soul2.majorStars.slice(0,3).forEach(function(s){
+      ctx.font='700 36px "Noto Serif KR",serif'; ctx.fillStyle='rgba(232,184,109,0.9)';
+      ctx.fillText(s, W/2, y); y+=48;
+    });
+  }
+
+  y=H-110; drawLine(y,150,0.4);
+  y+=42; ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.fillText('picolab.kr', W/2, y);
+
+  cb(canvas);
+}
+
+function shareZiweiKakao() {
+  var btn = document.getElementById('ziweiKakaoBtn');
+  if(btn){ btn.disabled=true; btn.textContent='⏳ 생성 중...'; }
+  var pageUrl='https://picolab.kr?utm_source=share&utm_medium=kakao';
+  try{ navigator.clipboard && navigator.clipboard.writeText(pageUrl); }catch(e){}
+  _drawZiweiCard(function(canvas){
+    if(btn){ btn.disabled=false; btn.textContent='⭐ 카카오톡 공유'; }
+    if(!canvas){ _ziweiShowToast('카드 생성 실패 😢'); return; }
+    canvas.toBlob(function(blob){
+      if(!blob){ _ziweiShowToast('이미지 생성 실패'); return; }
+      var file=new File([blob],'fortuna_ziwei.png',{type:'image/png'});
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:'FORTUNA 자미두수'})
+          .then(function(){ _ziweiShowToast('🔗 링크가 클립보드에 복사됐어요!'); }).catch(function(){});
+      } else if(navigator.share){
+        navigator.share({title:'FORTUNA 자미두수',url:pageUrl}).catch(function(){});
+        _ziweiShowToast('🔗 링크가 클립보드에 복사됐어요!');
+      } else {
+        _ziweiShowToast('🔗 링크가 클립보드에 복사됐어요!');
+      }
+    },'image/png');
+  });
 }
 </script>
 </body>

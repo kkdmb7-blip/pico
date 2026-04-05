@@ -337,11 +337,11 @@
     </div>
   </div>
 
-  <div class="action-row" id="action-row">
-    <a href="https://kkdmb7-blip.github.io/memox/?mode=astro" target="_blank" class="btn-memox">
-      ✦ AI 점성 상담하기
-    </a>
+  <div id="astroShareBtnWrap" style="display:none;padding:20px 20px 32px;flex-direction:column;align-items:center;gap:10px;">
+    <button id="astroKakaoBtn" onclick="shareAstroKakao()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;letter-spacing:-0.3px;">🌟 카카오톡 공유</button>
+    <a href="https://kkdmb7-blip.github.io/memox/?mode=astro" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;">✦ AI 점성 상담하기</a>
   </div>
+  <div class="action-row" id="action-row"></div>
 </main>
 
 <script>
@@ -622,12 +622,171 @@ async function loadChart(year, month, day, hour, min) {
     setVisible('card-interp', true);
 
     setVisible('card-action', true);
-    setVisible('action-row', true);
+
+    window._astroData = { planets, aspects };
+    var wrap = document.getElementById('astroShareBtnWrap');
+    wrap.style.display = 'flex';
 
   } catch(e) {
     status.className = 'status-msg visible err';
     status.textContent = '차트 로드 오류: ' + e.message;
   }
+}
+
+// ── 공유 카드 ─────────────────────────────────────────────
+function _astroShowToast(msg) {
+  var t = document.getElementById('_astroToast');
+  if (!t) {
+    t = document.createElement('div'); t.id = '_astroToast';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#e8e0f0;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._tid); t._tid = setTimeout(function(){ t.style.opacity='0'; }, 2500);
+}
+
+function _drawAstroCard(cb) {
+  var d = window._astroData;
+  if (!d) { cb(null); return; }
+  var planets = d.planets || [];
+  var get = function(name) { return (planets.find(function(p){ return p.name===name; })||{}).sign||''; };
+  var sunSign  = get('Sun'), moonSign = get('Moon'), ascSign = get('Ascendant');
+  var rising = get('Ascendant') || get('Rising');
+
+  var SIGN_SYM2 = { '양자리':'♈','황소자리':'♉','쌍둥이자리':'♊','게자리':'♋','사자자리':'♌','처녀자리':'♍','천칭자리':'♎','전갈자리':'♏','사수자리':'♐','염소자리':'♑','물병자리':'♒','물고기자리':'♓' };
+  var EL_COLOR2 = { '화':'#FF6B6B','지':'#A8D5A2','풍':'#FFE66D','수':'#74B9FF' };
+  var SIGN_EL2 = { '양자리':'화','사자자리':'화','사수자리':'화','황소자리':'지','처녀자리':'지','염소자리':'지','쌍둥이자리':'풍','천칭자리':'풍','물병자리':'풍','게자리':'수','전갈자리':'수','물고기자리':'수' };
+
+  var today = new Date(Date.now() + 9*3600000);
+  var dateStr = today.getUTCFullYear()+'년 '+(today.getUTCMonth()+1)+'월 '+today.getUTCDate()+'일';
+
+  var W = 1080, H = 1920;
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+
+  // 배경
+  var bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#0a0a1a'); bg.addColorStop(0.5,'#0f0f2e'); bg.addColorStop(1,'#1a0a2e');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // 별
+  [[8,12],[20,35],[38,8],[55,22],[72,10],[85,28],[6,52],[18,68],[32,80],[50,60],[66,78],[82,48],[90,65],[14,90],[44,45],[78,35],[60,90],[25,15],[92,82],[48,30],[35,55],[15,42],[70,25]].forEach(function(s){
+    var sz=((s[0]*3+s[1])%3)+1.5, op=0.25+((s[0]+s[1])%5)*0.1;
+    ctx.beginPath(); ctx.arc(s[0]/100*W, s[1]/100*H, sz, 0, Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,'+op+')'; ctx.fill();
+  });
+
+  ctx.textAlign='center';
+  var drawLine=function(cy,w2,alpha){
+    var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0);
+    lg.addColorStop(0,'transparent'); lg.addColorStop(0.5,'rgba(116,185,255,'+alpha+')'); lg.addColorStop(1,'transparent');
+    ctx.strokeStyle=lg; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(W/2-w2,cy); ctx.lineTo(W/2+w2,cy); ctx.stroke();
+  };
+
+  // 헤더
+  var y = 120;
+  ctx.font='700 40px "Noto Sans KR",sans-serif'; ctx.fillStyle='#74B9FF';
+  ctx.fillText('FORTUNA', W/2, y);
+  y+=32; ctx.font='400 26px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(116,185,255,0.65)';
+  ctx.fillText('서양 점성술 차트', W/2, y);
+  y+=36; ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.45)';
+  ctx.fillText(dateStr, W/2, y);
+  y+=30; drawLine(y,180,0.5);
+
+  // 빅3 카드
+  var cards = [
+    { icon:'☀️', role:'태양궁', sign: sunSign  },
+    { icon:'🌙', role:'달궁',   sign: moonSign },
+    { icon:'↑',  role:'상승궁', sign: ascSign  },
+  ];
+  y+=50;
+  ctx.font='700 28px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText('☀️ 태양 · 🌙 달 · ↑ 상승궁', W/2, y);
+
+  var cardW=280, cardH=220, cardGap=20;
+  var totalW=cards.length*cardW+(cards.length-1)*cardGap;
+  var cx0=W/2-totalW/2;
+  y+=30;
+  cards.forEach(function(c, i){
+    var cx2=cx0+i*(cardW+cardGap);
+    var elC=EL_COLOR2[SIGN_EL2[c.sign]]||'#aaa';
+    // 카드 배경
+    ctx.fillStyle='rgba(255,255,255,0.04)';
+    ctx.beginPath(); ctx.roundRect(cx2,y,cardW,cardH,14); ctx.fill();
+    ctx.strokeStyle=elC.replace(')',',0.4)').replace('rgb','rgba')||'rgba(116,185,255,0.3)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.roundRect(cx2,y,cardW,cardH,14); ctx.stroke();
+    // 아이콘
+    ctx.font='52px serif'; ctx.textAlign='center';
+    ctx.fillText(c.icon, cx2+cardW/2, y+70);
+    // 역할
+    ctx.font='400 20px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.45)';
+    ctx.fillText(c.role, cx2+cardW/2, y+105);
+    // 별자리
+    ctx.font='700 26px "Noto Sans KR",sans-serif'; ctx.fillStyle=elC;
+    ctx.fillText(c.sign||'–', cx2+cardW/2, y+145);
+    // 심볼
+    ctx.font='400 30px serif'; ctx.fillStyle='rgba(255,255,255,0.2)';
+    ctx.fillText(SIGN_SYM2[c.sign]||'', cx2+cardW/2, y+185);
+  });
+  ctx.textAlign='center';
+
+  // 행성 목록 (주요 5개)
+  y+=cardH+50;
+  drawLine(y,180,0.3);
+  y+=44;
+  ctx.font='700 28px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText('🌟 주요 행성 배치', W/2, y);
+  y+=40;
+
+  var PLANET_KO={'Sun':'태양','Moon':'달','Mercury':'수성','Venus':'금성','Mars':'화성','Jupiter':'목성','Saturn':'토성'};
+  var PLANET_ICON={'Sun':'☀️','Moon':'🌙','Mercury':'☿','Venus':'♀','Mars':'♂','Jupiter':'♃','Saturn':'♄'};
+  var mainPlanets=['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn'];
+  mainPlanets.forEach(function(name){
+    var p=planets.find(function(x){return x.name===name;});
+    if(!p) return;
+    var elC2=EL_COLOR2[SIGN_EL2[p.sign]]||'rgba(255,255,255,0.6)';
+    ctx.textAlign='left';
+    ctx.font='400 22px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.fillText((PLANET_ICON[name]||'')+(PLANET_KO[name]||name), W/2-200, y);
+    ctx.textAlign='right';
+    ctx.font='700 22px "Noto Sans KR",sans-serif'; ctx.fillStyle=elC2;
+    ctx.fillText((SIGN_SYM2[p.sign]||'')+' '+(p.sign||''), W/2+200, y);
+    ctx.textAlign='center';
+    y+=38;
+  });
+
+  y=H-110; drawLine(y,150,0.4);
+  y+=42; ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.fillText('picolab.kr', W/2, y);
+
+  cb(canvas);
+}
+
+function shareAstroKakao() {
+  var btn = document.getElementById('astroKakaoBtn');
+  if (btn) { btn.disabled=true; btn.textContent='⏳ 생성 중...'; }
+  var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
+  try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e){}
+  _drawAstroCard(function(canvas){
+    if(btn){ btn.disabled=false; btn.textContent='🌟 카카오톡 공유'; }
+    if(!canvas){ _astroShowToast('카드 생성 실패 😢'); return; }
+    canvas.toBlob(function(blob){
+      if(!blob){ _astroShowToast('이미지 생성 실패'); return; }
+      var file=new File([blob],'fortuna_astro.png',{type:'image/png'});
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:'FORTUNA 점성술'})
+          .then(function(){ _astroShowToast('🔗 링크가 클립보드에 복사됐어요!'); })
+          .catch(function(){});
+      } else if(navigator.share){
+        navigator.share({title:'FORTUNA 점성술',url:pageUrl}).catch(function(){});
+        _astroShowToast('🔗 링크가 클립보드에 복사됐어요!');
+      } else {
+        _astroShowToast('🔗 링크가 클립보드에 복사됐어요!');
+      }
+    },'image/png');
+  });
 }
 
 // ── STARS ─────────────────────────────────────────────────
