@@ -557,16 +557,13 @@
     </div>
   </div>
 
-  <!-- 공유 버튼 -->
-  <div id="qimenShareBtnWrap" style="display:none;text-align:center;padding:16px 20px 4px;">
-    <button onclick="shareQimenKakao()" style="padding:13px 32px;background:#fee500;color:#3c1e1e;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:320px;">🧭 카카오톡 공유</button>
+  <!-- 버튼 그룹 -->
+  <div id="qimenShareBtnWrap" style="display:none;padding:20px 20px 32px;display:none;flex-direction:column;align-items:center;gap:10px;">
+    <button onclick="shareQimenKakao()" id="qimenKakaoBtn" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;letter-spacing:-0.3px;">🧭 카카오톡 공유</button>
+    <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;">✦ AI 운세 상담하기</a>
   </div>
 
-  <div class="action-row" id="action-row">
-    <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" class="btn-ai">
-      ✦ AI 운세 상담하기
-    </a>
-  </div>
+  <div class="action-row" id="action-row"></div>
 </main>
 
 <script src="qimen_geokguk.js"></script>
@@ -828,12 +825,12 @@ function renderResult(data) {
   // 해석 카드
   renderInterp(data);
 
-  setVisible('action-row', true);
   hasResult = true;
 
   // 공유 카드용 데이터 저장
   _qimenData = data;
-  document.getElementById('qimenShareBtnWrap').style.display = 'block';
+  var wrap = document.getElementById('qimenShareBtnWrap');
+  wrap.style.display = 'flex';
 }
 
 function buildCell(n, p, isZhifu) {
@@ -1060,132 +1057,260 @@ function _drawQimenCard(cb) {
   if (!_qimenData) { cb(null); return; }
   var data = _qimenData;
   var meta = data.meta || {};
+  var palaces = data.palaces || {};
 
-  // 최길 방향 추출
-  var bestDirs = [];
-  ['生','開'].forEach(function(door) {
-    Object.entries(data.palaces || {}).forEach(function(entry) {
-      var n = entry[0], p = entry[1];
-      if (p && p.팔문 === door) bestDirs.push(GONG_DIR_LOCAL[parseInt(n)] + '(' + door + '門)');
-    });
-  });
-  var bestDirText = bestDirs.length ? bestDirs.join(' · ') : '–';
   var today = new Date(Date.now() + 9*3600000);
   var dateStr = today.getUTCFullYear()+'년 '+(today.getUTCMonth()+1)+'월 '+today.getUTCDate()+'일';
-  var dunStr = (meta.음양둔 || '') + ' ' + (meta.원 || '') + ' ' + (meta.국수 ? meta.국수+'국' : '');
+  var dunStr = (meta.음양둔 || '') + ' · ' + (meta.원 || '') + ' ' + (meta.국수 ? meta.국수+'국' : '');
   var jieqiStr = meta.절기 || '';
-  var doorStr = meta['직사문'] || data['직사문'] || '';
-  var starStr = meta['직부성'] || data['직부성'] || '';
+  var zhifuGong = data['직부궁'];
 
-  var W = 540, H = 960;
+  // 최길방향 수집 (生門·開門·六合역마)
+  var bestDirs = [];
+  ['生','開'].forEach(function(door) {
+    Object.entries(palaces).forEach(function(e) {
+      var p = e[1];
+      if (p && p.팔문 === door) bestDirs.push({ dir: GONG_DIR_LOCAL[parseInt(e[0])], door: door+'門', color: '#FFD700' });
+    });
+  });
+  Object.entries(palaces).forEach(function(e) {
+    var p = e[1];
+    if (p && p.팔신 === '六合') bestDirs.push({ dir: GONG_DIR_LOCAL[parseInt(e[0])], door: '역마·六合', color: '#a07fd4' });
+  });
+
+  // 오행 색상
+  var EL_C = { 목:'#00C853', 화:'#FF5252', 토:'#FFD740', 금:'#d4d4d4', 수:'#64b5f6' };
+  var EL_B = { 목:'rgba(0,200,83,0.18)', 화:'rgba(255,82,82,0.18)', 토:'rgba(255,215,0,0.18)', 금:'rgba(212,212,212,0.12)', 수:'rgba(100,181,246,0.18)' };
+  var STAR_EL2 = {'天蓬':'수','天芮':'토','天衝':'목','天冲':'목','天輔':'목','天禽':'토','天心':'금','天柱':'금','天任':'토','天英':'화'};
+  var SHEN_EL2 = {'直符':'토','値符':'토','騰蛇':'화','太陰':'금','六合':'목','白虎':'금','玄武':'수','九地':'토','九天':'금'};
+  var DOOR_EL2 = {'生':'목','傷':'목','杜':'목','景':'화','死':'토','開':'금','驚':'금','休':'수'};
+  var DOOR_GOOD = {'生':true,'開':true,'休':true};
+
+  var W = 1080, H = 1920;
   var canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H;
   var ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
 
   // 배경
-  var bg = ctx.createLinearGradient(0, 0, W*0.4, H);
-  bg.addColorStop(0, '#0a0a0f');
-  bg.addColorStop(0.6, '#1a1a2e');
-  bg.addColorStop(1, '#0f1f3d');
+  var bg = ctx.createLinearGradient(0, 0, W*0.3, H);
+  bg.addColorStop(0, '#0a0a0f'); bg.addColorStop(0.55, '#12122a'); bg.addColorStop(1, '#0f1f3d');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
   // 별
-  var starSeeds = [[8,12],[20,35],[38,8],[55,22],[72,10],[85,28],[6,52],[18,68],[32,80],[50,60],[66,78],[82,48],[90,65],[14,90],[44,45],[78,35],[60,90],[25,15],[92,82],[48,30],[35,55],[15,42],[70,25]];
-  starSeeds.forEach(function(s) {
-    var sz = ((s[0]*3+s[1])%3)+1;
-    var op = 0.3+((s[0]+s[1])%5)*0.12;
-    ctx.beginPath();
-    ctx.arc(s[0]/100*W, s[1]/100*H, sz, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,'+op+')';
-    ctx.fill();
+  [[8,12],[20,35],[38,8],[55,22],[72,10],[85,28],[6,52],[18,68],[32,80],[50,60],[66,78],[82,48],[90,65],[14,90],[44,45],[78,35],[60,90],[25,15],[92,82],[48,30],[35,55],[15,42],[70,25],[5,75],[65,15],[30,68]].forEach(function(s) {
+    var sz = ((s[0]*3+s[1])%3)+1.5;
+    var op = 0.25+((s[0]+s[1])%5)*0.1;
+    ctx.beginPath(); ctx.arc(s[0]/100*W, s[1]/100*H, sz, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,'+op+')'; ctx.fill();
   });
 
   ctx.textAlign = 'center';
 
-  // FORTUNA 로고
-  var y = 140;
-  ctx.font = '700 22px "Noto Sans KR", sans-serif';
+  // ─── 헤더 ───
+  var y = 110;
+  ctx.font = '700 40px "Noto Sans KR", sans-serif';
   ctx.fillStyle = '#c9a84c';
-  ctx.letterSpacing = '0.3em';
   ctx.fillText('FORTUNA', W/2, y);
 
-  // 구분선
-  y += 20;
-  var lg = ctx.createLinearGradient(W/2-60, 0, W/2+60, 0);
-  lg.addColorStop(0, 'transparent'); lg.addColorStop(0.5, '#c9a84c'); lg.addColorStop(1, 'transparent');
-  ctx.strokeStyle = lg; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(W/2-60, y); ctx.lineTo(W/2+60, y); ctx.stroke();
-
-  // 기문둔갑
-  y += 48;
-  ctx.font = '400 13px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(201,168,76,0.75)';
+  y += 28;
+  ctx.font = '400 26px "Noto Sans KR", sans-serif';
+  ctx.fillStyle = 'rgba(201,168,76,0.65)';
   ctx.fillText('기문둔갑 포국반', W/2, y);
 
-  // 날짜
-  y += 48;
-  ctx.font = '400 18px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  y += 36;
+  ctx.font = '400 28px "Noto Sans KR", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
   ctx.fillText(dateStr, W/2, y);
 
-  // 절기/원/국수
-  y += 36;
-  ctx.font = '400 14px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  ctx.fillText((jieqiStr ? jieqiStr + ' · ' : '') + dunStr.trim(), W/2, y);
+  y += 34;
+  ctx.font = '400 24px "Noto Sans KR", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.fillText(jieqiStr + ' · ' + dunStr, W/2, y);
 
   // 구분선
-  y += 40;
-  var lg2 = ctx.createLinearGradient(W/2-100, 0, W/2+100, 0);
-  lg2.addColorStop(0, 'transparent'); lg2.addColorStop(0.5, 'rgba(201,168,76,0.35)'); lg2.addColorStop(1, 'transparent');
-  ctx.strokeStyle = lg2; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(W/2-100, y); ctx.lineTo(W/2+100, y); ctx.stroke();
-
-  // 직사문 섹션
-  y += 52;
-  ctx.font = '400 12px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.45)';
-  ctx.fillText('직사문', W/2, y);
-  y += 38;
-  ctx.font = '700 42px "Noto Serif KR", serif';
-  ctx.fillStyle = '#e8d080';
-  ctx.fillText(doorStr ? doorStr + '門' : '–', W/2, y);
-
-  // 직부성
-  if (starStr) {
-    y += 32;
-    ctx.font = '400 13px "Noto Sans KR", sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
-    ctx.fillText('직부성 · ' + starStr, W/2, y);
-  }
-
-  // 최길 방향 섹션
-  y += 70;
-  ctx.font = '400 12px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.45)';
-  ctx.fillText('🧭 오늘의 최길 방향', W/2, y);
-  y += 44;
-  ctx.font = '700 28px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = '#FFD700';
-  // 긴 텍스트면 줄 나눠서
-  var parts = bestDirText.split(' · ');
-  if (parts.length > 2) {
-    ctx.font = '700 22px "Noto Sans KR", sans-serif';
-    parts.forEach(function(p, i) { ctx.fillText(p, W/2, y + i*34); });
-    y += (parts.length - 1) * 34;
-  } else {
-    ctx.fillText(bestDirText, W/2, y);
-  }
-
-  // 하단 구분선 + URL
-  y = H - 100;
-  var lg3 = ctx.createLinearGradient(W/2-60, 0, W/2+60, 0);
-  lg3.addColorStop(0, 'transparent'); lg3.addColorStop(0.5, '#c9a84c'); lg3.addColorStop(1, 'transparent');
-  ctx.strokeStyle = lg3; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(W/2-60, y); ctx.lineTo(W/2+60, y); ctx.stroke();
   y += 28;
-  ctx.font = '400 13px "Noto Sans KR", sans-serif';
+  var drawLine = function(cy, w2, alpha) {
+    var lg = ctx.createLinearGradient(W/2-w2, 0, W/2+w2, 0);
+    lg.addColorStop(0,'transparent'); lg.addColorStop(0.5,'rgba(201,168,76,'+alpha+')'); lg.addColorStop(1,'transparent');
+    ctx.strokeStyle=lg; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(W/2-w2, cy); ctx.lineTo(W/2+w2, cy); ctx.stroke();
+  };
+  drawLine(y, 200, 0.5);
+
+  // ─── 9궁 그리드 ───
+  y += 28;
+  var gridTitle = '9궁 포국  ·  낙서 배치';
+  ctx.font = '400 22px "Noto Sans KR", sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillText(gridTitle, W/2, y);
+
+  y += 20;
+  var LAKSHO2 = [[4,9,2],[3,5,7],[8,1,6]];
+  var pad = 36;
+  var gridW = W - pad*2;
+  var cellW = Math.floor(gridW / 3);
+  var cellH = 200;
+  var gridX = pad;
+  var gridY = y;
+
+  // 그리드 배경 + 테두리
+  ctx.fillStyle = '#13131a';
+  ctx.beginPath();
+  ctx.roundRect(gridX, gridY, gridW, cellH*3, 16);
+  ctx.fill();
+
+  LAKSHO2.forEach(function(row, ri) {
+    row.forEach(function(n, ci) {
+      var cx = gridX + ci*cellW;
+      var cy = gridY + ri*cellH;
+      var p = palaces[String(n)] || {};
+      var isZhifu = n === zhifuGong;
+
+      // 직부궁 배경
+      if (isZhifu) {
+        ctx.fillStyle = 'rgba(123,94,167,0.12)';
+        ctx.fillRect(cx, cy, cellW, cellH);
+      }
+
+      // 셀 테두리
+      ctx.strokeStyle = '#2a2a3d'; ctx.lineWidth = 1;
+      ctx.strokeRect(cx, cy, cellW, cellH);
+
+      var midX = cx + cellW/2;
+
+      // 궁번호 (좌상단)
+      ctx.textAlign = 'left';
+      ctx.font = '400 20px "Noto Sans KR", sans-serif';
+      ctx.fillStyle = '#6b6b85';
+      ctx.fillText(n+'궁', cx+14, cy+28);
+
+      // 방위 (우상단)
+      ctx.textAlign = 'right';
+      ctx.font = '600 19px "Noto Sans KR", sans-serif';
+      ctx.fillStyle = isZhifu ? '#c9a84c' : '#6b6b85';
+      ctx.fillText(GONG_DIR_LOCAL[n]||'', cx+cellW-12, cy+28);
+
+      // 직부 표시
+      if (isZhifu) {
+        ctx.textAlign = 'right';
+        ctx.font = '700 18px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = '#c9a84c';
+        ctx.fillText('★直', cx+cellW-12, cy+52);
+      }
+
+      ctx.textAlign = 'center';
+
+      // 구성(九星) — 박스형
+      if (p.구성) {
+        var el = STAR_EL2[p.구성] || '토';
+        var sc = EL_C[el]||'#aaa', sb = EL_B[el]||'rgba(255,255,255,0.08)';
+        var starW = p.구성.length * 22 + 12;
+        var starX = midX - starW/2, starY = cy + 46;
+        ctx.fillStyle = sb;
+        ctx.beginPath(); ctx.roundRect(starX, starY, starW, 30, 6); ctx.fill();
+        ctx.strokeStyle = sc; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.roundRect(starX, starY, starW, 30, 6); ctx.stroke();
+        ctx.font = '700 19px "Noto Serif KR", serif';
+        ctx.fillStyle = sc;
+        ctx.fillText(p.구성, midX, starY+21);
+      }
+
+      // 팔신 — 박스형
+      if (p.팔신) {
+        var el2 = SHEN_EL2[p.팔신]||'토';
+        var sc2 = EL_C[el2]||'#aaa', sb2 = EL_B[el2]||'rgba(255,255,255,0.08)';
+        var shenW = p.팔신.length * 22 + 12;
+        var shenX = midX - shenW/2, shenY = cy + 83;
+        ctx.fillStyle = sb2;
+        ctx.beginPath(); ctx.roundRect(shenX, shenY, shenW, 30, 6); ctx.fill();
+        ctx.strokeStyle = sc2; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.roundRect(shenX, shenY, shenW, 30, 6); ctx.stroke();
+        ctx.font = '700 19px "Noto Serif KR", serif';
+        ctx.fillStyle = sc2;
+        ctx.fillText(p.팔신, midX, shenY+21);
+      }
+
+      // 지반 천간 — 큰 글씨
+      if (p.지반) {
+        var stem1 = p.지반[0] || '';
+        var stemEl2 = STEM_OHAENG[stem1] || '토';
+        var stemC = EL_C[stemEl2]||'#aaa', stemB = EL_B[stemEl2]||'rgba(255,255,255,0.08)';
+        var stemW = 54, stemH2 = 54;
+        var stemX = midX - stemW/2, stemY = cy + 118;
+        ctx.fillStyle = stemB;
+        ctx.beginPath(); ctx.roundRect(stemX, stemY, stemW, stemH2, 10); ctx.fill();
+        ctx.strokeStyle = stemC; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.roundRect(stemX, stemY, stemW, stemH2, 10); ctx.stroke();
+        ctx.font = '700 30px "Noto Serif KR", serif';
+        ctx.fillStyle = stemC;
+        ctx.fillText(p.지반, midX, stemY+38);
+      }
+
+      // 팔문 — 우하단 작게
+      if (p.팔문) {
+        var del2 = DOOR_EL2[p.팔문]||'토';
+        var dc = EL_C[del2]||'#aaa';
+        var isGood = DOOR_GOOD[p.팔문];
+        ctx.font = (isGood ? '700' : '400') + ' 21px "Noto Serif KR", serif';
+        ctx.fillStyle = isGood ? '#FFD700' : 'rgba(255,255,255,0.4)';
+        ctx.textAlign = 'right';
+        ctx.fillText(p.팔문+'門', cx+cellW-12, cy+cellH-14);
+      }
+
+      ctx.textAlign = 'center';
+    });
+  });
+
+  // 그리드 외곽 테두리
+  ctx.strokeStyle = '#2a2a3d'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(gridX, gridY, gridW, cellH*3, 16); ctx.stroke();
+
+  // ─── 최길 방향 ───
+  y = gridY + cellH*3 + 48;
+  drawLine(y, 180, 0.3);
+
+  y += 38;
+  ctx.font = '700 30px "Noto Sans KR", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillText('🧭 오늘의 최길 방향', W/2, y);
+
+  y += 44;
+  var chipW = 200, chipH = 72, chipGap = 16;
+  var totalChipW = bestDirs.length * chipW + (bestDirs.length-1)*chipGap;
+  var chipStartX = W/2 - totalChipW/2;
+
+  if (bestDirs.length === 0) {
+    ctx.font = '400 26px "Noto Sans KR", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillText('–', W/2, y+36);
+  } else {
+    bestDirs.forEach(function(bd, i) {
+      var cx2 = chipStartX + i*(chipW+chipGap);
+      // 칩 배경
+      ctx.fillStyle = 'rgba(255,255,255,0.05)';
+      ctx.beginPath(); ctx.roundRect(cx2, y, chipW, chipH, 12); ctx.fill();
+      ctx.strokeStyle = bd.color === '#FFD700' ? 'rgba(255,215,0,0.35)' : 'rgba(160,127,212,0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.roundRect(cx2, y, chipW, chipH, 12); ctx.stroke();
+      // 방위 텍스트
+      ctx.font = '700 28px "Noto Serif KR", serif';
+      ctx.fillStyle = bd.color;
+      ctx.textAlign = 'center';
+      ctx.fillText(bd.dir, cx2+chipW/2, y+34);
+      // 문 레이블
+      ctx.font = '400 20px "Noto Sans KR", sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.fillText(bd.door, cx2+chipW/2, y+58);
+    });
+  }
+
+  // ─── 하단 ───
+  y = H - 110;
+  drawLine(y, 150, 0.4);
+  y += 42;
+  ctx.font = '400 24px "Noto Sans KR", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
   ctx.fillText('picolab.kr', W/2, y);
 
   cb(canvas);
