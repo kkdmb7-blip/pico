@@ -368,20 +368,10 @@
 
 <!-- 사주 공유 버튼 (결과 보이면 표시) -->
 <div id="sajuShareBtnWrap" style="display:none;text-align:center;padding:0 16px 20px;max-width:440px;margin:0 auto;">
-  <button onclick="openSajuShareCard()" style="width:100%;padding:13px;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;">🔗 결과 공유하기</button>
-</div>
-
-<!-- 사주 공유 모달 -->
-<div id="sajuShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;flex-direction:column;padding:20px;box-sizing:border-box;">
-  <button onclick="closeSajuShareModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;">✕</button>
-  <div id="sajuSharePreview" style="width:min(320px,80vw);max-height:70vh;overflow-y:auto;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,0.7);background:#0d0d14;"></div>
-  <p id="sajuShareLoading" style="color:#c9a84c;font-size:13px;margin-top:14px;">카드 생성 중... ✨</p>
-  <div id="sajuShareActions" style="display:none;gap:8px;margin-top:16px;flex-wrap:wrap;justify-content:center;">
-    <button onclick="shareSajuKakao()" style="padding:11px 18px;border-radius:22px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#fee500;color:#3c1e1e;">카카오톡 공유</button>
-    <button onclick="downloadSajuCard()" style="padding:11px 18px;border-radius:22px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:linear-gradient(135deg,#c9a84c,#e8d080);color:#1a1a2e;">이미지 저장</button>
-    <button onclick="copySajuLink()" style="padding:11px 18px;border-radius:22px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.2);">🔗 링크 복사</button>
-    <button onclick="closeSajuShareModal()" style="padding:11px 18px;border-radius:22px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.45);">닫기</button>
-  </div>
+  <button id="sajuShareBtn" onclick="shareSajuKakao()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#fee500;color:#3c1e1e;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="#3c1e1e"><path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.07 1.7 5.78 4.32 7.46L5.5 22l4.27-2.14C10.47 20.28 11.22 20.4 12 20.4c5.52 0 10-3.92 10-8.8C22 5.92 17.52 2 12 2z"/></svg>
+    카카오톡 공유
+  </button>
 </div>
 
 <script>
@@ -1063,17 +1053,9 @@ function renderJohu(data) {
 var _sajuCanvas = null;
 var _sajuData = null;
 
-function openSajuShareCard() {
-  if (!_sajuData) return;
+function openSajuShareCard(cb) {
+  if (!_sajuData) { if(cb) cb(null); return; }
   _sajuCanvas = null;
-
-  var modal = document.getElementById('sajuShareModal');
-  var preview = document.getElementById('sajuSharePreview');
-  var loading = document.getElementById('sajuShareLoading');
-  var actions = document.getElementById('sajuShareActions');
-  preview.innerHTML = ''; loading.style.display = 'block'; actions.style.display = 'none';
-  modal.style.display = 'flex';
-  document.addEventListener('keydown', _sajuEsc);
 
   // Canvas 2D로 직접 그리기 — html2canvas flex 버그 완전 우회
   var d = _sajuData;
@@ -1270,14 +1252,10 @@ function openSajuShareCard() {
     ctx.fillText('picolab.kr에서 무료로 확인하세요', W/2, y+16);
 
     _sajuCanvas = cv;
-    var img = document.createElement('img');
-    img.src = cv.toDataURL('image/png');
-    img.style.cssText = 'width:100%;height:auto;display:block;';
-    preview.style.height = 'auto';
-    preview.innerHTML = ''; preview.appendChild(img);
-    loading.style.display = 'none'; actions.style.display = 'flex';
-  }).catch(function(){
-    loading.textContent = '카드 생성 실패 😢';
+    if (cb) cb(cv);
+  }).catch(function(e){
+    console.error('사주 카드 생성 실패:', e);
+    if (cb) cb(null);
   });
 }
 
@@ -1297,7 +1275,9 @@ function downloadSajuCard() {
 }
 
 function shareSajuKakao() {
-  if (!_sajuCanvas) return;
+  var btn = document.getElementById('sajuShareBtn');
+  if (btn) { btn.textContent = '공유 준비 중...'; btn.disabled = true; }
+
   var d = _sajuData || {};
   var dayPillar = (d.summary && d.summary.pillars && d.summary.pillars.day) || '';
   var EN_EL_MAP = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
@@ -1307,40 +1287,57 @@ function shareSajuKakao() {
 
   if (window.Kakao && !window.Kakao.isInitialized()) window.Kakao.init('2543c896dead8185e2edfa0976396f25');
 
-  _sajuCanvas.toBlob(function(blob) {
-    var file = new File([blob], 'fortuna_saju.png', { type: 'image/png' });
-    if (window.Kakao && window.Kakao.isInitialized()) {
-      Kakao.Share.uploadImage({ file: [file] }).then(function(res) {
-        Kakao.Share.sendDefault({
-          objectType: 'feed',
-          content: {
-            title: '🔮 FORTUNA 사주 분석',
-            description: desc,
-            imageUrl: res.infos.original.url,
-            link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
-          },
-          buttons: [{ title: 'picolab.kr에서 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
-        });
-      }).catch(function() {
-        Kakao.Share.sendDefault({
-          objectType: 'feed',
-          content: {
-            title: '🔮 FORTUNA 사주 분석',
-            description: desc,
-            imageUrl: 'https://picolab.kr/og.png',
-            link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
-          },
-          buttons: [{ title: 'picolab.kr에서 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
-        });
-      });
-    } else if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], text: desc + '\n\n나도 확인해봐 👇\n' + pageUrl }).catch(function(){});
-    } else {
-      navigator.clipboard && navigator.clipboard.writeText(desc + '\n\n' + pageUrl);
-      alert('클립보드에 복사했어요!');
-    }
-  }, 'image/png');
-  closeSajuShareModal();
+  function resetBtn() {
+    if (btn) { btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="#3c1e1e"><path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.07 1.7 5.78 4.32 7.46L5.5 22l4.27-2.14C10.47 20.28 11.22 20.4 12 20.4c5.52 0 10-3.92 10-8.8C22 5.92 17.52 2 12 2z"/></svg> 카카오톡 공유'; btn.disabled = false; }
+  }
+
+  // 카드가 아직 없으면 새로 그리고, 있으면 바로 공유
+  var doShare = function(cv) {
+    if (!cv) { alert('카드 생성 실패'); resetBtn(); return; }
+    cv.toBlob(function(blob) {
+      var file = new File([blob], 'fortuna_saju.png', { type: 'image/png' });
+      if (window.Kakao && window.Kakao.isInitialized()) {
+        Kakao.Share.uploadImage({ file: [file] })
+          .then(function(res) {
+            resetBtn();
+            Kakao.Share.sendDefault({
+              objectType: 'feed',
+              content: {
+                title: '🔮 FORTUNA 사주 분석',
+                description: desc,
+                imageUrl: res.infos.original.url,
+                link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+              },
+              buttons: [{ title: 'picolab.kr에서 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+            });
+          })
+          .catch(function(err) {
+            console.warn('Kakao uploadImage 실패, navigator.share로 대체:', err);
+            resetBtn();
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+              navigator.share({ files: [file], text: desc + '\n\n나도 확인해봐 👇\n' + pageUrl }).catch(function(){});
+            } else {
+              navigator.clipboard && navigator.clipboard.writeText(desc + '\n\n' + pageUrl);
+              alert('링크를 클립보드에 복사했어요!');
+            }
+          });
+      } else {
+        resetBtn();
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], text: desc + '\n\n나도 확인해봐 👇\n' + pageUrl }).catch(function(){});
+        } else {
+          navigator.clipboard && navigator.clipboard.writeText(desc + '\n\n' + pageUrl);
+          alert('링크를 클립보드에 복사했어요!');
+        }
+      }
+    }, 'image/png');
+  };
+
+  if (_sajuCanvas) {
+    doShare(_sajuCanvas);
+  } else {
+    openSajuShareCard(doShare);  // 카드 그린 후 콜백
+  }
 }
 
 function copySajuLink() {
