@@ -1173,13 +1173,13 @@
 </div>
 
 <!-- GUNGHAP RESULT MODAL -->
-<div class="saju-overlay" id="gunghapResultOverlay" onclick="if(event.target===this)closeGunghapResult()" style="display:none;">
-  <div class="saju-modal" style="max-height:85vh;overflow-y:auto;padding-bottom:28px;">
+<div class="saju-overlay" id="gunghapResultOverlay" onclick="if(event.target===this)closeGunghapResult()" style="display:none;padding:12px;">
+  <div class="saju-modal" style="padding:20px 16px 24px;max-height:92vh;overflow-y:auto;width:100%;">
     <button class="saju-modal-close" onclick="closeGunghapResult()">✕</button>
-    <h3 style="color:#ff8ab0;">💕 궁합 결과</h3>
-    <div id="ghResultNames" style="font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:16px;"></div>
-    <div id="ghResultCards" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;"></div>
-    <div id="ghResultAI" style="font-size:14px;line-height:1.85;color:#e8e0f0;"></div>
+    <h3 style="color:#ff8ab0;font-size:18px;margin-bottom:4px;">💕 궁합 결과</h3>
+    <div id="ghResultNames" style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:14px;"></div>
+    <div id="ghResultCards" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;"></div>
+    <div id="ghResultAI" style="font-size:13px;line-height:1.8;color:#e8e0f0;"></div>
   </div>
 </div>
 
@@ -1562,23 +1562,23 @@ function _calcSaju(year, month, day, hour) {
 
 function _sajuMiniCard(saju, label, name, gender) {
   var EL_BG=saju.EL_BG, EL_TC=saju.EL_TC;
-  function box(h,bg,tc){ return '<div style="width:36px;height:36px;border-radius:6px;background:'+bg+';text-align:center;line-height:36px;font-family:\'Noto Serif KR\',serif;font-size:18px;font-weight:700;color:'+tc+';margin:0 auto 2px;">'+h+'</div>'; }
+  function box(h,bg,tc){ return '<div style="width:30px;height:30px;border-radius:5px;background:'+bg+';text-align:center;line-height:30px;font-family:\'Noto Serif KR\',serif;font-size:15px;font-weight:700;color:'+tc+';margin:0 auto 2px;">'+h+'</div>'; }
   var order=['hour','day','month','year'], labs=['시','일','월','년'];
   var cols=order.map(function(k,i){
     return '<div style="text-align:center;">'
-      +'<div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:3px;">'+labs[i]+'</div>'
+      +'<div style="font-size:8px;color:rgba(255,255,255,0.3);margin-bottom:2px;">'+labs[i]+'</div>'
       +box(saju.stemH[k],EL_BG[saju.stemEl[k]]||'#333',EL_TC[saju.stemEl[k]]||'#fff')
       +box(saju.branchH[k],EL_BG[saju.branchEl[k]]||'#333',EL_TC[saju.branchEl[k]]||'#fff')
       +'</div>';
   }).join('');
   var gText=gender==='F'?'여성':gender==='M'?'남성':'';
   var fp=saju.fivePct;
-  return '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 10px;">'
-    +'<div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:4px;">'+label+'</div>'
-    +'<div style="font-size:13px;font-weight:700;color:#e8e0f0;margin-bottom:8px;">'+(name||label)
-    +(gText?' <span style="font-size:10px;color:rgba(255,255,255,0.35);">'+gText+'</span>':'')+' <span style="font-size:10px;color:rgba(255,255,255,0.35);">'+saju.zodiac+'띠</span></div>'
-    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">'+cols+'</div>'
-    +'<div style="margin-top:8px;font-size:10px;color:rgba(255,255,255,0.4);">일간 '+saju.dayEl+' · '+saju.strength+'<br>목'+fp.목+'%·화'+fp.화+'%·토'+fp.토+'%·금'+fp.금+'%·수'+fp.수+'%</div>'
+  return '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 8px;">'
+    +'<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:3px;">'+label+'</div>'
+    +'<div style="font-size:12px;font-weight:700;color:#e8e0f0;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(name||label)
+    +(gText?' <span style="font-size:9px;color:rgba(255,255,255,0.35);">'+gText+'</span>':'')+' <span style="font-size:9px;color:rgba(255,255,255,0.35);">'+saju.zodiac+'띠</span></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;">'+cols+'</div>'
+    +'<div style="margin-top:6px;font-size:9px;color:rgba(255,255,255,0.4);line-height:1.5;">'+saju.dayEl+' · '+saju.strength+'<br>목'+fp.목+'·화'+fp.화+'·토'+fp.토+'·금'+fp.금+'·수'+fp.수+'</div>'
     +'</div>';
 }
 
