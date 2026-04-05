@@ -603,107 +603,127 @@ function _drawZiweiCard(cb) {
   var d = window._ziweiData;
   if (!d) { cb(null); return; }
 
-  var today = new Date(Date.now() + 9*3600000);
+  var today = new Date(Date.now()+9*3600000);
   var dateStr = today.getUTCFullYear()+'년 '+(today.getUTCMonth()+1)+'월 '+today.getUTCDate()+'일';
 
-  var W = 1080, H = 1920;
-  var canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  var ctx = canvas.getContext('2d');
+  var W=1080, H=1920;
+  var canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
+  var ctx=canvas.getContext('2d');
 
-  var bg = ctx.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0,'#0a0a15'); bg.addColorStop(0.5,'#150a2a'); bg.addColorStop(1,'#0a1520');
+  // 배경
+  var bg=ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#050510'); bg.addColorStop(0.4,'#100820'); bg.addColorStop(1,'#080f1e');
   ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-
-  [[8,12],[20,35],[38,8],[55,22],[72,10],[85,28],[6,52],[18,68],[32,80],[50,60],[66,78],[82,48],[90,65],[14,90],[44,45],[78,35],[60,90],[25,15],[92,82],[48,30],[35,55],[15,42],[70,25]].forEach(function(s){
-    ctx.beginPath(); ctx.arc(s[0]/100*W, s[1]/100*H, ((s[0]*3+s[1])%3)+1.5, 0, Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,'+(0.25+((s[0]+s[1])%5)*0.1)+')'; ctx.fill();
+  [{cx:0.2,cy:0.15,r:0.4,c:'150,80,220,0.07'},{cx:0.8,cy:0.6,r:0.5,c:'80,60,180,0.06'},{cx:0.5,cy:0.85,r:0.35,c:'200,120,50,0.05'}].forEach(function(n){
+    var g=ctx.createRadialGradient(n.cx*W,n.cy*H,0,n.cx*W,n.cy*H,n.r*W); g.addColorStop(0,'rgba('+n.c+')'); g.addColorStop(1,'transparent'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  });
+  [[8,12,2],[20,35,1.5],[38,8,2],[55,22,1],[72,10,2.5],[85,28,1.5],[6,52,1],[18,68,2],[32,80,1.5],[50,60,1],[66,78,2],[82,48,1],[90,65,1.5],[14,90,2],[44,45,1],[78,35,1.5],[60,90,1],[25,15,2],[92,82,1.5],[48,30,1],[35,55,1.5],[15,42,2],[70,25,1],[42,72,1.5],[88,40,1]].forEach(function(s){
+    ctx.beginPath(); ctx.arc(s[0]/100*W,s[1]/100*H,s[2],0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,'+(0.2+((s[0]+s[1])%5)*0.1)+')'; ctx.fill();
   });
 
   ctx.textAlign='center';
-  var drawLine=function(cy,w2,alpha){
-    var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0);
-    lg.addColorStop(0,'transparent'); lg.addColorStop(0.5,'rgba(201,168,76,'+alpha+')'); lg.addColorStop(1,'transparent');
-    ctx.strokeStyle=lg; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(W/2-w2,cy); ctx.lineTo(W/2+w2,cy); ctx.stroke();
-  };
+  function drawLine(cy,w2,al){ var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0); lg.addColorStop(0,'transparent'); lg.addColorStop(0.5,'rgba(201,168,76,'+al+')'); lg.addColorStop(1,'transparent'); ctx.strokeStyle=lg; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(W/2-w2,cy); ctx.lineTo(W/2+w2,cy); ctx.stroke(); }
+  function fRR(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); }
+  function sRR(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.stroke(); }
 
-  var y=120;
-  ctx.font='700 40px "Noto Sans KR",sans-serif'; ctx.fillStyle='#e8b86d';
-  ctx.fillText('FORTUNA', W/2, y);
-  y+=32; ctx.font='400 26px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(232,184,109,0.65)';
-  ctx.fillText('자미두수 명반', W/2, y);
-  y+=36; ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.45)';
-  ctx.fillText(dateStr, W/2, y);
-  y+=30; drawLine(y,180,0.5);
+  // ── 헤더
+  var y=110;
+  ctx.font='bold 48px sans-serif'; ctx.fillStyle='#e8b86d'; ctx.fillText('FORTUNA',W/2,y);
+  y+=40; ctx.font='400 28px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(232,184,109,0.7)'; ctx.fillText('자미두수 명반',W/2,y);
+  y+=36; ctx.font='400 22px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.fillText(dateStr,W/2,y);
+  y+=28; drawLine(y,220,0.5);
 
-  // 핵심 3개 배지
-  y+=50;
-  ctx.font='700 28px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
-  ctx.fillText('⭐ 핵심 명반 정보', W/2, y);
-  var badges=[
-    {label:'명주성', val:d.destinyMaster||'—'},
-    {label:'신주성', val:d.bodyMaster||'—'},
-    {label:'오행국', val:d.element||'—'},
-  ];
-  var bW=280, bH=160, bGap=20;
-  var totalBW=badges.length*bW+(badges.length-1)*bGap;
-  var bx0=W/2-totalBW/2;
-  y+=34;
+  // ── 핵심 3배지
+  y+=44; ctx.font='600 26px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fillText('⭐ 핵심 명반',W/2,y); y+=30;
+  var badges=[{label:'명주성',val:d.destinyMaster||'—'},{label:'신주성',val:d.bodyMaster||'—'},{label:'오행국',val:d.element||'—'}];
+  var bW=300,bH=175,bGap=16,bx0=W/2-((bW*3+bGap*2)/2);
   badges.forEach(function(b,i){
-    var bx2=bx0+i*(bW+bGap);
-    ctx.fillStyle='rgba(232,184,109,0.07)';
-    ctx.beginPath(); ctx.roundRect(bx2,y,bW,bH,14); ctx.fill();
-    ctx.strokeStyle='rgba(232,184,109,0.3)'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.roundRect(bx2,y,bW,bH,14); ctx.stroke();
-    ctx.font='400 20px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)';
-    ctx.fillText(b.label, bx2+bW/2, y+46);
-    ctx.font='700 34px "Noto Serif KR",serif'; ctx.fillStyle='#e8b86d';
-    ctx.fillText(b.val, bx2+bW/2, y+110);
+    var bx=bx0+i*(bW+bGap);
+    var bg2=ctx.createLinearGradient(bx,y,bx,y+bH); bg2.addColorStop(0,'rgba(232,184,109,0.1)'); bg2.addColorStop(1,'rgba(232,184,109,0.03)'); ctx.fillStyle=bg2; fRR(bx,y,bW,bH,16);
+    var tg=ctx.createLinearGradient(bx,y,bx+bW,y); tg.addColorStop(0,'transparent'); tg.addColorStop(0.5,'rgba(232,184,109,0.7)'); tg.addColorStop(1,'transparent'); ctx.fillStyle=tg; ctx.beginPath(); ctx.roundRect(bx,y,bW,3,[16,16,0,0]); ctx.fill();
+    ctx.strokeStyle='rgba(232,184,109,0.3)'; ctx.lineWidth=1.5; sRR(bx,y,bW,bH,16);
+    ctx.font='400 20px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.fillText(b.label,bx+bW/2,y+46);
+    ctx.font='700 36px "Noto Serif KR",serif'; ctx.fillStyle='#e8b86d'; ctx.fillText(b.val,bx+bW/2,y+112);
   });
+  y+=bH+46;
 
-  // 현재 대한
-  y+=bH+50; drawLine(y,180,0.4); y+=44;
-  ctx.font='700 28px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
-  ctx.fillText('🌊 현재 대한 大限', W/2, y); y+=44;
-  var dec2=d.currentDecade;
-  if(dec2){
-    ctx.font='700 40px "Noto Serif KR",serif'; ctx.fillStyle='#e8b86d';
-    ctx.fillText(dec2.name||'—', W/2, y); y+=36;
-    ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)';
-    ctx.fillText(dec2.ageRange||'', W/2, y); y+=44;
-    if(dec2.stars && dec2.stars.length){
-      var stW=140, stH=48, stGap=10;
-      var totalStW=Math.min(dec2.stars.length,4)*stW+(Math.min(dec2.stars.length,4)-1)*stGap;
-      var stx0=W/2-totalStW/2;
-      dec2.stars.slice(0,4).forEach(function(s,i){
-        var sx2=stx0+i*(stW+stGap);
-        ctx.fillStyle='rgba(232,184,109,0.12)';
-        ctx.beginPath(); ctx.roundRect(sx2,y,stW,stH,8); ctx.fill();
-        ctx.strokeStyle='rgba(232,184,109,0.3)'; ctx.lineWidth=1;
-        ctx.beginPath(); ctx.roundRect(sx2,y,stW,stH,8); ctx.stroke();
-        ctx.font='700 22px "Noto Serif KR",serif'; ctx.fillStyle='#e8b86d';
-        ctx.fillText(s, sx2+stW/2, y+33);
-      });
-      y+=stH+16;
+  // ── 12궁 그리드
+  drawLine(y,220,0.4); y+=40;
+  ctx.font='600 26px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fillText('🏛 12궁 명반도',W/2,y); y+=24;
+  var palaces=d.palaces||[], palPad=18, palGap=6;
+  var palCW=Math.floor((W-palPad*2-palGap*3)/4);
+  var palCH=162, gridY=y;
+  palaces.slice(0,12).forEach(function(pal,idx){
+    var col=idx%4, row=Math.floor(idx/4);
+    var cx=palPad+col*(palCW+palGap), cy=gridY+row*(palCH+palGap);
+    var isSelf=pal.isSelf, isBody=pal.isBody;
+    // 배경
+    if(isSelf){ var sg=ctx.createLinearGradient(cx,cy,cx,cy+palCH); sg.addColorStop(0,'rgba(155,111,224,0.22)'); sg.addColorStop(1,'rgba(155,111,224,0.07)'); ctx.fillStyle=sg; }
+    else if(isBody){ var bg3=ctx.createLinearGradient(cx,cy,cx,cy+palCH); bg3.addColorStop(0,'rgba(232,184,109,0.18)'); bg3.addColorStop(1,'rgba(232,184,109,0.05)'); ctx.fillStyle=bg3; }
+    else { ctx.fillStyle='rgba(255,255,255,0.04)'; }
+    fRR(cx,cy,palCW,palCH,10);
+    // 테두리
+    if(isSelf){ ctx.strokeStyle='rgba(155,111,224,0.65)'; ctx.lineWidth=2; }
+    else if(isBody){ ctx.strokeStyle='rgba(232,184,109,0.55)'; ctx.lineWidth=1.5; }
+    else { ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; }
+    sRR(cx,cy,palCW,palCH,10);
+    // 궁 이름 (상단 좌)
+    ctx.textAlign='left'; ctx.font='700 15px "Noto Sans KR",sans-serif';
+    ctx.fillStyle=isSelf?'#c4a6f5':isBody?'#e8c875':'rgba(255,255,255,0.55)';
+    ctx.fillText(pal.name||'',cx+7,cy+19);
+    // 천간지지 (상단 우)
+    ctx.textAlign='right'; ctx.font='400 13px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.25)';
+    ctx.fillText((pal.heavenlyStem||'')+(pal.earthlyBranch||''),cx+palCW-6,cy+19);
+    // 명/신 배지
+    if(isSelf||isBody){
+      ctx.fillStyle=isSelf?'rgba(155,111,224,0.85)':'rgba(232,184,109,0.8)'; fRR(cx+7,cy+26,34,16,4);
+      ctx.textAlign='center'; ctx.font='bold 11px sans-serif'; ctx.fillStyle='#fff';
+      ctx.fillText(isSelf?'★명':'◎신',cx+24,cy+37); ctx.textAlign='left';
+    }
+    // 주성
+    var my=cy+(isSelf||isBody?50:30);
+    (pal.majorStars||[]).slice(0,3).forEach(function(s){
+      ctx.font='600 17px "Noto Serif KR",serif';
+      ctx.fillStyle=isSelf?'#c4a6f5':isBody?'#e8b86d':'rgba(255,255,255,0.82)';
+      ctx.fillText(s,cx+7,my); my+=21;
+    });
+    // 보성 (소형)
+    if((pal.minorStars||[]).length && my<cy+palCH-16){
+      ctx.font='400 12px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.28)';
+      ctx.fillText((pal.minorStars||[]).slice(0,3).join(' '),cx+7,my);
+    }
+    // 대한 연령대
+    if(pal.ageRange){ ctx.textAlign='right'; ctx.font='400 11px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.18)'; ctx.fillText(pal.ageRange,cx+palCW-5,cy+palCH-6); }
+    ctx.textAlign='center';
+  });
+  y=gridY+3*(palCH+palGap)+28;
+
+  // ── 현재 대한
+  drawLine(y,220,0.4); y+=42;
+  ctx.font='600 26px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fillText('🌊 현재 대한 大限',W/2,y); y+=40;
+  var dec=d.currentDecade;
+  if(dec){
+    ctx.font='bold 44px "Noto Serif KR",serif'; ctx.fillStyle='#e8b86d'; ctx.fillText(dec.name||'—',W/2,y); y+=36;
+    ctx.font='400 22px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.38)'; ctx.fillText(dec.ageRange||'',W/2,y); y+=36;
+    var dStars=(dec.stars||[]).slice(0,4);
+    if(dStars.length){
+      var sW=130,sH=44,sGap=10, sx=W/2-((sW+sGap)*dStars.length-sGap)/2;
+      dStars.forEach(function(s){ ctx.fillStyle='rgba(232,184,109,0.12)'; fRR(sx,y,sW,sH,8); ctx.strokeStyle='rgba(232,184,109,0.3)'; ctx.lineWidth=1; sRR(sx,y,sW,sH,8); ctx.font='600 19px "Noto Serif KR",serif'; ctx.fillStyle='#e8b86d'; ctx.fillText(s,sx+sW/2,y+30); sx+=sW+sGap; }); y+=sH+14;
     }
   }
 
-  // 명궁 명반
-  y+=10; drawLine(y,180,0.3); y+=44;
-  ctx.font='700 28px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
-  ctx.fillText('🏠 명궁 주성', W/2, y); y+=44;
-  var soul2=(d.palaces||[]).find(function(p){return p.isSelf;});
-  if(soul2 && soul2.majorStars && soul2.majorStars.length){
-    soul2.majorStars.slice(0,3).forEach(function(s){
-      ctx.font='700 36px "Noto Serif KR",serif'; ctx.fillStyle='rgba(232,184,109,0.9)';
-      ctx.fillText(s, W/2, y); y+=48;
-    });
+  // ── 유년
+  var yr=d.currentYear;
+  if(yr){
+    drawLine(y,180,0.3); y+=36;
+    ctx.font='600 22px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.fillText('✦ 유년 流年',W/2,y); y+=34;
+    ctx.font='700 28px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(232,184,109,0.8)';
+    ctx.fillText((yr.heavenlyStem||'')+(yr.earthlyBranch||'')+' '+(yr.year||'')+'년 · '+(yr.palace||''),W/2,y); y+=14;
   }
 
+  // ── 푸터
   y=H-110; drawLine(y,150,0.4);
-  y+=42; ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.25)';
-  ctx.fillText('picolab.kr', W/2, y);
+  y+=42; ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.22)'; ctx.fillText('picolab.kr',W/2,y);
 
   cb(canvas);
 }
