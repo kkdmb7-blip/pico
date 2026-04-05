@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
   <style>
     * { box-sizing: border-box; }
     body { font-family: 'Noto Sans KR', sans-serif; background: #0d0d14; color: #e8e8f0; }
@@ -1301,17 +1302,41 @@ function shareSajuKakao() {
   var dayPillar = (d.summary && d.summary.pillars && d.summary.pillars.day) || '';
   var EN_EL_MAP = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
   var yongshin = d.yongshin ? (EN_EL_MAP[d.yongshin.primary]||d.yongshin.primary||'') : '';
-  var text = '🔮 포르투나 사주 분석\n\n일주: '+dayPillar+(yongshin?'\n용신: '+yongshin:'')+(d.summary&&d.summary.strength?'\n'+d.summary.strength:'')+'\n\n나도 확인해봐 👇\nhttps://picolab.kr';
+  var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
+  var desc = '일주: '+dayPillar+(yongshin?' · 용신: '+yongshin:'')+(d.summary&&d.summary.strength?' · '+d.summary.strength:'');
+
+  if (window.Kakao && !window.Kakao.isInitialized()) window.Kakao.init('2543c896dead8185e2edfa0976396f25');
+
   _sajuCanvas.toBlob(function(blob) {
     var file = new File([blob], 'fortuna_saju.png', { type: 'image/png' });
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], text: text }).catch(function(e) {
-        if (e.name !== 'AbortError') { navigator.clipboard && navigator.clipboard.writeText(text); alert('클립보드에 복사했어요!'); }
+    if (window.Kakao && window.Kakao.isInitialized()) {
+      Kakao.Share.uploadImage({ file: [file] }).then(function(res) {
+        Kakao.Share.sendDefault({
+          objectType: 'feed',
+          content: {
+            title: '🔮 FORTUNA 사주 분석',
+            description: desc,
+            imageUrl: res.infos.original.url,
+            link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+          },
+          buttons: [{ title: 'picolab.kr에서 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+        });
+      }).catch(function() {
+        Kakao.Share.sendDefault({
+          objectType: 'feed',
+          content: {
+            title: '🔮 FORTUNA 사주 분석',
+            description: desc,
+            imageUrl: 'https://picolab.kr/og.png',
+            link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+          },
+          buttons: [{ title: 'picolab.kr에서 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+        });
       });
-    } else if (navigator.share) {
-      navigator.share({ title: 'FORTUNA 사주 분석', text: text, url: 'https://picolab.kr' }).catch(function(){});
+    } else if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], text: desc + '\n\n나도 확인해봐 👇\n' + pageUrl }).catch(function(){});
     } else {
-      navigator.clipboard && navigator.clipboard.writeText(text);
+      navigator.clipboard && navigator.clipboard.writeText(desc + '\n\n' + pageUrl);
       alert('클립보드에 복사했어요!');
     }
   }, 'image/png');
