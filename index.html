@@ -2022,20 +2022,35 @@ function shareGunghapKakao() {
     if (!cv) { alert('카드 생성 실패'); resetBtn(); return; }
     cv.toBlob(function(blob) {
       resetBtn();
-      // iOS에서 파일공유 시 text가 카카오로 전달 안 됨 → URL 클립보드에 미리 복사
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(pageUrl).then(function() {
-          _showToast('picolab.kr 주소가 복사됐어요\n카카오톡에서 붙여넣기 하세요 📋');
-        }).catch(function(){});
-      }
       var file = new File([blob], 'fortuna_gunghap.png', { type: 'image/png' });
+      // 모바일: navigator.share로 이미지 직접 공유
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        if (navigator.clipboard) navigator.clipboard.writeText(pageUrl).catch(function(){});
         navigator.share({ files: [file], text: text }).catch(function(){});
       } else if (navigator.share) {
         navigator.share({ title: 'FORTUNA 궁합', text: text }).catch(function(){});
       } else {
-        navigator.clipboard && navigator.clipboard.writeText(text);
-        alert('클립보드에 복사했어요!');
+        // PC: 카카오 SDK 공유 + 이미지 다운로드
+        var a = document.createElement('a');
+        a.href = cv.toDataURL('image/png');
+        a.download = 'fortuna_gunghap.png';
+        a.click();
+        if (window.Kakao && window.Kakao.isInitialized()) {
+          var score2 = calcGunghapScore(window._ghLastMySaju, window._ghLastPSaju);
+          Kakao.Share.sendDefault({
+            objectType: 'feed',
+            content: {
+              title: '💕 FORTUNA 궁합 · ' + myName + ' ❤ ' + pName,
+              description: score2.total + '점 · ' + score2.comment + '\n두 사람의 인연을 확인해보세요!',
+              imageUrl: 'https://picolab.kr/og-image.png',
+              link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+            },
+            buttons: [{ title: '나도 궁합 보기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+          });
+        } else {
+          if (navigator.clipboard) navigator.clipboard.writeText(text);
+          _showToast('이미지 저장됨 · 링크가 클립보드에 복사됐어요');
+        }
       }
     }, 'image/png');
   });
