@@ -1499,10 +1499,13 @@ function openGunghapModal() {
     }
   }
   document.getElementById('gunghapOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  history.pushState({ modal: 'gunghap' }, '');
 }
 
 function closeGunghapModal() {
   document.getElementById('gunghapOverlay').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function closeGunghapResult() {
@@ -1598,7 +1601,7 @@ async function submitGunghap() {
   if (namesEl) namesEl.textContent = myName + ' ❤ ' + pNameDisp;
   if (cardsEl) cardsEl.innerHTML = '';
   if (aiEl) aiEl.innerHTML = '<span style="color:rgba(255,255,255,0.4);">✦ 궁합을 분석하고 있어요...</span>';
-  if (resultOverlay) resultOverlay.style.display = 'flex';
+  if (resultOverlay) { resultOverlay.style.display = 'flex'; history.pushState({ modal: 'gunghapResult' }, ''); }
 
   var myH = (_ghMyProfile.hour !== 'unknown' && _ghMyProfile.hour != null) ? parseInt(_ghMyProfile.hour) : 12;
   var phVal = document.getElementById('ghPartnerHour').value;
@@ -2375,6 +2378,8 @@ window.addEventListener('popstate', function(e) {
   if (document.getElementById('sajuOverlay').classList.contains('open'))  { closeSajuModal(); return; }
   if (document.getElementById('qimenOverlay').classList.contains('open')) { closeQimenModal(); return; }
   if (document.getElementById('birthOverlay').classList.contains('open')) { closeBirthModal(); return; }
+  if (document.getElementById('gunghapOverlay').style.display === 'flex') { closeGunghapModal(); return; }
+  if (document.getElementById('gunghapResultOverlay').style.display === 'flex') { closeGunghapResult(); return; }
 });
 
 // checkAuth는 score.js 로드 후 실행 (onload에서 호출)
