@@ -623,8 +623,8 @@ function _drawZiweiCard(cb) {
 
   ctx.textAlign='center';
   function drawLine(cy,w2,al){ var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0); lg.addColorStop(0,'transparent'); lg.addColorStop(0.5,'rgba(201,168,76,'+al+')'); lg.addColorStop(1,'transparent'); ctx.strokeStyle=lg; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(W/2-w2,cy); ctx.lineTo(W/2+w2,cy); ctx.stroke(); }
-  function fRR(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); }
-  function sRR(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.stroke(); }
+  function fRR(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);} ctx.fill(); }
+  function sRR(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);} ctx.stroke(); }
 
   // ── 헤더
   var y=110;

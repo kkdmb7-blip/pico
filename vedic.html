@@ -610,9 +610,9 @@ function _drawVedicCard(cb) {
     var cx2=cx0+i*(cardW+cardGap);
     var elC3=EL_C2[RASHI_EL2[c.sign]]||'#A8D5A2';
     ctx.fillStyle='rgba(255,255,255,0.04)';
-    ctx.beginPath(); ctx.roundRect(cx2,y,cardW,cardH,14); ctx.fill();
+    ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(cx2,y,cardW,cardH,14);}else{ctx.rect(cx2,y,cardW,cardH);} ctx.fill();
     ctx.strokeStyle='rgba(168,213,162,0.25)'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.roundRect(cx2,y,cardW,cardH,14); ctx.stroke();
+    ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(cx2,y,cardW,cardH,14);}else{ctx.rect(cx2,y,cardW,cardH);} ctx.stroke();
     ctx.font='52px serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,0.9)';
     ctx.fillText(c.icon, cx2+cardW/2, y+70);
     ctx.font='400 20px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)';

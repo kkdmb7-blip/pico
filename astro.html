@@ -681,8 +681,8 @@ function _drawAstroCard(cb) {
 
   ctx.textAlign='center';
   function drawLine(cy,w2,al){ var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0); lg.addColorStop(0,'transparent'); lg.addColorStop(0.5,'rgba(116,185,255,'+al+')'); lg.addColorStop(1,'transparent'); ctx.strokeStyle=lg; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(W/2-w2,cy); ctx.lineTo(W/2+w2,cy); ctx.stroke(); }
-  function fRR(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); }
-  function sRR(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.stroke(); }
+  function fRR(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);} ctx.fill(); }
+  function sRR(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);} ctx.stroke(); }
 
   // ── 헤더
   var y=110;
@@ -701,12 +701,12 @@ function _drawAstroCard(cb) {
   var cW=300,cH=232,cGap=16,cx0=W/2-((cW*3+cGap*2)/2);
   y+=30;
   big3.forEach(function(c,i){
-    var cx=cx0+i*(cW+cGap), ec=EL_COLOR[SIGN_EL[c.sign]]||'#888';
+    var cx=cx0+i*(cW+cGap), ec=EL_COLOR[SIGN_EL[c.sign]]||'#8888cc';
     var cg=ctx.createLinearGradient(cx,y,cx,y+cH); cg.addColorStop(0,'rgba(255,255,255,0.06)'); cg.addColorStop(1,'rgba(255,255,255,0.02)');
     ctx.fillStyle=cg; fRR(cx,y,cW,cH,16);
-    var tg=ctx.createLinearGradient(cx,y,cx+cW,y); tg.addColorStop(0,'transparent'); tg.addColorStop(0.5,ec+'aa'); tg.addColorStop(1,'transparent');
-    ctx.fillStyle=tg; ctx.beginPath(); ctx.roundRect(cx,y,cW,4,[16,16,0,0]); ctx.fill();
-    ctx.strokeStyle=ec+'55'; ctx.lineWidth=1.5; sRR(cx,y,cW,cH,16);
+    var tg=ctx.createLinearGradient(cx,y,cx+cW,y); tg.addColorStop(0,'transparent'); tg.addColorStop(0.5,ec); tg.addColorStop(1,'transparent');
+    ctx.fillStyle=tg; fRR(cx,y,cW,4,2);
+    ctx.strokeStyle='rgba(100,100,200,0.3)'; ctx.lineWidth=1.5; sRR(cx,y,cW,cH,16);
     ctx.font='46px serif'; ctx.fillText(c.icon,cx+cW/2,y+64);
     ctx.font='400 18px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.38)'; ctx.fillText(c.role,cx+cW/2,y+96);
     ctx.font='700 27px "Noto Sans KR",sans-serif'; ctx.fillStyle=ec; ctx.fillText(c.sign||'—',cx+cW/2,y+140);
