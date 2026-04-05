@@ -2018,6 +2018,12 @@ function shareGunghapKakao() {
     if (!cv) { alert('카드 생성 실패'); resetBtn(); return; }
     cv.toBlob(function(blob) {
       resetBtn();
+      // iOS에서 파일공유 시 text가 카카오로 전달 안 됨 → URL 클립보드에 미리 복사
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(pageUrl).then(function() {
+          _showToast('picolab.kr 주소가 복사됐어요\n카카오톡에서 붙여넣기 하세요 📋');
+        }).catch(function(){});
+      }
       var file = new File([blob], 'fortuna_gunghap.png', { type: 'image/png' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         navigator.share({ files: [file], text: text }).catch(function(){});
@@ -2029,6 +2035,14 @@ function shareGunghapKakao() {
       }
     }, 'image/png');
   });
+}
+
+function _showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#e8e0f0;padding:12px 20px;border-radius:12px;font-size:13px;font-family:"Noto Sans KR",sans-serif;z-index:9999;text-align:center;white-space:pre-line;box-shadow:0 4px 20px rgba(0,0,0,0.4);pointer-events:none;';
+  document.body.appendChild(t);
+  setTimeout(function() { t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(function(){t.remove();},400); }, 2500);
 }
 
 // pico_profiles 항목을 공통 {name,year,month,day,hour,minute,gender} 형태로 변환
@@ -2900,18 +2914,15 @@ function goScoreQuick() {
   window.location.href = 'score.html?' + new URLSearchParams({ year: y, month: m, day: d }).toString();
 }
 
-// ── 스크롤 위치 저장/복원 (localStorage — PWA 재시작 시에도 유지) ──
+// ── 스크롤 위치 저장/복원 ──
 (function() {
   var KEY = 'pico_scroll_index';
-  // 복원: 레이아웃이 다 잡힌 후 실행
-  var saved = localStorage.getItem(KEY);
-  if (saved) {
-    requestAnimationFrame(function() {
-      setTimeout(function() {
-        window.scrollTo(0, parseInt(saved, 10));
-      }, 80);
-    });
-  }
+
+  // 복원: 모든 리소스(이미지/폰트/스크립트) 로드 완료 후 실행
+  window.addEventListener('load', function() {
+    var saved = localStorage.getItem(KEY);
+    if (saved) window.scrollTo(0, parseInt(saved, 10));
+  });
 
   var _st;
   window.addEventListener('scroll', function() {

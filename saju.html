@@ -1293,6 +1293,11 @@ function shareSajuKakao() {
     if (!cv) { alert('카드 생성 실패'); resetBtn(); return; }
     cv.toBlob(function(blob) {
       resetBtn();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(pageUrl).then(function() {
+          _showSajuToast('picolab.kr 주소가 복사됐어요\n카카오톡에서 붙여넣기 하세요 📋');
+        }).catch(function(){});
+      }
       var file = new File([blob], 'fortuna_saju.png', { type: 'image/png' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         navigator.share({ files: [file], text: text }).catch(function(){});
@@ -1304,6 +1309,14 @@ function shareSajuKakao() {
       }
     }, 'image/png');
   };
+
+  function _showSajuToast(msg) {
+    var t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#e8e0f0;padding:12px 20px;border-radius:12px;font-size:13px;font-family:"Noto Sans KR",sans-serif;z-index:9999;text-align:center;white-space:pre-line;box-shadow:0 4px 20px rgba(0,0,0,0.4);pointer-events:none;';
+    document.body.appendChild(t);
+    setTimeout(function() { t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(function(){t.remove();},400); }, 2500);
+  }
 
   if (_sajuCanvas) { doShare(_sajuCanvas); }
   else { openSajuShareCard(doShare); }
@@ -1322,12 +1335,10 @@ document.getElementById('sajuShareModal').addEventListener('click', function(e) 
 // ── 스크롤 위치 저장/복원 ──────────────────────────────
 (function() {
   var KEY = 'pico_scroll_saju';
-  var saved = localStorage.getItem(KEY);
-  if (saved) {
-    requestAnimationFrame(function() {
-      setTimeout(function() { window.scrollTo(0, parseInt(saved, 10)); }, 80);
-    });
-  }
+  window.addEventListener('load', function() {
+    var saved = localStorage.getItem(KEY);
+    if (saved) window.scrollTo(0, parseInt(saved, 10));
+  });
   var _st;
   window.addEventListener('scroll', function() {
     clearTimeout(_st);
