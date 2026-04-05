@@ -16,6 +16,7 @@
 - **display:none → display:flex**: flex 컨테이너를 show할 때 `block`이 아닌 `flex`로 설정
 - **공유 버튼 미노출**: 결과 렌더링 함수(renderResult 등) 끝에 shareBtn `display:flex` 코드 포함됐는지 확인
 - **성별 누락**: AI 프롬프트/API 호출 시 gender 파라미터 빠지면 기본값(보통 남성)으로 처리됨
+- **코드 삽입 위치 오류**: 함수 내부에 코드를 추가할 때 닫는 `}` 위치 반드시 확인. 함수 밖에 삽입되면 실행 안 됨 (ziwei render() 버그 사례)
 
 ## 페이지별 핵심 구조
 
