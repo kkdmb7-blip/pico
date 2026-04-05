@@ -1177,9 +1177,31 @@
   <div class="saju-modal" style="padding:20px 16px 24px;max-height:92vh;overflow-y:auto;width:100%;">
     <button class="saju-modal-close" onclick="closeGunghapResult()">✕</button>
     <h3 style="color:#ff8ab0;font-size:18px;margin-bottom:4px;">💕 궁합 결과</h3>
-    <div id="ghResultNames" style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:14px;"></div>
-    <div id="ghResultCards" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;"></div>
-    <div id="ghResultAI" style="font-size:13px;line-height:1.8;color:#e8e0f0;"></div>
+    <div id="ghResultNames" style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:12px;"></div>
+
+    <!-- 무료: 점수 -->
+    <div style="text-align:center;margin-bottom:14px;">
+      <div id="ghResScore" style="font-size:48px;font-weight:900;color:#ff8ab0;line-height:1;">--</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">/ 100점</div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:999px;height:8px;margin:0 4px 8px;">
+        <div id="ghResBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#c2185b,#ff8ab0);width:0%;transition:width .6s ease;"></div>
+      </div>
+      <div id="ghResComment" style="font-size:14px;font-weight:700;color:#f5e0ec;"></div>
+    </div>
+
+    <!-- 무료: 사주 카드 + 세부 점수 -->
+    <div id="ghResultCards" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;"></div>
+    <div id="ghResDetail" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px;"></div>
+
+    <!-- 유료: AI 분석 버튼 -->
+    <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px;">
+      <div style="font-size:12px;font-weight:700;color:#e8b86d;margin-bottom:3px;">🔮 AI 정밀 분석 받기</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px;">두 사람의 깊은 인연을 AI가 분석합니다 · <span style="color:rgba(255,200,100,0.6);">질문권 1개 사용</span></div>
+      <button id="ghAiBtn" onclick="requestGunghapAI()" style="padding:10px 24px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:10px;color:#e8b86d;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">AI 분석 시작</button>
+    </div>
+
+    <!-- AI 결과 -->
+    <div id="ghResultAI" style="font-size:13px;line-height:1.8;color:#e8e0f0;display:none;"></div>
   </div>
 </div>
 
@@ -1551,7 +1573,7 @@ function _calcSaju(year, month, day, hour) {
   var str=supPt/tot>=0.55?'신강':supPt/tot>=0.35?'중화':'신약';
   return {
     pillars:{year:STEMS[ySi]+BRANCHES[yBi],month:STEMS[mSi]+BRANCHES[mbi],day:STEMS[dSi]+BRANCHES[dBi],hour:STEMS[hSi]+BRANCHES[hBi]},
-    zodiac:ZODIAC[yBi], dayEl:dEl, strength:str, fivePct:fivePct,
+    zodiac:ZODIAC[yBi], zodiacBranch:BRANCHES[yBi], monthBranch:BRANCHES[mbi], dayEl:dEl, strength:str, fivePct:fivePct,
     stemH:{year:STEM_H[ySi],month:STEM_H[mSi],day:STEM_H[dSi],hour:STEM_H[hSi]},
     branchH:{year:BRANCH_H[yBi],month:BRANCH_H[mbi],day:BRANCH_H[dBi],hour:BRANCH_H[hBi]},
     stemEl:{year:STEM_EL[ySi],month:STEM_EL[mSi],day:STEM_EL[dSi],hour:STEM_EL[hSi]},
@@ -1582,7 +1604,36 @@ function _sajuMiniCard(saju, label, name, gender) {
     +'</div>';
 }
 
-async function submitGunghap() {
+function calcGunghapScore(mySaju, pSaju) {
+  var SENG = { 목:'화', 화:'토', 토:'금', 금:'수', 수:'목' };
+  var e1 = mySaju.dayEl, e2 = pSaju.dayEl;
+  var oScore = (SENG[e1]===e2 || SENG[e2]===e1) ? 40 : (e1===e2) ? 25 : 10;
+
+  var ZODIAC_IDX = {자:0,축:1,인:2,묘:3,진:4,사:5,오:6,미:7,신:8,유:9,술:10,해:11};
+  var SAMHAP = [[0,4,8],[1,5,9],[2,6,10],[3,7,11]];
+  var YUKHAP = [[0,11],[1,10],[2,9],[3,8],[4,7],[5,6]];
+  var CHUNG  = [[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
+  var HYEONG = [[1,10,7],[2,11],[3,6],[4,16]];
+  var z1 = ZODIAC_IDX[mySaju.zodiacBranch], z2 = ZODIAC_IDX[pSaju.zodiacBranch];
+  var tScore = 20;
+  if (SAMHAP.some(function(g){return g.includes(z1)&&g.includes(z2);})) tScore=30;
+  else if (YUKHAP.some(function(g){return g.includes(z1)&&g.includes(z2);})) tScore=25;
+  else if (CHUNG.some(function(g){return g.includes(z1)&&g.includes(z2);})) tScore=5;
+  else if (HYEONG.some(function(g){return g.includes(z1)&&g.includes(z2);})) tScore=10;
+
+  var SEASON = {인:0,묘:0,진:0, 사:1,오:1,미:1, 신:2,유:2,술:2, 해:3,자:3,축:3};
+  var s1=SEASON[mySaju.monthBranch], s2=SEASON[pSaju.monthBranch];
+  var sScore = (s1===s2) ? 30 : (Math.abs(s1-s2)===1||Math.abs(s1-s2)===3) ? 20 : 10;
+
+  var total = Math.round(oScore + tScore + sScore);
+  return {
+    total: total,
+    oScore: oScore, tScore: tScore, sScore: sScore,
+    comment: total>=85?'천생연분이에요 ✨':total>=70?'좋은 인연이에요 💕':total>=55?'보완하며 성장할 수 있어요 🌱':'서로 노력이 필요해요 💪'
+  };
+}
+
+function submitGunghap() {
   if (!_ghMyProfile) { alert('프로필이 없습니다.\n사주 분석 메뉴에서 먼저 생년월일을 입력해주세요.'); return; }
   var pName = document.getElementById('ghPartnerName').value.trim();
   var pY = parseInt(document.getElementById('ghPartnerYear').value);
@@ -1592,27 +1643,69 @@ async function submitGunghap() {
 
   closeGunghapModal();
 
-  var resultOverlay = document.getElementById('gunghapResultOverlay');
-  var namesEl = document.getElementById('ghResultNames');
-  var cardsEl = document.getElementById('ghResultCards');
-  var aiEl    = document.getElementById('ghResultAI');
   var myName  = _ghMyProfile.name || '나';
   var pNameDisp = pName || '상대방';
-  if (namesEl) namesEl.textContent = myName + ' ❤ ' + pNameDisp;
-  if (cardsEl) cardsEl.innerHTML = '';
-  if (aiEl) aiEl.innerHTML = '<span style="color:rgba(255,255,255,0.4);">✦ 궁합을 분석하고 있어요...</span>';
-  if (resultOverlay) { resultOverlay.style.display = 'flex'; history.pushState({ modal: 'gunghapResult' }, ''); }
-
   var myH = (_ghMyProfile.hour !== 'unknown' && _ghMyProfile.hour != null) ? parseInt(_ghMyProfile.hour) : 12;
-  var phVal = document.getElementById('ghPartnerHour').value;
+  var phVal = document.getElementById('ghPartnerHour') ? document.getElementById('ghPartnerHour').value : '';
   var pH = (phVal !== '') ? parseInt(phVal) : 12;
   var mySaju = _calcSaju(_ghMyProfile.year, _ghMyProfile.month, _ghMyProfile.day, myH);
   var pSaju  = _calcSaju(pY, pM, pD, pH);
   var myGender = _ghMyProfile.gender === 'female' ? 'F' : 'M';
-  if (cardsEl) cardsEl.innerHTML = _sajuMiniCard(mySaju,'나',myName,myGender) + _sajuMiniCard(pSaju,'상대방',pNameDisp,_ghPartnerGender);
 
-  var myGTxt = myGender==='F'?'여성':'남성';
-  var pGTxt  = _ghPartnerGender==='F'?'여성':_ghPartnerGender==='M'?'남성':'';
+  // 저장 (AI 버튼에서 재사용)
+  window._ghLastMySaju = mySaju;
+  window._ghLastPSaju  = pSaju;
+  window._ghLastMyName = myName;
+  window._ghLastPName  = pNameDisp;
+  window._ghLastMyGender = myGender;
+
+  var score = calcGunghapScore(mySaju, pSaju);
+
+  var resultOverlay = document.getElementById('gunghapResultOverlay');
+  var namesEl = document.getElementById('ghResultNames');
+  var cardsEl = document.getElementById('ghResultCards');
+  var aiEl    = document.getElementById('ghResultAI');
+  var scoreEl = document.getElementById('ghResScore');
+  var barEl   = document.getElementById('ghResBar');
+  var commentEl = document.getElementById('ghResComment');
+  var detailEl  = document.getElementById('ghResDetail');
+
+  if (namesEl) namesEl.textContent = myName + ' ❤ ' + pNameDisp;
+  if (cardsEl) cardsEl.innerHTML = _sajuMiniCard(mySaju,'나',myName,myGender) + _sajuMiniCard(pSaju,'상대방',pNameDisp,_ghPartnerGender);
+  if (aiEl)    { aiEl.innerHTML = ''; aiEl.style.display = 'none'; }
+  if (scoreEl) scoreEl.textContent = score.total;
+  if (barEl)   { barEl.style.width = '0%'; setTimeout(function(){ barEl.style.width = score.total + '%'; }, 100); }
+  if (commentEl) commentEl.textContent = score.comment;
+  if (detailEl) detailEl.innerHTML =
+    '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">'
+    +'<div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:2px;">오행 조화</div>'
+    +'<div style="font-size:18px;font-weight:800;color:#ff8ab0;">'+score.oScore+'</div></div>'
+    +'<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">'
+    +'<div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:2px;">띠 궁합</div>'
+    +'<div style="font-size:18px;font-weight:800;color:#ff8ab0;">'+score.tScore+'</div></div>'
+    +'<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">'
+    +'<div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:2px;">계절 조화</div>'
+    +'<div style="font-size:18px;font-weight:800;color:#ff8ab0;">'+score.sScore+'</div></div>';
+  var aiBtn = document.getElementById('ghAiBtn');
+  if (aiBtn) aiBtn.textContent = 'AI 분석 시작';
+
+  if (resultOverlay) { resultOverlay.style.display = 'flex'; history.pushState({ modal: 'gunghapResult' }, ''); }
+}
+
+async function requestGunghapAI() {
+  var user = currentUser || window._fortunaUser;
+  if (!user) { alert('로그인 후 AI 분석을 이용할 수 있어요.'); return; }
+  var mySaju = window._ghLastMySaju, pSaju = window._ghLastPSaju;
+  if (!mySaju || !pSaju) { alert('먼저 궁합 보기를 실행해주세요.'); return; }
+
+  var aiEl  = document.getElementById('ghResultAI');
+  var aiBtn = document.getElementById('ghAiBtn');
+  if (aiBtn) aiBtn.textContent = '분석 중...';
+  if (aiEl)  { aiEl.style.display = 'block'; aiEl.innerHTML = '<span style="color:rgba(255,255,255,0.4);">✦ AI가 분석하고 있어요...</span>'; }
+
+  var myName=window._ghLastMyName||'나', pNameDisp=window._ghLastPName||'상대방';
+  var myGender=window._ghLastMyGender||'M';
+  var myGTxt=myGender==='F'?'여성':'남성', pGTxt=_ghPartnerGender==='F'?'여성':_ghPartnerGender==='M'?'남성':'';
   var fp1=mySaju.fivePct, fp2=pSaju.fivePct;
   var prompt = '【궁합 요청】\n'
     +myName+'('+myGTxt+'): 년주 '+mySaju.pillars.year+' 월주 '+mySaju.pillars.month+' 일주 '+mySaju.pillars.day+' 시주 '+mySaju.pillars.hour
@@ -1625,11 +1718,6 @@ async function submitGunghap() {
   var systemMsg = '당신은 사주명리학 전문가입니다. 두 사람의 사주로 궁합을 따뜻하고 구체적으로 설명합니다. 헤더(##,###)와 표는 사용하지 않습니다. **볼드**는 핵심 키워드에 3~5개만 사용하세요. 긍정적인 면과 주의할 점을 균형 있게 알려주세요.';
 
   try {
-    var user = currentUser || window._fortunaUser;
-    if (!user) {
-      if (aiEl) aiEl.innerHTML = '로그인 후 AI 궁합 해석을 이용할 수 있어요. 위의 사주 비교는 로그인 없이도 확인 가능합니다.';
-      return;
-    }
     var res = await fetch('https://fortuna-silk.vercel.app/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1637,15 +1725,16 @@ async function submitGunghap() {
     });
     if (!res.ok) {
       var err = await res.json().catch(function(){return{};});
-      if (err.error === 'limit_exceeded') { if (aiEl) aiEl.textContent = '오늘 사용량을 모두 소진했어요. 내일 다시 시도해주세요.'; return; }
+      if (err.error === 'limit_exceeded') { if (aiEl) aiEl.textContent = '오늘 사용량을 모두 소진했어요. 내일 다시 시도해주세요.'; if (aiBtn) aiBtn.textContent = 'AI 분석 시작'; return; }
       throw new Error(err.error || res.status);
     }
     var data = await res.json();
-    var reply = data.reply || '';
-    reply = reply.replace(/\*\*(.+?)\*\*/g, '<strong style="color:#ff8ab0;">$1</strong>');
+    var reply = (data.reply || '').replace(/\*\*(.+?)\*\*/g, '<strong style="color:#ff8ab0;">$1</strong>');
     if (aiEl) aiEl.innerHTML = reply || '해석을 불러오지 못했어요.';
+    if (aiBtn) aiBtn.style.display = 'none';
   } catch(e) {
     if (aiEl) aiEl.textContent = '오류가 발생했어요: ' + e.message;
+    if (aiBtn) aiBtn.textContent = 'AI 분석 시작';
   }
 }
 
