@@ -1282,62 +1282,31 @@ function shareSajuKakao() {
   var dayPillar = (d.summary && d.summary.pillars && d.summary.pillars.day) || '';
   var EN_EL_MAP = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
   var yongshin = d.yongshin ? (EN_EL_MAP[d.yongshin.primary]||d.yongshin.primary||'') : '';
-  var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var desc = '일주: '+dayPillar+(yongshin?' · 용신: '+yongshin:'')+(d.summary&&d.summary.strength?' · '+d.summary.strength:'');
-
-  if (window.Kakao && !window.Kakao.isInitialized()) window.Kakao.init('2543c896dead8185e2edfa0976396f25');
+  var pageUrl = 'https://picolab.kr';
+  var text = '🔮 FORTUNA 사주 분석\n일주: '+dayPillar+(yongshin?' · 용신: '+yongshin:'')+(d.summary&&d.summary.strength?' · '+d.summary.strength:'')+'\n\n나도 확인해봐 👇\n'+pageUrl;
 
   function resetBtn() {
     if (btn) { btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="#3c1e1e"><path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.07 1.7 5.78 4.32 7.46L5.5 22l4.27-2.14C10.47 20.28 11.22 20.4 12 20.4c5.52 0 10-3.92 10-8.8C22 5.92 17.52 2 12 2z"/></svg> 카카오톡 공유'; btn.disabled = false; }
   }
 
-  // 카드가 아직 없으면 새로 그리고, 있으면 바로 공유
   var doShare = function(cv) {
     if (!cv) { alert('카드 생성 실패'); resetBtn(); return; }
     cv.toBlob(function(blob) {
+      resetBtn();
       var file = new File([blob], 'fortuna_saju.png', { type: 'image/png' });
-      if (window.Kakao && window.Kakao.isInitialized()) {
-        Kakao.Share.uploadImage({ file: [file] })
-          .then(function(res) {
-            resetBtn();
-            Kakao.Share.sendDefault({
-              objectType: 'feed',
-              content: {
-                title: '🔮 FORTUNA 사주 분석',
-                description: desc,
-                imageUrl: res.infos.original.url,
-                link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
-              },
-              buttons: [{ title: 'picolab.kr에서 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
-            });
-          })
-          .catch(function(err) {
-            console.warn('Kakao uploadImage 실패, navigator.share로 대체:', err);
-            resetBtn();
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-              navigator.share({ files: [file], text: desc + '\n\n나도 확인해봐 👇\n' + pageUrl }).catch(function(){});
-            } else {
-              navigator.clipboard && navigator.clipboard.writeText(desc + '\n\n' + pageUrl);
-              alert('링크를 클립보드에 복사했어요!');
-            }
-          });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], text: text }).catch(function(){});
+      } else if (navigator.share) {
+        navigator.share({ title: 'FORTUNA 사주', text: text }).catch(function(){});
       } else {
-        resetBtn();
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], text: desc + '\n\n나도 확인해봐 👇\n' + pageUrl }).catch(function(){});
-        } else {
-          navigator.clipboard && navigator.clipboard.writeText(desc + '\n\n' + pageUrl);
-          alert('링크를 클립보드에 복사했어요!');
-        }
+        navigator.clipboard && navigator.clipboard.writeText(text);
+        alert('클립보드에 복사했어요!');
       }
     }, 'image/png');
   };
 
-  if (_sajuCanvas) {
-    doShare(_sajuCanvas);
-  } else {
-    openSajuShareCard(doShare);  // 카드 그린 후 콜백
-  }
+  if (_sajuCanvas) { doShare(_sajuCanvas); }
+  else { openSajuShareCard(doShare); }
 }
 
 function copySajuLink() {
@@ -1352,15 +1321,20 @@ document.getElementById('sajuShareModal').addEventListener('click', function(e) 
 
 // ── 스크롤 위치 저장/복원 ──────────────────────────────
 (function() {
-  var saved = sessionStorage.getItem('picoSajuScrollY');
-  if (saved) { window.scrollTo(0, parseInt(saved, 10)); sessionStorage.removeItem('picoSajuScrollY'); }
+  var KEY = 'pico_scroll_saju';
+  var saved = localStorage.getItem(KEY);
+  if (saved) {
+    requestAnimationFrame(function() {
+      setTimeout(function() { window.scrollTo(0, parseInt(saved, 10)); }, 80);
+    });
+  }
   var _st;
   window.addEventListener('scroll', function() {
     clearTimeout(_st);
-    _st = setTimeout(function() { sessionStorage.setItem('picoSajuScrollY', String(Math.round(window.scrollY))); }, 200);
+    _st = setTimeout(function() { localStorage.setItem(KEY, String(Math.round(window.scrollY))); }, 200);
   }, { passive: true });
   document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'hidden') sessionStorage.setItem('picoSajuScrollY', String(Math.round(window.scrollY)));
+    if (document.visibilityState === 'hidden') localStorage.setItem(KEY, String(Math.round(window.scrollY)));
   });
 })();
 </script>
