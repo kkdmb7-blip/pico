@@ -587,13 +587,13 @@ function handleCta() {
 // ── 초기화 ──
 (function init() {
   try {
-    var raw = localStorage.getItem('fortuna_kakao_user');
+    var raw = localStorage.getItem('pico_user');
     if (raw) {
       var data = JSON.parse(raw);
       currentUser = {
-        id: data.id || (data.profile && data.profile.id),
-        name: data.name || (data.profile && data.profile.nickname) || '사용자',
-        avatar: data.avatar || (data.profile && data.profile.profile_image_url) || '',
+        id: data.id,
+        name: data.name || '사용자',
+        avatar: data.avatar || '',
       };
     }
   } catch(e) {}
