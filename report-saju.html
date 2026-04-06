@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나만의 사주 리포트 · FORTUNA</title>
+<meta name="theme-color" content="#0a0a0f">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c28;
+  --border: #2a2a3d;
+  --accent: #7b5ea7;
+  --accent2: #e8b86d;
+  --text: #f0f0f5;
+  --muted: #6b6b85;
+  --gold: #e8b86d;
+  --radius: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+#starCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.star {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  50% { opacity: var(--max-op, 0.7); transform: scale(1); }
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.logo-inner { display: flex; align-items: center; gap: 5px; }
+.logo-dot { color: var(--accent2); font-size: 10px; margin-bottom: 2px; }
+.logo-sub { font-size: 10px; font-weight: 400; color: var(--muted); letter-spacing: 0; font-family: 'Noto Sans KR', sans-serif; }
+
+.btn-kakao {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: #fee500;
+  color: #191919;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.btn-kakao:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(254,229,0,0.3); }
+
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border); }
+#userNameDisplay { font-size: 14px; font-weight: 500; color: var(--text); }
+.hamburger-wrap { position: relative; }
+.hamburger-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; cursor: pointer; color: var(--text); display: flex; align-items: center; }
+.hamburger-dropdown { display: none; position: absolute; right: 0; top: calc(100% + 8px); background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; white-space: nowrap; min-width: 150px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); z-index: 200; }
+.hamburger-dropdown.open { display: block; }
+.hamburger-dropdown button { display: block; width: 100%; padding: 12px 18px; background: none; border: none; color: var(--text); font-size: 14px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; text-align: left; }
+.hamburger-dropdown button:hover { background: var(--surface); }
+.menu-divider { height: 1px; background: var(--border); }
+
+/* ── MAIN CONTENT ── */
+.page-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* [1] Hero */
+.hero {
+  padding: 72px 0 48px;
+  text-align: center;
+}
+.hero-emoji { font-size: 52px; margin-bottom: 20px; display: block; }
+.hero-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  margin-bottom: 14px;
+}
+.hero-sub {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* [2] Price badge */
+.price-box {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+  margin: 32px 0;
+}
+.price-label { font-size: 13px; color: var(--muted); margin-bottom: 10px; letter-spacing: 0.5px; }
+.price-main {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+}
+.price-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+.btn-gold {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #c9922a, var(--gold));
+  color: #1a1000;
+  font-size: 16px;
+  font-weight: 800;
+  font-family: 'Noto Sans KR', sans-serif;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  text-align: center;
+}
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,184,109,0.35); }
+
+/* [3] Checklist */
+.section-block { margin: 48px 0; }
+.section-block-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -0.3px;
+}
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.checklist-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.checklist-text { color: var(--text); }
+.checklist-text strong { color: var(--gold); }
+
+/* [4] Sample preview */
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+.preview-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.preview-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 10px;
+}
+.preview-text-top {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.preview-blur {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  filter: blur(5px);
+  user-select: none;
+  pointer-events: none;
+}
+.preview-lock {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to top, var(--surface) 40%, transparent);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 10px;
+}
+.preview-lock-icon { font-size: 18px; opacity: 0.5; }
+.preview-footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* [5] Steps */
+.steps { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.step-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+.step-num {
+  font-size: 22px;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+.step-content {}
+.step-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+/* [6] Bottom CTA */
+.cta-bottom {
+  margin: 48px 0 24px;
+  text-align: center;
+}
+.cta-bottom-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+.cta-bottom-title em { font-style: normal; color: var(--gold); }
+
+/* [7] Notice */
+.orb-notice {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.orb-notice a { color: var(--gold); text-decoration: none; }
+.orb-notice a:hover { text-decoration: underline; }
+
+/* divider */
+.divider { height: 1px; background: var(--border); margin: 48px 0; opacity: 0.5; }
+
+@media (max-width: 480px) {
+  .preview-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="starCanvas"></canvas>
+
+<nav>
+  <a class="logo" href="/">
+    <div class="logo-inner"><span class="logo-dot">●</span>FORTUNA</div>
+    <div class="logo-sub">AI 운세 상담 · 사주 · 점성 · 기문둔갑</div>
+  </a>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="btn-kakao" id="btnKakao" onclick="kakaoLogin()" style="display:none;">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1C4.134 1 1 3.582 1 6.757c0 1.904 1.178 3.584 2.98 4.624L3.2 14.2a.25.25 0 00.363.28l3.49-2.29c.31.03.622.047.947.047 3.866 0 7-2.582 7-5.48C15 3.582 11.866 1 8 1z" fill="#191919"/></svg>
+      카카오로 시작하기
+    </button>
+    <div id="userArea" style="display:none;align-items:center;gap:10px;display:none;">
+      <img id="userAvatar" class="user-avatar" src="" alt="">
+      <span id="userNameDisplay"></span>
+      <div class="hamburger-wrap">
+        <button class="hamburger-btn" onclick="toggleHamburger(event)">
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+            <rect width="18" height="2" rx="1" fill="currentColor"/>
+            <rect y="6" width="18" height="2" rx="1" fill="currentColor"/>
+            <rect y="12" width="18" height="2" rx="1" fill="currentColor"/>
+          </svg>
+        </button>
+        <div class="hamburger-dropdown" id="hamburgerDropdown">
+          <button onclick="location.href='/'">🏠 홈으로</button>
+          <div class="menu-divider"></div>
+          <button onclick="logout()" style="color:#e05c6a;">로그아웃</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- [1] Hero -->
+  <div class="hero">
+    <span class="hero-emoji">🌙</span>
+    <h1 class="hero-title">나만의 사주 리포트</h1>
+    <p class="hero-sub">타고난 기질부터 2026년 운세까지<br>5단계 심층 분석으로 나를 이해합니다</p>
+  </div>
+
+  <!-- [2] Price badge -->
+  <div class="price-box">
+    <div class="price-label">리포트 가격</div>
+    <div class="price-main">500 Orb</div>
+    <div class="price-sub">약 5,500원 상당 · 한 번 발급 후 영구 보관</div>
+    <button class="btn-gold" id="mainCtaBtn" onclick="handleCta()">지금 바로 받아보기 →</button>
+  </div>
+
+  <!-- [3] Checklist -->
+  <div class="section-block">
+    <div class="section-block-title">리포트에 포함된 내용</div>
+    <ul class="checklist">
+      <li>
+        <span class="checklist-icon">✅</span>
+        <span class="checklist-text"><strong>일주 기본 풀이</strong> — 성격 / 재물 / 연애 / 직업 / 건강</span>
+      </li>
+      <li>
+        <span class="checklist-icon">✅</span>
+        <span class="checklist-text"><strong>신강/신약 에너지 분석</strong> — 현재 내 에너지 방향과 실용 조언</span>
+      </li>
+      <li>
+        <span class="checklist-icon">✅</span>
+        <span class="checklist-text"><strong>연령대별 맞춤 조언</strong> — 20대 / 40대 / 60대 시기별 가이드</span>
+      </li>
+      <li>
+        <span class="checklist-icon">✅</span>
+        <span class="checklist-text"><strong>고민 테마별 솔루션</strong> — 창업 / 이직 / 투자 / 대인관계</span>
+      </li>
+      <li>
+        <span class="checklist-icon">✅</span>
+        <span class="checklist-text"><strong>2026 병오년 나의 운세</strong> — 올해 찾아오는 기운과 방향</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- [4] Sample preview -->
+  <div class="section-block">
+    <div class="section-block-title">이런 내용이 담겨있어요</div>
+    <div class="preview-grid">
+
+      <!-- 카드1: 성격 분석 -->
+      <div class="preview-card">
+        <div class="preview-card-label">성격 분석</div>
+        <div class="preview-text-top">
+          갑인(甲寅)일주인 당신은<br>
+          뿌리 깊은 거목처럼<br>
+          강한 추진력과 타고난<br>
+          리더십을 지녔습니다.
+        </div>
+        <div class="preview-blur">
+          한번 결심하면 끝까지 밀고 나가는 성향으로 주변에서 믿음직한 존재로 인식됩니다. 재물운은 꾸준한 노력형이며...
+        </div>
+        <div class="preview-lock"><span class="preview-lock-icon">🔒</span></div>
+      </div>
+
+      <!-- 카드2: 2026 운세 -->
+      <div class="preview-card">
+        <div class="preview-card-label">2026 병오년 운세</div>
+        <div class="preview-text-top">
+          2026 병오년은 당신에게<br>
+          '실행력이 폭발하는 해'<br>
+          입니다. 머릿속에만<br>
+          있던 아이디어를...
+        </div>
+        <div class="preview-blur">
+          실제로 움직여야 할 때입니다. 화(火)의 기운이 강해지는 해로 새로운 시작과 도전에 유리한 에너지가...
+        </div>
+        <div class="preview-lock"><span class="preview-lock-icon">🔒</span></div>
+      </div>
+
+      <!-- 카드3: 연령대 조언 -->
+      <div class="preview-card">
+        <div class="preview-card-label">연령대별 조언</div>
+        <div class="preview-text-top">
+          지금 이 나이에<br>
+          갑인일주라면 독립심이<br>
+          최고조에 달하는<br>
+          시기입니다...
+        </div>
+        <div class="preview-blur">
+          자신의 길을 스스로 개척하려는 욕구가 강하게 올라오는 때입니다. 이 에너지를 현명하게 활용하면...
+        </div>
+        <div class="preview-lock"><span class="preview-lock-icon">🔒</span></div>
+      </div>
+
+    </div>
+    <div class="preview-footer">전체 내용은 리포트에서 확인하세요 🔒</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- [5] 5단계 분석 -->
+  <div class="section-block">
+    <div class="section-block-title">5단계로 당신을 입체적으로 분석합니다</div>
+    <div class="steps">
+      <div class="step-card">
+        <span class="step-num">1️⃣</span>
+        <div class="step-content">
+          <div class="step-title">일주 분석</div>
+          <div class="step-desc">60갑자 중 당신의 타고난 기질 — 성격, 재물관, 연애 방식, 건강 취약점까지</div>
+        </div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">2️⃣</span>
+        <div class="step-content">
+          <div class="step-title">에너지 분석</div>
+          <div class="step-desc">신강/신약으로 보는 현재 에너지 방향 — 지금 나에게 필요한 것과 피해야 할 것</div>
+        </div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">3️⃣</span>
+        <div class="step-content">
+          <div class="step-title">연령대 조언</div>
+          <div class="step-desc">지금 이 나이에 맞는 실용적 가이드 — 20대 / 40대 / 60대 각각 다른 방향 제시</div>
+        </div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">4️⃣</span>
+        <div class="step-content">
+          <div class="step-title">테마별 솔루션</div>
+          <div class="step-desc">창업 / 이직 / 투자 / 대인관계 — 고민 상황에 맞춘 사주 기반 맞춤 조언</div>
+        </div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">5️⃣</span>
+        <div class="step-content">
+          <div class="step-title">올해 운세</div>
+          <div class="step-desc">2026 병오년 당신에게 찾아오는 기운 — 유리한 시기, 조심해야 할 국면</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [6] Bottom CTA -->
+  <div class="cta-bottom">
+    <div class="cta-bottom-title">지금 <em>500 Orb</em>로 받아보기</div>
+    <button class="btn-gold" onclick="handleCta()">리포트 받기 →</button>
+  </div>
+
+  <!-- [7] Orb notice -->
+  <div class="orb-notice">
+    Orb가 부족하다면? <a href="charge.html">첫 충전 시 1+1 이벤트 진행 중 →</a>
+  </div>
+
+</div>
+
+<script>
+var KAKAO_REST_KEY = '51b4f87ad9cfd6312c176ad34eb62025';
+var currentUser = null;
+
+// ── 별 배경 ──
+(function() {
+  var canvas = document.getElementById('starCanvas');
+  var wrap = document.body;
+  for (var i = 0; i < 60; i++) {
+    var s = document.createElement('div');
+    s.className = 'star';
+    var size = Math.random() * 2 + 1;
+    s.style.cssText = [
+      'width:' + size + 'px',
+      'height:' + size + 'px',
+      'left:' + Math.random() * 100 + '%',
+      'top:' + Math.random() * 100 + '%',
+      '--dur:' + (Math.random() * 4 + 2) + 's',
+      '--delay:' + (Math.random() * 4) + 's',
+      '--max-op:' + (Math.random() * 0.5 + 0.2),
+    ].join(';');
+    canvas.appendChild(s);
+  }
+})();
+
+// ── 카카오 로그인 ──
+function kakaoLogin() {
+  window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=' + KAKAO_REST_KEY
+    + '&redirect_uri=' + encodeURIComponent('https://picolab.kr/')
+    + '&response_type=code&prompt=login';
+}
+
+function logout() {
+  localStorage.removeItem('fortuna_kakao_user');
+  currentUser = null;
+  updateNav();
+}
+
+function toggleHamburger(e) {
+  e.stopPropagation();
+  document.getElementById('hamburgerDropdown').classList.toggle('open');
+}
+document.addEventListener('click', function() {
+  var dd = document.getElementById('hamburgerDropdown');
+  if (dd) dd.classList.remove('open');
+});
+
+function updateNav() {
+  var btnKakao = document.getElementById('btnKakao');
+  var userArea = document.getElementById('userArea');
+  if (currentUser) {
+    btnKakao.style.display = 'none';
+    userArea.style.display = 'flex';
+    var avatar = document.getElementById('userAvatar');
+    var nameEl = document.getElementById('userNameDisplay');
+    if (avatar && currentUser.avatar) avatar.src = currentUser.avatar;
+    if (nameEl) nameEl.textContent = currentUser.name || '';
+  } else {
+    btnKakao.style.display = 'flex';
+    userArea.style.display = 'none';
+  }
+}
+
+function handleCta() {
+  if (!currentUser) {
+    kakaoLogin();
+    return;
+  }
+  // 로그인 상태 → 사주 리포트 생성 페이지로
+  location.href = 'saju.html';
+}
+
+// ── 초기화 ──
+(function init() {
+  try {
+    var raw = localStorage.getItem('fortuna_kakao_user');
+    if (raw) {
+      var data = JSON.parse(raw);
+      currentUser = {
+        id: data.id || (data.profile && data.profile.id),
+        name: data.name || (data.profile && data.profile.nickname) || '사용자',
+        avatar: data.avatar || (data.profile && data.profile.profile_image_url) || '',
+      };
+    }
+  } catch(e) {}
+  updateNav();
+})();
+</script>
+
+</body>
+</html>
