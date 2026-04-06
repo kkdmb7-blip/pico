@@ -1155,8 +1155,8 @@ function renderSajuTeaser(data) {
   <div style="margin-bottom:16px">
     <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:8px">${namePart}의 일주 기질</div>
     <div style="display:flex;gap:5px;margin-bottom:10px">
-      <div class="hanja-box ${stemBgCss}" style="width:40px;height:40px;font-size:1.35rem">${STEM_H[si]||'?'}</div>
-      <div class="hanja-box ${branBgCss}" style="width:40px;height:40px;font-size:1.35rem">${BRANCH_H[bi]||'?'}</div>
+      <div class="hanja-box ${stemBgCss}" style="width:40px;height:40px;font-size:1.35rem;margin:0">${STEM_H[si]||'?'}</div>
+      <div class="hanja-box ${branBgCss}" style="width:40px;height:40px;font-size:1.35rem;margin:0">${BRANCH_H[bi]||'?'}</div>
     </div>
     <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
       ${keywords.map(k=>`<span class="badge" style="color:#CE93D8;border-color:rgba(206,147,216,0.3);background:rgba(206,147,216,0.08)">${k}</span>`).join('')}
