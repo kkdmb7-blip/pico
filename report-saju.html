@@ -322,6 +322,115 @@ nav {
 @media (max-width: 480px) {
   .preview-grid { grid-template-columns: 1fr; }
 }
+
+/* ── LOADING ── */
+.loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,15,0.92);
+  z-index: 200;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.loading-overlay.active { display: flex; }
+.loading-spinner {
+  width: 52px;
+  height: 52px;
+  border: 3px solid var(--border);
+  border-top-color: var(--purple-light);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { color: var(--muted); font-size: 14px; }
+
+.toast-msg {
+  display: none;
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2a2a3d;
+  color: var(--text);
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  z-index: 300;
+  text-align: center;
+  max-width: 300px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.toast-msg.active { display: block; }
+
+/* ── RESULT SECTION ── */
+#resultSection {
+  display: none;
+  padding: 0 20px 60px;
+  max-width: 640px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.result-header {
+  text-align: center;
+  padding: 32px 0 24px;
+}
+.result-header h2 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.result-header p { font-size: 13px; color: var(--muted); }
+.result-body {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px 22px;
+  line-height: 1.95;
+  font-size: 15px;
+  color: #d8d8e8;
+}
+.result-body h2 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--purple-light);
+  margin: 26px 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.result-body h2:first-child { margin-top: 0; }
+.result-body h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 16px 0 6px;
+}
+.result-body strong { color: var(--orb); }
+.result-body p { margin-bottom: 10px; }
+.result-body ul { margin: 8px 0 12px 18px; }
+.result-body li { margin-bottom: 6px; }
+.result-back-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+.result-back-btn button {
+  padding: 14px 36px;
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -504,6 +613,27 @@ nav {
 
 </div>
 
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">사주 리포트를 생성하고 있습니다...</div>
+</div>
+
+<!-- Toast message -->
+<div class="toast-msg" id="toastMsg"></div>
+
+<!-- Result section -->
+<div id="resultSection">
+  <div class="result-header">
+    <h2 id="resultTitle">나만의 사주 리포트</h2>
+    <p id="resultSubtitle"></p>
+  </div>
+  <div class="result-body" id="resultBody"></div>
+  <div class="result-back-btn">
+    <button onclick="location.reload()">다시 보기</button>
+  </div>
+</div>
+
 <script>
 var KAKAO_REST_KEY = '51b4f87ad9cfd6312c176ad34eb62025';
 var currentUser = null;
@@ -567,14 +697,126 @@ function updateNav() {
   }
 }
 
+var TEST_USER_IDS = ['3d7633bc-3351-4f22-bc10-10cd1bfc5c28'];
+
 function handleCta() {
   if (!currentUser) {
     kakaoLogin();
     return;
   }
-  // 로그인 상태 → 사주 파라미터 보존해서 복귀
-  var params = location.search;
-  location.href = 'saju.html' + (params || '');
+  if (!TEST_USER_IDS.includes(currentUser.id)) {
+    showToast('준비 중입니다. 곧 오픈됩니다! 🌟');
+    return;
+  }
+  generateReport();
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toastMsg');
+  t.textContent = msg;
+  t.classList.add('active');
+  setTimeout(function() { t.classList.remove('active'); }, 3500);
+}
+
+function setLoading(on) {
+  var el = document.getElementById('loadingOverlay');
+  if (on) el.classList.add('active');
+  else el.classList.remove('active');
+}
+
+async function generateReport() {
+  var params = new URLSearchParams(location.search);
+  var year = params.get('year');
+  var month = params.get('month');
+  var day = params.get('day');
+  var hour = params.get('hour') || '';
+  var minute = params.get('minute') || '';
+  var gender = params.get('gender') || 'male';
+  var midnightType = params.get('midnightType') || '';
+  var age = params.get('age') || '';
+
+  if (!year || !month || !day) {
+    showToast('사주 정보가 없습니다. 사주 페이지에서 다시 시도해주세요.');
+    return;
+  }
+
+  var currentMonth = new Date().getMonth() + 1;
+
+  setLoading(true);
+  try {
+    var workerUrl = 'https://fortuna.kkdmb7.workers.dev/saju-report'
+      + '?year=' + encodeURIComponent(year)
+      + '&month=' + encodeURIComponent(month)
+      + '&day=' + encodeURIComponent(day)
+      + '&hour=' + encodeURIComponent(hour)
+      + '&minute=' + encodeURIComponent(minute)
+      + '&gender=' + encodeURIComponent(gender)
+      + '&age=' + encodeURIComponent(age)
+      + '&current_month=' + currentMonth;
+    if (midnightType) workerUrl += '&midnightType=' + encodeURIComponent(midnightType);
+
+    var workerRes = await fetch(workerUrl);
+    if (!workerRes.ok) throw new Error('worker_error ' + workerRes.status);
+    var workerData = await workerRes.json();
+    if (workerData.error) throw new Error(workerData.error);
+
+    var claudeRes = await fetch('/api/saju-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workerData: workerData, userId: currentUser.id }),
+    });
+    if (!claudeRes.ok) throw new Error('api_error ' + claudeRes.status);
+    var claudeData = await claudeRes.json();
+    if (claudeData.error) throw new Error(claudeData.error);
+
+    setLoading(false);
+    renderReport(workerData, claudeData.report);
+  } catch (e) {
+    setLoading(false);
+    showToast('리포트 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+    console.error(e);
+  }
+}
+
+function renderReport(workerData, markdown) {
+  document.querySelector('.page-wrap').style.display = 'none';
+  var resultSection = document.getElementById('resultSection');
+  resultSection.style.display = 'block';
+
+  var name = new URLSearchParams(location.search).get('name') || '';
+  document.getElementById('resultTitle').textContent = (name ? name + '님의 ' : '') + '사주 리포트';
+  var subtitle = (workerData.일주 || '');
+  if (workerData.신강약) subtitle += ' · ' + workerData.신강약;
+  if (workerData.용신) subtitle += ' · 용신 ' + workerData.용신;
+  document.getElementById('resultSubtitle').textContent = subtitle;
+
+  document.getElementById('resultBody').innerHTML = markdownToHtml(markdown);
+  window.scrollTo(0, 0);
+}
+
+function markdownToHtml(md) {
+  var escaped = md
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  var html = escaped
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>');
+  // Wrap consecutive <li> in <ul>
+  html = html.replace(/(<li>[\s\S]*?<\/li>)(\n<li>[\s\S]*?<\/li>)*/g, function(m) {
+    return '<ul>' + m + '</ul>';
+  });
+  // Split on double newlines for paragraphs
+  var parts = html.split(/\n\n+/);
+  var result = parts.map(function(p) {
+    p = p.trim();
+    if (!p) return '';
+    if (/^<(h2|h3|ul|li)/.test(p)) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  }).join('\n');
+  return result;
 }
 
 // ── 초기화 ──
