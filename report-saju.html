@@ -105,7 +105,7 @@ nav {
 .btn-kakao:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(254,229,0,0.3); }
 
 .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border); }
-#userNameDisplay { font-size: 14px; font-weight: 500; color: var(--text); }
+#userNameDisplay { font-size: 14px; font-weight: 500; color: var(--text); max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hamburger-wrap { position: relative; }
 .hamburger-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; cursor: pointer; color: var(--text); display: flex; align-items: center; }
 .hamburger-dropdown { display: none; position: absolute; right: 0; top: calc(100% + 8px); background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; white-space: nowrap; min-width: 150px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); z-index: 200; }
