@@ -1153,7 +1153,7 @@ function renderSajuTeaser(data) {
   // ① 일주 기질 — hanja-box + 키워드 배지 + 설명
   html += `
   <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px">
-    <div style="display:flex;gap:5px;flex-shrink:0">
+    <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
       <div class="hanja-box ${stemBgCss}" style="width:40px;height:40px;font-size:1.35rem">${STEM_H[si]||'?'}</div>
       <div class="hanja-box ${branBgCss}" style="width:40px;height:40px;font-size:1.35rem">${BRANCH_H[bi]||'?'}</div>
     </div>
