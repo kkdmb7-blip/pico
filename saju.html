@@ -1039,42 +1039,179 @@ function renderJohu(data) {
 
 // ─── 사주 핵심 티저 ───────────────────────────────────
 function renderSajuTeaser(data) {
-  const dayStr = (data.summary && data.summary.pillars && data.summary.pillars.day) || '';
-  const stem = dayStr[0] || '';
+  const dayStr   = (data.summary && data.summary.pillars && data.summary.pillars.day) || '';
+  const stem     = dayStr[0] || '';
+  const branch   = dayStr[1] || '';
   const strength = (data.summary && data.summary.strength) || '';
+  const isGang   = strength.includes('신강');
+  const y        = data.yongshin || {};
+  const priKor   = EN_EL[y.primary] || '';
+  const secKor   = EN_EL[y.secondary] || '';
+  const namePart = pName ? `<strong>${pName}</strong>님` : '당신';
 
-  const STEM_TRAIT = {
-    '갑': '강한 추진력과 타고난 리더십을 지녔습니다',
-    '을': '유연한 감각과 뛰어난 적응력을 지녔습니다',
-    '병': '밝고 열정적인 에너지로 주변을 이끕니다',
-    '정': '섬세한 내면과 깊은 배려심을 가졌습니다',
-    '무': '묵직한 안정감과 넓은 포용력이 특징입니다',
-    '기': '실용적이고 현실 감각이 뛰어납니다',
-    '경': '결단력 있고 원칙을 굽히지 않습니다',
-    '신': '예민한 감수성과 완벽을 추구하는 성향입니다',
-    '임': '자유롭고 창의적인 흐름을 좋아합니다',
-    '계': '깊은 직관력과 풍부한 감수성을 지녔습니다',
+  // ① 일주 천간별 키워드 3개 + 설명 2줄
+  const STEM_KEYWORDS = {
+    '갑':['리더십','추진력','고집'], '을':['친화력','적응력','끈기'],
+    '병':['열정','존재감','회복력'], '정':['배려','섬세함','내면의 강인함'],
+    '무':['포용력','안정감','대범함'], '기':['현실감각','꼼꼼함','재물복'],
+    '경':['원칙','의리','결단력'], '신':['감수성','완벽주의','날카로움'],
+    '임':['창의력','자유로움','큰그림'], '계':['직관력','감성','깊이'],
+  };
+  const STEM_DESC1 = {
+    '갑':'한 번 목표를 정하면 끝까지 밀어붙이는 힘이 있습니다. 독립심이 강하고 남의 간섭을 싫어하는 편입니다.',
+    '을':'부드러운 외면 뒤에 강한 의지가 숨어 있습니다. 인간관계를 통해 기회를 만드는 능력이 탁월합니다.',
+    '병':'어디서든 존재감이 뚜렷하고 주변 사람을 끌어모으는 에너지가 있습니다. 감정 기복이 있지만 회복도 빠릅니다.',
+    '정':'깊은 배려심으로 사람들을 품는 타입입니다. 겉으로는 조용해 보여도 속마음은 단단하고 집요합니다.',
+    '무':'작은 것에 쉽게 흔들리지 않는 넓은 품을 지녔습니다. 조직이나 큰 프로젝트에서 존재감을 발휘합니다.',
+    '기':'실속을 챙기고 현실적인 판단력이 뛰어납니다. 꾸준히 쌓아가는 방식으로 성과를 냅니다.',
+    '경':'원칙과 의리를 중시하며 불의를 참지 못하는 정의감이 있습니다. 주변에 강렬한 인상을 남깁니다.',
+    '신':'남들이 놓치는 것을 포착하는 섬세한 감각이 있습니다. 높은 기준을 유지하려다 스스로 지치지 않도록 주의하세요.',
+    '임':'통 크게 생각하고 새로운 가능성을 탐색하는 것을 즐깁니다. 반복되는 루틴보다 변화와 흐름을 선호합니다.',
+    '계':'타인의 감정을 읽는 직감이 남다릅니다. 표면적으로는 조용해도 내면에 풍부한 세계를 갖고 있습니다.',
+  };
+  const STEM_DESC2 = {
+    '갑':'강점이 발휘될 때는 개척자이지만, 고집이 지나치면 혼자 짊어지다 지칩니다. 유연함이 더 큰 성과를 만듭니다.',
+    '을':'관계망이 결국 인생의 자원입니다. 지나친 눈치 보기보다 자신의 중심을 지키는 연습이 필요합니다.',
+    '병':'밝은 에너지로 사람을 이끌 수 있지만, 에너지 소모가 크므로 혼자만의 회복 시간이 중요합니다.',
+    '정':'속마음을 잘 드러내지 않아 오해받기 쉽습니다. 신뢰하는 사람에게라도 솔직하게 표현하는 연습이 도움이 됩니다.',
+    '무':'지나친 책임감으로 혼자 다 떠안으려는 경향이 있습니다. 위임하고 나누는 것이 더 큰 리더십입니다.',
+    '기':'꼼꼼함이 강점이지만 완벽주의로 진행이 느려질 수 있습니다. 완료 기준을 먼저 정하는 습관이 도움이 됩니다.',
+    '경':'한번 결정하면 잘 바꾸지 않는 뚝심이 있습니다. 때로는 유연하게 방향을 바꾸는 용기도 필요합니다.',
+    '신':'높은 심미안과 완벽 추구가 특기인 동시에 스트레스 원인이기도 합니다. 80점에서 만족하는 연습이 필요합니다.',
+    '임':'실행보다 구상에 머무는 시간이 길어질 수 있습니다. 작은 것부터 먼저 움직여야 큰 흐름이 따라옵니다.',
+    '계':'감수성이 풍부한 만큼 상처도 쉽게 받습니다. 자신의 경계를 분명히 하는 것이 정신 건강의 핵심입니다.',
   };
 
-  const isGang = strength.includes('신강');
-  const strengthLine = isGang
-    ? '에너지가 강한 편이라 자기 주도적이고 독립심이 강합니다. 이 힘을 어떻게 쓰느냐가 인생의 핵심입니다.'
-    : '에너지가 섬세한 편이라 환경의 영향을 크게 받습니다. 나를 지지해줄 기운을 곁에 두는 것이 중요합니다.';
+  // ② 일지(지지)별 재물·관계 특성
+  const BRANCH_HINT = {
+    '자':'영리하고 재물 감각이 있으며, 정보를 빠르게 흡수합니다.',
+    '축':'묵묵히 실력을 쌓아 나중에 빛을 발하는 타입입니다. 신뢰가 두텁습니다.',
+    '인':'도전정신과 활동력이 강하며 새 분야 개척에 강합니다.',
+    '묘':'부드러운 매력과 예술적 감각으로 사람을 끄는 힘이 있습니다.',
+    '진':'다재다능하며 변화에 강하지만 에너지가 분산되기 쉬운 구조입니다.',
+    '사':'두뇌 회전이 빠르고 추진력과 지략이 있습니다.',
+    '오':'화려하고 열정적이며, 사람들의 시선을 끄는 자리에 잘 어울립니다.',
+    '미':'배려심이 깊고 인내심이 있어 주변을 편안하게 만듭니다.',
+    '신':'순발력과 실행력이 뛰어나며 변화무쌍한 환경에서 강합니다.',
+    '유':'섬세한 심미안과 완성도 높은 작업으로 인정받습니다.',
+    '술':'깊이 파고드는 탐구력이 있어 전문 분야에서 두각을 나타냅니다.',
+    '해':'자유로운 감각으로 경계를 넘나들며 다양한 경험을 추구합니다.',
+  };
 
-  const y = data.yongshin || {};
-  const priKor = EN_EL[y.primary] || '';
-  const yLine = priKor
-    ? `지금 당신에게 가장 필요한 기운은 <strong style="color:#FFAB40">${priKor}</strong>입니다.`
-    : '';
+  // ③ 신강/신약 구체 패턴 3가지
+  const gangPatterns = [
+    '뚜렷한 자기 의견이 있어 쉽게 설득되지 않습니다',
+    '혼자 결정하고 혼자 밀어붙이는 경향이 강합니다',
+    '강한 에너지를 쏟을 방향을 잘 잡는 것이 인생의 핵심입니다',
+  ];
+  const yakPatterns = [
+    '주변 환경과 사람의 영향을 크게 받는 편입니다',
+    '혼자보다 좋은 파트너가 곁에 있을 때 능력이 극대화됩니다',
+    '나를 지지해주는 기운을 의식적으로 가까이 두는 게 중요합니다',
+  ];
+  const patterns = isGang ? gangPatterns : yakPatterns;
 
-  const namePart = pName ? `<strong>${pName}</strong>님은 ` : '';
-  const lines = [
-    `${namePart}<strong style="color:#CE93D8">${dayStr}일주</strong>로, ${STEM_TRAIT[stem] || '독특한 기질을 지녔습니다'}.`,
-    strengthLine,
-    yLine,
-  ].filter(Boolean);
+  // ④ 현재 대운 찾기
+  const cy = new Date().getFullYear();
+  const bigLuck = data.big_luck || [];
+  const nowLuck = bigLuck.find(lk => {
+    const yr = (lk.year_range || '').split(/[–\-]/);
+    return cy >= parseInt(yr[0]) && cy <= parseInt(yr[1]);
+  });
 
-  document.getElementById('sajuTeaserText').innerHTML = lines.join('<br><br>');
+  // ⑤ 용신별 구체 조언
+  const EL_ADVICE = {
+    '목':'초록·나무 계열 환경, 동쪽 방향이 힘을 줍니다. 교육·기획·창업 분야와 잘 맞습니다.',
+    '화':'밝고 따뜻한 공간, 남쪽 방향이 좋습니다. 미디어·디자인·영업·공연 분야에서 힘이 납니다.',
+    '토':'안정된 환경과 꾸준한 루틴이 중요합니다. 부동산·농업·관리·중개 분야가 기운을 안정시킵니다.',
+    '금':'서쪽 방향과 흰색·금속 소품이 도움이 됩니다. 금융·법률·기술·제조 분야와 잘 어울립니다.',
+    '수':'파랑·검정 계열과 북쪽 방향이 유리합니다. 유통·커뮤니케이션·IT·무역 분야에서 두각을 냅니다.',
+  };
+  const EL_COLOR = { 목:'#69F0AE', 화:'#FF7043', 토:'#FFD54F', 금:'#E0E0E0', 수:'#64B5F6' };
+
+  // ⑥ 형·충 주의 힌트
+  const rel = data.branch_relations_kor || {};
+  const hasClash   = (rel.clashes      || []).length > 0;
+  const hasPunish  = (rel.punishments  || []).length > 0;
+
+  const keywords = STEM_KEYWORDS[stem] || ['개성', '직관', '의지'];
+  const desc1 = STEM_DESC1[stem] || '';
+  const desc2 = STEM_DESC2[stem] || '';
+  const branchHint = BRANCH_HINT[branch] || '';
+
+  // ── HTML 조립 ──
+  let html = '';
+
+  // ① 일주 기질
+  html += `
+  <div style="margin-bottom:16px">
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;letter-spacing:0.5px">${namePart}의 일주 <span style="color:#CE93D8;font-weight:700">${dayStr}</span> 기질</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      ${keywords.map(k=>`<span style="background:rgba(206,147,216,0.15);border:1px solid rgba(206,147,216,0.35);border-radius:20px;padding:4px 12px;font-size:12px;color:#CE93D8">${k}</span>`).join('')}
+    </div>
+    <p style="font-size:13.5px;line-height:1.85;color:#e0e0ef;margin:0 0 8px">${desc1}</p>
+    ${desc2 ? `<p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.5);margin:0">${desc2}</p>` : ''}
+    ${branchHint ? `<p style="font-size:12.5px;line-height:1.75;color:rgba(255,255,255,0.4);margin:8px 0 0;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)">일지(${branch}) · ${branchHint}</p>` : ''}
+  </div>`;
+
+  // ② 신강/신약 패턴
+  html += `
+  <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px">${strength} — ${isGang?'에너지가 강한 사주':'에너지가 섬세한 사주'}</div>
+    ${patterns.map(p=>`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.6"><span style="color:${isGang?'#FF8A65':'#82B1FF'};margin-top:3px;flex-shrink:0">●</span>${p}</div>`).join('')}
+  </div>`;
+
+  // ③ 현재 대운
+  if (nowLuck) {
+    const lkEl = nowLuck.element || '';
+    const lkElKor = EN_EL[lkEl] || '';
+    const lkColor = EL_COLOR[lkElKor] || '#CE93D8';
+    const lkStemH = STEM_H[STEMS.indexOf(nowLuck.stem_kor)] || nowLuck.stem_kor || '';
+    const lkBranI = BRANCHES.indexOf(nowLuck.branch_kor);
+    const lkBranH = lkBranI >= 0 ? BRANCH_H[lkBranI] : (nowLuck.branch_kor || '');
+    html += `
+  <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px">현재 대운 (${nowLuck.age_range} · ${nowLuck.year_range})</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:6px 14px;text-align:center;flex-shrink:0">
+        <span style="font-size:20px;font-weight:700;color:#e8e8f0;font-family:'Noto Serif KR',serif;letter-spacing:4px">${lkStemH}${lkBranH}</span>
+      </div>
+      <div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6">${lkElKor ? `<span style="color:${lkColor};font-weight:700">${lkElKor}(${lkEl})</span> 기운이 흐르는 대운입니다` : '현재 대운이 흐르는 시기입니다'}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:4px">이 대운의 세부 흐름은 리포트에서 확인하세요</div>
+      </div>
+    </div>
+  </div>`;
+  }
+
+  // ④ 용신 조언
+  if (priKor) {
+    const priColor = EL_COLOR[priKor] || '#FFAB40';
+    const secColor = EL_COLOR[secKor] || '#FFAB40';
+    const advice = EL_ADVICE[priKor] || '';
+    html += `
+  <div style="background:rgba(255,171,64,0.07);border:1px solid rgba(255,171,64,0.2);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">나에게 필요한 기운</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <span style="background:${priColor}22;border:1px solid ${priColor}55;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:700;color:${priColor}">용신 ${priKor}</span>
+      ${secKor ? `<span style="background:${secColor}18;border:1px solid ${secColor}40;border-radius:20px;padding:4px 14px;font-size:13px;color:${secColor}">희신 ${secKor}</span>` : ''}
+    </div>
+    ${advice ? `<div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.75">${advice}</div>` : ''}
+  </div>`;
+  }
+
+  // ⑤ 형·충 주의
+  if (hasClash || hasPunish) {
+    html += `
+  <div style="background:rgba(255,82,82,0.07);border:1px solid rgba(255,82,82,0.2);border-radius:12px;padding:12px 16px;margin-bottom:14px">
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">관계 & 변화 주의</div>
+    <div style="font-size:13px;color:rgba(255,200,200,0.8);line-height:1.75">
+      ${hasClash ? `사주 내 <strong style="color:#FF7043">충(沖)</strong>이 있어 급격한 변화와 충돌이 잦을 수 있습니다. ` : ''}${hasPunish ? `<strong style="color:#FFD740">형(刑)</strong> 관계로 예기치 않은 마찰이 생기기 쉬운 구조입니다. ` : ''}자세한 풀이는 전문 리포트에서 확인하세요.
+    </div>
+  </div>`;
+  }
+
+  document.getElementById('sajuTeaserText').innerHTML = html;
   document.getElementById('sajuTeaserWrap').style.display = 'block';
 }
 
