@@ -740,7 +740,9 @@ async function generateReport() {
     return;
   }
 
-  var currentMonth = new Date().getMonth() + 1;
+  var now = new Date();
+  var currentYear = now.getFullYear();
+  var currentMonth = now.getMonth() + 1;
 
   setLoading(true);
   try {
@@ -752,6 +754,7 @@ async function generateReport() {
       + '&minute=' + encodeURIComponent(minute)
       + '&gender=' + encodeURIComponent(gender)
       + '&age=' + encodeURIComponent(age)
+      + '&current_year=' + currentYear
       + '&current_month=' + currentMonth;
     if (midnightType) workerUrl += '&midnightType=' + encodeURIComponent(midnightType);
 
