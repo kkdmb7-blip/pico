@@ -290,10 +290,28 @@ function hideLoading() { document.getElementById('loadingOverlay').classList.rem
 async function loadUser() {
   // 카카오 로그인 캐시 확인 (pico_user 우선, fortuna_kakao_user fallback)
   var kakaoRaw = localStorage.getItem('pico_user') || localStorage.getItem('fortuna_kakao_user');
+  var kakaoData = null;
   if (kakaoRaw) {
     try {
-      var kakaoData = JSON.parse(kakaoRaw);
-      currentUserId = kakaoData.id || kakaoData.profile && kakaoData.profile.id;
+      kakaoData = JSON.parse(kakaoRaw);
+      currentUserId = kakaoData.id || (kakaoData.profile && kakaoData.profile.id);
+    } catch(e) {}
+  }
+  // _v:2 미설정이면 fortuna-silk로 UUID 재검증 (one-time migration)
+  if (kakaoData && kakaoData.email && !kakaoData._v) {
+    try {
+      var resolveRes = await fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: kakaoData.email, name: kakaoData.name })
+      });
+      var resolved = await resolveRes.json();
+      if (resolved && resolved.id) {
+        currentUserId = resolved.id;
+        kakaoData.id = resolved.id;
+        kakaoData._v = 2;
+        localStorage.setItem('pico_user', JSON.stringify(kakaoData));
+      }
     } catch(e) {}
   }
   // Supabase 세션 확인
