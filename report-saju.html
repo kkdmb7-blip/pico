@@ -650,8 +650,12 @@ async function getOrbBalance() {
   if (!currentUser) return 0;
   try {
     var res = await sb.from('orb_balance').select('balance').eq('user_id', currentUser.id).maybeSingle();
-    return (res.data && res.data.balance) || 0;
-  } catch(e) { return 0; }
+    if (res.error) throw new Error(res.error.message);
+    return (res.data && res.data.balance != null) ? res.data.balance : 0;
+  } catch(e) {
+    console.error('orb_balance 조회 실패:', e);
+    return 0;
+  }
 }
 
 async function deductOrb(amount) {
@@ -689,8 +693,8 @@ async function handleGenerate() {
   var balance = await getOrbBalance();
   if (balance < REPORT_COST) {
     setLoading(false);
-    showToast('Orb가 부족합니다. 충전 페이지로 이동합니다.');
-    setTimeout(function() { location.href = 'charge.html'; }, 1800);
+    showToast('Orb가 부족합니다. 충전 페이지로 이동합니다.', 2000);
+    setTimeout(function() { window.location.href = 'charge.html'; }, 2000);
     return;
   }
 
