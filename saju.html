@@ -1162,9 +1162,8 @@ function renderSajuTeaser(data) {
       <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
         ${keywords.map(k=>`<span class="badge" style="color:#CE93D8;border-color:rgba(206,147,216,0.3);background:rgba(206,147,216,0.08)">${k}</span>`).join('')}
       </div>
-      <p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.8);margin:0 0 5px">${desc1}</p>
-      ${desc2 ? `<p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,0.45);margin:0">${desc2}</p>` : ''}
-      ${branchHint ? `<p style="font-size:12px;line-height:1.7;color:rgba(255,255,255,0.35);margin:6px 0 0;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06)">${branchHint}</p>` : ''}
+      <p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.8);margin:0 0 5px">${desc1}${branchHint ? ' ' + branchHint : ''}</p>
+      ${desc2 ? `<p style="font-size:13px;line-height:1.75;color:rgba(255,255,255,0.45);margin:0">${desc2}</p>` : ''}
     </div>
   </div>
   <div style="border-top:1px solid rgba(255,255,255,0.06);margin-bottom:14px"></div>`;
