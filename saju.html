@@ -1044,9 +1044,13 @@ function renderSajuTeaser(data) {
   const branch   = dayStr[1] || '';
   const strength = (data.summary && data.summary.strength) || '';
   const isGang   = strength.includes('신강');
-  const y        = data.yongshin || {};
-  const priKor   = EN_EL[y.primary] || '';
-  const secKor   = EN_EL[y.secondary] || '';
+  const j        = data.johu || {};
+  const johuNeeds   = j.needs || [];
+  const johuNeedsKor = j.needs_kor || [];
+  const priEl    = EN_EL[johuNeeds[0]] || '';
+  const secEl    = EN_EL[johuNeeds[1]] || '';
+  const priKor   = johuNeedsKor[0] || '';
+  const secKor   = johuNeedsKor[1] || '';
   const namePart = pName ? `<strong>${pName}</strong>님` : '당신';
 
   // ① 일주 천간별 키워드 3개 + 설명 2줄
@@ -1184,17 +1188,17 @@ function renderSajuTeaser(data) {
   </div>`;
   }
 
-  // ④ 용신 조언
+  // ④ 용신 조언 (프로필 카드와 동일하게 johu 기준)
   if (priKor) {
-    const priColor = EL_COLOR[priKor] || '#FFAB40';
-    const secColor = EL_COLOR[secKor] || '#FFAB40';
-    const advice = EL_ADVICE[priKor] || '';
+    const priColor = EL_COLOR[priEl] || '#FFAB40';
+    const secColor = EL_COLOR[secEl] || '#FFAB40';
+    const advice = EL_ADVICE[priEl] || '';
     html += `
   <div style="background:rgba(255,171,64,0.07);border:1px solid rgba(255,171,64,0.2);border-radius:12px;padding:14px 16px;margin-bottom:14px">
     <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">나에게 필요한 기운</div>
     <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-      <span style="background:${priColor}22;border:1px solid ${priColor}55;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:700;color:${priColor}">용신 ${priKor}</span>
-      ${secKor ? `<span style="background:${secColor}18;border:1px solid ${secColor}40;border-radius:20px;padding:4px 14px;font-size:13px;color:${secColor}">희신 ${secKor}</span>` : ''}
+      <span style="background:${priColor}22;border:1px solid ${priColor}55;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:700;color:${priColor}">조후용신 ${priKor}</span>
+      ${secKor ? `<span style="background:${secColor}18;border:1px solid ${secColor}40;border-radius:20px;padding:4px 14px;font-size:13px;color:${secColor}">조후희신 ${secKor}</span>` : ''}
     </div>
     ${advice ? `<div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.75">${advice}</div>` : ''}
   </div>`;
