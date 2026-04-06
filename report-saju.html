@@ -7,6 +7,8 @@
 <meta name="theme-color" content="#0a0a0f">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
 :root {
   --bg: #0a0a0f;
@@ -16,11 +18,14 @@
   --purple: #7b5ea7;
   --purple-light: #a07fd4;
   --orb: #7ac4ff;
+  --gold: #e8b86d;
   --text: #f0f0f5;
   --muted: #6b6b85;
+  --green: #4caf82;
+  --red: #e05c6a;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
 body {
   background: var(--bg);
@@ -33,403 +38,259 @@ body {
 
 body::before {
   content: '';
-  position: fixed;
-  inset: 0;
+  position: fixed; inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.4;
+  pointer-events: none; z-index: 0; opacity: 0.4;
 }
 
-#starCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+#starCanvas { position:fixed; inset:0; pointer-events:none; z-index:0; }
 .star {
-  position: absolute;
-  background: #fff;
-  border-radius: 50%;
-  opacity: 0;
-  animation: twinkle var(--dur, 3s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
+  position:absolute; background:#fff; border-radius:50%; opacity:0;
+  animation: twinkle var(--dur,3s) ease-in-out infinite;
+  animation-delay: var(--delay,0s);
 }
 @keyframes twinkle {
-  0%, 100% { opacity: 0; transform: scale(0.4); }
-  50% { opacity: var(--max-op, 0.7); transform: scale(1); }
+  0%,100% { opacity:0; transform:scale(0.4); }
+  50% { opacity:var(--max-op,0.7); transform:scale(1); }
 }
 
 /* ── NAV ── */
 nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(10,10,15,0.88);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  position:sticky; top:0; z-index:100;
+  background:rgba(10,10,15,0.88); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px; height:60px;
+  display:flex; align-items:center; justify-content:space-between;
 }
 .logo {
-  font-family: 'Noto Serif KR', serif;
-  font-weight: 700;
-  font-size: 20px;
-  letter-spacing: -0.5px;
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1px;
-  cursor: pointer;
-  text-decoration: none;
+  font-family:'Noto Serif KR',serif; font-weight:700; font-size:20px;
+  letter-spacing:-0.5px; color:var(--text);
+  display:flex; flex-direction:column; align-items:flex-start; gap:1px;
+  cursor:pointer; text-decoration:none;
 }
-.logo-inner { display: flex; align-items: center; gap: 5px; }
-.logo-dot { color: var(--purple-light); font-size: 9px; margin-bottom: 2px; }
-.logo-sub { font-size: 10px; font-weight: 400; color: var(--muted); font-family: 'Noto Sans KR', sans-serif; }
+.logo-inner { display:flex; align-items:center; gap:5px; }
+.logo-dot { color:var(--purple-light); font-size:9px; margin-bottom:2px; }
+.logo-sub { font-size:10px; font-weight:400; color:var(--muted); font-family:'Noto Sans KR',sans-serif; }
 
 .btn-kakao {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: #fee500;
-  color: #191919;
-  border: none;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  font-family: 'Noto Sans KR', sans-serif;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s;
+  display:flex; align-items:center; gap:8px; padding:8px 16px;
+  background:#fee500; color:#191919; border:none; border-radius:10px;
+  font-size:13px; font-weight:700; font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer; white-space:nowrap; transition:all 0.2s;
 }
-.btn-kakao:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(254,229,0,0.25); }
+.btn-kakao:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(254,229,0,0.25); }
 
-.user-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border); }
-#userNameDisplay { font-size: 13px; font-weight: 500; color: var(--text); max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hamburger-wrap { position: relative; }
-.hamburger-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; cursor: pointer; color: var(--text); display: flex; align-items: center; }
-.hamburger-dropdown { display: none; position: absolute; right: 0; top: calc(100% + 8px); background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; white-space: nowrap; min-width: 150px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); z-index: 200; }
-.hamburger-dropdown.open { display: block; }
-.hamburger-dropdown button { display: block; width: 100%; padding: 12px 18px; background: none; border: none; color: var(--text); font-size: 14px; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; text-align: left; }
-.hamburger-dropdown button:hover { background: var(--surface); }
-.menu-divider { height: 1px; background: var(--border); }
+.user-avatar { width:30px; height:30px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border); }
+#userNameDisplay { font-size:13px; font-weight:500; color:var(--text); max-width:80px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hamburger-wrap { position:relative; }
+.hamburger-btn { background:none; border:1px solid var(--border); border-radius:8px; padding:7px 10px; cursor:pointer; color:var(--text); display:flex; align-items:center; }
+.hamburger-dropdown { display:none; position:absolute; right:0; top:calc(100% + 8px); background:var(--surface2); border:1px solid var(--border); border-radius:12px; overflow:hidden; white-space:nowrap; min-width:150px; box-shadow:0 8px 32px rgba(0,0,0,0.4); z-index:200; }
+.hamburger-dropdown.open { display:block; }
+.hamburger-dropdown button { display:block; width:100%; padding:12px 18px; background:none; border:none; color:var(--text); font-size:14px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; text-align:left; }
+.hamburger-dropdown button:hover { background:var(--surface); }
+.menu-divider { height:1px; background:var(--border); }
 
-/* ── MAIN ── */
+/* ── SETUP PHASE ── */
 .page-wrap {
-  position: relative;
-  z-index: 1;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 20px 80px;
+  position:relative; z-index:1;
+  max-width:600px; margin:0 auto; padding:0 20px 80px;
 }
 
-/* [1] Hero */
-.hero {
-  padding: 56px 0 40px;
-  text-align: center;
-}
-.hero-eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: var(--purple-light);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-}
-.hero-title {
-  font-family: 'Noto Serif KR', serif;
-  font-size: clamp(24px, 5vw, 36px);
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -0.5px;
-  margin-bottom: 14px;
-  color: var(--text);
-}
-.hero-sub {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.8;
-}
+.hero { padding:44px 0 28px; text-align:center; }
+.hero-eyebrow { font-size:11px; font-weight:600; letter-spacing:2px; color:var(--purple-light); text-transform:uppercase; margin-bottom:12px; }
+.hero-title { font-family:'Noto Serif KR',serif; font-size:clamp(22px,5vw,30px); font-weight:700; line-height:1.3; letter-spacing:-0.5px; margin-bottom:10px; }
+.hero-sub { color:var(--muted); font-size:13px; line-height:1.8; }
 
-/* [2] Price box */
-.price-box {
-  background: rgba(123,94,167,0.07);
-  border: 1px solid rgba(123,94,167,0.25);
-  border-radius: 18px;
-  padding: 28px 24px;
-  text-align: center;
-  margin: 28px 0;
+.step-section { margin:22px 0; }
+.step-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.step-badge {
+  width:26px; height:26px; flex-shrink:0;
+  background:linear-gradient(135deg,var(--purple),var(--purple-light));
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; color:#fff;
 }
-.price-label { font-size: 12px; color: var(--muted); margin-bottom: 10px; letter-spacing: 0.5px; }
-.price-main {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--orb);
-  letter-spacing: -1px;
-  margin-bottom: 4px;
-}
-.price-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
-.btn-primary {
-  display: block;
-  width: 100%;
-  padding: 15px;
-  background: linear-gradient(135deg, var(--purple), var(--purple-light));
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: 'Noto Sans KR', sans-serif;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-  text-align: center;
-  letter-spacing: -0.2px;
-}
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(123,94,167,0.35); }
+.step-label { font-size:14px; font-weight:600; color:var(--text); }
+.step-optional { font-size:11px; color:var(--muted); margin-left:2px; }
 
-/* [3] Checklist */
-.section-block { margin: 40px 0; }
-.section-block-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 16px;
-  letter-spacing: 0.3px;
+/* Info card */
+.info-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:18px 20px;
+  display:flex; flex-direction:column; gap:12px;
 }
-.checklist { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.checklist li {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  font-size: 14px;
-  line-height: 1.6;
-}
-.checklist-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--purple-light);
-  flex-shrink: 0;
-  margin-top: 6px;
-}
-.checklist-text { color: rgba(255,255,255,0.8); }
-.checklist-text strong { color: var(--text); font-weight: 600; }
+.info-row { display:flex; justify-content:space-between; align-items:center; }
+.info-key { font-size:13px; color:var(--muted); }
+.info-val { font-size:14px; font-weight:600; color:var(--text); }
+.info-val.hl { color:var(--purple-light); }
+.info-missing { text-align:center; padding:20px; color:var(--muted); font-size:13px; }
+.info-missing a { color:var(--purple-light); text-decoration:none; }
 
-/* [4] Sample preview */
-.preview-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-  margin-top: 16px;
+/* Form section */
+.form-section {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:20px;
+  display:flex; flex-direction:column; gap:22px;
 }
-.preview-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px 16px;
-  position: relative;
-  overflow: hidden;
-}
-.preview-card-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--purple-light);
-  margin-bottom: 10px;
-}
-.preview-text-top {
-  font-size: 13px;
-  line-height: 1.75;
-  color: rgba(255,255,255,0.75);
-  margin-bottom: 8px;
-}
-.preview-blur {
-  font-size: 13px;
-  line-height: 1.75;
-  color: rgba(255,255,255,0.6);
-  filter: blur(5px);
-  user-select: none;
-  pointer-events: none;
-}
-.preview-lock {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 70px;
-  background: linear-gradient(to top, var(--surface) 40%, transparent);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 10px;
-}
-.preview-lock-text { font-size: 11px; color: var(--muted); }
-.preview-footer {
-  text-align: center;
-  margin-top: 16px;
-  font-size: 12px;
-  color: var(--muted);
-}
+.form-group { display:flex; flex-direction:column; gap:10px; }
+.form-label { font-size:13px; font-weight:600; color:var(--text); }
+.form-hint { font-size:11px; color:var(--muted); font-weight:400; margin-left:6px; }
 
-/* [5] Steps */
-.steps { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-.step-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 18px;
+.checkbox-grid { display:flex; flex-direction:column; gap:8px; }
+.check-item {
+  display:flex; align-items:center; gap:10px; padding:12px 14px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; cursor:pointer; font-size:13px; color:var(--text);
+  transition:border-color 0.15s, background 0.15s; user-select:none;
 }
-.step-num {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: rgba(123,94,167,0.15);
-  border: 1px solid rgba(123,94,167,0.3);
-  color: var(--purple-light);
-  font-size: 12px;
-  font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
+.check-item:hover { border-color:var(--purple); }
+.check-item.checked { border-color:var(--purple-light); background:rgba(123,94,167,0.12); }
+.check-item input { width:16px; height:16px; accent-color:var(--purple-light); flex-shrink:0; cursor:pointer; }
+
+.radio-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.radio-item {
+  display:flex; align-items:center; gap:8px; padding:11px 14px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; cursor:pointer; font-size:13px; color:var(--text);
+  transition:border-color 0.15s, background 0.15s; user-select:none;
 }
-.step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-.step-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.radio-item:hover { border-color:var(--purple); }
+.radio-item.selected { border-color:var(--purple-light); background:rgba(123,94,167,0.12); }
+.radio-item input { width:15px; height:15px; accent-color:var(--purple-light); flex-shrink:0; cursor:pointer; }
 
-/* [6] Bottom CTA */
-.cta-bottom { margin: 40px 0 24px; text-align: center; }
-.cta-bottom-title {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--muted);
-  margin-bottom: 16px;
-  line-height: 1.6;
+.partner-selects { display:flex; flex-direction:column; gap:8px; }
+select {
+  width:100%; padding:12px 36px 12px 14px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; color:var(--text); font-size:13px;
+  font-family:'Noto Sans KR',sans-serif; appearance:none; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b85' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center;
 }
-.cta-bottom-title em { font-style: normal; color: var(--orb); font-weight: 700; }
+select:focus { outline:none; border-color:var(--purple-light); }
+select option { background:var(--surface2); color:var(--text); }
 
-/* [7] Notice */
-.orb-notice { text-align: center; font-size: 12px; color: var(--muted); line-height: 1.7; }
-.orb-notice a { color: var(--orb); text-decoration: none; }
-.orb-notice a:hover { text-decoration: underline; }
-
-/* divider */
-.divider { height: 1px; background: var(--border); margin: 40px 0; opacity: 0.4; }
-
-@media (max-width: 480px) {
-  .preview-grid { grid-template-columns: 1fr; }
+/* Generate btn */
+.btn-generate {
+  display:block; width:100%; margin:28px 0 14px;
+  padding:18px 24px;
+  background:linear-gradient(135deg,var(--purple),var(--purple-light));
+  color:#fff; border:none; border-radius:14px; cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:16px; font-weight:700; letter-spacing:-0.2px;
+  text-align:center; transition:all 0.2s; line-height:1.5;
 }
+.btn-generate:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(123,94,167,0.4); }
+.btn-generate:active { transform:translateY(0); }
+.btn-orb-sub { display:block; margin-top:4px; font-size:13px; font-weight:400; color:rgba(255,255,255,0.65); }
+
+.orb-notice { text-align:center; font-size:12px; color:var(--muted); line-height:1.7; }
+.orb-notice a { color:var(--orb); text-decoration:none; }
 
 /* ── LOADING ── */
 .loading-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(10,10,15,0.92);
-  z-index: 200;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
+  display:none; position:fixed; inset:0; background:rgba(10,10,15,0.95);
+  z-index:300; flex-direction:column; align-items:center; justify-content:center; gap:18px;
 }
-.loading-overlay.active { display: flex; }
+.loading-overlay.active { display:flex; }
 .loading-spinner {
-  width: 52px;
-  height: 52px;
-  border: 3px solid var(--border);
-  border-top-color: var(--purple-light);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  width:52px; height:52px;
+  border:3px solid var(--border); border-top-color:var(--purple-light);
+  border-radius:50%; animation:spin 0.8s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { color: var(--muted); font-size: 14px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-title { font-size:16px; font-weight:600; color:var(--text); }
+.loading-sub { font-size:13px; color:var(--muted); }
+.loading-bar-wrap { width:220px; height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+.loading-bar { height:100%; background:linear-gradient(90deg,var(--purple),var(--purple-light)); border-radius:2px; width:0; transition:width 0.5s ease; }
 
+/* ── TOAST ── */
 .toast-msg {
-  display: none;
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #2a2a3d;
-  color: var(--text);
-  padding: 14px 24px;
-  border-radius: 12px;
-  font-size: 14px;
-  z-index: 300;
-  text-align: center;
-  max-width: 300px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  display:none; position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+  background:#1e1e2e; color:var(--text); padding:13px 22px; border-radius:12px;
+  font-size:14px; z-index:400; text-align:center; max-width:300px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5); border:1px solid var(--border);
 }
-.toast-msg.active { display: block; }
+.toast-msg.active { display:block; }
 
-/* ── RESULT SECTION ── */
-#resultSection {
-  display: none;
-  padding: 0 20px 60px;
-  max-width: 640px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
+/* ── RESULT ── */
+#resultSection { position:relative; z-index:1; display:none; }
+.result-wrap { max-width:680px; margin:0 auto; padding:24px 20px 80px; }
+
+.result-header { text-align:center; padding:28px 0 24px; }
+.result-ilju-badge {
+  display:inline-block;
+  background:linear-gradient(135deg,var(--purple),var(--purple-light));
+  color:#fff; font-size:13px; font-weight:700;
+  padding:6px 18px; border-radius:20px; margin-bottom:14px; letter-spacing:0.3px;
 }
-.result-header {
-  text-align: center;
-  padding: 32px 0 24px;
+.result-name {
+  font-family:'Noto Serif KR',serif;
+  font-size:clamp(20px,4vw,26px); font-weight:700; color:var(--text); margin-bottom:8px;
 }
-.result-header h2 {
-  font-family: 'Noto Serif KR', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
+.result-meta { font-size:13px; color:var(--muted); line-height:1.7; }
+
+/* 오행 차트 */
+.chart-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:22px 20px 18px; margin-bottom:16px;
 }
-.result-header p { font-size: 13px; color: var(--muted); }
+.chart-card-title { font-size:13px; font-weight:600; color:rgba(255,255,255,0.5); margin-bottom:16px; letter-spacing:0.3px; }
+.chart-wrap { width:220px; height:220px; margin:0 auto; }
+.chart-legend {
+  display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:16px;
+}
+.legend-item { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--muted); }
+.legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+/* Report body */
 .result-body {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 28px 22px;
-  line-height: 1.95;
-  font-size: 15px;
-  color: #d8d8e8;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:26px 22px;
+  line-height:2.0; font-size:15px; color:#d0d0e0;
+  margin-bottom:16px;
 }
 .result-body h2 {
-  font-family: 'Noto Serif KR', serif;
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--purple-light);
-  margin: 26px 0 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+  font-family:'Noto Serif KR',serif;
+  font-size:16px; font-weight:700; color:var(--purple-light);
+  margin:28px 0 10px; padding-bottom:8px;
+  border-bottom:1px solid var(--border);
 }
-.result-body h2:first-child { margin-top: 0; }
-.result-body h3 {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-  margin: 16px 0 6px;
+.result-body h2:first-child { margin-top:0; }
+.result-body h3 { font-size:14px; font-weight:700; color:var(--text); margin:14px 0 6px; }
+.result-body strong { color:var(--orb); font-weight:600; }
+.result-body em { color:var(--gold); font-style:normal; }
+.result-body p { margin-bottom:10px; }
+.result-body ul { margin:8px 0 12px 18px; }
+.result-body li { margin-bottom:6px; }
+
+/* Actions */
+.result-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.action-btn {
+  flex:1; min-width:100px; padding:14px 12px;
+  border-radius:12px; font-size:13px; font-weight:600;
+  font-family:'Noto Sans KR',sans-serif; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  transition:all 0.2s; border:1px solid transparent;
 }
-.result-body strong { color: var(--orb); }
-.result-body p { margin-bottom: 10px; }
-.result-body ul { margin: 8px 0 12px 18px; }
-.result-body li { margin-bottom: 6px; }
-.result-back-btn {
-  display: flex;
-  justify-content: center;
-  margin-top: 32px;
+.action-kakao { background:#fee500; color:#3c1e1e; border-color:#fee500; }
+.action-kakao:hover { box-shadow:0 4px 16px rgba(254,229,0,0.3); transform:translateY(-1px); }
+.action-save { background:var(--surface2); color:var(--text); border-color:var(--border); }
+.action-save:hover { border-color:var(--purple); }
+.action-retry { background:transparent; color:var(--muted); border-color:var(--border); }
+.action-retry:hover { color:var(--text); }
+
+@media (max-width:480px) {
+  .radio-grid { grid-template-columns:1fr 1fr; }
+  .chart-wrap { width:180px; height:180px; }
 }
-.result-back-btn button {
-  padding: 14px 36px;
-  background: var(--surface2);
-  color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: 'Noto Sans KR', sans-serif;
-  cursor: pointer;
+
+@media print {
+  nav, .loading-overlay, .toast-msg, .result-actions,
+  #setupPhase, #starCanvas, body::before { display:none !important; }
+  #resultSection { display:block !important; }
+  .result-body { border:none; padding:0; background:white; color:#111; }
+  .result-body h2 { color:#7b5ea7; }
+  body { background:white; color:#111; }
 }
 </style>
 </head>
@@ -447,7 +308,7 @@ nav {
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1C4.134 1 1 3.582 1 6.757c0 1.904 1.178 3.584 2.98 4.624L3.2 14.2a.25.25 0 00.363.28l3.49-2.29c.31.03.622.047.947.047 3.866 0 7-2.582 7-5.48C15 3.582 11.866 1 8 1z" fill="#191919"/></svg>
       카카오로 시작하기
     </button>
-    <div id="userArea" style="display:none;align-items:center;gap:10px;display:none;">
+    <div id="userArea" style="display:none;align-items:center;gap:10px;">
       <img id="userAvatar" class="user-avatar" src="" alt="">
       <span id="userNameDisplay"></span>
       <div class="hamburger-wrap">
@@ -468,180 +329,181 @@ nav {
   </div>
 </nav>
 
-<div class="page-wrap">
+<!-- ===== SETUP PHASE ===== -->
+<div class="page-wrap" id="setupPhase">
 
-  <!-- [1] Hero -->
   <div class="hero">
     <div class="hero-eyebrow">사주 정밀 분석</div>
     <h1 class="hero-title">나만의 사주 리포트</h1>
-    <p class="hero-sub">타고난 기질부터 2026년 운세까지<br>5단계 심층 분석으로 나를 이해합니다</p>
+    <p class="hero-sub">타고난 기질부터 2026년 운세까지<br>AI 심층 분석으로 나를 이해합니다</p>
   </div>
 
-  <!-- [2] Price box -->
-  <div class="price-box">
-    <div class="price-label">리포트 가격</div>
-    <div class="price-main">500 Orb</div>
-    <div class="price-sub">한 번 발급 후 영구 보관</div>
-    <button class="btn-primary" id="mainCtaBtn" onclick="handleCta()">리포트 받기</button>
+  <!-- Step 1 -->
+  <div class="step-section">
+    <div class="step-header">
+      <span class="step-badge">1</span>
+      <span class="step-label">기본 정보 확인</span>
+    </div>
+    <div class="info-card" id="infoCard"></div>
   </div>
 
-  <!-- [3] Checklist -->
-  <div class="section-block">
-    <div class="section-block-title">포함된 내용</div>
-    <ul class="checklist">
-      <li>
-        <span class="checklist-dot"></span>
-        <span class="checklist-text"><strong>일주 기본 풀이</strong> — 성격 / 재물 / 연애 / 직업 / 건강</span>
-      </li>
-      <li>
-        <span class="checklist-dot"></span>
-        <span class="checklist-text"><strong>신강/신약 에너지 분석</strong> — 현재 내 에너지 방향과 실용 조언</span>
-      </li>
-      <li>
-        <span class="checklist-dot"></span>
-        <span class="checklist-text"><strong>연령대별 맞춤 조언</strong> — 20대 / 40대 / 60대 시기별 가이드</span>
-      </li>
-      <li>
-        <span class="checklist-dot"></span>
-        <span class="checklist-text"><strong>고민 테마별 솔루션</strong> — 창업 / 이직 / 투자 / 대인관계</span>
-      </li>
-      <li>
-        <span class="checklist-dot"></span>
-        <span class="checklist-text"><strong>2026 병오년 나의 운세</strong> — 올해 찾아오는 기운과 방향</span>
-      </li>
-    </ul>
-  </div>
+  <!-- Step 2 -->
+  <div class="step-section">
+    <div class="step-header">
+      <span class="step-badge">2</span>
+      <span class="step-label">맞춤 설정</span>
+      <span class="step-optional">(선택사항)</span>
+    </div>
+    <div class="form-section">
 
-  <div class="divider"></div>
-
-  <!-- [4] Sample preview -->
-  <div class="section-block">
-    <div class="section-block-title">미리보기</div>
-    <div class="preview-grid">
-
-      <div class="preview-card">
-        <div class="preview-card-label">성격 분석</div>
-        <div class="preview-text-top">
-          갑인(甲寅)일주인 당신은 뿌리 깊은 거목처럼 강한 추진력과 타고난 리더십을 지녔습니다.
+      <!-- 관심 테마 -->
+      <div class="form-group">
+        <div class="form-label">관심 테마 <span class="form-hint">복수 선택 가능</span></div>
+        <div class="checkbox-grid">
+          <label class="check-item" id="themeA">
+            <input type="checkbox" value="코인/주식 투자"> 📈 코인/주식 투자
+          </label>
+          <label class="check-item" id="themeB">
+            <input type="checkbox" value="창업/플랫폼 비즈니스"> 🚀 창업/플랫폼 비즈니스
+          </label>
+          <label class="check-item" id="themeC">
+            <input type="checkbox" value="디지털노마드/이직"> 💻 디지털노마드/이직
+          </label>
         </div>
-        <div class="preview-blur">
-          한번 결심하면 끝까지 밀고 나가는 성향으로 주변에서 믿음직한 존재로 인식됩니다. 재물운은 꾸준한 노력형이며...
-        </div>
-        <div class="preview-lock"><span class="preview-lock-text">잠금 해제 후 전체 보기</span></div>
       </div>
 
-      <div class="preview-card">
-        <div class="preview-card-label">2026 병오년 운세</div>
-        <div class="preview-text-top">
-          2026 병오년은 당신에게 실행력이 폭발하는 해입니다. 머릿속에만 있던 아이디어를...
+      <!-- 주요 고민 -->
+      <div class="form-group">
+        <div class="form-label">주요 고민 <span class="form-hint">1개 선택</span></div>
+        <div class="radio-grid">
+          <label class="radio-item">
+            <input type="radio" name="concern" value="이직/취업"> 이직/취업
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="concern" value="창업"> 창업
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="concern" value="투자/재테크"> 투자/재테크
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="concern" value="대인관계"> 대인관계
+          </label>
         </div>
-        <div class="preview-blur">
-          실제로 움직여야 할 때입니다. 화(火)의 기운이 강해지는 해로 새로운 시작과 도전에 유리한 에너지가...
-        </div>
-        <div class="preview-lock"><span class="preview-lock-text">잠금 해제 후 전체 보기</span></div>
       </div>
 
-      <div class="preview-card">
-        <div class="preview-card-label">연령대별 조언</div>
-        <div class="preview-text-top">
-          지금 이 나이에 갑인일주라면 독립심이 최고조에 달하는 시기입니다...
+      <!-- 상대방 일주 -->
+      <div class="form-group">
+        <div class="form-label">상대방 일주 <span class="form-hint">입력 시 관계 공략법 포함</span></div>
+        <div class="partner-selects">
+          <select id="partnerIlju" onchange="onPartnerChange()">
+            <option value="">입력 안 함</option>
+          </select>
+          <select id="relationType" style="display:none;">
+            <option value="직장상사">직장상사</option>
+            <option value="연인">연인</option>
+            <option value="친구동료">친구동료</option>
+            <option value="거래처">거래처</option>
+          </select>
         </div>
-        <div class="preview-blur">
-          자신의 길을 스스로 개척하려는 욕구가 강하게 올라오는 때입니다. 이 에너지를 현명하게 활용하면...
-        </div>
-        <div class="preview-lock"><span class="preview-lock-text">잠금 해제 후 전체 보기</span></div>
       </div>
 
     </div>
-    <div class="preview-footer">전체 내용은 리포트 발급 후 확인 가능합니다</div>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- [5] 5단계 분석 -->
-  <div class="section-block">
-    <div class="section-block-title">5단계 분석 구성</div>
-    <div class="steps">
-      <div class="step-card">
-        <span class="step-num">1</span>
-        <div class="step-content">
-          <div class="step-title">일주 분석</div>
-          <div class="step-desc">60갑자 중 당신의 타고난 기질 — 성격, 재물관, 연애 방식, 건강 취약점까지</div>
-        </div>
-      </div>
-      <div class="step-card">
-        <span class="step-num">2</span>
-        <div class="step-content">
-          <div class="step-title">에너지 분석</div>
-          <div class="step-desc">신강/신약으로 보는 현재 에너지 방향 — 지금 나에게 필요한 것과 피해야 할 것</div>
-        </div>
-      </div>
-      <div class="step-card">
-        <span class="step-num">3</span>
-        <div class="step-content">
-          <div class="step-title">연령대 조언</div>
-          <div class="step-desc">지금 이 나이에 맞는 실용적 가이드 — 20대 / 40대 / 60대 각각 다른 방향 제시</div>
-        </div>
-      </div>
-      <div class="step-card">
-        <span class="step-num">4</span>
-        <div class="step-content">
-          <div class="step-title">테마별 솔루션</div>
-          <div class="step-desc">창업 / 이직 / 투자 / 대인관계 — 고민 상황에 맞춘 사주 기반 맞춤 조언</div>
-        </div>
-      </div>
-      <div class="step-card">
-        <span class="step-num">5</span>
-        <div class="step-content">
-          <div class="step-title">올해 운세</div>
-          <div class="step-desc">2026 병오년 당신에게 찾아오는 기운 — 유리한 시기, 조심해야 할 국면</div>
-        </div>
-      </div>
+  <!-- Step 3 -->
+  <div class="step-section">
+    <div class="step-header">
+      <span class="step-badge">3</span>
+      <span class="step-label">리포트 생성</span>
     </div>
-  </div>
-
-  <!-- [6] Bottom CTA -->
-  <div class="cta-bottom">
-    <div class="cta-bottom-title"><em>500 Orb</em>로 지금 바로 확인하세요</div>
-    <button class="btn-primary" onclick="handleCta()">리포트 받기</button>
-  </div>
-
-  <!-- [7] Orb notice -->
-  <div class="orb-notice">
-    Orb가 부족하다면? <a href="charge.html">첫 충전 1+1 이벤트 진행 중</a>
+    <button class="btn-generate" onclick="handleGenerate()">
+      나만의 사주 리포트 생성하기
+      <span class="btn-orb-sub">500 Orb 차감</span>
+    </button>
+    <div class="orb-notice">
+      Orb가 부족하다면? <a href="charge.html">첫 충전 1+1 이벤트 진행 중</a>
+    </div>
   </div>
 
 </div>
 
-<!-- Loading overlay -->
+<!-- Loading -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
-  <div class="loading-text">사주 리포트를 생성하고 있습니다...</div>
+  <div class="loading-title" id="loadingTitle">사주 분석 중...</div>
+  <div class="loading-sub" id="loadingSub">잠시만 기다려주세요</div>
+  <div class="loading-bar-wrap">
+    <div class="loading-bar" id="loadingBar"></div>
+  </div>
 </div>
 
-<!-- Toast message -->
+<!-- Toast -->
 <div class="toast-msg" id="toastMsg"></div>
 
-<!-- Result section -->
+<!-- ===== RESULT PHASE ===== -->
 <div id="resultSection">
-  <div class="result-header">
-    <h2 id="resultTitle">나만의 사주 리포트</h2>
-    <p id="resultSubtitle"></p>
-  </div>
-  <div class="result-body" id="resultBody"></div>
-  <div class="result-back-btn">
-    <button onclick="location.reload()">다시 보기</button>
+  <div class="result-wrap">
+
+    <div class="result-header">
+      <div class="result-ilju-badge" id="resultBadge"></div>
+      <div class="result-name" id="resultName">사주 리포트</div>
+      <div class="result-meta" id="resultMeta"></div>
+    </div>
+
+    <!-- 오행 차트 -->
+    <div class="chart-card" id="chartCard" style="display:none;">
+      <div class="chart-card-title">오행 에너지 분포</div>
+      <div class="chart-wrap">
+        <canvas id="fiveChart"></canvas>
+      </div>
+      <div class="chart-legend" id="chartLegend"></div>
+    </div>
+
+    <!-- 리포트 본문 -->
+    <div class="result-body" id="resultBody"></div>
+
+    <!-- 액션 버튼 -->
+    <div class="result-actions">
+      <button class="action-btn action-kakao" onclick="shareKakao()">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1C4.134 1 1 3.582 1 6.757c0 1.904 1.178 3.584 2.98 4.624L3.2 14.2a.25.25 0 00.363.28l3.49-2.29c.31.03.622.047.947.047 3.866 0 7-2.582 7-5.48C15 3.582 11.866 1 8 1z" fill="#3c1e1e"/></svg>
+        카카오 공유
+      </button>
+      <button class="action-btn action-save" onclick="printReport()">
+        저장/인쇄
+      </button>
+      <button class="action-btn action-retry" onclick="location.reload()">
+        다시 생성
+      </button>
+    </div>
+
   </div>
 </div>
 
 <script>
+// ── 상수 ──────────────────────────────────────────────────────────
 var KAKAO_REST_KEY = '51b4f87ad9cfd6312c176ad34eb62025';
-var currentUser = null;
+var KAKAO_JS_KEY   = '2543c896dead8185e2edfa0976396f25';
+var WORKER_BASE    = 'https://fortuna.kkdmb7.workers.dev';
+var SB_URL         = 'https://ymghmfkqctckxxysxkvy.supabase.co';
+var SB_KEY         = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
+var REPORT_COST    = 500;
 
-// ── 별 배경 ──
+var sb = window.supabase.createClient(SB_URL, SB_KEY);
+var currentUser = null;
+var _workerData = null;
+
+var GAPJA_60 = [
+  '갑자','을축','병인','정묘','무진','기사','경오','신미','임신','계유',
+  '갑술','을해','병자','정축','무인','기묘','경진','신사','임오','계미',
+  '갑신','을유','병술','정해','무자','기축','경인','신묘','임진','계사',
+  '갑오','을미','병신','정유','무술','기해','경자','신축','임인','계묘',
+  '갑진','을사','병오','정미','무신','기유','경술','신해','임자','계축',
+  '갑인','을묘','병진','정사','무오','기미','경신','신유','임술','계해'
+];
+
+// ── 별 배경 ──────────────────────────────────────────────────────
 (function() {
   var canvas = document.getElementById('starCanvas');
-  var wrap = document.body;
   for (var i = 0; i < 60; i++) {
     var s = document.createElement('div');
     s.className = 'star';
@@ -653,13 +515,18 @@ var currentUser = null;
       'top:' + Math.random() * 100 + '%',
       '--dur:' + (Math.random() * 4 + 2) + 's',
       '--delay:' + (Math.random() * 4) + 's',
-      '--max-op:' + (Math.random() * 0.5 + 0.2),
+      '--max-op:' + (Math.random() * 0.5 + 0.2)
     ].join(';');
     canvas.appendChild(s);
   }
 })();
 
-// ── 카카오 로그인 ──
+// Kakao 초기화
+if (window.Kakao && !window.Kakao.isInitialized()) {
+  window.Kakao.init(KAKAO_JS_KEY);
+}
+
+// ── Nav ──────────────────────────────────────────────────────────
 function kakaoLogin() {
   window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=' + KAKAO_REST_KEY
     + '&redirect_uri=' + encodeURIComponent('https://picolab.kr/')
@@ -667,7 +534,7 @@ function kakaoLogin() {
 }
 
 function logout() {
-  localStorage.removeItem('fortuna_kakao_user');
+  localStorage.removeItem('pico_user');
   currentUser = null;
   updateNav();
 }
@@ -687,66 +554,171 @@ function updateNav() {
   if (currentUser) {
     btnKakao.style.display = 'none';
     userArea.style.display = 'flex';
-    var avatar = document.getElementById('userAvatar');
-    var nameEl = document.getElementById('userNameDisplay');
-    if (avatar && currentUser.avatar) avatar.src = currentUser.avatar;
-    if (nameEl) nameEl.textContent = currentUser.name || '';
+    var av = document.getElementById('userAvatar');
+    var nm = document.getElementById('userNameDisplay');
+    if (av && currentUser.avatar) av.src = currentUser.avatar;
+    if (nm) nm.textContent = currentUser.name || '';
   } else {
     btnKakao.style.display = 'flex';
     userArea.style.display = 'none';
   }
 }
 
-var TEST_USER_IDS = ['kakao_4783626781'];
-
-function handleCta() {
-  if (!currentUser) {
-    kakaoLogin();
-    return;
-  }
-  if (!TEST_USER_IDS.includes(currentUser.id)) {
-    showToast('준비 중입니다. 곧 오픈됩니다! 🌟');
-    return;
-  }
-  generateReport();
-}
-
-function showToast(msg) {
+// ── 유틸 ──────────────────────────────────────────────────────────
+function showToast(msg, ms) {
   var t = document.getElementById('toastMsg');
   t.textContent = msg;
   t.classList.add('active');
-  setTimeout(function() { t.classList.remove('active'); }, 3500);
+  setTimeout(function() { t.classList.remove('active'); }, ms || 3500);
 }
 
-function setLoading(on) {
+function setLoading(on, title, sub) {
   var el = document.getElementById('loadingOverlay');
-  if (on) el.classList.add('active');
-  else el.classList.remove('active');
+  if (on) {
+    el.classList.add('active');
+    if (title) document.getElementById('loadingTitle').textContent = title;
+    if (sub !== undefined) document.getElementById('loadingSub').textContent = sub;
+  } else {
+    el.classList.remove('active');
+  }
 }
 
-async function generateReport() {
-  var params = new URLSearchParams(location.search);
-  var year = params.get('year');
-  var month = params.get('month');
-  var day = params.get('day');
-  var hour = params.get('hour') || '';
-  var minute = params.get('minute') || '';
-  var gender = params.get('gender') || 'male';
-  var midnightType = params.get('midnightType') || '';
-  var age = params.get('age') || '';
+function setProgress(pct) {
+  document.getElementById('loadingBar').style.width = pct + '%';
+}
 
+// ── Init ──────────────────────────────────────────────────────────
+(function init() {
+  // 60갑자 드롭다운
+  var sel = document.getElementById('partnerIlju');
+  GAPJA_60.forEach(function(g) {
+    var opt = document.createElement('option');
+    opt.value = g; opt.textContent = g;
+    sel.appendChild(opt);
+  });
+
+  // 유저 로드
+  try {
+    var raw = localStorage.getItem('pico_user');
+    if (raw) {
+      var d = JSON.parse(raw);
+      currentUser = { id: d.id, name: d.name || '사용자', avatar: d.avatar || '' };
+    }
+  } catch(e) {}
+  updateNav();
+
+  // URL 파라미터
+  var p = new URLSearchParams(location.search);
+  var year = p.get('year'), month = p.get('month'), day = p.get('day');
+  var hour = p.get('hour'), gender = p.get('gender') || '', name = p.get('name') || '';
+
+  var card = document.getElementById('infoCard');
   if (!year || !month || !day) {
-    showToast('사주 정보가 없습니다. 사주 페이지에서 다시 시도해주세요.');
+    card.innerHTML = '<div class="info-missing">사주 정보가 없습니다. <a href="saju.html">사주 분석 페이지</a>에서 시작해주세요.</div>';
+  } else {
+    var gl = gender === 'male' ? '남성' : gender === 'female' ? '여성' : '-';
+    var hl = (hour !== null && hour !== '') ? hour + '시' : '시간 미입력';
+    card.innerHTML =
+      '<div class="info-row"><span class="info-key">이름</span><span class="info-val hl">' + (name || '미입력') + '</span></div>' +
+      '<div class="info-row"><span class="info-key">생년월일</span><span class="info-val">' + year + '년 ' + month + '월 ' + day + '일</span></div>' +
+      '<div class="info-row"><span class="info-key">출생시각</span><span class="info-val">' + hl + '</span></div>' +
+      '<div class="info-row"><span class="info-key">성별</span><span class="info-val">' + gl + '</span></div>';
+  }
+
+  // 체크박스 스타일
+  document.querySelectorAll('.check-item input').forEach(function(inp) {
+    inp.addEventListener('change', function() {
+      this.closest('.check-item').classList.toggle('checked', this.checked);
+    });
+  });
+  // 라디오 스타일
+  document.querySelectorAll('.radio-item input').forEach(function(inp) {
+    inp.addEventListener('change', function() {
+      document.querySelectorAll('.radio-item').forEach(function(el) { el.classList.remove('selected'); });
+      this.closest('.radio-item').classList.add('selected');
+    });
+  });
+})();
+
+function onPartnerChange() {
+  var v = document.getElementById('partnerIlju').value;
+  document.getElementById('relationType').style.display = v ? 'block' : 'none';
+}
+
+// ── Orb ──────────────────────────────────────────────────────────
+async function getOrbBalance() {
+  if (!currentUser) return 0;
+  try {
+    var res = await sb.from('orb_balance').select('balance').eq('user_id', currentUser.id).maybeSingle();
+    return (res.data && res.data.balance) || 0;
+  } catch(e) { return 0; }
+}
+
+async function deductOrb(amount) {
+  var balance = await getOrbBalance();
+  var newBal = balance - amount;
+  await sb.from('orb_balance').upsert({
+    user_id: currentUser.id,
+    balance: newBal,
+    updated_at: new Date().toISOString()
+  });
+  try {
+    await sb.from('orb_transactions').insert({
+      user_id: currentUser.id,
+      amount: -amount,
+      type: 'use',
+      description: '사주 리포트 생성'
+    });
+  } catch(e) {}
+}
+
+// ── 생성 플로우 ──────────────────────────────────────────────────
+async function handleGenerate() {
+  if (!currentUser) { kakaoLogin(); return; }
+
+  var p = new URLSearchParams(location.search);
+  var year = p.get('year'), month = p.get('month'), day = p.get('day');
+  if (!year || !month || !day) {
+    showToast('사주 정보가 없습니다. 사주 분석 페이지에서 다시 시도해주세요.');
     return;
   }
 
-  var now = new Date();
-  var currentYear = now.getFullYear();
-  var currentMonth = now.getMonth() + 1;
+  // Orb 확인
+  setLoading(true, 'Orb 잔액 확인 중...', '');
+  setProgress(8);
+  var balance = await getOrbBalance();
+  if (balance < REPORT_COST) {
+    setLoading(false);
+    showToast('Orb가 부족합니다. 충전 페이지로 이동합니다.');
+    setTimeout(function() { location.href = 'charge.html'; }, 1800);
+    return;
+  }
 
-  setLoading(true);
+  // 선택값 수집
+  var selectedThemes = [];
+  document.querySelectorAll('.check-item input:checked').forEach(function(inp) {
+    selectedThemes.push(inp.value);
+  });
+  var concernEl = document.querySelector('input[name="concern"]:checked');
+  var mainConcern = concernEl ? concernEl.value : '';
+  var partnerIlju = document.getElementById('partnerIlju').value;
+  var relationType = document.getElementById('relationType').value;
+
+  var hour = p.get('hour') || '0';
+  var minute = p.get('minute') || '0';
+  var gender = p.get('gender') || 'male';
+  var midnightType = p.get('midnightType') || '';
+  var age = p.get('age') || '';
+  var name = p.get('name') || '';
+  var now = new Date();
+  var curYear = now.getFullYear();
+  var curMonth = now.getMonth() + 1;
+
+  // Worker 호출
+  setLoading(true, '사주 분석 중...', '오행과 용신을 계산하고 있어요');
+  setProgress(25);
   try {
-    var workerUrl = 'https://fortuna.kkdmb7.workers.dev/saju-report'
+    var wUrl = WORKER_BASE + '/saju-report'
       + '?year=' + encodeURIComponent(year)
       + '&month=' + encodeURIComponent(month)
       + '&day=' + encodeURIComponent(day)
@@ -754,89 +726,172 @@ async function generateReport() {
       + '&minute=' + encodeURIComponent(minute)
       + '&gender=' + encodeURIComponent(gender)
       + '&age=' + encodeURIComponent(age)
-      + '&current_year=' + currentYear
-      + '&current_month=' + currentMonth;
-    if (midnightType) workerUrl += '&midnightType=' + encodeURIComponent(midnightType);
+      + '&current_year=' + curYear
+      + '&current_month=' + curMonth;
+    if (midnightType) wUrl += '&midnightType=' + encodeURIComponent(midnightType);
+    if (partnerIlju && relationType) {
+      wUrl += '&partner_ilju=' + encodeURIComponent(partnerIlju)
+           + '&relation_type=' + encodeURIComponent(relationType);
+    }
 
-    var workerRes = await fetch(workerUrl);
-    if (!workerRes.ok) throw new Error('worker_error ' + workerRes.status);
-    var workerData = await workerRes.json();
-    if (workerData.error) throw new Error(workerData.error);
+    var wRes = await fetch(wUrl);
+    if (!wRes.ok) throw new Error('worker 오류 ' + wRes.status);
+    var wData = await wRes.json();
+    if (wData.error) throw new Error(wData.error);
+    _workerData = wData;
+    setProgress(50);
 
-    var claudeRes = await fetch('/api/saju-report', {
+    // Claude 호출
+    setLoading(true, 'AI 리포트 작성 중...', '1500자 심층 분석 생성 중');
+    setProgress(65);
+    var cRes = await fetch('/api/saju-report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ workerData: workerData, userId: currentUser.id }),
+      body: JSON.stringify({
+        workerData: wData,
+        userId: currentUser.id,
+        selectedThemes: selectedThemes,
+        mainConcern: mainConcern
+      })
     });
-    if (!claudeRes.ok) throw new Error('api_error ' + claudeRes.status);
-    var claudeData = await claudeRes.json();
-    if (claudeData.error) throw new Error(claudeData.error);
+    if (!cRes.ok) throw new Error('API 오류 ' + cRes.status);
+    var cData = await cRes.json();
+    if (cData.error) throw new Error(cData.error);
+    setProgress(85);
 
+    // Orb 차감
+    setLoading(true, '완료!', 'Orb 차감 처리 중...');
+    await deductOrb(REPORT_COST);
+    setProgress(100);
+
+    setTimeout(function() {
+      setLoading(false);
+      renderReport(wData, cData.report, name);
+    }, 400);
+
+  } catch(e) {
     setLoading(false);
-    renderReport(workerData, claudeData.report);
-  } catch (e) {
-    setLoading(false);
-    showToast('리포트 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+    showToast('오류가 발생했습니다: ' + (e.message || '다시 시도해주세요.'));
     console.error(e);
   }
 }
 
-function renderReport(workerData, markdown) {
-  document.querySelector('.page-wrap').style.display = 'none';
-  var resultSection = document.getElementById('resultSection');
-  resultSection.style.display = 'block';
+// ── 렌더링 ──────────────────────────────────────────────────────
+function renderReport(wData, markdown, name) {
+  document.getElementById('setupPhase').style.display = 'none';
+  document.getElementById('resultSection').style.display = 'block';
+  window.scrollTo(0, 0);
 
-  var name = new URLSearchParams(location.search).get('name') || '';
-  document.getElementById('resultTitle').textContent = (name ? name + '님의 ' : '') + '사주 리포트';
-  var subtitle = (workerData.일주 || '');
-  if (workerData.신강약) subtitle += ' · ' + workerData.신강약;
-  if (workerData.용신) subtitle += ' · 용신 ' + workerData.용신;
-  document.getElementById('resultSubtitle').textContent = subtitle;
+  var ilju  = wData.일주  || '';
+  var sinak = wData.신강약 || '';
+  var yong  = wData.용신  || '';
+
+  document.getElementById('resultBadge').textContent = ilju + ' 일주';
+  document.getElementById('resultName').textContent = (name ? name + '님의 ' : '') + '사주 리포트';
+  var metas = [];
+  if (sinak) metas.push(sinak);
+  if (yong) metas.push('용신 ' + yong);
+  document.getElementById('resultMeta').textContent = metas.join(' · ');
+
+  // 오행 차트
+  if (wData.오행비율) {
+    document.getElementById('chartCard').style.display = 'block';
+    renderFiveChart(wData.오행비율);
+  }
 
   document.getElementById('resultBody').innerHTML = markdownToHtml(markdown);
-  window.scrollTo(0, 0);
 }
 
+function renderFiveChart(fp) {
+  var labels = ['목(木)', '화(火)', '토(土)', '금(金)', '수(水)'];
+  var colors = ['#4caf82', '#e05c6a', '#e8b86d', '#a07fd4', '#5b8dee'];
+  var vals   = [fp.wood || 0, fp.fire || 0, fp.earth || 0, fp.metal || 0, fp.water || 0];
+
+  new Chart(document.getElementById('fiveChart'), {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: vals,
+        backgroundColor: 'rgba(123,94,167,0.18)',
+        borderColor: 'rgba(160,127,212,0.85)',
+        borderWidth: 2,
+        pointBackgroundColor: colors,
+        pointBorderColor: '#fff',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: {
+          label: function(ctx) { return ctx.raw.toFixed(1) + '%'; }
+        }
+      }},
+      scales: {
+        r: {
+          beginAtZero: true, max: 50,
+          ticks: { display: false },
+          grid: { color: 'rgba(42,42,61,0.8)' },
+          angleLines: { color: 'rgba(42,42,61,0.6)' },
+          pointLabels: { color: '#a0a0b8', font: { size: 12, family: "'Noto Sans KR'" } }
+        }
+      }
+    }
+  });
+
+  var legend = document.getElementById('chartLegend');
+  legend.innerHTML = labels.map(function(l, i) {
+    return '<div class="legend-item"><div class="legend-dot" style="background:' + colors[i] + '"></div>' + l + ' ' + vals[i].toFixed(1) + '%</div>';
+  }).join('');
+}
+
+// ── 마크다운 → HTML ──────────────────────────────────────────────
 function markdownToHtml(md) {
-  var escaped = md
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-  var html = escaped
+  var html = md
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/^- (.+)$/gm, '<li>$1</li>');
-  // Wrap consecutive <li> in <ul>
-  html = html.replace(/(<li>[\s\S]*?<\/li>)(\n<li>[\s\S]*?<\/li>)*/g, function(m) {
+  // ul 래핑
+  html = html.replace(/((?:<li>[^\n]*<\/li>\n?)+)/g, function(m) {
     return '<ul>' + m + '</ul>';
   });
-  // Split on double newlines for paragraphs
-  var parts = html.split(/\n\n+/);
-  var result = parts.map(function(p) {
+  // 단락
+  var parts = html.split(/\n{2,}/);
+  return parts.map(function(p) {
     p = p.trim();
     if (!p) return '';
     if (/^<(h2|h3|ul|li)/.test(p)) return p;
     return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
   }).join('\n');
-  return result;
 }
 
-// ── 초기화 ──
-(function init() {
-  try {
-    var raw = localStorage.getItem('pico_user');
-    if (raw) {
-      var data = JSON.parse(raw);
-      currentUser = {
-        id: data.id,
-        name: data.name || '사용자',
-        avatar: data.avatar || '',
-      };
-    }
-  } catch(e) {}
-  updateNav();
-})();
+// ── 카카오 공유 ──────────────────────────────────────────────────
+function shareKakao() {
+  if (!window.Kakao || !window.Kakao.isInitialized()) {
+    showToast('카카오 초기화 중입니다. 잠시 후 다시 시도해주세요.');
+    return;
+  }
+  var ilju = (_workerData && _workerData.일주) || '';
+  Kakao.Share.sendDefault({
+    objectType: 'text',
+    text: '✨ ' + ilju + ' 일주 나만의 사주 리포트\n\nFORTUNA에서 AI 심층 사주 분석을 받아보세요!',
+    link: {
+      mobileWebUrl: 'https://picolab.kr/report-saju.html',
+      webUrl: 'https://picolab.kr/report-saju.html',
+    },
+  });
+}
+
+// ── 저장/인쇄 ────────────────────────────────────────────────────
+function printReport() {
+  window.print();
+}
 </script>
 
 </body>

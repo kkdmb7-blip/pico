@@ -20,7 +20,7 @@ export default async function handler(req) {
 
   try {
     const body = await req.json();
-    const { workerData } = body;
+    const { workerData, selectedThemes = [], mainConcern = '' } = body;
 
     if (!workerData) {
       return new Response(JSON.stringify({ error: 'workerData is required' }), {
@@ -31,26 +31,38 @@ export default async function handler(req) {
 
     const {
       일간, 일주, 신강약, 용신,
-      리포트, 대운분석, 월별운세, 유명인, 용신활용,
+      리포트, 대운분석, 월별운세, 유명인, 용신활용, 관계공략,
     } = workerData;
 
-    const 기본 = 리포트?.기본 || '';
-    const 조언 = 리포트?.조언 || '';
-    const 올해운세 = 리포트?.올해운세 || '';
-    const 연령대조언 = 리포트?.연령대조언 || '';
+    const 기본 = 리포트?.기본 || {};
+    const 조언 = 리포트?.조언 || {};
+    const 올해운세 = 리포트?.올해운세 || {};
+    const 연령대조언 = 리포트?.연령대조언 || null;
 
     const famousNames = (유명인?.유명인 || []).join(', ');
     const famousCommon = 유명인?.공통특성 || '';
-
     const yongsinUse = 용신활용?.활용법 || '';
 
     const daeunText = 대운분석
-      ? `현재 대운: ${대운분석.대운 || ''} / 흐름: ${대운분석.흐름 || ''} / 조언: ${대운분석.조언 || ''}`
+      ? `대운특성: ${대운분석.대운특성 || ''} / 상승대운: ${대운분석.상승대운 || ''} / 전환점: ${대운분석.전환점 || ''}`
       : '';
 
     const monthlyText = 월별운세
-      ? `이달 운세: ${월별운세.운세 || ''} / 조언: ${월별운세.조언 || ''}`
+      ? `월건: ${월별운세.월건 || ''} / 운세: ${월별운세.운세 || ''} / 조언: ${월별운세.조언 || ''}`
       : '';
+
+    const relationText = 관계공략
+      ? `상대방 일주 공략법: ${관계공략.공략법 || ''}`
+      : '';
+
+    // 테마/고민 강조 지시
+    let emphasisGuide = '';
+    if (selectedThemes.length > 0) {
+      emphasisGuide += `\n관심 테마: ${selectedThemes.join(', ')} - ⑦ 행동 전략 섹션에서 이 테마 관점으로 조언할 것.`;
+    }
+    if (mainConcern) {
+      emphasisGuide += `\n주요 고민: ${mainConcern} - 해당 고민에 대한 사주 기반 조언을 ⑦에서 우선 다룰 것.`;
+    }
 
     const systemPrompt = `주어진 사주 분석 데이터를 아래 구조로 자연스럽게 다듬어줘. 새로운 해석이나 판단은 절대 추가하지 말 것. 데이터에 있는 내용만 문장으로 정리할 것.
 
@@ -58,30 +70,35 @@ export default async function handler(req) {
 ① 당신의 일주 (유명인 사례 포함)
 ② 타고난 기질과 강점
 ③ 지금 이 시기 (대운 흐름으로 위로)
-④ 올해의 흐름 (2026 운세)
-⑤ 당신의 용신 활용법
+④ 2026년 올해의 흐름
+⑤ 당신의 용신 실생활 활용법
 ⑥ 이달의 운세
-⑦ 행동 전략 (테마별 조언)
+⑦ 맞춤 행동 전략 (테마별 조언)${관계공략 ? '\n⑧ 상대방 일주 관계 공략법' : ''}
 
-총 1500자 내외. 마크다운 사용.`;
+총 1500자 내외. 마크다운 사용(## 섹션 제목, **강조**). 따뜻하고 현실적인 톤.${emphasisGuide}`;
 
-    const userPrompt = `[사주 데이터]
+    const userPrompt = `[사주 기본 정보]
 일간: ${일간}
 일주: ${일주}
 신강약: ${신강약}
 용신: ${용신}
 
 [일주 기본 분석]
-${기본}
+성격: ${기본.성격 || ''}
+재물운: ${기본.재물운 || ''}
+연애운: ${기본.연애운 || ''}
+직업운: ${기본.직업운 || ''}
+건강: ${기본.건강 || ''}
 
-[유명인]
+[유명인 사례]
 ${famousNames} / 공통특성: ${famousCommon}
 
 [대운 분석]
 ${daeunText}
 
-[올해 운세 2026]
-${올해운세}
+[2026 올해 운세]
+키워드: ${올해운세.키워드 || ''}
+분석: ${올해운세.분석 || ''}
 
 [용신 활용법]
 ${yongsinUse}
@@ -90,10 +107,14 @@ ${yongsinUse}
 ${monthlyText}
 
 [테마별 조언]
-${조언}
+창업/비즈니스: ${조언['창업/비즈니스'] || ''}
+이직/커리어: ${조언['이직/커리어'] || ''}
+투자/재테크: ${조언['투자/재테크'] || ''}
+대인관계/부부: ${조언['대인관계/부부'] || ''}
 
-[연령대 조언]
-${연령대조언}`;
+${연령대조언 ? '[연령대 조언]\n' + 연령대조언.연령대 + ': ' + 연령대조언.조언 : ''}
+
+${relationText}`;
 
     const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -104,7 +125,7 @@ ${연령대조언}`;
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
+        max_tokens: 2500,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],
       }),
@@ -122,18 +143,12 @@ ${연령대조언}`;
     const report = data.content?.[0]?.text || '생성 실패';
 
     return new Response(JSON.stringify({ report }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), {
       status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 }
