@@ -2400,11 +2400,25 @@ function checkAuth() {
     var stored = localStorage.getItem('pico_user');
     if (stored) {
       currentUser = JSON.parse(stored);
-      // kakao_ 형식이면 UUID로 자동 업그레이드
-      if (currentUser.id && currentUser.id.indexOf('kakao_') === 0) {
+      // kakao_ 형식이거나, 같은 브라우저의 fortuna_kakao_user(memox)와 UUID가 다르면 업그레이드
+      var needsUpgrade = currentUser.id && currentUser.id.indexOf('kakao_') === 0;
+      if (!needsUpgrade && currentUser.email) {
+        // memox와 cross-app 동기화: 같은 이메일인데 ID가 다르면 맞춤
+        try {
+          var memoxRaw = localStorage.getItem('fortuna_kakao_user');
+          if (memoxRaw) {
+            var memoxUser = JSON.parse(memoxRaw);
+            if (memoxUser.email === currentUser.email && memoxUser.id && memoxUser.id !== currentUser.id) {
+              currentUser.id = memoxUser.id;
+              localStorage.setItem('pico_user', JSON.stringify(currentUser));
+            }
+          }
+        } catch(e2) {}
+      }
+      if (needsUpgrade) {
         if (currentUser.email) {
-          // email 있으면 resolve-user로 UUID 획득
-          fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
+          // email 있으면 resolve-user로 UUID 획득 (memox와 동일 엔드포인트)
+          fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: currentUser.email, name: currentUser.name })
@@ -2480,8 +2494,8 @@ function handleKakaoCallback(code) {
     var email  = (profile.kakao_account && profile.kakao_account.email) || '';
     var kakaoFallbackId = 'kakao_' + profile.id;
 
-    // resolve-user → Supabase UUID (memox와 동일 방식)
-    return fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
+    // resolve-user → chat_users UUID (memox와 완전 동일 엔드포인트)
+    return fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, name: name })
