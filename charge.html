@@ -288,8 +288,8 @@ function showLoading() { document.getElementById('loadingOverlay').classList.add
 function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
 
 async function loadUser() {
-  // 카카오 로그인 캐시 확인
-  var kakaoRaw = localStorage.getItem('fortuna_kakao_user');
+  // 카카오 로그인 캐시 확인 (pico_user 우선, fortuna_kakao_user fallback)
+  var kakaoRaw = localStorage.getItem('pico_user') || localStorage.getItem('fortuna_kakao_user');
   if (kakaoRaw) {
     try {
       var kakaoData = JSON.parse(kakaoRaw);
