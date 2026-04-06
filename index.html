@@ -2400,8 +2400,8 @@ function checkAuth() {
     var stored = localStorage.getItem('pico_user');
     if (stored) {
       currentUser = JSON.parse(stored);
-      // _v:2 미설정이거나 kakao_ 접두어면 fortuna-silk UUID로 업그레이드 (one-time migration)
-      var needsUpgrade = currentUser.email && (!currentUser._v || (currentUser.id && currentUser.id.indexOf('kakao_') === 0));
+      // _v<3 이거나 kakao_ 접두어면 UUID 재검증 (v3: 올바른 email 필터링 적용)
+      var needsUpgrade = currentUser.email && ((!currentUser._v || currentUser._v < 3) || (currentUser.id && currentUser.id.indexOf('kakao_') === 0));
       if (needsUpgrade) {
         fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
           method: 'POST',
@@ -2412,7 +2412,7 @@ function checkAuth() {
         .then(function(resolved) {
           if (resolved && resolved.id) {
             currentUser.id = resolved.id;
-            currentUser._v = 2;
+            currentUser._v = 3;
             localStorage.setItem('pico_user', JSON.stringify(currentUser));
           }
           updateAuthUI();
@@ -2487,7 +2487,7 @@ function handleKakaoCallback(code) {
     .then(function(r) { return r.json(); })
     .then(function(resolved) {
       var userId = (resolved && resolved.id) ? resolved.id : kakaoFallbackId;
-      var resolved_v = (resolved && resolved.id) ? 2 : undefined;
+      var resolved_v = (resolved && resolved.id) ? 3 : undefined;
       currentUser = { id: userId, name: name, avatar: avatar, email: email, _v: resolved_v };
       localStorage.setItem('pico_user', JSON.stringify(currentUser));
       updateAuthUI();
