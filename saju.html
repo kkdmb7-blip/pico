@@ -1164,9 +1164,10 @@ function renderSajuTeaser(data) {
       </div>
       <p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.8);margin:0 0 5px">${desc1}</p>
       ${desc2 ? `<p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,0.45);margin:0">${desc2}</p>` : ''}
+      ${branchHint ? `<p style="font-size:12px;line-height:1.7;color:rgba(255,255,255,0.35);margin:6px 0 0;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06)">일지(${branch}) · ${branchHint}</p>` : ''}
     </div>
   </div>
-  ${branchHint ? `<div style="font-size:12px;color:rgba(255,255,255,0.35);padding:8px 0;border-top:1px solid rgba(255,255,255,0.06);margin-bottom:14px">일지(${branch}) · ${branchHint}</div>` : '<div style="border-top:1px solid rgba(255,255,255,0.06);margin-bottom:14px"></div>'}`;
+  <div style="border-top:1px solid rgba(255,255,255,0.06);margin-bottom:14px"></div>`;
 
   // ② 신강/신약
   const dotColor = isGang ? '#FF8A65' : '#82B1FF';
