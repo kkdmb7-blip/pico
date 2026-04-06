@@ -346,6 +346,15 @@
 </div>
 
 
+<!-- 사주 핵심 티저 -->
+<div id="sajuTeaserWrap" style="display:none;padding:4px 20px 8px;max-width:440px;margin:0 auto;">
+  <div style="background:rgba(123,94,167,0.08);border:1px solid rgba(123,94,167,0.3);border-radius:16px;padding:20px 18px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:#e8b86d;margin-bottom:14px;">✦ 나의 사주 핵심</div>
+    <div id="sajuTeaserText" style="font-size:14px;line-height:1.9;color:#e8e8f0;margin-bottom:18px;"></div>
+    <a href="report-saju.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#c9922a,#e8b86d);color:#1a1000;border-radius:12px;font-size:15px;font-weight:800;font-family:'Noto Sans KR',sans-serif;text-decoration:none;letter-spacing:-0.2px;">📄 자세히 보기 — 500 Orb</a>
+  </div>
+</div>
+
 <!-- 사주 공유 버튼 -->
 <div id="sajuShareBtnWrap" style="display:none;padding:20px 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
   <button id="sajuShareBtn" onclick="shareSajuKakao()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;letter-spacing:-0.3px;">🔮 카카오톡 공유</button>
@@ -598,6 +607,7 @@ function renderAll(data) {
   renderLuck(data);
   renderYun(data);
   renderJohu(data);
+  renderSajuTeaser(data);
 }
 
 // ─── 프로필 헤더 ─────────────────────────────────
@@ -1025,6 +1035,47 @@ function renderJohu(data) {
       </div>
     </div>`:''}
   `;
+}
+
+// ─── 사주 핵심 티저 ───────────────────────────────────
+function renderSajuTeaser(data) {
+  const dayStr = (data.summary && data.summary.pillars && data.summary.pillars.day) || '';
+  const stem = dayStr[0] || '';
+  const strength = (data.summary && data.summary.strength) || '';
+
+  const STEM_TRAIT = {
+    '갑': '강한 추진력과 타고난 리더십을 지녔습니다',
+    '을': '유연한 감각과 뛰어난 적응력을 지녔습니다',
+    '병': '밝고 열정적인 에너지로 주변을 이끕니다',
+    '정': '섬세한 내면과 깊은 배려심을 가졌습니다',
+    '무': '묵직한 안정감과 넓은 포용력이 특징입니다',
+    '기': '실용적이고 현실 감각이 뛰어납니다',
+    '경': '결단력 있고 원칙을 굽히지 않습니다',
+    '신': '예민한 감수성과 완벽을 추구하는 성향입니다',
+    '임': '자유롭고 창의적인 흐름을 좋아합니다',
+    '계': '깊은 직관력과 풍부한 감수성을 지녔습니다',
+  };
+
+  const isGang = strength.includes('신강');
+  const strengthLine = isGang
+    ? '에너지가 강한 편이라 자기 주도적이고 독립심이 강합니다. 이 힘을 어떻게 쓰느냐가 인생의 핵심입니다.'
+    : '에너지가 섬세한 편이라 환경의 영향을 크게 받습니다. 나를 지지해줄 기운을 곁에 두는 것이 중요합니다.';
+
+  const y = data.yongshin || {};
+  const priKor = EN_EL[y.primary] || '';
+  const yLine = priKor
+    ? `지금 당신에게 가장 필요한 기운은 <strong style="color:#FFAB40">${priKor}</strong>입니다.`
+    : '';
+
+  const namePart = pName ? `<strong>${pName}</strong>님은 ` : '';
+  const lines = [
+    `${namePart}<strong style="color:#CE93D8">${dayStr}일주</strong>로, ${STEM_TRAIT[stem] || '독특한 기질을 지녔습니다'}.`,
+    strengthLine,
+    yLine,
+  ].filter(Boolean);
+
+  document.getElementById('sajuTeaserText').innerHTML = lines.join('<br><br>');
+  document.getElementById('sajuTeaserWrap').style.display = 'block';
 }
 
 // ── 사주 공유 카드 ──────────────────────────────────
