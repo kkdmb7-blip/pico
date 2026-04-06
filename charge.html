@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Orb 충전 · FORTUNA</title>
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c28;
+  --border: #2a2a3d;
+  --accent: #7b5ea7;
+  --accent2: #e8b86d;
+  --text: #f0f0f5;
+  --muted: #6b6b85;
+  --orb: #7ac4ff;
+  --gold: #e8b86d;
+  --text2: #9090a8;
+  --text3: #4a4a62;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:'Noto Sans KR',sans-serif; min-height:100vh;
+}
+
+/* ── PICOLAB NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,15,0.88);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  height: 60px;
+  gap: 12px;
+}
+.nav-logo {
+  font-family: 'Noto Serif KR', serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+}
+.nav-logo-dot { color: var(--accent2); font-size: 9px; }
+.nav-divider {
+  width: 1px; height: 18px;
+  background: var(--border);
+}
+.nav-page-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text2);
+}
+.nav-orb {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(122,196,255,0.1);
+  border: 1px solid rgba(122,196,255,0.25);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 13px; font-weight: 700; color: var(--orb);
+}
+
+.page-body { padding:20px 16px 80px; max-width:480px; margin:0 auto; }
+
+.hero { text-align:center; padding:28px 0 24px; }
+.hero-icon { font-size:52px; margin-bottom:12px; }
+.hero-title { font-size:22px; font-weight:800; margin-bottom:6px; letter-spacing:-0.3px; }
+.hero-sub { font-size:14px; color:var(--text2); line-height:1.7; }
+
+.section-label {
+  font-size:11px; color:var(--text3); font-weight:700; letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:12px; margin-top:24px;
+}
+
+/* Pack cards */
+.pack-list { display:flex; flex-direction:column; gap:10px; }
+
+.pack-card {
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:16px; padding:16px 18px;
+  display:flex; align-items:center; gap:14px;
+  cursor:pointer; transition:border-color 0.2s, background 0.2s;
+  position:relative; overflow:hidden;
+}
+.pack-card:hover { border-color:rgba(122,196,255,0.4); background:var(--surface2); }
+.pack-card.featured {
+  border-color:rgba(232,184,109,0.55);
+  background:linear-gradient(135deg,rgba(232,184,109,0.07),rgba(232,184,109,0.02));
+}
+.pack-card.featured:hover { border-color:rgba(232,184,109,0.8); }
+
+.pack-badge {
+  position:absolute; top:0; right:16px;
+  background:var(--gold); color:#111; font-size:10px; font-weight:800;
+  padding:3px 10px; border-radius:0 0 8px 8px; letter-spacing:0.3px;
+}
+.pack-badge-best {
+  background:linear-gradient(90deg,#7ac4ff,#a78bfa);
+  color:#fff;
+}
+
+.pack-icon { font-size:28px; flex-shrink:0; }
+.pack-info { flex:1; min-width:0; }
+.pack-orb { font-size:18px; font-weight:800; letter-spacing:-0.3px; color:var(--orb); }
+.pack-orb-bonus { font-size:13px; color:var(--gold); font-weight:700; margin-top:1px; }
+.pack-desc { font-size:12px; color:var(--text3); margin-top:2px; }
+
+.pack-price { text-align:right; flex-shrink:0; }
+.pack-price-main { font-size:17px; font-weight:800; }
+.pack-price-per { font-size:11px; color:var(--text3); margin-top:2px; }
+
+/* how it works */
+.how-list { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.how-item {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:12px 16px;
+  display:flex; align-items:center; gap:12px;
+  font-size:13px; color:var(--text2);
+}
+.how-item strong { color:var(--text); }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:rgba(28,28,40,0.97); border:1px solid var(--border); border-radius:12px;
+  padding:12px 20px; font-size:14px; font-weight:600;
+  opacity:0; pointer-events:none; transition:all 0.3s; z-index:9999; white-space:nowrap;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* Loading overlay */
+.loading-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.72); z-index:9800;
+  display:none; align-items:center; justify-content:center; flex-direction:column; gap:16px;
+}
+.loading-overlay.show { display:flex; }
+.loading-spinner {
+  width:40px; height:40px; border-radius:50%;
+  border:3px solid rgba(255,255,255,0.1); border-top-color:var(--orb);
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- PICOLAB 스타일 네비게이션 -->
+<nav>
+  <a class="nav-logo" href="/">
+    <span class="nav-logo-dot">●</span>FORTUNA
+  </a>
+  <div class="nav-divider"></div>
+  <span class="nav-page-title">Orb 충전</span>
+  <div class="nav-orb">💎 <span id="currentBalance">...</span></div>
+</nav>
+
+<div class="page-body">
+  <div class="hero">
+    <div class="hero-icon">💎</div>
+    <div class="hero-title">Orb를 충전하세요</div>
+    <div class="hero-sub">AI 채팅 1회에 20 Orb가 사용됩니다<br>충전한 Orb는 만료되지 않아요</div>
+  </div>
+
+  <!-- 첫 충전 1+1 배너 (첫 충전자만 표시) -->
+  <div id="firstChargeBanner" style="display:none;background:linear-gradient(135deg,rgba(232,184,109,0.12),rgba(232,184,109,0.04));border:1.5px solid rgba(232,184,109,0.4);border-radius:16px;padding:16px 18px;margin-bottom:16px;text-align:center;">
+    <div style="font-size:20px;margin-bottom:6px;">🎁</div>
+    <div style="font-size:15px;font-weight:800;color:var(--gold);margin-bottom:4px;">첫 충전 한정 1+1 이벤트</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6;">500 Orb 충전 시 1,000 Orb를 드려요<br>첫 충전에만 적용되는 특별 혜택이에요</div>
+  </div>
+
+  <!-- 친구 초대 배너 -->
+  <div id="inviteBanner" onclick="handleInviteCharge()" style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,rgba(122,196,255,0.12),rgba(122,196,255,0.04));border:1.5px solid rgba(122,196,255,0.35);border-radius:16px;padding:16px 18px;margin-bottom:16px;cursor:pointer;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:28px;">👥</div>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:var(--orb);margin-bottom:2px;">친구 초대하고 Orb 받기</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5;">카카오톡으로 공유하면 친구가 가입할 때 Orb를 드려요</div>
+      </div>
+    </div>
+    <div style="font-size:18px;color:var(--text3);flex-shrink:0;">→</div>
+  </div>
+
+  <div class="section-label">충전 팩 선택</div>
+  <div class="pack-list" id="packList"></div>
+
+  <div class="section-label">이용 안내</div>
+  <div class="how-list">
+    <div class="how-item">💬 <span>AI 채팅 <strong>1회당 20 Orb</strong> 차감</span></div>
+    <div class="how-item">♾️ <span>충전한 Orb는 <strong>만료 없음</strong></span></div>
+    <div class="how-item">🔒 <span>결제는 <strong>KG이니시스</strong> 안전 처리</span></div>
+    <div class="how-item">📞 <span>문의: <strong>picolab.kr</strong></span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div style="font-size:14px;color:var(--text2);">결제 처리 중...</div>
+</div>
+
+<script>
+var SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
+var SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
+var sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+var currentUserId = null;
+var currentBalance = 0;
+var isFirstCharge = true;
+
+// 충전 팩 정의
+var PACKS = [
+  {
+    id: 'pack_first_1plus1',
+    firstOnly: true,
+    icon: '🎁',
+    orb: 500,
+    bonus: 500,
+    label: '첫 충전 1+1',
+    desc: '500+500 = 1,000 Orb 지급',
+    price: 5500,
+    priceLabel: '₩5,500',
+    perLabel: '개당 약 5.5원',
+  },
+  {
+    id: 'pack_950',
+    icon: '💎',
+    orb: 950,
+    label: null,
+    desc: '채팅 약 47회',
+    price: 9900,
+    priceLabel: '₩9,900',
+    perLabel: '개당 약 10.4원',
+  },
+  {
+    id: 'pack_1650',
+    icon: '💎',
+    orb: 1650,
+    label: 'BEST',
+    desc: '채팅 약 82회',
+    price: 16500,
+    priceLabel: '₩16,500',
+    perLabel: '개당 약 10.0원',
+  },
+  {
+    id: 'pack_2200',
+    icon: '💎',
+    orb: 2200,
+    label: null,
+    desc: '채팅 약 110회',
+    price: 22000,
+    priceLabel: '₩22,000',
+    perLabel: '개당 약 10.0원',
+  },
+  {
+    id: 'pack_3300',
+    icon: '💎',
+    orb: 3300,
+    label: null,
+    desc: '채팅 약 165회',
+    price: 33000,
+    priceLabel: '₩33,000',
+    perLabel: '개당 약 10.0원',
+  },
+];
+
+function toast(msg, dur) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, dur || 2800);
+}
+
+function showLoading() { document.getElementById('loadingOverlay').classList.add('show'); }
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+
+async function loadUser() {
+  // 카카오 로그인 캐시 확인
+  var kakaoRaw = localStorage.getItem('fortuna_kakao_user');
+  if (kakaoRaw) {
+    try {
+      var kakaoData = JSON.parse(kakaoRaw);
+      currentUserId = kakaoData.id || kakaoData.profile && kakaoData.profile.id;
+    } catch(e) {}
+  }
+  // Supabase 세션 확인
+  if (!currentUserId) {
+    try {
+      var session = await sb.auth.getSession();
+      if (session.data && session.data.session && session.data.session.user) {
+        currentUserId = session.data.session.user.id;
+      }
+    } catch(e) {}
+  }
+  if (!currentUserId) {
+    // 미로그인 → picolab 메인으로
+    location.href = 'https://picolab.kr';
+    return false;
+  }
+  return true;
+}
+
+async function loadBalance() {
+  try {
+    var res = await sb.from('orb_balance').select('balance,is_first_charge').eq('user_id', currentUserId).maybeSingle();
+    if (res.data) {
+      currentBalance = res.data.balance || 0;
+      isFirstCharge = res.data.is_first_charge !== false;
+    } else {
+      currentBalance = 0;
+      isFirstCharge = true;
+    }
+  } catch(e) { console.warn('잔액 로드 실패', e.message); }
+  document.getElementById('currentBalance').textContent = currentBalance + ' Orb';
+  renderPacks();
+}
+
+function renderPacks() {
+  var list = document.getElementById('packList');
+  list.innerHTML = '';
+
+  // 첫 충전 배너
+  var banner = document.getElementById('firstChargeBanner');
+  if (banner) banner.style.display = isFirstCharge ? 'block' : 'none';
+
+  PACKS.forEach(function(pack) {
+    // 첫 충전 전용 팩은 첫 충전자에게만 표시
+    if (pack.firstOnly && !isFirstCharge) return;
+
+    var card = document.createElement('div');
+    card.className = 'pack-card' + (pack.firstOnly ? ' featured' : '');
+
+    var totalOrb = pack.orb + (pack.bonus || 0);
+
+    var badgeHtml = '';
+    if (pack.firstOnly) {
+      badgeHtml = '<div class="pack-badge">첫 충전 1+1 🎁</div>';
+    } else if (pack.label === 'BEST') {
+      badgeHtml = '<div class="pack-badge pack-badge-best">BEST</div>';
+    }
+
+    var orbHtml = '<div class="pack-orb">' + totalOrb.toLocaleString() + ' Orb</div>';
+    var bonusHtml = pack.bonus ? '<div class="pack-orb-bonus">+' + pack.bonus + ' 보너스 증정</div>' : '';
+
+    card.innerHTML = badgeHtml +
+      '<div class="pack-icon">' + pack.icon + '</div>' +
+      '<div class="pack-info">' +
+        orbHtml + bonusHtml +
+        '<div class="pack-desc">' + pack.desc + '</div>' +
+      '</div>' +
+      '<div class="pack-price">' +
+        '<div class="pack-price-main">' + pack.priceLabel + '</div>' +
+        '<div class="pack-price-per">' + pack.perLabel + '</div>' +
+      '</div>';
+
+    card.addEventListener('click', function() { doPay(pack); });
+    list.appendChild(card);
+  });
+}
+
+function doPay(pack) {
+  if (typeof IMP === 'undefined') { toast('결제 모듈 로드 중이에요. 잠시 후 다시 시도해주세요.'); return; }
+
+  var totalOrb = pack.orb + (pack.bonus || 0);
+  var merchantUid = 'ORB-' + pack.id + '-' + Date.now();
+  var packName = '포르투나 ' + totalOrb.toLocaleString() + ' Orb 충전';
+
+  IMP.init('imp63718155');
+  IMP.request_pay({
+    pg: 'html5_inicis.MOI3302087',
+    pay_method: 'card',
+    merchant_uid: merchantUid,
+    name: packName,
+    amount: pack.price,
+    buyer_name: '',
+    buyer_email: '',
+  }, async function(rsp) {
+    if (!rsp.success) {
+      if (rsp.error_msg && !rsp.error_msg.includes('취소')) {
+        toast('결제가 취소되었어요.');
+      }
+      return;
+    }
+    showLoading();
+    try {
+      await chargeOrb(pack, totalOrb, rsp.imp_uid, merchantUid);
+      hideLoading();
+      toast('✅ ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
+      setTimeout(function() { location.href = 'https://picolab.kr'; }, 2000);
+    } catch(e) {
+      hideLoading();
+      toast('결제는 완료됐으나 저장 중 오류가 발생했어요. 고객센터에 문의해주세요.');
+    }
+  });
+}
+
+async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
+  var newBalance = currentBalance + totalOrb;
+
+  // orb_balance upsert
+  var upsertData = {
+    user_id: currentUserId,
+    balance: newBalance,
+    total_charged: (currentBalance + totalOrb), // rough estimate; server should handle properly
+    updated_at: new Date().toISOString(),
+  };
+  if (isFirstCharge) {
+    upsertData.is_first_charge = false;
+  }
+
+  var r1 = await sb.from('orb_balance').upsert(upsertData);
+  if (r1.error) throw new Error(r1.error.message);
+
+  // total_charged 증가 (별도 increment - upsert 이후)
+  try {
+    await sb.rpc('increment_total_charged', { p_user_id: currentUserId, p_amount: totalOrb });
+  } catch(e) { /* RPC 없으면 스킵 */ }
+
+  // orb_transactions 기록
+  var r2 = await sb.from('orb_transactions').insert({
+    user_id: currentUserId,
+    type: 'charge',
+    amount: totalOrb,
+    description: (pack.firstOnly ? '첫충전 1+1 ' : '') + pack.id + ' imp:' + impUid,
+    balance_after: newBalance,
+  });
+  if (r2.error) throw new Error(r2.error.message);
+
+  currentBalance = newBalance;
+  isFirstCharge = false;
+  document.getElementById('currentBalance').textContent = currentBalance + ' Orb';
+  renderPacks();
+}
+
+function handleInviteCharge() {
+  if (!currentUserId) return;
+  var link = 'https://kkdmb7-blip.github.io/memox/?ref=' + currentUserId;
+  var msg = '🔮 포르투나 — 사주·점성술 AI 운세 상담\n' + link;
+  if (navigator.share) {
+    navigator.share({ title: '포르투나 초대', text: msg, url: link });
+  } else if (window.Kakao && Kakao.isInitialized && Kakao.isInitialized()) {
+    Kakao.Share.sendDefault({ objectType: 'text', text: msg, link: { mobileWebUrl: link, webUrl: link } });
+  } else {
+    navigator.clipboard.writeText(link).then(function() {
+      toast('초대 링크가 복사됐어요! 친구에게 공유해보세요 🔮');
+    }).catch(function() { prompt('초대 링크:', link); });
+  }
+}
+
+// 초기화
+(async function() {
+  var ok = await loadUser();
+  if (ok) await loadBalance();
+})();
+</script>
+</body>
+</html>
