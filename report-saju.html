@@ -579,8 +579,9 @@ function handleCta() {
     kakaoLogin();
     return;
   }
-  // 로그인 상태 → 사주 리포트 생성 페이지로
-  location.href = 'saju.html';
+  // 로그인 상태 → 사주 파라미터 보존해서 복귀
+  var params = location.search;
+  location.href = 'saju.html' + (params || '');
 }
 
 // ── 초기화 ──
