@@ -2418,7 +2418,7 @@ function checkAuth() {
       if (needsUpgrade) {
         if (currentUser.email) {
           // email 있으면 resolve-user로 UUID 획득 (memox와 동일 엔드포인트)
-          fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+          fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: currentUser.email, name: currentUser.name })
@@ -2495,7 +2495,7 @@ function handleKakaoCallback(code) {
     var kakaoFallbackId = 'kakao_' + profile.id;
 
     // resolve-user → chat_users UUID (memox와 완전 동일 엔드포인트)
-    return fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+    return fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, name: name })
