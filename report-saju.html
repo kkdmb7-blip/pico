@@ -65,7 +65,7 @@ nav {
 .logo {
   font-family:'Noto Serif KR',serif; font-weight:700; font-size:20px;
   letter-spacing:-0.5px; color:var(--text);
-  display:flex; flex-direction:column; align-items:flex-start; gap:1px;
+  display:flex; align-items:center; gap:5px;
   cursor:pointer; text-decoration:none;
 }
 .logo-inner { display:flex; align-items:center; gap:5px; }
@@ -317,7 +317,8 @@ select option { background:var(--surface2); color:var(--text); }
           </svg>
         </button>
         <div class="hamburger-dropdown" id="hamburgerDropdown">
-          <a id="navOrbDisplay" href="charge.html" style="display:none;align-items:center;gap:6px;padding:10px 16px;font-size:13px;font-weight:600;color:#7ac4ff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.06);"></a>
+          <button onclick="location.href='mypage.html'">👤 마이페이지</button>
+          <div class="menu-divider"></div>
           <button onclick="location.href='/'">🏠 홈으로</button>
           <div class="menu-divider"></div>
           <button onclick="logout()" style="color:#e05c6a;">로그아웃</button>
