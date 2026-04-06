@@ -348,10 +348,10 @@
 
 <!-- 사주 핵심 티저 -->
 <div id="sajuTeaserWrap" style="display:none;padding:4px 20px 8px;max-width:440px;margin:0 auto;">
-  <div style="background:rgba(123,94,167,0.08);border:1px solid rgba(123,94,167,0.3);border-radius:16px;padding:20px 18px;">
-    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:#e8b86d;margin-bottom:14px;">✦ 나의 사주 핵심</div>
-    <div id="sajuTeaserText" style="font-size:14px;line-height:1.9;color:#e8e8f0;margin-bottom:18px;"></div>
-    <a href="report-saju.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#c9922a,#e8b86d);color:#1a1000;border-radius:12px;font-size:15px;font-weight:800;font-family:'Noto Sans KR',sans-serif;text-decoration:none;letter-spacing:-0.2px;">📄 자세히 보기 — 500 Orb</a>
+  <div class="glass" style="padding:20px 18px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.35);margin-bottom:16px;">✦ 나의 사주 핵심</div>
+    <div id="sajuTeaserText" style="margin-bottom:18px;"></div>
+    <a href="report-saju.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,rgba(122,196,255,0.25),rgba(122,196,255,0.12));border:1.5px solid rgba(122,196,255,0.45);color:#7ac4ff;border-radius:12px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;text-decoration:none;letter-spacing:-0.2px;">자세히 보기 · 500 Orb</a>
   </div>
 </div>
 
@@ -1138,79 +1138,102 @@ function renderSajuTeaser(data) {
   const hasClash   = (rel.clashes      || []).length > 0;
   const hasPunish  = (rel.punishments  || []).length > 0;
 
-  const keywords = STEM_KEYWORDS[stem] || ['개성', '직관', '의지'];
-  const desc1 = STEM_DESC1[stem] || '';
-  const desc2 = STEM_DESC2[stem] || '';
+  const si = STEMS.indexOf(stem);
+  const bi = BRANCHES.indexOf(branch);
+  const stemBgCss  = EL_BG_CSS[STEM_EL[si]] || '';
+  const branBgCss  = EL_BG_CSS[BRANCH_EL[bi]] || '';
+  const keywords   = STEM_KEYWORDS[stem] || ['개성', '직관', '의지'];
+  const desc1      = STEM_DESC1[stem] || '';
+  const desc2      = STEM_DESC2[stem] || '';
   const branchHint = BRANCH_HINT[branch] || '';
 
   // ── HTML 조립 ──
   let html = '';
 
-  // ① 일주 기질
+  // ① 일주 기질 — hanja-box + 키워드 배지 + 설명
   html += `
-  <div style="margin-bottom:16px">
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;letter-spacing:0.5px">${namePart}의 일주 <span style="color:#CE93D8;font-weight:700">${dayStr}</span> 기질</div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-      ${keywords.map(k=>`<span style="background:rgba(206,147,216,0.15);border:1px solid rgba(206,147,216,0.35);border-radius:20px;padding:4px 12px;font-size:12px;color:#CE93D8">${k}</span>`).join('')}
+  <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px">
+    <div style="display:flex;gap:5px;flex-shrink:0">
+      <div class="hanja-box ${stemBgCss}" style="width:40px;height:40px;font-size:1.35rem">${STEM_H[si]||'?'}</div>
+      <div class="hanja-box ${branBgCss}" style="width:40px;height:40px;font-size:1.35rem">${BRANCH_H[bi]||'?'}</div>
     </div>
-    <p style="font-size:13.5px;line-height:1.85;color:#e0e0ef;margin:0 0 8px">${desc1}</p>
-    ${desc2 ? `<p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.5);margin:0">${desc2}</p>` : ''}
-    ${branchHint ? `<p style="font-size:12.5px;line-height:1.75;color:rgba(255,255,255,0.4);margin:8px 0 0;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)">일지(${branch}) · ${branchHint}</p>` : ''}
-  </div>`;
+    <div style="flex:1;min-width:0">
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:5px">${namePart}의 일주 기질</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+        ${keywords.map(k=>`<span class="badge" style="color:#CE93D8;border-color:rgba(206,147,216,0.3);background:rgba(206,147,216,0.08)">${k}</span>`).join('')}
+      </div>
+      <p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.8);margin:0 0 5px">${desc1}</p>
+      ${desc2 ? `<p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,0.45);margin:0">${desc2}</p>` : ''}
+    </div>
+  </div>
+  ${branchHint ? `<div style="font-size:12px;color:rgba(255,255,255,0.35);padding:8px 0;border-top:1px solid rgba(255,255,255,0.06);margin-bottom:14px">일지(${branch}) · ${branchHint}</div>` : '<div style="border-top:1px solid rgba(255,255,255,0.06);margin-bottom:14px"></div>'}`;
 
-  // ② 신강/신약 패턴
+  // ② 신강/신약
+  const dotColor = isGang ? '#FF8A65' : '#82B1FF';
   html += `
-  <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px 16px;margin-bottom:14px">
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px">${strength} — ${isGang?'에너지가 강한 사주':'에너지가 섬세한 사주'}</div>
-    ${patterns.map(p=>`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.6"><span style="color:${isGang?'#FF8A65':'#82B1FF'};margin-top:3px;flex-shrink:0">●</span>${p}</div>`).join('')}
+  <div class="glass-sm" style="padding:12px 14px;margin-bottom:12px">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+      <span class="badge" style="color:#CE93D8;border-color:rgba(206,147,216,0.3);background:rgba(206,147,216,0.1)">${strength}</span>
+      <span style="font-size:11px;color:rgba(255,255,255,0.3)">${isGang?'에너지가 강한 사주':'에너지가 섬세한 사주'}</span>
+    </div>
+    ${patterns.map(p=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6"><span style="color:${dotColor};margin-top:3px;flex-shrink:0;font-size:8px">●</span>${p}</div>`).join('')}
   </div>`;
 
-  // ③ 현재 대운
-  if (nowLuck) {
-    const lkEl = nowLuck.element || '';
-    const lkElKor = EN_EL[lkEl] || '';
-    const lkColor = EL_COLOR[lkElKor] || '#CE93D8';
-    const lkStemH = STEM_H[STEMS.indexOf(nowLuck.stem_kor)] || nowLuck.stem_kor || '';
-    const lkBranI = BRANCHES.indexOf(nowLuck.branch_kor);
-    const lkBranH = lkBranI >= 0 ? BRANCH_H[lkBranI] : (nowLuck.branch_kor || '');
+  // ③ 조후용신/희신 — hanja-box
+  if (priKor) {
+    const advice = EL_ADVICE[priEl] || '';
+    const priBgCss = EL_BG_CSS[priEl] || '';
+    const secBgCss = EL_BG_CSS[secEl] || '';
     html += `
-  <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px 16px;margin-bottom:14px">
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px">현재 대운 (${nowLuck.age_range} · ${nowLuck.year_range})</div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:6px 14px;text-align:center;flex-shrink:0">
-        <span style="font-size:20px;font-weight:700;color:#e8e8f0;font-family:'Noto Serif KR',serif;letter-spacing:4px">${lkStemH}${lkBranH}</span>
+  <div class="glass-sm" style="padding:12px 14px;margin-bottom:12px">
+    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">나에게 필요한 기운</div>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+      <div style="text-align:center">
+        <div class="hanja-box ${priBgCss}" style="width:40px;height:40px;font-size:1.35rem;margin-bottom:4px">${EL_NAME[priEl]||'?'}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35)">조후용신</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:1px">${priKor}</div>
       </div>
-      <div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6">${lkElKor ? `<span style="color:${lkColor};font-weight:700">${lkElKor}(${lkEl})</span> 기운이 흐르는 대운입니다` : '현재 대운이 흐르는 시기입니다'}</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:4px">이 대운의 세부 흐름은 리포트에서 확인하세요</div>
-      </div>
+      ${secKor ? `<div style="text-align:center">
+        <div class="hanja-box ${secBgCss}" style="width:40px;height:40px;font-size:1.35rem;margin-bottom:4px">${EL_NAME[secEl]||'?'}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35)">조후희신</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:1px">${secKor}</div>
+      </div>` : ''}
     </div>
+    ${advice ? `<div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.7;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)">${advice}</div>` : ''}
   </div>`;
   }
 
-  // ④ 용신 조언 (프로필 카드와 동일하게 johu 기준)
-  if (priKor) {
-    const priColor = EL_COLOR[priEl] || '#FFAB40';
-    const secColor = EL_COLOR[secEl] || '#FFAB40';
-    const advice = EL_ADVICE[priEl] || '';
+  // ④ 현재 대운
+  if (nowLuck) {
+    const lkEl    = nowLuck.element || '';
+    const lkElKor = EN_EL[lkEl] || '';
+    const lkStemI = STEMS.indexOf(nowLuck.stem_kor);
+    const lkBranI = BRANCHES.indexOf(nowLuck.branch_kor);
+    const lkStemBg = EL_BG_CSS[STEM_EL[lkStemI]] || '';
+    const lkBranBg = EL_BG_CSS[BRANCH_EL[lkBranI]] || '';
+    const lkStemH  = lkStemI >= 0 ? STEM_H[lkStemI] : (nowLuck.stem_kor || '');
+    const lkBranH  = lkBranI >= 0 ? BRANCH_H[lkBranI] : (nowLuck.branch_kor || '');
+    const lkTcCss  = EL_TC_CSS[lkElKor] || '';
     html += `
-  <div style="background:rgba(255,171,64,0.07);border:1px solid rgba(255,171,64,0.2);border-radius:12px;padding:14px 16px;margin-bottom:14px">
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">나에게 필요한 기운</div>
-    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-      <span style="background:${priColor}22;border:1px solid ${priColor}55;border-radius:20px;padding:4px 14px;font-size:13px;font-weight:700;color:${priColor}">조후용신 ${priKor}</span>
-      ${secKor ? `<span style="background:${secColor}18;border:1px solid ${secColor}40;border-radius:20px;padding:4px 14px;font-size:13px;color:${secColor}">조후희신 ${secKor}</span>` : ''}
+  <div class="glass-sm" style="padding:12px 14px;margin-bottom:12px">
+    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">현재 대운 · ${nowLuck.age_range} (${nowLuck.year_range})</div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        <div class="hanja-box ${lkStemBg}" style="width:40px;height:40px;font-size:1.35rem">${lkStemH}</div>
+        <div class="hanja-box ${lkBranBg}" style="width:40px;height:40px;font-size:1.35rem">${lkBranH}</div>
+      </div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.65">${lkElKor ? `<span class="${lkTcCss}" style="font-weight:700">${lkElKor}</span> 기운이 흐르는 대운입니다` : '현재 대운이 흐르는 시기입니다'}</div>
     </div>
-    ${advice ? `<div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.75">${advice}</div>` : ''}
   </div>`;
   }
 
   // ⑤ 형·충 주의
   if (hasClash || hasPunish) {
     html += `
-  <div style="background:rgba(255,82,82,0.07);border:1px solid rgba(255,82,82,0.2);border-radius:12px;padding:12px 16px;margin-bottom:14px">
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">관계 & 변화 주의</div>
-    <div style="font-size:13px;color:rgba(255,200,200,0.8);line-height:1.75">
-      ${hasClash ? `사주 내 <strong style="color:#FF7043">충(沖)</strong>이 있어 급격한 변화와 충돌이 잦을 수 있습니다. ` : ''}${hasPunish ? `<strong style="color:#FFD740">형(刑)</strong> 관계로 예기치 않은 마찰이 생기기 쉬운 구조입니다. ` : ''}자세한 풀이는 전문 리포트에서 확인하세요.
+  <div class="glass-sm" style="padding:12px 14px;margin-bottom:12px;border-color:rgba(255,82,82,0.2)">
+    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:6px">관계 & 변화 주의</div>
+    <div style="font-size:13px;color:rgba(255,200,200,0.75);line-height:1.75">
+      ${hasClash ? `사주 내 <strong class="tc-fire">충(沖)</strong>이 있어 급격한 변화와 충돌이 잦을 수 있습니다. ` : ''}${hasPunish ? `<strong class="tc-earth">형(刑)</strong> 관계로 예기치 않은 마찰이 생기기 쉬운 구조입니다.` : ''}
     </div>
   </div>`;
   }
