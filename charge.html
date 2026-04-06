@@ -337,23 +337,22 @@ function renderPacks() {
   if (banner) banner.style.display = isFirstCharge ? 'block' : 'none';
 
   PACKS.forEach(function(pack) {
-    // 첫 충전 전용 팩은 첫 충전자에게만 표시
-    if (pack.firstOnly && !isFirstCharge) return;
+    var showBonus = pack.firstOnly && isFirstCharge;
 
     var card = document.createElement('div');
-    card.className = 'pack-card' + (pack.firstOnly ? ' featured' : '');
+    card.className = 'pack-card' + (showBonus ? ' featured' : '');
 
-    var totalOrb = pack.orb + (pack.bonus || 0);
+    var totalOrb = pack.orb + (showBonus ? (pack.bonus || 0) : 0);
 
     var badgeHtml = '';
-    if (pack.firstOnly) {
+    if (showBonus) {
       badgeHtml = '<div class="pack-badge">첫 충전 1+1 🎁</div>';
     } else if (pack.label === 'BEST') {
       badgeHtml = '<div class="pack-badge pack-badge-best">BEST</div>';
     }
 
     var orbHtml = '<div class="pack-orb">' + totalOrb.toLocaleString() + ' 오르브</div>';
-    var bonusHtml = pack.bonus ? '<div class="pack-orb-bonus">+' + pack.bonus + ' 보너스 증정</div>' : '';
+    var bonusHtml = showBonus && pack.bonus ? '<div class="pack-orb-bonus">+' + pack.bonus + ' 보너스 증정</div>' : '';
 
     card.innerHTML = badgeHtml +
       '<div class="pack-icon">' + pack.icon + '</div>' +
@@ -374,7 +373,7 @@ function renderPacks() {
 function doPay(pack) {
   if (typeof IMP === 'undefined') { toast('결제 모듈 로드 중이에요. 잠시 후 다시 시도해주세요.'); return; }
 
-  var totalOrb = pack.orb + (pack.bonus || 0);
+  var totalOrb = pack.orb + (pack.firstOnly && isFirstCharge ? (pack.bonus || 0) : 0);
   var merchantUid = 'ORB-' + pack.id + '-' + Date.now();
   var packName = '포르투나 ' + totalOrb.toLocaleString() + ' 오르브 충전';
 
@@ -434,7 +433,7 @@ async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
     user_id: currentUserId,
     type: 'charge',
     amount: totalOrb,
-    description: (pack.firstOnly ? '첫충전 1+1 ' : '') + pack.id + ' imp:' + impUid,
+    description: (pack.firstOnly && isFirstCharge ? '첫충전 1+1 ' : '') + pack.id + ' imp:' + impUid,
     balance_after: newBalance,
   });
   if (r2.error) throw new Error(r2.error.message);
