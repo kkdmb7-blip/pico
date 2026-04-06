@@ -2404,7 +2404,7 @@ function checkAuth() {
       if (currentUser.id && currentUser.id.indexOf('kakao_') === 0) {
         if (currentUser.email) {
           // email 있으면 resolve-user로 UUID 획득
-          fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+          fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: currentUser.email, name: currentUser.name })
@@ -2481,7 +2481,7 @@ function handleKakaoCallback(code) {
     var kakaoFallbackId = 'kakao_' + profile.id;
 
     // resolve-user → Supabase UUID (memox와 동일 방식)
-    return fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+    return fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, name: name })
