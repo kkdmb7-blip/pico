@@ -2403,7 +2403,7 @@ function checkAuth() {
       // _v:2 미설정이거나 kakao_ 접두어면 fortuna-silk UUID로 업그레이드 (one-time migration)
       var needsUpgrade = currentUser.email && (!currentUser._v || (currentUser.id && currentUser.id.indexOf('kakao_') === 0));
       if (needsUpgrade) {
-        fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+        fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: currentUser.email, name: currentUser.name })
