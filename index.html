@@ -1785,47 +1785,49 @@ async function requestGunghapAI() {
   aiBtn.disabled = true; aiBtn.textContent = '분석 중...';
   aiEl.style.display = 'block';
   aiEl.innerHTML =
-    '<div class="ai-chunk" id="chunk-1"><div class="ai-chunk-spinner"></div></div>' +
-    '<div class="ai-chunk" id="chunk-2"></div>' +
-    '<div class="ai-chunk" id="chunk-3"></div>';
+    '<div class="ai-chunk" id="chunk-db1"><div class="ai-chunk-spinner"></div></div>' +
+    '<div class="ai-chunk" id="chunk-db2"></div>' +
+    '<div class="ai-chunk" id="chunk-db3"></div>' +
+    '<div class="ai-chunk" id="chunk-ai1"></div>' +
+    '<div class="ai-chunk" id="chunk-ai2"></div>' +
+    '<div class="ai-chunk" id="chunk-db4"></div>';
 
   var myName = window._ghLastMyName || '나', pNameDisp = window._ghLastPName || '상대방';
   var myGender = window._ghLastMyGender || 'M';
   var gA = myGender === 'F' ? '여성' : '남성';
   var gB = _ghPartnerGender === 'F' ? '여성' : _ghPartnerGender === 'M' ? '남성' : '';
   var iljuA = mySaju.pillars.day, iljuB = pSaju.pillars.day;
+  var ohaengA = mySaju.dayEl, ohaengB = pSaju.dayEl;
+  var strA = mySaju.strength, strB = pSaju.strength;
   var thisYear = new Date().getFullYear();
   function ageBracket(y) { var a = thisYear - (y||1990); return a < 35 ? '20대' : a < 55 ? '40대' : '60대'; }
   var myBirthYear = mySaju._birthInfo ? mySaju._birthInfo.year : (_ghMyProfile ? _ghMyProfile.year : 1990);
   var pBirthYear = pSaju._birthInfo ? pSaju._birthInfo.year : 1990;
-  var myAge = ageBracket(myBirthYear);
-  var pAge  = ageBracket(pBirthYear);
+  var myAge = ageBracket(myBirthYear), pAge = ageBracket(pBirthYear);
+  var ilganA = iljuA ? iljuA[0] : '', ilganB = iljuB ? iljuB[0] : '';
   var CHAT_URL = 'https://fortuna-silk.vercel.app/api/chat';
   var WORKER_BASE = 'https://fortuna.kkdmb7.workers.dev';
 
-  // ── 용신: submitGunghap에서 이미 서버 조회 완료 ──
   var myYS = mySaju._yongsin || '';
   var pYS  = pSaju._yongsin  || '';
-  // 폴백 (서버 조회 실패한 경우만)
-  if (!myYS) { var SM={목:'화',화:'토',토:'금',금:'수',수:'목'},PM={목:'수',화:'목',토:'화',금:'토',수:'금'}; myYS = mySaju.strength==='신강'?SM[mySaju.dayEl]:PM[mySaju.dayEl]; }
-  if (!pYS)  { var SM2={목:'화',화:'토',토:'금',금:'수',수:'목'},PM2={목:'수',화:'목',토:'화',금:'토',수:'금'}; pYS = pSaju.strength==='신강'?SM2[pSaju.dayEl]:PM2[pSaju.dayEl]; }
+  if (!myYS) { var SM={목:'화',화:'토',토:'금',금:'수',수:'목'},PM={목:'수',화:'목',토:'화',금:'토',수:'금'}; myYS = strA==='신강'?SM[ohaengA]:PM[ohaengA]; }
+  if (!pYS)  { var SM2={목:'화',화:'토',토:'금',금:'수',수:'목'},PM2={목:'수',화:'목',토:'화',금:'토',수:'금'}; pYS = strB==='신강'?SM2[ohaengB]:PM2[ohaengB]; }
 
   function boldPink(s) { return (s||'').replace(/^#{1,4}\s+.+$/gm,'').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#ff8ab0;">$1</strong>').trim(); }
   function showChunk(id, title, html) {
     var el = document.getElementById(id);
     if (el) el.innerHTML = '<h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">'+title+'</h4><div style="animation:ghFadeIn .4s ease;">'+html+'</div>';
   }
-  function showSpinner(id) {
-    var el = document.getElementById(id);
-    if (el) el.innerHTML = '<div class="ai-chunk-spinner"></div>';
-  }
-  function showError(id, title) {
-    var el = document.getElementById(id);
-    if (el) el.innerHTML = '<h4 style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.3);margin:0 0 4px;">'+title+'</h4><div style="font-size:12px;color:rgba(255,255,255,0.25);">분석 실패</div>';
-  }
+  function showSpinner(id) { var el = document.getElementById(id); if (el) el.innerHTML = '<div class="ai-chunk-spinner"></div>'; }
+  function showError(id, title) { var el = document.getElementById(id); if (el) el.innerHTML = '<h4 style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.3);margin:0 0 4px;">'+title+'</h4><div style="font-size:12px;color:rgba(255,255,255,0.25);">분석 실패</div>'; }
 
-  // 일간 추출 (일주 첫 글자)
-  var ilganA = iljuA ? iljuA[0] : '', ilganB = iljuB ? iljuB[0] : '';
+  // ── 신강/띠/보완 판별 ──
+  var strKeyA = (strA === '신강' || strA === '신강(身强)') ? '신강' : '신약';
+  var strKeyB = (strB === '신강' || strB === '신강(身强)') ? '신강' : '신약';
+  var score = calcGunghapScore(mySaju, pSaju);
+  var ddiType = score.tScore >= 30 ? '삼합' : score.tScore >= 25 ? '육합' : score.tScore <= 5 ? '충' : score.tScore <= 10 ? '형' : '일반';
+  var aGetsFromB = (ohaengB === myYS), bGetsFromA = (ohaengA === pYS);
+  var bowanType = (aGetsFromB && bGetsFromA) ? '서로_채움' : (aGetsFromB || bGetsFromA) ? '한쪽_채움' : (myYS === pYS) ? '함께_보충' : '한쪽_채움';
 
   // ── 0. gunghap-context 조회 ──
   var ctx = {};
@@ -1834,33 +1836,52 @@ async function requestGunghapAI() {
       + 'ilju_a=' + encodeURIComponent(iljuA) + '&ilju_b=' + encodeURIComponent(iljuB)
       + '&age_a=' + encodeURIComponent(myAge) + '&age_b=' + encodeURIComponent(pAge)
       + '&yongsin_a=' + encodeURIComponent(myYS||'') + '&yongsin_b=' + encodeURIComponent(pYS||'')
-      + '&ilgan_a=' + encodeURIComponent(ilganA) + '&ilgan_b=' + encodeURIComponent(ilganB);
+      + '&ilgan_a=' + encodeURIComponent(ilganA) + '&ilgan_b=' + encodeURIComponent(ilganB)
+      + '&ohaeng_a=' + encodeURIComponent(ohaengA) + '&ohaeng_b=' + encodeURIComponent(ohaengB)
+      + '&singang_a=' + encodeURIComponent(strKeyA) + '&singang_b=' + encodeURIComponent(strKeyB)
+      + '&ddi_type=' + encodeURIComponent(ddiType) + '&bowan_type=' + encodeURIComponent(bowanType);
     var ctxRes = await fetch(ctxUrl);
     if (ctxRes.ok) ctx = await ctxRes.json();
   } catch(e) {}
 
-  console.log('=== 궁합 context 전체 ===', ctx);
-  console.log('=== 1단계 데이터 ===', 'a_personality:', ctx.a_personality?'✓':'✗', 'a_yeonae:', ctx.a_yeonae?'✓':'✗', 'a_gongreak:', ctx.a_gongreak?'✓':'✗');
-  console.log('=== 2단계 데이터 ===', 'a_age:', ctx.a_age_advice?'✓':'✗', 'a_daeun:', ctx.a_daeun?'✓':'✗', 'a_monthly:', ctx.a_monthly?'✓':'✗');
-  console.log('=== 3단계 데이터 ===', 'a_yongsin:', ctx.a_yongsin?'✓':'✗', 'a_famous:', ctx.a_famous?'✓':'✗');
-  console.log('용신: 나='+myYS+', 상대='+pYS, '일간: 나='+ilganA+', 상대='+ilganB);
+  // ── DB 1: 오행 궁합 (즉시) ──
+  var ohText = ctx.ohaeng_text;
+  if (ohText && ohText.텍스트) {
+    showChunk('chunk-db1', '🔥 오행 궁합 · ' + myName + '의 ' + ohaengA + ' × ' + pNameDisp + '의 ' + ohaengB + ' (' + ohText.관계 + ')', ohText.텍스트.replace(/\n/g, '<br>'));
+  } else {
+    showChunk('chunk-db1', '🔥 오행 궁합', ohaengA + ' × ' + ohaengB);
+  }
 
-  // ── 1단계: 연애 궁합 (80 Orb) ──
-  console.log('[궁합AI] 1단계 시작');
+  // ── DB 2: 체질 궁합 (즉시) ──
+  if (ctx.singang_text && ctx.singang_text.텍스트) {
+    showChunk('chunk-db2', '⚖️ 체질 궁합 · ' + myName + ' ' + strKeyA + ' × ' + pNameDisp + ' ' + strKeyB, ctx.singang_text.텍스트.replace(/\n/g,'<br>'));
+  } else {
+    showChunk('chunk-db2', '⚖️ 체질 궁합', strKeyA + ' × ' + strKeyB + ' 조합');
+  }
+
+  // ── DB 3: 띠 궁합 (즉시) ──
+  if (ctx.ddi_text && ctx.ddi_text.텍스트) {
+    showChunk('chunk-db3', '🐾 띠 궁합 · ' + mySaju.zodiac + '띠 × ' + pSaju.zodiac + '띠 (' + ddiType + ')', ctx.ddi_text.텍스트.replace(/\n/g,'<br>'));
+  } else {
+    showChunk('chunk-db3', '🐾 띠 궁합', ddiType + ' 관계');
+  }
+
+  // ── AI 1: 연애 스타일 (80 Orb) ──
+  showSpinner('chunk-ai1');
   try {
     var r1 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, orb_override:80,
-        system_prompt: '사주명리 궁합 전문가. 연애 궁합만 분석해. 톤: 따뜻하고 희망적으로. 부정적 요소도 "성장 포인트"나 "서로를 더 깊이 알아가는 계기"로 표현해. 상극도 "서로를 단련시키는 자극제"처럼 긍정 전환해. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
-        messages: [{ role:'user', content: '【연애 궁합 분석】\n'
-          +myName+'('+gA+'): 일주 '+iljuA+', 일간 '+mySaju.dayEl+', '+mySaju.strength+'\n'
-          +pNameDisp+'('+gB+'): 일주 '+iljuB+', 일간 '+pSaju.dayEl+', '+pSaju.strength+'\n\n'
+        system_prompt: '사주명리 궁합 전문가. 두 사람의 연애 스타일과 감정 궁합만 분석해. 톤: 따뜻하고 희망적. 부정적 요소도 성장 포인트로 표현. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜/오행관계 설명 금지(이미 위에서 했음). **볼드**는 핵심 단어에만 3~5개.',
+        messages: [{ role:'user', content: '【'+myName+' & '+pNameDisp+' 연애 스타일 분석】\n'
+          +myName+'('+gA+'): 일주 '+iljuA+', '+ohaengA+', '+strA+'\n'
+          +pNameDisp+'('+gB+'): 일주 '+iljuB+', '+ohaengB+', '+strB+'\n\n'
           +'▸ '+myName+' 성격: '+(ctx.a_personality||'정보 없음')+'\n'
           +'▸ '+pNameDisp+' 성격: '+(ctx.b_personality||'정보 없음')+'\n'
-          +'▸ '+myName+' 연애 스타일: '+(ctx.a_yeonae||'정보 없음')+'\n'
-          +'▸ '+pNameDisp+' 연애 스타일: '+(ctx.b_yeonae||'정보 없음')+'\n'
-          +'▸ '+myName+'이 상대에게 다가가는 법: '+(ctx.a_gongreak||'정보 없음')+'\n'
-          +'▸ '+pNameDisp+'이 상대에게 다가가는 법: '+(ctx.b_gongreak||'정보 없음')+'\n\n'
-          +'위 정보를 모두 활용해 두 사람의 연애/감정 궁합을 구체적으로 분석해줘. 400~500자.' }]
+          +'▸ '+myName+' 연애: '+(ctx.a_yeonae||'정보 없음')+'\n'
+          +'▸ '+pNameDisp+' 연애: '+(ctx.b_yeonae||'정보 없음')+'\n'
+          +'▸ '+myName+'→'+pNameDisp+' 공략법: '+(ctx.a_gongreak||'정보 없음')+'\n'
+          +'▸ '+pNameDisp+'→'+myName+' 공략법: '+(ctx.b_gongreak||'정보 없음')+'\n\n'
+          +'위 DB 정보를 바탕으로 두 사람만의 연애 패턴, 끌림 포인트, 주의할 갈등 요소를 구체적으로 분석해줘. 600~800자.' }]
       })
     });
     if (!r1.ok) {
@@ -1869,92 +1890,83 @@ async function requestGunghapAI() {
       throw new Error(e1.error||r1.status);
     }
     var d1 = await r1.json();
-    console.log('[궁합AI] 1단계 완료, reply:', (d1.reply||'').length+'자');
-    showChunk('chunk-1', '💕 연애 궁합', boldPink(d1.reply));
+    showChunk('chunk-ai1', '💕 ' + myName + ' & ' + pNameDisp + '의 연애 스타일', boldPink(d1.reply));
   } catch(e) {
-    console.error('[궁합AI] 1단계 실패:', e);
-    showError('chunk-1','💕 연애 궁합'); showError('chunk-2','⏰ 지금 이 시기'); showError('chunk-3','🌟 서로를 위한 조언');
-    aiBtn.disabled=false; aiBtn.textContent='AI 분석 시작'; return;
+    showError('chunk-ai1','💕 연애 스타일'); showError('chunk-ai2','⏰ 지금 이 시기');
+    aiBtn.disabled=false; aiBtn.textContent='AI 분석 시작';
+    return;
   }
 
-  // ── 2단계: 현재 시기 (skip_orb) ──
-  console.log('[궁합AI] 2단계 시작');
-  showSpinner('chunk-2');
+  // ── AI 2: 현재 시기 (skip_orb) ──
+  showSpinner('chunk-ai2');
   try {
     var r2 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, skip_orb:true,
-        system_prompt: '사주명리 궁합 전문가. 현재 시기 궁합만 분석해. 톤: 따뜻하고 희망적으로. "지금 만난 건 우연이 아니다"는 느낌으로. 어려운 시기도 "함께이기에 극복 가능"으로 전환. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
-        messages: [{ role:'user', content: '【현재 시기 궁합 분석】\n'
+        system_prompt: '사주명리 궁합 전문가. 현재 시기 궁합만 분석해. 톤: 따뜻하고 희망적. "지금 만난 건 우연이 아니다" 느낌. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
+        messages: [{ role:'user', content: '【'+myName+' & '+pNameDisp+' 현재 시기 분석】\n'
           +myName+': 일주 '+iljuA+', '+myAge+'\n'
           +pNameDisp+': 일주 '+iljuB+', '+pAge+'\n\n'
-          +'▸ '+myName+'의 '+myAge+' 시기: '+(ctx.a_age_advice||'정보 없음')+'\n'
-          +'▸ '+pNameDisp+'의 '+pAge+' 시기: '+(ctx.b_age_advice||'정보 없음')+'\n'
-          +'▸ '+myName+'의 대운 흐름: '+(ctx.a_daeun||'정보 없음')+'\n'
-          +'▸ '+pNameDisp+'의 대운 흐름: '+(ctx.b_daeun||'정보 없음')+'\n'
-          +'▸ '+myName+'의 이번 달 운세: '+(ctx.a_monthly||'정보 없음')+'\n'
-          +'▸ '+pNameDisp+'의 이번 달 운세: '+(ctx.b_monthly||'정보 없음')+'\n\n'
-          +'지금 이 시기에 두 사람이 만난 의미와 타이밍을 구체적으로 분석해줘. 400~500자.' }]
+          +'▸ '+myName+' '+myAge+' 시기: '+(ctx.a_age_advice||'정보 없음')+'\n'
+          +'▸ '+pNameDisp+' '+pAge+' 시기: '+(ctx.b_age_advice||'정보 없음')+'\n'
+          +'▸ '+myName+' 대운: '+(ctx.a_daeun||'정보 없음')+'\n'
+          +'▸ '+pNameDisp+' 대운: '+(ctx.b_daeun||'정보 없음')+'\n'
+          +'▸ '+myName+' 이달: '+(ctx.a_monthly||'정보 없음')+'\n'
+          +'▸ '+pNameDisp+' 이달: '+(ctx.b_monthly||'정보 없음')+'\n\n'
+          +'지금 이 시기에 두 사람이 만난 의미, 시너지, 주의점을 구체적으로 분석해줘. 600~800자.' }]
       })
     });
-    if (r2.ok) { var d2 = await r2.json(); console.log('[궁합AI] 2단계 완료'); showChunk('chunk-2', '⏰ 지금 이 시기', boldPink(d2.reply)); }
-    else { console.error('[궁합AI] 2단계 HTTP:', r2.status); showError('chunk-2','⏰ 지금 이 시기'); }
-  } catch(e) { console.error('[궁합AI] 2단계 실패:', e); showError('chunk-2','⏰ 지금 이 시기'); }
+    if (r2.ok) { var d2 = await r2.json(); showChunk('chunk-ai2', '⏰ 지금 이 시기의 의미', boldPink(d2.reply)); }
+    else showError('chunk-ai2','⏰ 지금 이 시기');
+  } catch(e) { showError('chunk-ai2','⏰ 지금 이 시기'); }
 
-  // ── 3단계: 실천 조언 (skip_orb) ──
-  console.log('[궁합AI] 3단계 시작');
-  console.log('a_famous 전체:', JSON.stringify(ctx.a_famous));
-  console.log('b_famous 전체:', JSON.stringify(ctx.b_famous));
-  showSpinner('chunk-3');
-  try {
-    var ohaengA = mySaju.dayEl, ohaengB = pSaju.dayEl;
-    var aFamousList = ctx.a_famous && ctx.a_famous.유명인 ? ctx.a_famous.유명인.join(', ') : '정보 없음';
-    var bFamousList = ctx.b_famous && ctx.b_famous.유명인 ? ctx.b_famous.유명인.join(', ') : '정보 없음';
-    var aFamousTrait = ctx.a_famous && ctx.a_famous.공통특성 ? ctx.a_famous.공통특성 : '';
-    var bFamousTrait = ctx.b_famous && ctx.b_famous.공통특성 ? ctx.b_famous.공통특성 : '';
-    var aYS = ctx.a_yongsin ? '색상 '+(ctx.a_yongsin.색상||'')+', 방위 '+(ctx.a_yongsin.방위||'')+', 음식 '+(ctx.a_yongsin.음식||'')+', 직업 '+(ctx.a_yongsin.직업||'') : '정보 없음';
-    var bYS = ctx.b_yongsin ? '색상 '+(ctx.b_yongsin.색상||'')+', 방위 '+(ctx.b_yongsin.방위||'')+', 음식 '+(ctx.b_yongsin.음식||'')+', 직업 '+(ctx.b_yongsin.직업||'') : '정보 없음';
+  // ── DB 4: 용신 실천법 (즉시, Claude 0회) ──
+  var yongsinHtml = '';
+  // 보완 관계 판별
+  var bowanType = (myYS === ohaengB || pYS === ohaengA) ? '서로_채움' : (myYS === ohaengB || pYS === ohaengA) ? '한쪽_채움' : (myYS === pYS) ? '함께_보충' : '한쪽_채움';
+  // 더 정확한 판별
+  var aGetsFromB = (ohaengB === myYS); // 상대 오행이 내 용신
+  var bGetsFromA = (ohaengA === pYS); // 내 오행이 상대 용신
+  if (aGetsFromB && bGetsFromA) bowanType = '서로_채움';
+  else if (aGetsFromB || bGetsFromA) bowanType = '한쪽_채움';
+  else if (myYS === pYS) bowanType = '함께_보충';
+  else bowanType = '한쪽_채움';
 
-    var r3 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ user_id:user.id, skip_orb:true,
-        system_prompt: '사주명리 궁합 전문가. 보완법과 실천 조언만 써. 톤: 따뜻하고 실천 가능한 희망을 줘. "이렇게 하면 더 좋아진다"는 방향으로. 유명인 사례는 긍정적 영감으로 활용. 주의: 일간 오행과 용신은 다른 것. 일간은 타고난 오행, 용신은 채워야 할 오행. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
-        messages: [{ role:'user', content: '【서로를 위한 조언】\n'
-          +myName+' 일간: '+ilganA+' (본래 오행: '+ohaengA+')\n'
-          +myName+' 용신(부족해서 채워야 할 기운): '+myYS+'\n'
-          +'용신 실천법: '+aYS+'\n\n'
-          +pNameDisp+' 일간: '+ilganB+' (본래 오행: '+ohaengB+')\n'
-          +pNameDisp+' 용신(부족해서 채워야 할 기운): '+pYS+'\n'
-          +'용신 실천법: '+bYS+'\n\n'
-          +myName+'과 같은 일주('+iljuA+') 유명인: '+aFamousList+'\n'
-          +'공통특성: '+aFamousTrait+'\n\n'
-          +pNameDisp+'과 같은 일주('+iljuB+') 유명인: '+bFamousList+'\n'
-          +'공통특성: '+bFamousTrait+'\n\n'
-          +'위 정보를 바탕으로:\n'
-          +'1. 두 사람의 본래 오행('+ohaengA+' vs '+ohaengB+')의 상생/상극 관계를 간단히 설명\n'
-          +'2. '+myName+'은 '+myYS+' 기운이 부족 → 실천법(위 색상/방위/음식)으로 본인이 직접 보충. '+pNameDisp+'은 '+pYS+' 기운이 부족 → 실천법으로 본인이 직접 보충. 각자 자기 용신을 채우는 것이지, 상대가 대신 채워주는 것이 아님.\n'
-          +'3. 같은 일주 유명인 사례로 각자의 잠재력과 가능성 보여주기\n'
-          +'4. 두 사람이 함께 할 수 있는 구체적 실천 (데이트 장소, 함께 먹을 음식, 인테리어 등)\n'
-          +'400~500자로 구체적으로.' }]
-      })
-    });
-    if (r3.ok) { var d3 = await r3.json(); console.log('[궁합AI] 3단계 완료'); showChunk('chunk-3', '🌟 서로를 위한 조언', boldPink(d3.reply)); }
-    else { console.error('[궁합AI] 3단계 HTTP:', r3.status); showError('chunk-3','🌟 서로를 위한 조언'); }
-  } catch(e) { console.error('[궁합AI] 3단계 실패:', e); showError('chunk-3','🌟 서로를 위한 조언'); }
+  yongsinHtml += '<div style="margin-bottom:16px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">';
+  yongsinHtml += '<div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:8px;">🧩 두 사람의 보완 관계</div>';
+  if (ctx.bowan_text && ctx.bowan_text.텍스트) {
+    yongsinHtml += '<div style="font-size:14px;color:#e8e0f0;line-height:1.7;margin-bottom:12px;">' + ctx.bowan_text.텍스트.replace(/\n/g,'<br>') + '</div>';
+  } else {
+    var bowanLabel = bowanType === '서로_채움' ? '서로의 빈자리를 채워주는 관계' : bowanType === '함께_보충' ? '같은 숙제를 함께 풀어가는 관계' : '한 명이 더 채워주는 관계';
+    yongsinHtml += '<div style="font-size:14px;color:#e8e0f0;line-height:1.7;margin-bottom:12px;">' + bowanLabel + '</div>';
+  }
+  yongsinHtml += '</div>';
+
+  // 용신 실천 카드
+  function yongsinCard(name, ys, data) {
+    if (!data) return '';
+    return '<div style="margin-bottom:12px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">'
+      +'<div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:8px;">✦ '+name+'이 채울 기운: '+ys+'</div>'
+      +'<div style="font-size:13px;color:#e8e0f0;line-height:1.7;">'
+      +'<div style="margin-bottom:4px;">🎨 <strong style="color:#ff8ab0;">색상</strong>: '+(data.색상||'')+'</div>'
+      +'<div style="margin-bottom:4px;">🧭 <strong style="color:#ff8ab0;">방위</strong>: '+(data.방위||'')+'</div>'
+      +'<div style="margin-bottom:4px;">🍽️ <strong style="color:#ff8ab0;">음식</strong>: '+(data.음식||'')+'</div>'
+      +'</div></div>';
+  }
+  yongsinHtml += yongsinCard(myName, myYS, ctx.a_yongsin);
+  yongsinHtml += yongsinCard(pNameDisp, pYS, ctx.b_yongsin);
+  showChunk('chunk-db4', '🌟 서로를 위한 실천 가이드', yongsinHtml);
 
   // ── 자동 저장 ──
   try {
-    var ch1 = document.getElementById('chunk-1'), ch2 = document.getElementById('chunk-2'), ch3 = document.getElementById('chunk-3');
     await fetch(WORKER_BASE + '/analysis-history', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         user_id: user.id, type: 'gunghap',
         title: myName + ' ❤ ' + pNameDisp + ' 궁합',
         result: {
-          personA: { name:myName, ilju:iljuA, ohaeng:mySaju.dayEl, strength:mySaju.strength, yongsin:myYS },
-          personB: { name:pNameDisp, ilju:iljuB, ohaeng:pSaju.dayEl, strength:pSaju.strength, yongsin:pYS },
-          score: calcGunghapScore(mySaju, pSaju).total,
-          step1: ch1 ? ch1.querySelector('div:last-child')?.innerHTML||'' : '',
-          step2: ch2 ? ch2.querySelector('div:last-child')?.innerHTML||'' : '',
-          step3: ch3 ? ch3.querySelector('div:last-child')?.innerHTML||'' : ''
+          personA: { name:myName, ilju:iljuA, ohaeng:ohaengA, strength:strA, yongsin:myYS },
+          personB: { name:pNameDisp, ilju:iljuB, ohaeng:ohaengB, strength:strB, yongsin:pYS },
+          score: score.total
         }
       })
     });
@@ -1962,7 +1974,7 @@ async function requestGunghapAI() {
     savedMsg.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:rgba(255,255,255,0.35);margin-top:8px;';
     savedMsg.textContent = '✅ 자동 저장됨 · 지난 분석에서 다시 볼 수 있어요';
     aiEl.appendChild(savedMsg);
-  } catch(e) { console.warn('히스토리 저장 실패:', e); }
+  } catch(e) {}
 
   aiBtn.disabled=false; aiBtn.textContent='AI 분석 시작';
 }
