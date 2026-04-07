@@ -450,10 +450,14 @@
   .yun-grade-흉   { color: #FF6D00; }
   .yun-grade-대흉 { color: #FF1744; }
   .yun-keyword { font-size: 13px; color: var(--text); flex: 1; }
-  .yun-current-badge {
-    font-size: 10px; font-weight: 700; color: #7c3aed;
-    background: rgba(124,58,237,0.15);
-    border-radius: 100px; padding: 2px 8px; white-space: nowrap;
+  .yun-now-dot {
+    display: inline-block; width: 6px; height: 6px;
+    background: #7c3aed; border-radius: 50%;
+    margin-left: 4px; vertical-align: middle;
+    animation: yunPulse 1.5s infinite;
+  }
+  @keyframes yunPulse {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
   }
 
   /* ── RESPONSIVE ── */
@@ -1607,14 +1611,13 @@ function shareQimenKakao() {
       row.className = 'yun-row' + (isCurrent ? ' current-shi' : '') + (isPast && !isCurrent ? ' past-shi' : '');
       if (isCurrent) row.id = 'currentShiRow';
       row.innerHTML =
-        '<div class="yun-shi">' + shi.name + '</div>' +
+        '<div class="yun-shi">' + shi.name + (isCurrent ? '<span class="yun-now-dot"></span>' : '') + '</div>' +
         '<div class="yun-range">' + shi.range + '</div>' +
         '<div class="yun-grade yun-grade-' + grade + '">' + grade + '</div>' +
         '<div class="yun-keyword">' + keyword +
           (door ? ' <span style="font-size:11px;color:var(--muted);">(' + door + '門)</span>' : '') +
           personNote +
-        '</div>' +
-        (isCurrent ? '<div class="yun-current-badge">현재</div>' : '');
+        '</div>';
       list.appendChild(row);
     });
 
