@@ -1958,6 +1958,7 @@ async function requestGunghapAI() {
 
   // ── 자동 저장 ──
   try {
+    var _g = function(id){ var e=document.getElementById(id); return e?e.innerHTML:''; };
     await fetch(WORKER_BASE + '/analysis-history', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -1966,7 +1967,8 @@ async function requestGunghapAI() {
         result: {
           personA: { name:myName, ilju:iljuA, ohaeng:ohaengA, strength:strA, yongsin:myYS },
           personB: { name:pNameDisp, ilju:iljuB, ohaeng:ohaengB, strength:strB, yongsin:pYS },
-          score: score.total
+          score: score.total,
+          sections: { db1:_g('chunk-db1'), db2:_g('chunk-db2'), db3:_g('chunk-db3'), ai1:_g('chunk-ai1'), ai2:_g('chunk-ai2'), db4:_g('chunk-db4') }
         }
       })
     });
@@ -2031,9 +2033,22 @@ async function openHistoryDetail(id) {
     var r = data.result || {};
     var html = '';
     if (r.score != null) html += '<div style="text-align:center;margin-bottom:16px;"><span style="font-size:42px;font-weight:900;color:#ff8ab0;">'+r.score+'</span><span style="font-size:13px;color:rgba(255,255,255,0.35);"> / 100점</span></div>';
-    if (r.step1) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">💕 연애 궁합</h4><div>'+r.step1+'</div></div>';
-    if (r.step2) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">⏰ 지금 이 시기</h4><div>'+r.step2+'</div></div>';
-    if (r.step3) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">🌟 서로를 위한 조언</h4><div>'+r.step3+'</div></div>';
+    // 새 구조 (6섹션)
+    if (r.sections) {
+      var s = r.sections;
+      if (s.db1) html += '<div class="ai-chunk">'+s.db1+'</div>';
+      if (s.db2) html += '<div class="ai-chunk">'+s.db2+'</div>';
+      if (s.db3) html += '<div class="ai-chunk">'+s.db3+'</div>';
+      if (s.ai1) html += '<div class="ai-chunk">'+s.ai1+'</div>';
+      if (s.ai2) html += '<div class="ai-chunk">'+s.ai2+'</div>';
+      if (s.db4) html += '<div class="ai-chunk">'+s.db4+'</div>';
+    }
+    // 구 구조 호환
+    else {
+      if (r.step1) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">💕 연애 궁합</h4><div>'+r.step1+'</div></div>';
+      if (r.step2) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">⏰ 지금 이 시기</h4><div>'+r.step2+'</div></div>';
+      if (r.step3) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">🌟 서로를 위한 조언</h4><div>'+r.step3+'</div></div>';
+    }
     contentEl.innerHTML = html || '<div style="color:var(--muted);">저장된 내용이 없습니다.</div>';
   } catch(e) { titleEl.textContent = '오류'; contentEl.textContent = e.message; }
 }
