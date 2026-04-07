@@ -1757,16 +1757,34 @@ async function requestGunghapAI() {
   var gA = myGender === 'F' ? '여성' : '남성';
   var gB = _ghPartnerGender === 'F' ? '여성' : _ghPartnerGender === 'M' ? '남성' : '';
   var iljuA = mySaju.pillars.day, iljuB = pSaju.pillars.day;
-  var SAENG_MAP = {목:'화',화:'토',토:'금',금:'수',수:'목'};
-  var PARENT_MAP = {목:'수',화:'목',토:'화',금:'토',수:'금'};
-  var myYS = mySaju.strength === '신강' ? SAENG_MAP[mySaju.dayEl] : PARENT_MAP[mySaju.dayEl];
-  var pYS  = pSaju.strength  === '신강' ? SAENG_MAP[pSaju.dayEl]  : PARENT_MAP[pSaju.dayEl];
   var thisYear = new Date().getFullYear();
   function ageBracket(y) { var a = thisYear - (y||1990); return a < 35 ? '20대' : a < 55 ? '40대' : '60대'; }
-  var myAge = ageBracket(_ghMyProfile ? _ghMyProfile.year : 1990);
-  var pAge  = ageBracket(parseInt(document.getElementById('ghPartnerYear').value) || 1990);
+  var myBirthYear = _ghMyProfile ? _ghMyProfile.year : 1990;
+  var pBirthYear = parseInt(document.getElementById('ghPartnerYear').value) || 1990;
+  var myAge = ageBracket(myBirthYear);
+  var pAge  = ageBracket(pBirthYear);
   var CHAT_URL = 'https://fortuna-silk.vercel.app/api/chat';
   var WORKER_BASE = 'https://fortuna.kkdmb7.workers.dev';
+  var EL_KOR = {fire:'화',water:'수',wood:'목',metal:'금',earth:'토'};
+
+  // ── 서버에서 정확한 용신 가져오기 ──
+  var myYS = '', pYS = '';
+  try {
+    var myH = (_ghMyProfile && _ghMyProfile.hour !== 'unknown' && _ghMyProfile.hour != null) ? _ghMyProfile.hour : 12;
+    var pHVal = document.getElementById('ghPartnerHour') ? document.getElementById('ghPartnerHour').value : '';
+    var pH2 = pHVal !== '' ? parseInt(pHVal) : 12;
+    var pBM = parseInt(document.getElementById('ghPartnerMonth').value) || 1;
+    var pBD = parseInt(document.getElementById('ghPartnerDay').value) || 1;
+    var [sajuA, sajuB] = await Promise.all([
+      fetch(WORKER_BASE+'/saju-test?year='+myBirthYear+'&month='+(_ghMyProfile?_ghMyProfile.month:1)+'&day='+(_ghMyProfile?_ghMyProfile.day:1)+'&hour='+myH+'&minute=0&gender=male').then(function(r){return r.json()}).catch(function(){return{}}),
+      fetch(WORKER_BASE+'/saju-test?year='+pBirthYear+'&month='+pBM+'&day='+pBD+'&hour='+pH2+'&minute=0&gender=male').then(function(r){return r.json()}).catch(function(){return{}})
+    ]);
+    if (sajuA.yongshin && sajuA.yongshin.primary) myYS = EL_KOR[sajuA.yongshin.primary] || sajuA.yongshin.primary;
+    if (sajuB.yongshin && sajuB.yongshin.primary) pYS = EL_KOR[sajuB.yongshin.primary] || sajuB.yongshin.primary;
+  } catch(e) {}
+  // 폴백: 서버 용신 없으면 간이 추정
+  if (!myYS) { var SM={목:'화',화:'토',토:'금',금:'수',수:'목'},PM={목:'수',화:'목',토:'화',금:'토',수:'금'}; myYS = mySaju.strength==='신강'?SM[mySaju.dayEl]:PM[mySaju.dayEl]; }
+  if (!pYS)  { var SM2={목:'화',화:'토',토:'금',금:'수',수:'목'},PM2={목:'수',화:'목',토:'화',금:'토',수:'금'}; pYS = pSaju.strength==='신강'?SM2[pSaju.dayEl]:PM2[pSaju.dayEl]; }
 
   function boldPink(s) { return (s||'').replace(/^#{1,4}\s+.+$/gm,'').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#ff8ab0;">$1</strong>').trim(); }
   function showChunk(id, title, html) {
