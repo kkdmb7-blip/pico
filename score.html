@@ -45,11 +45,9 @@ nav {
   padding: 0 24px; height: 64px;
   display:flex; align-items:center; justify-content:space-between;
 }
-.logo {
-  font-family:'Noto Serif KR',serif; font-weight:700; font-size:20px;
-  color:var(--text); text-decoration:none; display:flex; align-items:center; gap:5px;
-}
-.logo-dot { color:var(--accent2); font-size:10px; margin-bottom:2px; }
+.logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
+.logo img { height:56px; object-fit:contain; }
+.logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--accent2); }
 .nav-back {
   display:flex; align-items:center; gap:6px;
   color:var(--muted); font-size:13px; text-decoration:none;
@@ -319,7 +317,7 @@ nav {
 <body>
 
 <nav>
-  <a href="javascript:location.reload()" class="logo"><span class="logo-dot">●</span>FORTUNA</a>
+  <a href="javascript:location.reload()" class="logo"><img src="img/goddess.png" alt="FORTUNA"><span class="logo-text">FORTUNA</span></a>
   <a href="index.html" class="nav-back">← 메인으로</a>
 </nav>
 

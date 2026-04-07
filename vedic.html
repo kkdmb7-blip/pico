@@ -20,8 +20,9 @@
 
   /* NAV */
   nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;}
-  .logo{font-family:'Noto Serif KR',serif;font-weight:700;font-size:22px;letter-spacing:-.5px;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:5px;}
-  .logo-dot{color:var(--accent2);font-size:10px;margin-bottom:2px;}
+  .logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+  .logo img{height:56px;object-fit:contain;}
+  .logo-text{font-family:'Noto Serif KR',serif;font-weight:700;font-size:15px;letter-spacing:2px;color:var(--accent2);}
   .nav-btn{padding:8px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,var(--accent),#a07fd4);color:#fff;border:none;font-family:'Noto Sans KR',sans-serif;text-decoration:none;transition:all .2s;white-space:nowrap;}
   .nav-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(123,94,167,.4);}
 
@@ -132,7 +133,7 @@
 <div id="starCanvas"></div>
 
 <nav>
-  <a href="/" class="logo"><span class="logo-dot">●</span>FORTUNA</a>
+  <a href="/" class="logo"><img src="img/goddess.png" alt="FORTUNA"><span class="logo-text">FORTUNA</span></a>
   <a href="https://kkdmb7-blip.github.io/memox/?mode=vedic" target="_blank" class="nav-btn">AI 베딕 상담</a>
 </nav>
 
