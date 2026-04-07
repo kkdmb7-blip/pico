@@ -412,6 +412,50 @@
     border-radius: 8px !important;
   }
 
+  /* ── 시간대별 운표 ── */
+  .hourly-yun-section {
+    margin-top: 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .hourly-yun-title {
+    font-size: 11px; color: var(--muted); letter-spacing: 0.5px;
+    text-transform: uppercase; font-weight: 600; margin-bottom: 14px;
+  }
+  .yun-list { display: flex; flex-direction: column; gap: 8px; }
+  .yun-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+  }
+  .yun-row.current-shi {
+    border: 2px solid #7c3aed;
+    background: rgba(124,58,237,0.1);
+  }
+  .yun-row.past-shi { opacity: 0.4; }
+  .yun-shi {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 15px; font-weight: 700; min-width: 36px;
+  }
+  .yun-range { font-size: 11px; color: var(--muted); min-width: 80px; }
+  .yun-grade { font-size: 12px; font-weight: 700; min-width: 40px; text-align: center; }
+  .yun-grade-대길 { color: #FFD700; }
+  .yun-grade-길   { color: #00C853; }
+  .yun-grade-평   { color: var(--muted); }
+  .yun-grade-흉   { color: #FF6D00; }
+  .yun-grade-대흉 { color: #FF1744; }
+  .yun-keyword { font-size: 13px; color: var(--text); flex: 1; }
+  .yun-current-badge {
+    font-size: 10px; font-weight: 700; color: #7c3aed;
+    background: rgba(124,58,237,0.15);
+    border-radius: 100px; padding: 2px 8px; white-space: nowrap;
+  }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
     .palace { min-height: 118px; padding: 12px 4px 8px; gap: 3px; }
@@ -564,6 +608,16 @@
   </div>
 
   <div class="action-row" id="action-row"></div>
+
+  <!-- 오늘의 시간대별 운표 -->
+  <div class="hourly-yun-section" id="hourlyYunSection">
+    <div class="hourly-yun-title">오늘의 시간대별 운표 <span style="font-size:10px;font-weight:400;opacity:0.55;">진태양시 기준</span></div>
+    <div class="yun-list" id="hourlyYunList">
+      <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">
+        <span class="spinner"></span>시간대별 운세 계산 중…
+      </div>
+    </div>
+  </div>
 </main>
 
 <script src="qimen_geokguk.js"></script>
@@ -1348,6 +1402,118 @@ function shareQimenKakao() {
     }, 'image/png');
   });
 }
+</script>
+<script>
+// ── 오늘의 시간대별 운표 (진태양시 기준) ───────────────────
+(function() {
+  const SHICHEN = [
+    { name: '子時', range: '23:00~01:00', repHour: 23 },
+    { name: '丑時', range: '01:00~03:00', repHour: 1  },
+    { name: '寅時', range: '03:00~05:00', repHour: 3  },
+    { name: '卯時', range: '05:00~07:00', repHour: 5  },
+    { name: '辰時', range: '07:00~09:00', repHour: 7  },
+    { name: '巳時', range: '09:00~11:00', repHour: 9  },
+    { name: '午時', range: '11:00~13:00', repHour: 11 },
+    { name: '未時', range: '13:00~15:00', repHour: 13 },
+    { name: '申時', range: '15:00~17:00', repHour: 15 },
+    { name: '酉時', range: '17:00~19:00', repHour: 17 },
+    { name: '戌時', range: '19:00~21:00', repHour: 19 },
+    { name: '亥時', range: '21:00~23:00', repHour: 21 },
+  ];
+
+  const DOOR_YUN = {
+    '生': { grade: '대길', keyword: '계약·서명·창업 최적' },
+    '開': { grade: '대길', keyword: '왕성한 활동·투자·확장' },
+    '休': { grade: '길',   keyword: '안정·화해·양생 유리' },
+    '景': { grade: '길',   keyword: '문서·공부·창작 유리' },
+    '傷': { grade: '흉',   keyword: '이동·충돌 주의' },
+    '杜': { grade: '흉',   keyword: '막힘·정체 조심' },
+    '驚': { grade: '흉',   keyword: '긴장·놀람 주의' },
+    '死': { grade: '대흉', keyword: '중요 결정 보류 권장' },
+  };
+
+  // 진태양시(TST) 계산 — 서울 기준 (lon 127.0°, KST meridian 135°)
+  function getTSTShichenIdx() {
+    var now = new Date();
+    var kstH = now.getHours(), kstM = now.getMinutes();
+    // 경도 보정: (127 - 135) / 15 * 60 = -32분
+    var lonCorr = -32;
+    // 균시차(Equation of Time) 근사
+    var start = new Date(now.getFullYear(), 0, 0);
+    var doy = Math.floor((now - start) / 86400000);
+    var B = 2 * Math.PI * (doy - 81) / 365;
+    var eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+    var tstTotalMin = kstH * 60 + kstM + lonCorr + eot;
+    if (tstTotalMin < 0) tstTotalMin += 1440;
+    var tstH = Math.floor(tstTotalMin / 60) % 24;
+    // 시진 인덱스
+    if (tstH === 23) return 0;
+    return Math.floor((tstH + 1) / 2);
+  }
+
+  async function loadHourlyYun() {
+    var now = new Date();
+    var y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
+    var currentIdx = getTSTShichenIdx();
+    var kstH = now.getHours();
+    // 현재 KST 시간 기반 지난 시간대 판별용
+    var kstIdx = (kstH === 23) ? 0 : Math.floor((kstH + 1) / 2);
+
+    var results = await Promise.all(SHICHEN.map(function(shi) {
+      var sp = new URLSearchParams({ year: y, month: m, day: d, hour: shi.repHour, minute: 0, type: 'siga' });
+      return fetch('https://fortuna.kkdmb7.workers.dev/qimen?' + sp.toString())
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .catch(function() { return null; });
+    }));
+
+    var list = document.getElementById('hourlyYunList');
+    list.innerHTML = '';
+
+    SHICHEN.forEach(function(shi, i) {
+      var data = results[i];
+      var isCurrent = (i === currentIdx);
+      var isPast = (i !== 0 && i < kstIdx) || (kstIdx === 0 && i !== 0 && kstH >= 23);
+      var door = data && data.직사문 ? data.직사문 : null;
+      var yun = door && DOOR_YUN[door] ? DOOR_YUN[door] : { grade: '평', keyword: '정상적인 일과' };
+
+      // 격국 보정: 특수 격국이면 길흉 업그레이드 가능
+      if (data && typeof checkGeokguk === 'function') {
+        var matched = checkGeokguk(data);
+        if (matched.length > 0) {
+          var g = matched[0];
+          if (g.길흉 === '대길' || g.길흉 === '길') {
+            yun = { grade: g.길흉, keyword: g.name.replace(/\(.*\)/, '').trim() + ' — ' + (g.요약 || yun.keyword).slice(0, 20) };
+          } else if (g.길흉 === '대흉' || g.길흉 === '흉') {
+            yun = { grade: g.길흉, keyword: g.name.replace(/\(.*\)/, '').trim() + ' — ' + (g.주의 || yun.keyword).slice(0, 20) };
+          }
+        }
+      }
+
+      var row = document.createElement('div');
+      row.className = 'yun-row' + (isCurrent ? ' current-shi' : '') + (isPast && !isCurrent ? ' past-shi' : '');
+      if (isCurrent) row.id = 'currentShiRow';
+      row.innerHTML =
+        '<div class="yun-shi">' + shi.name + '</div>' +
+        '<div class="yun-range">' + shi.range + '</div>' +
+        '<div class="yun-grade yun-grade-' + yun.grade + '">' + yun.grade + '</div>' +
+        '<div class="yun-keyword">' + yun.keyword +
+          (door ? ' <span style="font-size:11px;color:var(--muted);">(' + door + '門)</span>' : '') +
+        '</div>' +
+        (isCurrent ? '<div class="yun-current-badge">현재</div>' : '');
+      list.appendChild(row);
+    });
+
+    // 현재 시간대로 스크롤
+    var cur = document.getElementById('currentShiRow');
+    if (cur) {
+      setTimeout(function() {
+        cur.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    }
+  }
+
+  loadHourlyYun();
+})();
 </script>
 </body>
 </html>
