@@ -9,14 +9,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --surface2: #1c1c28;
-    --border: #2a2a3d;
-    --accent: #7b5ea7;
-    --accent2: #e8b86d;
-    --text: #f0f0f5;
-    --muted: #6b6b85;
+    --bg: #08070d;
+    --surface: #110f19;
+    --surface2: #1a1724;
+    --border: rgba(201,168,76,0.12);
+    --accent: #9b7ec8;
+    --accent2: #d4a855;
+    --gold: #c9a84c;
+    --gold-light: #e8cc7a;
+    --rose: #c8879b;
+    --text: #ede8df;
+    --muted: #7a7590;
     --radius: 16px;
   }
 
@@ -38,7 +41,19 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
-    opacity: 0.4;
+    opacity: 0.3;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120%;
+    height: 60%;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
   }
 
   /* ── STARS ── */
@@ -66,9 +81,9 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(10,10,15,0.85);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+    background: rgba(8,7,13,0.88);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(201,168,76,0.08);
     padding: 0 24px;
     height: 64px;
     display: flex;
@@ -95,19 +110,20 @@
 
   .nav-start-btn {
     padding: 8px 18px;
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: 50px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    background: linear-gradient(135deg, var(--accent), #a07fd4);
-    color: #fff;
+    background: linear-gradient(135deg, var(--gold), #dbb96a);
+    color: #1a1200;
     border: none;
     font-family: 'Noto Sans KR', sans-serif;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s;
     white-space: nowrap;
+    letter-spacing: 0.3px;
   }
-  .nav-start-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(123,94,167,0.4); }
+  .nav-start-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,168,76,0.3); }
 
   /* ── HERO ── */
   .hero {
@@ -124,7 +140,7 @@
     transform: translateX(-50%);
     width: 700px;
     height: 500px;
-    background: radial-gradient(ellipse, rgba(123,94,167,0.28) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(201,168,76,0.12) 0%, rgba(155,126,200,0.06) 40%, transparent 70%);
     pointer-events: none;
   }
   .hero h1 {
@@ -156,15 +172,16 @@
     font-size: 15px;
     font-weight: 700;
     font-family: 'Noto Sans KR', sans-serif;
-    background: linear-gradient(135deg, var(--accent), #a07fd4);
-    color: #fff;
-    border-radius: 14px;
+    background: linear-gradient(135deg, var(--gold) 0%, #dbb96a 50%, var(--gold) 100%);
+    color: #1a1200;
+    border-radius: 50px;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s;
     border: none;
     cursor: pointer;
+    letter-spacing: 0.5px;
   }
-  .btn-cta-hero:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(123,94,167,0.45); }
+  .btn-cta-hero:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,168,76,0.35); }
   .btn-ghost-hero {
     display: inline-block;
     padding: 15px 36px;
@@ -172,13 +189,13 @@
     font-weight: 600;
     font-family: 'Noto Sans KR', sans-serif;
     background: transparent;
-    color: var(--muted);
-    border-radius: 14px;
+    color: var(--gold-light);
+    border-radius: 50px;
     text-decoration: none;
-    transition: all 0.2s;
-    border: 1px solid var(--border);
+    transition: all 0.3s;
+    border: 1px solid rgba(201,168,76,0.25);
   }
-  .btn-ghost-hero:hover { background: var(--surface); color: var(--text); }
+  .btn-ghost-hero:hover { background: rgba(201,168,76,0.08); color: var(--gold-light); border-color: rgba(201,168,76,0.45); }
 
   /* ── SECTION COMMON ── */
   .section-label {
@@ -222,19 +239,20 @@
     line-height: 1.6;
   }
   .why-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: linear-gradient(160deg, rgba(17,15,25,0.95), rgba(26,23,36,0.8));
+    border: 1px solid rgba(201,168,76,0.1);
     border-radius: 20px;
     padding: 32px 24px;
-    transition: all 0.3s;
+    transition: all 0.35s cubic-bezier(.4,0,.2,1);
+    backdrop-filter: blur(8px);
   }
   .why-card:hover {
-    border-color: var(--accent);
-    background: var(--surface2);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(123,94,167,0.15);
+    border-color: rgba(201,168,76,0.35);
+    background: linear-gradient(160deg, rgba(26,23,36,0.95), rgba(35,30,50,0.8));
+    transform: translateY(-5px);
+    box-shadow: 0 16px 48px rgba(201,168,76,0.08), 0 4px 16px rgba(0,0,0,0.3);
   }
-  .why-icon { font-size: 36px; margin-bottom: 16px; }
+  .why-icon { font-size: 32px; margin-bottom: 16px; display:flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:14px; background:rgba(201,168,76,0.06); border:1px solid rgba(201,168,76,0.1); }
   .why-card h3 {
     font-family: 'Noto Serif KR', sans-serif;
     font-size: 16px;
@@ -247,15 +265,15 @@
     grid-column: 1 / -1;
     display: flex; align-items: center; gap: 32px;
     padding: 28px 40px;
-    border-color: rgba(255,130,170,0.3);
-    background: linear-gradient(135deg, var(--surface), rgba(255,130,170,0.04));
+    border-color: rgba(200,135,155,0.2);
+    background: linear-gradient(135deg, rgba(17,15,25,0.95), rgba(200,135,155,0.04));
   }
-  .why-card.why-card-full:hover { border-color: rgba(255,130,170,0.6); }
-  .why-card.why-card-full .why-icon { font-size: 44px; margin-bottom: 0; flex-shrink: 0; }
+  .why-card.why-card-full:hover { border-color: rgba(200,135,155,0.45); box-shadow: 0 16px 48px rgba(200,135,155,0.08), 0 4px 16px rgba(0,0,0,0.3); }
+  .why-card.why-card-full .why-icon { font-size: 28px; margin-bottom: 0; flex-shrink: 0; background:rgba(200,135,155,0.08); border-color:rgba(200,135,155,0.15); }
   .why-card.why-card-full .why-card-body { flex: 1; }
   .why-card.why-card-full h3 { margin-bottom: 4px; font-size: 18px; }
   .why-card.why-card-full p { margin: 0; }
-  .why-card.why-card-full .why-card-link { flex-shrink: 0; font-size: 13px; font-weight: 700; color: #ff8ab0; }
+  .why-card.why-card-full .why-card-link { flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--rose); }
 
   /* ── SERVICES SECTION ── */
   .section-services {
@@ -272,15 +290,15 @@
     gap: 20px;
   }
   .service-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: linear-gradient(160deg, rgba(17,15,25,0.95), rgba(26,23,36,0.8));
+    border: 1px solid rgba(201,168,76,0.1);
     border-radius: 24px;
     padding: 36px 28px;
     text-decoration: none;
     color: var(--text);
     text-align: left;
     position: relative;
-    transition: all 0.3s;
+    transition: all 0.35s cubic-bezier(.4,0,.2,1);
     display: block;
     overflow: hidden;
   }
@@ -288,11 +306,11 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at top left, rgba(123,94,167,0.12) 0%, transparent 60%);
+    background: radial-gradient(ellipse at top left, rgba(201,168,76,0.06) 0%, transparent 60%);
     opacity: 0;
     transition: opacity 0.3s;
   }
-  .service-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.3); }
+  .service-card:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-5px); box-shadow: 0 16px 48px rgba(201,168,76,0.06), 0 4px 16px rgba(0,0,0,0.3); }
   .service-card:hover::before { opacity: 1; }
   .service-icon { font-size: 40px; margin-bottom: 16px; }
   .service-badge {
@@ -302,15 +320,15 @@
     letter-spacing: 0.5px;
     padding: 3px 10px;
     border-radius: 100px;
-    background: rgba(123,94,167,0.2);
-    border: 1px solid rgba(123,94,167,0.4);
-    color: #c4a8e8;
+    background: rgba(155,126,200,0.12);
+    border: 1px solid rgba(155,126,200,0.25);
+    color: #c4b0e4;
     margin-bottom: 14px;
   }
   .service-badge-premium {
-    background: rgba(232,184,109,0.15);
-    border-color: rgba(232,184,109,0.4);
-    color: var(--accent2);
+    background: rgba(201,168,76,0.1);
+    border-color: rgba(201,168,76,0.3);
+    color: var(--gold-light);
   }
   .service-card h3 {
     font-family: 'Noto Serif KR', sans-serif;
@@ -336,7 +354,7 @@
     transform: translate(-50%, -50%);
     width: 700px;
     height: 400px;
-    background: radial-gradient(ellipse, rgba(123,94,167,0.2) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, rgba(155,126,200,0.04) 40%, transparent 70%);
     pointer-events: none;
   }
   .section-cta h2 {
@@ -353,16 +371,17 @@
     font-size: 16px;
     font-weight: 700;
     font-family: 'Noto Sans KR', sans-serif;
-    background: linear-gradient(135deg, var(--accent), #a07fd4);
-    color: #fff;
-    border-radius: 14px;
+    background: linear-gradient(135deg, var(--gold) 0%, #dbb96a 50%, var(--gold) 100%);
+    color: #1a1200;
+    border-radius: 50px;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s;
     position: relative;
     border: none;
     cursor: pointer;
+    letter-spacing: 0.5px;
   }
-  .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(123,94,167,0.45); }
+  .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,168,76,0.35); }
 
   /* ── DIVIDER ── */
   .section-divider {
@@ -370,7 +389,7 @@
     max-width: 960px;
     margin: 0 auto;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent);
     position: relative;
     z-index: 1;
   }
@@ -407,18 +426,18 @@
     margin-bottom: 24px;
   }
   .score-mini-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: linear-gradient(160deg, rgba(17,15,25,0.9), rgba(26,23,36,0.7));
+    border: 1px solid rgba(201,168,76,0.08);
     border-radius: 14px;
     padding: 18px 12px 16px;
     text-align: center;
-    transition: all 0.3s;
+    transition: all 0.35s;
     cursor: default;
   }
   .score-mini-card:hover {
-    border-color: var(--accent);
+    border-color: rgba(201,168,76,0.25);
     transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 24px rgba(201,168,76,0.06);
   }
   .score-mini-emoji { font-size: 22px; margin-bottom: 8px; }
   .score-mini-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
@@ -466,12 +485,12 @@
   }
   .score-detail-btn {
     display: inline-block; padding: 9px 20px;
-    background: linear-gradient(135deg, var(--accent), #a07fd4);
-    color: #fff; border-radius: 10px; text-decoration: none;
+    background: linear-gradient(135deg, var(--gold), #dbb96a);
+    color: #1a1200; border-radius: 50px; text-decoration: none;
     font-size: 13px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
-    transition: all 0.2s; white-space: nowrap;
+    transition: all 0.3s; white-space: nowrap;
   }
-  .score-detail-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(123,94,167,0.4); }
+  .score-detail-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(201,168,76,0.3); }
   .score-login-prompt {
     text-align: center; padding: 32px 20px;
     background: var(--surface); border: 1px solid var(--border);
@@ -594,18 +613,18 @@
   .saju-submit-btn {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #7b5ea7, #a07fd4);
-    color: #fff;
+    background: linear-gradient(135deg, var(--gold), #dbb96a);
+    color: #1a1200;
     border: none;
-    border-radius: 12px;
+    border-radius: 50px;
     font-size: 15px;
     font-weight: 700;
     font-family: 'Noto Sans KR', sans-serif;
     cursor: pointer;
     margin-top: 8px;
-    transition: all 0.2s;
+    transition: all 0.3s;
   }
-  .saju-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(123,94,167,0.4); }
+  .saju-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(201,168,76,0.3); }
   .saju-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
   /* 결과 화면 */
@@ -665,20 +684,20 @@
     display: block;
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #7b5ea7, #a07fd4);
-    color: #fff;
+    background: linear-gradient(135deg, var(--gold), #dbb96a);
+    color: #1a1200;
     border: none;
-    border-radius: 12px;
+    border-radius: 50px;
     font-size: 15px;
     font-weight: 700;
     font-family: 'Noto Sans KR', sans-serif;
     cursor: pointer;
     text-decoration: none;
     text-align: center;
-    transition: all 0.2s;
+    transition: all 0.3s;
     margin-top: 4px;
   }
-  .saju-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(123,94,167,0.4); }
+  .saju-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(201,168,76,0.3); }
   .saju-back-btn {
     background: none;
     border: none;
@@ -703,15 +722,15 @@
     background: #FEE500;
     color: #191919;
     border: none;
-    border-radius: 10px;
+    border-radius: 50px;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif;
     white-space: nowrap;
-    transition: all 0.2s;
+    transition: all 0.3s;
   }
-  .btn-kakao:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(254,229,0,0.3); }
+  .btn-kakao:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(254,229,0,0.25); }
   .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
   #userArea { display: flex; align-items: center; gap: 10px; }
   #userNameDisplay { font-size: 13px; color: var(--text); max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -741,9 +760,9 @@
   /* ── HAMBURGER MENU ── */
   .hamburger-btn {
     background: none;
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-radius: 8px;
+    border: 1px solid rgba(201,168,76,0.15);
+    color: var(--gold-light);
+    border-radius: 50%;
     width: 36px; height: 36px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
@@ -756,9 +775,9 @@
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    background: rgba(17,15,25,0.98);
+    border: 1px solid rgba(201,168,76,0.12);
+    border-radius: 16px;
     padding: 8px 0;
     min-width: 140px;
     z-index: 300;
@@ -973,47 +992,47 @@
 
 <!-- WHY PICOLAB -->
 <section class="section-why">
-  <div class="section-label">PICO Lab의 6중 교차검증 시스템</div>
+  <div class="section-label">FORTUNA 6중 교차검증 시스템</div>
   <h2 class="section-title" style="font-size:clamp(24px,3.8vw,44px)">5,000년 인류의 지혜를<br><em>AI가 동시에 교차 분석합니다</em></h2>
   <div class="why-grid">
     <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
-      <div class="why-icon">🏛️</div>
+      <div class="why-icon">✦</div>
       <h3>사주 (四柱)</h3>
-      <p>당신의 리더십 DNA</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      <p>생년월일 사주팔자로<br>타고난 기질과 운의 흐름 분석</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:var(--gold-light);">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openBirthModal('astro')" style="cursor:pointer;">
-      <div class="why-icon">🌟</div>
+      <div class="why-icon">☽</div>
       <h3>서양 점성술</h3>
-      <p>당신의 우주 에너지</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      <p>태양·달·상승궁으로<br>당신의 우주 에너지맵 해독</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:var(--gold-light);">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openBirthModal('vedic')" style="cursor:pointer;">
-      <div class="why-icon">🕉️</div>
+      <div class="why-icon">◎</div>
       <h3>베딕 점성술</h3>
-      <p>카르마와 세부 운의 변화. 달의 별자리(낙샤트라)로 읽는<br>정밀한 운의 리듬.</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      <p>낙샤트라와 다샤 주기로<br>카르마의 정밀한 리듬 포착</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:var(--gold-light);">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openBirthModal('ziwei')" style="cursor:pointer;">
-      <div class="why-icon">⭐</div>
-      <h3>자미두수<br>紫微斗數</h3>
-      <p>당신의 내면 심리</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      <div class="why-icon">紫</div>
+      <h3>자미두수</h3>
+      <p>명궁 14주성 배치로<br>내면 심리와 운명 궤적 분석</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:var(--gold-light);">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openQimenModal()" style="cursor:pointer;">
-      <div class="why-icon">🗺️</div>
-      <h3>기문둔갑<br>奇門遁甲</h3>
-      <p>당신의 결정적 타이밍</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      <div class="why-icon">門</div>
+      <h3>기문둔갑</h3>
+      <p>9궁 포국으로 읽는<br>결정적 타이밍과 방위 전략</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:var(--gold-light);">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openTarotIntro()" style="cursor:pointer;">
-      <div class="why-icon">🔮</div>
+      <div class="why-icon">♠</div>
       <h3>타로카드</h3>
-      <p>당신의 직관 신호</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      <p>무의식이 선택한 카드로<br>지금 이 순간의 메시지 전달</p>
+      <div style="margin-top:14px;font-size:12px;font-weight:600;color:var(--gold-light);">바로 보기 →</div>
     </div>
     <div class="why-card why-card-full" onclick="openGunghapModal()" style="cursor:pointer;">
-      <div class="why-icon">💕</div>
+      <div class="why-icon">♡</div>
       <div class="why-card-body">
         <h3>궁합</h3>
         <p>사주 오행·띠·계절 조화로 보는 두 사람의 인연. AI가 심층 궁합 해석을 도와드립니다.</p>
