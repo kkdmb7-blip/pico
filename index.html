@@ -77,16 +77,13 @@
   }
 
   .logo {
-    font-family: 'Noto Serif KR', serif;
-    font-weight: 700;
-    font-size: 22px;
-    letter-spacing: -0.5px;
-    color: var(--text);
     display: flex;
     align-items: center;
-    gap: 5px;
   }
-  .logo-dot { color: var(--accent2); font-size: 10px; }
+  .logo img {
+    height: 38px;
+    object-fit: contain;
+  }
 
   .nav-start-btn {
     padding: 8px 18px;
@@ -881,7 +878,7 @@
 <!-- NAV -->
 <nav>
   <div class="logo" style="cursor:pointer;" onclick="location.reload()">
-    <span class="logo-dot">●</span>FORTUNA
+    <img src="img/logo.png" alt="FORTUNA">
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <button class="btn-kakao" id="btnKakao" onclick="kakaoLogin()">
