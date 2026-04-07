@@ -2402,9 +2402,9 @@ function checkAuth() {
     if (stored) {
       currentUser = JSON.parse(stored);
       // _v<4 이거나 kakao_ 접두어면 UUID 재검증 (v4: worker email 필터 완전 수정)
-      var needsUpgrade = currentUser.email && ((!currentUser._v || currentUser._v < 4) || (currentUser.id && currentUser.id.indexOf('kakao_') === 0));
+      var needsUpgrade = currentUser.email && ((!currentUser._v || currentUser._v < 5) || (currentUser.id && currentUser.id.indexOf('kakao_') === 0));
       if (needsUpgrade) {
-        fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
+        fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: currentUser.email, name: currentUser.name })
@@ -2413,7 +2413,7 @@ function checkAuth() {
         .then(function(resolved) {
           if (resolved && resolved.id) {
             currentUser.id = resolved.id;
-            currentUser._v = 4;
+            currentUser._v = 5;
             localStorage.setItem('pico_user', JSON.stringify(currentUser));
           }
           updateAuthUI();
@@ -2487,7 +2487,7 @@ function handleKakaoCallback(code) {
     }
 
     // resolve-user → chat_users UUID (memox와 완전 동일 엔드포인트)
-    return fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
+    return fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, name: name })
@@ -2495,7 +2495,7 @@ function handleKakaoCallback(code) {
     .then(function(r) { return r.json(); })
     .then(function(resolved) {
       var userId = (resolved && resolved.id) ? resolved.id : kakaoFallbackId;
-      var resolved_v = (resolved && resolved.id) ? 4 : undefined;
+      var resolved_v = (resolved && resolved.id) ? 5 : undefined;
       currentUser = { id: userId, name: name, avatar: avatar, email: email, _v: resolved_v };
       localStorage.setItem('pico_user', JSON.stringify(currentUser));
       updateAuthUI();
