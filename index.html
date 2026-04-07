@@ -1022,6 +1022,9 @@
     </div>
   </div>
   <p class="why-tagline">6가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
+  <div id="historyBtnWrap" style="display:none;text-align:center;margin-top:20px;">
+    <button onclick="openHistoryModal()" style="padding:10px 24px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📜 지난 분석 보기</button>
+  </div>
 </section>
 
 <div class="section-divider"></div>
@@ -1246,6 +1249,27 @@
         카카오톡 공유
       </button>
     </div>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="saju-overlay" id="historyOverlay" onclick="if(event.target===this)closeHistoryModal()" style="display:none;padding:12px;">
+  <div class="saju-modal" style="padding:20px 16px 24px;max-height:92vh;overflow-y:auto;">
+    <button class="saju-modal-close" onclick="closeHistoryModal()">✕</button>
+    <h3 style="font-size:18px;margin-bottom:4px;">📜 지난 분석</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">저장된 AI 정밀분석 결과를 다시 볼 수 있어요</p>
+    <div id="historyList" style="display:flex;flex-direction:column;gap:8px;">
+      <div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">불러오는 중...</div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY DETAIL MODAL -->
+<div class="saju-overlay" id="historyDetailOverlay" onclick="if(event.target===this)closeHistoryDetail()" style="display:none;padding:12px;">
+  <div class="saju-modal" style="padding:20px 16px 24px;max-height:92vh;overflow-y:auto;">
+    <button class="saju-modal-close" onclick="closeHistoryDetail()">✕</button>
+    <h3 id="historyDetailTitle" style="color:#ff8ab0;font-size:18px;margin-bottom:12px;"></h3>
+    <div id="historyDetailContent" style="font-size:18px;line-height:1.8;color:#e8e0f0;"></div>
   </div>
 </div>
 
@@ -1916,9 +1940,92 @@ async function requestGunghapAI() {
     else { console.error('[궁합AI] 3단계 HTTP:', r3.status); showError('chunk-3','🌟 서로를 위한 조언'); }
   } catch(e) { console.error('[궁합AI] 3단계 실패:', e); showError('chunk-3','🌟 서로를 위한 조언'); }
 
+  // ── 자동 저장 ──
+  try {
+    var ch1 = document.getElementById('chunk-1'), ch2 = document.getElementById('chunk-2'), ch3 = document.getElementById('chunk-3');
+    await fetch(WORKER_BASE + '/analysis-history', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        user_id: user.id, type: 'gunghap',
+        title: myName + ' ❤ ' + pNameDisp + ' 궁합',
+        result: {
+          personA: { name:myName, ilju:iljuA, ohaeng:mySaju.dayEl, strength:mySaju.strength, yongsin:myYS },
+          personB: { name:pNameDisp, ilju:iljuB, ohaeng:pSaju.dayEl, strength:pSaju.strength, yongsin:pYS },
+          score: calcGunghapScore(mySaju, pSaju).total,
+          step1: ch1 ? ch1.querySelector('div:last-child')?.innerHTML||'' : '',
+          step2: ch2 ? ch2.querySelector('div:last-child')?.innerHTML||'' : '',
+          step3: ch3 ? ch3.querySelector('div:last-child')?.innerHTML||'' : ''
+        }
+      })
+    });
+    var savedMsg = document.createElement('div');
+    savedMsg.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:rgba(255,255,255,0.35);margin-top:8px;';
+    savedMsg.textContent = '✅ 자동 저장됨 · 지난 분석에서 다시 볼 수 있어요';
+    aiEl.appendChild(savedMsg);
+  } catch(e) { console.warn('히스토리 저장 실패:', e); }
+
   aiBtn.disabled=false; aiBtn.textContent='AI 분석 시작';
 }
 
+
+// ── 히스토리 ────────────────────────────────────────────────
+function _showHistoryBtn() {
+  var user = currentUser || window._fortunaUser;
+  if (user && user.id) document.getElementById('historyBtnWrap').style.display = '';
+}
+// checkAuth 후 호출
+setTimeout(_showHistoryBtn, 1500);
+
+async function openHistoryModal() {
+  var user = currentUser || window._fortunaUser;
+  if (!user) { alert('로그인 후 이용 가능합니다.'); return; }
+  document.getElementById('historyOverlay').style.display = 'flex';
+  var list = document.getElementById('historyList');
+  list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">불러오는 중...</div>';
+  try {
+    var res = await fetch('https://fortuna.kkdmb7.workers.dev/analysis-history?user_id='+encodeURIComponent(user.id));
+    var rows = await res.json();
+    if (!rows || rows.length === 0) { list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">저장된 분석이 없어요</div>'; return; }
+    list.innerHTML = '';
+    rows.forEach(function(r) {
+      var d = new Date(r.created_at);
+      var dateStr = d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+      var icon = r.type === 'gunghap' ? '💕' : r.type === 'saju' ? '🏛️' : '💬';
+      var item = document.createElement('div');
+      item.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .2s;';
+      item.onmouseover = function(){ this.style.borderColor='var(--accent)'; };
+      item.onmouseout = function(){ this.style.borderColor='var(--border)'; };
+      item.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;">'
+        +'<div><span style="font-size:16px;margin-right:6px;">'+icon+'</span><span style="font-size:14px;font-weight:700;color:var(--text);">'+r.title+'</span></div>'
+        +'<span style="font-size:11px;color:var(--muted);">'+dateStr+'</span></div>';
+      item.onclick = function(){ openHistoryDetail(r.id); };
+      list.appendChild(item);
+    });
+  } catch(e) { list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">조회 실패</div>'; }
+}
+function closeHistoryModal() { document.getElementById('historyOverlay').style.display = 'none'; }
+
+async function openHistoryDetail(id) {
+  document.getElementById('historyDetailOverlay').style.display = 'flex';
+  var titleEl = document.getElementById('historyDetailTitle');
+  var contentEl = document.getElementById('historyDetailContent');
+  titleEl.textContent = '불러오는 중...';
+  contentEl.innerHTML = '';
+  try {
+    var res = await fetch('https://fortuna.kkdmb7.workers.dev/analysis-history-detail?id='+encodeURIComponent(id));
+    var data = await res.json();
+    if (!data) { titleEl.textContent = '데이터 없음'; return; }
+    titleEl.textContent = data.title || '';
+    var r = data.result || {};
+    var html = '';
+    if (r.score != null) html += '<div style="text-align:center;margin-bottom:16px;"><span style="font-size:42px;font-weight:900;color:#ff8ab0;">'+r.score+'</span><span style="font-size:13px;color:rgba(255,255,255,0.35);"> / 100점</span></div>';
+    if (r.step1) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">💕 연애 궁합</h4><div>'+r.step1+'</div></div>';
+    if (r.step2) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">⏰ 지금 이 시기</h4><div>'+r.step2+'</div></div>';
+    if (r.step3) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">🌟 서로를 위한 조언</h4><div>'+r.step3+'</div></div>';
+    contentEl.innerHTML = html || '<div style="color:var(--muted);">저장된 내용이 없습니다.</div>';
+  } catch(e) { titleEl.textContent = '오류'; contentEl.textContent = e.message; }
+}
+function closeHistoryDetail() { document.getElementById('historyDetailOverlay').style.display = 'none'; }
 
 var _ghCanvas = null;
 
