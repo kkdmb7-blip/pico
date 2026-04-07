@@ -1534,7 +1534,8 @@ function openGunghapModal() {
       if (pp.birth_date) { var pts = pp.birth_date.split('-'); y = parseInt(pts[0]); m = parseInt(pts[1]); d = parseInt(pts[2]); }
       else if (pp.year) { y = parseInt(pp.year); m = parseInt(pp.month); d = parseInt(pp.day); }
       if (pp.hour !== undefined && pp.hour !== 'unknown') hour = parseInt(pp.hour);
-      gender = pp.gender || 'male';
+      var rawGender = pp.gender || 'M';
+      gender = (rawGender === 'F' || rawGender === 'female') ? 'female' : 'male';
       name = pp.name || '';
       if (y && m && d) _ghMyProfile = { name: name, year: y, month: m, day: d, hour: hour, gender: gender };
     }
