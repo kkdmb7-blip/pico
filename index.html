@@ -1850,7 +1850,7 @@ async function requestGunghapAI() {
   try {
     var r1 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, orb_override:80,
-        system_prompt: '사주명리 궁합 전문가. 연애 궁합만 분석해. 절대 규칙: #헤더, ##헤더, ###헤더 사용 금지. 표(|--|) 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개. 자연스러운 문장으로만 써.',
+        system_prompt: '사주명리 궁합 전문가. 연애 궁합만 분석해. 톤: 따뜻하고 희망적으로. 부정적 요소도 "성장 포인트"나 "서로를 더 깊이 알아가는 계기"로 표현해. 상극도 "서로를 단련시키는 자극제"처럼 긍정 전환해. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
         messages: [{ role:'user', content: '【연애 궁합 분석】\n'
           +myName+'('+gA+'): 일주 '+iljuA+', 일간 '+mySaju.dayEl+', '+mySaju.strength+'\n'
           +pNameDisp+'('+gB+'): 일주 '+iljuB+', 일간 '+pSaju.dayEl+', '+pSaju.strength+'\n\n'
@@ -1883,7 +1883,7 @@ async function requestGunghapAI() {
   try {
     var r2 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, skip_orb:true,
-        system_prompt: '사주명리 궁합 전문가. 현재 시기 궁합만 분석해. 절대 규칙: #헤더, ##헤더, ###헤더 사용 금지. 표(|--|) 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개. 자연스러운 문장으로만 써.',
+        system_prompt: '사주명리 궁합 전문가. 현재 시기 궁합만 분석해. 톤: 따뜻하고 희망적으로. "지금 만난 건 우연이 아니다"는 느낌으로. 어려운 시기도 "함께이기에 극복 가능"으로 전환. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
         messages: [{ role:'user', content: '【현재 시기 궁합 분석】\n'
           +myName+': 일주 '+iljuA+', '+myAge+'\n'
           +pNameDisp+': 일주 '+iljuB+', '+pAge+'\n\n'
@@ -1916,7 +1916,7 @@ async function requestGunghapAI() {
 
     var r3 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, skip_orb:true,
-        system_prompt: '사주명리 궁합 전문가. 보완법과 실천 조언만 써. 절대 규칙: #헤더, ##헤더, ###헤더 사용 금지. 표(|--|) 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개. 자연스러운 문장으로만 써. 주의: 일간 오행과 용신은 다른 것임. 일간은 본래 타고난 오행이고, 용신은 부족해서 채워야 할 오행임.',
+        system_prompt: '사주명리 궁합 전문가. 보완법과 실천 조언만 써. 톤: 따뜻하고 실천 가능한 희망을 줘. "이렇게 하면 더 좋아진다"는 방향으로. 유명인 사례는 긍정적 영감으로 활용. 주의: 일간 오행과 용신은 다른 것. 일간은 타고난 오행, 용신은 채워야 할 오행. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
         messages: [{ role:'user', content: '【서로를 위한 조언】\n'
           +myName+' 일간: '+ilganA+' (본래 오행: '+ohaengA+')\n'
           +myName+' 용신(부족해서 채워야 할 기운): '+myYS+'\n'
