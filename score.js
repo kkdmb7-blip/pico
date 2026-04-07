@@ -93,21 +93,82 @@ const _SHEN_BONUS = {
   '白虎': { money:8, health:-6 },
 };
 
-function _scoreQimen(data) {
+// 연명궁 계산 (출생년 + 성별)
+function _calcYeonmyeong(year, gender) {
+  let sum = 0;
+  const s = String(year);
+  for (let i = 0; i < s.length; i++) sum += parseInt(s[i]);
+  while (sum > 9) { let t = 0; const ss = String(sum); for (let j = 0; j < ss.length; j++) t += parseInt(ss[j]); sum = t; }
+  const isMale = (gender !== 'F' && gender !== 'female');
+  let gong = year < 2000 ? (isMale ? 11 - sum : sum + 4) : (isMale ? 9 - sum : sum + 6);
+  if (gong > 9) gong -= 9;
+  if (gong <= 0) gong += 9;
+  if (gong === 5) gong = isMale ? 2 : 8;
+  return gong;
+}
+
+const _QM_DOOR_EL = {'生':'목','傷':'목','杜':'목','景':'화','死':'토','開':'금','驚':'금','休':'수'};
+const _QM_SAENG   = {목:'화',화:'토',토:'금',금:'수',수:'목'};
+const _QM_GEUK    = {목:'토',토:'수',수:'화',화:'금',금:'목'};
+const _QM_STEM_EL = {'甲':'목','乙':'목','丙':'화','丁':'화','戊':'토','己':'토','庚':'금','辛':'금','壬':'수','癸':'수'};
+const _QM_STEM_KOR= {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
+
+function _elDelta(srcEl, tgtEl) {
+  if (!srcEl || !tgtEl || srcEl === tgtEl) return 0;
+  if (_QM_SAENG[srcEl] === tgtEl) return 1;   // src生tgt
+  if (_QM_GEUK[srcEl] === tgtEl) return -1;   // src克tgt
+  return 0;
+}
+
+function _scoreQimen(data, profile, saju) {
   const out = { money:50, love:50, health:50, wisdom:50, travel:50 };
   if (!data || !data.palaces) return out;
 
+  // ① 기본: 직사문 기반
   const zjm = data['직사문'];
   if (zjm && _DOOR_SC[zjm]) {
     for (const d of SCORE_DOMAINS) out[d] = _DOOR_SC[zjm][d] || 50;
   }
 
-  // 직부궁 팔신 보너스
+  // ② 직부궁 팔신 보너스
   const zfg  = data['직부궁'];
   const pal  = zfg && data.palaces[String(zfg)];
   const shen = pal && pal['팔신'];
   if (shen && _SHEN_BONUS[shen]) {
     for (const d of SCORE_DOMAINS) out[d] = _clamp(out[d] + (_SHEN_BONUS[shen][d] || 0));
+  }
+
+  // ③ 연명궁: 내 궁의 팔문 점수를 25% 가중치로 블렌딩
+  if (profile && profile.year) {
+    const ymGong = _calcYeonmyeong(parseInt(profile.year), profile.gender);
+    const ymPal  = ymGong && data.palaces[String(ymGong)];
+    const ymDoor = ymPal && ymPal['팔문'];
+    if (ymDoor && _DOOR_SC[ymDoor]) {
+      for (const d of SCORE_DOMAINS) {
+        out[d] = _clamp(out[d] + Math.round((_DOOR_SC[ymDoor][d] - 50) * 0.25));
+      }
+    }
+  }
+
+  // ④ 일간 + ⑤ 시간: 사주 일간 오행 기반 보정
+  if (saju) {
+    const dayP = saju.summary && saju.summary.pillars ? saju.summary.pillars.day : '';
+    if (dayP && dayP.length >= 1) {
+      const userEl = _QM_STEM_KOR[dayP[0]];
+      if (userEl) {
+        // ④ 일간 vs 직사문 오행
+        const doorEl = zjm && _QM_DOOR_EL[zjm];
+        const ilD = _elDelta(doorEl, userEl);  // 문→나: +1 생, -1 극
+        for (const d of SCORE_DOMAINS) out[d] = _clamp(out[d] + ilD * 5);
+
+        // ⑤ 시간: 직부궁 지반 오행 vs 일간
+        const zhifuStem = (pal && pal['지반'] || '').trim();
+        if (zhifuStem && _QM_STEM_EL[zhifuStem[0]]) {
+          const siD = _elDelta(_QM_STEM_EL[zhifuStem[0]], userEl);
+          for (const d of SCORE_DOMAINS) out[d] = _clamp(out[d] + siD * 3);
+        }
+      }
+    }
   }
 
   for (const d of SCORE_DOMAINS) out[d] = _clamp(out[d]);
@@ -341,7 +402,7 @@ async function calcFortuneScore(profile) {
 
   const scores = {
     saju:  _scoreSaju(saju),
-    qimen: _scoreQimen(qimen),
+    qimen: _scoreQimen(qimen, profile, saju),
     astro: _scoreAstro(astro),
     vedic: _scoreVedic(vedic),
     ziwei: _scoreZiwei(ziwei),
