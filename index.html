@@ -79,10 +79,19 @@
   .logo {
     display: flex;
     align-items: center;
+    gap: 8px;
   }
   .logo img {
-    height: 54px;
+    height: 36px;
     object-fit: contain;
+    mix-blend-mode: lighten;
+  }
+  .logo-text {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--accent2);
   }
 
   .nav-start-btn {
@@ -878,7 +887,7 @@
 <!-- NAV -->
 <nav>
   <div class="logo" style="cursor:pointer;" onclick="location.reload()">
-    <img src="img/logo.png" alt="FORTUNA">
+    <img src="img/goddess.png" alt="FORTUNA"><span class="logo-text">FORTUNA</span>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <button class="btn-kakao" id="btnKakao" onclick="kakaoLogin()">
