@@ -1786,6 +1786,8 @@ async function requestGunghapAI() {
   aiEl.style.display = 'block';
   aiEl.innerHTML =
     '<div class="ai-chunk" id="chunk-db1"><div class="ai-chunk-spinner"></div></div>' +
+    '<div class="ai-chunk" id="chunk-cg"></div>' +
+    '<div class="ai-chunk" id="chunk-ij"></div>' +
     '<div class="ai-chunk" id="chunk-db2"></div>' +
     '<div class="ai-chunk" id="chunk-db3"></div>' +
     '<div class="ai-chunk" id="chunk-ai1"></div>' +
@@ -1821,13 +1823,33 @@ async function requestGunghapAI() {
   function showSpinner(id) { var el = document.getElementById(id); if (el) el.innerHTML = '<div class="ai-chunk-spinner"></div>'; }
   function showError(id, title) { var el = document.getElementById(id); if (el) el.innerHTML = '<h4 style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.3);margin:0 0 4px;">'+title+'</h4><div style="font-size:12px;color:rgba(255,255,255,0.25);">분석 실패</div>'; }
 
-  // ── 신강/띠/보완 판별 ──
+  // ── 판별 로직 ──
   var strKeyA = (strA === '신강' || strA === '신강(身强)') ? '신강' : '신약';
   var strKeyB = (strB === '신강' || strB === '신강(身强)') ? '신강' : '신약';
   var score = calcGunghapScore(mySaju, pSaju);
   var ddiType = score.tScore >= 30 ? '삼합' : score.tScore >= 25 ? '육합' : score.tScore <= 5 ? '충' : score.tScore <= 10 ? '형' : '일반';
   var aGetsFromB = (ohaengB === myYS), bGetsFromA = (ohaengA === pYS);
   var bowanType = (aGetsFromB && bGetsFromA) ? '서로_채움' : (aGetsFromB || bGetsFromA) ? '한쪽_채움' : (myYS === pYS) ? '함께_보충' : '한쪽_채움';
+
+  // 일지(日支) 추출 — 일주 두 번째 글자
+  var iljiA = iljuA && iljuA.length >= 2 ? iljuA[1] : '';
+  var iljiB = iljuB && iljuB.length >= 2 ? iljuB[1] : '';
+  // 일지 관계 판별
+  var ZODIAC_IDX2 = {자:0,축:1,인:2,묘:3,진:4,사:5,오:6,미:7,신:8,유:9,술:10,해:11};
+  var j1 = ZODIAC_IDX2[iljiA], j2 = ZODIAC_IDX2[iljiB];
+  var SAMHAP2 = [[0,4,8],[2,6,10],[1,5,9],[3,7,11]];
+  var YUKHAP2 = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+  var CHUNG2  = [[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
+  var HYUNG2  = [[2,5,8],[1,10,7],[0,3]];
+  var WONJIN2 = [[0,7],[1,6],[2,5],[3,4],[8,11],[9,10]];
+  var iljiType = '일반';
+  if (j1 != null && j2 != null) {
+    if (SAMHAP2.some(function(g){return g.indexOf(j1)>=0&&g.indexOf(j2)>=0&&j1!==j2;})) iljiType='삼합';
+    else if (YUKHAP2.some(function(g){return (g[0]===j1&&g[1]===j2)||(g[0]===j2&&g[1]===j1);})) iljiType='육합';
+    else if (CHUNG2.some(function(g){return (g[0]===j1&&g[1]===j2)||(g[0]===j2&&g[1]===j1);})) iljiType='충';
+    else if (HYUNG2.some(function(g){return g.indexOf(j1)>=0&&g.indexOf(j2)>=0&&j1!==j2;})) iljiType='형';
+    else if (WONJIN2.some(function(g){return (g[0]===j1&&g[1]===j2)||(g[0]===j2&&g[1]===j1);})) iljiType='원진';
+  }
 
   // ── 0. gunghap-context 조회 ──
   var ctx = {};
@@ -1839,7 +1861,9 @@ async function requestGunghapAI() {
       + '&ilgan_a=' + encodeURIComponent(ilganA) + '&ilgan_b=' + encodeURIComponent(ilganB)
       + '&ohaeng_a=' + encodeURIComponent(ohaengA) + '&ohaeng_b=' + encodeURIComponent(ohaengB)
       + '&singang_a=' + encodeURIComponent(strKeyA) + '&singang_b=' + encodeURIComponent(strKeyB)
-      + '&ddi_type=' + encodeURIComponent(ddiType) + '&bowan_type=' + encodeURIComponent(bowanType);
+      + '&ddi_type=' + encodeURIComponent(ddiType) + '&bowan_type=' + encodeURIComponent(bowanType)
+      + '&chungan_a=' + encodeURIComponent(ilganA) + '&chungan_b=' + encodeURIComponent(ilganB)
+      + '&ilji_type=' + encodeURIComponent(iljiType);
     var ctxRes = await fetch(ctxUrl);
     if (ctxRes.ok) ctx = await ctxRes.json();
   } catch(e) {}
@@ -1850,6 +1874,22 @@ async function requestGunghapAI() {
     showChunk('chunk-db1', '🔥 오행 궁합 · ' + myName + '의 ' + ohaengA + ' × ' + pNameDisp + '의 ' + ohaengB + ' (' + ohText.관계 + ')', ohText.텍스트.replace(/\n/g, '<br>'));
   } else {
     showChunk('chunk-db1', '🔥 오행 궁합', ohaengA + ' × ' + ohaengB);
+  }
+
+  // ── 천간합 (즉시) ──
+  if (ctx.chungan_text) {
+    var cgTitle = ctx.chungan_text.합 ? '✨ 천간합 · ' + ilganA + ' + ' + ilganB + ' = ' + ctx.chungan_text.합화 + '으로 합화!' : '✨ 천간 관계';
+    showChunk('chunk-cg', cgTitle, ctx.chungan_text.텍스트.replace(/\n/g,'<br>'));
+  } else {
+    document.getElementById('chunk-cg').style.display = 'none';
+  }
+
+  // ── 일지 관계 (즉시) ──
+  if (ctx.ilji_text && ctx.ilji_text.텍스트) {
+    var KOR_HANJA = {자:'子',축:'丑',인:'寅',묘:'卯',진:'辰',사:'巳',오:'午',미:'未',신:'申',유:'酉',술:'戌',해:'亥'};
+    showChunk('chunk-ij', '💫 일지 궁합 · ' + (KOR_HANJA[iljiA]||iljiA) + ' × ' + (KOR_HANJA[iljiB]||iljiB) + ' (' + iljiType + ')', ctx.ilji_text.텍스트.replace(/\n/g,'<br>'));
+  } else {
+    document.getElementById('chunk-ij').style.display = 'none';
   }
 
   // ── DB 2: 체질 궁합 (즉시) ──
