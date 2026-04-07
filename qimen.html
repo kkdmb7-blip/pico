@@ -1410,20 +1410,40 @@ function shareQimenKakao() {
 <script>
 // ── 오늘의 시간대별 운표 (진태양시 + 연명궁·일간·시간 3중 분석) ──
 (function() {
+  // 진태양시 보정값 (서울 lon 127°, KST 기준경도 135°)
+  var _now = new Date();
+  var _doy = Math.floor((_now - new Date(_now.getFullYear(),0,0)) / 86400000);
+  var _B   = 2 * Math.PI * (_doy - 81) / 365;
+  var _eot = 9.87 * Math.sin(2*_B) - 7.53 * Math.cos(_B) - 1.5 * Math.sin(_B);
+  var _tstOffsetMin = -32 + _eot; // TST = KST + offset → KST = TST - offset
+  // 시진 경계(TST)를 KST로 변환: KST = TST시각 - offset
+  function tstToKst(tstHour) {
+    var totalMin = tstHour * 60 - _tstOffsetMin;
+    if (totalMin < 0) totalMin += 1440;
+    totalMin = totalMin % 1440;
+    var h = Math.floor(totalMin / 60), m = Math.round(totalMin % 60);
+    if (m === 60) { h++; m = 0; }
+    return String(h % 24).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  }
+
   var SHICHEN = [
-    { name: '子時', range: '23:00~01:00', repHour: 23 },
-    { name: '丑時', range: '01:00~03:00', repHour: 1  },
-    { name: '寅時', range: '03:00~05:00', repHour: 3  },
-    { name: '卯時', range: '05:00~07:00', repHour: 5  },
-    { name: '辰時', range: '07:00~09:00', repHour: 7  },
-    { name: '巳時', range: '09:00~11:00', repHour: 9  },
-    { name: '午時', range: '11:00~13:00', repHour: 11 },
-    { name: '未時', range: '13:00~15:00', repHour: 13 },
-    { name: '申時', range: '15:00~17:00', repHour: 15 },
-    { name: '酉時', range: '17:00~19:00', repHour: 17 },
-    { name: '戌時', range: '19:00~21:00', repHour: 19 },
-    { name: '亥時', range: '21:00~23:00', repHour: 21 },
+    { name: '子時', tstStart: 23, tstEnd: 1,  repHour: 23 },
+    { name: '丑時', tstStart: 1,  tstEnd: 3,  repHour: 1  },
+    { name: '寅時', tstStart: 3,  tstEnd: 5,  repHour: 3  },
+    { name: '卯時', tstStart: 5,  tstEnd: 7,  repHour: 5  },
+    { name: '辰時', tstStart: 7,  tstEnd: 9,  repHour: 7  },
+    { name: '巳時', tstStart: 9,  tstEnd: 11, repHour: 9  },
+    { name: '午時', tstStart: 11, tstEnd: 13, repHour: 11 },
+    { name: '未時', tstStart: 13, tstEnd: 15, repHour: 13 },
+    { name: '申時', tstStart: 15, tstEnd: 17, repHour: 15 },
+    { name: '酉時', tstStart: 17, tstEnd: 19, repHour: 17 },
+    { name: '戌時', tstStart: 19, tstEnd: 21, repHour: 19 },
+    { name: '亥時', tstStart: 21, tstEnd: 23, repHour: 21 },
   ];
+  // 각 시진에 KST 변환 시간범위 추가
+  SHICHEN.forEach(function(shi) {
+    shi.range = tstToKst(shi.tstStart) + '~' + tstToKst(shi.tstEnd);
+  });
 
   var DOOR_KW = {
     '生':'계약·서명·창업 최적','開':'왕성한 활동·투자·확장',
