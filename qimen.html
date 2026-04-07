@@ -1404,7 +1404,7 @@ function shareQimenKakao() {
 }
 </script>
 <script>
-// ── 오늘의 시간대별 운표 (진태양시 + 사주 연동) ────────────────
+// ── 오늘의 시간대별 운표 (진태양시 + 연명궁·일간·시간 3중 분석) ──
 (function() {
   var SHICHEN = [
     { name: '子時', range: '23:00~01:00', repHour: 23 },
@@ -1421,45 +1421,101 @@ function shareQimenKakao() {
     { name: '亥時', range: '21:00~23:00', repHour: 21 },
   ];
 
-  var DOOR_YUN = {
-    '生': { grade: '대길', keyword: '계약·서명·창업 최적' },
-    '開': { grade: '대길', keyword: '왕성한 활동·투자·확장' },
-    '休': { grade: '길',   keyword: '안정·화해·양생 유리' },
-    '景': { grade: '길',   keyword: '문서·공부·창작 유리' },
-    '傷': { grade: '흉',   keyword: '이동·충돌 주의' },
-    '杜': { grade: '흉',   keyword: '막힘·정체 조심' },
-    '驚': { grade: '흉',   keyword: '긴장·놀람 주의' },
-    '死': { grade: '대흉', keyword: '중요 결정 보류 권장' },
+  var DOOR_KW = {
+    '生':'계약·서명·창업 최적','開':'왕성한 활동·투자·확장',
+    '休':'안정·화해·양생 유리','景':'문서·공부·창작 유리',
+    '傷':'이동·충돌 주의','杜':'막힘·정체 조심',
+    '驚':'긴장·놀람 주의','死':'중요 결정 보류 권장',
   };
 
-  // 팔문 오행
-  var DOOR_EL = { '生':'목','傷':'목','杜':'목','景':'화','死':'토','開':'금','驚':'금','休':'수' };
-  // 상생: key가 value를 생함 (木生火, 火生土, 土生金, 金生水, 水生木)
-  var SAENG = { 목:'화', 화:'토', 토:'금', 금:'수', 수:'목' };
-  // 상극: key가 value를 극함 (木克土, 土克水, 水克火, 火克金, 金克木)
-  var GEUK  = { 목:'토', 토:'수', 수:'화', 화:'금', 금:'목' };
-  var EL_HAN = { 목:'木', 화:'火', 토:'土', 금:'金', 수:'水' };
-  var STEM_EL = { 갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수' };
-  var KOR_HAN = { 갑:'甲',을:'乙',병:'丙',정:'丁',무:'戊',기:'己',경:'庚',신:'辛',임:'壬',계:'癸' };
-  var GRADES = ['대흉','흉','평','길','대길'];
+  var DOOR_EL  = {'生':'목','傷':'목','杜':'목','景':'화','死':'토','開':'금','驚':'금','休':'수'};
+  var SAENG    = {목:'화',화:'토',토:'금',금:'수',수:'목'};
+  var GEUK     = {목:'토',토:'수',수:'화',화:'금',금:'목'};
+  var EL_HAN   = {목:'木',화:'火',토:'土',금:'金',수:'水'};
+  var STEM_EL_KOR = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
+  var KOR_HAN  = {갑:'甲',을:'乙',병:'丙',정:'丁',무:'戊',기:'己',경:'庚',신:'辛',임:'壬',계:'癸'};
+  var GONG_NAME = {1:'坎',2:'坤',3:'震',4:'巽',6:'乾',7:'兌',8:'艮',9:'離'};
+  var DOOR_SCORE = {'生':2,'開':2,'休':1,'景':1,'傷':-1,'杜':-1,'驚':-1,'死':-2};
 
-  // 사주 일간 vs 팔문 오행 → 등급 보정
-  function adjustGrade(base, doorEl, userEl) {
-    var idx = GRADES.indexOf(base);
-    if (idx === -1) idx = 2;
-    var delta = 0;
-    if (SAENG[doorEl] === userEl) delta = 1;       // 문生나 → 유리
-    else if (GEUK[doorEl] === userEl) delta = -1;   // 문克나 → 불리
-    else if (GEUK[userEl] === doorEl) delta = 1;    // 나克문 → 제압 유리
-    else if (SAENG[userEl] === doorEl) delta = -1;  // 나生문 → 기운 소모
-    return { grade: GRADES[Math.max(0, Math.min(4, idx + delta))], delta: delta };
+  // ── 연명궁 계산 ──
+  function calcYeonmyeong(year, gender) {
+    var sum = 0, s = String(year);
+    for (var i = 0; i < s.length; i++) sum += parseInt(s[i]);
+    while (sum > 9) { var t = 0, ss = String(sum); for (var j = 0; j < ss.length; j++) t += parseInt(ss[j]); sum = t; }
+    var isMale = (gender !== 'F' && gender !== 'female');
+    var gong;
+    if (year < 2000) { gong = isMale ? 11 - sum : sum + 4; }
+    else { gong = isMale ? 9 - sum : sum + 6; }
+    if (gong > 9) gong -= 9;
+    if (gong <= 0) gong += 9;
+    if (gong === 5) gong = isMale ? 2 : 8;
+    return gong;
   }
 
-  // 진태양시(TST) — 서울 기준 (lon 127.0°, KST 기준경도 135°)
+  // ── 오행 상생상극 점수 ──
+  function elScore(srcEl, tgtEl) {
+    if (!srcEl || !tgtEl || srcEl === tgtEl) return 0;
+    if (SAENG[srcEl] === tgtEl) return 1;   // src生tgt → tgt 유리
+    if (GEUK[srcEl] === tgtEl) return -1;   // src克tgt → tgt 불리
+    return 0;
+  }
+
+  // ── 3중 종합 점수 → 등급 ──
+  function calcPersonalGrade(data, userDayEl, ymGong) {
+    if (!data) return { grade: '평', total: 0, ymDoor: '', detail: '' };
+
+    // 1) 기본: 직사문
+    var base = DOOR_SCORE[data.직사문] || 0;
+
+    // 2) 연명궁: 내 궁의 팔문
+    var ymDoor = '', ymS = 0;
+    if (ymGong && data.palaces && data.palaces[String(ymGong)]) {
+      ymDoor = data.palaces[String(ymGong)].팔문 || '';
+      ymS = DOOR_SCORE[ymDoor] || 0;
+    }
+
+    // 3) 일간: 직사문 오행 → 나
+    var ilS = 0;
+    if (userDayEl && data.직사문 && DOOR_EL[data.직사문]) {
+      ilS = elScore(DOOR_EL[data.직사문], userDayEl);
+    }
+
+    // 4) 시간: 직부궁 지반 오행 → 나
+    var siS = 0;
+    if (userDayEl && data.직부궁 && data.palaces && data.palaces[String(data.직부궁)]) {
+      var stem = (data.palaces[String(data.직부궁)].지반 || '').trim();
+      if (stem && STEM_OHAENG[stem[0]]) {
+        siS = elScore(STEM_OHAENG[stem[0]], userDayEl);
+      }
+    }
+
+    var total = base + ymS + ilS + siS; // -6 ~ +6
+
+    var grade;
+    if (total >= 4)       grade = '대길';
+    else if (total >= 2)  grade = '길';
+    else if (total >= -1) grade = '평';
+    else if (total >= -3) grade = '흉';
+    else                  grade = '대흉';
+
+    // 세부 표시 텍스트
+    var parts = [];
+    if (ymDoor) {
+      var ymGood = DOOR_SCORE[ymDoor] > 0;
+      parts.push((ymGood ? '▲' : '▼') + ymDoor + '門');
+    }
+    var personalDelta = ilS + siS;
+    if (personalDelta > 0)      parts.push('▲' + EL_HAN[userDayEl]);
+    else if (personalDelta < 0) parts.push('▼' + EL_HAN[userDayEl]);
+
+    return { grade: grade, total: total, ymDoor: ymDoor, detail: parts.join(' ') };
+  }
+
+  // ── 진태양시(TST) — 서울 기준 ──
   function getTSTShichenIdx() {
     var now = new Date();
     var kstH = now.getHours(), kstM = now.getMinutes();
-    var lonCorr = -32; // (127 - 135) / 15 * 60
+    var lonCorr = -32;
     var start = new Date(now.getFullYear(), 0, 0);
     var doy = Math.floor((now - start) / 86400000);
     var B = 2 * Math.PI * (doy - 81) / 365;
@@ -1476,12 +1532,16 @@ function shareQimenKakao() {
     var y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
     var currentIdx = getTSTShichenIdx();
 
-    // ── 사용자 일간 가져오기 ──
-    var userDayEl = null, userDayStem = '';
+    // ── 사용자 프로필 → 일간 + 연명궁 ──
+    var userDayEl = null, userDayStem = '', ymGong = 0;
     var profile = null;
     try { profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
 
     if (profile && profile.year) {
+      // 연명궁
+      ymGong = calcYeonmyeong(parseInt(profile.year), profile.gender);
+
+      // 일간
       try {
         var sp = new URLSearchParams({
           year: profile.year, month: profile.month, day: profile.day,
@@ -1492,7 +1552,7 @@ function shareQimenKakao() {
         var sajuData = await sajuRes.json();
         var dayPillar = sajuData.summary && sajuData.summary.pillars ? sajuData.summary.pillars.day : '';
         if (dayPillar && dayPillar.length >= 1) {
-          userDayEl = STEM_EL[dayPillar[0]];
+          userDayEl = STEM_EL_KOR[dayPillar[0]];
           userDayStem = KOR_HAN[dayPillar[0]] || dayPillar[0];
         }
       } catch(e) {}
@@ -1506,16 +1566,18 @@ function shareQimenKakao() {
         .catch(function() { return null; });
     }));
 
-    // ── 렌더링 ──
+    // ── 타이틀 업데이트 ──
     var section = document.getElementById('hourlyYunSection');
     var titleEl = section.querySelector('.hourly-yun-title');
-    if (userDayEl) {
+    if (userDayEl && ymGong) {
       titleEl.innerHTML = '오늘의 시간대별 운표 '
         + '<span style="font-size:10px;font-weight:400;opacity:0.55;">진태양시 기준</span>'
-        + ' <span style="font-size:11px;font-weight:700;color:var(--accent2);margin-left:6px;">'
-        + '✦ ' + userDayStem + '(' + EL_HAN[userDayEl] + ') 일간 맞춤</span>';
+        + '<br><span style="font-size:11px;font-weight:700;color:var(--accent2);margin-top:4px;display:inline-block;">'
+        + '✦ ' + userDayStem + '(' + EL_HAN[userDayEl] + ') 일간 · '
+        + ymGong + '궁(' + (GONG_NAME[ymGong]||'') + ') 연명 맞춤</span>';
     }
 
+    // ── 렌더링 ──
     var list = document.getElementById('hourlyYunList');
     list.innerHTML = '';
 
@@ -1524,18 +1586,21 @@ function shareQimenKakao() {
       var isCurrent = (i === currentIdx);
       var isPast = (currentIdx === 0) ? (i > 0) : (i < currentIdx);
       var door = data && data.직사문 ? data.직사문 : null;
-      var baseYun = door && DOOR_YUN[door] ? DOOR_YUN[door] : { grade: '평', keyword: '정상적인 일과' };
+      var keyword = door && DOOR_KW[door] ? DOOR_KW[door] : '정상적인 일과';
 
-      var grade = baseYun.grade;
-      var keyword = baseYun.keyword;
-      var personNote = '';
-
-      // 사주 연동 보정
-      if (userDayEl && door && DOOR_EL[door]) {
-        var adj = adjustGrade(grade, DOOR_EL[door], userDayEl);
-        grade = adj.grade;
-        if (adj.delta > 0) personNote = '<span style="font-size:10px;color:#7c3aed;margin-left:4px;">▲' + EL_HAN[userDayEl] + '유리</span>';
-        else if (adj.delta < 0) personNote = '<span style="font-size:10px;color:#e05c6a;margin-left:4px;">▼' + EL_HAN[userDayEl] + '불리</span>';
+      // 개인화 분석
+      var grade, personNote = '';
+      if (userDayEl && ymGong) {
+        var result = calcPersonalGrade(data, userDayEl, ymGong);
+        grade = result.grade;
+        if (result.detail) {
+          var noteColor = result.total >= 2 ? '#7c3aed' : result.total <= -2 ? '#e05c6a' : 'var(--muted)';
+          personNote = '<span style="font-size:10px;color:' + noteColor + ';margin-left:4px;">' + result.detail + '</span>';
+        }
+      } else {
+        // 비로그인: 직사문 기반 단순 등급
+        var DOOR_GRADE = {'生':'대길','開':'대길','休':'길','景':'길','傷':'흉','杜':'흉','驚':'흉','死':'대흉'};
+        grade = door && DOOR_GRADE[door] ? DOOR_GRADE[door] : '평';
       }
 
       var row = document.createElement('div');
@@ -1557,7 +1622,7 @@ function shareQimenKakao() {
     if (!userDayEl) {
       var tip = document.createElement('div');
       tip.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:var(--muted);';
-      tip.textContent = '프로필을 설정하면 사주 맞춤 운표를 볼 수 있어요';
+      tip.textContent = '프로필을 설정하면 연명궁·일간·시간 3중 맞춤 운표를 볼 수 있어요';
       list.appendChild(tip);
     }
 
