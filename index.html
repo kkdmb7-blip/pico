@@ -2454,7 +2454,7 @@ function shareMainKakao() {
 function kakaoLogin() {
   var redirectUri = encodeURIComponent('https://picolab.kr');
   window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=' + KAKAO_REST_KEY
-    + '&redirect_uri=' + redirectUri + '&response_type=code&scope=profile_nickname,account_email';
+    + '&redirect_uri=' + redirectUri + '&response_type=code&scope=profile_nickname,account_email&prompt=consent';
 }
 
 function handleKakaoCallback(code) {
@@ -2477,6 +2477,13 @@ function handleKakaoCallback(code) {
     var avatar = (profile.kakao_account && profile.kakao_account.profile && profile.kakao_account.profile.profile_image_url) || '';
     var email  = (profile.kakao_account && profile.kakao_account.email) || '';
     var kakaoFallbackId = 'kakao_' + profile.id;
+
+    // 이메일 동의 안 된 경우 → 재동의 유도
+    if (!email) {
+      alert('이메일 동의가 필요해요.\n카카오 로그인 시 이메일 제공에 동의해주세요.\n(오르브 잔액 공유에 필요합니다)');
+      kakaoLogin();
+      return;
+    }
 
     // resolve-user → chat_users UUID (memox와 완전 동일 엔드포인트)
     return fetch('https://fortuna.kkdmb7.workers.dev/resolve-user', {
