@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root {
     --bg: #0a0a0f;
@@ -860,6 +861,14 @@
   from { opacity:0; transform: translateY(12px); }
   to   { opacity:1; transform: translateY(0); }
 }
+@keyframes fortunaPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.6); }
+  70%  { box-shadow: 0 0 0 12px rgba(139, 92, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+}
+.fortuna-pulse {
+  animation: fortunaPulse 2s infinite;
+}
 </style>
 </head>
 <body>
@@ -937,7 +946,10 @@
 
   <!-- 결과 -->
   <div id="scoreMiniResult" style="display:none;">
-    <div class="score-mini-grid" id="scoreMiniGrid"></div>
+    <div id="ohaengRadarWrap" style="position:relative;max-width:280px;margin:0 auto 16px;">
+      <div style="text-align:center;font-size:11px;font-weight:700;color:rgba(139,92,246,0.85);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">오늘의 균형 지수</div>
+      <canvas id="ohaengRadar"></canvas>
+    </div>
     <div class="score-summary-text" id="scoreSummaryText" style="margin-bottom:10px;"></div>
     <p style="margin:0 auto 14px;text-align:center;max-width:320px;">
       <span style="display:block;font-size:12px;font-weight:600;color:rgba(200,180,255,0.85);line-height:1.6;">⏱ 기문둔갑 · 베딕점성술은 실시간 반영됩니다</span>
@@ -964,13 +976,13 @@
     <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
       <div class="why-icon">🏛️</div>
       <h3>사주 (四柱)</h3>
-      <p>인생의 설계도,<br>기질의 뿌리. 태어난<br>연·월·일·시의<br>네 기둥이 만드는<br>운명의 지도.</p>
+      <p>당신의 리더십 DNA</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openBirthModal('astro')" style="cursor:pointer;">
       <div class="why-icon">🌟</div>
       <h3>서양 점성술</h3>
-      <p>심리적 동기와 운의 타이밍. 행성의 위치가 드러내는 내면의 패턴과 흐름.</p>
+      <p>당신의 우주 에너지</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openBirthModal('vedic')" style="cursor:pointer;">
@@ -982,19 +994,19 @@
     <div class="why-card" onclick="openBirthModal('ziwei')" style="cursor:pointer;">
       <div class="why-icon">⭐</div>
       <h3>자미두수<br>紫微斗數</h3>
-      <p>인생 12궁 배치도. 별의 배열로 삶의 영역별 운세와 인연의<br>구조를 분석합니다.</p>
+      <p>당신의 내면 심리</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openQimenModal()" style="cursor:pointer;">
       <div class="why-icon">🗺️</div>
       <h3>기문둔갑<br>奇門遁甲</h3>
-      <p>중화권 CEO들이 의사결정에 쓰는 시공간 최적화 전략 엔진. 언제, 어느 방향으로 움직여야 유리한지 계산합니다.</p>
+      <p>당신의 결정적 타이밍</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card" onclick="openTarotIntro()" style="cursor:pointer;">
       <div class="why-icon">🔮</div>
       <h3>타로카드</h3>
-      <p>78장의 상징 체계로 읽는 무의식의 언어. 오늘의 카드가 전하는 메시지를 확인하세요.</p>
+      <p>당신의 직관 신호</p>
       <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
     </div>
     <div class="why-card why-card-full" onclick="openGunghapModal()" style="cursor:pointer;">
@@ -1014,9 +1026,9 @@
 <!-- CTA -->
 <section class="section-cta">
   <div class="cta-glow"></div>
-  <h2>지금 바로 시작하세요</h2>
+  <h2>나의 수호령 깨우기</h2>
   <p>무료로 체험하고,<br>당신의 별자리가 말하는 이야기를 들어보세요</p>
-  <a href="https://kkdmb7-blip.github.io/memox/" class="btn-cta" target="_blank">지금 나의 운명 확인하기 🔮</a>
+  <a href="https://kkdmb7-blip.github.io/memox/" class="btn-cta fortuna-pulse" target="_blank">운명의 봉인 해제 🔮</a>
 </section>
 
 <!-- SAJU MODAL -->
@@ -2931,37 +2943,43 @@ async function loadMiniScore() {
     travel:{emoji:'🌍',label:'이동/변화'},
   };
 
-  var grid = document.getElementById('scoreMiniGrid');
-  grid.innerHTML = '';
-  domainOrder.forEach(function(d, i) {
-    var info = domainInfo[d];
-    var sc   = result.final[d];
-    var col  = _scoreColor(sc);
-    var card = document.createElement('div');
-    card.className = 'score-mini-card';
-    card.innerHTML =
-      '<div class="score-mini-emoji">' + info.emoji + '</div>' +
-      '<div class="score-mini-label">' + info.label + '</div>' +
-      '<div class="score-mini-gauge"><div class="score-mini-fill" id="mfill_' + d + '" style="background:' + col + ';"></div></div>' +
-      '<div class="score-mini-num" id="mnum_' + d + '" style="color:' + col + ';">0</div>';
-    grid.appendChild(card);
-
-    // 애니메이션
-    setTimeout(function() {
-      var fillEl = document.getElementById('mfill_' + d);
-      var numEl  = document.getElementById('mnum_' + d);
-      if (fillEl) fillEl.style.width = sc + '%';
-      if (numEl) {
-        var start = performance.now();
-        (function step(now) {
-          var prog = Math.min((now - start) / 1100, 1);
-          var eased = 1 - Math.pow(1 - prog, 3);
-          numEl.textContent = Math.round(sc * eased);
-          if (prog < 1) requestAnimationFrame(step);
-        })(start);
+  var hour = (profile.hour === 'unknown' || profile.hour === undefined || profile.hour === null) ? 12 : parseInt(profile.hour);
+  var saju = _calcSaju(parseInt(profile.year), parseInt(profile.month), parseInt(profile.day), hour);
+  var fp = saju.fivePct;
+  var radarCanvas = document.getElementById('ohaengRadar');
+  if (radarCanvas && window.Chart) {
+    var ctx = radarCanvas.getContext('2d');
+    if (window._ohaengChart) { window._ohaengChart.destroy(); window._ohaengChart = null; }
+    window._ohaengChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['목(木)', '화(火)', '토(土)', '금(金)', '수(水)'],
+        datasets: [{
+          data: [fp.목, fp.화, fp.토, fp.금, fp.수],
+          backgroundColor: 'rgba(139,92,246,0.15)',
+          borderColor: 'rgba(139,92,246,0.8)',
+          pointBackgroundColor: '#fff',
+          pointBorderColor: 'rgba(139,92,246,0.8)',
+          pointRadius: 4,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { display: false },
+            grid: { color: 'rgba(255,255,255,0.08)' },
+            angleLines: { color: 'rgba(255,255,255,0.08)' },
+            pointLabels: { color: '#e8e0f0', font: { size: 13, weight: '700' } }
+          }
+        }
       }
-    }, i * 80 + 50);
-  });
+    });
+  }
 
   // 종합
   var overallEl = document.getElementById('scoreOverallNum');
