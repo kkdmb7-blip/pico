@@ -1404,9 +1404,9 @@ function shareQimenKakao() {
 }
 </script>
 <script>
-// ── 오늘의 시간대별 운표 (진태양시 기준) ───────────────────
+// ── 오늘의 시간대별 운표 (진태양시 + 사주 연동) ────────────────
 (function() {
-  const SHICHEN = [
+  var SHICHEN = [
     { name: '子時', range: '23:00~01:00', repHour: 23 },
     { name: '丑時', range: '01:00~03:00', repHour: 1  },
     { name: '寅時', range: '03:00~05:00', repHour: 3  },
@@ -1421,7 +1421,7 @@ function shareQimenKakao() {
     { name: '亥時', range: '21:00~23:00', repHour: 21 },
   ];
 
-  const DOOR_YUN = {
+  var DOOR_YUN = {
     '生': { grade: '대길', keyword: '계약·서명·창업 최적' },
     '開': { grade: '대길', keyword: '왕성한 활동·투자·확장' },
     '休': { grade: '길',   keyword: '안정·화해·양생 유리' },
@@ -1432,21 +1432,41 @@ function shareQimenKakao() {
     '死': { grade: '대흉', keyword: '중요 결정 보류 권장' },
   };
 
-  // 진태양시(TST) 계산 — 서울 기준 (lon 127.0°, KST meridian 135°)
+  // 팔문 오행
+  var DOOR_EL = { '生':'목','傷':'목','杜':'목','景':'화','死':'토','開':'금','驚':'금','休':'수' };
+  // 상생: key가 value를 생함 (木生火, 火生土, 土生金, 金生水, 水生木)
+  var SAENG = { 목:'화', 화:'토', 토:'금', 금:'수', 수:'목' };
+  // 상극: key가 value를 극함 (木克土, 土克水, 水克火, 火克金, 金克木)
+  var GEUK  = { 목:'토', 토:'수', 수:'화', 화:'금', 금:'목' };
+  var EL_HAN = { 목:'木', 화:'火', 토:'土', 금:'金', 수:'水' };
+  var STEM_EL = { 갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수' };
+  var KOR_HAN = { 갑:'甲',을:'乙',병:'丙',정:'丁',무:'戊',기:'己',경:'庚',신:'辛',임:'壬',계:'癸' };
+  var GRADES = ['대흉','흉','평','길','대길'];
+
+  // 사주 일간 vs 팔문 오행 → 등급 보정
+  function adjustGrade(base, doorEl, userEl) {
+    var idx = GRADES.indexOf(base);
+    if (idx === -1) idx = 2;
+    var delta = 0;
+    if (SAENG[doorEl] === userEl) delta = 1;       // 문生나 → 유리
+    else if (GEUK[doorEl] === userEl) delta = -1;   // 문克나 → 불리
+    else if (GEUK[userEl] === doorEl) delta = 1;    // 나克문 → 제압 유리
+    else if (SAENG[userEl] === doorEl) delta = -1;  // 나生문 → 기운 소모
+    return { grade: GRADES[Math.max(0, Math.min(4, idx + delta))], delta: delta };
+  }
+
+  // 진태양시(TST) — 서울 기준 (lon 127.0°, KST 기준경도 135°)
   function getTSTShichenIdx() {
     var now = new Date();
     var kstH = now.getHours(), kstM = now.getMinutes();
-    // 경도 보정: (127 - 135) / 15 * 60 = -32분
-    var lonCorr = -32;
-    // 균시차(Equation of Time) 근사
+    var lonCorr = -32; // (127 - 135) / 15 * 60
     var start = new Date(now.getFullYear(), 0, 0);
     var doy = Math.floor((now - start) / 86400000);
     var B = 2 * Math.PI * (doy - 81) / 365;
     var eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
-    var tstTotalMin = kstH * 60 + kstM + lonCorr + eot;
-    if (tstTotalMin < 0) tstTotalMin += 1440;
-    var tstH = Math.floor(tstTotalMin / 60) % 24;
-    // 시진 인덱스
+    var tstMin = kstH * 60 + kstM + lonCorr + eot;
+    if (tstMin < 0) tstMin += 1440;
+    var tstH = Math.floor(tstMin / 60) % 24;
     if (tstH === 23) return 0;
     return Math.floor((tstH + 1) / 2);
   }
@@ -1455,10 +1475,30 @@ function shareQimenKakao() {
     var now = new Date();
     var y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
     var currentIdx = getTSTShichenIdx();
-    var kstH = now.getHours();
-    // 현재 KST 시간 기반 지난 시간대 판별용
-    var kstIdx = (kstH === 23) ? 0 : Math.floor((kstH + 1) / 2);
 
+    // ── 사용자 일간 가져오기 ──
+    var userDayEl = null, userDayStem = '';
+    var profile = null;
+    try { profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+
+    if (profile && profile.year) {
+      try {
+        var sp = new URLSearchParams({
+          year: profile.year, month: profile.month, day: profile.day,
+          hour: (profile.hour === 'unknown' || !profile.hour) ? 12 : profile.hour,
+          minute: profile.minute || 0, gender: 'male'
+        });
+        var sajuRes = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test?' + sp.toString());
+        var sajuData = await sajuRes.json();
+        var dayPillar = sajuData.summary && sajuData.summary.pillars ? sajuData.summary.pillars.day : '';
+        if (dayPillar && dayPillar.length >= 1) {
+          userDayEl = STEM_EL[dayPillar[0]];
+          userDayStem = KOR_HAN[dayPillar[0]] || dayPillar[0];
+        }
+      } catch(e) {}
+    }
+
+    // ── 12 시간대 병렬 호출 ──
     var results = await Promise.all(SHICHEN.map(function(shi) {
       var sp = new URLSearchParams({ year: y, month: m, day: d, hour: shi.repHour, minute: 0, type: 'siga' });
       return fetch('https://fortuna.kkdmb7.workers.dev/qimen?' + sp.toString())
@@ -1466,15 +1506,37 @@ function shareQimenKakao() {
         .catch(function() { return null; });
     }));
 
+    // ── 렌더링 ──
+    var section = document.getElementById('hourlyYunSection');
+    var titleEl = section.querySelector('.hourly-yun-title');
+    if (userDayEl) {
+      titleEl.innerHTML = '오늘의 시간대별 운표 '
+        + '<span style="font-size:10px;font-weight:400;opacity:0.55;">진태양시 기준</span>'
+        + ' <span style="font-size:11px;font-weight:700;color:var(--accent2);margin-left:6px;">'
+        + '✦ ' + userDayStem + '(' + EL_HAN[userDayEl] + ') 일간 맞춤</span>';
+    }
+
     var list = document.getElementById('hourlyYunList');
     list.innerHTML = '';
 
     SHICHEN.forEach(function(shi, i) {
       var data = results[i];
       var isCurrent = (i === currentIdx);
-      var isPast = (i !== 0 && i < kstIdx) || (kstIdx === 0 && i !== 0 && kstH >= 23);
+      var isPast = (currentIdx === 0) ? (i > 0) : (i < currentIdx);
       var door = data && data.직사문 ? data.직사문 : null;
-      var yun = door && DOOR_YUN[door] ? DOOR_YUN[door] : { grade: '평', keyword: '정상적인 일과' };
+      var baseYun = door && DOOR_YUN[door] ? DOOR_YUN[door] : { grade: '평', keyword: '정상적인 일과' };
+
+      var grade = baseYun.grade;
+      var keyword = baseYun.keyword;
+      var personNote = '';
+
+      // 사주 연동 보정
+      if (userDayEl && door && DOOR_EL[door]) {
+        var adj = adjustGrade(grade, DOOR_EL[door], userDayEl);
+        grade = adj.grade;
+        if (adj.delta > 0) personNote = '<span style="font-size:10px;color:#7c3aed;margin-left:4px;">▲' + EL_HAN[userDayEl] + '유리</span>';
+        else if (adj.delta < 0) personNote = '<span style="font-size:10px;color:#e05c6a;margin-left:4px;">▼' + EL_HAN[userDayEl] + '불리</span>';
+      }
 
       var row = document.createElement('div');
       row.className = 'yun-row' + (isCurrent ? ' current-shi' : '') + (isPast && !isCurrent ? ' past-shi' : '');
@@ -1482,13 +1544,22 @@ function shareQimenKakao() {
       row.innerHTML =
         '<div class="yun-shi">' + shi.name + '</div>' +
         '<div class="yun-range">' + shi.range + '</div>' +
-        '<div class="yun-grade yun-grade-' + yun.grade + '">' + yun.grade + '</div>' +
-        '<div class="yun-keyword">' + yun.keyword +
+        '<div class="yun-grade yun-grade-' + grade + '">' + grade + '</div>' +
+        '<div class="yun-keyword">' + keyword +
           (door ? ' <span style="font-size:11px;color:var(--muted);">(' + door + '門)</span>' : '') +
+          personNote +
         '</div>' +
         (isCurrent ? '<div class="yun-current-badge">현재</div>' : '');
       list.appendChild(row);
     });
+
+    // 프로필 없으면 안내
+    if (!userDayEl) {
+      var tip = document.createElement('div');
+      tip.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:var(--muted);';
+      tip.textContent = '프로필을 설정하면 사주 맞춤 운표를 볼 수 있어요';
+      list.appendChild(tip);
+    }
 
     // 현재 시간대로 스크롤
     var cur = document.getElementById('currentShiRow');
