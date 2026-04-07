@@ -171,6 +171,21 @@
     .cal-day-num.sun { color: #FF5252; }
     .cal-day-num.sat { color: #64B5F6; }
     .cal-hanja { font-family:'Noto Serif KR',serif; font-size:13px; font-weight:700; line-height:1.2; }
+    /* ── 사주 AI 분석 ── */
+    #sajuAiResult { font-size:18px; line-height:1.8; }
+    #sajuAiResult p { margin-bottom:20px; }
+    .saju-ai-chunk { padding:16px 0; border-bottom:1px solid rgba(122,196,255,0.12); }
+    .saju-ai-chunk:last-child { border-bottom:none; }
+    .saju-ai-spinner { display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.35);font-size:12px;padding:8px 0; }
+    .saju-ai-spinner::before { content:'';display:inline-block;width:16px;height:16px;border:2px solid rgba(122,196,255,0.15);border-top-color:#7ac4ff;border-radius:50%;animation:sajuSpin .7s linear infinite; }
+    .saju-ai-spinner::after { content:'분석 중...'; }
+    @keyframes sajuSpin { to { transform:rotate(360deg); } }
+    @keyframes sajuFadeIn { from { opacity:0;transform:translateY(6px); } to { opacity:1;transform:translateY(0); } }
+    .saju-tab-wrap { display:flex;gap:0;background:rgba(255,255,255,0.04);border-radius:10px;padding:3px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.06); }
+    .saju-tab { flex:1;padding:8px 4px;text-align:center;font-size:12px;font-weight:600;color:rgba(255,255,255,0.4);cursor:pointer;border-radius:8px;transition:all .2s; }
+    .saju-tab.active { background:rgba(122,196,255,0.15);color:#7ac4ff; }
+    .saju-tab-content { display:none;font-size:15px;line-height:1.8;color:#e8e0f0; }
+    .saju-tab-content.active { display:block;animation:sajuFadeIn .3s ease; }
   </style>
 </head>
 <body class="min-h-screen pb-24">
@@ -353,6 +368,16 @@
     <div id="sajuTeaserText" style="margin-bottom:18px;"></div>
     <a id="teaserDetailBtn" href="report-saju.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,rgba(122,196,255,0.25),rgba(122,196,255,0.12));border:1.5px solid rgba(122,196,255,0.45);color:#7ac4ff;border-radius:12px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;text-decoration:none;letter-spacing:-0.2px;">내 사주 정밀분석 보기</a>
   </div>
+</div>
+
+<!-- 사주 AI 정밀분석 -->
+<div id="sajuAiWrap" style="display:none;padding:4px 20px 8px;max-width:440px;margin:0 auto;">
+  <div class="glass" style="padding:20px 18px;text-align:center;">
+    <div style="font-size:13px;font-weight:700;color:#e8b86d;margin-bottom:4px;">🔮 AI 사주 정밀분석</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px;">DB 10개 + AI 심층 해석 · <span style="color:rgba(255,200,100,0.6);">80 Orb 사용</span></div>
+    <button id="sajuAiBtn" onclick="requestSajuAI()" style="padding:12px 28px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:12px;color:#e8b86d;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">정밀분석 시작</button>
+  </div>
+  <div id="sajuAiResult" style="color:#e8e0f0;display:none;margin-top:12px;"></div>
 </div>
 
 <!-- 사주 공유 버튼 -->
@@ -576,6 +601,7 @@ async function fetchSaju() {
     _sajuData = data;
     renderAll(data);
     document.getElementById('sajuShareBtnWrap').style.display = 'flex';
+    document.getElementById('sajuAiWrap').style.display = 'block';
   } catch(e) {
     document.getElementById('S_load').style.display='none';
     const fe=document.getElementById('f_err');
@@ -1539,6 +1565,212 @@ window.addEventListener('load', function() {
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'hidden') localStorage.setItem(KEY, String(Math.round(window.scrollY)));
   });
+})();
+
+// ═══════════════════════════════════════════════════
+// 사주 AI 정밀분석 (10섹션, DB+Claude 2회)
+// ═══════════════════════════════════════════════════
+async function requestSajuAI() {
+  if (!_sajuData) return;
+  var user = null;
+  try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+  if (!user || !user.id) { alert('로그인 후 이용 가능합니다.'); return; }
+
+  var btn = document.getElementById('sajuAiBtn');
+  var aiEl = document.getElementById('sajuAiResult');
+  btn.disabled = true; btn.textContent = '분석 중...';
+  aiEl.style.display = 'block';
+  aiEl.innerHTML =
+    '<div class="saju-ai-chunk" id="sc-1"><div class="saju-ai-spinner"></div></div>' +
+    '<div class="saju-ai-chunk" id="sc-2"></div>' +
+    '<div class="saju-ai-chunk" id="sc-3"></div>' +
+    '<div class="saju-ai-chunk" id="sc-4"></div>' +
+    '<div class="saju-ai-chunk" id="sc-5"></div>' +
+    '<div class="saju-ai-chunk" id="sc-6"></div>' +
+    '<div class="saju-ai-chunk" id="sc-7"></div>' +
+    '<div class="saju-ai-chunk" id="sc-8"></div>';
+
+  var WORKER = 'https://fortuna.kkdmb7.workers.dev';
+  var CHAT_URL = 'https://fortuna-silk.vercel.app/api/chat';
+  var thisYear = new Date().getFullYear();
+  var age = thisYear - parseInt(pYear);
+  var ageBracket = age < 35 ? '20' : age < 55 ? '40' : '60';
+
+  function showSC(id, title, html) {
+    var el = document.getElementById(id);
+    var processed = (html||'').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#7ac4ff;">$1</strong>').replace(/\n/g,'<br>');
+    if (el) el.innerHTML = '<h4 style="font-size:15px;font-weight:700;color:#7ac4ff;margin:0 0 10px;">'+title+'</h4><div style="animation:sajuFadeIn .4s ease;">'+processed+'</div>';
+  }
+  function showSpinSC(id) { var el = document.getElementById(id); if (el) el.innerHTML = '<div class="saju-ai-spinner"></div>'; }
+
+  // ── 0. /saju-report 호출 (DB 10개 한번에) ──
+  var rpt = {};
+  try {
+    var rptUrl = WORKER + '/saju-report?year='+pYear+'&month='+pMonth+'&day='+pDay+'&hour='+(pHour||0)+'&minute='+(pMinute||0)+'&gender='+pGender+'&age='+ageBracket;
+    var rptRes = await fetch(rptUrl);
+    if (rptRes.ok) rpt = await rptRes.json();
+  } catch(e) {}
+  console.log('[사주AI] report:', Object.keys(rpt));
+
+  // ── 1. 기질 DNA (DB) ──
+  var personality = rpt.리포트 && rpt.리포트.기본 ? rpt.리포트.기본.성격 : '';
+  showSC('sc-1', '🧬 나의 기질 DNA', personality || '데이터 준비 중');
+
+  // ── 2. 유명인 (DB) ──
+  var famous = rpt.유명인;
+  if (famous && famous.유명인) {
+    showSC('sc-2', '⭐ 나와 같은 일주 유명인', '**' + famous.유명인.join(', ') + '**\n\n' + (famous.공통특성||''));
+  } else {
+    document.getElementById('sc-2').style.display = 'none';
+  }
+
+  // ── 3. 분야별 운세 탭 (DB) ──
+  var basic = rpt.리포트 && rpt.리포트.기본 ? rpt.리포트.기본 : {};
+  var tabHtml = '<div class="saju-tab-wrap">'
+    +'<div class="saju-tab active" onclick="switchSajuTab(0)">💰 재물</div>'
+    +'<div class="saju-tab" onclick="switchSajuTab(1)">💕 연애</div>'
+    +'<div class="saju-tab" onclick="switchSajuTab(2)">💼 직업</div>'
+    +'<div class="saju-tab" onclick="switchSajuTab(3)">🏥 건강</div>'
+    +'</div>'
+    +'<div class="saju-tab-content active" id="stab-0">'+(basic.재물운||'')+'</div>'
+    +'<div class="saju-tab-content" id="stab-1">'+(basic.연애운||'')+'</div>'
+    +'<div class="saju-tab-content" id="stab-2">'+(basic.직업운||'')+'</div>'
+    +'<div class="saju-tab-content" id="stab-3">'+(basic.건강||'')+'</div>';
+  showSC('sc-3', '📊 분야별 운세', tabHtml);
+
+  // ── 4. 올해 운세 (DB) ──
+  var yearF = rpt.리포트 && rpt.리포트.올해운세 ? rpt.리포트.올해운세 : {};
+  if (yearF.분석) {
+    showSC('sc-4', '📅 ' + (yearF.년도||'올해') + ' 운세', '**' + (yearF.키워드||'') + '**\n\n' + yearF.분석);
+  } else {
+    document.getElementById('sc-4').style.display = 'none';
+  }
+
+  // ── 5. 이달 운세 (DB) ──
+  var monthly = rpt.월별운세;
+  if (monthly && monthly.운세) {
+    showSC('sc-5', '🗓️ 이달의 운세 · ' + (monthly.월건||''), '**' + (monthly.키워드||'') + '**\n\n' + monthly.운세);
+  } else {
+    document.getElementById('sc-5').style.display = 'none';
+  }
+
+  // ── 6. 오행 패턴 (DB) ──
+  var pattern = rpt.오행패턴;
+  if (pattern && pattern.명칭) {
+    showSC('sc-6', '⚡ 오행 패턴 · ' + pattern.현대명칭, '**' + pattern.명칭 + '**\n\n' + pattern.핵심메시지 + '\n\n💡 ' + pattern.현대조언);
+  } else {
+    document.getElementById('sc-6').style.display = 'none';
+  }
+
+  // ── 7. 지금 내 시기 (Claude 1회, 80 Orb) ──
+  showSpinSC('sc-7');
+  try {
+    var ageAdvice = rpt.연령대조언 ? rpt.연령대조언.조언 : '';
+    var daeun = rpt.대운분석 ? rpt.대운분석.대운특성 : '';
+    var monthlyText = monthly ? monthly.운세 + ' [' + monthly.키워드 + ']' : '';
+    var yearText = yearF.분석 || '';
+
+    var r1 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:user.id, orb_override:80,
+        system_prompt: '사주명리 전문가. 현재 시기 분석만. 톤: 따뜻하고 희망적. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 구체적 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
+        messages: [{ role:'user', content: '【'+( pName||'나') +' 현재 시기 종합 분석】\n'
+          +'일주: '+rpt.일주+', '+rpt.신강약+', 용신: '+rpt.용신+'\n'
+          +'나이: '+(age)+'세 ('+ageBracket+'대)\n\n'
+          +'▸ '+ageBracket+'대 시기 조언: '+(ageAdvice||'정보 없음')+'\n'
+          +'▸ 대운 흐름: '+(daeun||'정보 없음')+'\n'
+          +'▸ 올해 운세: '+(yearText||'정보 없음')+'\n'
+          +'▸ 이달 운세: '+(monthlyText||'정보 없음')+'\n\n'
+          +'위 DB 정보를 모두 종합하여 지금 이 시기에 집중해야 할 것, 조심할 것, 기회가 오는 방향을 구체적으로 분석해줘. 800~1000자.' }]
+      })
+    });
+    if (!r1.ok) {
+      var e1 = await r1.json().catch(function(){return{};});
+      if (e1.error === 'orb_insufficient') { aiEl.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.5);">Orb가 부족해요. 충전 후 다시 시도해주세요.</div>'; btn.disabled=false; btn.textContent='정밀분석 시작'; return; }
+      throw new Error(e1.error||r1.status);
+    }
+    var d1 = await r1.json();
+    showSC('sc-7', '⏰ 지금 내 시기 · AI 종합 해석', d1.reply);
+  } catch(e) {
+    showSC('sc-7', '⏰ 지금 내 시기', '분석 실패');
+  }
+
+  // ── 8. 맞춤 실전 전략 + 용신 가이드 (Claude 1회 skip_orb + DB) ──
+  showSpinSC('sc-8');
+  try {
+    var advice = rpt.리포트 && rpt.리포트.조언 ? rpt.리포트.조언 : {};
+    var modernThemes = ['창업플랫폼','디지털노마드','코인주식'];
+    var modernTexts = [];
+    for (var mi=0; mi<modernThemes.length; mi++) {
+      try {
+        var mRes = await fetch(WORKER+'/saju-report?year='+pYear+'&month='+pMonth+'&day='+pDay+'&hour='+(pHour||0)+'&minute=0&gender='+pGender+'&modern_theme='+encodeURIComponent(modernThemes[mi]));
+        var mData = await mRes.json();
+        if (mData.현대키워드 && mData.현대키워드.조언) modernTexts.push(modernThemes[mi]+': '+mData.현대키워드.조언);
+      } catch(e) {}
+    }
+
+    var r2 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:user.id, skip_orb:true,
+        system_prompt: '사주명리 전문가. 실전 전략과 구체적 액션 플랜만. 톤: 따뜻하고 실용적. 절대 규칙: #헤더 금지. 표 금지. **볼드**는 핵심 단어에만 3~5개.',
+        messages: [{ role:'user', content: '【'+( pName||'나') +' 맞춤 실전 전략】\n'
+          +'일주: '+rpt.일주+', '+rpt.신강약+', 용신: '+rpt.용신+'\n\n'
+          +'▸ 창업/비즈니스: '+(advice['창업/비즈니스']||'정보 없음')+'\n'
+          +'▸ 이직/커리어: '+(advice['이직/커리어']||'정보 없음')+'\n'
+          +'▸ 투자/재테크: '+(advice['투자/재테크']||'정보 없음')+'\n'
+          +'▸ 대인관계: '+(advice['대인관계/부부']||'정보 없음')+'\n'
+          +(modernTexts.length ? '\n▸ 현대 트렌드:\n'+modernTexts.join('\n')+'\n' : '')
+          +'\n위 DB 정보를 종합하여 지금 당장 실행할 수 있는 구체적인 액션 플랜을 알려줘. 각 분야별로 한 줄씩 핵심 행동을 제시하고, 마지막에 가장 우선순위 높은 한 가지를 강조해줘. 800~1000자.' }]
+      })
+    });
+    if (r2.ok) {
+      var d2 = await r2.json();
+      // 용신 가이드 카드
+      var ys = rpt.용신활용;
+      var ysHtml = '';
+      if (ys) {
+        function ysCard(icon, label, val) { return val ? '<div style="margin-bottom:4px;">'+icon+' <strong style="color:#7ac4ff;">'+label+'</strong>: '+val+'</div>' : ''; }
+        ysHtml = '<div style="margin-top:20px;padding:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">'
+          +'<div style="font-size:13px;font-weight:700;color:#e8b86d;margin-bottom:10px;">🌟 용신 실천 가이드 · '+rpt.용신+'</div>'
+          +'<div style="font-size:14px;color:#e8e0f0;line-height:1.7;">'
+          +ysCard('🎨','색상',ys.색상)+ysCard('🧭','방위',ys.방위)+ysCard('🍽️','음식',ys.음식)+ysCard('💼','직업',ys.직업)+ysCard('🏠','인테리어',ys.인테리어)
+          +'</div></div>';
+      }
+      showSC('sc-8', '💼 맞춤 실전 전략 · AI', d2.reply + ysHtml);
+    } else {
+      showSC('sc-8', '💼 맞춤 실전 전략', '분석 실패');
+    }
+  } catch(e) {
+    showSC('sc-8', '💼 맞춤 실전 전략', '분석 실패');
+  }
+
+  // ── 자동 저장 ──
+  try {
+    var _gs = function(id){ var e=document.getElementById(id); return e?e.innerHTML:''; };
+    await fetch(WORKER + '/analysis-history', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        user_id: user.id, type: 'saju',
+        title: (pName||'나') + '의 사주 정밀분석',
+        result: {
+          ilju: rpt.일주, strength: rpt.신강약, yongsin: rpt.용신,
+          sections: { s1:_gs('sc-1'),s2:_gs('sc-2'),s3:_gs('sc-3'),s4:_gs('sc-4'),s5:_gs('sc-5'),s6:_gs('sc-6'),s7:_gs('sc-7'),s8:_gs('sc-8') }
+        }
+      })
+    });
+    var savedMsg = document.createElement('div');
+    savedMsg.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:rgba(255,255,255,0.35);margin-top:8px;';
+    savedMsg.textContent = '✅ 자동 저장됨 · 지난 분석에서 다시 볼 수 있어요';
+    aiEl.appendChild(savedMsg);
+  } catch(e) {}
+
+  btn.disabled=false; btn.textContent='정밀분석 시작';
+}
+
+function switchSajuTab(idx) {
+  var tabs = document.querySelectorAll('.saju-tab');
+  var contents = document.querySelectorAll('.saju-tab-content');
+  tabs.forEach(function(t,i){ t.classList.toggle('active', i===idx); });
+  contents.forEach(function(c,i){ c.classList.toggle('active', i===idx); });
+}
 })();
 </script>
 <!-- 공유 카드 프리뷰 모달 -->
