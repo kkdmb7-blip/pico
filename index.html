@@ -1222,7 +1222,7 @@
     <!-- 유료: AI 분석 버튼 -->
     <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px;">
       <div style="font-size:12px;font-weight:700;color:#e8b86d;margin-bottom:3px;">🔮 AI 정밀 분석 받기</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px;">두 사람의 깊은 인연을 AI가 분석합니다 · <span style="color:rgba(255,200,100,0.6);">질문권 1개 사용</span></div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px;">두 사람의 깊은 인연을 AI가 분석합니다 · <span style="color:rgba(255,200,100,0.6);">20 Orb 사용</span></div>
       <button id="ghAiBtn" onclick="requestGunghapAI()" style="padding:10px 24px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:10px;color:#e8b86d;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">AI 분석 시작</button>
     </div>
 
@@ -1760,7 +1760,7 @@ async function requestGunghapAI() {
     });
     if (!res.ok) {
       var err = await res.json().catch(function(){return{};});
-      if (err.error === 'limit_exceeded') { if (aiEl) aiEl.textContent = '오늘 사용량을 모두 소진했어요. 내일 다시 시도해주세요.'; if (aiBtn) aiBtn.textContent = 'AI 분석 시작'; return; }
+      if (err.error === 'orb_insufficient' || err.error === 'limit_exceeded') { if (aiEl) aiEl.textContent = 'Orb가 부족해요. 충전 후 다시 시도해주세요.'; if (aiBtn) aiBtn.textContent = 'AI 분석 시작'; return; }
       throw new Error(err.error || res.status);
     }
     var data = await res.json();
