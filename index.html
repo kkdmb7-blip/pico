@@ -1756,7 +1756,7 @@ async function requestGunghapAI() {
     var res = await fetch('https://fortuna-silk.vercel.app/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: user.id, messages: [{ role: 'user', content: prompt }], system_prompt: systemMsg })
+      body: JSON.stringify({ user_id: user.id, messages: [{ role: 'user', content: prompt }], system_prompt: systemMsg, orb_override: 80 })
     });
     if (!res.ok) {
       var err = await res.json().catch(function(){return{};});
