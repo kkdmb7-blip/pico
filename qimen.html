@@ -1476,19 +1476,6 @@ function shareQimenKakao() {
       var door = data && data.직사문 ? data.직사문 : null;
       var yun = door && DOOR_YUN[door] ? DOOR_YUN[door] : { grade: '평', keyword: '정상적인 일과' };
 
-      // 격국 보정: 특수 격국이면 길흉 업그레이드 가능
-      if (data && typeof checkGeokguk === 'function') {
-        var matched = checkGeokguk(data);
-        if (matched.length > 0) {
-          var g = matched[0];
-          if (g.길흉 === '대길' || g.길흉 === '길') {
-            yun = { grade: g.길흉, keyword: g.name.replace(/\(.*\)/, '').trim() + ' — ' + (g.요약 || yun.keyword).slice(0, 20) };
-          } else if (g.길흉 === '대흉' || g.길흉 === '흉') {
-            yun = { grade: g.길흉, keyword: g.name.replace(/\(.*\)/, '').trim() + ' — ' + (g.주의 || yun.keyword).slice(0, 20) };
-          }
-        }
-      }
-
       var row = document.createElement('div');
       row.className = 'yun-row' + (isCurrent ? ' current-shi' : '') + (isPast && !isCurrent ? ' past-shi' : '');
       if (isCurrent) row.id = 'currentShiRow';
