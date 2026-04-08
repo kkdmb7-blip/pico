@@ -374,7 +374,7 @@
 <div id="sajuAiWrap" style="display:none;padding:4px 20px 8px;max-width:440px;margin:0 auto;">
   <div class="glass" style="padding:20px 18px;text-align:center;">
     <div style="font-size:13px;font-weight:700;color:#e8b86d;margin-bottom:4px;">🔮 AI 사주 정밀분석</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px;">DB 10개 + AI 심층 해석 · <span style="color:rgba(255,200,100,0.6);">80 Orb 사용</span></div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px;">DB 10개 + AI 심층 해석 · <span style="color:rgba(255,200,100,0.6);">500 Orb 사용</span></div>
     <button id="sajuAiBtn" onclick="requestSajuAI()" style="padding:12px 28px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:12px;color:#e8b86d;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">정밀분석 시작</button>
   </div>
   <div id="sajuAiResult" style="color:#e8e0f0;display:none;margin-top:12px;"></div>
@@ -1663,7 +1663,7 @@ async function requestSajuAI() {
     document.getElementById('sc-6').style.display = 'none';
   }
 
-  // ── 7. 지금 내 시기 (Claude 1회, 80 Orb) ──
+  // ── 7. 지금 내 시기 (Claude 1회, 500 Orb) ──
   showSpinSC('sc-7');
   try {
     var ageAdvice = rpt.연령대조언 ? rpt.연령대조언.조언 : '';
@@ -1672,7 +1672,7 @@ async function requestSajuAI() {
     var yearText = yearF.분석 || '';
 
     var r1 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ user_id:user.id, orb_override:80,
+      body: JSON.stringify({ user_id:user.id, orb_override:500,
         system_prompt: '사주명리 전문가. 현재 시기 분석만. 톤: 따뜻하고 희망적. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 구체적 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
         messages: [{ role:'user', content: '【'+( pName||'나') +' 현재 시기 종합 분석】\n'
           +'일주: '+rpt.일주+', '+rpt.신강약+', 용신: '+rpt.용신+'\n'
