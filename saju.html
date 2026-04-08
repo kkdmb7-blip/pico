@@ -186,6 +186,10 @@
     .saju-tab.active { background:rgba(122,196,255,0.15);color:#7ac4ff; }
     .saju-tab-content { display:none;font-size:15px;line-height:1.8;color:#e8e0f0; }
     .saju-tab-content.active { display:block;animation:sajuFadeIn .3s ease; }
+    .tq-row { margin-bottom:12px; }
+    .tq-btn { flex:1;padding:9px 6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.5);font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .2s; }
+    .tq-btn:hover { border-color:rgba(232,184,109,0.3); }
+    .tq-btn.selected { background:rgba(232,184,109,0.12);border-color:rgba(232,184,109,0.5);color:#e8b86d; }
   </style>
 </head>
 <body class="min-h-screen pb-24">
@@ -371,10 +375,44 @@
 
 <!-- 사주 AI 정밀분석 -->
 <div id="sajuAiWrap" style="display:none;padding:4px 20px 8px;max-width:440px;margin:0 auto;">
-  <div class="glass" style="padding:20px 18px;text-align:center;">
-    <div style="font-size:13px;font-weight:700;color:#e8b86d;margin-bottom:4px;">🔮 AI 사주 정밀분석</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px;">DB 10개 + AI 심층 해석 · <span style="color:rgba(255,200,100,0.6);">500 Orb 사용</span></div>
-    <button id="sajuAiBtn" onclick="requestSajuAI()" style="padding:12px 28px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:12px;color:#e8b86d;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">정밀분석 시작</button>
+  <div class="glass" style="padding:20px 18px;">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:700;color:#e8b86d;margin-bottom:4px;">🔮 AI 사주 정밀분석</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);">적천수 이론 + DB 10개 + AI 심층 해석 · <span style="color:rgba(255,200,100,0.6);">500 Orb 사용</span></div>
+    </div>
+    <!-- 성향 질문 4개 -->
+    <div id="tendencyQuestions" style="margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.35);margin-bottom:12px;">간단한 성향 체크 (선택사항)</div>
+      <div class="tq-row" data-id="social">
+        <div style="font-size:13px;color:#e8e0f0;margin-bottom:6px;">모임에 가면?</div>
+        <div style="display:flex;gap:6px;">
+          <button class="tq-btn" data-value="extrovert" onclick="selectTQ(this)">먼저 말 거는 편</button>
+          <button class="tq-btn" data-value="introvert" onclick="selectTQ(this)">누가 말 걸길 기다림</button>
+        </div>
+      </div>
+      <div class="tq-row" data-id="action">
+        <div style="font-size:13px;color:#e8e0f0;margin-bottom:6px;">새로운 일을 시작할 때?</div>
+        <div style="display:flex;gap:6px;">
+          <button class="tq-btn" data-value="planner" onclick="selectTQ(this)">계획을 먼저 세움</button>
+          <button class="tq-btn" data-value="impulsive_start" onclick="selectTQ(this)">일단 시작하고 봄</button>
+        </div>
+      </div>
+      <div class="tq-row" data-id="decision">
+        <div style="font-size:13px;color:#e8e0f0;margin-bottom:6px;">결정을 내릴 때?</div>
+        <div style="display:flex;gap:6px;">
+          <button class="tq-btn" data-value="logical" onclick="selectTQ(this)">논리적으로 따짐</button>
+          <button class="tq-btn" data-value="feeling_based" onclick="selectTQ(this)">느낌·직감을 따름</button>
+        </div>
+      </div>
+      <div class="tq-row" data-id="stress">
+        <div style="font-size:13px;color:#e8e0f0;margin-bottom:6px;">스트레스 받으면?</div>
+        <div style="display:flex;gap:6px;">
+          <button class="tq-btn" data-value="seek_people" onclick="selectTQ(this)">사람을 만나서 풀림</button>
+          <button class="tq-btn" data-value="need_alone_time" onclick="selectTQ(this)">혼자만의 시간이 필요</button>
+        </div>
+      </div>
+    </div>
+    <button id="sajuAiBtn" onclick="requestSajuAI()" style="width:100%;padding:14px;background:linear-gradient(135deg,rgba(201,168,76,0.25),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:12px;color:#e8b86d;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">정밀분석 시작 ✦</button>
   </div>
   <div id="sajuAiResult" style="color:#e8e0f0;display:none;margin-top:12px;"></div>
 </div>
@@ -1565,6 +1603,43 @@ window.addEventListener('load', function() {
 // ═══════════════════════════════════════════════════
 // 사주 AI 정밀분석 (10섹션, DB+Claude 2회)
 // ═══════════════════════════════════════════════════
+// ── 성향 질문 선택 ──
+var _userTendency = {};
+function selectTQ(el) {
+  var row = el.closest('.tq-row');
+  var id = row.getAttribute('data-id');
+  row.querySelectorAll('.tq-btn').forEach(function(b){ b.classList.remove('selected'); });
+  el.classList.add('selected');
+  _userTendency[id] = el.getAttribute('data-value');
+}
+
+// ── validateReport: AI 텍스트 검증 ──
+function validateReport(text, sajuData, theoryFrame) {
+  var errors = [];
+  var fc = sajuData.five_count || {};
+  var elNames = {
+    fire:['화','火','병화','정화','丙火','丁火'], metal:['금','金','경금','신금','庚金','辛金'],
+    earth:['토','土','무토','기토','戊土','己土'], water:['수','水','임수','계수','壬水','癸水'],
+    wood:['목','木','갑목','을목','甲木','乙木']
+  };
+  for (var el in elNames) {
+    if (fc[el] === 0) {
+      for (var ni=0; ni<elNames[el].length; ni++) {
+        var nm = elNames[el][ni];
+        if (new RegExp(nm+'[을를이가]\\s*가지고').test(text) || new RegExp(nm+'[이가]\\s*있').test(text) || new RegExp(nm+'[이가]\\s*풍부').test(text)) {
+          errors.push(el+'=0인데 보유로 서술');
+        }
+      }
+    }
+  }
+  if (theoryFrame && theoryFrame.yongshin_final && theoryFrame.yongshin_final.primary) {
+    var ysN = theoryFrame.yongshin_final.primary;
+    if (new RegExp(ysN+'.{0,20}(피해야|조심|기신|불리|해롭)').test(text)) errors.push('용신을 기신으로 서술');
+  }
+  if (/(반드시|확실히|틀림없이).{0,20}(됩니다|됩니다|합니다)/.test(text)) errors.push('확정적 예언 표현');
+  return { passed: errors.length === 0, errors: errors };
+}
+
 async function requestSajuAI() {
   if (!_sajuData) return;
   var user = null;
@@ -1657,85 +1732,131 @@ async function requestSajuAI() {
     document.getElementById('sc-6').style.display = 'none';
   }
 
-  // ── 7. 지금 내 시기 (Claude 1회, 500 Orb) ──
+  // ── STEP 2: 이론 판단 (Claude, JSON만, 500 Orb) ──
   showSpinSC('sc-7');
-  try {
-    var ageAdvice = rpt.연령대조언 ? rpt.연령대조언.조언 : '';
-    var daeun = rpt.대운분석 ? rpt.대운분석.대운특성 : '';
-    var monthlyText = monthly ? monthly.운세 + ' [' + monthly.키워드 + ']' : '';
-    var yearText = yearF.분석 || '';
+  var sd = _sajuData;
+  var dayS = sd.summary && sd.summary.pillars ? sd.summary.pillars.day : '';
+  var dayStem = dayS ? dayS[0] : '';
+  var STEM_H_MAP = {갑:'甲',을:'乙',병:'丙',정:'丁',무:'戊',기:'己',경:'庚',신:'辛',임:'壬',계:'癸'};
+  var stemHanja = STEM_H_MAP[dayStem] || '';
 
-    var r1 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+  var theoryFrame = null;
+  try {
+    var step2Body = {
+      summary: sd.summary, geokguk: sd.geokguk, yongshin: sd.yongshin,
+      five_pct: sd.five_pct, five_count: sd.five_count,
+      strength_score: sd.strength_score, strength_level_5: sd.strength_level_5,
+      pattern: sd.pattern, ten_gods_map: sd.ten_gods_map, johu: sd.johu,
+      branch_relations_kor: sd.branch_relations_kor,
+      user_tendency: _userTendency
+    };
+
+    var r0 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, orb_override:500,
-        system_prompt: '사주명리 전문가. 현재 시기 분석만. 톤: 따뜻하고 희망적. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 구체적 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
-        messages: [{ role:'user', content: '【'+( pName||'나') +' 현재 시기 종합 분석】\n'
-          +'일주: '+rpt.일주+', '+rpt.신강약+', 용신: '+rpt.용신+'\n'
-          +'나이: '+(age)+'세 ('+ageBracket+'대)\n\n'
-          +'▸ '+ageBracket+'대 시기 조언: '+(ageAdvice||'정보 없음')+'\n'
-          +'▸ 대운 흐름: '+(daeun||'정보 없음')+'\n'
-          +'▸ 올해 운세: '+(yearText||'정보 없음')+'\n'
-          +'▸ 이달 운세: '+(monthlyText||'정보 없음')+'\n\n'
-          +'위 DB 정보를 모두 종합하여 지금 이 시기에 집중해야 할 것, 조심할 것, 기회가 오는 방향을 구체적으로 분석해줘. 800~1000자.' }]
+        system_prompt: '당신은 사주 이론 판별 엔진입니다. JSON만 반환하세요. 텍스트 해석 절대 금지.\n\n판단 규칙:\n- pattern.type이 "양신성상" 또는 "독상" → primary_theory: "적천수"\n- strength_level_5가 "극왕" 또는 "극약" → primary_theory: "적천수"\n- strength_level_5가 "신강" 또는 "신약" + pattern.type이 "정격" → primary_theory: "억부지전"\n- johu.needs의 원소가 five_count에서 0개 → secondary_theory: "궁통보감"\n\n용신 재확인:\n- 양신성상이면: 象을 疏(통하게)하는 오행 = 용신\n- 정격이면: yongshin.primary 그대로\n- 극왕 종격이면: 비겁/인성이 포섭, 식상이 용신\n\n성향 보정:\n- social=introvert + 비겁과다 → personality_keywords에 "내향적" 포함\n- action=impulsive_start → "아이디어다발_마무리약" 포함\n- stress=need_alone_time → "독립선호" 포함',
+        messages: [{ role:'user', content: '분석 데이터:\n'+JSON.stringify(step2Body)+'\n\nJSON만 반환. 필드: primary_theory, secondary_theory, yongshin_final:{primary,primary_element,in_chart}, structure_summary, strength_interpretation, bijob_role, personality_keywords[], wealth_structure:{type,note}, career_tendency, writing_guidelines[]' }]
       })
     });
-    if (!r1.ok) {
-      var e1 = await r1.json().catch(function(){return{};});
-      if (e1.error === 'orb_insufficient') { aiEl.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.5);">Orb가 부족해요. 충전 후 다시 시도해주세요.</div>'; btn.disabled=false; btn.textContent='정밀분석 시작'; return; }
-      throw new Error(e1.error||r1.status);
+    if (!r0.ok) {
+      var e0 = await r0.json().catch(function(){return{};});
+      if (e0.error === 'orb_insufficient') { aiEl.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.5);">Orb가 부족해요. 충전 후 다시 시도해주세요.</div>'; btn.disabled=false; btn.textContent='정밀분석 시작 ✦'; return; }
+      throw new Error(e0.error||r0.status);
     }
-    var d1 = await r1.json();
-    showSC('sc-7', '⏰ 지금 내 시기 · AI 종합 해석', d1.reply);
+    var d0 = await r0.json();
+    var replyText = (d0.reply||'').trim();
+    // JSON 추출 (```json ... ``` 또는 순수 JSON)
+    var jsonMatch = replyText.match(/```json?\s*([\s\S]*?)```/) || replyText.match(/(\{[\s\S]*\})/);
+    if (jsonMatch) theoryFrame = JSON.parse(jsonMatch[1]);
+    console.log('[사주AI] STEP2 이론판단:', theoryFrame);
   } catch(e) {
-    showSC('sc-7', '⏰ 지금 내 시기', '분석 실패');
+    console.error('[사주AI] STEP2 실패:', e);
   }
 
-  // ── 8. 맞춤 실전 전략 + 용신 가이드 (Claude 1회 skip_orb + DB) ──
+  // ── STEP 3-A: 원국 분석 (Claude, skip_orb) ──
+  var ageAdvice = rpt.연령대조언 ? rpt.연령대조언.조언 : '';
+  var daeun = rpt.대운분석 ? rpt.대운분석.대운특성 : '';
+  var monthlyText = monthly ? monthly.운세 + ' [' + monthly.키워드 + ']' : '';
+  var yearText = yearF.분석 || '';
+  var advice = rpt.리포트 && rpt.리포트.조언 ? rpt.리포트.조언 : {};
+
+  var wg = theoryFrame && theoryFrame.writing_guidelines ? '\n\n금지 표현 체크리스트:\n' + theoryFrame.writing_guidelines.map(function(g){return '- '+g;}).join('\n') : '';
+  var pkw = theoryFrame && theoryFrame.personality_keywords ? theoryFrame.personality_keywords.join(', ') : '';
+  var theoryName = theoryFrame ? (theoryFrame.primary_theory||'억부지전') : '억부지전';
+  var ysFinal = theoryFrame && theoryFrame.yongshin_final ? theoryFrame.yongshin_final.primary : (rpt.용신||'');
+
+  try {
+    var r1 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:user.id, skip_orb:true,
+        system_prompt: '당신은 '+theoryName+' 기반 사주 분석가입니다.\n확정된 사실과 작성 지시만 따르세요.\n\n절대 규칙:\n- #헤더 금지, 표 금지, 일진/날짜 구체적 언급 금지\n- **볼드**는 핵심 단어에만 3~5개\n- 톤: 따뜻하고 정확한 친구 같은 전문가\n- 없는 오행을 "있다"고 쓰면 안 됨\n- 용신('+ysFinal+')을 기신/불리로 쓰면 안 됨'+wg,
+        messages: [{ role:'user', content: '【원국 분석】\n'
+          +'일간: '+dayStem+'('+stemHanja+'), 일주: '+(rpt.일주||dayS)+'\n'
+          +'사주: '+(sd.summary?JSON.stringify(sd.summary.pillars):'')+'\n'
+          +'오행 개수: 목'+(sd.five_count?sd.five_count.wood:'')+' 화'+(sd.five_count?sd.five_count.fire:'')+' 토'+(sd.five_count?sd.five_count.earth:'')+' 금'+(sd.five_count?sd.five_count.metal:'')+' 수'+(sd.five_count?sd.five_count.water:'')+'\n'
+          +'오행 비율: '+(sd.five_pct?JSON.stringify(sd.five_pct):'')+'\n'
+          +'신강도: '+(sd.strength_level_5||'')+' ('+(sd.strength_score||'')+'점)\n'
+          +'패턴: '+(sd.pattern?sd.pattern.type+' '+sd.pattern.subtype:'')+'\n'
+          +'격국: '+(sd.geokguk?sd.geokguk.geok_kor:'')+'\n'
+          +'용신: '+ysFinal+'\n'
+          +'십신: '+(sd.ten_gods_map?JSON.stringify(sd.ten_gods_map):'')+'\n'
+          +'성격 키워드: '+pkw+'\n\n'
+          +'▸ 성격 DB: '+(personality||'')+'\n'
+          +'▸ '+ageBracket+'대 조언: '+(ageAdvice||'정보 없음')+'\n\n'
+          +'위 확정 사실을 바탕으로 원국 분석을 작성해주세요.\n'
+          +'구조: ① 이 사주의 핵심 구조를 비유로 설명 ② 성격·기질·강점 ③ 약점과 보완점 ④ 왜 이런 패턴인지 사주 구조로 설명\n'
+          +'800~1200자.' }]
+      })
+    });
+    if (r1.ok) {
+      var d1 = await r1.json();
+      var v1 = validateReport(d1.reply||'', sd, theoryFrame);
+      if (!v1.passed) console.warn('[사주AI] 원국 검증 실패:', v1.errors);
+      showSC('sc-7', '🧬 원국 심층 분석 · '+theoryName, d1.reply);
+    } else showSC('sc-7', '🧬 원국 분석', '분석 실패');
+  } catch(e) { showSC('sc-7', '🧬 원국 분석', '분석 실패'); }
+
+  // ── STEP 3-B: 대운 분석 + 실전 전략 + 용신 (Claude, skip_orb) ──
   showSpinSC('sc-8');
   try {
-    var advice = rpt.리포트 && rpt.리포트.조언 ? rpt.리포트.조언 : {};
-    var modernThemes = ['창업플랫폼','디지털노마드','코인주식'];
-    var modernTexts = [];
-    for (var mi=0; mi<modernThemes.length; mi++) {
-      try {
-        var mRes = await fetch(WORKER+'/saju-report?year='+pYear+'&month='+pMonth+'&day='+pDay+'&hour='+(pHour||0)+'&minute=0&gender='+pGender+'&modern_theme='+encodeURIComponent(modernThemes[mi]));
-        var mData = await mRes.json();
-        if (mData.현대키워드 && mData.현대키워드.조언) modernTexts.push(modernThemes[mi]+': '+mData.현대키워드.조언);
-      } catch(e) {}
-    }
+    var blAnalysis = sd.big_luck_analysis ? JSON.stringify(sd.big_luck_analysis.slice(0,8)) : '[]';
 
     var r2 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, skip_orb:true,
-        system_prompt: '사주명리 전문가. 실전 전략과 구체적 액션 플랜만. 톤: 따뜻하고 실용적. 절대 규칙: #헤더 금지. 표 금지. **볼드**는 핵심 단어에만 3~5개.',
-        messages: [{ role:'user', content: '【'+( pName||'나') +' 맞춤 실전 전략】\n'
-          +'일주: '+rpt.일주+', '+rpt.신강약+', 용신: '+rpt.용신+'\n\n'
-          +'▸ 창업/비즈니스: '+(advice['창업/비즈니스']||'정보 없음')+'\n'
-          +'▸ 이직/커리어: '+(advice['이직/커리어']||'정보 없음')+'\n'
-          +'▸ 투자/재테크: '+(advice['투자/재테크']||'정보 없음')+'\n'
-          +'▸ 대인관계: '+(advice['대인관계/부부']||'정보 없음')+'\n'
-          +(modernTexts.length ? '\n▸ 현대 트렌드:\n'+modernTexts.join('\n')+'\n' : '')
-          +'\n위 DB 정보를 종합하여 지금 당장 실행할 수 있는 구체적인 액션 플랜을 알려줘. 각 분야별로 한 줄씩 핵심 행동을 제시하고, 마지막에 가장 우선순위 높은 한 가지를 강조해줘. 800~1000자.' }]
+        system_prompt: '당신은 '+theoryName+' 기반 사주 분석가입니다.\n대운 분석 + 실전 전략을 작성하세요.\n\n절대 규칙:\n- #헤더 금지, 표 금지\n- **볼드**는 핵심 단어에만 3~5개\n- 톤: 따뜻하고 실용적\n- 구체적 금액, 확정적 예언 금지\n- 대운별로 stem_ten_god과 element_supply 반드시 반영'+wg,
+        messages: [{ role:'user', content: '【대운 분석 + 실전 전략】\n'
+          +'일주: '+(rpt.일주||dayS)+', '+(sd.strength_level_5||'')+', 용신: '+ysFinal+'\n'
+          +'나이: '+age+'세, '+ageBracket+'대\n\n'
+          +'대운 데이터:\n'+blAnalysis+'\n\n'
+          +'▸ 대운 특성: '+(daeun||'정보 없음')+'\n'
+          +'▸ 올해 운세: '+(yearText||'정보 없음')+'\n'
+          +'▸ 이달 운세: '+(monthlyText||'정보 없음')+'\n'
+          +'▸ 창업 조언: '+(advice['창업/비즈니스']||'')+'\n'
+          +'▸ 투자 조언: '+(advice['투자/재테크']||'')+'\n\n'
+          +'구조:\n'
+          +'① 현재 대운 해석 (400자, 가장 상세)\n'
+          +'② 과거 대운 요약 (각 150자)\n'
+          +'③ 미래 대운 전망 (각 250자)\n'
+          +'④ 지금 당장 할 수 있는 실전 액션 3가지\n'
+          +'1000~1500자.' }]
       })
     });
     if (r2.ok) {
       var d2 = await r2.json();
+      var v2 = validateReport(d2.reply||'', sd, theoryFrame);
+      if (!v2.passed) console.warn('[사주AI] 대운 검증 실패:', v2.errors);
       // 용신 가이드 카드
       var ys = rpt.용신활용;
       var ysHtml = '';
       if (ys) {
         function ysCard(icon, label, val) { return val ? '<div style="margin-bottom:4px;">'+icon+' <strong style="color:#7ac4ff;">'+label+'</strong>: '+val+'</div>' : ''; }
         ysHtml = '<div style="margin-top:20px;padding:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">'
-          +'<div style="font-size:13px;font-weight:700;color:#e8b86d;margin-bottom:10px;">🌟 용신 실천 가이드 · '+rpt.용신+'</div>'
+          +'<div style="font-size:13px;font-weight:700;color:#e8b86d;margin-bottom:10px;">🌟 용신 실천 가이드 · '+(ysFinal||rpt.용신)+'</div>'
           +'<div style="font-size:14px;color:#e8e0f0;line-height:1.7;">'
           +ysCard('🎨','색상',ys.색상)+ysCard('🧭','방위',ys.방위)+ysCard('🍽️','음식',ys.음식)+ysCard('💼','직업',ys.직업)+ysCard('🏠','인테리어',ys.인테리어)
           +'</div></div>';
       }
-      showSC('sc-8', '💼 맞춤 실전 전략 · AI', d2.reply + ysHtml);
-    } else {
-      showSC('sc-8', '💼 맞춤 실전 전략', '분석 실패');
-    }
-  } catch(e) {
-    showSC('sc-8', '💼 맞춤 실전 전략', '분석 실패');
-  }
+      showSC('sc-8', '⏰ 대운 분석 + 💼 실전 전략', d2.reply + ysHtml);
+    } else showSC('sc-8', '⏰ 대운 + 전략', '분석 실패');
+  } catch(e) { showSC('sc-8', '⏰ 대운 + 전략', '분석 실패'); }
 
   // ── 자동 저장 ──
   try {
