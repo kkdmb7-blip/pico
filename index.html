@@ -2732,8 +2732,8 @@ function checkAuth() {
     var stored = localStorage.getItem('pico_user');
     if (stored) {
       currentUser = JSON.parse(stored);
-      // _v<4 이거나 kakao_ 접두어면 UUID 재검증 (v4: worker email 필터 완전 수정)
-      var needsUpgrade = currentUser.email && ((!currentUser._v || currentUser._v < 5) || (currentUser.id && currentUser.id.indexOf('kakao_') === 0));
+      // _v<6 이거나 kakao_ 접두어면 UUID 재검증 (v6: 프로필 초기화 후 ID 변경 대응)
+      var needsUpgrade = currentUser.email && ((!currentUser._v || currentUser._v < 6) || (currentUser.id && currentUser.id.indexOf('kakao_') === 0));
       if (needsUpgrade) {
         fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
           method: 'POST',
@@ -2744,7 +2744,7 @@ function checkAuth() {
         .then(function(resolved) {
           if (resolved && resolved.id) {
             currentUser.id = resolved.id;
-            currentUser._v = 5;
+            currentUser._v = 6;
             localStorage.setItem('pico_user', JSON.stringify(currentUser));
           }
           updateAuthUI();
@@ -2826,7 +2826,7 @@ function handleKakaoCallback(code) {
     .then(function(r) { return r.json(); })
     .then(function(resolved) {
       var userId = (resolved && resolved.id) ? resolved.id : kakaoFallbackId;
-      var resolved_v = (resolved && resolved.id) ? 5 : undefined;
+      var resolved_v = (resolved && resolved.id) ? 6 : undefined;
       currentUser = { id: userId, name: name, avatar: avatar, email: email, _v: resolved_v };
       localStorage.setItem('pico_user', JSON.stringify(currentUser));
       updateAuthUI();
