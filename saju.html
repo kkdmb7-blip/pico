@@ -412,7 +412,7 @@
         </div>
       </div>
     </div>
-    <button id="sajuAiBtn" onclick="requestSajuAI()" style="width:100%;padding:14px;background:linear-gradient(135deg,rgba(201,168,76,0.25),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:12px;color:#e8b86d;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">정밀분석 시작 ✦</button>
+    <button id="sajuAiBtn" onclick="requestSajuAI()" style="width:100%;padding:14px;background:linear-gradient(135deg,#7b5ea7,#a07fd4);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">✦ 정밀분석 시작 · <span style="font-size:13px;opacity:0.85;">500 Orb</span></button>
   </div>
   <div id="sajuAiResult" style="color:#e8e0f0;display:none;margin-top:12px;"></div>
 </div>
@@ -1769,7 +1769,7 @@ async function requestSajuAI() {
     });
     if (!r0.ok) {
       var e0 = await r0.json().catch(function(){return{};});
-      if (e0.error === 'orb_insufficient') { aiEl.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.5);">Orb가 부족해요. 충전 후 다시 시도해주세요.</div>'; btn.disabled=false; btn.textContent='정밀분석 시작 ✦'; return; }
+      if (e0.error === 'orb_insufficient') { aiEl.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.5);">Orb가 부족해요. 충전 후 다시 시도해주세요.</div>'; btn.disabled=false; btn.innerHTML='✦ 정밀분석 시작 · <span style="font-size:13px;opacity:0.85;">500 Orb</span>'; return; }
       throw new Error(e0.error||r0.status);
     }
     var d0 = await r0.json();
@@ -1890,7 +1890,7 @@ async function requestSajuAI() {
     aiEl.appendChild(savedMsg);
   } catch(e) {}
 
-  btn.disabled=false; btn.textContent='정밀분석 시작';
+  btn.disabled=false; btn.innerHTML='✦ 정밀분석 시작 · <span style="font-size:13px;opacity:0.85;">500 Orb</span>';
 }
 
 function switchSajuTab(idx) {
