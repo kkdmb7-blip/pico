@@ -411,47 +411,59 @@ function doPay(pack) {
       setTimeout(function() { location.href = 'https://picolab.kr'; }, 2000);
     } catch(e) {
       hideLoading();
-      toast('결제는 완료됐으나 저장 중 오류가 발생했어요. 고객센터에 문의해주세요.');
+      console.error('[charge] chargeOrb 에러:', e);
+      toast('결제는 완료됐으나 저장 중 오류가 발생했어요. 고객센터에 문의해주세요. ('+e.message+')');
     }
   });
 }
 
 async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
+  console.log('[charge] 시작 user_id='+currentUserId+', totalOrb='+totalOrb+', balance='+currentBalance);
   var newBalance = currentBalance + totalOrb;
 
-  // orb_balance upsert
-  var upsertData = {
-    user_id: currentUserId,
-    balance: newBalance,
-    total_charged: (currentBalance + totalOrb), // rough estimate; server should handle properly
-    updated_at: new Date().toISOString(),
-  };
-  if (isFirstCharge) {
-    upsertData.is_first_charge = false;
+  // orb_balance 업데이트 (기존 row가 있으면 PATCH, 없으면 INSERT)
+  try {
+    // 먼저 기존 row 확인
+    var check = await sb.from('orb_balance').select('balance').eq('user_id', currentUserId).maybeSingle();
+    if (check.data) {
+      // 기존 row 있음 → PATCH
+      var r1 = await sb.from('orb_balance')
+        .update({ balance: newBalance, is_first_charge: false, updated_at: new Date().toISOString() })
+        .eq('user_id', currentUserId);
+      console.log('[charge] orb_balance PATCH:', r1.error ? r1.error.message : 'OK');
+      if (r1.error) throw new Error('balance 업데이트 실패: ' + r1.error.message);
+    } else {
+      // 없음 → INSERT
+      var r1 = await sb.from('orb_balance')
+        .insert({ user_id: currentUserId, balance: newBalance, is_first_charge: false, updated_at: new Date().toISOString() });
+      console.log('[charge] orb_balance INSERT:', r1.error ? r1.error.message : 'OK');
+      if (r1.error) throw new Error('balance 생성 실패: ' + r1.error.message);
+    }
+  } catch(e) {
+    console.error('[charge] orb_balance 실패:', e);
+    throw e;
   }
 
-  var r1 = await sb.from('orb_balance').upsert(upsertData);
-  if (r1.error) throw new Error(r1.error.message);
-
-  // total_charged 증가 (별도 increment - upsert 이후)
-  try {
-    await sb.rpc('increment_total_charged', { p_user_id: currentUserId, p_amount: totalOrb });
-  } catch(e) { /* RPC 없으면 스킵 */ }
-
   // orb_transactions 기록
-  var r2 = await sb.from('orb_transactions').insert({
-    user_id: currentUserId,
-    type: 'charge',
-    amount: totalOrb,
-    description: (pack.firstOnly && isFirstCharge ? '첫충전 1+1 ' : '') + pack.id + ' imp:' + impUid,
-    balance_after: newBalance,
-  });
-  if (r2.error) throw new Error(r2.error.message);
+  try {
+    var r2 = await sb.from('orb_transactions').insert({
+      user_id: currentUserId,
+      type: 'charge',
+      amount: totalOrb,
+      description: (pack.firstOnly && isFirstCharge ? '첫충전 1+1 ' : '') + pack.id + ' imp:' + impUid,
+      balance_after: newBalance,
+    });
+    console.log('[charge] orb_transactions INSERT:', r2.error ? r2.error.message : 'OK');
+    if (r2.error) console.error('[charge] 거래 기록 실패 (충전은 완료):', r2.error.message);
+  } catch(e) {
+    console.error('[charge] 거래 기록 실패 (충전은 완료):', e);
+  }
 
   currentBalance = newBalance;
   isFirstCharge = false;
   document.getElementById('currentBalance').textContent = currentBalance + ' Orb';
   renderPacks();
+  console.log('[charge] 완료! newBalance='+newBalance);
 }
 
 function handleInviteCharge() {
