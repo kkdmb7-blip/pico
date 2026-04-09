@@ -927,14 +927,25 @@ function setType(t, silent) {
   // localStorage 프로필로 _birthDateParams 보완
   if (t === 'wonmyong' && !_birthDateParams) {
     try {
-      var _pu = localStorage.getItem('pico_user');
-      if (_pu) {
-        var _pup = JSON.parse(_pu);
-        if (_pup && _pup.profile && _pup.profile.birth_date) {
-          var _bd = _pup.profile.birth_date.split('-');
-          var _bt = (_pup.profile.birth_time || '12:00').split(':');
-          _birthDateParams = { year: parseInt(_bd[0]), month: parseInt(_bd[1]), day: parseInt(_bd[2]), hour: parseInt(_bt[0]), minute: parseInt(_bt[1]) };
+      // pico_profile 우선, 없으면 pico_user
+      var _rawP = localStorage.getItem('pico_profile') || (function(){
+        var u = localStorage.getItem('pico_user');
+        return u ? JSON.stringify(JSON.parse(u).profile) : null;
+      })();
+      if (_rawP) {
+        var _rp = JSON.parse(_rawP);
+        var _wy, _wm, _wd, _wh = '0', _wmin = '0';
+        if (_rp.birth_date) {
+          var _wbd = _rp.birth_date.split('-');
+          _wy = _wbd[0]; _wm = String(parseInt(_wbd[1])); _wd = String(parseInt(_wbd[2]));
+        } else { _wy = _rp.year; _wm = _rp.month; _wd = _rp.day; }
+        if (_rp.birth_time && _rp.birth_time !== 'unknown') {
+          var _wbt = _rp.birth_time.split(':');
+          _wh = String(parseInt(_wbt[0])); _wmin = String(parseInt(_wbt[1]) || 0);
+        } else if (_rp.hour && _rp.hour !== 'unknown') {
+          _wh = String(_rp.hour); _wmin = String(_rp.minute || 0);
         }
+        if (_wy && _wm && _wd) _birthDateParams = { year: _wy, month: _wm, day: _wd, hour: _wh, minute: _wmin };
       }
     } catch(e) {}
   }
@@ -1805,12 +1816,23 @@ function renderInterp(data) {
     // URL에 없으면 프로필에서 가져오기
     try {
       var _prof = JSON.parse(localStorage.getItem('pico_profile'));
-      if (_prof && _prof.year && _prof.month && _prof.day) {
-        _birthDateParams = {
-          year: String(_prof.year), month: String(_prof.month), day: String(_prof.day),
-          hour: (_prof.hour && _prof.hour !== 'unknown') ? String(_prof.hour) : '0',
-          minute: _prof.minute ? String(_prof.minute) : '0'
-        };
+      if (_prof) {
+        var _py, _pm, _pd, _ph = '0', _pmin = '0';
+        if (_prof.birth_date) {
+          var _pbd = _prof.birth_date.split('-');
+          _py = _pbd[0]; _pm = String(parseInt(_pbd[1])); _pd = String(parseInt(_pbd[2]));
+        } else {
+          _py = _prof.year; _pm = _prof.month; _pd = _prof.day;
+        }
+        if (_prof.birth_time && _prof.birth_time !== 'unknown') {
+          var _pbt = _prof.birth_time.split(':');
+          _ph = String(parseInt(_pbt[0])); _pmin = String(parseInt(_pbt[1]) || 0);
+        } else if (_prof.hour && _prof.hour !== 'unknown') {
+          _ph = String(_prof.hour); _pmin = String(_prof.minute || 0);
+        }
+        if (_py && _pm && _pd) {
+          _birthDateParams = { year: _py, month: _pm, day: _pd, hour: _ph, minute: _pmin };
+        }
       }
     } catch(e) {}
   }
