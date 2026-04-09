@@ -3632,13 +3632,7 @@ initHeroSelects();
     }).catch(function() {});
 
   Promise.all([p1, p2, p3]).then(function() {
-    // 정적 카드 렌더 (AI 해석 전 기본)
-    renderCosmicCards(cosmicData, null);
-    // 로그인 유저만 AI 해석
-    try {
-      var u = JSON.parse(localStorage.getItem('pico_user') || 'null');
-      if (u && u.id) fetchCosmicInterp(cosmicData, u.id);
-    } catch(e) {}
+    renderCosmicCards(cosmicData, buildInterp(cosmicData));
   });
 
   function renderCosmicCards(data, interp) {
@@ -3683,33 +3677,77 @@ initHeroSelects();
     }
   }
 
-  function fetchCosmicInterp(data, userId) {
-    var q = data.qimen ? (data.qimen.gate + '(' + data.qimen.luck + ')') : '없음';
-    var nak = data.nakshatra || '없음';
-    var pl = data.planets ? ('달-' + (data.planets.Moon||'?') + ', 금성-' + (data.planets.Venus||'?') + ', 화성-' + (data.planets.Mars||'?')) : '없음';
+  var DOOR_INTERP = {
+    '生':'새로운 시작과 창조의 기운이 강하게 흐르는 날입니다.\n계약·서명·창업 등 중요한 결정을 내리기에 최적입니다.',
+    '開':'활발한 확장과 도전의 에너지가 가득합니다.\n새로운 사람을 만나거나 투자를 추진하기에 좋은 때입니다.',
+    '休':'고요함 속에서 내면을 채우는 날입니다.\n무리한 행동보다 휴식과 관계 회복에 집중하세요.',
+    '景':'문서·학습·창작의 기운이 넘치는 날입니다.\n글쓰기, 공부, 기획 작업에서 특히 집중력이 빛납니다.',
+    '傷':'움직임이 많고 변수가 생기기 쉬운 날입니다.\n충돌이나 급한 결정은 피하고 신중하게 대응하세요.',
+    '杜':'에너지가 막히고 정체되는 기운입니다.\n서두르지 말고 전략을 재정비하는 시간으로 활용하세요.',
+    '驚':'예상치 못한 변화나 긴장감이 있을 수 있습니다.\n감정적 대응보다 차분한 판단이 중요한 날입니다.',
+    '死':'활동보다 내면을 정리하는 날입니다.\n중요한 결정은 미루고 조용히 재충전에 집중하세요.'
+  };
+  var NAK_INTERP2 = {
+    '아쉬위니':'치유와 빠른 시작의 에너지가 달을 감싸고 있습니다.\n오늘은 망설임 없이 즉각 행동하는 것이 유리합니다.',
+    '바라니':'변화와 카르마 정산의 에너지가 흐릅니다.\n묵은 것을 내려놓고 새로운 흐름에 몸을 맡기세요.',
+    '크리티카':'예리한 판단력과 정화의 기운이 강합니다.\n불필요한 것을 과감히 정리하기 좋은 날입니다.',
+    '로히니':'풍요와 아름다움의 에너지가 충만합니다.\n창의적 작업과 감성적인 만남에서 좋은 결과가 납니다.',
+    '므리가쉬라':'호기심과 탐구의 에너지가 활발합니다.\n새로운 정보를 흡수하고 배움에 투자하기 좋습니다.',
+    '아르드라':'변혁과 혼돈 속 성장의 에너지입니다.\n어려움이 있어도 그것이 더 깊은 지혜로 이어집니다.',
+    '푸나르바수':'재생과 회복의 낙관적 에너지가 감돕니다.\n새로 시작하거나 포기했던 것을 다시 도전하기 좋습니다.',
+    '푸쉬야':'양육과 성장을 지원하는 안정적 에너지입니다.\n중요한 사람을 돌보거나 장기 계획을 세우기 좋습니다.',
+    '아쉬레샤':'깊은 직관과 신비로운 통찰의 에너지입니다.\n표면 너머를 꿰뚫는 날, 중요한 진실이 드러납니다.',
+    '마가':'권위와 전통의 기운이 강하게 흐릅니다.\n리더십을 발휘하거나 중요한 결정을 내리기에 좋습니다.',
+    '푸르바팔구니':'즐거움과 창의적 낭만의 에너지입니다.\n예술·연애·취미 활동에서 특별한 빛이 납니다.',
+    '우타라팔구니':'협력과 파트너십의 에너지가 강합니다.\n중요한 관계를 맺거나 계약·제휴에 좋은 날입니다.',
+    '하스타':'손재주와 실용적 지혜가 빛나는 날입니다.\n세밀한 작업이나 구체적인 계획 실행에 최적입니다.',
+    '치트라':'심미적 감각과 창의성이 폭발하는 날입니다.\n디자인·예술·패션 등 아름다움과 관련된 일이 빛납니다.',
+    '스바티':'독립과 자유의 바람 같은 에너지입니다.\n자신만의 방식으로 유연하게 움직이는 것이 유리합니다.',
+    '비샤카':'목표를 향한 강한 추진력이 샘솟습니다.\n집중력과 의지가 강해져 오래된 목표에 다가설 수 있습니다.',
+    '아누라다':'우정과 헌신의 따뜻한 에너지가 흐릅니다.\n소중한 사람과의 유대를 깊게 하기 좋은 날입니다.',
+    '지에쉬타':'용기와 위엄의 에너지가 강합니다.\n어려운 상황에서도 리더십으로 돌파할 힘이 생깁니다.',
+    '물라':'근원을 파고드는 변혁의 에너지입니다.\n깊이 있는 탐구와 구조적 변화를 시도하기 좋습니다.',
+    '푸르바아샤다':'정화와 승리의 자신감이 넘칩니다.\n역경을 이겨내고 목표를 향해 힘차게 나아가는 날입니다.',
+    '우타라아샤다':'인내와 최종 승리의 에너지입니다.\n꾸준한 노력이 드디어 결실로 이어지는 시간입니다.',
+    '쉬라바나':'학습과 경청의 에너지가 풍부합니다.\n오늘 들은 정보가 중요한 통찰로 이어질 수 있습니다.',
+    '다니쉬타':'풍요와 사교의 에너지가 활발합니다.\n사람들과의 교류에서 기회와 즐거움이 찾아옵니다.',
+    '샤타비샤':'신비로운 치유와 진실 탐구의 에너지입니다.\n독립적으로 생각하고 숨겨진 것을 발견하는 날입니다.',
+    '푸르바바드라파다':'열정과 혁신의 불꽃이 타오릅니다.\n대담한 아이디어로 변화를 이끌기에 좋은 때입니다.',
+    '우타라바드라파다':'깊은 지혜와 연민의 에너지가 감돕니다.\n내면의 평화를 찾고 영적 통찰을 얻는 날입니다.',
+    '레바티':'완성과 새로운 여정의 에너지입니다.\n한 챕터를 마무리하고 다음 단계를 준비하기 좋습니다.'
+  };
+  var SIGN_FEEL = {
+    '양자리':'열정적이고 직접적인', '황소자리':'안정적이고 풍요로운', '쌍둥이자리':'호기심 넘치고 소통하는',
+    '게자리':'감성적이고 돌보는', '사자자리':'빛나고 창의적인', '처녀자리':'섬세하고 분석적인',
+    '천칭자리':'균형 잡히고 조화로운', '전갈자리':'깊고 변혁적인', '사수자리':'자유롭고 낙관적인',
+    '염소자리':'책임감 있고 실용적인', '물병자리':'독창적이고 혁신적인', '물고기자리':'직관적이고 공감하는'
+  };
 
-    fetch(CHAT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: userId,
-        orb_override: 0,
-        system_prompt: '동서양 점성술과 기문둔갑 전문가. 오늘의 우주 에너지를 2~3문장으로 따뜻하게 해석한다. JSON만 반환한다.',
-        messages: [{ role: 'user', content:
-          '오늘의 우주 에너지:\n- 기문 직사문: ' + q + '\n- 달 낙샤트라: ' + nak + '\n- 행성: ' + pl +
-          '\n\n각 항목별 2줄 해석과 종합 한줄 멘트를 아래 JSON 형식으로만 반환해줘 (다른 텍스트 없이):\n{"qimen":"...","nakshatra":"...","planets":"...","summary":"..."}'
-        }]
-      })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(res) {
-      var text = (res && (res.content || res.text || res.message || (res.choices && res.choices[0] && res.choices[0].message && res.choices[0].message.content))) || '';
-      var match = text.match(/\{[\s\S]*\}/);
-      if (!match) return;
-      var interp = JSON.parse(match[0]);
-      renderCosmicCards(data, interp);
-    })
-    .catch(function() {});
+  function buildInterp(data) {
+    var qimen = null, nakshatra = null, planets = null, summary = '';
+    if (data.qimen && data.qimen.gate) {
+      qimen = DOOR_INTERP[data.qimen.gate] || (data.qimen.kw + ' 기운이 흐르는 날입니다.\n오늘의 흐름을 잘 살펴 현명하게 활용하세요.');
+    }
+    if (data.nakshatra) {
+      nakshatra = NAK_INTERP2[data.nakshatra] || ('달이 ' + data.nakshatra + '에 머물고 있습니다.\n' + (NAK_KW[data.nakshatra] || '') + '의 에너지가 감성을 이끕니다.');
+    }
+    if (data.planets && (data.planets.Moon || data.planets.Venus || data.planets.Mars)) {
+      var moonSign = data.planets.Moon, venusSign = data.planets.Venus, marsSign = data.planets.Mars;
+      var moonFeel = moonSign ? (SIGN_FEEL[moonSign] || '') : '';
+      var venusFeel = venusSign ? (SIGN_FEEL[venusSign] || '') : '';
+      planets = (moonFeel ? '달이 ' + moonSign + '에서 ' + moonFeel + ' 감성을 전합니다.' : '') +
+                (venusFeel ? '\n금성은 ' + venusSign + '에서 ' + venusFeel + ' 사랑의 에너지를 발산합니다.' : '');
+    }
+    // 종합
+    var gate = data.qimen && data.qimen.gate;
+    var nak = data.nakshatra;
+    var isGood = gate && (gate === '生' || gate === '開' || gate === '休' || gate === '景');
+    if (gate && nak) {
+      summary = isGood
+        ? (gate + '門의 순풍과 ' + nak + '의 에너지가 만나 오늘을 특별하게 만듭니다.')
+        : ('오늘은 ' + nak + '의 지혜로 ' + gate + '門의 기운을 현명하게 헤쳐나가는 날입니다.');
+    }
+    return { qimen: qimen, nakshatra: nakshatra, planets: planets, summary: summary || null };
   }
 })();
 
