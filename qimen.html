@@ -1978,13 +1978,7 @@ function shareQimenKakao() {
       list.appendChild(tip);
     }
 
-    // 현재 시간대로 스크롤
-    var cur = document.getElementById('currentShiRow');
-    if (cur) {
-      setTimeout(function() {
-        cur.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    }
+    // 현재 시간대 하이라이트만 (스크롤은 하지 않음)
   }
 
   loadHourlyYun();
