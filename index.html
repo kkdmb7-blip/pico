@@ -2849,10 +2849,6 @@ function checkAuth() {
       try {
         var guestProfile = JSON.parse(localStorage.getItem('pico_profile'));
         if (guestProfile && guestProfile.year) {
-          var heroEl = document.querySelector('.hero');
-          var heroInputEl = document.getElementById('heroInputWrap');
-          if (heroEl) heroEl.style.display = 'none';
-          if (heroInputEl) heroInputEl.style.display = 'none';
           loadMiniScore();
         }
       } catch(e2) {}
@@ -2986,9 +2982,8 @@ function updateAuthUI() {
     var p = null;
     try { p = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
     // 비로그인이라도 이미 입력한 프로필이 있으면 히어로 숨김 유지
-    var hasGuestProfile = p && p.year;
-    if (heroEl) heroEl.style.display = hasGuestProfile ? 'none' : '';
-    if (heroInputEl) heroInputEl.style.display = hasGuestProfile ? 'none' : '';
+    if (heroEl) heroEl.style.display = '';
+    if (heroInputEl) heroInputEl.style.display = '';
     if (titleEl && p && p.name) {
       titleEl.innerHTML = p.name + '님의 <em>오늘의 운세 점수</em>';
     }
@@ -3494,12 +3489,6 @@ function goScoreHero() {
     name: '게스트'
   };
   try { localStorage.setItem('pico_profile', JSON.stringify(profile)); } catch(e) {}
-
-  // 히어로 섹션 숨김
-  var heroEl = document.querySelector('.hero');
-  var heroInputEl = document.getElementById('heroInputWrap');
-  if (heroEl) heroEl.style.display = 'none';
-  if (heroInputEl) heroInputEl.style.display = 'none';
 
   // 점수 섹션 업데이트
   if (typeof loadMiniScore === 'function') loadMiniScore();
