@@ -3444,17 +3444,12 @@ function goScoreQuick() {
     }
 
     var now=new Date(Date.now()+9*3600000);
-    var today=now.getUTCDay();
-    // 이번주 월요일~일요일
-    var monday=new Date(now);
-    var diff=today===0?-6:1-today;
-    monday.setUTCDate(monday.getUTCDate()+diff);
-
+    // 오늘 기준 -3일 ~ +3일 (오늘이 항상 가운데)
     var dates=[];
-    for(var i=0;i<7;i++){
-      var dt=new Date(monday);
-      dt.setUTCDate(monday.getUTCDate()+i);
-      dates.push({y:dt.getUTCFullYear(),m:dt.getUTCMonth()+1,d:dt.getUTCDate(),day:DAYS[dt.getUTCDay()],isToday:dt.getUTCDate()===now.getUTCDate()&&dt.getUTCMonth()===now.getUTCMonth()});
+    for(var i=-3;i<=3;i++){
+      var dt=new Date(now);
+      dt.setUTCDate(now.getUTCDate()+i);
+      dates.push({y:dt.getUTCFullYear(),m:dt.getUTCMonth()+1,d:dt.getUTCDate(),day:DAYS[dt.getUTCDay()],isToday:i===0});
     }
 
     var results=[];
