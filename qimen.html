@@ -1231,10 +1231,8 @@ function updateSummaryTimeFromHourly(shichenList, gradeList, rangeList) {
     valText = '특별히 좋은 시간 없음';
     subText = '무난한 하루입니다';
   } else {
-    // 최대 3개까지 표시
-    var top = best.slice(0, 3);
-    valText = top.map(function(b) { return b.range; }).join(', ');
-    subText = top.map(function(b) {
+    valText = best.map(function(b) { return b.range; }).join(', ');
+    subText = best.map(function(b) {
       return (SHI_KR[b.shi] || b.shi) + ' (' + b.grade + ')';
     }).join(', ');
   }
