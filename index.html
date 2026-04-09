@@ -927,7 +927,8 @@
 </nav>
 
 
-<!-- HERO -->
+<!-- HERO (비로그인 전용) -->
+<script>(function(){try{if(localStorage.getItem('pico_user')){document.write('<style>.hero,#heroInputWrap{display:none}</style>');}}catch(e){}})();</script>
 <section class="hero">
   <div class="hero-glow"></div>
   <div style="font-size:11px;font-weight:700;letter-spacing:3px;color:var(--accent2);margin-bottom:20px;text-transform:uppercase;position:relative;">
@@ -2928,9 +2929,13 @@ function updateAuthUI() {
   var btnKakao = document.getElementById('btnKakao');
   var userArea = document.getElementById('userArea');
   var titleEl = document.getElementById('mainScoreTitle');
+  var heroEl = document.querySelector('.hero');
+  var heroInputEl = document.getElementById('heroInputWrap');
   if (currentUser) {
     btnKakao.style.display = 'none';
     userArea.style.display = 'flex';
+    if (heroEl) heroEl.style.display = 'none';
+    if (heroInputEl) heroInputEl.style.display = 'none';
     document.getElementById('userNameDisplay').textContent = currentUser.name;
     var av = document.getElementById('userAvatar');
     if (currentUser.avatar) { av.src = currentUser.avatar; av.style.display = ''; }
@@ -2943,6 +2948,8 @@ function updateAuthUI() {
   } else {
     btnKakao.style.display = '';
     userArea.style.display = 'none';
+    if (heroEl) heroEl.style.display = '';
+    if (heroInputEl) heroInputEl.style.display = '';
     var p = null;
     try { p = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
     if (titleEl && p && p.name) {
