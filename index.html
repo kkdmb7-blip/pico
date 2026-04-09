@@ -2849,7 +2849,10 @@ function checkAuth() {
       try {
         var guestProfile = JSON.parse(localStorage.getItem('pico_profile'));
         if (guestProfile && guestProfile.year) {
-          loadMiniScore();
+          loadMiniScore().then(function() {
+            // 일간 오행이 저장된 후 기문 주간 재로드
+            if (typeof window.loadWeeklyQimen === 'function') window.loadWeeklyQimen();
+          }).catch(function(){});
         }
       } catch(e2) {}
     }
@@ -3352,6 +3355,17 @@ async function loadMiniScore() {
   document.getElementById('scoreLoadingRow').style.display  = 'none';
   document.getElementById('scoreMiniResult').style.display  = 'block';
 
+  // 일간 오행 캐싱 → 기문 주간 일운 개인화에 사용
+  try {
+    var _QM_STEM_KOR_IDX = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
+    var dayP = result.rawData && result.rawData.saju && result.rawData.saju.summary &&
+               result.rawData.saju.summary.pillars && result.rawData.saju.summary.pillars.day;
+    if (dayP && dayP.length >= 1) {
+      var dayEl = _QM_STEM_KOR_IDX[dayP[0]];
+      if (dayEl) localStorage.setItem('pico_daystem', dayEl);
+    }
+  } catch(e) {}
+
   var domainOrder = ['money','love','health','wisdom','travel'];
   var domainInfo  = {
     money:{emoji:'💼',label:'재물/사업'}, love:{emoji:'❤️',label:'관계/연애'},
@@ -3490,13 +3504,11 @@ function goScoreHero() {
   };
   try { localStorage.setItem('pico_profile', JSON.stringify(profile)); } catch(e) {}
 
-  // 점수 섹션 업데이트
-  if (typeof loadMiniScore === 'function') loadMiniScore();
-
-  // 기문 주간 일운 재로드
-  if (typeof window.loadWeeklyQimen === 'function') {
-    document.getElementById('qimenWeeklyWrap').style.display = 'none';
-    setTimeout(function() { window.loadWeeklyQimen(); }, 100);
+  // 점수 계산 완료 후 기문 주간 일운 재로드 (일간 오행 저장 후)
+  if (typeof loadMiniScore === 'function') {
+    loadMiniScore().then(function() {
+      if (typeof window.loadWeeklyQimen === 'function') window.loadWeeklyQimen();
+    }).catch(function(){});
   }
 
   // 스크롤
@@ -3788,10 +3800,9 @@ initHeroSelects();
       var profile=JSON.parse(localStorage.getItem('pico_profile'));
       if(profile&&profile.year){
         ymGong=calcYM(profile.year, profile.gender);
-        if(typeof _calcSaju==='function'){
-          var sj=_calcSaju(profile.year,profile.month,profile.day,profile.hour!=='unknown'?parseInt(profile.hour)||12:12);
-          userDayEl=sj.dayEl;
-        }
+        // pico_daystem: loadMiniScore()가 saju API 결과에서 추출해 저장한 일간 오행
+        var cached = localStorage.getItem('pico_daystem');
+        if(cached) userDayEl = cached;
       }
     }catch(e){}
 
