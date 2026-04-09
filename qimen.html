@@ -953,7 +953,7 @@ function setType(t, silent) {
   } else {
     notice.style.display = 'none';
   }
-  if (!silent && hasResult) doFetch();
+  if (!silent) doFetch();
 }
 
 function showStatus(msg, isErr) {
