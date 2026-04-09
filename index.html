@@ -960,6 +960,10 @@
 <section style="padding:0 24px 40px;max-width:500px;margin:0 auto;position:relative;z-index:1;" id="heroInputWrap">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;">
     <div class="saju-form-group">
+      <label>이름</label>
+      <input type="text" id="heroName" placeholder="이름을 입력해주세요" style="width:100%;background:#1c1c28;border:1px solid #2a2a3d;border-radius:10px;padding:11px 14px;color:#f0f0f5;font-size:14px;outline:none;">
+    </div>
+    <div class="saju-form-group">
       <label>생년월일</label>
       <div class="saju-date-row">
         <select id="heroYear"><option value="">년</option></select>
@@ -3522,7 +3526,7 @@ function goScoreHero() {
     hour: h === 'unknown' ? 'unknown' : parseInt(h),
     minute: mi,
     gender: _heroGender,
-    name: '게스트'
+    name: ((document.getElementById('heroName') || {}).value || '').trim() || '게스트'
   };
   try { localStorage.setItem('pico_profile', JSON.stringify(profile)); } catch(e) {}
 
@@ -3565,6 +3569,8 @@ initHeroSelects();
     var dEl = document.getElementById('heroDay');
     var hEl = document.getElementById('heroHour');
     var miEl = document.getElementById('heroMinute');
+    var nEl = document.getElementById('heroName');
+    if (nEl && p.name && p.name !== '게스트') nEl.value = p.name;
     if (yEl) yEl.value = p.year;
     if (mEl) mEl.value = p.month;
     if (dEl) dEl.value = p.day;
