@@ -988,12 +988,18 @@
 </section>
 
 <!-- TODAY COSMIC ENERGY -->
-<section id="todayCosmicWrap" style="padding:0 24px 48px;max-width:960px;margin:0 auto;position:relative;z-index:1;display:none;">
+<section id="todayCosmicWrap" style="padding:48px 24px 48px;max-width:960px;margin:0 auto;position:relative;z-index:1;display:none;">
   <div class="section-label" style="text-align:center;margin-bottom:20px;">
     ✦ 오늘의 우주 에너지 · 매일 업데이트
   </div>
   <div id="cosmicGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;"></div>
 </section>
+<style>
+@media(max-width:600px){
+  #cosmicGrid { grid-template-columns: 1fr !important; }
+  #cosmicGrid > div { min-height:unset !important; }
+}
+</style>
 
 <!-- TODAY SCORE -->
 <section class="section-score" id="scoreSectionWrap">
