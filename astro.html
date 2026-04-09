@@ -857,7 +857,7 @@ function closeAstroShareModal() {
   loadChart(year, month, day, hour, min);
 })();
 history.pushState(null, '', location.href);
-window.addEventListener('popstate', function() { window.location.href = '/'; });
+window.addEventListener('popstate', function() { sessionStorage.setItem('pico_home','1'); window.location.href = '/'; });
 </script>
 <!-- 공유 카드 프리뷰 모달 -->
 <div id="astroShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">

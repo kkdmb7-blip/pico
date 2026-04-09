@@ -306,7 +306,7 @@ function renderProfiles() {
 
 function doLogout() {
   localStorage.removeItem('pico_user');
-  location.href = '/';
+  sessionStorage.setItem('pico_home','1'); location.href = '/';
 }
 
 init();

@@ -320,7 +320,7 @@ select option { background:var(--surface2); color:var(--text); }
         <div class="hamburger-dropdown" id="hamburgerDropdown">
           <button onclick="location.href='mypage.html'">👤 마이페이지</button>
           <div class="menu-divider"></div>
-          <button onclick="location.href='/'">🏠 홈으로</button>
+          <button onclick="sessionStorage.setItem('pico_home','1');location.href='/'">🏠 홈으로</button>
           <div class="menu-divider"></div>
           <button onclick="logout()" style="color:#e05c6a;">로그아웃</button>
         </div>

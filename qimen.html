@@ -1088,7 +1088,7 @@ function renderInterp(data) {
   if (year && month && day) doFetch();
 })();
 history.pushState(null, '', location.href);
-window.addEventListener('popstate', function() { window.location.href = '/'; });
+window.addEventListener('popstate', function() { sessionStorage.setItem('pico_home','1'); window.location.href = '/'; });
 
 // ── 기문 공유 카드 ──────────────────────────────────
 var _qimenData = null;
