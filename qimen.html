@@ -589,6 +589,67 @@
   }
   .qm-detail-wrap.open { display: flex; }
 
+  /* ── 팔문/팔신 상세 패널 ── */
+  .doorshen-wrap {
+    display: none; margin-bottom: 16px;
+  }
+  .doorshen-wrap.visible { display: block; }
+  .doorshen-section-title {
+    font-size: 11px; color: var(--muted); letter-spacing: 0.5px;
+    text-transform: uppercase; font-weight: 600; margin-bottom: 10px;
+  }
+  .doorshen-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .doorshen-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .doorshen-dir {
+    font-size: 12px; font-weight: 700; color: var(--accent2);
+    min-width: 20px; padding-top: 1px;
+  }
+  .doorshen-main {
+    font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.3;
+  }
+  .doorshen-desc {
+    font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4;
+  }
+  .doorshen-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 7px;
+    border-radius: 10px; margin-left: 6px; vertical-align: middle;
+  }
+  .doorshen-badge.gil    { background:rgba(0,200,83,0.15); color:#00C853; }
+  .doorshen-badge.daegil { background:rgba(255,215,0,0.15); color:#FFD700; }
+  .doorshen-badge.hyung  { background:rgba(255,109,0,0.15); color:#FF6D00; }
+  .doorshen-badge.daehyung { background:rgba(255,23,68,0.15); color:#FF1744; }
+  .doorshen-badge.jung   { background:rgba(107,107,133,0.15); color:var(--muted); }
+
+  /* ── 택일 카드 ── */
+  .taegil-wrap {
+    display: none; margin-bottom: 16px;
+  }
+  .taegil-wrap.visible { display: block; }
+  .taegil-section-title {
+    font-size: 11px; color: var(--muted); letter-spacing: 0.5px;
+    text-transform: uppercase; font-weight: 600; margin-bottom: 10px;
+  }
+  .taegil-list { display: flex; flex-direction: column; gap: 8px; }
+  .taegil-row {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 11px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .taegil-icon { font-size: 18px; min-width: 24px; }
+  .taegil-label { font-size: 13px; font-weight: 600; flex: 1; color: var(--text); }
+  .taegil-stars { font-size: 14px; letter-spacing: 1px; }
+  .taegil-note { font-size: 11px; color: var(--muted); margin-left: 4px; }
+
+  /* 흉방 칩 */
+  .bestdir-chip.bad .bestdir-dir { color: #FF1744; }
+  .bestdir-chip.bad { border-left: 2px solid #FF1744; }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
     .palace { min-height: 118px; padding: 12px 4px 8px; gap: 3px; }
@@ -715,8 +776,22 @@
     <div class="qm-grid" id="qm-grid"></div>
   </div>
 
+  <!-- 택일 추천 카드 -->
+  <div class="taegil-wrap" id="taegil-wrap">
+    <div class="taegil-section-title">택일(擇日) 적합도</div>
+    <div class="taegil-list" id="taegil-list"></div>
+  </div>
+
+  <!-- 팔문/팔신 상세 패널 -->
+  <div class="doorshen-wrap" id="doorshen-wrap">
+    <div class="doorshen-section-title">팔문 위치 & 의미</div>
+    <div class="doorshen-grid" id="doorshen-door-grid"></div>
+    <div class="doorshen-section-title" style="margin-top:12px;">팔신 위치 & 성질</div>
+    <div class="doorshen-grid" id="doorshen-shen-grid"></div>
+  </div>
+
   <div class="bestdir-box" id="bestdir-box">
-    <div class="bestdir-title">오늘의 최길 방향 <span style="font-size:10px;font-weight:400;opacity:0.55">生門·開門이 있는 방위가 유리합니다</span></div>
+    <div class="bestdir-title">길방 · 흉방 <span style="font-size:10px;font-weight:400;opacity:0.55">生門·開門 / 死門·傷門·驚門 방위</span></div>
     <div class="bestdir-rows" id="bestdir-rows"></div>
   </div>
 
@@ -898,6 +973,8 @@ function hideResults() {
   setVisible('meta-bar', false);
   setVisible('saju-bar', false);
   setVisible('grid-wrap', false);
+  setVisible('taegil-wrap', false);
+  setVisible('doorshen-wrap', false);
   setVisible('bestdir-box', false);
   setVisible('zhifu-bar', false);
   setVisible('interp-wrap', false);
@@ -1329,6 +1406,12 @@ function renderResult(data) {
   });
   setVisible('grid-wrap', true);
 
+  // 택일 추천 카드
+  renderTaegil(data);
+
+  // 팔문/팔신 상세 패널
+  renderDoorShenPanel(data);
+
   // 최길 방향
   renderBestDir(data);
 
@@ -1408,6 +1491,164 @@ function buildCell(n, p, isZhifu) {
   return cell;
 }
 
+// ── 팔문 상세 데이터 ──
+var DOOR_DETAIL = {
+  '開': { kr: '개문', desc: '시작·출발 최길', badge: 'daegil' },
+  '生': { kr: '생문', desc: '생산·창조 길',   badge: 'gil' },
+  '休': { kr: '휴문', desc: '휴식·재충전 길', badge: 'gil' },
+  '景': { kr: '경문', desc: '문서·소송 중',   badge: 'jung' },
+  '傷': { kr: '상문', desc: '부상·다툼 흉',   badge: 'hyung' },
+  '杜': { kr: '두문', desc: '은둔·도주 흉',   badge: 'hyung' },
+  '驚': { kr: '경문', desc: '놀람·변동 흉',   badge: 'hyung' },
+  '死': { kr: '사문', desc: '죽음·손실 대흉', badge: 'daehyung' },
+};
+var SHEN_DETAIL = {
+  '直符': { kr: '직부', desc: '귀인 대길',       badge: 'daegil' },
+  '値符': { kr: '직부', desc: '귀인 대길',       badge: 'daegil' },
+  '六合': { kr: '육합', desc: '협력·합의 길',    badge: 'gil' },
+  '太陰': { kr: '태음', desc: '비밀·음모 중',    badge: 'jung' },
+  '九天': { kr: '구천', desc: '원거리·비행 중',  badge: 'jung' },
+  '螣蛇': { kr: '등사', desc: '허위·구설 흉',    badge: 'hyung' },
+  '騰蛇': { kr: '등사', desc: '허위·구설 흉',    badge: 'hyung' },
+  '九地': { kr: '구지', desc: '막힘·방해 흉',    badge: 'hyung' },
+  '玄武': { kr: '현무', desc: '도둑·손실 흉',    badge: 'hyung' },
+  '白虎': { kr: '백호', desc: '폭력·사고 대흉',  badge: 'daehyung' },
+};
+
+function renderDoorShenPanel(data) {
+  var doorGrid = document.getElementById('doorshen-door-grid');
+  var shenGrid = document.getElementById('doorshen-shen-grid');
+  doorGrid.innerHTML = '';
+  shenGrid.innerHTML = '';
+
+  // 팔문 8개
+  Object.entries(data.palaces).forEach(function(entry) {
+    var n = parseInt(entry[0]), p = entry[1];
+    if (!p.팔문 || n === 5) return; // 5궁(중앙) 제외
+    var d = DOOR_DETAIL[p.팔문] || { kr: p.팔문, desc: '', badge: 'jung' };
+    var item = document.createElement('div');
+    item.className = 'doorshen-item';
+    item.innerHTML = '<div class="doorshen-dir">' + GONG_DIR[n] + '</div>'
+      + '<div><div class="doorshen-main">' + d.kr
+      + '<span class="doorshen-badge ' + d.badge + '">' + (d.badge === 'daegil' ? '대길' : d.badge === 'gil' ? '길' : d.badge === 'hyung' ? '흉' : d.badge === 'daehyung' ? '대흉' : '중') + '</span>'
+      + '</div><div class="doorshen-desc">' + d.desc + '</div></div>';
+    doorGrid.appendChild(item);
+  });
+
+  // 팔신 8개
+  Object.entries(data.palaces).forEach(function(entry) {
+    var n = parseInt(entry[0]), p = entry[1];
+    if (!p.팔신 || n === 5) return;
+    var s = SHEN_DETAIL[p.팔신] || { kr: p.팔신, desc: '', badge: 'jung' };
+    var item = document.createElement('div');
+    item.className = 'doorshen-item';
+    item.innerHTML = '<div class="doorshen-dir">' + GONG_DIR[n] + '</div>'
+      + '<div><div class="doorshen-main">' + s.kr
+      + '<span class="doorshen-badge ' + s.badge + '">' + (s.badge === 'daegil' ? '대길' : s.badge === 'gil' ? '길' : s.badge === 'hyung' ? '흉' : s.badge === 'daehyung' ? '대흉' : '중') + '</span>'
+      + '</div><div class="doorshen-desc">' + s.desc + '</div></div>';
+    shenGrid.appendChild(item);
+  });
+
+  setVisible('doorshen-wrap', true);
+}
+
+// ── 택일 추천 카드 ──
+function renderTaegil(data) {
+  var list = document.getElementById('taegil-list');
+  list.innerHTML = '';
+
+  var palaces = data.palaces;
+  var 직부궁 = String(data.직부궁);
+
+  // 팔문/팔신 위치 조회 헬퍼
+  function hasDoor(door) {
+    return Object.values(palaces).some(function(p) { return p.팔문 === door; });
+  }
+  function hasShen(shen) {
+    return Object.values(palaces).some(function(p) { return p.팔신 === shen; });
+  }
+  function samePalace(door, shen) {
+    return Object.values(palaces).some(function(p) { return p.팔문 === door && p.팔신 === shen; });
+  }
+  function hasStar(star) {
+    return Object.values(palaces).some(function(p) { return p.구성 === star; });
+  }
+  var zfDoor = palaces[직부궁] ? palaces[직부궁].팔문 : '';
+
+  // 적합도 계산
+  var CATS = [
+    {
+      icon: '💼', label: '사업·계약',
+      score: (function() {
+        var s = 0;
+        if (hasDoor('生')) s += 2;
+        if (hasDoor('開')) s += 2;
+        if (samePalace('生', '直符') || samePalace('生', '値符')) s += 1;
+        if (hasDoor('死') && !hasDoor('生') && !hasDoor('開')) s -= 2;
+        return Math.min(5, Math.max(1, Math.round(s / 5 * 5) || (s >= 4 ? 5 : s >= 2 ? 4 : s >= 0 ? 3 : s >= -1 ? 2 : 1)));
+      })()
+    },
+    {
+      icon: '✈️', label: '이동·여행',
+      score: (function() {
+        var s = 0;
+        if (hasDoor('開')) s += 2;
+        if (hasShen('六合')) s += 1;
+        if (hasDoor('傷')) s -= 1;
+        if (hasDoor('驚')) s -= 1;
+        return s >= 3 ? 5 : s >= 2 ? 4 : s >= 0 ? 3 : s >= -1 ? 2 : 1;
+      })()
+    },
+    {
+      icon: '💕', label: '연애·만남',
+      score: (function() {
+        var s = 0;
+        if (samePalace('生', '六合')) s += 3;
+        if (hasShen('太陰')) s += 1;
+        if (hasDoor('生') || hasDoor('休')) s += 1;
+        if (hasDoor('死') || hasDoor('傷')) s -= 2;
+        return s >= 4 ? 5 : s >= 2 ? 4 : s >= 0 ? 3 : s >= -1 ? 2 : 1;
+      })()
+    },
+    {
+      icon: '📝', label: '시험·면접',
+      score: (function() {
+        var s = 0;
+        if (hasStar('天輔')) s += 2;
+        if (hasDoor('景')) s += 1;
+        if (hasDoor('開')) s += 1;
+        if (hasDoor('死') || hasDoor('杜')) s -= 2;
+        return s >= 4 ? 5 : s >= 2 ? 4 : s >= 0 ? 3 : s >= -1 ? 2 : 1;
+      })()
+    },
+    {
+      icon: '💰', label: '재물·투자',
+      score: (function() {
+        var s = 0;
+        if (samePalace('開', '直符') || samePalace('開', '値符')) s += 3;
+        if (hasDoor('生')) s += 1;
+        if (hasDoor('死') || hasShen('玄武')) s -= 2;
+        return s >= 4 ? 5 : s >= 2 ? 4 : s >= 0 ? 3 : s >= -1 ? 2 : 1;
+      })()
+    },
+  ];
+
+  CATS.forEach(function(cat) {
+    var stars = '★'.repeat(cat.score) + '☆'.repeat(5 - cat.score);
+    var starColor = cat.score >= 4 ? '#FFD700' : cat.score >= 3 ? '#a07fd4' : cat.score >= 2 ? 'var(--muted)' : '#FF6D00';
+    var note = cat.score >= 4 ? '적합' : cat.score >= 3 ? '무난' : cat.score >= 2 ? '주의' : '비추';
+    var row = document.createElement('div');
+    row.className = 'taegil-row';
+    row.innerHTML = '<div class="taegil-icon">' + cat.icon + '</div>'
+      + '<div class="taegil-label">' + cat.label + '</div>'
+      + '<div class="taegil-stars" style="color:' + starColor + ';">' + stars + '</div>'
+      + '<div class="taegil-note">' + note + '</div>';
+    list.appendChild(row);
+  });
+
+  setVisible('taegil-wrap', true);
+}
+
 function renderBestDir(data) {
   const rows = document.getElementById('bestdir-rows');
   rows.innerHTML = '';
@@ -1434,6 +1675,19 @@ function renderBestDir(data) {
         + '<span class="bestdir-info">역마 · 六合</span>';
       rows.appendChild(chip);
     }
+  });
+
+  // 흉방: 死門·傷門·驚門
+  ['死', '傷', '驚'].forEach(door => {
+    Object.entries(data.palaces).forEach(([n, p]) => {
+      if (p.팔문 === door && parseInt(n) !== 5) {
+        const chip = document.createElement('div');
+        chip.className = 'bestdir-chip bad';
+        chip.innerHTML = '<span class="bestdir-dir">' + GONG_DIR[parseInt(n)] + '</span>'
+          + '<span class="bestdir-info" style="color:#FF6D00;">' + door + '門</span>';
+        rows.appendChild(chip);
+      }
+    });
   });
 
   setVisible('bestdir-box', rows.children.length > 0);
