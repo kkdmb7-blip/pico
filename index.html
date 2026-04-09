@@ -972,6 +972,14 @@
   </div>
 </section>
 
+<!-- TODAY COSMIC ENERGY -->
+<section id="todayCosmicWrap" style="padding:0 24px 48px;max-width:960px;margin:0 auto;position:relative;z-index:1;">
+  <div class="section-label" style="text-align:center;margin-bottom:20px;">
+    ✦ 오늘의 우주 에너지 · 매일 업데이트
+  </div>
+  <div id="cosmicGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;"></div>
+</section>
+
 <!-- TODAY SCORE -->
 <section class="section-score" id="scoreSectionWrap">
   <div class="section-label">5대 운세 교차 분석</div>
@@ -3416,6 +3424,120 @@ function heroQuickStart() {
     if (heroYear) heroYear.focus();
   }, 400);
 }
+
+// ── 오늘의 우주 에너지 ─────────────────────────────────────
+(function loadTodayCosmic() {
+  var W = 'https://fortuna.kkdmb7.workers.dev';
+  var now = new Date(Date.now() + 9 * 3600000); // KST
+  var Y = now.getUTCFullYear(), M = now.getUTCMonth() + 1, D = now.getUTCDate();
+  var H = now.getUTCHours(), MIN = now.getUTCMinutes();
+
+  var DOOR_KW = {
+    '生':'계약·서명·창업에 최적', '開':'활동·투자·확장에 유리', '休':'안정·화해·양생에 좋음',
+    '景':'문서·공부·창작에 유리', '傷':'이동 많고 충돌 주의', '杜':'막힘·정체 조심',
+    '驚':'긴장·놀람·소송 주의', '死':'중요 결정 보류'
+  };
+  var GRADE_CLR = {
+    '대길': { bg:'rgba(253,224,71,0.1)',  border:'rgba(253,224,71,0.25)',  text:'#fde047' },
+    '길':   { bg:'rgba(134,239,172,0.1)', border:'rgba(134,239,172,0.25)', text:'#86efac' },
+    '평':   { bg:'rgba(148,163,184,0.08)',border:'rgba(148,163,184,0.2)',  text:'#94a3b8' },
+    '흉':   { bg:'rgba(251,146,60,0.1)',  border:'rgba(251,146,60,0.25)',  text:'#fb923c' },
+    '대흉': { bg:'rgba(248,113,113,0.1)', border:'rgba(248,113,113,0.25)', text:'#f87171' }
+  };
+  var NAK_KW = {
+    '아쉬위니':'치유·속도·시작', '바라니':'변화·카르마·의지', '크리티카':'정화·판단·변혁',
+    '로히니':'풍요·미·창의', '므리가쉬라':'탐구·여행·호기심', '아르드라':'변혁·혼돈·성장',
+    '푸나르바수':'재생·회복·낙관', '푸쉬야':'양육·성장·헌신', '아쉬레샤':'직관·신비·통찰',
+    '마가':'전통·권위·카르마', '푸르바팔구니':'즐거움·창의·낭만', '우타라팔구니':'친절·후원·협력',
+    '하스타':'손재주·지혜·실용', '치트라':'창의·아름다움·심미', '스바티':'독립·자유·개방',
+    '비샤카':'목적·의지·추진', '아누라다':'우정·헌신·탐구', '지에쉬타':'용기·위엄·책임',
+    '물라':'근원·변혁·집요', '푸르바아샤다':'정화·승리·자신감', '우타라아샤다':'인내·최종승리·지구력',
+    '쉬라바나':'학습·경청·연결', '다니쉬타':'부·리듬·사교성', '샤타비샤':'치유·신비·진실',
+    '푸르바바드라파다':'불꽃·열정·혁신', '우타라바드라파다':'지혜·깊이·연민', '레바티':'풍요·완성·여정'
+  };
+  var PLANET_SYM = { 'Moon':'🌙', 'Venus':'♀', 'Mars':'♂', '달':'🌙', '금성':'♀', '화성':'♂' };
+  var PLANET_KOR = { 'Moon':'달', 'Venus':'금성', 'Mars':'화성' };
+  var SIGN_KOR = {
+    'Aries':'양자리','Taurus':'황소자리','Gemini':'쌍둥이자리','Cancer':'게자리',
+    'Leo':'사자자리','Virgo':'처녀자리','Libra':'천칭자리','Scorpio':'전갈자리',
+    'Sagittarius':'사수자리','Capricorn':'염소자리','Aquarius':'물병자리','Pisces':'물고기자리'
+  };
+
+  function cardHTML(icon, label, big, sub, badgeText, badgeClr, extra) {
+    var badge = badgeText
+      ? '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 10px;border-radius:12px;margin-bottom:10px;background:' + badgeClr.bg + ';border:1px solid ' + badgeClr.border + ';color:' + badgeClr.text + ';">' + badgeText + '</span><br>'
+      : '';
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;">' +
+      '<div style="font-size:22px;line-height:1;">' + icon + '</div>' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px;">' + label + '</div>' +
+      badge +
+      '<div style="font-family:\'Noto Serif KR\',serif;font-size:22px;font-weight:700;color:var(--text);line-height:1.2;">' + big + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);line-height:1.6;">' + sub + '</div>' +
+      (extra || '') +
+      '</div>';
+  }
+
+  var grid = document.getElementById('cosmicGrid');
+  if (!grid) return;
+  // 스켈레톤
+  grid.innerHTML = [1,2,3].map(function() {
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 16px;height:160px;animation:pulse 1.5s infinite;opacity:0.4;"></div>';
+  }).join('');
+
+  var cards = ['', '', ''];
+  var done = 0;
+  function tryRender() { done++; if (done >= 3) grid.innerHTML = cards.filter(Boolean).join('') || ''; }
+
+  // 카드1: 기문 일운
+  fetch(W + '/qimen?year=' + Y + '&month=' + M + '&day=' + D + '&hour=' + H + '&minute=' + MIN + '&type=ilga')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var door = '', grade = '평';
+      if (d && d.직사문) door = d.직사문;
+      else if (d && d.palaces) {
+        Object.keys(d.palaces).forEach(function(k) { if (d.palaces[k].직부) door = d.palaces[k].팔문 || ''; });
+      }
+      var kw = DOOR_KW[door] || '기운을 살피는 시간';
+      var gc = GRADE_CLR[grade] || GRADE_CLR['평'];
+      cards[0] = cardHTML('☯', '기문 일운', door || '—', kw, grade !== '평' ? grade : null, gc);
+    })
+    .catch(function() { cards[0] = ''; })
+    .finally(tryRender);
+
+  // 카드2: 달 낙샤트라 (vedic API, 서울 정오 기준)
+  var vp = new URLSearchParams({ year: Y, month: M, day: D, hour: 12, tz: 9, lat: 37.5665, lon: 126.978, gender: 'female' });
+  fetch(W + '/vedic?' + vp.toString())
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var nak = (d && d.nakshatra) || '';
+      var kw = NAK_KW[nak] || '';
+      cards[1] = cardHTML('🌙', '달 낙샤트라', nak || '—', kw);
+    })
+    .catch(function() { cards[1] = ''; })
+    .finally(tryRender);
+
+  // 카드3: 오늘의 행성 (astro POST)
+  fetch(W + '/astro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ year: Y, month: M, day: D, hour: 12, min: 0, lat: 37.5665, lon: 126.978, tzone: 9.0 })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(planets) {
+      var arr = Array.isArray(planets) ? planets : (planets.planets || []);
+      var targets = ['Moon', 'Venus', 'Mars'];
+      var lines = targets.map(function(name) {
+        var p = arr.find(function(x) { return x.name === name || x.name === PLANET_KOR[name]; });
+        if (!p) return null;
+        var sign = SIGN_KOR[p.sign] || p.sign || '—';
+        var sym = PLANET_SYM[name] || '';
+        return '<div style="font-size:13px;color:var(--text);margin:3px 0;">' + sym + ' ' + (PLANET_KOR[name] || name) + ' · ' + sign + '</div>';
+      }).filter(Boolean);
+      cards[2] = cardHTML('✦', '행성 에너지', '', '', null, {}, lines.join(''));
+    })
+    .catch(function() { cards[2] = ''; })
+    .finally(tryRender);
+})();
 
 // 스크롤 위치 저장/복원 제거됨 — 항상 맨 위부터 시작
 </script>
