@@ -3537,6 +3537,25 @@ function heroQuickStart() {
 }
 initHeroSelects();
 
+// pico_profile 저장값으로 히어로 입력칸 복원
+(function restoreHeroInputs() {
+  try {
+    var p = JSON.parse(localStorage.getItem('pico_profile'));
+    if (!p || !p.year) return;
+    var yEl = document.getElementById('heroYear');
+    var mEl = document.getElementById('heroMonth');
+    var dEl = document.getElementById('heroDay');
+    var hEl = document.getElementById('heroHour');
+    var miEl = document.getElementById('heroMinute');
+    if (yEl) yEl.value = p.year;
+    if (mEl) mEl.value = p.month;
+    if (dEl) dEl.value = p.day;
+    if (hEl) hEl.value = (p.hour === 'unknown' || p.hour == null) ? 'unknown' : p.hour;
+    if (miEl) miEl.value = p.minute || 0;
+    if (p.gender) selectHeroGender(p.gender === 'male' ? 'M' : (p.gender === 'female' ? 'F' : p.gender));
+  } catch(e) {}
+})();
+
 // ── 오늘의 우주 에너지 ─────────────────────────────────────
 (function loadTodayCosmic() {
   var W = 'https://fortuna.kkdmb7.workers.dev';
