@@ -839,6 +839,20 @@ function setType(t, silent) {
   });
   // 원명국 전환: 공지 표시 + 폼에 생년월일 채우기
   const notice = document.getElementById('wonmyong-notice');
+  // localStorage 프로필로 _birthDateParams 보완
+  if (t === 'wonmyong' && !_birthDateParams) {
+    try {
+      var _pu = localStorage.getItem('pico_user');
+      if (_pu) {
+        var _pup = JSON.parse(_pu);
+        if (_pup && _pup.profile && _pup.profile.birth_date) {
+          var _bd = _pup.profile.birth_date.split('-');
+          var _bt = (_pup.profile.birth_time || '12:00').split(':');
+          _birthDateParams = { year: parseInt(_bd[0]), month: parseInt(_bd[1]), day: parseInt(_bd[2]), hour: parseInt(_bt[0]), minute: parseInt(_bt[1]) };
+        }
+      }
+    } catch(e) {}
+  }
   if (t === 'wonmyong' && _birthDateParams) {
     const bp = _birthDateParams;
     const hStr = (bp.hour != null && bp.hour !== '')
