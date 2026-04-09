@@ -3561,8 +3561,16 @@ initHeroSelects();
   var W = 'https://fortuna.kkdmb7.workers.dev';
   var CHAT_URL = 'https://fortuna-silk.vercel.app/api/chat';
   var now = new Date(Date.now() + 9 * 3600000); // KST
-  var Y = now.getUTCFullYear(), M = now.getUTCMonth() + 1, D = now.getUTCDate();
+  var todayY = now.getUTCFullYear(), todayM = now.getUTCMonth() + 1, todayD = now.getUTCDate();
   var H = now.getUTCHours(), MIN = now.getUTCMinutes();
+  // 사용자 생년월일로 개인화 (없으면 오늘 날짜 fallback)
+  var _prof = null;
+  try { _prof = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+  var Y = (_prof && _prof.year)  ? _prof.year  : todayY;
+  var M = (_prof && _prof.month) ? _prof.month : todayM;
+  var D = (_prof && _prof.day)   ? _prof.day   : todayD;
+  var BH = (_prof && _prof.hour !== 'unknown' && _prof.hour != null) ? parseInt(_prof.hour) : 12;
+  var BMIN = (_prof && _prof.minute != null) ? parseInt(_prof.minute) : 0;
 
   var DOOR_KW = {
     '生':'계약·서명·창업에 최적', '開':'활동·투자·확장에 유리', '休':'안정·화해·양생에 좋음',
@@ -3622,7 +3630,7 @@ initHeroSelects();
   // 3개 API 병렬 수집 후 Claude 해석
   var cosmicData = { qimen: null, nakshatra: null, planets: null };
 
-  var p1 = fetch(W + '/qimen?year=' + Y + '&month=' + M + '&day=' + D + '&hour=' + H + '&minute=' + MIN + '&type=ilga')
+  var p1 = fetch(W + '/qimen?year=' + Y + '&month=' + M + '&day=' + D + '&hour=' + BH + '&minute=' + BMIN + '&type=ilga')
     .then(function(r) { return r.json(); })
     .then(function(d) {
       var door = '', grade = '평';
@@ -3633,9 +3641,8 @@ initHeroSelects();
       cosmicData.qimen = { gate: door, luck: grade, kw: DOOR_KW[door] || '' };
     }).catch(function() {});
 
-  var _cGender = 'female';
-  try { var _cp = JSON.parse(localStorage.getItem('pico_profile')); if (_cp && _cp.gender) _cGender = (_cp.gender === 'M' || _cp.gender === 'male') ? 'male' : 'female'; } catch(e) {}
-  var vp = new URLSearchParams({ year: Y, month: M, day: D, hour: 12, tz: 9, lat: 37.5665, lon: 126.978, gender: _cGender });
+  var _cGender = (_prof && _prof.gender) ? ((_prof.gender === 'M' || _prof.gender === 'male') ? 'male' : 'female') : 'female';
+  var vp = new URLSearchParams({ year: Y, month: M, day: D, hour: BH, tz: 9, lat: 37.5665, lon: 126.978, gender: _cGender });
   var p2 = fetch(W + '/vedic?' + vp.toString())
     .then(function(r) { return r.json(); })
     .then(function(d) {
@@ -3645,7 +3652,7 @@ initHeroSelects();
   var p3 = fetch(W + '/astro', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ year: Y, month: M, day: D, hour: 12, min: 0, lat: 37.5665, lon: 126.978, tzone: 9.0 })
+    body: JSON.stringify({ year: Y, month: M, day: D, hour: BH, min: BMIN, lat: 37.5665, lon: 126.978, tzone: 9.0 })
   })
     .then(function(r) { return r.json(); })
     .then(function(planets) {
