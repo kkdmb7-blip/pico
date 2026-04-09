@@ -2994,19 +2994,23 @@ function updateAuthUI() {
     else { av.style.display = 'none'; }
     var profileName = null;
     try { var pp = JSON.parse(localStorage.getItem('pico_profile')); profileName = pp && pp.name; } catch(e) {}
-    if (titleEl && (profileName || currentUser.name)) {
-      titleEl.innerHTML = (profileName || currentUser.name) + '님의 <em>오늘의 운세 점수</em>';
+    var _displayName = profileName || currentUser.name;
+    if (titleEl && _displayName) {
+      titleEl.innerHTML = _displayName + '님의 <em>오늘의 운세 점수</em>';
     }
+    var _ctn = document.getElementById('cosmicTitleName');
+    if (_ctn && _displayName) _ctn.textContent = _displayName + '의';
   } else {
     btnKakao.style.display = '';
     userArea.style.display = 'none';
     var p = null;
     try { p = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
-    // 비로그인이라도 이미 입력한 프로필이 있으면 히어로 숨김 유지
     if (heroEl) heroEl.style.display = '';
     if (heroInputEl) heroInputEl.style.display = '';
-    if (titleEl && p && p.name) {
-      titleEl.innerHTML = p.name + '님의 <em>오늘의 운세 점수</em>';
+    if (p && p.name) {
+      if (titleEl) titleEl.innerHTML = p.name + '님의 <em>오늘의 운세 점수</em>';
+      var _ctn2 = document.getElementById('cosmicTitleName');
+      if (_ctn2) _ctn2.textContent = p.name + '의';
     }
   }
 }
@@ -3731,20 +3735,13 @@ initHeroSelects();
   };
 
   function buildInterp(data) {
-    // 이름 가져오기: 로그인 > pico_profile > '당신'
+    // 이름 가져오기 (updateAuthUI와 동일 로직)
     var _uname = '당신';
     try {
-      var _pu = JSON.parse(localStorage.getItem('pico_user'));
-      if (_pu && _pu.name) _uname = _pu.name;
-      else {
-        var _pp = JSON.parse(localStorage.getItem('pico_profile'));
-        if (_pp && _pp.name && _pp.name !== '게스트') _uname = _pp.name;
-      }
+      var _pp2 = JSON.parse(localStorage.getItem('pico_profile'));
+      if (_pp2 && _pp2.name && _pp2.name !== '게스트') _uname = _pp2.name;
     } catch(e) {}
     var _subject = _uname + '은(는)';
-    // 제목 업데이트
-    var _titleEl = document.getElementById('cosmicTitleName');
-    if (_titleEl) _titleEl.textContent = (_uname === '당신' ? '당신의' : _uname + '의');
 
     var nakshatra = null, planets = null, summary = '';
     if (data.nakshatra) {
