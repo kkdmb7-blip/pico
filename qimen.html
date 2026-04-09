@@ -922,38 +922,42 @@ function setType(t, silent) {
   ['wonmyong','siga','ilga','wolga','nyeonga'].forEach(id => {
     document.getElementById('btn-' + id).classList.toggle('active', t === id);
   });
-  // 원명국 전환: 공지 표시 + 폼에 생년월일 채우기
   const notice = document.getElementById('wonmyong-notice');
-  // localStorage 프로필로 _birthDateParams 보완
-  if (t === 'wonmyong' && !_birthDateParams) {
+
+  if (t === 'wonmyong') {
+    // 프로필에서 직접 읽어서 폼 채우기
+    var _wy = '', _wm = '', _wd = '', _wh = '0', _wmin = '0';
     try {
       var _rp = JSON.parse(localStorage.getItem('pico_profile'));
-      if (_rp && _rp.year && _rp.month && _rp.day) {
-        var _wh = '0', _wmin = '0';
+      if (_rp) {
+        if (_rp.birth_date) {
+          var _bd = _rp.birth_date.split('-');
+          _wy = _bd[0]; _wm = String(parseInt(_bd[1])); _wd = String(parseInt(_bd[2]));
+        } else {
+          _wy = String(_rp.year || ''); _wm = String(_rp.month || ''); _wd = String(_rp.day || '');
+        }
         if (_rp.birth_time && _rp.birth_time !== 'unknown') {
-          var _wbt = _rp.birth_time.split(':');
-          _wh = String(parseInt(_wbt[0])); _wmin = String(parseInt(_wbt[1]) || 0);
+          var _bt = _rp.birth_time.split(':');
+          _wh = String(parseInt(_bt[0])); _wmin = String(parseInt(_bt[1]) || 0);
         } else if (_rp.hour != null && _rp.hour !== 'unknown') {
           _wh = String(_rp.hour); _wmin = String(_rp.minute || 0);
         }
-        _birthDateParams = { year: String(_rp.year), month: String(_rp.month), day: String(_rp.day), hour: _wh, minute: _wmin };
       }
     } catch(e) {}
-  }
-  if (t === 'wonmyong' && _birthDateParams) {
-    const bp = _birthDateParams;
-    const hStr = (bp.hour != null && bp.hour !== '')
-      ? ' ' + String(bp.hour).padStart(2,'0') + ':' + String(bp.minute||0).padStart(2,'0') : '';
-    document.getElementById('wonmyong-date-label').textContent =
-      '📅 원명국 · ' + bp.year + '.' + String(bp.month).padStart(2,'0') + '.' + String(bp.day).padStart(2,'0') + hStr;
-    document.getElementById('inp-year').value   = bp.year   || '';
-    document.getElementById('inp-month').value  = bp.month  || '';
-    document.getElementById('inp-day').value    = bp.day    || '';
-    document.getElementById('inp-hour').value   = bp.hour   || 0;
-    document.getElementById('inp-minute').value = bp.minute || 0;
-    notice.style.display = 'block';
+    if (_wy && _wm && _wd) {
+      document.getElementById('inp-year').value   = _wy;
+      document.getElementById('inp-month').value  = _wm;
+      document.getElementById('inp-day').value    = _wd;
+      document.getElementById('inp-hour').value   = _wh;
+      document.getElementById('inp-minute').value = _wmin;
+      document.getElementById('wonmyong-date-label').textContent =
+        '📅 원명국 · ' + _wy + '.' + String(_wm).padStart(2,'0') + '.' + String(_wd).padStart(2,'0');
+      notice.style.display = 'block';
+    } else {
+      notice.style.display = 'none';
+    }
   } else {
-    // 원명국 아닌 탭으로 전환: 현재 날짜/시각 복원
+    // 다른 탭: 현재 날짜/시각 복원
     var _n = new Date();
     document.getElementById('inp-year').value   = _n.getFullYear();
     document.getElementById('inp-month').value  = _n.getMonth() + 1;
