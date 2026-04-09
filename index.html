@@ -3508,7 +3508,7 @@ function goScoreQuick() {
             '<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;color:'+(GRADE_COLOR[it.grade]||'#9b8fb0')+';background:rgba(0,0,0,0.25);border:1px solid '+(GRADE_COLOR[it.grade]||'#9b8fb0')+'25;letter-spacing:0.05em;">'+it.grade+'</div>'+
           '</div>'+
           '<div style="font-size:14px;font-weight:300;color:#e8e0f0;line-height:1.7;letter-spacing:-0.01em;">'+it.kw+'</div>'+
-          '<div style="margin-top:12px;text-align:right;"><a href="qimen.html?year='+it.dt.y+'&month='+it.dt.m+'&day='+it.dt.d+'&hour=12&minute=0&type=ilga" style="font-size:10px;color:rgba(167,139,250,0.6);text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
+          '<div style="margin-top:12px;text-align:right;"><a href="#" onclick="event.preventDefault();goQimenWonmyong()" style="font-size:10px;color:rgba(167,139,250,0.6);text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
         };})(item,card);
       }
       card.addEventListener('mouseenter',function(){this.style.transform='translateY(-3px)';});
@@ -3524,6 +3524,18 @@ function goScoreQuick() {
 
     document.getElementById('qimenWeeklyWrap').style.display='block';
   }
+
+  window.goQimenWonmyong = function() {
+    var u = null;
+    try { var s = localStorage.getItem('pico_user'); if (s) u = JSON.parse(s); } catch(e) {}
+    if (u && u.profile && u.profile.birth_date) {
+      var bd = u.profile.birth_date.split('-');
+      var bt = (u.profile.birth_time || '12:00').split(':');
+      window.location.href = 'qimen.html?year='+parseInt(bd[0])+'&month='+parseInt(bd[1])+'&day='+parseInt(bd[2])+'&hour='+parseInt(bt[0])+'&minute='+parseInt(bt[1])+'&type=wonmyong';
+    } else {
+      window.location.href = 'qimen.html?type=wonmyong';
+    }
+  };
 
   loadWeeklyQimen();
 })();
