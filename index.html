@@ -28,6 +28,7 @@
     font-family: 'Noto Sans KR', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    padding-bottom: 60px;
   }
   /* UI 요소 Sans 강제 */
   button, input, select, textarea,
@@ -935,6 +936,7 @@
 </nav>
 
 
+<div id="tabHome">
 <!-- HERO (비로그인 전용) -->
 <script>(function(){try{if(localStorage.getItem('pico_user')){document.write('<style>.hero,#heroInputWrap{display:none}</style>');}}catch(e){}})();</script>
 <section class="hero">
@@ -1135,6 +1137,74 @@
   <a href="https://kkdmb7-blip.github.io/memox/" class="btn-cta" target="_blank">✦ AI 운세 상담하기</a>
   <a href="counselor.html" class="btn-cta" style="margin-top:12px;background:linear-gradient(135deg,#c2784e,#e8a87c);">👤 전문 상담사 연결</a>
 </section>
+
+</div><!-- /tabHome -->
+
+<!-- TAB: 리포트 -->
+<div id="tabReport" style="display:none;min-height:80vh;display:none;align-items:center;justify-content:center;flex-direction:column;padding:80px 24px;">
+  <div style="text-align:center;padding:80px 24px;">
+    <div style="font-size:48px;margin-bottom:20px;">📋</div>
+    <div style="font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:12px;">리포트</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.8;">나의 운세 분석 리포트를 모아볼 수 있는 공간입니다.<br>곧 업데이트될 예정이에요.</div>
+    <div style="margin-top:24px;display:inline-block;padding:8px 20px;background:rgba(155,127,212,0.1);border:1px solid rgba(155,127,212,0.25);border-radius:20px;font-size:12px;font-weight:700;color:#a07fd4;letter-spacing:1px;">준비중</div>
+  </div>
+</div>
+
+<!-- TAB: 상담 -->
+<div id="tabConsult" style="display:none;min-height:80vh;padding:60px 24px;max-width:600px;margin:0 auto;">
+  <div style="font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px;padding-top:20px;">상담</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:32px;">AI 또는 전문 상담사와 깊은 운세 상담을 나눠보세요.</div>
+  <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:flex;align-items:center;gap:16px;padding:20px 24px;background:linear-gradient(135deg,rgba(123,94,167,0.15),rgba(160,127,212,0.08));border:1px solid rgba(123,94,167,0.3);border-radius:16px;text-decoration:none;color:var(--text);margin-bottom:14px;transition:all 0.2s;">
+    <div style="font-size:32px;flex-shrink:0;">✦</div>
+    <div>
+      <div style="font-family:'Noto Serif KR',serif;font-size:16px;font-weight:700;margin-bottom:4px;">AI 운세 상담</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;">사주·점성술·기문 기반의 AI 심층 분석</div>
+    </div>
+    <div style="margin-left:auto;color:var(--muted);font-size:18px;">›</div>
+  </a>
+  <a href="counselor.html" style="display:flex;align-items:center;gap:16px;padding:20px 24px;background:linear-gradient(135deg,rgba(194,120,78,0.12),rgba(232,168,124,0.06));border:1px solid rgba(194,120,78,0.3);border-radius:16px;text-decoration:none;color:var(--text);transition:all 0.2s;">
+    <div style="font-size:32px;flex-shrink:0;">👤</div>
+    <div>
+      <div style="font-family:'Noto Serif KR',serif;font-size:16px;font-weight:700;margin-bottom:4px;">전문 상담사 연결</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;">사주·타로 전문가에게 1:1 직접 상담</div>
+    </div>
+    <div style="margin-left:auto;color:var(--muted);font-size:18px;">›</div>
+  </a>
+</div>
+
+<!-- TAB: 마이페이지 -->
+<div id="tabMypage" style="display:none;min-height:80vh;padding:60px 24px;max-width:600px;margin:0 auto;">
+  <div style="font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px;padding-top:20px;">마이페이지</div>
+  <!-- 비로그인 -->
+  <div id="mypageGuest" style="display:none;text-align:center;padding:60px 0;">
+    <div style="font-size:48px;margin-bottom:20px;">🔐</div>
+    <div style="font-size:15px;color:var(--muted);margin-bottom:24px;line-height:1.8;">카카오 로그인 후 나의 운세 기록과<br>프로필을 관리할 수 있어요.</div>
+    <button onclick="kakaoLogin()" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:#FEE500;color:#191919;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">
+      <img src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png" style="width:18px;height:18px;">카카오로 시작하기
+    </button>
+  </div>
+  <!-- 로그인 후 -->
+  <div id="mypageUser" style="display:none;">
+    <div style="display:flex;align-items:center;gap:16px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-bottom:20px;">
+      <img id="mypageAvatar" src="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;display:none;">
+      <div>
+        <div id="mypageName" style="font-family:'Noto Serif KR',serif;font-size:18px;font-weight:700;margin-bottom:2px;"></div>
+        <div style="font-size:12px;color:var(--muted);">PICO Lab 회원</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px;">
+      <button onclick="openProfileModal()" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;">
+        <span>👤 프로필 관리</span><span style="color:var(--muted);">›</span>
+      </button>
+      <button onclick="openHistoryModal()" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;">
+        <span>📜 지난 분석 보기</span><span style="color:var(--muted);">›</span>
+      </button>
+      <button onclick="logout()" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:none;border:none;color:#f87171;font-size:14px;cursor:pointer;text-align:left;">
+        <span>로그아웃</span><span style="color:var(--muted);">›</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- SAJU MODAL -->
 <div class="saju-overlay" id="sajuOverlay" onclick="if(event.target===this)closeSajuModal()">
@@ -1542,12 +1612,36 @@
   </div>
 </div>
 
-<footer>
+<footer id="mainFooter">
   <div>© 2026 PICO Lab · AI 운세 연구소</div>
   <div>
     <a href="http://pf.kakao.com/_krjxjn" target="_blank">💬 카카오 채널 고객센터</a>
   </div>
 </footer>
+
+<!-- 하단 탭 네비게이션 -->
+<nav id="bottomNav" style="
+  position:fixed;bottom:0;left:0;width:100%;
+  background:rgba(10,10,15,0.97);
+  backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:stretch;
+  height:60px;z-index:200;
+  padding-bottom:env(safe-area-inset-bottom);
+">
+  <button onclick="switchTab('home')" id="tnHome" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+    <span style="font-size:20px;">🏠</span>홈
+  </button>
+  <button onclick="switchTab('report')" id="tnReport" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+    <span style="font-size:20px;">📋</span>리포트
+  </button>
+  <button onclick="switchTab('consult')" id="tnConsult" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+    <span style="font-size:20px;">💬</span>상담
+  </button>
+  <button onclick="switchTab('mypage')" id="tnMypage" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+    <span style="font-size:20px;">👤</span>마이페이지
+  </button>
+</nav>
 
 <script>
 // ── STARS ────────────────────────────────────────────────
@@ -3772,6 +3866,48 @@ initHeroSelects();
     }
     return { nakshatra: nakshatra, planets: planets, summary: summary || null };
   }
+})();
+
+// ── 하단 탭 네비게이션 ─────────────────────────────────────
+var _currentTab = 'home';
+function switchTab(tab) {
+  var tabs = ['home','report','consult','mypage'];
+  tabs.forEach(function(t) {
+    var el = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+    var btn = document.getElementById('tn' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (el) el.style.display = (t === tab) ? '' : 'none';
+    if (btn) btn.style.color = (t === tab) ? '#e8b86d' : '';
+  });
+  // 홈 탭: footer 표시, 나머지: 숨김
+  var footer = document.getElementById('mainFooter');
+  if (footer) footer.style.display = (tab === 'home') ? '' : 'none';
+  // 마이페이지: 로그인 상태에 따라 분기
+  if (tab === 'mypage') updateMypageTab();
+  _currentTab = tab;
+  window.scrollTo(0, 0);
+}
+function updateMypageTab() {
+  var guest = document.getElementById('mypageGuest');
+  var user = document.getElementById('mypageUser');
+  if (!guest || !user) return;
+  if (currentUser) {
+    guest.style.display = 'none';
+    user.style.display = '';
+    var nameEl = document.getElementById('mypageName');
+    var avEl = document.getElementById('mypageAvatar');
+    var profileName = null;
+    try { var _mp = JSON.parse(localStorage.getItem('pico_profile')); profileName = _mp && _mp.name; } catch(e) {}
+    if (nameEl) nameEl.textContent = (profileName || currentUser.name) + '님';
+    if (avEl && currentUser.avatar) { avEl.src = currentUser.avatar; avEl.style.display = ''; }
+  } else {
+    guest.style.display = '';
+    user.style.display = 'none';
+  }
+}
+// 초기 홈 탭 활성화
+(function() {
+  var btn = document.getElementById('tnHome');
+  if (btn) btn.style.color = '#e8b86d';
 })();
 
 // 스크롤 위치 저장/복원 제거됨 — 항상 맨 위부터 시작
