@@ -455,6 +455,130 @@
     0%,100% { opacity: 1; } 50% { opacity: 0.3; }
   }
 
+  /* ── 사용자 친화적 요약 카드 ── */
+  .qm-summary-card {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .qm-summary-card.visible { display: flex; }
+  .qm-headline {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .qm-headline-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+  .qm-headline-badge.badge-길 { background: rgba(0,200,83,0.15); color: #00C853; }
+  .qm-headline-badge.badge-대길 { background: rgba(255,215,0,0.15); color: #FFD700; }
+  .qm-headline-badge.badge-흉 { background: rgba(255,109,0,0.15); color: #FF6D00; }
+  .qm-headline-badge.badge-대흉 { background: rgba(255,23,68,0.15); color: #FF1744; }
+  .qm-headline-badge.badge-보통 { background: rgba(107,107,133,0.15); color: var(--muted); }
+  .qm-headline-text {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .qm-headline-geok {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .qm-rec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 480px) {
+    .qm-rec-grid { grid-template-columns: 1fr; }
+  }
+  .qm-rec-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .qm-rec-icon {
+    font-size: 22px;
+    line-height: 1;
+  }
+  .qm-rec-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .qm-rec-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .qm-rec-sub {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .qm-warn-box {
+    background: rgba(255,109,0,0.06);
+    border: 1px solid rgba(255,109,0,0.2);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    display: none;
+  }
+  .qm-warn-box.visible { display: block; }
+  .qm-warn-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #FF6D00;
+    margin-bottom: 6px;
+  }
+  .qm-warn-text {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+  .qm-detail-toggle {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-family: 'Noto Sans KR', sans-serif;
+    width: 100%;
+  }
+  .qm-detail-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .qm-detail-wrap {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .qm-detail-wrap.open { display: flex; }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
     .palace { min-height: 118px; padding: 12px 4px 8px; gap: 3px; }
@@ -521,6 +645,24 @@
     <div id="wonmyong-date-label" style="font-size:13px;font-weight:700;color:var(--accent2);">📅 원명국</div>
     <div style="font-size:12px;color:var(--muted);margin-top:4px;">이 판은 태어난 순간의 고정된 기운입니다.</div>
   </div>
+
+  <!-- ── 사용자 친화적 요약 카드 ── -->
+  <div class="qm-summary-card" id="qm-summary-card">
+    <div class="qm-headline" id="qm-headline">
+      <div id="qm-headline-badge" class="qm-headline-badge"></div>
+      <div id="qm-headline-text" class="qm-headline-text"></div>
+      <div id="qm-headline-geok" class="qm-headline-geok"></div>
+    </div>
+    <div class="qm-rec-grid" id="qm-rec-grid"></div>
+    <div class="qm-warn-box" id="qm-warn-box">
+      <div class="qm-warn-title">⚠️ 주의할 점</div>
+      <div class="qm-warn-text" id="qm-warn-text"></div>
+    </div>
+    <button class="qm-detail-toggle" id="qm-detail-toggle" onclick="toggleQmDetail()">▼ 기문둔갑 포국 상세 보기</button>
+  </div>
+
+  <!-- ── 상세 보기 (접기/펼치기) ── -->
+  <div class="qm-detail-wrap" id="qm-detail-wrap">
 
   <div class="meta-bar" id="meta-bar">
     <div class="meta-item">
@@ -599,6 +741,8 @@
       <button class="btn-paid" onclick="alert('준비 중입니다. 곧 오픈될 예정이에요! 🔮')">🔒 AI 정밀 해석 받기 🔮<br><span style="font-size:10px;font-weight:400;opacity:0.7">20 Orb 사용</span></button>
     </div>
   </div>
+
+  </div><!-- /qm-detail-wrap -->
 
   <!-- 버튼 그룹 -->
   <div id="qimenShareBtnWrap" style="display:none;padding:20px 20px 32px;display:none;flex-direction:column;align-items:center;gap:10px;">
@@ -725,6 +869,8 @@ function setVisible(id, v) {
   document.getElementById(id).classList.toggle('visible', v);
 }
 function hideResults() {
+  setVisible('qm-summary-card', false);
+  document.getElementById('qm-detail-wrap').classList.remove('open');
   setVisible('meta-bar', false);
   setVisible('saju-bar', false);
   setVisible('grid-wrap', false);
@@ -733,6 +879,12 @@ function hideResults() {
   setVisible('interp-wrap', false);
   setVisible('action-row', false);
   hasResult = false;
+}
+function toggleQmDetail() {
+  var wrap = document.getElementById('qm-detail-wrap');
+  var btn  = document.getElementById('qm-detail-toggle');
+  var isOpen = wrap.classList.toggle('open');
+  btn.textContent = isOpen ? '▲ 상세 보기 접기' : '▼ 기문둔갑 포국 상세 보기';
 }
 
 // ── 사주 8자 ─────────────────────────────────────────────
@@ -815,8 +967,140 @@ async function doFetch() {
   }
 }
 
+// ── 팔문 한글 매핑 (요약 카드용) ──
+var DOOR_KR = {
+  '生': '생문(새로운 시작)',
+  '開': '개문(기회 오픈)',
+  '休': '휴문(쉬어가기 좋은)',
+  '景': '경문(빛나는, 주목받는)',
+  '傷': '상문(충돌 주의)',
+  '杜': '두문(숨기기 좋은)',
+  '驚': '경문(놀랄 일 주의)',
+  '死': '사문(정체, 막힘)'
+};
+var DOOR_DIR_DESC = {
+  '生': '새로운 시작에 좋은 방향',
+  '開': '기회가 열리는 방향'
+};
+var DOOR_TIME_KR = {
+  '生': '오전 5~7시, 오전 11~오후 1시',
+  '開': '오전 3~5시, 오후 7~9시',
+  '休': '오후 11~오전 1시, 오전 1~3시',
+  '景': '오전 11~오후 1시, 오후 1~3시'
+};
+
+function renderSummaryCard(data) {
+  var matched = (typeof checkGeokguk === 'function') ? checkGeokguk(data) : [];
+
+  // ── 한줄 요약 + 길흉 배지 ──
+  var 직사문명 = {
+    '生':'생기', '開':'왕성한 활동', '休':'안정', '景':'밝은 기운',
+    '傷':'주의', '杜':'막힘', '驚':'긴장', '死':'침체'
+  };
+  var summaryText = '';
+  var gilHyung = '보통';
+  var geokNames = [];
+
+  if (matched.length) {
+    summaryText = matched[0].요약;
+    gilHyung = matched[0].길흉;
+    matched.forEach(function(g) {
+      geokNames.push(g.name.replace(/\([^)]*\)/g, '').trim());
+    });
+  } else {
+    var dm = data.직사문 || '';
+    summaryText = (직사문명[dm] || '보통') + '의 기운이 흐르는 때입니다.';
+    // 직사문 기반 길흉
+    if (dm === '生' || dm === '開' || dm === '休') gilHyung = '길';
+    else if (dm === '景') gilHyung = '보통';
+    else if (dm === '傷' || dm === '杜' || dm === '驚') gilHyung = '흉';
+    else if (dm === '死') gilHyung = '흉';
+  }
+
+  var badgeEl = document.getElementById('qm-headline-badge');
+  badgeEl.textContent = gilHyung;
+  badgeEl.className = 'qm-headline-badge badge-' + gilHyung;
+  document.getElementById('qm-headline-text').textContent = summaryText;
+  var geokEl = document.getElementById('qm-headline-geok');
+  geokEl.textContent = geokNames.length ? geokNames.join(' · ') : '';
+  geokEl.style.display = geokNames.length ? '' : 'none';
+
+  // ── 3개 추천 카드 ──
+  var recGrid = document.getElementById('qm-rec-grid');
+  recGrid.innerHTML = '';
+
+  // 1. 좋은 방향
+  var dirLines = [];
+  ['生', '開'].forEach(function(door) {
+    Object.entries(data.palaces).forEach(function(entry) {
+      var n = entry[0], p = entry[1];
+      if (p.팔문 === door) {
+        var dir = GONG_DIR[parseInt(n)];
+        dirLines.push({ desc: DOOR_DIR_DESC[door], dir: dir });
+      }
+    });
+  });
+  var dirVal = dirLines.length
+    ? dirLines.map(function(d) { return d.dir; }).join(', ')
+    : '—';
+  var dirSub = dirLines.length
+    ? dirLines.map(function(d) { return d.desc + ': ' + d.dir + '쪽'; }).join('<br>')
+    : '해당 없음';
+  recGrid.appendChild(buildRecItem('🧭', '좋은 방향', dirVal, dirSub));
+
+  // 2. 좋은 시간
+  var timeVal = DOOR_TIME_KR[data.직사문] || '—';
+  var timeSub = data.직사문 ? DOOR_KR[data.직사문] + ' 기준' : '';
+  recGrid.appendChild(buildRecItem('⏰', '좋은 시간', timeVal, timeSub));
+
+  // 3. 오늘 하면 좋은 일
+  var 추천Set = [];
+  matched.forEach(function(g) {
+    if (g.추천행동) g.추천행동.split(',').forEach(function(a) {
+      var t = a.trim();
+      if (추천Set.indexOf(t) === -1) 추천Set.push(t);
+    });
+  });
+  var actVal = 추천Set.length ? 추천Set.join(', ') : '정상적인 일과 진행';
+  recGrid.appendChild(buildRecItem('💼', '오늘 하면 좋은 일', actVal, ''));
+
+  // ── 주의할 점 ──
+  var 주의List = [];
+  matched.forEach(function(g) {
+    if (g.주의 && g.주의.trim()) 주의List.push(g.주의.trim());
+  });
+  var warnBox = document.getElementById('qm-warn-box');
+  var warnText = document.getElementById('qm-warn-text');
+  if (주의List.length) {
+    warnText.textContent = 주의List.join(' / ');
+    warnBox.classList.add('visible');
+  } else {
+    warnBox.classList.remove('visible');
+  }
+
+  // 접기 초기화
+  document.getElementById('qm-detail-wrap').classList.remove('open');
+  document.getElementById('qm-detail-toggle').textContent = '▼ 기문둔갑 포국 상세 보기';
+
+  setVisible('qm-summary-card', true);
+}
+
+function buildRecItem(icon, label, value, sub) {
+  var item = document.createElement('div');
+  item.className = 'qm-rec-item';
+  var html = '<div class="qm-rec-icon">' + icon + '</div>'
+    + '<div class="qm-rec-label">' + label + '</div>'
+    + '<div class="qm-rec-value">' + value + '</div>';
+  if (sub) html += '<div class="qm-rec-sub">' + sub + '</div>';
+  item.innerHTML = html;
+  return item;
+}
+
 function renderResult(data) {
   const meta = data.meta;
+
+  // 사용자 친화적 요약 카드 (기존 상세 위에)
+  renderSummaryCard(data);
 
   // 사주 8자 (URL에 날짜 있을 때)
   const _y = parseInt(document.getElementById('inp-year').value);
