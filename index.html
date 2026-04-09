@@ -3594,7 +3594,9 @@ initHeroSelects();
       cosmicData.qimen = { gate: door, luck: grade, kw: DOOR_KW[door] || '' };
     }).catch(function() {});
 
-  var vp = new URLSearchParams({ year: Y, month: M, day: D, hour: 12, tz: 9, lat: 37.5665, lon: 126.978, gender: 'female' });
+  var _cGender = 'female';
+  try { var _cp = JSON.parse(localStorage.getItem('pico_profile')); if (_cp && _cp.gender) _cGender = (_cp.gender === 'M' || _cp.gender === 'male') ? 'male' : 'female'; } catch(e) {}
+  var vp = new URLSearchParams({ year: Y, month: M, day: D, hour: 12, tz: 9, lat: 37.5665, lon: 126.978, gender: _cGender });
   var p2 = fetch(W + '/vedic?' + vp.toString())
     .then(function(r) { return r.json(); })
     .then(function(d) {
