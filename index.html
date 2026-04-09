@@ -992,7 +992,7 @@
   <div class="section-label" style="text-align:center;margin-bottom:20px;">
     ✦ 오늘의 우주 에너지 · 매일 업데이트
   </div>
-  <div id="cosmicGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;"></div>
+  <div id="cosmicGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;"></div>
 </section>
 <style>
 @media(max-width:600px){
@@ -3577,18 +3577,6 @@ initHeroSelects();
   var BH = (_prof && _prof.hour !== 'unknown' && _prof.hour != null) ? parseInt(_prof.hour) : 12;
   var BMIN = (_prof && _prof.minute != null) ? parseInt(_prof.minute) : 0;
 
-  var DOOR_KW = {
-    '生':'계약·서명·창업에 최적', '開':'활동·투자·확장에 유리', '休':'안정·화해·양생에 좋음',
-    '景':'문서·공부·창작에 유리', '傷':'이동 많고 충돌 주의', '杜':'막힘·정체 조심',
-    '驚':'긴장·놀람·소송 주의', '死':'중요 결정 보류'
-  };
-  var GRADE_CLR = {
-    '대길': { bg:'rgba(253,224,71,0.1)',  border:'rgba(253,224,71,0.25)',  text:'#fde047' },
-    '길':   { bg:'rgba(134,239,172,0.1)', border:'rgba(134,239,172,0.25)', text:'#86efac' },
-    '평':   { bg:'rgba(148,163,184,0.08)',border:'rgba(148,163,184,0.2)',  text:'#94a3b8' },
-    '흉':   { bg:'rgba(251,146,60,0.1)',  border:'rgba(251,146,60,0.25)',  text:'#fb923c' },
-    '대흉': { bg:'rgba(248,113,113,0.1)', border:'rgba(248,113,113,0.25)', text:'#f87171' }
-  };
   var NAK_KW = {
     '아쉬위니':'치유·속도·시작', '바라니':'변화·카르마·의지', '크리티카':'정화·판단·변혁',
     '로히니':'풍요·미·창의', '므리가쉬라':'탐구·여행·호기심', '아르드라':'변혁·혼돈·성장',
@@ -3628,23 +3616,12 @@ initHeroSelects();
 
   var grid = document.getElementById('cosmicGrid');
   if (!grid) return;
-  grid.innerHTML = [1,2,3].map(function() {
+  grid.innerHTML = [1,2].map(function() {
     return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 16px;height:160px;opacity:0.4;"></div>';
   }).join('');
 
-  // 3개 API 병렬 수집 후 Claude 해석
-  var cosmicData = { qimen: null, nakshatra: null, planets: null };
-
-  var p1 = fetch(W + '/qimen?year=' + Y + '&month=' + M + '&day=' + D + '&hour=' + BH + '&minute=' + BMIN + '&type=ilga')
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      var door = '', grade = '평';
-      if (d && d.직사문) door = d.직사문;
-      else if (d && d.palaces) {
-        Object.keys(d.palaces).forEach(function(k) { if (d.palaces[k].직부) door = d.palaces[k].팔문 || ''; });
-      }
-      cosmicData.qimen = { gate: door, luck: grade, kw: DOOR_KW[door] || '' };
-    }).catch(function() {});
+  // 2개 API 병렬 수집
+  var cosmicData = { nakshatra: null, planets: null };
 
   var _cGender = (_prof && _prof.gender) ? ((_prof.gender === 'M' || _prof.gender === 'male') ? 'male' : 'female') : 'female';
   var vp = new URLSearchParams({ year: Y, month: M, day: D, hour: BH, tz: 9, lat: 37.5665, lon: 126.978, gender: _cGender });
@@ -3670,20 +3647,13 @@ initHeroSelects();
       cosmicData.planets = result;
     }).catch(function() {});
 
-  Promise.all([p1, p2, p3]).then(function() {
+  Promise.all([p2, p3]).then(function() {
     renderCosmicCards(cosmicData, buildInterp(cosmicData));
   });
 
   function renderCosmicCards(data, interp) {
     var cards = [];
-    // 카드1: 기문
-    if (data.qimen) {
-      var gc = GRADE_CLR[data.qimen.luck] || GRADE_CLR['평'];
-      cards.push(cardHTML('☯', '기문 일운', data.qimen.gate || '—', data.qimen.kw,
-        data.qimen.luck !== '평' ? data.qimen.luck : null, gc,
-        interp && interp.qimen ? interp.qimen : null));
-    }
-    // 카드2: 낙샤트라
+    // 카드1: 낙샤트라
     if (data.nakshatra) {
       cards.push(cardHTML('🌙', '달 낙샤트라', data.nakshatra, NAK_KW[data.nakshatra] || '',
         null, {}, interp && interp.nakshatra ? interp.nakshatra : null));
@@ -3716,16 +3686,6 @@ initHeroSelects();
     }
   }
 
-  var DOOR_INTERP = {
-    '生':'새로운 시작과 창조의 기운이 강하게 흐르는 날입니다.\n계약·서명·창업 등 중요한 결정을 내리기에 최적입니다.',
-    '開':'활발한 확장과 도전의 에너지가 가득합니다.\n새로운 사람을 만나거나 투자를 추진하기에 좋은 때입니다.',
-    '休':'고요함 속에서 내면을 채우는 날입니다.\n무리한 행동보다 휴식과 관계 회복에 집중하세요.',
-    '景':'문서·학습·창작의 기운이 넘치는 날입니다.\n글쓰기, 공부, 기획 작업에서 특히 집중력이 빛납니다.',
-    '傷':'움직임이 많고 변수가 생기기 쉬운 날입니다.\n충돌이나 급한 결정은 피하고 신중하게 대응하세요.',
-    '杜':'에너지가 막히고 정체되는 기운입니다.\n서두르지 말고 전략을 재정비하는 시간으로 활용하세요.',
-    '驚':'예상치 못한 변화나 긴장감이 있을 수 있습니다.\n감정적 대응보다 차분한 판단이 중요한 날입니다.',
-    '死':'활동보다 내면을 정리하는 날입니다.\n중요한 결정은 미루고 조용히 재충전에 집중하세요.'
-  };
   var NAK_INTERP2 = {
     '아쉬위니':'치유와 빠른 시작의 에너지가 달을 감싸고 있습니다.\n오늘은 망설임 없이 즉각 행동하는 것이 유리합니다.',
     '바라니':'변화와 카르마 정산의 에너지가 흐릅니다.\n묵은 것을 내려놓고 새로운 흐름에 몸을 맡기세요.',
@@ -3763,10 +3723,7 @@ initHeroSelects();
   };
 
   function buildInterp(data) {
-    var qimen = null, nakshatra = null, planets = null, summary = '';
-    if (data.qimen && data.qimen.gate) {
-      qimen = DOOR_INTERP[data.qimen.gate] || (data.qimen.kw + ' 기운이 흐르는 날입니다.\n오늘의 흐름을 잘 살펴 현명하게 활용하세요.');
-    }
+    var nakshatra = null, planets = null, summary = '';
     if (data.nakshatra) {
       nakshatra = NAK_INTERP2[data.nakshatra] || ('달이 ' + data.nakshatra + '에 머물고 있습니다.\n' + (NAK_KW[data.nakshatra] || '') + '의 에너지가 감성을 이끕니다.');
     }
@@ -3778,15 +3735,14 @@ initHeroSelects();
                 (venusFeel ? '\n금성은 ' + venusSign + '에서 ' + venusFeel + ' 사랑의 에너지를 발산합니다.' : '');
     }
     // 종합
-    var gate = data.qimen && data.qimen.gate;
     var nak = data.nakshatra;
-    var isGood = gate && (gate === '生' || gate === '開' || gate === '休' || gate === '景');
-    if (gate && nak) {
-      summary = isGood
-        ? (gate + '門의 순풍과 ' + nak + '의 에너지가 만나 오늘을 특별하게 만듭니다.')
-        : ('오늘은 ' + nak + '의 지혜로 ' + gate + '門의 기운을 현명하게 헤쳐나가는 날입니다.');
+    var moonSign = data.planets && data.planets.Moon;
+    if (nak && moonSign) {
+      summary = nak + '의 에너지와 ' + moonSign + '의 감성이 오늘 당신의 흐름을 이끕니다.';
+    } else if (nak) {
+      summary = nak + '의 에너지가 오늘 당신의 감성과 직관을 이끌고 있습니다.';
     }
-    return { qimen: qimen, nakshatra: nakshatra, planets: planets, summary: summary || null };
+    return { nakshatra: nakshatra, planets: planets, summary: summary || null };
   }
 })();
 
