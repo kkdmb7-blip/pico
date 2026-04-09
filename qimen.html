@@ -1402,13 +1402,24 @@ function renderInterp(data) {
       }
     } catch(e) {}
   }
-  if (year)   document.getElementById('inp-year').value   = year;
-  if (month)  document.getElementById('inp-month').value  = month;
-  if (day)    document.getElementById('inp-day').value    = day;
-  if (hour != null)   document.getElementById('inp-hour').value   = hour;
-  if (minute != null) document.getElementById('inp-minute').value = minute;
-  if (['ilga','wolga','nyeonga','wonmyong'].includes(type)) setType(type, true);
-  if (year && month && day) doFetch();
+  if (year && month && day) {
+    document.getElementById('inp-year').value   = year;
+    document.getElementById('inp-month').value  = month;
+    document.getElementById('inp-day').value    = day;
+    if (hour != null)   document.getElementById('inp-hour').value   = hour;
+    if (minute != null) document.getElementById('inp-minute').value = minute;
+    if (['ilga','wolga','nyeonga','wonmyong'].includes(type)) setType(type, true);
+    doFetch();
+  } else {
+    // URL 파라미터 없으면 현재 날짜/시각으로 채우고 자동 조회
+    var _now = new Date();
+    document.getElementById('inp-year').value   = _now.getFullYear();
+    document.getElementById('inp-month').value  = _now.getMonth() + 1;
+    document.getElementById('inp-day').value    = _now.getDate();
+    document.getElementById('inp-hour').value   = _now.getHours();
+    document.getElementById('inp-minute').value = _now.getMinutes();
+    doFetch();
+  }
 })();
 history.pushState(null, '', location.href);
 window.addEventListener('popstate', function() { window.location.href = '/'; });
