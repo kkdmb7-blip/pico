@@ -988,7 +988,7 @@
 </section>
 
 <!-- TODAY COSMIC ENERGY -->
-<section id="todayCosmicWrap" style="padding:0 24px 48px;max-width:960px;margin:0 auto;position:relative;z-index:1;">
+<section id="todayCosmicWrap" style="padding:0 24px 48px;max-width:960px;margin:0 auto;position:relative;z-index:1;display:none;">
   <div class="section-label" style="text-align:center;margin-bottom:20px;">
     ✦ 오늘의 우주 에너지 · 매일 업데이트
   </div>
@@ -2849,6 +2849,8 @@ function checkAuth() {
       try {
         var guestProfile = JSON.parse(localStorage.getItem('pico_profile'));
         if (guestProfile && guestProfile.year) {
+          var _cEl = document.getElementById('todayCosmicWrap');
+          if (_cEl) _cEl.style.display = '';
           loadMiniScore().then(function() {
             // 일간 오행이 저장된 후 기문 주간 재로드
             if (typeof window.loadWeeklyQimen === 'function') window.loadWeeklyQimen();
@@ -2970,6 +2972,8 @@ function updateAuthUI() {
     userArea.style.display = 'flex';
     if (heroEl) heroEl.style.display = 'none';
     if (heroInputEl) heroInputEl.style.display = 'none';
+    var _cosmicEl = document.getElementById('todayCosmicWrap');
+    if (_cosmicEl) _cosmicEl.style.display = '';
     document.getElementById('userNameDisplay').textContent = currentUser.name;
     var av = document.getElementById('userAvatar');
     if (currentUser.avatar) { av.src = currentUser.avatar; av.style.display = ''; }
@@ -3503,6 +3507,10 @@ function goScoreHero() {
     name: '게스트'
   };
   try { localStorage.setItem('pico_profile', JSON.stringify(profile)); } catch(e) {}
+
+  // 우주 에너지 섹션 노출
+  var cosmicEl = document.getElementById('todayCosmicWrap');
+  if (cosmicEl) cosmicEl.style.display = '';
 
   // 점수 계산 완료 후 기문 주간 일운 재로드 (일간 오행 저장 후)
   if (typeof loadMiniScore === 'function') {
