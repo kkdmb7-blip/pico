@@ -998,8 +998,7 @@
 <!-- TODAY COSMIC ENERGY -->
 <section id="todayCosmicWrap" style="padding:48px 24px 48px;max-width:960px;margin:0 auto;position:relative;z-index:1;display:none;">
   <div style="text-align:center;margin-bottom:24px;font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--accent2);letter-spacing:1px;">
-    ✦ 오늘의 우주 에너지
-    <div style="font-size:12px;font-weight:400;color:var(--muted);margin-top:6px;letter-spacing:2px;">매일 업데이트</div>
+    ✦ <span id="cosmicTitleName">당신의</span> 우주 에너지
   </div>
   <div id="cosmicGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;"></div>
 </section>
@@ -3732,24 +3731,41 @@ initHeroSelects();
   };
 
   function buildInterp(data) {
+    // 이름 가져오기: 로그인 > pico_profile > '당신'
+    var _uname = '당신';
+    try {
+      var _pu = JSON.parse(localStorage.getItem('pico_user'));
+      if (_pu && _pu.name) _uname = _pu.name;
+      else {
+        var _pp = JSON.parse(localStorage.getItem('pico_profile'));
+        if (_pp && _pp.name && _pp.name !== '게스트') _uname = _pp.name;
+      }
+    } catch(e) {}
+    var _subject = _uname + '은(는)';
+    // 제목 업데이트
+    var _titleEl = document.getElementById('cosmicTitleName');
+    if (_titleEl) _titleEl.textContent = (_uname === '당신' ? '당신의' : _uname + '의');
+
     var nakshatra = null, planets = null, summary = '';
     if (data.nakshatra) {
-      nakshatra = NAK_INTERP2[data.nakshatra] || ('달이 ' + data.nakshatra + '에 머물고 있습니다.\n' + (NAK_KW[data.nakshatra] || '') + '의 에너지가 감성을 이끕니다.');
+      var _raw = NAK_INTERP2[data.nakshatra] || ('달이 ' + data.nakshatra + '에 머물고 있습니다.\n' + (NAK_KW[data.nakshatra] || '') + '의 에너지가 감성을 이끕니다.');
+      nakshatra = _subject + ' ' + _raw;
     }
     if (data.planets && (data.planets.Moon || data.planets.Venus || data.planets.Mars)) {
       var moonSign = data.planets.Moon, venusSign = data.planets.Venus, marsSign = data.planets.Mars;
       var moonFeel = moonSign ? (SIGN_FEEL[moonSign] || '') : '';
       var venusFeel = venusSign ? (SIGN_FEEL[venusSign] || '') : '';
-      planets = (moonFeel ? '달이 ' + moonSign + '에서 ' + moonFeel + ' 감성을 전합니다.' : '') +
+      planets = (_subject + ' ') +
+                (moonFeel ? moonSign + '에서 ' + moonFeel + ' 감성을 지닙니다.' : '') +
                 (venusFeel ? '\n금성은 ' + venusSign + '에서 ' + venusFeel + ' 사랑의 에너지를 발산합니다.' : '');
     }
     // 종합
     var nak = data.nakshatra;
-    var moonSign = data.planets && data.planets.Moon;
-    if (nak && moonSign) {
-      summary = nak + '의 에너지와 ' + moonSign + '의 감성이 오늘 당신의 흐름을 이끕니다.';
+    var moonSign2 = data.planets && data.planets.Moon;
+    if (nak && moonSign2) {
+      summary = _subject + ' ' + nak + '의 에너지와 ' + moonSign2 + '의 감성이 함께 흐릅니다.';
     } else if (nak) {
-      summary = nak + '의 에너지가 오늘 당신의 감성과 직관을 이끌고 있습니다.';
+      summary = _subject + ' ' + nak + '의 에너지가 감성과 직관을 이끌고 있습니다.';
     }
     return { nakshatra: nakshatra, planets: planets, summary: summary || null };
   }
