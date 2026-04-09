@@ -3635,7 +3635,7 @@ initHeroSelects();
   // 3개 API 병렬 수집 후 Claude 해석
   var cosmicData = { qimen: null, nakshatra: null, planets: null };
 
-  var p1 = fetch(W + '/qimen?year=' + todayY + '&month=' + todayM + '&day=' + todayD + '&hour=' + H + '&minute=' + MIN + '&type=ilga')
+  var p1 = fetch(W + '/qimen?year=' + Y + '&month=' + M + '&day=' + D + '&hour=' + BH + '&minute=' + BMIN + '&type=ilga')
     .then(function(r) { return r.json(); })
     .then(function(d) {
       var door = '', grade = '평';
