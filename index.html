@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script>
+var _lp = localStorage.getItem("pico_last_page");
+if (_lp && _lp !== "index.html" && !sessionStorage.getItem("pico_home")) {
+  window.location.replace(_lp);
+}
+sessionStorage.removeItem("pico_home");
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PICO Lab · AI 운세 플랫폼</title>
@@ -3401,5 +3408,6 @@ function goScoreQuick() {
   };
 })();
 </script>
+<script>localStorage.setItem("pico_last_page", "index.html");</script>
 </body>
 </html>
