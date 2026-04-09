@@ -3464,15 +3464,43 @@ function initHeroSelects() {
 }
 
 function goScoreHero() {
-  var y = (document.getElementById('heroYear')  || {}).value;
-  var m = (document.getElementById('heroMonth') || {}).value;
-  var d = (document.getElementById('heroDay')   || {}).value;
-  var h = (document.getElementById('heroHour')  || {}).value || 'unknown';
-  var mi = (document.getElementById('heroMinute') || {}).value || '0';
+  var y  = parseInt((document.getElementById('heroYear')   || {}).value);
+  var m  = parseInt((document.getElementById('heroMonth')  || {}).value);
+  var d  = parseInt((document.getElementById('heroDay')    || {}).value);
+  var h  = (document.getElementById('heroHour')   || {}).value || 'unknown';
+  var mi = parseInt((document.getElementById('heroMinute') || {}).value) || 0;
   if (!y || !m || !d) { alert('생년월일을 모두 입력해주세요.'); return; }
-  var p = { year: y, month: m, day: d, gender: _heroGender === 'M' ? 'male' : 'female' };
-  if (h !== 'unknown') { p.hour = h; p.minute = mi; }
-  window.location.href = 'score.html?' + new URLSearchParams(p).toString();
+
+  // pico_profile에 임시 저장 (로그인 없이 체험)
+  var profile = {
+    year: y, month: m, day: d,
+    hour: h === 'unknown' ? 'unknown' : parseInt(h),
+    minute: mi,
+    gender: _heroGender,
+    name: '게스트'
+  };
+  try { localStorage.setItem('pico_profile', JSON.stringify(profile)); } catch(e) {}
+
+  // 히어로 섹션 숨김
+  var heroEl = document.querySelector('.hero');
+  var heroInputEl = document.getElementById('heroInputWrap');
+  if (heroEl) heroEl.style.display = 'none';
+  if (heroInputEl) heroInputEl.style.display = 'none';
+
+  // 점수 섹션 업데이트
+  if (typeof loadMiniScore === 'function') loadMiniScore();
+
+  // 기문 주간 일운 재로드
+  if (typeof window.loadWeeklyQimen === 'function') {
+    document.getElementById('qimenWeeklyWrap').style.display = 'none';
+    setTimeout(function() { window.loadWeeklyQimen(); }, 100);
+  }
+
+  // 스크롤
+  setTimeout(function() {
+    var target = document.getElementById('scoreSectionWrap');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 150);
 }
 
 function heroQuickStart() {
@@ -3847,6 +3875,7 @@ initHeroSelects();
     window.location.href = 'qimen.html?year='+y+'&month='+m+'&day='+d+'&hour='+h+'&minute='+mi+'&type=ilga';
   };
 
+  window.loadWeeklyQimen = loadWeeklyQimen;
   loadWeeklyQimen();
 })();
 </script>
