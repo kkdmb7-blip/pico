@@ -3431,17 +3431,17 @@ function goScoreQuick() {
   }
 
   async function loadWeeklyQimen(){
-    var user=null;
-    try{var s=localStorage.getItem('pico_user');if(s)user=JSON.parse(s);}catch(e){}
     var userDayEl=null, ymGong=0;
-    if(user&&user.profile){
-      var p=user.profile;
-      if(p.birth_date){var by=parseInt(p.birth_date.split('-')[0]);if(by)ymGong=calcYM(by,p.gender);}
-      if(p.saju_data&&p.saju_data.pillars&&p.saju_data.pillars.day){
-        var dp=p.saju_data.pillars.day;
-        if(dp.length>=1)userDayEl=STEM_EL_KOR[dp[0]];
+    try{
+      var profile=JSON.parse(localStorage.getItem('pico_profile'));
+      if(profile&&profile.year){
+        ymGong=calcYM(profile.year, profile.gender);
+        if(typeof _calcSaju==='function'){
+          var sj=_calcSaju(profile.year,profile.month,profile.day,profile.hour!=='unknown'?parseInt(profile.hour)||12:12);
+          userDayEl=sj.dayEl;
+        }
       }
-    }
+    }catch(e){}
 
     var now=new Date(Date.now()+9*3600000);
     // 오늘 기준 -3일 ~ +3일 (오늘이 항상 가운데)
