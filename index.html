@@ -25,9 +25,17 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Noto Serif KR', serif;
+    font-family: 'Noto Sans KR', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+  }
+  /* UI 요소 Sans 강제 */
+  button, input, select, textarea,
+  .nav-start-btn, .btn-cta-hero, .btn-ghost-hero, .btn-cta,
+  .score-detail-btn, .saju-gender-btn, .saju-submit-btn, .saju-cta-btn,
+  .saju-back-btn, .btn-kakao, .btn-logout, .btn-profiles,
+  .modal-profile-btn, .modal-profile-select, .hamburger-dropdown button {
+    font-family: 'Noto Sans KR', sans-serif !important;
   }
 
   /* BG grain */
