@@ -2999,7 +2999,7 @@ function updateAuthUI() {
       titleEl.innerHTML = _displayName + '님의 <em>오늘의 운세 점수</em>';
     }
     var _ctn = document.getElementById('cosmicTitleName');
-    if (_ctn && _displayName) _ctn.textContent = _displayName + '의';
+    if (_ctn && _displayName) _ctn.textContent = _displayName + '님의';
   } else {
     btnKakao.style.display = '';
     userArea.style.display = 'none';
@@ -3010,7 +3010,7 @@ function updateAuthUI() {
     if (p && p.name) {
       if (titleEl) titleEl.innerHTML = p.name + '님의 <em>오늘의 운세 점수</em>';
       var _ctn2 = document.getElementById('cosmicTitleName');
-      if (_ctn2) _ctn2.textContent = p.name + '의';
+      if (_ctn2) _ctn2.textContent = p.name + '님의';
     }
   }
 }
