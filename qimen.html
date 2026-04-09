@@ -982,12 +982,7 @@ var DOOR_DIR_DESC = {
   '生': '새로운 시작에 좋은 방향',
   '開': '기회가 열리는 방향'
 };
-var DOOR_TIME_KR = {
-  '生': '오전 5~7시, 오전 11~오후 1시',
-  '開': '오전 3~5시, 오후 7~9시',
-  '休': '오후 11~오전 1시, 오전 1~3시',
-  '景': '오전 11~오후 1시, 오후 1~3시'
-};
+// (좋은 시간은 시간대별 운표의 개인화 분석 결과를 사용)
 
 function renderSummaryCard(data) {
   var matched = (typeof checkGeokguk === 'function') ? checkGeokguk(data) : [];
@@ -1048,10 +1043,10 @@ function renderSummaryCard(data) {
     : '해당 없음';
   recGrid.appendChild(buildRecItem('🧭', '좋은 방향', dirVal, dirSub));
 
-  // 2. 좋은 시간
-  var timeVal = DOOR_TIME_KR[data.직사문] || '—';
-  var timeSub = data.직사문 ? DOOR_KR[data.직사문] + ' 기준' : '';
-  recGrid.appendChild(buildRecItem('⏰', '좋은 시간', timeVal, timeSub));
+  // 2. 좋은 시간 (초기값 — 시간대별 운표 로딩 후 개인화 데이터로 교체됨)
+  var timeItem = buildRecItem('⏰', '좋은 시간', '분석 중…', '시간대별 운세 계산 후 업데이트');
+  timeItem.id = 'qm-rec-time';
+  recGrid.appendChild(timeItem);
 
   // 3. 오늘 하면 좋은 일
   var 추천Set = [];
@@ -1094,6 +1089,44 @@ function buildRecItem(icon, label, value, sub) {
   if (sub) html += '<div class="qm-rec-sub">' + sub + '</div>';
   item.innerHTML = html;
   return item;
+}
+
+// 시간대별 운표 로딩 완료 후 요약 카드의 "좋은 시간" 업데이트
+function updateSummaryTimeFromHourly(shichenList, gradeList, rangeList) {
+  var timeEl = document.getElementById('qm-rec-time');
+  if (!timeEl) return;
+
+  // 시진 한자 → 한글
+  var SHI_KR = {'子時':'자시','丑時':'축시','寅時':'인시','卯時':'묘시',
+    '辰時':'진시','巳時':'사시','午時':'오시','未時':'미시',
+    '申時':'신시','酉時':'유시','戌時':'술시','亥時':'해시'};
+
+  // 길 이상인 시간대 수집 (대길 우선, 길 그 다음)
+  var best = [];
+  for (var i = 0; i < gradeList.length; i++) {
+    if (gradeList[i] === '대길' || gradeList[i] === '길') {
+      best.push({ shi: shichenList[i], grade: gradeList[i], range: rangeList[i], order: gradeList[i] === '대길' ? 0 : 1 });
+    }
+  }
+  best.sort(function(a, b) { return a.order - b.order; });
+
+  var valText, subText;
+  if (best.length === 0) {
+    valText = '특별히 좋은 시간 없음';
+    subText = '무난한 하루입니다';
+  } else {
+    // 최대 3개까지 표시
+    var top = best.slice(0, 3);
+    valText = top.map(function(b) { return b.range; }).join(', ');
+    subText = top.map(function(b) {
+      return (SHI_KR[b.shi] || b.shi) + ' (' + b.grade + ')';
+    }).join(', ');
+  }
+
+  timeEl.innerHTML = '<div class="qm-rec-icon">⏰</div>'
+    + '<div class="qm-rec-label">좋은 시간</div>'
+    + '<div class="qm-rec-value">' + valText + '</div>'
+    + '<div class="qm-rec-sub">' + subText + '</div>';
 }
 
 function renderResult(data) {
@@ -1885,6 +1918,7 @@ function shareQimenKakao() {
     var list = document.getElementById('hourlyYunList');
     list.innerHTML = '';
 
+    var _shiNames = [], _shiGrades = [], _shiRanges = [];
     SHICHEN.forEach(function(shi, i) {
       var data = results[i];
       var isCurrent = (i === currentIdx);
@@ -1907,6 +1941,10 @@ function shareQimenKakao() {
         grade = door && DOOR_GRADE[door] ? DOOR_GRADE[door] : '평';
       }
 
+      _shiNames.push(shi.name);
+      _shiGrades.push(grade);
+      _shiRanges.push(shi.range);
+
       var row = document.createElement('div');
       row.className = 'yun-row' + (isCurrent ? ' current-shi' : '') + (isPast && !isCurrent ? ' past-shi' : '');
       if (isCurrent) row.id = 'currentShiRow';
@@ -1920,6 +1958,11 @@ function shareQimenKakao() {
         '</div>';
       list.appendChild(row);
     });
+
+    // 요약 카드의 "좋은 시간"을 개인화 결과로 업데이트
+    if (typeof updateSummaryTimeFromHourly === 'function') {
+      updateSummaryTimeFromHourly(_shiNames, _shiGrades, _shiRanges);
+    }
 
     // 프로필 없으면 안내
     if (!userDayEl) {
