@@ -3405,7 +3405,7 @@ function goScoreQuick() {
   var EL_HAN = {목:'木',화:'Fire',토:'土',금:'金',수:'水'};
   var STEM_EL = {'甲':'목','乙':'목','丙':'화','丁':'화','戊':'토','己':'토','庚':'금','辛':'금','壬':'수','癸':'수'};
   var STEM_EL_KOR = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
-  var GRADE_COLOR = {'대길':'#4ade80','길':'#7ac4ff','평':'#9b8fb0','흉':'#f59e42','대흉':'#e05c6a'};
+  var GRADE_COLOR = {'대길':'#4ade80','길':'#34d399','평':'#9b8fb0','흉':'#f59e42','대흉':'#e05c6a'};
   var doorNameMap = {'生':'생','開':'개','休':'휴','景':'경','傷':'상','杜':'두','驚':'경','死':'사'};
   var DAYS = ['일','월','화','수','목','금','토'];
   var PERSONAL_KW = {
@@ -3485,11 +3485,11 @@ function goScoreQuick() {
       var dt=dates[idx];
       card.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.3s;';
       if(!item){
-        var dayColor0=dt.day==='토'?'#7ac4ff':dt.day==='일'?'#e05c6a':'var(--muted)';
+        var dayColor0=dt.day==='토'?'#34d399':dt.day==='일'?'#e05c6a':'var(--muted)';
         card.innerHTML='<div style="font-size:13px;font-weight:600;color:'+dayColor0+';">'+dt.day+'</div><div style="font-size:12px;margin-top:4px;">'+dt.m+'/'+dt.d+'</div><div style="font-size:11px;color:var(--muted);margin-top:6px;">—</div>';
       } else {
         var gc=GRADE_COLOR[item.grade]||'#9b8fb0';
-        var dayColor=dt.day==='토'?'#7ac4ff':dt.day==='일'?'#e05c6a':'var(--muted)';
+        var dayColor=dt.day==='토'?'#34d399':dt.day==='일'?'#e05c6a':'var(--muted)';
         card.innerHTML='<div style="font-size:13px;letter-spacing:0.05em;color:'+dayColor+';font-weight:600;">'+dt.day+'</div>'+
           '<div style="font-size:12px;margin-top:3px;color:rgba(240,240,245,0.6);">'+dt.m+'/'+dt.d+'</div>'+
           '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+gc+';letter-spacing:0.03em;">'+item.grade+'</div>'+
