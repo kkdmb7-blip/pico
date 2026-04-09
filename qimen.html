@@ -1048,26 +1048,20 @@ function renderSummaryCard(data) {
   timeItem.id = 'qm-rec-time';
   recGrid.appendChild(timeItem);
 
-  // 3. 오늘 하면 좋은 일
-  var 추천Set = [];
-  matched.forEach(function(g) {
-    if (g.추천행동) g.추천행동.split(',').forEach(function(a) {
-      var t = a.trim();
-      if (추천Set.indexOf(t) === -1) 추천Set.push(t);
-    });
-  });
-  var actVal = 추천Set.length ? 추천Set.join(', ') : '정상적인 일과 진행';
+  // 3. 오늘 하면 좋은 일 (첫 번째 격국만, 최대 2개)
+  var actVal = '정상적인 일과 진행';
+  if (matched.length && matched[0].추천행동) {
+    var acts = matched[0].추천행동.split(',').map(function(a) { return a.trim(); });
+    actVal = acts.slice(0, 2).join(', ');
+  }
   recGrid.appendChild(buildRecItem('💼', '오늘 하면 좋은 일', actVal, ''));
 
-  // ── 주의할 점 ──
-  var 주의List = [];
-  matched.forEach(function(g) {
-    if (g.주의 && g.주의.trim()) 주의List.push(g.주의.trim());
-  });
+  // ── 주의할 점 (첫 번째 격국만, 1줄) ──
   var warnBox = document.getElementById('qm-warn-box');
   var warnText = document.getElementById('qm-warn-text');
-  if (주의List.length) {
-    warnText.textContent = 주의List.join(' / ');
+  var firstWarn = matched.length && matched[0].주의 ? matched[0].주의.trim() : '';
+  if (firstWarn) {
+    warnText.textContent = firstWarn;
     warnBox.classList.add('visible');
   } else {
     warnBox.classList.remove('visible');
