@@ -3489,6 +3489,7 @@ initHeroSelects();
 // ── 오늘의 우주 에너지 ─────────────────────────────────────
 (function loadTodayCosmic() {
   var W = 'https://fortuna.kkdmb7.workers.dev';
+  var CHAT_URL = 'https://fortuna-silk.vercel.app/api/chat';
   var now = new Date(Date.now() + 9 * 3600000); // KST
   var Y = now.getUTCFullYear(), M = now.getUTCMonth() + 1, D = now.getUTCDate();
   var H = now.getUTCHours(), MIN = now.getUTCMinutes();
@@ -3524,33 +3525,34 @@ initHeroSelects();
     'Sagittarius':'사수자리','Capricorn':'염소자리','Aquarius':'물병자리','Pisces':'물고기자리'
   };
 
-  function cardHTML(icon, label, big, sub, badgeText, badgeClr, extra) {
+  function cardHTML(icon, label, big, sub, badgeText, badgeClr, interp, extra) {
     var badge = badgeText
-      ? '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 10px;border-radius:12px;margin-bottom:10px;background:' + badgeClr.bg + ';border:1px solid ' + badgeClr.border + ';color:' + badgeClr.text + ';">' + badgeText + '</span><br>'
+      ? '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 10px;border-radius:12px;margin-bottom:6px;background:' + badgeClr.bg + ';border:1px solid ' + badgeClr.border + ';color:' + badgeClr.text + ';">' + badgeText + '</span><br>'
       : '';
-    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;">' +
+    var interpHTML = interp
+      ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);font-size:12px;color:rgba(240,240,245,0.75);line-height:1.7;text-align:left;font-family:\'Noto Serif KR\',serif;font-weight:300;">' + interp + '</div>'
+      : '';
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;">' +
       '<div style="font-size:22px;line-height:1;">' + icon + '</div>' +
       '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px;">' + label + '</div>' +
       badge +
-      '<div style="font-family:\'Noto Serif KR\',serif;font-size:22px;font-weight:700;color:var(--text);line-height:1.2;">' + big + '</div>' +
+      '<div style="font-family:\'Noto Serif KR\',serif;font-size:20px;font-weight:700;color:var(--text);line-height:1.2;">' + big + '</div>' +
       '<div style="font-size:12px;color:var(--muted);line-height:1.6;">' + sub + '</div>' +
       (extra || '') +
+      interpHTML +
       '</div>';
   }
 
   var grid = document.getElementById('cosmicGrid');
   if (!grid) return;
-  // 스켈레톤
   grid.innerHTML = [1,2,3].map(function() {
-    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 16px;height:160px;animation:pulse 1.5s infinite;opacity:0.4;"></div>';
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 16px;height:160px;opacity:0.4;"></div>';
   }).join('');
 
-  var cards = ['', '', ''];
-  var done = 0;
-  function tryRender() { done++; if (done >= 3) grid.innerHTML = cards.filter(Boolean).join('') || ''; }
+  // 3개 API 병렬 수집 후 Claude 해석
+  var cosmicData = { qimen: null, nakshatra: null, planets: null };
 
-  // 카드1: 기문 일운
-  fetch(W + '/qimen?year=' + Y + '&month=' + M + '&day=' + D + '&hour=' + H + '&minute=' + MIN + '&type=ilga')
+  var p1 = fetch(W + '/qimen?year=' + Y + '&month=' + M + '&day=' + D + '&hour=' + H + '&minute=' + MIN + '&type=ilga')
     .then(function(r) { return r.json(); })
     .then(function(d) {
       var door = '', grade = '평';
@@ -3558,27 +3560,17 @@ initHeroSelects();
       else if (d && d.palaces) {
         Object.keys(d.palaces).forEach(function(k) { if (d.palaces[k].직부) door = d.palaces[k].팔문 || ''; });
       }
-      var kw = DOOR_KW[door] || '기운을 살피는 시간';
-      var gc = GRADE_CLR[grade] || GRADE_CLR['평'];
-      cards[0] = cardHTML('☯', '기문 일운', door || '—', kw, grade !== '평' ? grade : null, gc);
-    })
-    .catch(function() { cards[0] = ''; })
-    .finally(tryRender);
+      cosmicData.qimen = { gate: door, luck: grade, kw: DOOR_KW[door] || '' };
+    }).catch(function() {});
 
-  // 카드2: 달 낙샤트라 (vedic API, 서울 정오 기준)
   var vp = new URLSearchParams({ year: Y, month: M, day: D, hour: 12, tz: 9, lat: 37.5665, lon: 126.978, gender: 'female' });
-  fetch(W + '/vedic?' + vp.toString())
+  var p2 = fetch(W + '/vedic?' + vp.toString())
     .then(function(r) { return r.json(); })
     .then(function(d) {
-      var nak = (d && d.nakshatra) || '';
-      var kw = NAK_KW[nak] || '';
-      cards[1] = cardHTML('🌙', '달 낙샤트라', nak || '—', kw);
-    })
-    .catch(function() { cards[1] = ''; })
-    .finally(tryRender);
+      cosmicData.nakshatra = (d && d.nakshatra) || null;
+    }).catch(function() {});
 
-  // 카드3: 오늘의 행성 (astro POST)
-  fetch(W + '/astro', {
+  var p3 = fetch(W + '/astro', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ year: Y, month: M, day: D, hour: 12, min: 0, lat: 37.5665, lon: 126.978, tzone: 9.0 })
@@ -3586,18 +3578,94 @@ initHeroSelects();
     .then(function(r) { return r.json(); })
     .then(function(planets) {
       var arr = Array.isArray(planets) ? planets : (planets.planets || []);
-      var targets = ['Moon', 'Venus', 'Mars'];
-      var lines = targets.map(function(name) {
+      var result = {};
+      ['Moon','Venus','Mars'].forEach(function(name) {
         var p = arr.find(function(x) { return x.name === name || x.name === PLANET_KOR[name]; });
-        if (!p) return null;
-        var sign = SIGN_KOR[p.sign] || p.sign || '—';
-        var sym = PLANET_SYM[name] || '';
-        return '<div style="font-size:13px;color:var(--text);margin:3px 0;">' + sym + ' ' + (PLANET_KOR[name] || name) + ' · ' + sign + '</div>';
+        if (p) result[name] = SIGN_KOR[p.sign] || p.sign || '';
+      });
+      cosmicData.planets = result;
+    }).catch(function() {});
+
+  Promise.all([p1, p2, p3]).then(function() {
+    // 정적 카드 렌더 (AI 해석 전 기본)
+    renderCosmicCards(cosmicData, null);
+    // 로그인 유저만 AI 해석
+    try {
+      var u = JSON.parse(localStorage.getItem('pico_user') || 'null');
+      if (u && u.id) fetchCosmicInterp(cosmicData, u.id);
+    } catch(e) {}
+  });
+
+  function renderCosmicCards(data, interp) {
+    var cards = [];
+    // 카드1: 기문
+    if (data.qimen) {
+      var gc = GRADE_CLR[data.qimen.luck] || GRADE_CLR['평'];
+      cards.push(cardHTML('☯', '기문 일운', data.qimen.gate || '—', data.qimen.kw,
+        data.qimen.luck !== '평' ? data.qimen.luck : null, gc,
+        interp && interp.qimen ? interp.qimen : null));
+    }
+    // 카드2: 낙샤트라
+    if (data.nakshatra) {
+      cards.push(cardHTML('🌙', '달 낙샤트라', data.nakshatra, NAK_KW[data.nakshatra] || '',
+        null, {}, interp && interp.nakshatra ? interp.nakshatra : null));
+    }
+    // 카드3: 행성
+    if (data.planets && Object.keys(data.planets).length) {
+      var lines = ['Moon','Venus','Mars'].map(function(name) {
+        if (!data.planets[name]) return null;
+        return '<div style="font-size:12px;color:var(--text);margin:2px 0;">' + PLANET_SYM[name] + ' ' + PLANET_KOR[name] + ' · ' + data.planets[name] + '</div>';
       }).filter(Boolean);
-      cards[2] = cardHTML('✦', '행성 에너지', '', '', null, {}, lines.join(''));
+      cards.push(cardHTML('✦', '행성 에너지', '', '', null, {},
+        interp && interp.planets ? interp.planets : null,
+        lines.join('')));
+    }
+
+    grid.innerHTML = cards.join('');
+
+    // 종합 멘트
+    var summaryEl = document.getElementById('cosmicSummary');
+    if (interp && interp.summary) {
+      if (!summaryEl) {
+        var s = document.createElement('div');
+        s.id = 'cosmicSummary';
+        s.style.cssText = 'margin-top:16px;padding:14px 20px;background:rgba(155,127,212,0.07);border:1px solid rgba(155,127,212,0.15);border-radius:14px;font-size:13px;color:rgba(237,232,245,0.8);text-align:center;font-family:\'Noto Serif KR\',serif;font-weight:300;line-height:1.8;';
+        s.textContent = '✦ ' + interp.summary;
+        grid.parentNode.appendChild(s);
+      } else {
+        summaryEl.textContent = '✦ ' + interp.summary;
+      }
+    }
+  }
+
+  function fetchCosmicInterp(data, userId) {
+    var q = data.qimen ? (data.qimen.gate + '(' + data.qimen.luck + ')') : '없음';
+    var nak = data.nakshatra || '없음';
+    var pl = data.planets ? ('달-' + (data.planets.Moon||'?') + ', 금성-' + (data.planets.Venus||'?') + ', 화성-' + (data.planets.Mars||'?')) : '없음';
+
+    fetch(CHAT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        orb_override: 0,
+        system_prompt: '동서양 점성술과 기문둔갑 전문가. 오늘의 우주 에너지를 2~3문장으로 따뜻하게 해석한다. JSON만 반환한다.',
+        messages: [{ role: 'user', content:
+          '오늘의 우주 에너지:\n- 기문 직사문: ' + q + '\n- 달 낙샤트라: ' + nak + '\n- 행성: ' + pl +
+          '\n\n각 항목별 2줄 해석과 종합 한줄 멘트를 아래 JSON 형식으로만 반환해줘 (다른 텍스트 없이):\n{"qimen":"...","nakshatra":"...","planets":"...","summary":"..."}'
+        }]
+      })
     })
-    .catch(function() { cards[2] = ''; })
-    .finally(tryRender);
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      var text = (res && (res.content || res.text || res.message || (res.choices && res.choices[0] && res.choices[0].message && res.choices[0].message.content))) || '';
+      var match = text.match(/\{[\s\S]*\}/);
+      if (!match) return;
+      var interp = JSON.parse(match[0]);
+      renderCosmicCards(data, interp);
+    })
+    .catch(function() {});
+  }
 })();
 
 // 스크롤 위치 저장/복원 제거됨 — 항상 맨 위부터 시작
