@@ -330,48 +330,6 @@
   .service-card p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
   .service-cta { font-size: 14px; font-weight: 700; color: var(--accent2); }
 
-  /* ── CTA SECTION ── */
-  .section-cta {
-    padding: 96px 24px 112px;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-  }
-  .cta-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 700px;
-    height: 400px;
-    background: radial-gradient(ellipse, rgba(123,94,167,0.2) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .section-cta h2 {
-    font-family: 'Noto Serif KR', serif;
-    font-size: clamp(28px, 4vw, 44px);
-    font-weight: 800;
-    margin-bottom: 16px;
-    position: relative;
-  }
-  .section-cta p { color: var(--muted); font-size: 15px; margin-bottom: 36px; position: relative; }
-  .btn-cta {
-    display: inline-block;
-    padding: 16px 40px;
-    font-size: 16px;
-    font-weight: 700;
-    font-family: 'Noto Serif KR', serif;
-    background: linear-gradient(135deg, var(--accent), #a07fd4);
-    color: #fff;
-    border-radius: 14px;
-    text-decoration: none;
-    transition: all 0.2s;
-    position: relative;
-    border: none;
-    cursor: pointer;
-  }
-  .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(123,94,167,0.45); }
 
   /* ── DIVIDER ── */
   .section-divider {
@@ -496,7 +454,6 @@
     .why-card.why-card-full .why-icon { font-size: 32px; }
     .service-grid { grid-template-columns: 1fr; gap: 14px; }
     .section-why, .section-services { padding: 64px 20px 48px; }
-    .section-cta { padding: 64px 20px 80px; }
     .hero { padding: 72px 20px 60px; }
     .saju-pillars { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .saju-pillar { padding: 16px 10px; }
@@ -1060,21 +1017,8 @@
     </div>
   </div>
   <p class="why-tagline">6가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
-  <div id="historyBtnWrap" style="display:none;text-align:center;margin-top:20px;">
-    <button onclick="openHistoryModal()" style="padding:10px 24px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">📜 지난 분석 보기</button>
-  </div>
 </section>
 
-<div class="section-divider"></div>
-
-<!-- CTA -->
-<section class="section-cta">
-  <div class="cta-glow"></div>
-  <h2>지금 바로 시작하세요</h2>
-  <p>무료로 체험하고,<br>당신의 별자리가 말하는 이야기를 들어보세요</p>
-  <a href="https://kkdmb7-blip.github.io/memox/" class="btn-cta" target="_blank">✦ AI 운세 상담하기</a>
-  <a href="counselor.html" class="btn-cta" style="margin-top:12px;background:linear-gradient(135deg,#c2784e,#e8a87c);">👤 전문 상담사 연결</a>
-</section>
 
 </div><!-- /tabHome -->
 
@@ -2162,10 +2106,6 @@ async function requestGunghapAI() {
 
 
 // ── 히스토리 ────────────────────────────────────────────────
-function _showHistoryBtn() {
-  var user = currentUser || window._fortunaUser;
-  if (user && user.id) document.getElementById('historyBtnWrap').style.display = '';
-}
 // checkAuth 후 호출
 setTimeout(_showHistoryBtn, 1500);
 
