@@ -1389,6 +1389,18 @@ function renderInterp(data) {
   // 생년월일 파라미터 저장 (원명국 탭에서 재사용)
   if (year && month && day) {
     _birthDateParams = { year, month, day, hour: hour||'0', minute: minute||'0' };
+  } else {
+    // URL에 없으면 프로필에서 가져오기
+    try {
+      var _prof = JSON.parse(localStorage.getItem('pico_profile'));
+      if (_prof && _prof.year && _prof.month && _prof.day) {
+        _birthDateParams = {
+          year: String(_prof.year), month: String(_prof.month), day: String(_prof.day),
+          hour: (_prof.hour && _prof.hour !== 'unknown') ? String(_prof.hour) : '0',
+          minute: _prof.minute ? String(_prof.minute) : '0'
+        };
+      }
+    } catch(e) {}
   }
   if (year)   document.getElementById('inp-year').value   = year;
   if (month)  document.getElementById('inp-month').value  = month;
