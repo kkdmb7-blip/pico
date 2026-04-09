@@ -3488,16 +3488,19 @@ function goScoreQuick() {
     weekData.forEach(function(item,idx){
       var card=document.createElement('div');
       var dt=dates[idx];
-      card.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.3s;'+(dt.isToday?'border-color:var(--accent);box-shadow:0 0 12px rgba(123,94,167,0.3);':'');
+      card.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.3s;';
       if(!item){
         card.innerHTML='<div style="font-size:11px;color:var(--muted);">'+dt.day+'</div><div style="font-size:12px;margin-top:4px;">'+dt.m+'/'+dt.d+'</div><div style="font-size:11px;color:var(--muted);margin-top:6px;">—</div>';
       } else {
         var gc=GRADE_COLOR[item.grade]||'#9b8fb0';
-        card.innerHTML='<div style="font-size:10px;letter-spacing:0.05em;color:'+(dt.isToday?'var(--accent)':'var(--muted)')+';font-weight:'+(dt.isToday?'700':'400')+';">'+dt.day+(dt.isToday?' 오늘':'')+'</div>'+
-          '<div style="font-size:12px;margin-top:3px;color:'+(dt.isToday?'#fff':'rgba(240,240,245,0.6)')+';">'+dt.m+'/'+dt.d+'</div>'+
+        card.innerHTML='<div style="font-size:10px;letter-spacing:0.05em;color:var(--muted);font-weight:400;">'+dt.day+'</div>'+
+          '<div style="font-size:12px;margin-top:3px;color:rgba(240,240,245,0.6);">'+dt.m+'/'+dt.d+'</div>'+
           '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+gc+';letter-spacing:0.03em;">'+item.grade+'</div>'+
           '<div style="margin-top:3px;font-size:9px;color:rgba(155,143,176,0.6);letter-spacing:0.08em;">'+doorNameMap[item.door]+'門</div>';
-        card.onclick=(function(it){return function(){
+        card.onclick=(function(it,cardEl){return function(){
+          // 선택 스타일: 모든 카드 초기화 후 현재만 활성화
+          Array.from(grid.children).forEach(function(c){c.style.borderColor='var(--border)';c.style.boxShadow='';});
+          cardEl.style.borderColor='var(--accent)';cardEl.style.boxShadow='0 0 12px rgba(123,94,167,0.3)';
           detail.style.display='block';
           detail.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
             '<div><div style="font-size:10px;color:rgba(167,139,250,0.5);letter-spacing:0.12em;font-weight:600;margin-bottom:3px;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
@@ -3506,10 +3509,10 @@ function goScoreQuick() {
           '</div>'+
           '<div style="font-size:14px;font-weight:300;color:#e8e0f0;line-height:1.7;letter-spacing:-0.01em;">'+it.kw+'</div>'+
           '<div style="margin-top:12px;text-align:right;"><a href="qimen.html?year='+it.dt.y+'&month='+it.dt.m+'&day='+it.dt.d+'&hour=12&minute=0&type=ilga" style="font-size:10px;color:rgba(167,139,250,0.6);text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
-        };})(item);
+        };})(item,card);
       }
-      card.addEventListener('mouseenter',function(){this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.25)';});
-      card.addEventListener('mouseleave',function(){this.style.transform='';this.style.boxShadow=dt.isToday?'0 0 12px rgba(123,94,167,0.3)':'';});
+      card.addEventListener('mouseenter',function(){this.style.transform='translateY(-3px)';});
+      card.addEventListener('mouseleave',function(){this.style.transform='';});
       grid.appendChild(card);
     });
 
