@@ -8,15 +8,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --surface2: #1c1c28;
-    --border: #2a2a3d;
-    --accent: #7b5ea7;
+    --bg: #09090f;
+    --surface: #111118;
+    --surface2: #18181f;
+    --border: rgba(167,139,250,0.1);
+    --accent: #9b7fd4;
     --accent2: #e8b86d;
-    --text: #f0f0f5;
-    --muted: #6b6b85;
-    --radius: 16px;
+    --text: #ede8f5;
+    --muted: #6e6a82;
+    --radius: 18px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -79,14 +79,16 @@
   }
   .page-title {
     font-family: 'Noto Serif KR', serif;
-    font-size: clamp(28px, 5vw, 42px);
-    font-weight: 700; text-align: center;
-    margin-bottom: 8px; letter-spacing: -0.5px;
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 300; text-align: center;
+    margin-bottom: 8px; letter-spacing: 0.02em;
+    color: var(--text);
   }
-  .page-title em { font-style: normal; color: var(--accent2); }
+  .page-title em { font-style: normal; font-weight: 700; color: var(--accent2); }
   .page-sub {
     text-align: center; color: var(--muted);
-    font-size: 14px; margin-bottom: 36px;
+    font-size: 13px; margin-bottom: 36px;
+    letter-spacing: 0.03em; line-height: 1.7;
   }
 
   /* ── INPUT FORM ── */
@@ -133,18 +135,18 @@
     flex-wrap: wrap;
   }
   .type-btn {
-    padding: 7px 18px; border-radius: 7px;
+    padding: 7px 16px; border-radius: 8px;
     border: none; cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif;
-    font-size: 13px; font-weight: 600;
+    font-size: 12px; font-weight: 500;
     transition: all 0.2s;
     background: transparent; color: var(--muted);
-    white-space: nowrap;
+    white-space: nowrap; letter-spacing: 0.02em;
   }
   .type-btn.active {
-    background: linear-gradient(135deg, var(--accent), #a07fd4);
+    background: linear-gradient(135deg, #7b5ea7, #b08de0);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(123,94,167,0.4);
+    box-shadow: 0 2px 12px rgba(155,127,212,0.35);
   }
   .type-btn:hover:not(.active) { color: var(--text); }
 
@@ -279,19 +281,20 @@
   .interp-summary {
     margin-top: 16px; padding-top: 16px;
     border-top: 1px solid var(--border);
-    font-size: 15px; color: var(--text);
+    font-size: 15px; color: rgba(237,232,245,0.85);
     font-family: 'Noto Serif KR', serif;
-    font-weight: 400; line-height: 1.8;
+    font-weight: 300; line-height: 1.9;
+    letter-spacing: 0.01em;
   }
   .interp-geok-badge {
     display: inline-block; font-size: 11px; font-weight: 700;
     padding: 2px 8px; border-radius: 5px; margin-right: 6px;
     vertical-align: middle;
   }
-  .badge-대길 { background: rgba(255,215,0,0.15); color: #FFD700; border: 1px solid rgba(255,215,0,0.3); }
-  .badge-길   { background: rgba(0,200,83,0.12);  color: #00C853; border: 1px solid rgba(0,200,83,0.25); }
-  .badge-흉   { background: rgba(255,109,0,0.12); color: #FF6D00; border: 1px solid rgba(255,109,0,0.25); }
-  .badge-대흉 { background: rgba(255,23,68,0.12); color: #FF1744; border: 1px solid rgba(255,23,68,0.25); }
+  .badge-대길 { background: rgba(253,224,71,0.1);  color: #fde047; border: 1px solid rgba(253,224,71,0.2); }
+  .badge-길   { background: rgba(134,239,172,0.1); color: #86efac; border: 1px solid rgba(134,239,172,0.2); }
+  .badge-흉   { background: rgba(251,146,60,0.1);  color: #fb923c; border: 1px solid rgba(251,146,60,0.2); }
+  .badge-대흉 { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
   .interp-paid {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 20px 24px;
@@ -365,15 +368,16 @@
   .bestdir-rows { display: flex; flex-wrap: wrap; gap: 8px; }
   .bestdir-chip {
     display: inline-flex; align-items: center; gap: 6px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 6px 12px;
+    background: var(--surface2); border: 1px solid rgba(155,127,212,0.12);
+    border-radius: 10px; padding: 7px 14px;
+    transition: border-color 0.2s;
   }
-  .bestdir-chip.travel { border-left: 2px solid var(--accent); }
+  .bestdir-chip.travel { border-left: 2px solid rgba(155,127,212,0.5); }
   .bestdir-dir {
-    font-size: 14px; font-weight: 700;
+    font-size: 14px; font-weight: 500;
     font-family: 'Noto Serif KR', serif;
   }
-  .bestdir-chip:not(.travel) .bestdir-dir { color: #FFD700; }
+  .bestdir-chip:not(.travel) .bestdir-dir { color: #fde047; }
   .bestdir-chip.travel .bestdir-dir { color: var(--accent); }
   .bestdir-info { font-size: 11px; color: var(--muted); }
 
@@ -429,8 +433,8 @@
     transition: all 0.2s;
   }
   .yun-row.current-shi {
-    border: 2px solid #7c3aed;
-    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(155,127,212,0.5);
+    background: rgba(155,127,212,0.08);
   }
   .yun-row.past-shi { opacity: 0.4; }
   .yun-shi {
@@ -439,15 +443,15 @@
   }
   .yun-range { font-size: 11px; color: var(--muted); min-width: 80px; }
   .yun-grade { font-size: 12px; font-weight: 700; min-width: 40px; text-align: center; }
-  .yun-grade-대길 { color: #FFD700; }
-  .yun-grade-길   { color: #00C853; }
+  .yun-grade-대길 { color: #fde047; }
+  .yun-grade-길   { color: #86efac; }
   .yun-grade-평   { color: var(--muted); }
-  .yun-grade-흉   { color: #FF6D00; }
-  .yun-grade-대흉 { color: #FF1744; }
+  .yun-grade-흉   { color: #fb923c; }
+  .yun-grade-대흉 { color: #f87171; }
   .yun-keyword { font-size: 13px; color: var(--text); flex: 1; }
   .yun-now-dot {
     display: inline-block; width: 6px; height: 6px;
-    background: #7c3aed; border-radius: 50%;
+    background: var(--accent); border-radius: 50%;
     margin-left: 4px; vertical-align: middle;
     animation: yunPulse 1.5s infinite;
   }
@@ -459,44 +463,47 @@
   .qm-summary-card {
     display: none;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     margin-bottom: 24px;
     position: relative;
     z-index: 1;
   }
   .qm-summary-card.visible { display: flex; }
   .qm-headline {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: linear-gradient(160deg, #14101f, #1a1428);
+    border: 1px solid rgba(155,127,212,0.18);
     border-radius: var(--radius);
-    padding: 24px 20px;
+    padding: 28px 24px;
     text-align: center;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.3);
   }
   .qm-headline-badge {
     display: inline-block;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 3px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 14px;
     border-radius: 20px;
-    margin-bottom: 10px;
-    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    letter-spacing: 0.08em;
   }
-  .qm-headline-badge.badge-길 { background: rgba(0,200,83,0.15); color: #00C853; }
-  .qm-headline-badge.badge-대길 { background: rgba(255,215,0,0.15); color: #FFD700; }
-  .qm-headline-badge.badge-흉 { background: rgba(255,109,0,0.15); color: #FF6D00; }
-  .qm-headline-badge.badge-대흉 { background: rgba(255,23,68,0.15); color: #FF1744; }
-  .qm-headline-badge.badge-보통 { background: rgba(107,107,133,0.15); color: var(--muted); }
+  .qm-headline-badge.badge-길   { background: rgba(134,239,172,0.12); color: #86efac; border: 1px solid rgba(134,239,172,0.2); }
+  .qm-headline-badge.badge-대길 { background: rgba(253,224,71,0.12);  color: #fde047; border: 1px solid rgba(253,224,71,0.2); }
+  .qm-headline-badge.badge-흉   { background: rgba(251,146,60,0.12);  color: #fb923c; border: 1px solid rgba(251,146,60,0.2); }
+  .qm-headline-badge.badge-대흉 { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+  .qm-headline-badge.badge-보통 { background: rgba(148,163,184,0.1);  color: #94a3b8; border: 1px solid rgba(148,163,184,0.15); }
   .qm-headline-text {
     font-family: 'Noto Serif KR', serif;
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1.6;
-    color: var(--text);
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: #e8e0f5;
+    letter-spacing: 0.01em;
   }
   .qm-headline-geok {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
-    margin-top: 8px;
+    margin-top: 10px;
+    letter-spacing: 0.06em;
   }
   .qm-rec-grid {
     display: grid;
@@ -507,70 +514,73 @@
     .qm-rec-grid { grid-template-columns: 1fr; }
   }
   .qm-rec-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: linear-gradient(160deg, #13111c, #1a1728);
+    border: 1px solid rgba(155,127,212,0.13);
     border-radius: var(--radius);
-    padding: 18px 16px;
+    padding: 20px 16px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
   }
-  .qm-rec-icon {
-    font-size: 22px;
-    line-height: 1;
-  }
+  .qm-rec-icon { font-size: 20px; line-height: 1; }
   .qm-rec-label {
-    font-size: 11px;
-    color: var(--muted);
+    font-size: 10px;
+    color: rgba(155,127,212,0.6);
     font-weight: 600;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 2px;
   }
   .qm-rec-value {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1.5;
+    font-size: 14px;
+    font-weight: 500;
+    color: #e8e0f5;
+    line-height: 1.6;
+    font-family: 'Noto Serif KR', serif;
   }
   .qm-rec-sub {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
-    line-height: 1.4;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
   }
   .qm-warn-box {
-    background: rgba(255,109,0,0.06);
-    border: 1px solid rgba(255,109,0,0.2);
+    background: rgba(251,146,60,0.05);
+    border: 1px solid rgba(251,146,60,0.15);
     border-radius: var(--radius);
-    padding: 16px 18px;
+    padding: 16px 20px;
     display: none;
   }
   .qm-warn-box.visible { display: block; }
   .qm-warn-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #FF6D00;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fb923c;
     margin-bottom: 6px;
+    letter-spacing: 0.05em;
   }
   .qm-warn-text {
     font-size: 13px;
-    color: var(--text);
-    line-height: 1.5;
-    opacity: 0.85;
+    color: rgba(237,232,245,0.8);
+    line-height: 1.7;
   }
   .qm-detail-toggle {
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(155,127,212,0.12);
     border-radius: var(--radius);
-    padding: 14px 20px;
-    font-size: 13px;
-    font-weight: 600;
+    padding: 13px 20px;
+    font-size: 12px;
+    font-weight: 500;
     color: var(--muted);
     cursor: pointer;
     text-align: center;
     transition: all 0.2s;
     font-family: 'Noto Sans KR', sans-serif;
     width: 100%;
+    letter-spacing: 0.04em;
   }
-  .qm-detail-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .qm-detail-toggle:hover { border-color: rgba(155,127,212,0.35); color: #b08de0; }
   .qm-detail-wrap {
     display: none;
     flex-direction: column;
