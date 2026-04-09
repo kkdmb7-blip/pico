@@ -2844,6 +2844,18 @@ function checkAuth() {
         updateAuthUI();
         syncProfilesFromServer(currentUser.id).then(function() { loadMiniScore(); });
       }
+    } else {
+      // 비로그인이지만 이전에 입력한 pico_profile이 있으면 바로 결과 표시
+      try {
+        var guestProfile = JSON.parse(localStorage.getItem('pico_profile'));
+        if (guestProfile && guestProfile.year) {
+          var heroEl = document.querySelector('.hero');
+          var heroInputEl = document.getElementById('heroInputWrap');
+          if (heroEl) heroEl.style.display = 'none';
+          if (heroInputEl) heroInputEl.style.display = 'none';
+          loadMiniScore();
+        }
+      } catch(e2) {}
     }
   } catch(e) {}
   var params = new URLSearchParams(window.location.search);
@@ -2971,10 +2983,12 @@ function updateAuthUI() {
   } else {
     btnKakao.style.display = '';
     userArea.style.display = 'none';
-    if (heroEl) heroEl.style.display = '';
-    if (heroInputEl) heroInputEl.style.display = '';
     var p = null;
     try { p = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+    // 비로그인이라도 이미 입력한 프로필이 있으면 히어로 숨김 유지
+    var hasGuestProfile = p && p.year;
+    if (heroEl) heroEl.style.display = hasGuestProfile ? 'none' : '';
+    if (heroInputEl) heroInputEl.style.display = hasGuestProfile ? 'none' : '';
     if (titleEl && p && p.name) {
       titleEl.innerHTML = p.name + '님의 <em>오늘의 운세 점수</em>';
     }
