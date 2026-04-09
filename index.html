@@ -978,6 +978,18 @@ sessionStorage.removeItem("pico_home");
 
 <div class="section-divider"></div>
 
+<!-- QIMEN WEEKLY -->
+<section class="section-score" id="qimenWeeklyWrap" style="display:none;">
+  <div class="section-label">기문둔갑 일가 기반</div>
+  <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;">이번 주 <em>기문 일운</em></h2>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">직사문(直使門) 기준 · 일간 오행 맞춤 분석</p>
+  <div id="qimenWeeklyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:18px;"></div>
+  <div id="qimenWeeklyDetail" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 16px;display:none;"></div>
+  <p style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);">탭하면 상세 보기 · 기문둔갑 페이지에서 전체 포국 확인</p>
+</section>
+
+<div class="section-divider"></div>
+
 <!-- WHY PICOLAB -->
 <section class="section-why">
   <div class="section-label">PICO Lab의 6중 교차검증 시스템</div>
@@ -3409,5 +3421,140 @@ function goScoreQuick() {
 })();
 </script>
 <script>localStorage.setItem("pico_last_page", "index.html");</script>
+<script>
+// ── 기문둔갑 주간 일운 ──
+(function(){
+  var WORKER = 'https://fortuna.kkdmb7.workers.dev/qimen';
+  var DOOR_KW = {'生':'계약·서명·창업','開':'활동·투자·확장','休':'안정·화해·양생','景':'문서·공부·창작','傷':'이동·충돌 주의','杜':'막힘·정체 조심','驚':'긴장·놀람 주의','死':'중요결정 보류'};
+  var DOOR_ICON = {'生':'🌱','開':'🚀','休':'☕','景':'📖','傷':'⚡','杜':'🔒','驚':'😮','死':'🛑'};
+  var DOOR_SCORE = {'生':2,'開':2,'休':1,'景':1,'傷':-1,'杜':-1,'驚':-1,'死':-2};
+  var DOOR_EL = {'生':'목','傷':'목','杜':'목','景':'화','死':'토','開':'금','驚':'금','休':'수'};
+  var SAENG = {목:'화',화:'토',토:'금',금:'수',수:'목'};
+  var GEUK = {목:'토',토:'수',수:'화',화:'금',금:'목'};
+  var EL_HAN = {목:'木',화:'Fire',토:'土',금:'金',수:'水'};
+  var STEM_EL = {'甲':'목','乙':'목','丙':'화','丁':'화','戊':'토','己':'토','庚':'금','辛':'금','壬':'수','癸':'수'};
+  var STEM_EL_KOR = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
+  var GRADE_COLOR = {'대길':'#4ade80','길':'#7ac4ff','평':'#9b8fb0','흉':'#f59e42','대흉':'#e05c6a'};
+  var doorNameMap = {'生':'생','開':'개','休':'휴','景':'경','傷':'상','杜':'두','驚':'경','死':'사'};
+  var DAYS = ['일','월','화','수','목','금','토'];
+  var PERSONAL_KW = {
+    '목':{'生':'성장 에너지 폭발, 새 시작','開':'추진력 상승, 도전 유리','休':'깊은 휴식으로 재충전','景':'영감 넘침, 학습 몰입','傷':'과한 행동 자제','杜':'전략 재정비 시간','驚':'차분히 대응','死':'내일을 기다려'},
+    '화':{'生':'열정이 결실로','開':'자신감 UP, 리더십 적기','休':'과열 주의, 여유롭게','景':'표현력 빛남, 소통 최적','傷':'감정 충돌 주의','杜':'참을수록 이득','驚':'급한 판단 금물','死':'충전에 집중'},
+    '토':{'生':'안정 속 성장, 투자 유리','開':'신뢰 기반 활동, 계약 좋음','休':'평화로운 하루, 관계 회복','景':'지식 흡수력 최고','傷':'변화에 중심 잡기','杜':'유연하게 대처','驚':'여유 확보','死':'정리정돈의 날'},
+    '금':{'生':'실질적 성과, 재물운 상승','開':'결단력 최고, 중요 결정 적기','休':'내면 단련, 명상 추천','景':'분석력 상승, 전략 수립','傷':'날카로운 말 조심','杜':'곧 풀릴 막힘','驚':'과민반응 주의','死':'비움이 채움'},
+    '수':{'生':'아이디어 폭발, 기획 유리','開':'유연한 대처로 기회 포착','休':'최고의 휴식일','景':'직관력 상승, 영감 따라가기','傷':'감정 기복 주의','杜':'우회로 찾기','驚':'불안감 주의, 안정 추구','死':'내면 성찰의 시간'}
+  };
+
+  function elScore(a,b){if(!a||!b||a===b)return 0;if(SAENG[a]===b)return 1;if(GEUK[a]===b)return -1;return 0;}
+  function calcYM(year,gender){var s=0,st=String(year);for(var i=0;i<st.length;i++)s+=parseInt(st[i]);while(s>9){var t=0,ss=String(s);for(var j=0;j<ss.length;j++)t+=parseInt(ss[j]);s=t;}var m=(gender!=='F'&&gender!=='female');var g;if(year<2000){g=m?11-s:s+4}else{g=m?9-s:s+6}if(g>9)g-=9;if(g<=0)g+=9;if(g===5)g=m?2:8;return g;}
+
+  function getGrade(door,data,userDayEl,ymGong){
+    var base=DOOR_SCORE[door]||0;
+    var ymS=0;
+    if(data.palaces&&data.palaces[String(ymGong)]){ymS=DOOR_SCORE[data.palaces[String(ymGong)].팔문]||0;}
+    var ilS=DOOR_EL[door]?elScore(DOOR_EL[door],userDayEl):0;
+    var siS=0;
+    if(data.직부궁&&data.palaces&&data.palaces[String(data.직부궁)]){var st=(data.palaces[String(data.직부궁)].지반||'').trim();if(st&&STEM_EL[st[0]])siS=elScore(STEM_EL[st[0]],userDayEl);}
+    var t=base+ymS+ilS+siS;
+    if(t>=4)return '대길';if(t>=2)return '길';if(t>=-1)return '평';if(t>=-3)return '흉';return '대흉';
+  }
+
+  async function loadWeeklyQimen(){
+    var user=null;
+    try{var s=localStorage.getItem('pico_user');if(s)user=JSON.parse(s);}catch(e){}
+    var userDayEl=null, ymGong=0;
+    if(user&&user.profile){
+      var p=user.profile;
+      if(p.birth_date){var by=parseInt(p.birth_date.split('-')[0]);if(by)ymGong=calcYM(by,p.gender);}
+      if(p.saju_data&&p.saju_data.pillars&&p.saju_data.pillars.day){
+        var dp=p.saju_data.pillars.day;
+        if(dp.length>=1)userDayEl=STEM_EL_KOR[dp[0]];
+      }
+    }
+
+    var now=new Date(Date.now()+9*3600000);
+    var today=now.getUTCDay();
+    // 이번주 월요일~일요일
+    var monday=new Date(now);
+    var diff=today===0?-6:1-today;
+    monday.setUTCDate(monday.getUTCDate()+diff);
+
+    var dates=[];
+    for(var i=0;i<7;i++){
+      var dt=new Date(monday);
+      dt.setUTCDate(monday.getUTCDate()+i);
+      dates.push({y:dt.getUTCFullYear(),m:dt.getUTCMonth()+1,d:dt.getUTCDate(),day:DAYS[dt.getUTCDay()],isToday:dt.getUTCDate()===now.getUTCDate()&&dt.getUTCMonth()===now.getUTCMonth()});
+    }
+
+    var results=[];
+    try{
+      var fetches=dates.map(function(dt){return fetch(WORKER+'?year='+dt.y+'&month='+dt.m+'&day='+dt.d+'&hour=12&minute=0&type=ilga').then(function(r){return r.json()}).catch(function(){return null});});
+      results=await Promise.all(fetches);
+    }catch(e){return;}
+
+    var grid=document.getElementById('qimenWeeklyGrid');
+    var detail=document.getElementById('qimenWeeklyDetail');
+    if(!grid)return;
+    grid.innerHTML='';
+    var weekData=[];
+
+    for(var i=0;i<7;i++){
+      var dt=dates[i], data=results[i];
+      if(!data||!data.직사문){weekData.push(null);continue;}
+      var door=data.직사문;
+      var grade, kw;
+      if(userDayEl&&ymGong){
+        grade=getGrade(door,data,userDayEl,ymGong);
+        kw=(PERSONAL_KW[userDayEl]&&PERSONAL_KW[userDayEl][door])||DOOR_KW[door];
+      } else {
+        var DG={'生':'대길','開':'대길','休':'길','景':'길','傷':'흉','杜':'흉','驚':'흉','死':'대흉'};
+        grade=DG[door]||'평';
+        kw=DOOR_KW[door]||'';
+      }
+      weekData.push({door:door,grade:grade,kw:kw,icon:DOOR_ICON[door]||'🔮',dt:dt,data:data});
+    }
+
+    weekData.forEach(function(item,idx){
+      var card=document.createElement('div');
+      var dt=dates[idx];
+      card.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.3s;'+(dt.isToday?'border-color:var(--accent);box-shadow:0 0 12px rgba(123,94,167,0.3);':'');
+      if(!item){
+        card.innerHTML='<div style="font-size:11px;color:var(--muted);">'+dt.day+'</div><div style="font-size:12px;margin-top:4px;">'+dt.m+'/'+dt.d+'</div><div style="font-size:11px;color:var(--muted);margin-top:6px;">—</div>';
+      } else {
+        var gc=GRADE_COLOR[item.grade]||'#9b8fb0';
+        card.innerHTML='<div style="font-size:11px;color:'+(dt.isToday?'var(--accent)':'var(--muted)')+';font-weight:'+(dt.isToday?'700':'400')+';">'+dt.day+(dt.isToday?' 오늘':'')+'</div>'+
+          '<div style="font-size:12px;margin-top:2px;color:'+(dt.isToday?'#fff':'var(--muted)')+';">'+dt.m+'/'+dt.d+'</div>'+
+          '<div style="font-size:20px;margin-top:6px;">'+item.icon+'</div>'+
+          '<div style="margin-top:4px;font-size:11px;font-weight:700;color:'+gc+';">'+item.grade+'</div>'+
+          '<div style="margin-top:2px;font-size:9px;color:var(--muted);">'+doorNameMap[item.door]+'문</div>';
+        card.onclick=(function(it){return function(){
+          detail.style.display='block';
+          detail.innerHTML='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
+            '<span style="font-size:24px;">'+it.icon+'</span>'+
+            '<div><div style="font-size:13px;font-weight:700;color:#ede6f8;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
+            '<div style="font-size:11px;color:var(--muted);margin-top:2px;">직사문: '+doorNameMap[it.door]+'문('+it.door+')</div></div>'+
+            '<div style="margin-left:auto;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;color:'+(GRADE_COLOR[it.grade]||'#9b8fb0')+';background:rgba(0,0,0,0.3);border:1px solid '+(GRADE_COLOR[it.grade]||'#9b8fb0')+'30;">'+it.grade+'</div>'+
+          '</div>'+
+          '<div style="font-size:14px;font-weight:600;color:#e8e0f0;line-height:1.6;">'+it.kw+'</div>'+
+          '<div style="margin-top:10px;text-align:right;"><a href="qimen.html?year='+it.dt.y+'&month='+it.dt.m+'&day='+it.dt.d+'&hour=12&minute=0&type=ilga" style="font-size:11px;color:rgba(167,139,250,0.8);text-decoration:none;">전체 포국 보기 →</a></div>';
+        };})(item);
+      }
+      card.addEventListener('mouseenter',function(){this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.25)';});
+      card.addEventListener('mouseleave',function(){this.style.transform='';this.style.boxShadow=dt.isToday?'0 0 12px rgba(123,94,167,0.3)':'';});
+      grid.appendChild(card);
+    });
+
+    // 오늘 자동 선택
+    var todayIdx=dates.findIndex(function(d){return d.isToday;});
+    if(todayIdx>=0&&weekData[todayIdx]){
+      grid.children[todayIdx].click();
+    }
+
+    document.getElementById('qimenWeeklyWrap').style.display='block';
+  }
+
+  loadWeeklyQimen();
+})();
+</script>
 </body>
 </html>
