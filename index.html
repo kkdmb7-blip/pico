@@ -3354,30 +3354,7 @@ function goScoreQuick() {
   window.location.href = 'score.html?' + new URLSearchParams({ year: y, month: m, day: d }).toString();
 }
 
-// ── 스크롤 위치 저장/복원 ──
-(function() {
-  var KEY = 'pico_scroll_index';
-
-  // 복원: 모든 리소스(이미지/폰트/스크립트) 로드 완료 후 실행
-  window.addEventListener('load', function() {
-    var saved = localStorage.getItem(KEY);
-    if (saved) window.scrollTo(0, parseInt(saved, 10));
-  });
-
-  var _st;
-  window.addEventListener('scroll', function() {
-    clearTimeout(_st);
-    _st = setTimeout(function() {
-      localStorage.setItem(KEY, String(Math.round(window.scrollY)));
-    }, 200);
-  }, { passive: true });
-
-  document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'hidden') {
-      localStorage.setItem(KEY, String(Math.round(window.scrollY)));
-    }
-  });
-})();
+// 스크롤 위치 저장/복원 제거됨 — 항상 맨 위부터 시작
 </script>
 <script>
 (function() {
