@@ -984,13 +984,25 @@ var DOOR_DIR_DESC = {
 };
 // (좋은 시간은 시간대별 운표의 개인화 분석 결과를 사용)
 
-// 현재 포국 데이터 저장 (개인화 업데이트용)
+// 전역: 포국 데이터 + 개인화 데이터 (양쪽 준비되면 업데이트)
 var _currentPojuData = null;
+var _personalCache = null; // { userDayEl, ymGong, shiNames, shiGrades, shiRanges }
 
 function renderSummaryCard(data) {
   _currentPojuData = data;
 
-  // 로딩 상태로 표시 (개인화 데이터 로딩 후 전체 교체됨)
+  // 개인화 데이터가 이미 준비됐으면 바로 업데이트
+  if (_personalCache) {
+    var c = _personalCache;
+    updateSummaryPersonal(c.userDayEl, c.ymGong, c.currentData, c.shiNames, c.shiGrades, c.shiRanges);
+    // 접기 초기화
+    document.getElementById('qm-detail-wrap').classList.remove('open');
+    document.getElementById('qm-detail-toggle').textContent = '▼ 기문둔갑 포국 상세 보기';
+    setVisible('qm-summary-card', true);
+    return;
+  }
+
+  // 아직 안 왔으면 로딩 상태
   var badgeEl = document.getElementById('qm-headline-badge');
   badgeEl.textContent = '분석 중';
   badgeEl.className = 'qm-headline-badge badge-보통';
@@ -2086,8 +2098,13 @@ function shareQimenKakao() {
       list.appendChild(row);
     });
 
-    // 요약 카드 전체를 개인화 결과로 업데이트
-    if (typeof updateSummaryPersonal === 'function') {
+    // 개인화 데이터 캐시 저장
+    _personalCache = {
+      userDayEl: userDayEl, ymGong: ymGong, currentData: results[currentIdx],
+      shiNames: _shiNames, shiGrades: _shiGrades, shiRanges: _shiRanges
+    };
+    // 포국 데이터가 이미 있으면 바로 업데이트, 없으면 renderSummaryCard에서 처리
+    if (_currentPojuData && typeof updateSummaryPersonal === 'function') {
       updateSummaryPersonal(userDayEl, ymGong, results[currentIdx], _shiNames, _shiGrades, _shiRanges);
     }
 
