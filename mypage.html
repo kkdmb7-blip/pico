@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script>localStorage.setItem("pico_last_page", location.pathname.split("/").pop());</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>마이페이지 · FORTUNA</title>
@@ -306,7 +305,7 @@ function renderProfiles() {
 
 function doLogout() {
   localStorage.removeItem('pico_user');
-  sessionStorage.setItem('pico_home','1'); location.href = '/';
+  location.href = '/';
 }
 
 init();

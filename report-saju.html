@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script>localStorage.setItem("pico_last_page", location.pathname.split("/").pop());</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>나만의 사주 리포트 · FORTUNA</title>
@@ -320,7 +319,7 @@ select option { background:var(--surface2); color:var(--text); }
         <div class="hamburger-dropdown" id="hamburgerDropdown">
           <button onclick="location.href='mypage.html'">👤 마이페이지</button>
           <div class="menu-divider"></div>
-          <button onclick="sessionStorage.setItem('pico_home','1');location.href='/'">🏠 홈으로</button>
+          <button onclick="location.href='/'">🏠 홈으로</button>
           <div class="menu-divider"></div>
           <button onclick="logout()" style="color:#e05c6a;">로그아웃</button>
         </div>

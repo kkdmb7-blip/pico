@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script>localStorage.setItem("pico_last_page", location.pathname.split("/").pop());</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>오늘의 운세 점수 · PICO Lab</title>
@@ -319,7 +318,7 @@ nav {
 
 <nav>
   <a href="javascript:location.reload()" class="logo"><img src="img/goddess.png" alt="FORTUNA"><span class="logo-text">FORTUNA</span></a>
-  <a href="index.html" class="nav-back" onclick="sessionStorage.setItem('pico_home','1')">← 메인으로</a>
+  <a href="index.html" class="nav-back">← 메인으로</a>
 </nav>
 
 <div class="main-wrap">
@@ -335,7 +334,7 @@ nav {
     <div class="no-profile-icon">🔮</div>
     <h2>프로필이 필요합니다</h2>
     <p>오늘의 운세 점수를 계산하려면<br>생년월일을 먼저 등록해주세요.</p>
-    <a href="index.html" class="btn-go" onclick="sessionStorage.setItem('pico_home','1')">메인에서 설정하기</a>
+    <a href="index.html" class="btn-go">메인에서 설정하기</a>
   </div>
 
   <!-- 결과 -->
@@ -876,7 +875,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 run();
 history.pushState(null, '', location.href);
-window.addEventListener('popstate', function() { sessionStorage.setItem('pico_home','1'); window.location.href = '/'; });
+window.addEventListener('popstate', function() { window.location.href = '/'; });
 </script>
 </body>
 </html>

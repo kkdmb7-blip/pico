@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script>localStorage.setItem("pico_last_page", location.pathname.split("/").pop());</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>베딕 점성술 · FORTUNA</title>
@@ -540,7 +539,7 @@ async function loadVedic(year, month, day, hour, gender) {
   loadVedic(year, month, day, hour, gender);
 })();
 history.pushState(null, '', location.href);
-window.addEventListener('popstate', function() { sessionStorage.setItem('pico_home','1'); window.location.href = '/'; });
+window.addEventListener('popstate', function() { window.location.href = '/'; });
 
 // ── 공유 카드 ─────────────────────────────────────────────
 function _vedicShowToast(msg) {

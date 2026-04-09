@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script>localStorage.setItem("pico_last_page", location.pathname.split("/").pop());</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>타로 카드 · FORTUNA</title>
@@ -457,7 +456,7 @@ async function interpretWithAI() {
 
 // 뒤로가기 → 메인
 history.pushState(null, '', location.href);
-window.addEventListener('popstate', function() { sessionStorage.setItem('pico_home','1'); window.location.href = '../'; });
+window.addEventListener('popstate', function() { window.location.href = '../'; });
 </script>
 </body>
 </html>
