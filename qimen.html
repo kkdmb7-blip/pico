@@ -951,6 +951,13 @@ function setType(t, silent) {
     document.getElementById('inp-minute').value = bp.minute || 0;
     notice.style.display = 'block';
   } else {
+    // 원명국 아닌 탭으로 전환: 현재 날짜/시각 복원
+    var _n = new Date();
+    document.getElementById('inp-year').value   = _n.getFullYear();
+    document.getElementById('inp-month').value  = _n.getMonth() + 1;
+    document.getElementById('inp-day').value    = _n.getDate();
+    document.getElementById('inp-hour').value   = _n.getHours();
+    document.getElementById('inp-minute').value = _n.getMinutes();
     notice.style.display = 'none';
   }
   if (!silent) doFetch();
