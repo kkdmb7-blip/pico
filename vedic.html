@@ -146,6 +146,12 @@
 
   <div class="status-msg" id="status"><span class="spinner"></span>베딕 차트 계산 중…</div>
 
+  <!-- RASI CHART -->
+  <div class="section-card" id="card-rasi">
+    <div class="section-label">라시 차트 (Rasi Chakra)</div>
+    <div id="rasi-chart-wrap" style="display:flex;justify-content:center;align-items:center;"></div>
+  </div>
+
   <!-- BIG 3 -->
   <div class="section-card" id="card-big3">
     <div class="section-label">핵심 3요소</div>
@@ -323,6 +329,126 @@ function nextDasha(currentPlanet) {
   return { planet: next, years: DASHA_YEARS[next] };
 }
 
+// ── RASI CHART ────────────────────────────────────────────
+function renderRasiChart(d) {
+  const wrap = document.getElementById('rasi-chart-wrap');
+  if (!wrap) return;
+
+  const RASHIS = [
+    '양자리','황소자리','쌍둥이자리','게자리',
+    '사자자리','처녀자리','천칭자리','전갈자리',
+    '사수자리','염소자리','물병자리','물고기자리'
+  ];
+  const RASHI_NAME_SHORT = {
+    '양자리':'양','황소자리':'황소','쌍둥이자리':'쌍둥이','게자리':'게',
+    '사자자리':'사자','처녀자리':'처녀','천칭자리':'천칭','전갈자리':'전갈',
+    '사수자리':'사수','염소자리':'염소','물병자리':'물병','물고기자리':'물고기'
+  };
+  const EL_COLOR = {
+    '화': { fill:'rgba(255,107,107,0.10)', stroke:'rgba(255,107,107,0.45)', text:'#FF6B6B' },
+    '지': { fill:'rgba(168,213,162,0.10)', stroke:'rgba(168,213,162,0.45)', text:'#A8D5A2' },
+    '풍': { fill:'rgba(255,230,109,0.10)', stroke:'rgba(255,230,109,0.45)', text:'#FFE66D' },
+    '수': { fill:'rgba(116,185,255,0.10)', stroke:'rgba(116,185,255,0.45)', text:'#74B9FF' }
+  };
+  const PLANET_SYM = { '태양':'☉','달':'☽','화성':'♂','수성':'☿','목성':'♃','금성':'♀','토성':'♄','라후':'☊','케투':'☋' };
+
+  const size = Math.min(wrap.clientWidth || 340, 360);
+  const cx = size / 2, cy = size / 2;
+  const R_outer = size / 2 - 4;
+  const R_inner = R_outer * 0.42;
+  const R_sym   = (R_outer + R_inner) / 2;
+  const R_planet = R_sym * 0.75;
+  const sliceAngle = (2 * Math.PI) / 12;
+
+  // 행성 → 라시 맵핑
+  const planetsBySign = {};
+  (d.planets || []).forEach(p => {
+    if (!p.sign) return;
+    if (!planetsBySign[p.sign]) planetsBySign[p.sign] = [];
+    planetsBySign[p.sign].push(p.name);
+  });
+
+  let paths = '';
+  let texts = '';
+  let planetTexts = '';
+
+  RASHIS.forEach((rashi, i) => {
+    // 1번(양자리)이 상단(270°)에서 시계방향
+    const startAngle = -Math.PI / 2 + i * sliceAngle;
+    const endAngle   = startAngle + sliceAngle;
+    const midAngle   = (startAngle + endAngle) / 2;
+
+    const el = RASHI_EL[rashi] || '풍';
+    const ec = EL_COLOR[el];
+    const isAsc = (rashi === d.ascendant);
+
+    // 파이 slice path
+    const x1 = cx + R_outer * Math.cos(startAngle);
+    const y1 = cy + R_outer * Math.sin(startAngle);
+    const x2 = cx + R_outer * Math.cos(endAngle);
+    const y2 = cy + R_outer * Math.sin(endAngle);
+    const xi1 = cx + R_inner * Math.cos(startAngle);
+    const yi1 = cy + R_inner * Math.sin(startAngle);
+    const xi2 = cx + R_inner * Math.cos(endAngle);
+    const yi2 = cy + R_inner * Math.sin(endAngle);
+
+    const pathD = [
+      `M ${xi1} ${yi1}`,
+      `L ${x1} ${y1}`,
+      `A ${R_outer} ${R_outer} 0 0 1 ${x2} ${y2}`,
+      `L ${xi2} ${yi2}`,
+      `A ${R_inner} ${R_inner} 0 0 0 ${xi1} ${yi1}`,
+      'Z'
+    ].join(' ');
+
+    const strokeW = isAsc ? 2.5 : 1;
+    const strokeC = isAsc ? '#b08de0' : ec.stroke;
+    paths += `<path d="${pathD}" fill="${ec.fill}" stroke="${strokeC}" stroke-width="${strokeW}"/>`;
+
+    // 별자리 심볼
+    const sx = cx + R_sym * Math.cos(midAngle);
+    const sy = cy + R_sym * Math.sin(midAngle);
+    texts += `<text x="${sx}" y="${sy - 7}" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="${ec.text}">${RASHI_SYM[rashi]||''}</text>`;
+    texts += `<text x="${sx}" y="${sy + 9}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="${ec.text}" font-family="'Noto Sans KR',sans-serif">${RASHI_NAME_SHORT[rashi]}</text>`;
+
+    // 상승궁 표시
+    if (isAsc) {
+      texts += `<text x="${sx}" y="${sy + 20}" text-anchor="middle" dominant-baseline="middle" font-size="7.5" fill="#b08de0" font-weight="bold">ASC</text>`;
+    }
+
+    // 행성 표시
+    const planets = planetsBySign[rashi] || [];
+    planets.forEach((name, pi) => {
+      const offset = (planets.length > 1) ? (pi - (planets.length - 1) / 2) * 10 : 0;
+      const pAngle = midAngle + (offset / R_planet);
+      const px = cx + R_planet * Math.cos(pAngle);
+      const py = cy + R_planet * Math.sin(pAngle);
+      const psym = PLANET_SYM[name] || name[0];
+      planetTexts += `<text x="${px}" y="${py}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#e8e0f5" opacity="0.92">${psym}</text>`;
+    });
+  });
+
+  // 중앙 원
+  const moonSign = d.moonSign || '';
+  const moonEl = RASHI_EL[moonSign] || '풍';
+  const moonColor = EL_COLOR[moonEl].text;
+  const nakText = (d.nakshatra || '').replace(/[가-힣]{3,}파다/,'').trim();
+
+  const centerCircle = `<circle cx="${cx}" cy="${cy}" r="${R_inner - 2}" fill="#0e0c1a" stroke="rgba(155,127,212,0.2)" stroke-width="1"/>`;
+  const centerContent =
+    `<text x="${cx}" y="${cy - 16}" text-anchor="middle" dominant-baseline="middle" font-size="22" fill="${moonColor}">${RASHI_SYM[moonSign]||'☽'}</text>` +
+    `<text x="${cx}" y="${cy + 4}" text-anchor="middle" dominant-baseline="middle" font-size="9.5" fill="${moonColor}" font-family="'Noto Sans KR',sans-serif">${RASHI_NAME_SHORT[moonSign]||moonSign}</text>` +
+    `<text x="${cx}" y="${cy + 18}" text-anchor="middle" dominant-baseline="middle" font-size="8" fill="rgba(155,127,212,0.7)" font-family="'Noto Sans KR',sans-serif">${d.nakshatra||''}</text>`;
+
+  wrap.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="max-width:100%;display:block;">
+    ${paths}
+    ${texts}
+    ${planetTexts}
+    ${centerCircle}
+    ${centerContent}
+  </svg>`;
+}
+
 // ── RENDER ────────────────────────────────────────────────
 function renderBig3(d) {
   const grid = document.getElementById('big3-grid');
@@ -476,6 +602,8 @@ async function loadVedic(year, month, day, hour, gender) {
     if (d.error) throw new Error(d.error);
 
     status.className = 'status-msg';
+    renderRasiChart(d);
+    setVisible('card-rasi', true);
     renderBig3(d);
     setVisible('card-big3', true);
     renderPlanets(d);
