@@ -991,10 +991,17 @@ var _personalCache = null; // { userDayEl, ymGong, shiNames, shiGrades, shiRange
 function renderSummaryCard(data) {
   _currentPojuData = data;
 
+  // 탭 전환 시 시간대 캐시 초기화 (새 포국에 맞게 재계산)
+  if (_personalCache) {
+    _personalCache.shiNames = null;
+    _personalCache.shiGrades = null;
+    _personalCache.shiRanges = null;
+  }
+
   // 개인화 데이터가 이미 준비됐으면 바로 업데이트
   if (_personalCache) {
     var c = _personalCache;
-    updateSummaryPersonal(c.userDayEl, c.ymGong, c.currentData, c.shiNames, c.shiGrades, c.shiRanges);
+    updateSummaryPersonal(c.userDayEl, c.ymGong, c.currentData, null, null, null);
     // 접기 초기화
     document.getElementById('qm-detail-wrap').classList.remove('open');
     document.getElementById('qm-detail-toggle').textContent = '▼ 기문둔갑 포국 상세 보기';
