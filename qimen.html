@@ -984,94 +984,204 @@ var DOOR_DIR_DESC = {
 };
 // (좋은 시간은 시간대별 운표의 개인화 분석 결과를 사용)
 
+// 현재 포국 데이터 저장 (개인화 업데이트용)
+var _currentPojuData = null;
+
 function renderSummaryCard(data) {
-  var matched = (typeof checkGeokguk === 'function') ? checkGeokguk(data) : [];
+  _currentPojuData = data;
 
-  // ── 한줄 요약 + 길흉 배지 ──
-  var 직사문명 = {
-    '生':'생기', '開':'왕성한 활동', '休':'안정', '景':'밝은 기운',
-    '傷':'주의', '杜':'막힘', '驚':'긴장', '死':'침체'
-  };
-  var summaryText = '';
-  var gilHyung = '보통';
-  var geokNames = [];
-
-  if (matched.length) {
-    summaryText = matched[0].요약;
-    gilHyung = matched[0].길흉;
-    matched.forEach(function(g) {
-      geokNames.push(g.name.replace(/\([^)]*\)/g, '').trim());
-    });
-  } else {
-    var dm = data.직사문 || '';
-    summaryText = (직사문명[dm] || '보통') + '의 기운이 흐르는 때입니다.';
-    // 직사문 기반 길흉
-    if (dm === '生' || dm === '開' || dm === '休') gilHyung = '길';
-    else if (dm === '景') gilHyung = '보통';
-    else if (dm === '傷' || dm === '杜' || dm === '驚') gilHyung = '흉';
-    else if (dm === '死') gilHyung = '흉';
-  }
-
+  // 로딩 상태로 표시 (개인화 데이터 로딩 후 전체 교체됨)
   var badgeEl = document.getElementById('qm-headline-badge');
-  badgeEl.textContent = gilHyung;
-  badgeEl.className = 'qm-headline-badge badge-' + gilHyung;
-  document.getElementById('qm-headline-text').textContent = summaryText;
+  badgeEl.textContent = '분석 중';
+  badgeEl.className = 'qm-headline-badge badge-보통';
+  document.getElementById('qm-headline-text').textContent = '맞춤 분석을 준비하고 있어요…';
   var geokEl = document.getElementById('qm-headline-geok');
-  geokEl.textContent = geokNames.length ? geokNames.join(' · ') : '';
-  geokEl.style.display = geokNames.length ? '' : 'none';
+  geokEl.style.display = 'none';
 
-  // ── 3개 추천 카드 ──
   var recGrid = document.getElementById('qm-rec-grid');
   recGrid.innerHTML = '';
-
-  // 1. 좋은 방향
-  var dirLines = [];
-  ['生', '開'].forEach(function(door) {
-    Object.entries(data.palaces).forEach(function(entry) {
-      var n = entry[0], p = entry[1];
-      if (p.팔문 === door) {
-        var dir = GONG_DIR[parseInt(n)];
-        dirLines.push({ desc: DOOR_DIR_DESC[door], dir: dir });
-      }
-    });
-  });
-  var dirVal = dirLines.length
-    ? dirLines.map(function(d) { return d.dir; }).join(', ')
-    : '—';
-  var dirSub = dirLines.length
-    ? dirLines.map(function(d) { return d.desc + ': ' + d.dir + '쪽'; }).join('<br>')
-    : '해당 없음';
-  recGrid.appendChild(buildRecItem('🧭', '좋은 방향', dirVal, dirSub));
-
-  // 2. 좋은 시간 (초기값 — 시간대별 운표 로딩 후 개인화 데이터로 교체됨)
-  var timeItem = buildRecItem('⏰', '좋은 시간', '분석 중…', '시간대별 운세 계산 후 업데이트');
+  recGrid.appendChild(buildRecItem('🧭', '좋은 방향', '분석 중…', ''));
+  var timeItem = buildRecItem('⏰', '좋은 시간', '분석 중…', '');
   timeItem.id = 'qm-rec-time';
   recGrid.appendChild(timeItem);
+  recGrid.appendChild(buildRecItem('💼', '오늘 하면 좋은 일', '분석 중…', ''));
 
-  // 3. 오늘 하면 좋은 일 (첫 번째 격국만, 최대 2개)
-  var actVal = '정상적인 일과 진행';
-  if (matched.length && matched[0].추천행동) {
-    var acts = matched[0].추천행동.split(',').map(function(a) { return a.trim(); });
-    actVal = acts.slice(0, 2).join(', ');
-  }
-  recGrid.appendChild(buildRecItem('💼', '오늘 하면 좋은 일', actVal, ''));
-
-  // ── 주의할 점 (첫 번째 격국만, 1줄) ──
-  var warnBox = document.getElementById('qm-warn-box');
-  var warnText = document.getElementById('qm-warn-text');
-  var firstWarn = matched.length && matched[0].주의 ? matched[0].주의.trim() : '';
-  if (firstWarn) {
-    warnText.textContent = firstWarn;
-    warnBox.classList.add('visible');
-  } else {
-    warnBox.classList.remove('visible');
-  }
+  document.getElementById('qm-warn-box').classList.remove('visible');
 
   // 접기 초기화
   document.getElementById('qm-detail-wrap').classList.remove('open');
   document.getElementById('qm-detail-toggle').textContent = '▼ 기문둔갑 포국 상세 보기';
 
   setVisible('qm-summary-card', true);
+}
+
+// ── 연명궁 팔문 기반 개인화 텍스트 ──
+var YM_DOOR_SUMMARY = {
+  '生': '새로운 시작의 에너지가 당신에게 집중되고 있어요. 도전하기 좋은 때입니다.',
+  '開': '기회의 문이 열리는 흐름이에요. 적극적으로 움직여 보세요.',
+  '休': '충전과 회복에 최적인 때예요. 무리하지 말고 여유를 가지세요.',
+  '景': '주목받기 좋은 에너지예요. 표현하고 드러내 보세요.',
+  '傷': '감정 충돌이 생기기 쉬운 흐름이에요. 말과 행동에 신중하세요.',
+  '杜': '막히는 느낌이 들 수 있어요. 억지로 밀어붙이기보다 기다려 보세요.',
+  '驚': '예상 못한 일이 생길 수 있어요. 침착하게 대응하세요.',
+  '死': '에너지가 정체된 흐름이에요. 큰 결정은 미루는 게 좋아요.'
+};
+var YM_DOOR_ACTION = {
+  '生': '새 프로젝트 시작, 계약, 이사',
+  '開': '미팅, 영업, 투자, 확장',
+  '休': '휴식, 건강 관리, 명상',
+  '景': '발표, 창작, 문서 작업',
+  '傷': '운동, 에너지 발산 활동',
+  '杜': '내면 정리, 조용한 계획 수립',
+  '驚': '점검, 재확인, 백업',
+  '死': '정리, 마무리, 불필요한 것 버리기'
+};
+var YM_DOOR_WARN = {
+  '傷': '말다툼·충돌 주의. 감정적 결정은 피하세요.',
+  '杜': '새로운 일 시작은 비추. 기다리세요.',
+  '驚': '갑작스러운 변동 주의. 중요한 약속 재확인.',
+  '死': '큰 결정·계약 보류. 에너지가 낮은 때입니다.'
+};
+
+// 시간대별 운표 로딩 완료 후 요약 카드 전체 개인화 업데이트
+function updateSummaryPersonal(userDayEl, ymGong, currentData, shichenList, gradeList, rangeList) {
+  if (!_currentPojuData) return;
+  var data = _currentPojuData;
+  var matched = (typeof checkGeokguk === 'function') ? checkGeokguk(data) : [];
+  var hasProfile = !!(userDayEl && ymGong);
+
+  // ── 연명궁 팔문 ──
+  var ymDoor = '';
+  var ymDir = '';
+  if (hasProfile && data.palaces && data.palaces[String(ymGong)]) {
+    ymDoor = data.palaces[String(ymGong)].팔문 || '';
+    ymDir = GONG_DIR[ymGong] || '';
+  }
+
+  // ── 1. 길흉 배지 (개인화 등급) ──
+  var gilHyung = '보통';
+  if (hasProfile) {
+    // 연명궁 팔문 + 일간 오행 종합
+    var DOOR_BASE = {'生':2,'開':2,'休':1,'景':1,'傷':-1,'杜':-1,'驚':-1,'死':-2};
+    var ymScore = DOOR_BASE[ymDoor] || 0;
+    // 직사문 오행 → 일간
+    var DOOR_EL_MAP = {'生':'목','傷':'목','杜':'목','景':'화','死':'토','開':'금','驚':'금','休':'수'};
+    var SAENG_MAP = {목:'화',화:'토',토:'금',금:'수',수:'목'};
+    var GEUK_MAP = {목:'토',토:'수',수:'화',화:'금',금:'목'};
+    var ilScore = 0;
+    if (userDayEl && data.직사문 && DOOR_EL_MAP[data.직사문]) {
+      var srcEl = DOOR_EL_MAP[data.직사문];
+      if (srcEl === userDayEl) ilScore = 0;
+      else if (SAENG_MAP[srcEl] === userDayEl) ilScore = 1;
+      else if (GEUK_MAP[srcEl] === userDayEl) ilScore = -1;
+    }
+    var total = ymScore + ilScore;
+    if (total >= 3)       gilHyung = '대길';
+    else if (total >= 1)  gilHyung = '길';
+    else if (total >= -1) gilHyung = '보통';
+    else if (total >= -2) gilHyung = '흉';
+    else                  gilHyung = '대흉';
+  } else {
+    // 프로필 없음: 직사문 기반
+    var dm = data.직사문 || '';
+    if (dm === '生' || dm === '開' || dm === '休') gilHyung = '길';
+    else if (dm === '傷' || dm === '杜' || dm === '驚') gilHyung = '흉';
+    else if (dm === '死') gilHyung = '흉';
+  }
+  var badgeEl = document.getElementById('qm-headline-badge');
+  badgeEl.textContent = gilHyung;
+  badgeEl.className = 'qm-headline-badge badge-' + gilHyung;
+
+  // ── 2. 한줄 요약 (개인화) ──
+  var summaryText = '';
+  if (hasProfile && ymDoor && YM_DOOR_SUMMARY[ymDoor]) {
+    summaryText = YM_DOOR_SUMMARY[ymDoor];
+  } else if (matched.length) {
+    summaryText = matched[0].요약;
+  } else {
+    var 직사문명 = {'生':'생기','開':'왕성한 활동','休':'안정','景':'밝은 기운','傷':'주의','杜':'막힘','驚':'긴장','死':'침체'};
+    summaryText = (직사문명[data.직사문] || '보통') + '의 기운이 흐르는 때입니다.';
+  }
+  document.getElementById('qm-headline-text').textContent = summaryText;
+
+  // 격국명 (있으면 표시)
+  var geokEl = document.getElementById('qm-headline-geok');
+  if (matched.length) {
+    var geokNames = matched.map(function(g) { return g.name.replace(/\([^)]*\)/g, '').trim(); });
+    geokEl.textContent = geokNames.join(' · ');
+    geokEl.style.display = '';
+  } else {
+    geokEl.style.display = 'none';
+  }
+
+  // ── 3. 추천 카드 ──
+  var recGrid = document.getElementById('qm-rec-grid');
+  recGrid.innerHTML = '';
+
+  // 3-1. 좋은 방향 (개인화: 연명궁 방위 우선)
+  var dirVal, dirSub;
+  if (hasProfile && ymDir) {
+    dirVal = ymDir;
+    dirSub = '내 연명궁(' + ymGong + '궁)의 방위';
+    // 생문/개문 방향도 부가 표시
+    var extraDirs = [];
+    ['生', '開'].forEach(function(door) {
+      Object.entries(data.palaces).forEach(function(entry) {
+        var n = entry[0], p = entry[1];
+        if (p.팔문 === door) {
+          extraDirs.push(DOOR_DIR_DESC[door] + ': ' + GONG_DIR[parseInt(n)] + '쪽');
+        }
+      });
+    });
+    if (extraDirs.length) dirSub += '<br>' + extraDirs.join(', ');
+  } else {
+    var dirLines = [];
+    ['生', '開'].forEach(function(door) {
+      Object.entries(data.palaces).forEach(function(entry) {
+        var n = entry[0], p = entry[1];
+        if (p.팔문 === door) dirLines.push({ desc: DOOR_DIR_DESC[door], dir: GONG_DIR[parseInt(n)] });
+      });
+    });
+    dirVal = dirLines.length ? dirLines.map(function(d) { return d.dir; }).join(', ') : '—';
+    dirSub = dirLines.length ? dirLines.map(function(d) { return d.desc + ': ' + d.dir + '쪽'; }).join('<br>') : '해당 없음';
+  }
+  recGrid.appendChild(buildRecItem('🧭', '나의 좋은 방향', dirVal, dirSub));
+
+  // 3-2. 좋은 시간 (개인화 — 시간대별 운표 결과)
+  var timeItem = buildRecItem('⏰', '나의 좋은 시간', '—', '');
+  timeItem.id = 'qm-rec-time';
+  recGrid.appendChild(timeItem);
+  if (shichenList && gradeList && rangeList) {
+    updateSummaryTimeFromHourly(shichenList, gradeList, rangeList);
+  }
+
+  // 3-3. 오늘 하면 좋은 일 (개인화: 연명궁 팔문 기반)
+  var actVal;
+  if (hasProfile && ymDoor && YM_DOOR_ACTION[ymDoor]) {
+    actVal = YM_DOOR_ACTION[ymDoor];
+  } else if (matched.length && matched[0].추천행동) {
+    var acts = matched[0].추천행동.split(',').map(function(a) { return a.trim(); });
+    actVal = acts.slice(0, 2).join(', ');
+  } else {
+    actVal = '정상적인 일과 진행';
+  }
+  recGrid.appendChild(buildRecItem('💼', '나에게 좋은 활동', actVal, ''));
+
+  // ── 4. 주의할 점 (개인화: 연명궁 흉문이면 경고) ──
+  var warnBox = document.getElementById('qm-warn-box');
+  var warnText = document.getElementById('qm-warn-text');
+  var warnMsg = '';
+  if (hasProfile && ymDoor && YM_DOOR_WARN[ymDoor]) {
+    warnMsg = YM_DOOR_WARN[ymDoor];
+  } else if (matched.length && matched[0].주의) {
+    warnMsg = matched[0].주의.trim();
+  }
+  if (warnMsg) {
+    warnText.textContent = warnMsg;
+    warnBox.classList.add('visible');
+  } else {
+    warnBox.classList.remove('visible');
+  }
 }
 
 function buildRecItem(icon, label, value, sub) {
@@ -1976,9 +2086,9 @@ function shareQimenKakao() {
       list.appendChild(row);
     });
 
-    // 요약 카드의 "좋은 시간"을 개인화 결과로 업데이트
-    if (typeof updateSummaryTimeFromHourly === 'function') {
-      updateSummaryTimeFromHourly(_shiNames, _shiGrades, _shiRanges);
+    // 요약 카드 전체를 개인화 결과로 업데이트
+    if (typeof updateSummaryPersonal === 'function') {
+      updateSummaryPersonal(userDayEl, ymGong, results[currentIdx], _shiNames, _shiGrades, _shiRanges);
     }
 
     // 프로필 없으면 안내
