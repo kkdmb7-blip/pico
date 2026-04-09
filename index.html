@@ -973,12 +973,12 @@
 
 <!-- QIMEN WEEKLY -->
 <section class="section-score" id="qimenWeeklyWrap" style="display:none;">
-  <div class="section-label">기문둔갑 일가 기반</div>
-  <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;">이번 주 <em>기문 일운</em></h2>
-  <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">직사문(直使門) 기준 · 일간 오행 맞춤 분석</p>
+  <div class="section-label" style="letter-spacing:0.15em;">奇門遁甲 · 일가 기반</div>
+  <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;font-weight:300;">이번 주 <em style="font-weight:700;">기문 일운</em></h2>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:24px;letter-spacing:0.03em;">直使門 기준 · 일간 오행 맞춤 분석</p>
   <div id="qimenWeeklyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:18px;"></div>
   <div id="qimenWeeklyDetail" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 16px;display:none;"></div>
-  <p style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);">탭하면 상세 보기 · 기문둔갑 페이지에서 전체 포국 확인</p>
+  <p style="margin-top:14px;text-align:center;font-size:10px;color:rgba(107,107,133,0.6);letter-spacing:0.05em;">탭하면 상세 보기 · 기문둔갑 페이지에서 전체 포국 확인</p>
 </section>
 
 <div class="section-divider"></div>
@@ -3493,21 +3493,19 @@ function goScoreQuick() {
         card.innerHTML='<div style="font-size:11px;color:var(--muted);">'+dt.day+'</div><div style="font-size:12px;margin-top:4px;">'+dt.m+'/'+dt.d+'</div><div style="font-size:11px;color:var(--muted);margin-top:6px;">—</div>';
       } else {
         var gc=GRADE_COLOR[item.grade]||'#9b8fb0';
-        card.innerHTML='<div style="font-size:11px;color:'+(dt.isToday?'var(--accent)':'var(--muted)')+';font-weight:'+(dt.isToday?'700':'400')+';">'+dt.day+(dt.isToday?' 오늘':'')+'</div>'+
-          '<div style="font-size:12px;margin-top:2px;color:'+(dt.isToday?'#fff':'var(--muted)')+';">'+dt.m+'/'+dt.d+'</div>'+
-          '<div style="font-size:20px;margin-top:6px;">'+item.icon+'</div>'+
-          '<div style="margin-top:4px;font-size:11px;font-weight:700;color:'+gc+';">'+item.grade+'</div>'+
-          '<div style="margin-top:2px;font-size:9px;color:var(--muted);">'+doorNameMap[item.door]+'문</div>';
+        card.innerHTML='<div style="font-size:10px;letter-spacing:0.05em;color:'+(dt.isToday?'var(--accent)':'var(--muted)')+';font-weight:'+(dt.isToday?'700':'400')+';">'+dt.day+(dt.isToday?' 오늘':'')+'</div>'+
+          '<div style="font-size:12px;margin-top:3px;color:'+(dt.isToday?'#fff':'rgba(240,240,245,0.6)')+';">'+dt.m+'/'+dt.d+'</div>'+
+          '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+gc+';letter-spacing:0.03em;">'+item.grade+'</div>'+
+          '<div style="margin-top:3px;font-size:9px;color:rgba(155,143,176,0.6);letter-spacing:0.08em;">'+doorNameMap[item.door]+'門</div>';
         card.onclick=(function(it){return function(){
           detail.style.display='block';
-          detail.innerHTML='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
-            '<span style="font-size:24px;">'+it.icon+'</span>'+
-            '<div><div style="font-size:13px;font-weight:700;color:#ede6f8;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
-            '<div style="font-size:11px;color:var(--muted);margin-top:2px;">직사문: '+doorNameMap[it.door]+'문('+it.door+')</div></div>'+
-            '<div style="margin-left:auto;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;color:'+(GRADE_COLOR[it.grade]||'#9b8fb0')+';background:rgba(0,0,0,0.3);border:1px solid '+(GRADE_COLOR[it.grade]||'#9b8fb0')+'30;">'+it.grade+'</div>'+
+          detail.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
+            '<div><div style="font-size:10px;color:rgba(167,139,250,0.5);letter-spacing:0.12em;font-weight:600;margin-bottom:3px;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
+            '<div style="font-size:10px;color:rgba(155,143,176,0.6);letter-spacing:0.03em;">'+doorNameMap[it.door]+'門 · 일가 포국</div></div>'+
+            '<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;color:'+(GRADE_COLOR[it.grade]||'#9b8fb0')+';background:rgba(0,0,0,0.25);border:1px solid '+(GRADE_COLOR[it.grade]||'#9b8fb0')+'25;letter-spacing:0.05em;">'+it.grade+'</div>'+
           '</div>'+
-          '<div style="font-size:14px;font-weight:600;color:#e8e0f0;line-height:1.6;">'+it.kw+'</div>'+
-          '<div style="margin-top:10px;text-align:right;"><a href="qimen.html?year='+it.dt.y+'&month='+it.dt.m+'&day='+it.dt.d+'&hour=12&minute=0&type=ilga" style="font-size:11px;color:rgba(167,139,250,0.8);text-decoration:none;">전체 포국 보기 →</a></div>';
+          '<div style="font-size:14px;font-weight:300;color:#e8e0f0;line-height:1.7;letter-spacing:-0.01em;">'+it.kw+'</div>'+
+          '<div style="margin-top:12px;text-align:right;"><a href="qimen.html?year='+it.dt.y+'&month='+it.dt.m+'&day='+it.dt.d+'&hour=12&minute=0&type=ilga" style="font-size:10px;color:rgba(167,139,250,0.6);text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
         };})(item);
       }
       card.addEventListener('mouseenter',function(){this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.25)';});
