@@ -2861,6 +2861,11 @@ function checkAuth() {
     history.replaceState({}, '', window.location.pathname);
     handleKakaoCallback(code);
   }
+  // /index.html에서 리다이렉트된 경우 자동 로그인 실행
+  if (params.get('kakao_login') === '1') {
+    history.replaceState({}, '', window.location.pathname);
+    kakaoLogin();
+  }
 }
 
 function shareMainKakao() {
@@ -2875,6 +2880,11 @@ function shareMainKakao() {
 }
 
 function kakaoLogin() {
+  // /index.html로 접근한 경우 /로 정규화 후 로그인
+  if (window.location.pathname !== '/') {
+    window.location.href = 'https://picolab.kr/?kakao_login=1';
+    return;
+  }
   var redirectUri = encodeURIComponent('https://picolab.kr');
   window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=' + KAKAO_REST_KEY
     + '&redirect_uri=' + redirectUri + '&response_type=code&scope=profile_nickname,account_email&prompt=consent';
