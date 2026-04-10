@@ -11,6 +11,12 @@
 
 # 코드 수정 전 필수 확인 체크리스트
 
+## 데이터 구조 확인 규칙 (필수)
+- API 응답, localStorage, Supabase 데이터의 필드를 새로 쓸 때: **절대 추측 금지**
+- 코딩 전에 반드시 실제 데이터 샘플 확인 (Supabase row 조회 또는 콘솔 출력값 요청)
+- 확인 없이 필드명을 가정하면 버그 발생 (사례: saju_data.pillars.day → 실제는 saju_data.saju_pillars 문자열)
+- 데이터 구조가 불확실할 때는 작업 전에 사용자에게 샘플 데이터를 요청할 것
+
 ## 자주 발생하는 버그 패턴 (반드시 체크)
 - **function 선언 호이스팅 무한재귀**: `var orig = fn; function fn() { orig() }` 패턴 절대 사용 금지. 기존 함수를 override할 때는 원본 함수 끝에 직접 코드 추가
 - **display:none → display:flex**: flex 컨테이너를 show할 때 `block`이 아닌 `flex`로 설정
