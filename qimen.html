@@ -2327,18 +2327,17 @@ function shareQimenKakao() {
     var currentIdx = getTSTShichenIdx();
 
     // ── 사용자 프로필 → 일간 + 연명궁 ──
-    // URL 파라미터(다른 프로필 선택) 우선, 없으면 pico_profile 사용
+    // _birthDateParams: 피코 모달에서 선택한 프로필의 생년월일 (있으면 우선)
+    // 없으면 pico_profile 사용
     var userDayEl = null, userDayStem = '', ymGong = 0;
     var profile = null;
-    var _urlParams = new URLSearchParams(location.search);
-    var _urlYear = _urlParams.get('year'), _urlMonth = _urlParams.get('month'), _urlDay = _urlParams.get('day');
-    var _urlHour = _urlParams.get('hour'), _urlGender = window._qimenUrlGender || null;
+    var _urlGender = window._qimenUrlGender || null;
 
-    if (_urlYear && _urlMonth && _urlDay) {
-      // URL 파라미터 기반 프로필 구성
+    if (_birthDateParams && _birthDateParams.year && parseInt(_birthDateParams.year) < 2010) {
+      // 피코 모달에서 넘어온 생년월일 (생년이 최소 2010년 이전이어야 실제 출생년도)
       profile = {
-        year: parseInt(_urlYear), month: parseInt(_urlMonth), day: parseInt(_urlDay),
-        hour: _urlHour || 0, minute: 0,
+        year: parseInt(_birthDateParams.year), month: parseInt(_birthDateParams.month),
+        day: parseInt(_birthDateParams.day), hour: _birthDateParams.hour || 0, minute: 0,
         gender: _urlGender === 'female' ? 'F' : 'M'
       };
     } else {
@@ -2354,7 +2353,7 @@ function shareQimenKakao() {
         var sp = new URLSearchParams({
           year: profile.year, month: profile.month, day: profile.day,
           hour: (profile.hour === 'unknown' || !profile.hour) ? 12 : profile.hour,
-          minute: profile.minute || 0, gender: _urlGender || 'male'
+          minute: profile.minute || 0, gender: (profile.gender === 'F') ? 'female' : 'male'
         });
         var sajuRes = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test?' + sp.toString());
         var sajuData = await sajuRes.json();
