@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <style>
 :root {
   --bg: #0a0614;
@@ -18,6 +19,7 @@
   --gold: #d4af37;
   --golddim: rgba(201,168,76,0.3);
   --accent: #7b5ea7;
+  --orb: #7ac4ff;
   --fn: 'Noto Sans KR', sans-serif;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,9 +33,7 @@ nav {
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 14px;
 }
-.nav-back {
-  color: var(--muted); font-size: 20px; text-decoration: none; line-height: 1;
-}
+.nav-back { color: var(--muted); font-size: 20px; text-decoration: none; line-height: 1; cursor: pointer; }
 .nav-title { font-family: 'Noto Serif KR', serif; font-size: 15px; font-weight: 700; color: var(--gold); }
 
 .wrap { max-width: 600px; margin: 0 auto; padding: 72px 16px 80px; }
@@ -53,6 +53,68 @@ nav {
 }
 .loading-label { font-size: 14px; color: var(--muted); text-align: center; line-height: 1.7; }
 .loading-label strong { color: var(--gold); display: block; margin-bottom: 4px; }
+
+/* ── 상품 소개 화면 ── */
+#stateIntro { display: none; }
+.intro-header { text-align: center; padding: 32px 0 24px; }
+.intro-emoji { font-size: 48px; margin-bottom: 12px; }
+.intro-title { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.intro-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+.intro-section-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.intro-section-label {
+  font-size: 11px; font-weight: 700; color: var(--gold);
+  letter-spacing: 0.08em; margin-bottom: 14px;
+}
+.intro-section-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px; color: rgba(240,240,245,0.85);
+}
+.intro-section-item:last-child { border-bottom: none; }
+.intro-section-num {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid var(--golddim);
+  font-size: 10px; font-weight: 700; color: var(--gold);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.intro-orb-box {
+  background: rgba(122,196,255,0.06);
+  border: 1px solid rgba(122,196,255,0.25);
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.intro-orb-label { font-size: 12px; color: var(--muted); }
+.intro-orb-cost { font-size: 18px; font-weight: 800; color: var(--orb); }
+
+.btn-intro-gen {
+  display: block; width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #7b5ea7, #a07fd4);
+  border: none; border-radius: 14px;
+  color: #fff; font-size: 15px; font-weight: 700;
+  cursor: pointer; font-family: var(--fn);
+  margin-bottom: 10px;
+}
+.btn-intro-back {
+  display: block; width: 100%;
+  padding: 13px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--muted); font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: var(--fn);
+}
 
 /* ── 섹션 카드 ── */
 .report-header { text-align: center; margin-bottom: 28px; padding: 28px 0 0; }
@@ -95,8 +157,14 @@ nav {
 .section-body {
   padding: 12px 18px 18px;
   font-size: 14px; line-height: 1.85; color: rgba(240,240,245,0.88);
-  white-space: pre-wrap;
 }
+.section-body h1,.section-body h2,.section-body h3 {
+  font-family: 'Noto Serif KR', serif; margin: 12px 0 6px; color: var(--text);
+}
+.section-body strong { color: var(--gold); }
+.section-body p { margin-bottom: 8px; }
+.section-body ul,.section-body ol { padding-left: 20px; margin-bottom: 8px; }
+.section-body li { margin-bottom: 4px; }
 .section-loading {
   padding: 20px 18px;
   display: flex; align-items: center; gap: 10px;
@@ -164,7 +232,7 @@ nav {
 <body>
 
 <nav>
-  <a href="index.html" class="nav-back">←</a>
+  <a onclick="history.back()" class="nav-back">←</a>
   <div class="nav-title" id="navTitle">리포트</div>
 </nav>
 
@@ -176,7 +244,26 @@ nav {
     <div class="loading-label"><strong id="loadingTitle">준비 중...</strong><span id="loadingDesc">잠시만 기다려 주세요</span></div>
   </div>
 
-  <!-- 리포트 본문 (숨김) -->
+  <!-- 상품 소개 -->
+  <div id="stateIntro">
+    <div class="intro-header">
+      <div class="intro-emoji" id="introEmoji"></div>
+      <div class="intro-title" id="introTitle"></div>
+      <div class="intro-desc" id="introDesc"></div>
+    </div>
+    <div class="intro-section-list">
+      <div class="intro-section-label">포함 내용</div>
+      <div id="introSections"></div>
+    </div>
+    <div class="intro-orb-box">
+      <div class="intro-orb-label">리포트 비용</div>
+      <div class="intro-orb-cost" id="introOrbCost"></div>
+    </div>
+    <button class="btn-intro-gen" id="btnGenerate">✦ 리포트 생성하기</button>
+    <button class="btn-intro-back" onclick="history.back()">돌아가기</button>
+  </div>
+
+  <!-- 리포트 본문 -->
   <div id="stateReport" style="display:none;">
     <div class="report-header">
       <div class="report-badge" id="reportBadge">AI REPORT</div>
@@ -210,18 +297,23 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 const TYPE_CONFIG = {
-  character: { title: '타고난 기질 리포트', orb: 500, emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식' },
-  money:     { title: '재물/사업 리포트',   orb: 700, emoji: '💰', focus: '재물운, 사업 적성, 투자 패턴, 돈과의 관계' },
-  love:      { title: '연애/결혼 리포트',   orb: 700, emoji: '💕', focus: '연애 패턴, 이상형, 결혼운, 파트너십의 특성' },
-  daeun:     { title: '대운 흐름 리포트',   orb: 1000, emoji: '📈', focus: '현재 대운의 의미, 앞으로의 대운 흐름, 인생 타이밍' },
-  year:      { title: '올해 운세 리포트',   orb: 500, emoji: '✨', focus: '2026년 운세, 상반기/하반기 흐름, 월별 포인트, 주의사항' }
+  character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
+    desc: '사주+베딕+자미두수로 보는 타고난 성격과 잠재력' },
+  money:     { title: '재물/사업 리포트',   orb: 700,  emoji: '💰', focus: '재물운, 사업 적성, 투자 패턴, 돈과의 관계',
+    desc: '재성 분석부터 베딕 2하우스까지 재물 구조 완전 해석' },
+  love:      { title: '연애/결혼 리포트',   orb: 700,  emoji: '💕', focus: '연애 패턴, 이상형, 결혼운, 파트너십의 특성',
+    desc: '관성/재성 분석 + 베딕 7하우스로 보는 연애/결혼 구조' },
+  daeun:     { title: '대운 흐름 리포트',   orb: 1000, emoji: '📈', focus: '현재 대운의 의미, 앞으로의 대운 흐름, 인생 타이밍',
+    desc: '현재 대운 심층 분석 + 다샤 + 자미두수 대한 융합' },
+  year:      { title: '올해 운세 리포트',   orb: 500,  emoji: '✨', focus: '2026년 운세, 상반기/하반기 흐름, 월별 포인트, 주의사항',
+    desc: '올해 세운 + 베딕 트랜짓 + 자미두수 유년 월별 흐름' }
 };
 
 const SECTIONS = [
-  { name: '핵심 요약',           chars: 300 },
-  { name: '사주 기반 심층 분석', chars: 600 },
-  { name: '베딕/낙샤트라 분석',  chars: 500 },
-  { name: '자미두수 분석',       chars: 500 },
+  { name: '핵심 요약',             chars: 300 },
+  { name: '사주 기반 심층 분석',   chars: 600 },
+  { name: '베딕/낙샤트라 분석',    chars: 500 },
+  { name: '자미두수 분석',         chars: 500 },
   { name: '종합 결론 + 실천 방향', chars: 400 }
 ];
 
@@ -243,27 +335,40 @@ function setLoading(title, desc) {
 }
 
 function showState(state) {
-  document.getElementById('stateLoading').style.display = state === 'loading' ? 'flex' : 'none';
+  document.getElementById('stateLoading').style.display = state === 'loading' ? 'flex'  : 'none';
+  document.getElementById('stateIntro').style.display   = state === 'intro'   ? 'block' : 'none';
   document.getElementById('stateReport').style.display  = state === 'report'  ? 'block' : 'none';
+}
+
+// ── 일주 추출 (localStorage fortuna_saju_data) ──
+function getIlju() {
+  try {
+    const raw = localStorage.getItem('fortuna_saju_data');
+    if (!raw) return null;
+    const saju = JSON.parse(raw);
+    const p = saju.saju_pillars || saju.pillars;
+    if (typeof p === 'string') {
+      const m = p.match(/(\S+)일/);
+      return m ? m[1] : null;
+    } else if (p && typeof p === 'object') {
+      return p.day || null;
+    }
+  } catch(e) {}
+  return null;
 }
 
 // ── 초기화 ──
 (async function init() {
-  // URL 파라미터
   const params = new URLSearchParams(location.search);
   _type = params.get('type');
   _config = TYPE_CONFIG[_type];
   if (!_config) { setLoading('잘못된 접근', '리포트 타입이 올바르지 않아요'); return; }
 
   document.getElementById('navTitle').textContent = _config.title;
-  setLoading(_config.emoji + ' ' + _config.title, '로그인 확인 중...');
 
   // 로그인 확인
   try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
-  if (!_user || !_user.id) {
-    location.href = 'index.html';
-    return;
-  }
+  if (!_user || !_user.id) { location.href = 'index.html'; return; }
 
   // 프로필 확인
   try { _profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
@@ -273,16 +378,32 @@ function showState(state) {
     return;
   }
 
+  // 상품 소개 화면 렌더
+  document.getElementById('introEmoji').textContent = _config.emoji;
+  document.getElementById('introTitle').textContent = _config.title;
+  document.getElementById('introDesc').textContent  = _config.desc;
+  document.getElementById('introOrbCost').textContent = _config.orb.toLocaleString() + ' Orb';
+  const secWrap = document.getElementById('introSections');
+  SECTIONS.forEach((s, i) => {
+    secWrap.innerHTML += `<div class="intro-section-item">
+      <div class="intro-section-num">${i+1}</div>${s.name}</div>`;
+  });
+  document.getElementById('btnGenerate').onclick = startGeneration;
+
+  showState('intro');
+})();
+
+// ── 생성 시작 (소개 화면 → 실제 흐름) ──
+async function startGeneration() {
+  showState('loading');
   setLoading('기존 리포트 확인 중...', '');
 
-  // 기존 리포트 조회
   const existing = await fetchExistingReport();
   if (existing) {
-    renderReport(existing.content, existing.created_at, false);
+    renderReport(existing.content, existing.created_at);
     return;
   }
 
-  // Orb 잔액 확인
   setLoading('Orb 잔액 확인 중...', '');
   const balance = await fetchOrbBalance();
   if (balance < _config.orb) {
@@ -293,9 +414,8 @@ function showState(state) {
     return;
   }
 
-  // 리포트 생성
   await generateReport();
-})();
+}
 
 // ── 기존 리포트 조회 ──
 async function fetchExistingReport() {
@@ -339,18 +459,22 @@ function buildSectionPrompt(secIdx, prevSections) {
   const charLimit = SECTIONS[secIdx].chars;
   const focus = _config.focus;
 
+  const ilju = getIlju();
+  const iljuLine = ilju ? `일주 정보: 이 사람은 ${ilju}일주입니다.\n` : '';
+
   const prevText = prevSections.length > 0
     ? `\n[이전 섹션 요약]\n${prevSections.map((s,i) => `${i+1}. ${SECTIONS[i].name}: ${s.slice(0,100)}...`).join('\n')}\n`
     : '';
 
   const systemPrompt = `당신은 사주명리, 베딕점성술, 자미두수를 융합하는 동양철학 AI입니다.
 내담자 정보: ${profileStr}
-리포트 주제: ${_config.title} (${focus})
+${iljuLine}리포트 주제: ${_config.title} (${focus})
 현재 작성 섹션: [${secName}]
 ${prevText}
 규칙:
 - 반드시 ${charLimit}자 내외로 작성
 - 내담자의 생년월일로 사주 기둥을 계산하여 분석에 활용
+- 일주 정보가 제공된 경우 반드시 해당 일주로 분석 (임의로 다른 일주 계산 금지)
 - 현재 섹션 주제에 집중
 - 전문 용어 사용 후 쉬운 말로 풀어쓰기
 - **볼드** 적극 활용 (핵심 키워드 3~5개)
@@ -358,7 +482,6 @@ ${prevText}
 - 마지막 문장은 희망적으로 마무리`;
 
   const userMsg = `[${secName}] 섹션을 작성해주세요. 주제: ${focus}`;
-
   return { systemPrompt, userMsg };
 }
 
@@ -368,7 +491,6 @@ async function generateReport() {
   document.getElementById('reportTitle').textContent = _config.title;
   document.getElementById('reportMeta').textContent = '생성 중...';
 
-  // 섹션 카드 미리 생성 (로딩 상태)
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
   SECTIONS.forEach((s, i) => {
@@ -392,7 +514,6 @@ async function generateReport() {
 
   for (let i = 0; i < SECTIONS.length; i++) {
     const { systemPrompt, userMsg } = buildSectionPrompt(i, results);
-    // 첫 섹션만 Orb 차감, 나머지는 skip
     const body = {
       user_id: _user.id,
       messages: [{ role: 'user', content: userMsg }],
@@ -415,10 +536,10 @@ async function generateReport() {
       if (!res.ok) {
         const err = await res.json();
         if (err.error === 'orb_insufficient') {
-          document.getElementById('orbModalSub').textContent = `Orb가 부족해요. 현재 잔액: ${(err.orb_balance||0).toLocaleString()} Orb`;
+          document.getElementById('orbModalSub').textContent =
+            `Orb가 부족해요. 현재 잔액: ${(err.orb_balance||0).toLocaleString()} Orb`;
           document.getElementById('orbModal').classList.add('open');
-          genOk = false;
-          break;
+          genOk = false; break;
         }
         throw new Error(err.error || 'API 오류');
       }
@@ -426,23 +547,19 @@ async function generateReport() {
       const text = (data.reply || '').trim();
       results.push(text);
 
-      // 섹션 표시
       document.getElementById(`sloading-${i}`).style.display = 'none';
       const bodyEl = document.getElementById(`sbody-${i}`);
-      bodyEl.textContent = text;
+      bodyEl.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text.replace(/\n/g,'<br>');
       bodyEl.style.display = 'block';
 
     } catch(e) {
       document.getElementById(`sloading-${i}`).innerHTML = `<span style="color:#e05c6a;">생성 실패: ${e.message}</span>`;
-      genOk = false;
-      break;
+      genOk = false; break;
     }
   }
 
   if (!genOk || results.length < SECTIONS.length) return;
 
-  // Supabase 저장
-  const now = new Date().toISOString();
   try {
     const sb = getSb();
     const { data } = await sb.from('reports').insert({
@@ -450,7 +567,7 @@ async function generateReport() {
       report_type: _type,
       content: results,
       orb_spent: _config.orb,
-      created_at: now
+      created_at: new Date().toISOString()
     }).select().maybeSingle();
     if (data) _reportId = data.id;
   } catch(e) {}
@@ -462,12 +579,11 @@ async function generateReport() {
 }
 
 // ── 기존 리포트 렌더 ──
-function renderReport(sections, createdAt, isNew) {
+function renderReport(sections, createdAt) {
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
-  const dateStr = createdAt ? new Date(createdAt).toLocaleDateString('ko-KR') : '';
-  document.getElementById('reportMeta').textContent = `생성일: ${dateStr}`;
+  document.getElementById('reportMeta').textContent = `생성일: ${createdAt ? new Date(createdAt).toLocaleDateString('ko-KR') : ''}`;
 
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
@@ -478,9 +594,9 @@ function renderReport(sections, createdAt, isNew) {
     card.innerHTML = `
       <div class="section-header">
         <div class="section-num">${i+1}</div>
-        <div class="section-name">${SECTIONS[i].name}</div>
+        <div class="section-name">${SECTIONS[i] ? SECTIONS[i].name : ''}</div>
       </div>
-      <div class="section-body">${escHtml(text)}</div>`;
+      <div class="section-body">${typeof marked !== 'undefined' ? marked.parse(text) : text.replace(/\n/g,'<br>')}</div>`;
     wrap.appendChild(card);
   });
 
@@ -488,21 +604,14 @@ function renderReport(sections, createdAt, isNew) {
   document.getElementById('reportActions').style.display = 'flex';
 }
 
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
 // ── 다시 생성 ──
 async function regenReport() {
   if (!confirm(`다시 생성하면 ${_config.orb.toLocaleString()} Orb가 추가 차감됩니다.\n계속하시겠어요?`)) return;
-
-  // 기존 리포트 삭제
   try {
     const sb = getSb();
     await sb.from('reports').delete().eq('user_id', _user.id).eq('report_type', _type);
   } catch(e) {}
 
-  // Orb 확인 후 재생성
   showState('loading');
   setLoading('Orb 잔액 확인 중...', '');
   const balance = await fetchOrbBalance();
