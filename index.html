@@ -997,28 +997,28 @@
 <div class="section-divider"></div>
 
 <!-- NAME SCORE WIDGET -->
-<section class="section-score" id="nameScoreWrap" style="text-align:center;">
+<section class="section-score" id="nameScoreWrap" style="text-align:center;overflow:hidden;">
   <div class="section-label">✨ 이름 수리 무료 체험</div>
   <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;">내 이름은 <em>몇 점</em>일까?</h2>
   <p style="font-size:13px;color:var(--muted);margin-bottom:28px;letter-spacing:0.04em;">이름 획수로 알아보는 81수리 점수</p>
 
   <!-- 입력 -->
-  <div style="display:flex;gap:10px;max-width:400px;margin:0 auto 16px;">
+  <div style="display:flex;gap:10px;max-width:400px;margin:0 auto 16px;padding:0 16px;box-sizing:border-box;">
     <input id="nsSur" type="text" maxlength="3" placeholder="성(姓)"
-      style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:border-color 0.2s;"
+      style="flex:1;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 10px;color:var(--text);font-size:15px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:border-color 0.2s;"
       onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
     <input id="nsName" type="text" maxlength="4" placeholder="이름"
-      style="flex:2;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:border-color 0.2s;"
+      style="flex:2;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 10px;color:var(--text);font-size:15px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:border-color 0.2s;"
       onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
     <button onclick="nsCalc()" id="nsBtn"
-      style="background:linear-gradient(135deg,#7b5ea7,#a07fd4);border:none;border-radius:10px;padding:12px 18px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.25s;"
+      style="flex-shrink:0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);border:none;border-radius:10px;padding:12px 16px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.25s;"
       onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
       점수 확인
     </button>
   </div>
 
   <!-- 결과 카드 -->
-  <div id="nsResult" style="display:none;max-width:480px;margin:0 auto;">
+  <div id="nsResult" style="display:none;max-width:480px;margin:0 auto;padding:0 16px;box-sizing:border-box;">
     <div id="nsGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px;"></div>
     <a id="nsCtaBtn" href="https://fortuna-silk.vercel.app/name-score.html" target="_blank"
       style="display:block;background:linear-gradient(135deg,#d4af37,#f0d060,#d4af37);background-size:200% 200%;border-radius:12px;padding:14px;color:#06020f;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:all 0.3s;"
