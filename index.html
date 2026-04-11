@@ -3067,7 +3067,7 @@ function handleKakaoCallback(code) {
     return fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, name: name })
+      body: JSON.stringify({ email: email, name: name, kakao_id: profile.id })
     })
     .then(function(r) { return r.json(); })
     .then(function(resolved) {
