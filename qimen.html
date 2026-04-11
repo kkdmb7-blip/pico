@@ -1818,6 +1818,9 @@ function renderInterp(data) {
   const p = new URLSearchParams(location.search);
   const year = p.get('year'), month = p.get('month'), day = p.get('day');
   const hour = p.get('hour'), minute = p.get('minute'), type = p.get('type');
+  // gender: URL 우선, 없으면 pico_profile
+  const genderParam = p.get('gender');
+  if (genderParam) window._qimenUrlGender = genderParam; // 'male' or 'female'
   // 생년월일 파라미터 저장 (원명국 탭에서 재사용)
   if (year && month && day) {
     _birthDateParams = { year, month, day, hour: hour||'0', minute: minute||'0' };
@@ -2324,9 +2327,23 @@ function shareQimenKakao() {
     var currentIdx = getTSTShichenIdx();
 
     // ── 사용자 프로필 → 일간 + 연명궁 ──
+    // URL 파라미터(다른 프로필 선택) 우선, 없으면 pico_profile 사용
     var userDayEl = null, userDayStem = '', ymGong = 0;
     var profile = null;
-    try { profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+    var _urlParams = new URLSearchParams(location.search);
+    var _urlYear = _urlParams.get('year'), _urlMonth = _urlParams.get('month'), _urlDay = _urlParams.get('day');
+    var _urlHour = _urlParams.get('hour'), _urlGender = window._qimenUrlGender || null;
+
+    if (_urlYear && _urlMonth && _urlDay) {
+      // URL 파라미터 기반 프로필 구성
+      profile = {
+        year: parseInt(_urlYear), month: parseInt(_urlMonth), day: parseInt(_urlDay),
+        hour: _urlHour || 0, minute: 0,
+        gender: _urlGender === 'female' ? 'F' : 'M'
+      };
+    } else {
+      try { profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+    }
 
     if (profile && profile.year) {
       // 연명궁
@@ -2337,7 +2354,7 @@ function shareQimenKakao() {
         var sp = new URLSearchParams({
           year: profile.year, month: profile.month, day: profile.day,
           hour: (profile.hour === 'unknown' || !profile.hour) ? 12 : profile.hour,
-          minute: profile.minute || 0, gender: 'male'
+          minute: profile.minute || 0, gender: _urlGender || 'male'
         });
         var sajuRes = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test?' + sp.toString());
         var sajuData = await sajuRes.json();
