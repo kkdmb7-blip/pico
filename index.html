@@ -2992,16 +2992,19 @@ function kakaoLogin() {
   var p = window.location.pathname;
   var isRoot = (p === '/' || p === '/index.html');
   if (!isRoot) {
-    window.location.href = 'https://picolab.kr/?kakao_login=1';
+    window.location.href = 'https://picolab.kr/index.html?kakao_login=1';
     return;
   }
-  var redirectUri = encodeURIComponent('https://picolab.kr');
+  var base = 'https://picolab.kr' + (p === '/index.html' ? '/index.html' : '');
+  window._kakaoRedirectUri = base;
+  var redirectUri = encodeURIComponent(base);
   window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=' + KAKAO_REST_KEY
     + '&redirect_uri=' + redirectUri + '&response_type=code&scope=profile_nickname,account_email&prompt=consent';
 }
 
 function handleKakaoCallback(code) {
-  var redirectUri = 'https://picolab.kr';
+  var p = window.location.pathname;
+  var redirectUri = 'https://picolab.kr' + (p === '/index.html' ? '/index.html' : '');
   fetch(WORKER_BASE + '/kakao-token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
