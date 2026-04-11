@@ -421,33 +421,38 @@
     font-size: 11px; color: var(--muted); letter-spacing: 0.5px;
     text-transform: uppercase; font-weight: 600; margin-bottom: 14px;
   }
-  .yun-list { display: flex; flex-direction: column; gap: 8px; }
+  .yun-list { display: flex; flex-direction: column; gap: 6px; }
   .yun-row {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 12px 16px;
+    padding: 11px 14px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     transition: all 0.2s;
   }
   .yun-row.current-shi {
     border: 1px solid rgba(155,127,212,0.5);
     background: rgba(155,127,212,0.08);
   }
-  .yun-row.past-shi { opacity: 0.4; }
+  .yun-row.past-shi { opacity: 0.35; }
   .yun-shi {
     font-family: 'Noto Serif KR', serif;
-    font-size: 15px; font-weight: 700; min-width: 36px;
+    font-size: 14px; font-weight: 700; min-width: 34px;
   }
-  .yun-range { font-size: 11px; color: var(--muted); min-width: 80px; }
-  .yun-grade { font-size: 12px; font-weight: 700; min-width: 40px; text-align: center; }
-  .yun-grade-대길 { color: #fde047; }
-  .yun-grade-길   { color: #86efac; }
-  .yun-grade-평   { color: var(--muted); }
-  .yun-grade-흉   { color: #fb923c; }
-  .yun-grade-대흉 { color: #f87171; }
+  .yun-range { font-size: 10px; color: var(--muted); min-width: 78px; }
+  .yun-grade {
+    font-size: 11px; font-weight: 800;
+    min-width: 36px; text-align: center;
+    padding: 3px 7px; border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .yun-grade-대길 { color: #1a1200; background: #fde047; }
+  .yun-grade-길   { color: #0a2a14; background: #86efac; }
+  .yun-grade-평   { color: #c8c8e0; background: rgba(200,200,224,0.13); border: 1px solid rgba(200,200,224,0.2); }
+  .yun-grade-흉   { color: #fff7f0; background: rgba(251,146,60,0.25); border: 1px solid rgba(251,146,60,0.35); }
+  .yun-grade-대흉 { color: #fff0f0; background: rgba(248,113,113,0.22); border: 1px solid rgba(248,113,113,0.35); }
   .yun-keyword { font-size: 13px; color: var(--text); flex: 1; }
   .yun-now-dot {
     display: inline-block; width: 6px; height: 6px;
