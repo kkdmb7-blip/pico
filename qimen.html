@@ -1826,6 +1826,16 @@ function renderInterp(data) {
   // gender: URL 우선, 없으면 pico_profile
   const genderParam = p.get('gender');
   if (genderParam) window._qimenUrlGender = genderParam; // 'male' or 'female'
+  // 메목스에서 넘어온 생년월일 파라미터 — URL 교체 전에 미리 저장
+  const _mby = parseInt(p.get('byear'));
+  if (_mby && _mby > 1900) {
+    window._memoxBirthParams = {
+      year: _mby, month: parseInt(p.get('bmonth')) || 1,
+      day: parseInt(p.get('bday')) || 1,
+      hour: parseInt(p.get('bhour')) || 12,
+      gender: (p.get('bgender') || genderParam) === 'female' ? 'F' : 'M'
+    };
+  }
   // 생년월일 파라미터 저장 (원명국 탭에서 재사용)
   if (year && month && day) {
     _birthDateParams = { year, month, day, hour: hour||'0', minute: minute||'0' };
@@ -2338,16 +2348,12 @@ function shareQimenKakao() {
     var profile = null;
     var _urlGender = window._qimenUrlGender || null;
 
-    // 메목스에서 넘어온 byear/bmonth/bday/bgender 파라미터 우선 사용
-    var _urlParams = new URLSearchParams(window.location.search);
-    var _byear = parseInt(_urlParams.get('byear'));
-    var _bgender = _urlParams.get('bgender') || _urlGender;
-    if (_byear && _byear < 2010) {
+    // 메목스에서 넘어온 생년월일 (initFromUrl에서 미리 저장)
+    if (window._memoxBirthParams) {
       profile = {
-        year: _byear, month: parseInt(_urlParams.get('bmonth')) || 1,
-        day: parseInt(_urlParams.get('bday')) || 1,
-        hour: parseInt(_urlParams.get('bhour')) || 12, minute: 0,
-        gender: _bgender === 'female' ? 'F' : 'M'
+        year: window._memoxBirthParams.year, month: window._memoxBirthParams.month,
+        day: window._memoxBirthParams.day, hour: window._memoxBirthParams.hour, minute: 0,
+        gender: window._memoxBirthParams.gender
       };
     } else if (_birthDateParams && _birthDateParams.year && parseInt(_birthDateParams.year) < 2010) {
       // 피코 모달에서 넘어온 생년월일 (생년이 최소 2010년 이전이어야 실제 출생년도)
