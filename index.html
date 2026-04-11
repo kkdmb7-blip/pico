@@ -2894,8 +2894,9 @@ function shareMainKakao() {
 }
 
 function kakaoLogin() {
-  // /index.html로 접근한 경우 /로 정규화 후 로그인
-  if (window.location.pathname !== '/') {
+  var p = window.location.pathname;
+  var isRoot = (p === '/' || p === '/index.html');
+  if (!isRoot) {
     window.location.href = 'https://picolab.kr/?kakao_login=1';
     return;
   }
