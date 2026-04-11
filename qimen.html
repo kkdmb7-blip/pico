@@ -2338,7 +2338,18 @@ function shareQimenKakao() {
     var profile = null;
     var _urlGender = window._qimenUrlGender || null;
 
-    if (_birthDateParams && _birthDateParams.year && parseInt(_birthDateParams.year) < 2010) {
+    // 메목스에서 넘어온 byear/bmonth/bday/bgender 파라미터 우선 사용
+    var _urlParams = new URLSearchParams(window.location.search);
+    var _byear = parseInt(_urlParams.get('byear'));
+    var _bgender = _urlParams.get('bgender') || _urlGender;
+    if (_byear && _byear < 2010) {
+      profile = {
+        year: _byear, month: parseInt(_urlParams.get('bmonth')) || 1,
+        day: parseInt(_urlParams.get('bday')) || 1,
+        hour: parseInt(_urlParams.get('bhour')) || 12, minute: 0,
+        gender: _bgender === 'female' ? 'F' : 'M'
+      };
+    } else if (_birthDateParams && _birthDateParams.year && parseInt(_birthDateParams.year) < 2010) {
       // 피코 모달에서 넘어온 생년월일 (생년이 최소 2010년 이전이어야 실제 출생년도)
       profile = {
         year: parseInt(_birthDateParams.year), month: parseInt(_birthDateParams.month),
