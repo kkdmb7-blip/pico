@@ -3776,7 +3776,7 @@ function switchTab(tab) {
     var el = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
     var btn = document.getElementById('tn' + t.charAt(0).toUpperCase() + t.slice(1));
     if (el) el.style.display = (t === tab) ? '' : 'none';
-    if (btn) btn.style.color = (t === tab) ? '#e8b86d' : '';
+    if (btn) btn.style.color = (t === tab) ? '#e8b86d' : '#b0afc8';
   });
   // 홈 탭: footer 표시, 나머지: 숨김
   var footer = document.getElementById('mainFooter');
