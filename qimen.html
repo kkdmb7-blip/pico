@@ -2424,8 +2424,12 @@ function shareQimenKakao() {
     }
 
     // ── 12 시간대 병렬 호출 ──
+    // API는 KST 입력 → 내부 TST 변환. TST 시주 중간값(+1h)을 KST로 환산: +32분
     var results = await Promise.all(SHICHEN.map(function(shi) {
-      var sp = new URLSearchParams({ year: y, month: m, day: d, hour: shi.repHour, minute: 0, type: 'siga' });
+      var kstMid = (shi.tstStart + 1) * 60 + 32;
+      if (kstMid >= 1440) kstMid -= 1440;
+      var apiH = Math.floor(kstMid / 60), apiM = kstMid % 60;
+      var sp = new URLSearchParams({ year: y, month: m, day: d, hour: apiH, minute: apiM, type: 'siga' });
       return fetch('https://fortuna.kkdmb7.workers.dev/qimen?' + sp.toString())
         .then(function(r) { return r.ok ? r.json() : null; })
         .catch(function() { return null; });
