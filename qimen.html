@@ -1879,6 +1879,42 @@ window.addEventListener('popstate', function() { window.location.href = '/'; });
 // bfcache 복원 시 강제 새로고침 (이전 명국이 그대로 보이는 문제 방지)
 window.addEventListener('pageshow', function(e) { if (e.persisted) location.reload(); });
 
+// 시가기문: 시주 변경 감지 → 자동 재조회
+(function() {
+  function _getTSTSiju() {
+    var now = new Date();
+    var kstH = now.getHours(), kstM = now.getMinutes();
+    var doy = Math.floor((now - new Date(now.getFullYear(),0,0))/86400000);
+    var B = 2*Math.PI*(doy-81)/365;
+    var eot = 9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B);
+    var tstMin = kstH*60+kstM-32+eot;
+    if(tstMin<0)tstMin+=1440;
+    var h=Math.floor(tstMin/60)%24;
+    return h%2===0?h:h-1;
+  }
+  var _lastSiju = _getTSTSiju();
+  setInterval(function() {
+    if(currentType !== 'siga') return;
+    var cur = _getTSTSiju();
+    if(cur !== _lastSiju) {
+      _lastSiju = cur;
+      var now = new Date();
+      var kstH = now.getHours(), kstM = now.getMinutes();
+      var doy = Math.floor((now-new Date(now.getFullYear(),0,0))/86400000);
+      var B = 2*Math.PI*(doy-81)/365;
+      var eot = 9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B);
+      var tstMin = kstH*60+kstM-32+eot;
+      if(tstMin<0)tstMin+=1440;
+      document.getElementById('inp-hour').value = Math.floor(tstMin/60)%24;
+      document.getElementById('inp-minute').value = Math.round(tstMin%60);
+      document.getElementById('inp-year').value = now.getFullYear();
+      document.getElementById('inp-month').value = now.getMonth()+1;
+      document.getElementById('inp-day').value = now.getDate();
+      doFetch();
+    }
+  }, 60000);
+})();
+
 // ── 기문 공유 카드 ──────────────────────────────────
 var _qimenData = null;
 var GONG_DIR_LOCAL = {1:'북',2:'남서',3:'동',4:'동남',5:'중앙',6:'북서',7:'서',8:'북동',9:'남'};
