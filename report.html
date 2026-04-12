@@ -605,6 +605,15 @@ let _type = null;
 let _config = null;
 let _reportId = null;
 let _ilju = null;
+let _sajuData = null;
+let _palju = null;
+let _geokguk = null;
+let _yongsin = null;
+let _singang = null;
+let _daeun = null;
+let _sewun = null;
+let _ohaeng = null;
+let _vedicData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -638,8 +647,8 @@ function renderMarkdown(text) {
   return '<p>' + text + '</p>';
 }
 
-// ── 일주 조회 (fortuna worker) ──
-async function fetchIlju() {
+// ── 사주 전체 데이터 조회 ──
+async function loadSajuData() {
   try {
     const p = _profile;
     const gender = p.gender === 'F' ? 'female' : 'male';
@@ -648,10 +657,48 @@ async function fetchIlju() {
     const now = new Date();
     const url = `${WORKER_BASE}/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&current_year=${now.getFullYear()}&current_month=${now.getMonth()+1}&current_day=${now.getDate()}`;
     const res = await fetch(url);
-    if (!res.ok) return null;
+    if (!res.ok) return;
     const data = await res.json();
-    return data['일주'] || null;
-  } catch(e) { return null; }
+    _sajuData = data;
+    _ilju     = data['일주'] || null;
+    _singang  = data['신강약'] || null;
+    _yongsin  = data['용신'] || null;
+    _ohaeng   = data['오행비율'] || null;
+    _geokguk  = data['오행패턴'] ? (data['오행패턴'].type || null) : null;
+    // 대운 정보 (대운분석 배열에서 현재 대운 추출)
+    if (data['대운분석'] && Array.isArray(data['대운분석'])) {
+      const now2 = new Date();
+      const cur = data['대운분석'].find(d => {
+        const range = (d.year_range || '').split(/[–\-]/);
+        return now2.getFullYear() >= parseInt(range[0]) && now2.getFullYear() <= parseInt(range[1]);
+      }) || data['대운분석'][0];
+      _daeun = cur ? `${cur.ganjee || ''}(${cur.year_range || ''})` : null;
+    }
+    // 세운: 올해운세 필드
+    if (data['리포트'] && data['리포트']['올해운세']) {
+      _sewun = data['리포트']['올해운세']['년도'] || null;
+    }
+    // 팔자 (사주원국 pillars)
+    _palju = null; // saju-report는 pillars를 직접 반환하지 않으므로 일주로 대체
+  } catch(e) { /* API 실패 시 null 유지 */ }
+}
+
+// ── 베딕 데이터 조회 ──
+async function loadVedicData() {
+  try {
+    const p = _profile;
+    const hour = (p.hour != null && p.hour !== 'unknown') ? p.hour : 12;
+    const url = `${WORKER_BASE}/vedic?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&tz=9`;
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    _vedicData = {
+      nakshatra: data.nakshatra || null,
+      rashi:     data.moonSign  || null,
+      dasha:     data.currentDasha ? `${data.currentDasha.planet || ''} (${data.currentDasha.end ? new Date(data.currentDasha.end).getFullYear() + '년까지' : ''})` : null,
+      antardasha: data.antardasha ? (data.antardasha.planet || null) : null,
+    };
+  } catch(e) { /* API 실패 시 null 유지 */ }
 }
 
 // ── 초기화 ──
@@ -676,6 +723,9 @@ async function fetchIlju() {
   }
 
   document.getElementById('btnGenerate').onclick = startGeneration;
+
+  // 사주+베딕 병렬 선제 로드 (stateIntro 표시하면서 백그라운드)
+  Promise.all([loadSajuData(), loadVedicData()]).catch(() => {});
 
   renderIntro();
   showState('intro');
@@ -768,8 +818,8 @@ async function startGeneration() {
   showState('loading');
   setLoading('사주 정보 불러오는 중...', '');
 
-  // 일주 조회 (worker API)
-  _ilju = await fetchIlju();
+  // 사주+베딕 병렬 조회 (이미 init에서 로드됐으면 skip)
+  if (!_sajuData) await Promise.all([loadSajuData(), loadVedicData()]);
 
   setLoading('기존 리포트 확인 중...', '');
   const existing = await fetchExistingReport();
@@ -839,9 +889,28 @@ function buildSectionPrompt(secIdx, prevSections) {
     ? `\n[이전 섹션 요약]\n${prevSections.map((s,i) => `${i+1}. ${SECTIONS[i].name}: ${s.slice(0,100)}...`).join('\n')}\n`
     : '';
 
+  const sajuBlock = _ilju ? `
+【사주 원국】
+일주: ${_ilju}
+신강신약: ${_singang || '미확인'}
+격국: ${_geokguk || '미확인'}
+용신: ${_yongsin || '미확인'}
+오행분포: ${_ohaeng ? JSON.stringify(_ohaeng) : '미확인'}
+현재 대운: ${_daeun || '미확인'}
+올해 세운: ${_sewun || '미확인'}
+` : '';
+
+  const vedicBlock = _vedicData ? `
+【베딕 점성술 데이터】
+낙샤트라(월성): ${_vedicData.nakshatra || '미확인'}
+라시(월궁): ${_vedicData.rashi || '미확인'}
+현재 다샤(행운기): ${_vedicData.dasha || '미확인'}
+안타르다샤(세부운): ${_vedicData.antardasha || '미확인'}
+` : '';
+
   const systemPrompt = `당신은 사주명리, 베딕점성술, 자미두수를 융합하는 동양철학 AI입니다.
 내담자 정보: ${profileStr}
-${iljuLine}리포트 주제: ${_config.title} (${focus})
+${iljuLine}${sajuBlock}${vedicBlock}리포트 주제: ${_config.title} (${focus})
 현재 작성 섹션: [${secName}]
 ${prevText}
 절대 규칙:
@@ -850,7 +919,8 @@ ${prevText}
 - ${charLimit}자 내외로 작성
 - **볼드** 적극 활용 (핵심 키워드 3~5개)
 - 전문 용어 사용 후 쉬운 말로 풀어쓰기
-- 마지막 문장은 희망적으로 마무리`;
+- 마지막 문장은 희망적으로 마무리
+- 위 사주 원국 및 베딕 데이터를 반드시 분석에 반영할 것`;
 
   const userMsg = `[${secName}] 섹션을 작성해주세요. 주제: ${focus}`;
   return { systemPrompt, userMsg };
