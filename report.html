@@ -727,6 +727,7 @@ async function loadSajuData() {
     const res = await fetch(url);
     if (!res.ok) return;
     const data = await res.json();
+    console.log('[loadSajuData] API 응답:', data);
     _sajuData = data;
     _ilju     = data['일주'] || null;
     _singang  = data['신강약'] || null;
@@ -992,6 +993,7 @@ ${prevText}
 - 마지막 문장은 희망적으로 마무리
 - 위 사주 원국 및 베딕 데이터를 반드시 분석에 반영할 것`;
 
+  console.log(`[buildSectionPrompt] 섹션 ${secIdx} systemPrompt:`, systemPrompt);
   const secFocus = (SECTION_FOCUS[_type] || SECTION_FOCUS.character)[secIdx] ?? focus;
   const userMsg = `[${secName}] 섹션을 작성해주세요.\n분석 지시: ${secFocus}`;
   return { systemPrompt, userMsg };
