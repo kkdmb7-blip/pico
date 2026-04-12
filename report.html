@@ -72,10 +72,8 @@ nav {
   letter-spacing: 0.08em; margin-bottom: 14px;
 }
 .intro-section-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px; color: rgba(240,240,245,0.85);
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .intro-section-item:last-child { border-bottom: none; }
 .intro-section-num {
@@ -84,7 +82,62 @@ nav {
   border: 1px solid var(--golddim);
   font-size: 10px; font-weight: 700; color: var(--gold);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  margin-top: 1px;
 }
+.intro-section-text { flex: 1; }
+.intro-section-name { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 3px; }
+.intro-section-desc { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.5; }
+
+.intro-full-desc {
+  font-size: 14px; color: rgba(255,255,255,0.7);
+  line-height: 1.7; margin: 8px 0 20px; text-align: center;
+}
+.intro-recommend {
+  background: rgba(212,175,55,0.07); border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 12px; padding: 16px; margin: 0 0 20px;
+}
+.intro-recommend-label { font-size: 12px; color: #d4af37; margin-bottom: 12px; font-weight: 600; }
+.intro-recommend-item {
+  font-size: 13px; color: rgba(255,255,255,0.85);
+  padding: 4px 0; display: flex; align-items: flex-start; gap: 8px;
+}
+.intro-check { color: #d4af37; font-weight: 700; flex-shrink: 0; }
+
+.intro-preview-box {
+  margin: 0 0 20px;
+  border: 1px solid rgba(212,175,55,0.2); border-radius: 12px; overflow: hidden;
+}
+.intro-preview-label { font-size: 12px; color: #d4af37; padding: 12px 16px 8px; font-weight: 600; }
+.intro-preview-inner { position: relative; max-height: 100px; overflow: hidden; }
+.intro-preview-text {
+  font-size: 13px; color: rgba(255,255,255,0.7);
+  line-height: 1.7; padding: 0 16px 16px;
+}
+.intro-preview-fade {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+  background: linear-gradient(transparent, #0d0d1a);
+}
+.intro-preview-lock {
+  font-size: 11px; color: #d4af37; text-align: center;
+  padding: 10px 16px 14px; opacity: 0.8;
+}
+
+.intro-faq { margin: 0 0 16px; }
+.intro-faq-label { font-size: 12px; color: #d4af37; margin-bottom: 10px; font-weight: 600; }
+.intro-faq-item { border-bottom: 1px solid rgba(255,255,255,0.06); }
+.intro-faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; color: rgba(255,255,255,0.85);
+  padding: 12px 0; cursor: pointer;
+}
+.intro-faq-arrow { color: #d4af37; font-size: 18px; transition: transform 0.2s; }
+.intro-faq-item.open .intro-faq-arrow { transform: rotate(90deg); }
+.intro-faq-a {
+  font-size: 12px; color: rgba(255,255,255,0.55);
+  line-height: 1.6; max-height: 0; overflow: hidden;
+  transition: max-height 0.25s ease, padding 0.25s ease; padding: 0;
+}
+.intro-faq-item.open .intro-faq-a { max-height: 200px; padding-bottom: 12px; }
 
 .intro-orb-box {
   background: rgba(122,196,255,0.06);
@@ -226,6 +279,78 @@ nav {
 .orb-note {
   font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px;
 }
+
+/* ── detailIntro ── */
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+#stateDetail { animation: fadeIn 0.2s ease; }
+.detail-back {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--muted); cursor: pointer;
+  background: none; border: none; font-family: var(--fn);
+  padding: 0; margin-bottom: 20px;
+}
+.detail-back:hover { color: var(--gold); }
+.detail-hero {
+  text-align: center; margin-bottom: 24px;
+}
+.detail-icon { font-size: 40px; margin-bottom: 10px; }
+.detail-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(201,168,76,0.1); border: 1px solid var(--golddim);
+  color: var(--gold); font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
+}
+.detail-title { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.detail-subtitle { font-size: 13px; color: var(--muted); }
+.detail-desc {
+  font-size: 13px; color: rgba(240,240,245,0.8); line-height: 1.8;
+  margin-bottom: 20px;
+}
+.detail-what {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px 16px; margin-bottom: 16px;
+}
+.detail-what-label {
+  font-size: 11px; font-weight: 700; color: var(--gold);
+  letter-spacing: 0.08em; margin-bottom: 12px;
+}
+.detail-what-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 13px; color: rgba(240,240,245,0.85);
+  padding: 5px 0; border-bottom: 1px solid var(--border);
+}
+.detail-what-item:last-child { border-bottom: none; }
+.detail-what-check { color: var(--gold); font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+.detail-preview-wrap {
+  position: relative; margin-bottom: 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+}
+.detail-preview-label {
+  font-size: 11px; font-weight: 700; color: var(--gold);
+  letter-spacing: 0.08em; padding: 14px 16px 8px;
+}
+.detail-preview-text {
+  font-size: 13px; color: rgba(240,240,245,0.75); line-height: 1.85;
+  padding: 0 16px 60px;
+}
+.detail-preview-fade {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 12px;
+}
+.detail-preview-lock { font-size: 11px; color: var(--muted); }
+.detail-orb-box {
+  background: rgba(122,196,255,0.06); border: 1px solid rgba(122,196,255,0.25);
+  border-radius: 14px; padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.detail-orb-info { font-size: 12px; color: var(--muted); }
+.detail-orb-info strong { color: var(--orb); font-size: 16px; font-weight: 800; display: block; }
+.detail-balance { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.detail-save-note { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 16px; }
 </style>
 </head>
 <body>
@@ -260,6 +385,38 @@ nav {
     </div>
     <button class="btn-intro-gen" id="btnGenerate">✦ 리포트 생성하기</button>
     <button class="btn-intro-back" onclick="history.back()">돌아가기</button>
+  </div>
+
+  <!-- 섹션 상세 소개 -->
+  <div id="stateDetail" style="display:none;">
+    <button class="detail-back" onclick="hideDetail()">← 목록으로</button>
+    <div class="detail-hero">
+      <div class="detail-icon" id="detailIcon"></div>
+      <div class="detail-badge"><span id="detailNum"></span></div>
+      <div class="detail-title" id="detailTitle"></div>
+      <div class="detail-subtitle" id="detailSubtitle"></div>
+    </div>
+    <p class="detail-desc" id="detailDesc"></p>
+    <div class="detail-what">
+      <div class="detail-what-label">이런 내용이 담겨있어요</div>
+      <div id="detailWhatList"></div>
+    </div>
+    <div class="detail-preview-wrap">
+      <div class="detail-preview-label">미리보기</div>
+      <div class="detail-preview-text" id="detailPreview"></div>
+      <div class="detail-preview-fade">
+        <span class="detail-preview-lock">🔒 전체 내용은 리포트 생성 후 확인 가능합니다</span>
+      </div>
+    </div>
+    <div class="detail-orb-box">
+      <div class="detail-orb-info">
+        리포트 비용
+        <strong id="detailOrbCost"></strong>
+      </div>
+      <div class="detail-balance" id="detailBalance"></div>
+    </div>
+    <p class="detail-save-note">✦ 생성 후 영구 저장 · 언제든 다시 확인 가능</p>
+    <button class="btn-intro-gen" id="detailBtnGen"></button>
   </div>
 
   <!-- 리포트 본문 -->
@@ -315,6 +472,129 @@ const SECTIONS = [
   { name: '자미두수 분석',         chars: 500 },
   { name: '종합 결론 + 실천 방향', chars: 400 }
 ];
+
+const TYPE_DETAIL = {
+  character: {
+    emoji: "🌱",
+    subtitle: "나는 어떤 사람으로 태어났을까?",
+    desc: "타고난 성격의 본질, 숨겨진 재능과 약점까지. 사주·베딕·자미 3개 엔진이 당신의 본질을 입체적으로 분석합니다. 나를 이해하는 것이 모든 변화의 시작입니다.",
+    recommend: [
+      "내 성격과 기질이 어디서 오는지 궁금한 분",
+      "강점을 살리고 약점을 보완하고 싶은 분",
+      "진짜 나에게 맞는 삶의 방향을 찾고 싶은 분",
+      "MBTI·심리검사로는 만족이 안 된 분"
+    ],
+    sectionDesc: [
+      "일간·오행·신강신약으로 당신의 본질 압축 정리",
+      "격국과 용신으로 타고난 성향과 재능 심층 해석",
+      "출생 낙샤트라가 말하는 삶의 패턴과 기질",
+      "명궁 성요 배치로 본 운명의 구조적 특성",
+      "내 기질을 지금 삶에서 활용하는 실천 방향"
+    ],
+    preview: "甲木 일간으로 태어난 당신은 독립적이고 추진력이 강한 기질을 타고났습니다. 목화통명의 구조로 표현력과 창의성이 뛰어나며, 리더십이 자연스럽게 발휘되는 사주입니다. 다만 토(土) 기운이 약해 현실적인 마무리와 지속성이 보완 과제가 될 수 있습니다. 출생 낙샤트라는 성장과 풍요를 상징하며, 자미두수 명궁에는...",
+    faq: [
+      { q: "다른 성격 테스트와 어떻게 다른가요?", a: "MBTI는 설문 기반이지만, 사주·베딕·자미는 태어난 시간의 천문 데이터를 기반으로 분석합니다. 3개 엔진이 교차 검증하므로 더 입체적입니다." },
+      { q: "출생 시간을 모르면 어떻게 되나요?", a: "시주 없이 일주 기준으로 분석합니다. 정확도가 다소 낮아질 수 있지만 핵심 기질 분석은 충분히 가능합니다." },
+      { q: "리포트는 얼마나 걸리나요?", a: "AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다." }
+    ]
+  },
+  money: {
+    emoji: "💰",
+    subtitle: "내 재물운의 구조는 어떻게 생겼을까?",
+    desc: "재성의 위치, 식상의 흐름, 대운의 타이밍까지. 왜 돈이 모이지 않는지, 언제 기회가 오는지 사주가 이미 알고 있습니다. 3개 엔진으로 재물 구조를 정밀 분석합니다.",
+    recommend: [
+      "재테크나 투자 방향이 고민인 분",
+      "사업 시작이나 전환을 고민하는 분",
+      "열심히 일하는데 돈이 모이지 않는 분",
+      "직업 적성과 재물 흐름을 함께 보고 싶은 분"
+    ],
+    sectionDesc: [
+      "재성 위치와 재물 구조를 한눈에 압축 정리",
+      "식상-재성 흐름과 재물 들어오는 패턴 심층 분석",
+      "베딕 2하우스·11하우스 재물궁과 행성 영향",
+      "자미두수 재백궁 성요로 본 재물과 사업 구조",
+      "재물을 키우는 시기와 실질적 전략 제시"
+    ],
+    preview: "재성이 월지에 위치하여 재물과의 인연이 깊은 구조입니다. 식상이 재성을 생하는 흐름으로 본인의 능력이 재물로 연결되는 구조이나, 비겁이 강해 재물이 들어올 때마다 나가는 패턴이 반복될 수 있습니다. 현재 대운에서 재성이 투간되어 재물 기운이 활성화되는 시기이며...",
+    faq: [
+      { q: "투자나 주식에 대한 내용도 나오나요?", a: "구체적인 종목 추천은 아니지만, 재물 에너지가 강한 시기와 적합한 투자 스타일을 사주 구조로 분석합니다." },
+      { q: "사업과 직장 중 어떤 게 맞는지도 알 수 있나요?", a: "식상과 재성의 관계, 관성의 위치를 통해 사업 적성 여부와 적합한 직업군을 함께 분석합니다." },
+      { q: "리포트는 얼마나 걸리나요?", a: "AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다." }
+    ]
+  },
+  love: {
+    emoji: "💕",
+    subtitle: "연애와 결혼, 사주가 말하는 나의 패턴은?",
+    desc: "연애 스타일, 이상형의 조건, 결혼 시기와 배우자 정보까지. 반복되는 연애 패턴의 이유와 지금 집중해야 할 방향을 3개 엔진으로 분석합니다.",
+    recommend: [
+      "연애가 잘 안 되는 이유가 궁금한 분",
+      "결혼 시기나 배우자 인연이 언제 올지 궁금한 분",
+      "이상형과 현실 사이에서 고민하는 분",
+      "반복되는 연애 패턴을 바꾸고 싶은 분"
+    ],
+    sectionDesc: [
+      "관성·인성 구조로 본 연애 스타일 압축 정리",
+      "배우자궁, 결혼 시기, 인연의 특성 심층 분석",
+      "베딕 7하우스 배우자궁과 금성 위치 분석",
+      "자미두수 부처궁 성요로 본 배우자 인연",
+      "지금 연애·결혼에서 집중해야 할 것과 피할 것"
+    ],
+    preview: "관성이 시주에 위치한 구조로, 인연은 늦게 오지만 한번 만나면 깊고 안정적인 관계를 형성하는 패턴입니다. 현재 대운에서 관성이 활성화되어 인연의 기운이 높아지는 시기입니다. 베딕 7하우스에 목성이 위치하여 좋은 배우자 인연을 암시하며...",
+    faq: [
+      { q: "배우자의 직업이나 성향도 알 수 있나요?", a: "배우자성의 오행과 베딕·자미 분석을 통해 배우자의 기질, 직업 계통, 성향을 파악할 수 있습니다." },
+      { q: "결혼 시기를 정확히 알 수 있나요?", a: "사주 대운·세운, 베딕 다샤, 자미 소한을 종합해 가능성이 높은 시기를 분석합니다. 정확한 날짜보다는 흐름과 시기를 파악하는 데 의미가 있습니다." },
+      { q: "리포트는 얼마나 걸리나요?", a: "AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다." }
+    ]
+  },
+  daeun: {
+    emoji: "🌊",
+    subtitle: "지금 내가 어떤 흐름 위에 있는지 알고 싶다면",
+    desc: "10년을 주기로 바뀌는 대운은 인생의 조류입니다. 지금 어떤 조류를 타고 있는지, 언제 방향을 바꿔야 하는지. 사주·베딕·자미 3개 엔진이 현재 흐름을 정밀 분석합니다.",
+    recommend: [
+      "중요한 결정이나 변화를 앞두고 있는 분",
+      "지금이 전진할 때인지 기다릴 때인지 모르는 분",
+      "최근 갑자기 흐름이 바뀐 것 같다고 느끼는 분",
+      "향후 10년 큰 그림을 그리고 싶은 분"
+    ],
+    sectionDesc: [
+      "현재 대운·세운의 핵심 에너지 압축 정리",
+      "대운 천간·지지가 내 사주에 미치는 영향 심층 분석",
+      "베딕 다샤(행성기) 흐름과 현재 시기의 의미",
+      "자미두수 대한 분석과 주요 변화 시기",
+      "이 대운에서 해야 할 것과 하지 말아야 할 것"
+    ],
+    preview: "현재 壬水 대운으로 진입하여 내면의 성찰과 지혜가 깊어지는 시기입니다. 甲木 일간에게 壬水는 인성으로 작용하여 학습·연구·내공 쌓기에 유리한 구간입니다. 다만 행동보다 준비가 앞서는 시기로 지나친 확장은 주의가 필요합니다. 베딕 다샤에서는...",
+    faq: [
+      { q: "대운이 언제 바뀌는지도 알 수 있나요?", a: "현재 대운의 시작과 끝 시기, 다음 대운의 특성을 함께 분석해드립니다." },
+      { q: "세운(올해 운세)도 포함되나요?", a: "대운과 세운의 상호작용을 함께 분석합니다. 올해 운세만 보고 싶다면 '올해 운세' 리포트를 추천드립니다." },
+      { q: "리포트는 얼마나 걸리나요?", a: "AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다." }
+    ]
+  },
+  year: {
+    emoji: "📅",
+    subtitle: "2026년, 나에게 어떤 해인가?",
+    desc: "병오년(丙午) 2026년이 내 사주에 어떤 에너지로 작용하는지. 재물·직업·건강·관계 각 영역별 흐름과 주의 시기를 3개 엔진으로 정밀 분석합니다.",
+    recommend: [
+      "올해 중요한 결정이나 계획이 있는 분",
+      "2026년이 나에게 좋은 해인지 나쁜 해인지 궁금한 분",
+      "월별로 어떤 시기를 조심해야 하는지 알고 싶은 분",
+      "새해 방향을 제대로 잡고 싶은 분"
+    ],
+    sectionDesc: [
+      "2026 병오년이 내 사주에 미치는 핵심 영향 요약",
+      "올해 세운 천간·지지가 만드는 변화와 기회 분석",
+      "2026년 행성 배치와 내 베딕 차트의 상호작용",
+      "자미두수 올해 소한(小限) 분석",
+      "2026년 분야별 흐름과 월별 주요 시기 지침"
+    ],
+    preview: "2026년 丙午年은 甲木 일간에게 식상의 해로, 활동성과 표현력이 극대화되는 시기입니다. 새로운 시작과 창의적 도전에 유리하며, 특히 상반기 3~5월 흐름이 강합니다. 다만 午火가 인성을 극하는 구조로 과로와 건강 관리에 주의가 필요합니다...",
+    faq: [
+      { q: "월별 운세도 나오나요?", a: "종합 결론 섹션에서 2026년 월별 주요 흐름과 특히 주의할 시기를 함께 분석해드립니다." },
+      { q: "작년에 생성한 리포트와 어떻게 다른가요?", a: "세운이 매년 바뀌므로 분석 결과가 달라집니다. 2026년 병오년에 맞춰 새롭게 분석됩니다." },
+      { q: "리포트는 얼마나 걸리나요?", a: "AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다." }
+    ]
+  }
+};
 
 const WORKER_BASE = 'https://fortuna.kkdmb7.workers.dev';
 
@@ -395,20 +675,93 @@ async function fetchIlju() {
     return;
   }
 
-  // 상품 소개 화면 렌더
-  document.getElementById('introEmoji').textContent = _config.emoji;
-  document.getElementById('introTitle').textContent = _config.title;
-  document.getElementById('introDesc').textContent  = _config.desc;
-  document.getElementById('introOrbCost').textContent = _config.orb.toLocaleString() + ' Orb';
-  const secWrap = document.getElementById('introSections');
-  SECTIONS.forEach((s, i) => {
-    secWrap.innerHTML += `<div class="intro-section-item">
-      <div class="intro-section-num">${i+1}</div>${s.name}</div>`;
-  });
   document.getElementById('btnGenerate').onclick = startGeneration;
 
+  renderIntro();
   showState('intro');
 })();
+
+function renderIntro() {
+  const d = TYPE_DETAIL[_type];
+  if (!d) return;
+
+  document.getElementById('introEmoji').textContent = d.emoji;
+  document.getElementById('introTitle').textContent = _config.title;
+  document.getElementById('introDesc').textContent = d.subtitle;
+
+  // 설명문
+  let descEl = document.getElementById('introFullDesc');
+  if (!descEl) {
+    descEl = document.createElement('div');
+    descEl.id = 'introFullDesc';
+    descEl.className = 'intro-full-desc';
+    document.querySelector('.intro-header').appendChild(descEl);
+  }
+  descEl.textContent = d.desc;
+
+  // 이런 분께 추천
+  let recEl = document.getElementById('introRecommend');
+  if (!recEl) {
+    recEl = document.createElement('div');
+    recEl.id = 'introRecommend';
+    recEl.className = 'intro-recommend';
+    document.getElementById('stateIntro').insertBefore(
+      recEl, document.querySelector('.intro-section-list')
+    );
+  }
+  recEl.innerHTML = `<div class="intro-recommend-label">이런 분께 추천해요</div>` +
+    d.recommend.map(r => `<div class="intro-recommend-item"><span class="intro-check">✓</span>${r}</div>`).join('');
+
+  // 섹션 목록 (sectionDesc 포함)
+  const secWrap = document.getElementById('introSections');
+  secWrap.innerHTML = '';
+  SECTIONS.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'intro-section-item';
+    el.innerHTML = `<div class="intro-section-num">${i+1}</div>
+      <div class="intro-section-text">
+        <div class="intro-section-name">${s.name}</div>
+        <div class="intro-section-desc">${d.sectionDesc[i]}</div>
+      </div>`;
+    secWrap.appendChild(el);
+  });
+
+  // 샘플 미리보기
+  let previewEl = document.getElementById('introPreview');
+  if (!previewEl) {
+    previewEl = document.createElement('div');
+    previewEl.id = 'introPreview';
+    previewEl.className = 'intro-preview-box';
+    const orbBox = document.querySelector('.intro-orb-box');
+    orbBox.parentNode.insertBefore(previewEl, orbBox);
+  }
+  previewEl.innerHTML = `<div class="intro-preview-label">미리보기</div>
+    <div class="intro-preview-inner">
+      <div class="intro-preview-text">${d.preview}</div>
+      <div class="intro-preview-fade"></div>
+    </div>
+    <div class="intro-preview-lock">✦ 전체 내용은 리포트 생성 후 확인 가능합니다</div>`;
+
+  // Orb 비용
+  document.getElementById('introOrbCost').textContent = `${_config.orb.toLocaleString()} Orb`;
+
+  // FAQ
+  let faqEl = document.getElementById('introFaq');
+  if (!faqEl) {
+    faqEl = document.createElement('div');
+    faqEl.id = 'introFaq';
+    faqEl.className = 'intro-faq';
+    const backBtn = document.querySelector('#stateIntro .btn-intro-back');
+    backBtn.parentNode.insertBefore(faqEl, backBtn);
+  }
+  faqEl.innerHTML = `<div class="intro-faq-label">자주 묻는 질문</div>` +
+    d.faq.map(f => `<div class="intro-faq-item">
+      <div class="intro-faq-q" onclick="this.parentNode.classList.toggle('open')">
+        <span>${f.q}</span><span class="intro-faq-arrow">›</span>
+      </div>
+      <div class="intro-faq-a">${f.a}</div>
+    </div>`).join('');
+}
 
 // ── 생성 시작 (소개 화면 → 실제 흐름) ──
 async function startGeneration() {
