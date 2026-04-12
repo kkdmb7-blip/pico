@@ -351,6 +351,33 @@ nav {
 .detail-orb-info strong { color: var(--orb); font-size: 16px; font-weight: 800; display: block; }
 .detail-balance { font-size: 11px; color: var(--muted); margin-top: 2px; }
 .detail-save-note { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 16px; }
+
+/* ── 성향 체크 화면 ── */
+#statePersonality { display: none; padding: 20px; max-width: 480px; margin: 0 auto; }
+.pers-title { font-size: 18px; font-weight: 600; color: var(--gold); text-align: center; margin-bottom: 6px; }
+.pers-subtitle { font-size: 13px; color: rgba(255,255,255,0.6); text-align: center; margin-bottom: 28px; }
+.pers-q { margin-bottom: 20px; }
+.pers-q-text { font-size: 14px; color: rgba(255,255,255,0.85); margin-bottom: 10px; font-weight: 500; }
+.pers-btn {
+  display: block; width: 100%; padding: 12px 16px; margin-bottom: 8px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 10px; color: rgba(255,255,255,0.8); font-size: 14px;
+  cursor: pointer; text-align: left; transition: all 0.15s; font-family: var(--fn);
+}
+.pers-btn.selected { background: rgba(212,175,55,0.15); border-color: var(--gold); color: var(--gold); }
+#btnStartAnalysis {
+  width: 100%; padding: 16px; margin-top: 12px;
+  background: var(--gold); color: #0a0a1a;
+  border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+  cursor: pointer; font-family: var(--fn);
+}
+#btnStartAnalysis:disabled { opacity: 0.3; cursor: not-allowed; }
+.pers-back {
+  display: block; width: 100%; padding: 13px; margin-top: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; color: var(--muted); font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: var(--fn);
+}
 </style>
 </head>
 <body>
@@ -385,6 +412,34 @@ nav {
     </div>
     <button class="btn-intro-gen" id="btnGenerate">✦ 리포트 생성하기</button>
     <button class="btn-intro-back" onclick="history.back()">돌아가기</button>
+  </div>
+
+  <!-- 성향 체크 -->
+  <div id="statePersonality">
+    <div class="pers-title">조금 더 정확한 분석을 위해</div>
+    <div class="pers-subtitle">4가지만 답해주세요</div>
+    <div class="pers-q">
+      <div class="pers-q-text">모임에 가면?</div>
+      <button class="pers-btn" data-q="1" data-v="extrovert" onclick="selectPersonality(this)">먼저 말을 거는 편</button>
+      <button class="pers-btn" data-q="1" data-v="introvert" onclick="selectPersonality(this)">말 걸어주길 기다림</button>
+    </div>
+    <div class="pers-q">
+      <div class="pers-q-text">새로운 일을 시작할 때?</div>
+      <button class="pers-btn" data-q="2" data-v="planner" onclick="selectPersonality(this)">계획 먼저 세움</button>
+      <button class="pers-btn" data-q="2" data-v="spontaneous" onclick="selectPersonality(this)">일단 시작하고 봄</button>
+    </div>
+    <div class="pers-q">
+      <div class="pers-q-text">결정을 내릴 때?</div>
+      <button class="pers-btn" data-q="3" data-v="logical" onclick="selectPersonality(this)">논리적으로 따짐</button>
+      <button class="pers-btn" data-q="3" data-v="intuitive" onclick="selectPersonality(this)">느낌/직감을 따름</button>
+    </div>
+    <div class="pers-q">
+      <div class="pers-q-text">스트레스를 받으면?</div>
+      <button class="pers-btn" data-q="4" data-v="social" onclick="selectPersonality(this)">사람 만나서 풀림</button>
+      <button class="pers-btn" data-q="4" data-v="solitary" onclick="selectPersonality(this)">혼자만의 시간 필요</button>
+    </div>
+    <button id="btnStartAnalysis" disabled onclick="startCharacterGeneration()">분석 시작하기</button>
+    <button class="pers-back" onclick="showState('intro')">돌아가기</button>
   </div>
 
   <!-- 섹션 상세 소개 -->
@@ -682,6 +737,7 @@ let _daeun = null;
 let _sewun = null;
 let _ohaeng = null;
 let _vedicData = null;
+let _personality = {};
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -694,9 +750,10 @@ function setLoading(title, desc) {
 }
 
 function showState(state) {
-  document.getElementById('stateLoading').style.display = state === 'loading' ? 'flex'  : 'none';
-  document.getElementById('stateIntro').style.display   = state === 'intro'   ? 'block' : 'none';
-  document.getElementById('stateReport').style.display  = state === 'report'  ? 'block' : 'none';
+  document.getElementById('stateLoading').style.display     = state === 'loading'     ? 'flex'  : 'none';
+  document.getElementById('stateIntro').style.display       = state === 'intro'       ? 'block' : 'none';
+  document.getElementById('statePersonality').style.display = state === 'personality' ? 'block' : 'none';
+  document.getElementById('stateReport').style.display      = state === 'report'      ? 'block' : 'none';
 }
 
 // ── 마크다운 인라인 렌더러 ──
@@ -791,7 +848,13 @@ async function loadVedicData() {
     return;
   }
 
-  document.getElementById('btnGenerate').onclick = startGeneration;
+  document.getElementById('btnGenerate').onclick = function() {
+    if (_type === 'character') {
+      showState('personality');
+    } else {
+      startGeneration();
+    }
+  };
 
   // 사주+베딕 병렬 선제 로드 (stateIntro 표시하면서 백그라운드)
   Promise.all([loadSajuData(), loadVedicData()]).catch(() => {});
@@ -1138,6 +1201,227 @@ async function regenReport() {
     return;
   }
   await generateReport();
+}
+
+// ── 성향 선택 ──
+function selectPersonality(btn) {
+  const q = btn.getAttribute('data-q');
+  document.querySelectorAll(`.pers-btn[data-q="${q}"]`).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const keyMap = { '1': 'social', '2': 'planning', '3': 'decision', '4': 'stress' };
+  _personality[keyMap[q]] = btn.getAttribute('data-v');
+  const allAnswered = ['social','planning','decision','stress'].every(k => _personality[k]);
+  document.getElementById('btnStartAnalysis').disabled = !allAnswered;
+}
+
+// ── character 생성 시작 (Orb 확인 후 generateCharacterReport) ──
+async function startCharacterGeneration() {
+  showState('loading');
+  setLoading('사주 정보 불러오는 중...', '');
+  if (!_sajuData) await Promise.all([loadSajuData(), loadVedicData()]);
+
+  setLoading('기존 리포트 확인 중...', '');
+  const existing = await fetchExistingReport();
+  if (existing) { renderReport(existing.content, existing.created_at); return; }
+
+  setLoading('Orb 잔액 확인 중...', '');
+  const balance = await fetchOrbBalance();
+  if (balance < _config.orb) {
+    document.getElementById('orbModalSub').textContent =
+      `이 리포트에는 ${_config.orb.toLocaleString()} Orb가 필요해요.\n현재 잔액: ${balance.toLocaleString()} Orb`;
+    document.getElementById('orbModal').classList.add('open');
+    document.getElementById('stateLoading').style.display = 'none';
+    return;
+  }
+  await generateCharacterReport();
+}
+
+// ── character 타입 전용 리포트 생성 ──
+async function generateCharacterReport() {
+  showState('report');
+  document.getElementById('reportTitle').textContent = _config.title;
+  document.getElementById('reportMeta').textContent = '생성 중...';
+
+  // 성향 키워드 빌드
+  const pk = [];
+  if (_personality.social === 'introvert') pk.push('내향적', '신중한', '깊이있는');
+  else pk.push('외향적', '활동적', '표현력강한');
+  if (_personality.planning === 'planner') pk.push('계획적', '체계적');
+  else pk.push('즉흥적', '유연한');
+  if (_personality.decision === 'logical') pk.push('논리적', '분석적');
+  else pk.push('직관적', '감성적');
+  if (_personality.stress === 'solitary') pk.push('내면성찰형', '독립적');
+  else pk.push('관계지향형', '사교적');
+
+  // 섹션 카드 생성
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.innerHTML = '';
+  const genSections = TYPE_SECTIONS.character;
+  genSections.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'section-card';
+    card.id = `section-${i}`;
+    card.innerHTML = `
+      <div class="section-header">
+        <div class="section-num">${i+1}</div>
+        <div class="section-name">${s.name}</div>
+      </div>
+      <div class="section-loading" id="sloading-${i}">
+        <div class="dot-spin"></div> 분석 중...
+      </div>
+      <div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
+    wrap.appendChild(card);
+  });
+
+  // AI 호출 1: 이론 판단 (JSON, 화면 미표시, 500 Orb)
+  let theoryFrame = { 격국유형: '격국미확인', 분석프레임: '억부법 기준', 핵심키워드: pk.slice(0,3), 성향반영: '', 주의점: '' };
+  try {
+    const theoryPrompt = `사주 데이터를 보고 자평진전 격국론 기반 분석 프레임을 JSON으로 반환하세요.
+일주: ${_ilju || '미확인'}
+격국: ${_geokguk || '미확인'}
+용신: ${_yongsin || '미확인'}
+신강신약: ${_singang || '미확인'}
+오행분포: ${_ohaeng ? JSON.stringify(_ohaeng) : '미확인'}
+성향키워드: ${pk.join(', ')}
+
+JSON만 반환 (다른 텍스트 없이):
+{"격국유형":"...","분석프레임":"...","핵심키워드":["..."],"성향반영":"...","주의점":"..."}`;
+
+    const r0 = await fetch(CHAT_API, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        user_id: _user.id,
+        messages: [{role: 'user', content: theoryPrompt}],
+        system_prompt: '사주명리 이론 전문가. JSON만 반환. 다른 텍스트 없이.',
+        mode: 'saju', max_tokens: 500, orb_override: _config.orb
+      })
+    });
+    if (r0.ok) {
+      const d0 = await r0.json();
+      if (d0.error === 'orb_insufficient') {
+        document.getElementById('orbModalSub').textContent = `Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`;
+        document.getElementById('orbModal').classList.add('open');
+        return;
+      }
+      const raw = (d0.reply || '').trim();
+      const m = raw.match(/```json?\s*([\s\S]*?)```/) || raw.match(/(\{[\s\S]*\})/);
+      if (m) theoryFrame = { ...theoryFrame, ...JSON.parse(m[1]) };
+    }
+  } catch(e) { console.warn('[character] 이론판단 실패:', e); }
+  console.log('[character] theoryFrame:', theoryFrame);
+
+  // AI 호출 2: 원국 분석 → 섹션 0,1,2
+  const analysisPrompt = `당신은 자평진전 격국론 기반 사주 전문가입니다.
+【사주 데이터】
+이름: ${_profile?.name || '익명'}, 성별: ${_profile?.gender === 'F' ? '여성' : '남성'}
+일주: ${_ilju || '미확인'}
+격국: ${_geokguk || '미확인'} / 용신: ${_yongsin || '미확인'}
+신강신약: ${_singang || '미확인'}
+오행분포: ${_ohaeng ? JSON.stringify(_ohaeng) : '미확인'}
+【분석 프레임】
+${theoryFrame.분석프레임}
+핵심키워드: ${(theoryFrame.핵심키워드||[]).join(', ')}
+성향: ${pk.join(', ')}
+${theoryFrame.성향반영}
+【절대 규칙】
+# ## ### 헤더 기호 절대 사용 금지. **볼드**로 핵심 강조. 800~1000자 이내.
+섹션 구성:
+1. 타고난 기질의 본질 (일주+격국 기반)
+2. 강점과 약점 (오행분포+성향 반영)
+3. 삶의 방식과 대인관계 패턴`;
+  await streamToSections(analysisPrompt, [0, 1, 2], false);
+
+  // AI 호출 3: 실천 전략 → 섹션 3,4
+  const strategyPrompt = `당신은 자평진전 격국론 기반 사주 전문가입니다.
+【이전 분석 요약】
+격국: ${theoryFrame.격국유형}
+핵심키워드: ${(theoryFrame.핵심키워드||[]).join(', ')}
+주의점: ${theoryFrame.주의점}
+현재 대운: ${_daeun || '미확인'}
+올해 세운: ${_sewun || '미확인'}
+낙샤트라: ${_vedicData?.nakshatra || '미확인'}
+라시: ${_vedicData?.rashi || '미확인'}
+【절대 규칙】
+# ## ### 헤더 기호 절대 사용 금지. **볼드**로 강조. 700~900자 이내.
+섹션 구성:
+4. 베딕/낙샤트라로 본 기질 교차 분석
+5. 지금 이 기질을 활용하는 실천 방향 (현재 대운 연계)`;
+  await streamToSections(strategyPrompt, [3, 4], true);
+
+  // 저장
+  try {
+    const sb = getSb();
+    const allTexts = Array.from({length: 5}, (_, i) => document.getElementById(`sbody-${i}`)?.innerText || '');
+    const { data } = await sb.from('reports').insert({
+      user_id: _user.id, report_type: _type,
+      content: allTexts, orb_spent: _config.orb,
+      created_at: new Date().toISOString()
+    }).select().maybeSingle();
+    if (data) _reportId = data.id;
+  } catch(e) {}
+
+  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
+  document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display = 'flex';
+}
+
+// ── 응답을 섹션 배열에 나눠 표시 ──
+async function streamToSections(prompt, secIndices, skipOrb) {
+  try {
+    const res = await fetch(CHAT_API, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        user_id: _user.id,
+        messages: [{role: 'user', content: prompt}],
+        system_prompt: '당신은 사주명리 전문가입니다. 요청한 섹션 구성대로 번호를 붙여 작성하세요. # ## ### 헤더 금지. **볼드**로 핵심 강조.',
+        mode: 'saju', max_tokens: 2000,
+        ...(skipOrb ? {skip_orb: true} : {skip_orb: true})
+      })
+    });
+    if (!res.ok) throw new Error('API 오류');
+    const data = await res.json();
+    const text = (data.reply || '').trim();
+
+    // 번호 기준 분할 시도
+    const parts = splitIntoSections(text, secIndices.length);
+    secIndices.forEach((secIdx, i) => {
+      document.getElementById(`sloading-${secIdx}`).style.display = 'none';
+      const body = document.getElementById(`sbody-${secIdx}`);
+      body.innerHTML = renderMarkdown(parts[i] || (i === 0 ? text : ''));
+      body.style.display = 'block';
+    });
+  } catch(e) {
+    secIndices.forEach(i => {
+      const el = document.getElementById(`sloading-${i}`);
+      if (el) el.innerHTML = `<span style="color:#e05c6a;">생성 실패</span>`;
+    });
+  }
+}
+
+function splitIntoSections(text, count) {
+  // "1." "2." 등 번호 기준 분할
+  const regex = /(?:^|\n)\s*\d+\.\s+/g;
+  const matches = [...text.matchAll(regex)];
+  if (matches.length >= count) {
+    return Array.from({length: count}, (_, i) => {
+      const start = matches[i].index + matches[i][0].length;
+      const end = i + 1 < matches.length ? matches[i+1].index : text.length;
+      return text.slice(start, end).trim();
+    });
+  }
+  // ① ② ③ 기준 분할 시도
+  const regex2 = /(?:^|\n)\s*[①②③④⑤]\s*/g;
+  const matches2 = [...text.matchAll(regex2)];
+  if (matches2.length >= count) {
+    return Array.from({length: count}, (_, i) => {
+      const start = matches2[i].index + matches2[i][0].length;
+      const end = i + 1 < matches2.length ? matches2[i+1].index : text.length;
+      return text.slice(start, end).trim();
+    });
+  }
+  // 분할 실패 시 전체를 첫 섹션에, 나머지 빈 문자열
+  return [text, ...Array(count - 1).fill('')];
 }
 
 // ── 공유 ──
