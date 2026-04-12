@@ -465,13 +465,81 @@ const TYPE_CONFIG = {
     desc: '올해 세운 + 베딕 트랜짓 + 자미두수 유년 월별 흐름' }
 };
 
-const SECTIONS = [
-  { name: '핵심 요약',             chars: 300 },
-  { name: '사주 기반 심층 분석',   chars: 600 },
-  { name: '베딕/낙샤트라 분석',    chars: 500 },
-  { name: '자미두수 분석',         chars: 500 },
-  { name: '종합 결론 + 실천 방향', chars: 400 }
-];
+const TYPE_SECTIONS = {
+  character: [
+    { name: '핵심 기질 요약',           chars: 300 },
+    { name: '일간과 격국 분석',          chars: 600 },
+    { name: '강점·약점과 오행 균형',     chars: 500 },
+    { name: '베딕 낙샤트라로 본 패턴',   chars: 400 },
+    { name: '기질을 활용하는 실천 방향', chars: 400 }
+  ],
+  money: [
+    { name: '재물 구조 핵심 요약',       chars: 300 },
+    { name: '재성·식상 분석',           chars: 600 },
+    { name: '사업 적성과 직업 방향',     chars: 500 },
+    { name: '재물 대운·세운 흐름',       chars: 500 },
+    { name: '재물을 키우는 실천 전략',   chars: 400 }
+  ],
+  love: [
+    { name: '연애 패턴 핵심 요약',       chars: 300 },
+    { name: '관성·배우자궁 분석',        chars: 600 },
+    { name: '이상형과 궁합 조건',        chars: 500 },
+    { name: '인연 시기 (대운·세운·베딕)', chars: 500 },
+    { name: '지금 연애에서 해야 할 것',  chars: 400 }
+  ],
+  daeun: [
+    { name: '현재 대운 핵심 요약',          chars: 300 },
+    { name: '대운 천간·지지 심층 분석',     chars: 600 },
+    { name: '대운별 재물·직업·관계 흐름',   chars: 500 },
+    { name: '베딕 다샤 교차 분석',          chars: 500 },
+    { name: '이 대운의 전략과 주의점',      chars: 400 }
+  ],
+  year: [
+    { name: '2026년 핵심 요약',                   chars: 300 },
+    { name: '세운 천간·지지 분석',                chars: 500 },
+    { name: '분야별 운세 (재물·직업·연애·건강)',   chars: 600 },
+    { name: '월별 주요 흐름',                     chars: 500 },
+    { name: '2026년 실천 전략',                   chars: 400 }
+  ]
+};
+
+const SECTION_FOCUS = {
+  character: [
+    '일간 오행, 신강신약, 격국을 바탕으로 타고난 기질과 본질적 성격을 압축 정리하라.',
+    '일간의 특성, 격국 구조, 십신 배치로 성격의 뿌리를 심층 분석하라.',
+    '오행 분포 %를 기반으로 강점과 약점을 구체적으로 분석하고 보완 방향을 제시하라.',
+    '낙샤트라와 라시를 바탕으로 삶의 패턴과 기질적 특성을 분석하라.',
+    '지금 이 시점에서 자신의 기질을 가장 잘 활용할 수 있는 구체적 행동 방향을 제시하라.'
+  ],
+  money: [
+    '재성 위치, 식상 흐름, 재물 관련 신강신약을 한눈에 압축 정리하라.',
+    '재성의 위치와 강약, 식상이 재성을 생하는 흐름, 비겁이 재성을 탈취하는 패턴을 심층 분석하라.',
+    '격국과 용신을 바탕으로 사업 적성 여부, 적합한 직업군과 사업 방향을 분석하라.',
+    '현재 대운과 올해 세운이 재물에 미치는 영향, 재물 기회가 오는 시기를 분석하라.',
+    '재물 구조에 맞는 구체적 재테크 방향, 피해야 할 패턴, 지금 당장 실행할 전략을 제시하라.'
+  ],
+  love: [
+    '관성 위치, 배우자성 오행, 연애 패턴의 핵심을 압축 정리하라.',
+    '관성의 위치와 강약, 배우자궁(일지) 특성, 십신으로 본 연애 스타일을 심층 분석하라.',
+    '배우자성 오행으로 본 이상형 조건, 잘 맞는 일간과 맞지 않는 유형을 분석하라.',
+    '대운·세운에서 관성이 활성화되는 시기, 베딕 다샤에서 인연 기운이 강한 시기를 분석하라.',
+    '지금 연애 상황에서 해야 할 것과 피해야 할 것, 인연을 만나기 위한 구체적 행동을 제시하라.'
+  ],
+  daeun: [
+    '현재 대운 천간지지와 내 사주의 관계, 이 대운의 핵심 키워드를 압축 정리하라.',
+    '대운 천간이 내 일간에 미치는 십신 작용, 대운 지지의 합충형파 영향을 심층 분석하라.',
+    '이 대운에서 재물·직업·관계 각 영역이 어떻게 흘러가는지 구체적으로 분석하라.',
+    '베딕 다샤(행성기)와 안타르다샤가 사주 대운과 겹치는 에너지를 교차 분석하라.',
+    '이 대운에서 반드시 해야 할 것, 절대 하지 말아야 할 것, 다음 대운 준비 방향을 제시하라.'
+  ],
+  year: [
+    '2026 병오년 간지가 내 사주에 미치는 핵심 영향을 압축 정리하라.',
+    '병(丙) 천간과 오(午) 지지가 내 일간과 격국에 어떤 십신으로 작용하는지 분석하라.',
+    '2026년 재물·직업·연애·건강 각 분야별 흐름을 구체적으로 분석하라.',
+    '상반기(1~6월)와 하반기(7~12월) 흐름, 특히 주의할 월과 기회의 월을 분석하라.',
+    '2026년을 잘 보내기 위한 구체적 전략, 해야 할 것과 피해야 할 것을 제시하라.'
+  ]
+};
 
 const TYPE_DETAIL = {
   character: {
@@ -485,11 +553,11 @@ const TYPE_DETAIL = {
       "MBTI·심리검사로는 만족이 안 된 분"
     ],
     sectionDesc: [
-      "일간·오행·신강신약으로 당신의 본질 압축 정리",
-      "격국과 용신으로 타고난 성향과 재능 심층 해석",
-      "출생 낙샤트라가 말하는 삶의 패턴과 기질",
-      "명궁 성요 배치로 본 운명의 구조적 특성",
-      "내 기질을 지금 삶에서 활용하는 실천 방향"
+      "일간·격국·신강신약으로 타고난 본질 압축",
+      "성격의 뿌리, 격국 구조, 십신 배치 심층 해석",
+      "오행 % 기반 강점·약점 분석과 보완 방향",
+      "낙샤트라·라시로 본 삶의 패턴과 기질",
+      "지금 내 기질을 활용하는 구체적 실천 방향"
     ],
     preview: "甲木 일간으로 태어난 당신은 독립적이고 추진력이 강한 기질을 타고났습니다. 목화통명의 구조로 표현력과 창의성이 뛰어나며, 리더십이 자연스럽게 발휘되는 사주입니다. 다만 토(土) 기운이 약해 현실적인 마무리와 지속성이 보완 과제가 될 수 있습니다. 출생 낙샤트라는 성장과 풍요를 상징하며, 자미두수 명궁에는...",
     faq: [
@@ -509,11 +577,11 @@ const TYPE_DETAIL = {
       "직업 적성과 재물 흐름을 함께 보고 싶은 분"
     ],
     sectionDesc: [
-      "재성 위치와 재물 구조를 한눈에 압축 정리",
-      "식상-재성 흐름과 재물 들어오는 패턴 심층 분석",
-      "베딕 2하우스·11하우스 재물궁과 행성 영향",
-      "자미두수 재백궁 성요로 본 재물과 사업 구조",
-      "재물을 키우는 시기와 실질적 전략 제시"
+      "재성 위치·식상 흐름·재물 구조 압축",
+      "돈이 들어오고 나가는 패턴 심층 분석",
+      "사업 적성, 적합한 직업군과 방향",
+      "재물 대운·세운 타이밍과 기회 시기",
+      "지금 당장 실행할 재물 전략"
     ],
     preview: "재성이 월지에 위치하여 재물과의 인연이 깊은 구조입니다. 식상이 재성을 생하는 흐름으로 본인의 능력이 재물로 연결되는 구조이나, 비겁이 강해 재물이 들어올 때마다 나가는 패턴이 반복될 수 있습니다. 현재 대운에서 재성이 투간되어 재물 기운이 활성화되는 시기이며...",
     faq: [
@@ -533,11 +601,11 @@ const TYPE_DETAIL = {
       "반복되는 연애 패턴을 바꾸고 싶은 분"
     ],
     sectionDesc: [
-      "관성·인성 구조로 본 연애 스타일 압축 정리",
-      "배우자궁, 결혼 시기, 인연의 특성 심층 분석",
-      "베딕 7하우스 배우자궁과 금성 위치 분석",
-      "자미두수 부처궁 성요로 본 배우자 인연",
-      "지금 연애·결혼에서 집중해야 할 것과 피할 것"
+      "관성 위치·배우자성·연애 패턴 압축",
+      "연애 스타일과 배우자궁 심층 분석",
+      "이상형 조건과 잘 맞는 유형 분석",
+      "인연 기운이 강한 시기 (대운·세운·베딕)",
+      "지금 연애에서 해야 할 구체적 행동"
     ],
     preview: "관성이 시주에 위치한 구조로, 인연은 늦게 오지만 한번 만나면 깊고 안정적인 관계를 형성하는 패턴입니다. 현재 대운에서 관성이 활성화되어 인연의 기운이 높아지는 시기입니다. 베딕 7하우스에 목성이 위치하여 좋은 배우자 인연을 암시하며...",
     faq: [
@@ -557,11 +625,11 @@ const TYPE_DETAIL = {
       "향후 10년 큰 그림을 그리고 싶은 분"
     ],
     sectionDesc: [
-      "현재 대운·세운의 핵심 에너지 압축 정리",
-      "대운 천간·지지가 내 사주에 미치는 영향 심층 분석",
-      "베딕 다샤(행성기) 흐름과 현재 시기의 의미",
-      "자미두수 대한 분석과 주요 변화 시기",
-      "이 대운에서 해야 할 것과 하지 말아야 할 것"
+      "현재 대운 핵심 키워드와 에너지 압축",
+      "대운 천간지지 합충형파 심층 분석",
+      "이 대운의 재물·직업·관계 흐름",
+      "베딕 다샤와 교차 분석",
+      "이 대운 전략과 다음 대운 준비"
     ],
     preview: "현재 壬水 대운으로 진입하여 내면의 성찰과 지혜가 깊어지는 시기입니다. 甲木 일간에게 壬水는 인성으로 작용하여 학습·연구·내공 쌓기에 유리한 구간입니다. 다만 행동보다 준비가 앞서는 시기로 지나친 확장은 주의가 필요합니다. 베딕 다샤에서는...",
     faq: [
@@ -581,11 +649,11 @@ const TYPE_DETAIL = {
       "새해 방향을 제대로 잡고 싶은 분"
     ],
     sectionDesc: [
-      "2026 병오년이 내 사주에 미치는 핵심 영향 요약",
-      "올해 세운 천간·지지가 만드는 변화와 기회 분석",
-      "2026년 행성 배치와 내 베딕 차트의 상호작용",
-      "자미두수 올해 소한(小限) 분석",
-      "2026년 분야별 흐름과 월별 주요 시기 지침"
+      "2026 병오년 내 사주 영향 압축",
+      "병천간·오지지 십신 작용 분석",
+      "재물·직업·연애·건강 분야별 흐름",
+      "월별 주요 흐름과 주의·기회의 달",
+      "2026년 최적 전략과 주의사항"
     ],
     preview: "2026년 丙午年은 甲木 일간에게 식상의 해로, 활동성과 표현력이 극대화되는 시기입니다. 새로운 시작과 창의적 도전에 유리하며, 특히 상반기 3~5월 흐름이 강합니다. 다만 午火가 인성을 극하는 구조로 과로와 건강 관리에 주의가 필요합니다...",
     faq: [
@@ -765,7 +833,8 @@ function renderIntro() {
   // 섹션 목록 (sectionDesc 포함)
   const secWrap = document.getElementById('introSections');
   secWrap.innerHTML = '';
-  SECTIONS.forEach((s, i) => {
+  const sections = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
+  sections.forEach((s, i) => {
     const el = document.createElement('div');
     el.className = 'intro-section-item';
     el.innerHTML = `<div class="intro-section-num">${i+1}</div>
@@ -879,14 +948,15 @@ function buildProfileStr() {
 // ── 섹션별 프롬프트 ──
 function buildSectionPrompt(secIdx, prevSections) {
   const profileStr = buildProfileStr();
-  const secName = SECTIONS[secIdx].name;
-  const charLimit = SECTIONS[secIdx].chars;
+  const typeSections = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
+  const secName = typeSections[secIdx].name;
+  const charLimit = typeSections[secIdx].chars;
   const focus = _config.focus;
 
   const iljuLine = _ilju ? `일주: 이 사람은 ${_ilju}일주입니다. 반드시 ${_ilju}일주로 분석할 것.\n` : '';
 
   const prevText = prevSections.length > 0
-    ? `\n[이전 섹션 요약]\n${prevSections.map((s,i) => `${i+1}. ${SECTIONS[i].name}: ${s.slice(0,100)}...`).join('\n')}\n`
+    ? `\n[이전 섹션 요약]\n${prevSections.map((s,i) => `${i+1}. ${typeSections[i].name}: ${s.slice(0,100)}...`).join('\n')}\n`
     : '';
 
   const sajuBlock = _ilju ? `
@@ -922,7 +992,8 @@ ${prevText}
 - 마지막 문장은 희망적으로 마무리
 - 위 사주 원국 및 베딕 데이터를 반드시 분석에 반영할 것`;
 
-  const userMsg = `[${secName}] 섹션을 작성해주세요. 주제: ${focus}`;
+  const secFocus = (SECTION_FOCUS[_type] || SECTION_FOCUS.character)[secIdx] ?? focus;
+  const userMsg = `[${secName}] 섹션을 작성해주세요.\n분석 지시: ${secFocus}`;
   return { systemPrompt, userMsg };
 }
 
@@ -934,7 +1005,8 @@ async function generateReport() {
 
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
-  SECTIONS.forEach((s, i) => {
+  const genSections = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
+  genSections.forEach((s, i) => {
     const card = document.createElement('div');
     card.className = 'section-card';
     card.id = `section-${i}`;
@@ -953,7 +1025,7 @@ async function generateReport() {
   const results = [];
   let genOk = true;
 
-  for (let i = 0; i < SECTIONS.length; i++) {
+  for (let i = 0; i < genSections.length; i++) {
     const { systemPrompt, userMsg } = buildSectionPrompt(i, results);
     const body = {
       user_id: _user.id,
@@ -999,7 +1071,7 @@ async function generateReport() {
     }
   }
 
-  if (!genOk || results.length < SECTIONS.length) return;
+  if (!genOk || results.length < genSections.length) return;
 
   try {
     const sb = getSb();
@@ -1035,7 +1107,7 @@ function renderReport(sections, createdAt) {
     card.innerHTML = `
       <div class="section-header">
         <div class="section-num">${i+1}</div>
-        <div class="section-name">${SECTIONS[i] ? SECTIONS[i].name : ''}</div>
+        <div class="section-name">${(TYPE_SECTIONS[_type] || TYPE_SECTIONS.character)[i]?.name || ''}</div>
       </div>
       <div class="section-body">${renderMarkdown(text)}</div>`;
     wrap.appendChild(card);
