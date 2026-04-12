@@ -799,6 +799,45 @@ async function loadVedicData() {
   showState('intro');
 })();
 
+function getPersonalizedPreview(type, ilju) {
+  if (!ilju) return TYPE_DETAIL[type]?.preview ?? '';
+
+  const cheongan = ilju.charAt(0);
+
+  const ILGAN_KEYWORD = {
+    '甲': '독립적이고 추진력이 강한', '乙': '유연하고 섬세한',
+    '丙': '밝고 열정적인', '丁': '따뜻하고 신중한',
+    '戊': '안정적이고 포용력 있는', '己': '현실적이고 성실한',
+    '庚': '강직하고 결단력 있는', '辛': '예리하고 완벽을 추구하는',
+    '壬': '지혜롭고 유연한', '癸': '섬세하고 직관력 강한'
+  };
+
+  const ILJU_KEYWORD = {
+    '甲子': '지혜와 추진력을 겸비한', '甲午': '열정적이고 독립심 강한',
+    '乙丑': '성실하고 끈기 있는', '乙未': '온화하고 예술적 감각이 뛰어난',
+    '丙寅': '활동적이고 리더십 강한', '丙申': '분석적이고 추진력 있는',
+    '丁卯': '창의적이고 감수성 풍부한', '丁酉': '완벽주의적이고 예리한',
+    '戊辰': '안정적이고 신뢰감 주는', '戊戌': '의지가 강하고 현실적인',
+    '己巳': '지혜롭고 통찰력 있는', '己亥': '포용력 있고 배려 깊은',
+    '庚午': '강렬하고 도전적인', '庚子': '결단력 있고 명확한',
+    '辛未': '섬세하고 심미안 있는', '辛丑': '꼼꼼하고 책임감 강한',
+    '壬申': '지적이고 유연한', '壬寅': '활동적이고 통찰력 있는',
+    '癸酉': '예리하고 완성도를 추구하는', '癸卯': '감성적이고 창의적인'
+  };
+
+  const iljuKeyword = ILJU_KEYWORD[ilju] ?? ILGAN_KEYWORD[cheongan] ?? '독특한 기질을 가진';
+
+  const previewMap = {
+    character: `${ilju} 일주로 태어난 당신은 ${iljuKeyword} 기질을 타고났습니다. 사주 원국의 오행 균형과 격국 구조가 이 기질을 어떻게 강화하거나 보완하는지, 그리고 지금 이 시기에 어떻게 발휘하면 좋을지 심층 분석합니다...`,
+    money: `${ilju} 일주의 재물 구조는 ${iljuKeyword} 성향이 재물 흐름에 직접적으로 영향을 줍니다. 재성의 위치와 식상의 흐름, 현재 대운이 재물에 어떤 에너지로 작용하는지 실제 사주 데이터로 분석합니다...`,
+    love: `${ilju} 일주는 ${iljuKeyword} 연애 패턴을 보입니다. 관성의 위치와 배우자궁(일지)의 특성, 인연이 찾아오는 시기와 잘 맞는 상대의 조건을 사주 실제 데이터로 분석합니다...`,
+    daeun: `${ilju} 일주인 당신의 현재 대운은 ${iljuKeyword} 기질과 어떻게 상호작용하는지가 핵심입니다. 대운 천간지지가 내 사주에 미치는 실제 영향과 이 시기를 어떻게 활용할지 분석합니다...`,
+    year: `${ilju} 일주에게 2026 병오년은 ${iljuKeyword} 성향이 더욱 부각되는 해입니다. 병오 세운이 내 사주에 어떤 십신으로 작용하는지, 어떤 달이 기회이고 주의해야 하는지 분석합니다...`
+  };
+
+  return previewMap[type] ?? TYPE_DETAIL[type]?.preview ?? '';
+}
+
 function renderIntro() {
   const d = TYPE_DETAIL[_type];
   if (!d) return;
@@ -856,7 +895,7 @@ function renderIntro() {
   }
   previewEl.innerHTML = `<div class="intro-preview-label">미리보기</div>
     <div class="intro-preview-inner">
-      <div class="intro-preview-text">${d.preview}</div>
+      <div class="intro-preview-text">${getPersonalizedPreview(_type, _ilju)}</div>
       <div class="intro-preview-fade"></div>
     </div>
     <div class="intro-preview-lock">✦ 전체 내용은 리포트 생성 후 확인 가능합니다</div>`;
