@@ -1253,6 +1253,48 @@ async function generateCharacterReport() {
   if (_personality.stress === 'solitary') pk.push('내면성찰형', '독립적');
   else pk.push('관계지향형', '사교적');
 
+  // ── saju.html과 동일하게 /saju-test POST로 실제 사주 계산 데이터 로드 ──
+  const p = _profile;
+  const hour = (p.hour != null && p.hour !== 'unknown') ? parseInt(p.hour) : 12;
+  const minute = parseInt(p.minute) || 0;
+  const birthISO = `${p.year}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:00`;
+  const gender = p.gender === 'F' ? 'female' : 'male';
+
+  let sd = null;
+  let rpt = {};
+  try {
+    const [sdRes, rptRes] = await Promise.all([
+      fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({birth: birthISO, gender, calendar: 'solar'})
+      }),
+      fetch(`https://fortuna.kkdmb7.workers.dev/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&current_year=${new Date().getFullYear()}&current_month=${new Date().getMonth()+1}&current_day=${new Date().getDate()}`)
+    ]);
+    if (sdRes.ok) sd = await sdRes.json();
+    if (rptRes.ok) rpt = await rptRes.json();
+  } catch(e) { console.warn('[character] 데이터 로드 실패:', e); }
+
+  console.log('[character] sd:', sd);
+  console.log('[character] rpt:', rpt);
+
+  // sd에서 핵심 값 추출 (saju.html 방식 그대로)
+  const STEM_H_MAP = {갑:'甲',을:'乙',병:'丙',정:'丁',무:'戊',기:'己',경:'庚',신:'辛',임:'壬',계:'癸'};
+  const dayS = sd?.summary?.pillars?.day || '';
+  const dayStem = dayS ? dayS[0] : '';
+  const stemHanja = STEM_H_MAP[dayStem] || dayStem;
+  const ilju = rpt['일주'] || dayS || '미확인';
+  const geokguk = sd?.geokguk?.geok_kor || rpt['격국'] || '미확인';
+  const yongshin = rpt['용신'] || sd?.yongshin?.primary || '미확인';
+  const strengthLevel = sd?.strength_level_5 || '미확인';
+  const fiveCount = sd?.five_count || {};
+  const fivePct = sd?.five_pct || {};
+  const pattern = sd?.pattern || {};
+  const tenGods = sd?.ten_gods_map || {};
+  const personality = rpt?.리포트?.기본?.성격 || '';
+  const daeun = rpt?.대운분석?.대운특성 || _daeun || '미확인';
+  const yearF = rpt?.리포트?.올해운세 || {};
+  const sewun = yearF.년도 || _sewun || '미확인';
+
   // 섹션 카드 생성
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
@@ -1273,27 +1315,24 @@ async function generateCharacterReport() {
     wrap.appendChild(card);
   });
 
-  // AI 호출 1: 이론 판단 (JSON, 화면 미표시, 500 Orb)
-  let theoryFrame = { 격국유형: '격국미확인', 분석프레임: '억부법 기준', 핵심키워드: pk.slice(0,3), 성향반영: '', 주의점: '' };
+  // AI 호출 1: 이론 판단 (JSON, 화면 미표시, orb 차감) ── saju.html STEP2와 동일
+  let theoryFrame = { 격국유형: geokguk, 분석프레임: '억부법 기준', 핵심키워드: pk.slice(0,3), 성향반영: '', 주의점: '' };
   try {
-    const theoryPrompt = `사주 데이터를 보고 자평진전 격국론 기반 분석 프레임을 JSON으로 반환하세요.
-일주: ${_ilju || '미확인'}
-격국: ${_geokguk || '미확인'}
-용신: ${_yongsin || '미확인'}
-신강신약: ${_singang || '미확인'}
-오행분포: ${_ohaeng ? JSON.stringify(_ohaeng) : '미확인'}
-성향키워드: ${pk.join(', ')}
-
-JSON만 반환 (다른 텍스트 없이):
-{"격국유형":"...","분석프레임":"...","핵심키워드":["..."],"성향반영":"...","주의점":"..."}`;
-
+    const step2Body = {
+      summary: sd?.summary, geokguk: sd?.geokguk, yongshin: sd?.yongshin,
+      five_pct: fivePct, five_count: fiveCount,
+      strength_score: sd?.strength_score, strength_level_5: strengthLevel,
+      pattern, ten_gods_map: tenGods, johu: sd?.johu,
+      branch_relations_kor: sd?.branch_relations_kor,
+      user_tendency: _personality
+    };
     const r0 = await fetch(CHAT_API, {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         user_id: _user.id,
-        messages: [{role: 'user', content: theoryPrompt}],
-        system_prompt: '사주명리 이론 전문가. JSON만 반환. 다른 텍스트 없이.',
-        mode: 'saju', max_tokens: 500, orb_override: _config.orb
+        orb_override: _config.orb,
+        system_prompt: '당신은 사주 이론 판별 엔진입니다. JSON만 반환하세요. 텍스트 해석 절대 금지.\n\n판단 규칙:\n- pattern.type이 "양신성상" 또는 "독상" → primary_theory: "적천수"\n- strength_level_5가 "극왕" 또는 "극약" → primary_theory: "적천수"\n- strength_level_5가 "신강" 또는 "신약" + pattern.type이 "정격" → primary_theory: "억부지전"\n- johu.needs의 원소가 five_count에서 0개 → secondary_theory: "궁통보감"\n\n용신 재확인:\n- 양신성상이면: 象을 疏(통하게)하는 오행 = 용신\n- 정격이면: yongshin.primary 그대로\n- 극왕 종격이면: 비겁/인성이 포섭, 식상이 용신\n\n성향 보정:\n- social=introvert + 비겁과다 → personality_keywords에 "내향적" 포함\n- action=impulsive_start → "아이디어다발_마무리약" 포함\n- stress=need_alone_time → "독립선호" 포함',
+        messages: [{ role: 'user', content: '분석 데이터:\n' + JSON.stringify(step2Body) + '\n\nJSON만 반환. 필드: primary_theory, secondary_theory, yongshin_final:{primary,primary_element,in_chart}, structure_summary, strength_interpretation, bijob_role, personality_keywords[], wealth_structure:{type,note}, career_tendency, writing_guidelines[], 격국유형, 분석프레임, 핵심키워드[], 성향반영, 주의점' }]
       })
     });
     if (r0.ok) {
@@ -1310,43 +1349,72 @@ JSON만 반환 (다른 텍스트 없이):
   } catch(e) { console.warn('[character] 이론판단 실패:', e); }
   console.log('[character] theoryFrame:', theoryFrame);
 
-  // AI 호출 2: 원국 분석 → 섹션 0,1,2
-  const analysisPrompt = `당신은 자평진전 격국론 기반 사주 전문가입니다.
-【사주 데이터】
-이름: ${_profile?.name || '익명'}, 성별: ${_profile?.gender === 'F' ? '여성' : '남성'}
-일주: ${_ilju || '미확인'}
-격국: ${_geokguk || '미확인'} / 용신: ${_yongsin || '미확인'}
-신강신약: ${_singang || '미확인'}
-오행분포: ${_ohaeng ? JSON.stringify(_ohaeng) : '미확인'}
-【분석 프레임】
-${theoryFrame.분석프레임}
-핵심키워드: ${(theoryFrame.핵심키워드||[]).join(', ')}
-성향: ${pk.join(', ')}
-${theoryFrame.성향반영}
-【절대 규칙】
-# ## ### 헤더 기호 절대 사용 금지. **볼드**로 핵심 강조. 800~1000자 이내.
+  const theoryName = theoryFrame.primary_theory || '억부지전';
+  const ysFinal = theoryFrame.yongshin_final?.primary || yongshin;
+  const pkw = (theoryFrame.personality_keywords || pk).join(', ');
+  const wg = theoryFrame.writing_guidelines?.length
+    ? '\n\n금지 표현:\n' + theoryFrame.writing_guidelines.map(g => '- ' + g).join('\n') : '';
+
+  // 적천수 원문 (saju.html 그대로)
+  const CHEONSU = {
+    '甲':'甲木參天，莫論要火。春不容金，秋不容土。',
+    '乙':'乙木雖柔，刲羊解牛。懷丁抱丁，跨鳳乘猴。',
+    '丙':'丙火猛烈，欺霜侮雪。能鍛庚鐵，逢辛會折。',
+    '丁':'丁火柔中，內性昭融。抱乙而孝，合壬而忠。',
+    '戊':'戊唯厚壤，既中且正。靜翕動闢，萬物司命。',
+    '己':'己唯臥田，中正蓄藏。不懼木盛，不怕水旺。',
+    '庚':'庚金帶殺，剛健為最。得水而清，得火而銳。',
+    '辛':'辛金軟弱，溫潤而清。畏土之多，樂水之盈。',
+    '壬':'壬水通河，能泄能氣。剛中之德，周流不滯。',
+    '癸':'癸水至弱，達於天津。得龍而運，功化斯神。'
+  };
+
+  // AI 호출 2: 원국 심층 분석 → 섹션 0,1,2 (saju.html STEP3-A와 동일)
+  const analysisPrompt = `【원국 분석】
+이름: ${p.name || '익명'}, 성별: ${gender === 'female' ? '여성' : '남성'}
+일간: ${dayStem}(${stemHanja}), 일주: ${ilju}
+사주: ${sd?.summary ? JSON.stringify(sd.summary.pillars) : '미확인'}
+오행 개수: 목${fiveCount.wood||0} 화${fiveCount.fire||0} 토${fiveCount.earth||0} 금${fiveCount.metal||0} 수${fiveCount.water||0}
+오행 비율: ${JSON.stringify(fivePct)}
+신강도: ${strengthLevel} (${sd?.strength_score || ''}점)
+패턴: ${pattern.type || ''} ${pattern.subtype || ''}
+격국: ${geokguk}
+용신: ${ysFinal}
+십신: ${JSON.stringify(tenGods)}
+성격 키워드: ${pkw}
+성향 데이터: ${pk.join(', ')}
+
+▸ 성격 DB: ${personality}
+
+위 확정 사실을 바탕으로 원국 분석을 작성해주세요.
+구조: ① 적천수 천간론 원문을 1~2구절 인용하고, 자연 현상에 비유하여 이 사주의 핵심 구조를 설명 ② 성격·기질·강점 ③ 약점과 보완점 ④ 왜 이런 패턴인지 사주 구조로 설명
+적천수 원문 참조 - ${stemHanja}일간: ${CHEONSU[stemHanja] || ''}
 섹션 구성:
 1. 타고난 기질의 본질 (일주+격국 기반)
 2. 강점과 약점 (오행분포+성향 반영)
-3. 삶의 방식과 대인관계 패턴`;
-  await streamToSections(analysisPrompt, [0, 1, 2], false);
+3. 삶의 방식과 대인관계 패턴
+800~1200자.`;
 
-  // AI 호출 3: 실천 전략 → 섹션 3,4
-  const strategyPrompt = `당신은 자평진전 격국론 기반 사주 전문가입니다.
-【이전 분석 요약】
-격국: ${theoryFrame.격국유형}
-핵심키워드: ${(theoryFrame.핵심키워드||[]).join(', ')}
-주의점: ${theoryFrame.주의점}
-현재 대운: ${_daeun || '미확인'}
-올해 세운: ${_sewun || '미확인'}
+  await streamToSections(analysisPrompt, [0, 1, 2], theoryName, ysFinal, wg, false);
+
+  // AI 호출 3: 베딕 + 실천 전략 → 섹션 3,4
+  const strategyPrompt = `【베딕 교차 분석 + 실천 방향】
+일주: ${ilju}, ${strengthLevel}, 용신: ${ysFinal}
+현재 대운: ${daeun}
+올해 세운: ${sewun}
 낙샤트라: ${_vedicData?.nakshatra || '미확인'}
 라시: ${_vedicData?.rashi || '미확인'}
-【절대 규칙】
-# ## ### 헤더 기호 절대 사용 금지. **볼드**로 강조. 700~900자 이내.
+다샤: ${_vedicData?.dasha || '미확인'}
+핵심키워드: ${pkw}
+성향: ${pk.join(', ')}
+주의점: ${theoryFrame.주의점 || ''}
+
 섹션 구성:
 4. 베딕/낙샤트라로 본 기질 교차 분석
-5. 지금 이 기질을 활용하는 실천 방향 (현재 대운 연계)`;
-  await streamToSections(strategyPrompt, [3, 4], true);
+5. 지금 이 기질을 활용하는 실천 방향 (현재 대운 연계)
+700~900자.`;
+
+  await streamToSections(strategyPrompt, [3, 4], theoryName, ysFinal, wg, true);
 
   // 저장
   try {
@@ -1367,16 +1435,25 @@ ${theoryFrame.성향반영}
 }
 
 // ── 응답을 섹션 배열에 나눠 표시 ──
-async function streamToSections(prompt, secIndices, skipOrb) {
+async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isFirst) {
   try {
+    const sysPrompt = `당신은 ${theoryName || '억부지전'} 기반 사주 분석가입니다.
+절대 규칙:
+- #헤더 금지, 표 금지
+- **볼드**는 핵심 단어에만 3~5개
+- 톤: 따뜻하고 정확한 친구 같은 전문가
+- 없는 오행을 "있다"고 쓰면 안 됨
+- 용신(${ysFinal || ''})을 기신/불리로 쓰면 안 됨
+- 요청한 섹션 구성대로 번호를 붙여 작성${wg || ''}`;
+
     const res = await fetch(CHAT_API, {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         user_id: _user.id,
         messages: [{role: 'user', content: prompt}],
-        system_prompt: '당신은 사주명리 전문가입니다. 요청한 섹션 구성대로 번호를 붙여 작성하세요. # ## ### 헤더 금지. **볼드**로 핵심 강조.',
+        system_prompt: sysPrompt,
         mode: 'saju', max_tokens: 2000,
-        ...(skipOrb ? {skip_orb: true} : {skip_orb: true})
+        skip_orb: true
       })
     });
     if (!res.ok) throw new Error('API 오류');
