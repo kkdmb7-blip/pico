@@ -2919,8 +2919,21 @@ function openQimenModal() {
   }
   dEl.value = now.getDate();
 
-  document.getElementById('qmHour').value = now.getHours();
-  document.getElementById('qmMinute').value = 0;
+  // 진태양시(TST) 보정 — qimen.html과 동일 로직 (서울 lon 127°, KST 기준 135°)
+  (function() {
+    var kstH = now.getHours(), kstM = now.getMinutes();
+    var lonCorr = -32;
+    var start = new Date(now.getFullYear(), 0, 0);
+    var doy = Math.floor((now - start) / 86400000);
+    var B = 2 * Math.PI * (doy - 81) / 365;
+    var eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+    var tstMin = kstH * 60 + kstM + lonCorr + eot;
+    if (tstMin < 0) tstMin += 1440;
+    var tstH = Math.floor(tstMin / 60) % 24;
+    var tstM = Math.round(tstMin % 60);
+    document.getElementById('qmHour').value = tstH;
+    document.getElementById('qmMinute').value = tstM;
+  })();
 
   document.getElementById('qimenProfileSelect').value = '';
   _populateProfileSelect('qimenProfileSelect');
