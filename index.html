@@ -2377,28 +2377,73 @@ async function openHistoryModal() {
   document.getElementById('historyOverlay').style.display = 'flex';
   var list = document.getElementById('historyList');
   list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">불러오는 중...</div>';
+
+  var allItems = [];
+  var TYPE_ICON = { character:'🌟', money:'💰', love:'💕', daeun:'🔮', year:'📅', gunghap:'💕', saju:'🏛️' };
+  var TYPE_LABEL = { character:'기질 분석', money:'재물·직업 운', love:'연애·인연 운', daeun:'대운 흐름', year:'신년운' };
+
+  // 기존 analysis-history 조회
   try {
     var res = await fetch('https://fortuna.kkdmb7.workers.dev/analysis-history?user_id='+encodeURIComponent(user.id));
     var rows = await res.json();
-    if (!rows || rows.length === 0) { list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">저장된 분석이 없어요</div>'; return; }
-    list.innerHTML = '';
-    rows.forEach(function(r) {
-      var d = new Date(r.created_at);
-      var dateStr = d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-      var icon = r.type === 'gunghap' ? '💕' : r.type === 'saju' ? '🏛️' : '💬';
-      var item = document.createElement('div');
-      item.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .2s;';
-      item.onmouseover = function(){ this.style.borderColor='var(--accent)'; };
-      item.onmouseout = function(){ this.style.borderColor='var(--border)'; };
-      item.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;">'
-        +'<div><span style="font-size:16px;margin-right:6px;">'+icon+'</span><span style="font-size:14px;font-weight:700;color:var(--text);">'+r.title+'</span></div>'
-        +'<span style="font-size:11px;color:var(--muted);">'+dateStr+'</span></div>';
-      item.onclick = function(){ openHistoryDetail(r.id); };
-      list.appendChild(item);
-    });
-  } catch(e) { list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">조회 실패</div>'; }
+    if (Array.isArray(rows)) rows.forEach(function(r){ r._source='history'; allItems.push(r); });
+  } catch(e) {}
+
+  // reports 테이블 조회
+  try {
+    var sb = getSb();
+    var rptRes = await sb.from('reports').select('id,report_type,content,created_at').eq('user_id', user.id).order('created_at', { ascending: false });
+    if (rptRes.data) {
+      rptRes.data.forEach(function(r) {
+        allItems.push({
+          _source: 'reports',
+          id: r.id,
+          title: (TYPE_LABEL[r.report_type] || r.report_type) + ' 리포트',
+          type: r.report_type,
+          created_at: r.created_at,
+          _content: r.content
+        });
+      });
+    }
+  } catch(e) {}
+
+  allItems.sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); });
+
+  if (allItems.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">저장된 분석이 없어요</div>';
+    return;
+  }
+  list.innerHTML = '';
+  allItems.forEach(function(r) {
+    var d = new Date(r.created_at);
+    var dateStr = d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    var icon = TYPE_ICON[r.type] || '💬';
+    var item = document.createElement('div');
+    item.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .2s;';
+    item.onmouseover = function(){ this.style.borderColor='var(--accent)'; };
+    item.onmouseout = function(){ this.style.borderColor='var(--border)'; };
+    item.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;">'
+      +'<div><span style="font-size:16px;margin-right:6px;">'+icon+'</span><span style="font-size:14px;font-weight:700;color:var(--text);">'+r.title+'</span></div>'
+      +'<span style="font-size:11px;color:var(--muted);">'+dateStr+'</span></div>';
+    if (r._source === 'reports') {
+      (function(title, content){ item.onclick = function(){ openReportDetail(title, content); }; })(r.title, r._content);
+    } else {
+      (function(id){ item.onclick = function(){ openHistoryDetail(id); }; })(r.id);
+    }
+    list.appendChild(item);
+  });
 }
 function closeHistoryModal() { document.getElementById('historyOverlay').style.display = 'none'; }
+
+function openReportDetail(title, content) {
+  document.getElementById('historyDetailOverlay').style.display = 'flex';
+  document.getElementById('historyDetailTitle').textContent = title;
+  var html = '';
+  if (Array.isArray(content)) {
+    content.forEach(function(text){ if (text) html += '<div class="ai-chunk" style="margin-bottom:12px;white-space:pre-wrap;">'+text+'</div>'; });
+  }
+  document.getElementById('historyDetailContent').innerHTML = html || '<div style="color:var(--muted);">내용이 없습니다.</div>';
+}
 
 async function openHistoryDetail(id) {
   document.getElementById('historyDetailOverlay').style.display = 'flex';

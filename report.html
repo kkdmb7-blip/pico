@@ -744,6 +744,20 @@ function getSb() {
   return _sb;
 }
 
+function showToast(msg) {
+  var t = document.getElementById('_reportToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_reportToast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(123,94,167,0.95);color:#fff;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity .4s;white-space:nowrap;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(function(){ t.style.opacity = '0'; }, 2800);
+}
+
 function setLoading(title, desc) {
   document.getElementById('loadingTitle').textContent = title;
   document.getElementById('loadingDesc').textContent = desc;
@@ -1147,7 +1161,7 @@ async function generateReport() {
       orb_spent: _config.orb,
       created_at: new Date().toISOString()
     }).select().maybeSingle();
-    if (data) _reportId = data.id;
+    if (data) { _reportId = data.id; showToast('✦ 리포트가 저장되었습니다. 마이페이지에서 다시 확인할 수 있어요.'); }
   } catch(e) {}
 
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
@@ -1425,7 +1439,7 @@ async function generateCharacterReport() {
       content: allTexts, orb_spent: _config.orb,
       created_at: new Date().toISOString()
     }).select().maybeSingle();
-    if (data) _reportId = data.id;
+    if (data) { _reportId = data.id; showToast('✦ 리포트가 저장되었습니다. 마이페이지에서 다시 확인할 수 있어요.'); }
   } catch(e) {}
 
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
