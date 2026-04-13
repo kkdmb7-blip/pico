@@ -1890,7 +1890,7 @@ window.addEventListener('pageshow', function(e) { if (e.persisted) location.relo
     var tstMin = kstH*60+kstM-32+eot;
     if(tstMin<0)tstMin+=1440;
     var h=Math.floor(tstMin/60)%24;
-    return h%2===0?h:h-1;
+    return h%2===1?h:(h===0?23:h-1);
   }
   var _lastSiju = _getTSTSiju();
   setInterval(function() {
