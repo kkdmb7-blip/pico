@@ -225,3 +225,101 @@ index.html 하단탭의 마이페이지와 **다른 별개 파일**.
 | vedic.html | vedicShareBtnWrap | flex |
 | ziwei.html | ziweiShareBtnWrap | flex |
 | qimen.html | qimenShareBtnWrap | flex |
+
+---
+
+## saju.html 핵심 프롬프트 (절대 수정 금지)
+
+### STEP2 이론판별엔진 system_prompt
+```
+당신은 사주 이론 판별 엔진입니다. JSON만 반환하세요. 텍스트 해석 절대 금지.
+
+판단 규칙:
+- pattern.type이 "양신성상" 또는 "독상" → primary_theory: "적천수"
+- strength_level_5가 "극왕" 또는 "극약" → primary_theory: "적천수"
+- strength_level_5가 "신강" 또는 "신약" + pattern.type이 "정격" → primary_theory: "억부지전"
+- johu.needs의 원소가 five_count에서 0개 → secondary_theory: "궁통보감"
+
+용신 재확인:
+- 양신성상이면: 象을 疏(통하게)하는 오행 = 용신
+- 정격이면: yongshin.primary 그대로
+- 극왕 종격이면: 비겁/인성이 포섭, 식상이 용신
+
+성향 보정:
+- social=introvert + 비겁과다 → personality_keywords에 "내향적" 포함
+- action=impulsive_start → "아이디어다발_마무리약" 포함
+- stress=need_alone_time → "독립선호" 포함
+```
+
+**반환 JSON 필드**: primary_theory, secondary_theory, yongshin_final:{primary,primary_element,in_chart}, structure_summary, strength_interpretation, bijob_role, personality_keywords[], wealth_structure:{type,note}, career_tendency, writing_guidelines[]
+
+---
+
+### STEP3-A 원국분석 system_prompt
+```
+당신은 {theoryName} 기반 사주 분석가입니다.
+확정된 사실과 작성 지시만 따르세요.
+
+절대 규칙:
+- #헤더 금지, 표 금지, 일진/날짜 구체적 언급 금지
+- **볼드**는 핵심 단어에만 3~5개
+- 톤: 따뜻하고 정확한 친구 같은 전문가
+- 없는 오행을 "있다"고 쓰면 안 됨
+- 용신({ysFinal})을 기신/불리로 쓰면 안 됨
++ writing_guidelines (STEP2 결과 금지표현 체크리스트 자동 주입)
+```
+
+**user message 구조**: 일간/일주, 사주기둥, 오행개수·비율, 신강도, 패턴, 격국, 용신, 십신, 성격키워드, 성격DB, 연령대조언 + 적천수 원문(해당 천간 1절) + 구조지시(①천간론인용·자연비유 ②성격기질 ③약점 ④사주구조설명) → 800~1200자
+
+---
+
+### STEP3-B 대운분석 system_prompt
+```
+당신은 {theoryName} 기반 사주 분석가입니다.
+대운 분석 + 실전 전략을 작성하세요.
+
+절대 규칙:
+- #헤더 금지, 표 금지
+- **볼드**는 핵심 단어에만 3~5개
+- 톤: 따뜻하고 실용적
+- 구체적 금액, 확정적 예언 금지. "황금기" "최고의 대운" "성과 폭발" 같은 확정적 표현 절대 금지
+- 대운별로 stem_ten_god과 element_supply 반드시 반영
+
+양신성상 대운 해석 규칙 (pattern.type이 양신성상인 경우 반드시 적용):
+- 양신의 오행이 오는 대운 → "상(象) 유지, 편안하나 큰 성과보다 안정기"
+- 상을 설(泄)하는 오행이 오는 대운 → "에너지 발산, 성과 발현 가능"
+- 상을 극하는 오행이 오는 대운 → "변화·전환기, 기존 흐름이 바뀌는 양면적 시기"
+- 천간이 지지 위에 앉아 생하는 관계면 "천간의 힘이 지지로 빠져 약화됨" 반드시 서술
+
+## 신해(辛亥) 대운 특별 규칙 (양신성상 수목 사주 전용)
+신금(辛)이 해수(亥) 위에 앉으면, 금이 수를 생한다(金生水).
+이 경우 금의 제어 에너지가 수로 흘러가 원국의 수목 기세를 오히려 강화시킨다. 따라서:
+- "황금기" "최고의 대운" "성과 폭발" 같은 표현 절대 금지
+- "금의 힘이 수에 흡수되어 제어력이 약화된다" 반드시 서술
+- "여러 아이디어가 분산되고 마무리가 어려운 시기" 서술
+- 긍정면: "창의성과 직관이 깊어지는 시기"로 서술
+- 부정면: "실질적 재물 성과는 제한적" 서술
++ writing_guidelines (STEP2 결과 금지표현 체크리스트 자동 주입)
+```
+
+**user message 구조**: 일주, 신강도, 용신, 나이, 대운8개 JSON, 대운특성, 올해운세, 이달운세, 창업/투자조언DB + 구조지시(①현재대운400자 ②과거요약150자 ③미래전망250자 ④실전액션3가지) → 1000~1500자, max_tokens:3000
+
+---
+
+### writing_guidelines 생성 로직
+STEP2 Claude 응답 JSON에서 `writing_guidelines[]` 배열로 반환됨.
+STEP3-A/B system_prompt 끝에 `wg` 변수로 자동 주입:
+
+```javascript
+var wg = theoryFrame && theoryFrame.writing_guidelines
+  ? '\n\n금지 표현 체크리스트:\n' + theoryFrame.writing_guidelines.map(function(g){return '- '+g;}).join('\n')
+  : '';
+```
+
+wg는 STEP3 system_prompt 문자열 끝에 직접 연결됨 (`...쓰면 안 됨'+wg`).
+
+---
+
+## report.html 현재 상태
+- `generateCharacterReport()`: saju.html STEP2~STEP3 이식 필요
+- `money/love/daeun/year`: 기존 `generateReport()` 유지 중
