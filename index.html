@@ -3188,7 +3188,7 @@ function checkAuth() {
         var guestProfile = JSON.parse(localStorage.getItem('pico_profile'));
         if (guestProfile && guestProfile.year) {
           var _cEl = document.getElementById('todayCosmicWrap');
-          if (_cEl) _cEl.style.display = '';
+          if (_cEl && !localStorage.getItem('pico_cosmic_seen')) _cEl.style.display = '';
           loadMiniScore().then(function() {
             // 일간 오행이 저장된 후 기문 주간 재로드
             if (typeof window.loadWeeklyQimen === 'function') window.loadWeeklyQimen();
@@ -3317,7 +3317,7 @@ function updateAuthUI() {
     if (heroEl) heroEl.style.display = 'none';
     if (heroInputEl) heroInputEl.style.display = 'none';
     var _cosmicEl = document.getElementById('todayCosmicWrap');
-    if (_cosmicEl) _cosmicEl.style.display = '';
+    if (_cosmicEl && !localStorage.getItem('pico_cosmic_seen')) _cosmicEl.style.display = '';
     document.getElementById('userNameDisplay').textContent = currentUser.name;
     var av = document.getElementById('userAvatar');
     if (currentUser.avatar) { av.src = currentUser.avatar; av.style.display = ''; }
@@ -3869,9 +3869,9 @@ function goScoreHero() {
   };
   try { localStorage.setItem('pico_profile', JSON.stringify(profile)); } catch(e) {}
 
-  // 우주 에너지 섹션 노출
+  // 우주 에너지 섹션 노출 (첫 방문만)
   var cosmicEl = document.getElementById('todayCosmicWrap');
-  if (cosmicEl) cosmicEl.style.display = '';
+  if (cosmicEl && !localStorage.getItem('pico_cosmic_seen')) cosmicEl.style.display = '';
 
   // 점수 계산 완료 후 기문 주간 일운 재로드 (일간 오행 저장 후)
   if (typeof loadMiniScore === 'function') {
@@ -4009,6 +4009,7 @@ initHeroSelects();
 
   Promise.all([p2, p3]).then(function() {
     renderCosmicCards(cosmicData, buildInterp(cosmicData));
+    localStorage.setItem('pico_cosmic_seen', '1');
   });
 
   function renderCosmicCards(data, interp) {
