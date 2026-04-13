@@ -1745,6 +1745,28 @@
         <button class="saju-gender-btn" id="profileGenderF" onclick="selectProfileGender('F')">여성 ♀</button>
       </div>
     </div>
+    <div class="saju-form-group">
+      <label>출생지</label>
+      <select id="profileCity" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+        <option value="서울|37.5665|126.9780|9">서울</option>
+        <option value="부산|35.1796|129.0756|9">부산</option>
+        <option value="인천|37.4563|126.7052|9">인천</option>
+        <option value="대구|35.8714|128.6014|9">대구</option>
+        <option value="대전|36.3504|127.3845|9">대전</option>
+        <option value="광주|35.1595|126.8526|9">광주</option>
+        <option value="울산|35.5384|129.3114|9">울산</option>
+        <option value="수원|37.2636|127.0286|9">수원</option>
+        <option value="제주|33.4996|126.5312|9">제주</option>
+        <option value="도쿄|35.6762|139.6503|9">도쿄</option>
+        <option value="베이징|39.9042|116.4074|8">베이징</option>
+        <option value="상하이|31.2304|121.4737|8">상하이</option>
+        <option value="뉴욕|40.7128|-74.0060|-5">뉴욕</option>
+        <option value="로스앤젤레스|34.0522|-118.2437|-8">로스앤젤레스</option>
+        <option value="런던|51.5074|-0.1278|0">런던</option>
+        <option value="파리|48.8566|2.3522|1">파리</option>
+        <option value="시드니|-33.8688|151.2093|10">시드니</option>
+      </select>
+    </div>
     <button class="saju-submit-btn" onclick="saveProfile()">저장하기 ✦</button>
   </div>
 </div>
@@ -3369,6 +3391,14 @@ function openProfileModal() {
       if (existing.hour != null) document.getElementById('profileHour').value = String(existing.hour);
       if (existing.minute != null) document.getElementById('profileMinute').value = String(existing.minute);
       selectProfileGender(existing.gender || 'M');
+      if (existing.city) {
+        var cityEl = document.getElementById('profileCity');
+        for (var i = 0; i < cityEl.options.length; i++) {
+          if (cityEl.options[i].value.split('|')[0] === existing.city) {
+            cityEl.selectedIndex = i; break;
+          }
+        }
+      }
     }
   } catch(e) {}
 }
@@ -3392,12 +3422,17 @@ function saveProfile() {
   var hour   = document.getElementById('profileHour').value;
   var minute = document.getElementById('profileMinute').value;
   if (!year || !month || !day) { alert('생년월일을 모두 선택해주세요.'); return; }
+  var cityVal = document.getElementById('profileCity').value.split('|');
   var profile = {
     name: name,
     year: parseInt(year), month: parseInt(month), day: parseInt(day),
     hour: hour === 'unknown' ? 'unknown' : parseInt(hour),
     minute: parseInt(minute) || 0,
-    gender: _profileGender
+    gender: _profileGender,
+    city: cityVal[0] || '서울',
+    lat: parseFloat(cityVal[1]) || 37.5665,
+    lon: parseFloat(cityVal[2]) || 126.9780,
+    tz: parseFloat(cityVal[3]) || 9
   };
   localStorage.setItem('pico_profile', JSON.stringify(profile));
   syncMyProfileToProfiles(profile);
@@ -3946,7 +3981,10 @@ initHeroSelects();
   var cosmicData = { nakshatra: null, planets: null };
 
   var _cGender = (_prof && _prof.gender) ? ((_prof.gender === 'M' || _prof.gender === 'male') ? 'male' : 'female') : 'female';
-  var vp = new URLSearchParams({ year: Y, month: M, day: D, hour: BH, tz: 9, lat: 37.5665, lon: 126.978, gender: _cGender });
+  var _cLat = (_prof && _prof.lat) ? _prof.lat : 37.5665;
+  var _cLon = (_prof && _prof.lon) ? _prof.lon : 126.9780;
+  var _cTz  = (_prof && _prof.tz  != null) ? _prof.tz  : 9;
+  var vp = new URLSearchParams({ year: Y, month: M, day: D, hour: BH, minute: BMIN, tz: _cTz, lat: _cLat, lon: _cLon, gender: _cGender });
   var p2 = fetch(W + '/vedic?' + vp.toString())
     .then(function(r) { return r.json(); })
     .then(function(d) {
@@ -3956,7 +3994,7 @@ initHeroSelects();
   var p3 = fetch(W + '/astro', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ year: Y, month: M, day: D, hour: BH, min: BMIN, lat: 37.5665, lon: 126.978, tzone: 9.0 })
+    body: JSON.stringify({ year: Y, month: M, day: D, hour: BH, min: BMIN, lat: _cLat, lon: _cLon, tzone: _cTz })
   })
     .then(function(r) { return r.json(); })
     .then(function(planets) {

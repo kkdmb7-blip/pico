@@ -594,7 +594,11 @@ async function loadVedic(year, month, day, hour, gender) {
   status.className = 'status-msg visible';
   status.innerHTML = '<span class="spinner"></span>베딕 차트 계산 중…';
 
-  const sp = new URLSearchParams({ year, month, day, hour, tz: 9, lat: 37.5665, lon: 126.978, gender });
+  const _prof = (() => { try { return JSON.parse(localStorage.getItem('pico_profile')) || {}; } catch(e) { return {}; } })();
+  const _lat = _prof.lat || 37.5665;
+  const _lon = _prof.lon || 126.9780;
+  const _tz  = _prof.tz  != null ? _prof.tz : 9;
+  const sp = new URLSearchParams({ year, month, day, hour, minute: 0, tz: _tz, lat: _lat, lon: _lon, gender });
   try {
     const res = await fetch('https://fortuna.kkdmb7.workers.dev/vedic?' + sp.toString());
     if (!res.ok) throw new Error('HTTP ' + res.status);

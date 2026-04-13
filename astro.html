@@ -578,7 +578,11 @@ async function loadChart(year, month, day, hour, min) {
   status.className = 'status-msg visible';
   status.innerHTML = '<span class="spinner"></span>출생 차트 계산 중…';
 
-  const body = { year, month, day, hour, min, lat: 37.5665, lon: 126.978, tzone: 9.0 };
+  const _prof = (() => { try { return JSON.parse(localStorage.getItem('pico_profile')) || {}; } catch(e) { return {}; } })();
+  const _lat = _prof.lat || 37.5665;
+  const _lon = _prof.lon || 126.9780;
+  const _tz  = _prof.tz  != null ? _prof.tz : 9;
+  const body = { year, month, day, hour, min, lat: _lat, lon: _lon, tzone: _tz };
   const opts = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
