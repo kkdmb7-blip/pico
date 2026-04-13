@@ -1019,7 +1019,8 @@
 
   <!-- 결과 카드 -->
   <div id="nsResult" style="display:none;max-width:480px;margin:0 auto;padding:0 16px;box-sizing:border-box;">
-    <div id="nsGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px;"></div>
+    <div id="nsGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;"></div>
+    <div id="nsTotalScore" style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:14px;"></div>
     <a id="nsCtaBtn" href="https://fortuna-silk.vercel.app/name-score.html" target="_blank"
       style="display:block;background:linear-gradient(135deg,#d4af37,#f0d060,#d4af37);background-size:200% 200%;border-radius:12px;padding:14px;color:#06020f;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:all 0.3s;"
       onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 30px rgba(212,175,55,0.35)'"
@@ -1136,6 +1137,19 @@
         '<div style="font-size:10px;color:rgba(255,255,255,0.45);line-height:1.4;margin-top:4px;">'+(_SURI_DESC[s.val]||'')+'</div>';
       grid.appendChild(card);
     });
+
+    // 종합 점수 카드
+    var _GRADE_SCORE = {'대길':100,'길':75,'반길':50,'흉':25,'대흉':0};
+    var _gradeList = ['정격','형격','원격','이격'].map(function(k){ return _SURI[scores[k].val]||'흉'; });
+    var _total = Math.round(_gradeList.reduce(function(a,g){ return a+(_GRADE_SCORE[g]||0); },0)/4);
+    var _comment = _total>=90?'매우 좋은 이름입니다. 강한 길운을 가진 이름이에요.':_total>=75?'좋은 이름입니다. 전반적으로 길한 기운이 흐릅니다.':_total>=60?'무난한 이름입니다. 일부 보완이 도움될 수 있어요.':_total>=40?'주의가 필요한 이름입니다. 개명을 고려해볼 수 있어요.':'흉한 기운이 강한 이름입니다. 전문 작명가 상담을 권장합니다.';
+    document.getElementById('nsTotalScore').innerHTML =
+      '<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:8px;letter-spacing:1px;">이름 종합 점수</div>'+
+      '<div style="font-size:52px;font-weight:700;color:#d4af37;line-height:1;">'+_total+'</div>'+
+      '<div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:12px;">/ 100점</div>'+
+      '<div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:10px 0;overflow:hidden;"><div id="nsTotalFill" style="height:100%;width:0%;background:linear-gradient(90deg,#d4af37,#f5d87a);border-radius:3px;transition:width 0.8s ease;"></div></div>'+
+      '<div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;">'+_comment+'</div>';
+    setTimeout(function(){ var f=document.getElementById('nsTotalFill'); if(f) f.style.width=_total+'%'; },50);
 
     // CTA URL에 이름 전달
     var ctaUrl = 'https://fortuna-silk.vercel.app/name-score.html?sur='+encodeURIComponent(sur)+'&name='+encodeURIComponent(name);
