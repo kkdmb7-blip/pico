@@ -4197,9 +4197,10 @@ function updateMypageTab() {
       try {
         var sb = window.supabase && window.supabase.createClient('https://ymghmfkqctckxxysxkvy.supabase.co','sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x');
         if (!sb) return;
-        sb.from('orb_balance').select('balance').eq('user_id', uid).maybeSingle().then(function(res) {
+        sb.from('orb_balance').select('balance,paid_balance').eq('user_id', uid).maybeSingle().then(function(res) {
           var badge = document.getElementById('mypageOrbBadge');
-          if (badge) badge.textContent = '✦ ' + ((res.data && res.data.balance != null) ? res.data.balance.toLocaleString() : '0') + ' Orb';
+          var b = ((res.data && res.data.balance != null) ? res.data.balance : 0) + ((res.data && res.data.paid_balance != null) ? res.data.paid_balance : 0);
+          if (badge) badge.textContent = '✦ ' + b.toLocaleString() + ' Orb';
         });
       } catch(e) {}
     })(currentUser.id);
@@ -4232,8 +4233,8 @@ function updateMypageTab() {
     try {
       var sb = getSb();
       if (!sb) return;
-      var res = await sb.from('orb_balance').select('balance').eq('user_id', userId).maybeSingle();
-      var bal = (res.data && res.data.balance != null) ? res.data.balance : 0;
+      var res = await sb.from('orb_balance').select('balance,paid_balance').eq('user_id', userId).maybeSingle();
+      var bal = ((res.data && res.data.balance != null) ? res.data.balance : 0) + ((res.data && res.data.paid_balance != null) ? res.data.paid_balance : 0);
       el.textContent = '✦ ' + bal.toLocaleString() + ' Orb';
       el.style.display = 'block';
     } catch(e) {}

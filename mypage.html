@@ -263,8 +263,8 @@ function renderUser() {
 
 async function fetchOrb() {
   try {
-    var res = await sb.from('orb_balance').select('balance').eq('user_id', currentUser.id).maybeSingle();
-    var bal = (res.data && res.data.balance != null) ? res.data.balance : 0;
+    var res = await sb.from('orb_balance').select('balance,paid_balance').eq('user_id', currentUser.id).maybeSingle();
+    var bal = ((res.data && res.data.balance != null) ? res.data.balance : 0) + ((res.data && res.data.paid_balance != null) ? res.data.paid_balance : 0);
     document.getElementById('myOrbBalance').textContent = bal.toLocaleString();
   } catch(e) {
     document.getElementById('myOrbBalance').textContent = '0';
