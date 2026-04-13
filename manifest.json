@@ -1,0 +1,26 @@
+{
+  "name": "피코랩",
+  "short_name": "피코랩",
+  "description": "사주·점성·베딕·자미두수·기문둔갑 운세 분석",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a1a",
+  "theme_color": "#0a0a1a",
+  "categories": ["lifestyle", "entertainment"],
+  "icons": [
+    {
+      "src": "/img/goddess.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/goddess.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
