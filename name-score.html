@@ -1158,29 +1158,23 @@ var SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
 var SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 
 function getOrbBalance(userId) {
-  return fetch(SB_URL + '/rest/v1/orb_balance?user_id=eq.' + encodeURIComponent(userId) + '&select=balance,paid_balance', {
+  return fetch(SB_URL + '/rest/v1/orb_balance?user_id=eq.' + encodeURIComponent(userId) + '&select=balance', {
     headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
   })
   .then(function(r){ return r.json(); })
   .then(function(rows) {
-    if (!rows || !rows.length) return { balance: 0, paid_balance: 0 };
-    return rows[0];
+    if (!rows || !rows.length) return 0;
+    return (rows[0] && rows[0].balance != null) ? rows[0].balance : 0;
   });
 }
 
 function deductOrb(userId, amount) {
   return getOrbBalance(userId).then(function(bal) {
-    var paid = bal.paid_balance || 0;
-    var free = bal.balance || 0;
-    var total = paid + free;
-    if (total < amount) return Promise.reject(new Error('잔액 부족'));
-    var newPaid = Math.max(0, paid - amount);
-    var remain = amount - (paid - newPaid);
-    var newFree = free - remain;
+    if (bal < amount) return Promise.reject(new Error('잔액 부족'));
     return fetch(SB_URL + '/rest/v1/orb_balance?user_id=eq.' + encodeURIComponent(userId), {
       method: 'PATCH',
       headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ balance: newFree, paid_balance: newPaid })
+      body: JSON.stringify({ balance: bal - amount })
     }).then(function() {
       return fetch(SB_URL + '/rest/v1/orb_transactions', {
         method: 'POST',
@@ -1199,13 +1193,12 @@ function onAiAnalysisClick() {
   var btn = document.getElementById('btnAiAnalysis');
   btn.disabled = true;
   getOrbBalance(user.id).then(function(bal) {
-    var total = (bal.balance || 0) + (bal.paid_balance || 0);
-    if (total < 500) {
-      showToast('Orb가 부족합니다 (현재 ' + total + ' Orb)', true);
+    if (bal < 500) {
+      showToast('Orb가 부족합니다 (현재 ' + bal + ' Orb)', true);
       btn.disabled = false;
       return;
     }
-    if (!confirm('AI 심층분석을 실행합니다. 500 Orb가 차감됩니다.\n현재 잔액: ' + total + ' Orb')) {
+    if (!confirm('AI 심층분석을 실행합니다. 500 Orb가 차감됩니다.\n현재 잔액: ' + bal + ' Orb')) {
       btn.disabled = false;
       return;
     }
