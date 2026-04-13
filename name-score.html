@@ -138,6 +138,8 @@ nav {
 }
 .btn-gold:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(212,175,55,0.35); }
 .btn-gold:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+.orb-hint { font-size:11px; color:rgba(255,255,255,0.4); margin-top:6px; text-align:center; }
+#aiAnalysisResult { margin-top:16px; padding:16px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid var(--border); font-size:14px; line-height:1.8; white-space:pre-wrap; display:none; }
 @keyframes shimmer { 0%,100%{background-position:0% 50%}50%{background-position:100% 50%} }
 .result-area { display:none; margin-top:24px; }
 .result-area.show { display:block; animation:fadeUp 0.5s ease; }
@@ -382,6 +384,11 @@ nav {
 
     <div class="interpret-card" id="interpretCard"></div>
     <div id="yongsinMatchBox"></div>
+    <div id="aiAnalysisWrap" style="display:none;margin-top:16px;">
+      <button class="btn-gold" id="btnAiAnalysis" onclick="onAiAnalysisClick()">AI 심층분석 · 500 Orb</button>
+      <div class="orb-hint">로그인 후 이용 · Orb로 결제</div>
+    </div>
+    <div id="aiAnalysisResult"></div>
   </div>
 </div>
 
@@ -1084,6 +1091,9 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
   // 종합 해석
   renderInterpret(gyek, grades, rels, eyPat, allJawon, hasGeuk, allSaeng, allYang, allEum, yangCnt);
   renderYongsinMatch(allChars, allJawon, allEumOh);
+  document.getElementById('aiAnalysisWrap').style.display = 'block';
+  document.getElementById('aiAnalysisResult').style.display = 'none';
+  document.getElementById('aiAnalysisResult').textContent = '';
   document.getElementById('resultArea').classList.add('show');
 }
 
@@ -1142,6 +1152,165 @@ function renderInterpret(gyek, grades, rels, eyPat, jawon, hasGeuk, allSaeng, al
   if (jawonText) html += '<div class="interpret-section"><span class="interpret-label">자원오행 해석</span>'+jawonText+'</div>';
   html += '<div class="interpret-section" style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px;"><span class="interpret-label">종합 판단</span>'+overall+'</div>';
   el.innerHTML = html;
+}
+
+var SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
+var SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
+
+function getOrbBalance(userId) {
+  return fetch(SB_URL + '/rest/v1/orb_balance?user_id=eq.' + encodeURIComponent(userId) + '&select=balance,paid_balance', {
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(rows) {
+    if (!rows || !rows.length) return { balance: 0, paid_balance: 0 };
+    return rows[0];
+  });
+}
+
+function deductOrb(userId, amount) {
+  return getOrbBalance(userId).then(function(bal) {
+    var paid = bal.paid_balance || 0;
+    var free = bal.balance || 0;
+    var total = paid + free;
+    if (total < amount) return Promise.reject(new Error('잔액 부족'));
+    var newPaid = Math.max(0, paid - amount);
+    var remain = amount - (paid - newPaid);
+    var newFree = free - remain;
+    return fetch(SB_URL + '/rest/v1/orb_balance?user_id=eq.' + encodeURIComponent(userId), {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ balance: newFree, paid_balance: newPaid })
+    }).then(function() {
+      return fetch(SB_URL + '/rest/v1/orb_transactions', {
+        method: 'POST',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ user_id: userId, amount: -amount, type: 'use', desc: '이름 AI 심층분석' })
+      });
+    });
+  });
+}
+
+function onAiAnalysisClick() {
+  var user = null;
+  try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+  if (!user) { showToast('로그인이 필요합니다', true); return; }
+  if (!lastScores) { showToast('먼저 점수를 확인해주세요', true); return; }
+  var btn = document.getElementById('btnAiAnalysis');
+  btn.disabled = true;
+  getOrbBalance(user.id).then(function(bal) {
+    var total = (bal.balance || 0) + (bal.paid_balance || 0);
+    if (total < 500) {
+      showToast('Orb가 부족합니다 (현재 ' + total + ' Orb)', true);
+      btn.disabled = false;
+      return;
+    }
+    if (!confirm('AI 심층분석을 실행합니다. 500 Orb가 차감됩니다.\n현재 잔액: ' + total + ' Orb')) {
+      btn.disabled = false;
+      return;
+    }
+    deductOrb(user.id, 500).then(function() {
+      runAiAnalysis();
+    }).catch(function(e) {
+      showToast(e.message || '차감 중 오류가 발생했습니다', true);
+      btn.disabled = false;
+    });
+  }).catch(function() {
+    showToast('잔액 조회 중 오류가 발생했습니다', true);
+    btn.disabled = false;
+  });
+}
+
+function runAiAnalysis() {
+  var btn = document.getElementById('btnAiAnalysis');
+  var resultEl = document.getElementById('aiAnalysisResult');
+  btn.textContent = '분석 중...';
+  resultEl.style.display = 'block';
+  resultEl.textContent = '';
+
+  var sur = document.getElementById('inputSur').value.trim();
+  var name = document.getElementById('inputName').value.trim();
+  var scores = lastScores;
+  var grades = [scores.jung, scores.hyun, scores.won, scores.yi].map(function(v){ return (SURI_TABLE[v]||'흉') + '(' + v + ')'; });
+  var totalScore = Math.round(
+    [scores.jung, scores.hyun, scores.won, scores.yi]
+      .map(function(v){ return GRADE_SCORE[SURI_TABLE[v]||'흉']||0; })
+      .reduce(function(a,b){return a+b;},0) / 4
+  );
+
+  var profile = null;
+  try { profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+  var profileText = profile
+    ? '생년월일: ' + profile.year + '년 ' + profile.month + '월 ' + profile.day + '일, 성별: ' + (profile.gender === 'M' ? '남' : '여')
+    : '';
+  var yongsinText = _yongsin ? '용신: ' + _yongsin : '';
+  var geokgukText = _geokguk ? '격국: ' + _geokguk : '';
+
+  var prompt = '이름 "' + sur + name + '"의 수리성명학 심층분석을 해주세요.\n\n' +
+    '【수리 4격】\n' +
+    '정격(전체운): ' + grades[0] + '\n' +
+    '형격(사회운): ' + grades[1] + '\n' +
+    '원격(내면·재능): ' + grades[2] + '\n' +
+    '이격(가정·말년): ' + grades[3] + '\n' +
+    '종합 점수: ' + totalScore + '/100점\n' +
+    (profileText ? '\n【사주 정보】\n' + profileText + '\n' : '') +
+    (yongsinText ? yongsinText + '\n' : '') +
+    (geokgukText ? geokgukText + '\n' : '') +
+    '\n다음 항목을 중심으로 500자 이상 상세 분석해주세요:\n' +
+    '1. 수리 4격의 종합적 의미와 상호 작용\n' +
+    '2. 이 이름이 인생에 미치는 주요 영향\n' +
+    '3. 강점과 주의해야 할 운의 흐름\n' +
+    (yongsinText ? '4. 용신 오행과의 조화도\n' : '') +
+    '5. 종합 조언 및 보완 방향\n\n' +
+    '친근하고 따뜻한 전문가 톤으로 작성해주세요. 헤더(#) 금지.';
+
+  fetch('https://fortuna-silk.vercel.app/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      messages: [{ role: 'user', content: prompt }],
+      system: '당신은 수리성명학 전문가입니다. 이름의 수리 에너지를 깊이 분석하여 실질적인 조언을 제공합니다.',
+      max_tokens: 1200,
+      stream: true
+    })
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('API 오류');
+    var reader = r.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '';
+    function read() {
+      reader.read().then(function(chunk) {
+        if (chunk.done) {
+          btn.textContent = 'AI 심층분석 완료';
+          btn.disabled = false;
+          return;
+        }
+        buffer += decoder.decode(chunk.value, { stream: true });
+        var lines = buffer.split('\n');
+        buffer = lines.pop();
+        lines.forEach(function(line) {
+          if (!line.startsWith('data:')) return;
+          var d = line.slice(5).trim();
+          if (d === '[DONE]') return;
+          try {
+            var j = JSON.parse(d);
+            var delta = j.delta && j.delta.text ? j.delta.text
+              : j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content
+              ? j.choices[0].delta.content : '';
+            if (delta) resultEl.textContent += delta;
+          } catch(e) {}
+        });
+        read();
+      }).catch(function() { btn.disabled = false; });
+    }
+    read();
+  })
+  .catch(function() {
+    showToast('분석 중 오류가 발생했습니다', true);
+    btn.textContent = 'AI 심층분석 · 500 Orb';
+    btn.disabled = false;
+  });
 }
 
 var toastTimer = null;
