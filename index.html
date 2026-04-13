@@ -1021,7 +1021,7 @@
   <div id="nsResult" style="display:none;max-width:480px;margin:0 auto;padding:0 16px;box-sizing:border-box;">
     <div id="nsGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;"></div>
     <div id="nsTotalScore" style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:14px;"></div>
-    <a id="nsCtaBtn" href="https://picolab.kr/name-score.html" target="_blank"
+    <a id="nsCtaBtn" href="/name-score.html" target="_blank"
       style="display:block;background:linear-gradient(135deg,#d4af37,#f0d060,#d4af37);background-size:200% 200%;border-radius:12px;padding:14px;color:#06020f;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:all 0.3s;"
       onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 30px rgba(212,175,55,0.35)'"
       onmouseout="this.style.transform='';this.style.boxShadow=''">
@@ -1152,7 +1152,7 @@
     setTimeout(function(){ var f=document.getElementById('nsTotalFill'); if(f) f.style.width=_total+'%'; },50);
 
     // CTA URL에 이름 전달
-    var ctaUrl = 'https://picolab.kr/name-score.html?sur='+encodeURIComponent(sur)+'&name='+encodeURIComponent(name);
+    var ctaUrl = '/name-score.html?sur='+encodeURIComponent(sur)+'&name='+encodeURIComponent(name);
     document.getElementById('nsCtaBtn').href = ctaUrl;
     document.getElementById('nsResult').style.display = 'block';
   };
