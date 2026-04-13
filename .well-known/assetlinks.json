@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "kr.picolab.main",
+    "sha256_cert_fingerprints": [
+      "21:55:3E:26:B5:BF:8F:ED:60:5E:3B:60:44:E3:87:DA:20:D7:96:1F:05:82:45:DF:E7:89:7C:A6:B4:44:48:E4"
+    ]
+  }
+}]
