@@ -989,6 +989,12 @@ async function startGeneration() {
 }
 
 // ── 기존 리포트 조회 ──
+function getProfileKey() {
+  const p = _profile;
+  if (!p) return '';
+  return `${p.year}-${p.month}-${p.day}-${p.hour || 0}-${p.gender}`;
+}
+
 async function fetchExistingReport() {
   try {
     const sb = getSb();
@@ -999,7 +1005,12 @@ async function fetchExistingReport() {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
-    return data || null;
+    if (!data) return null;
+    // 프로필 키 불일치 시 무효 처리 (다른 프로필로 생성된 캐시 방지)
+    const sectionCount = (TYPE_SECTIONS[_type] || TYPE_SECTIONS.character).length;
+    const storedKey = Array.isArray(data.content) ? data.content[sectionCount] : null;
+    if (storedKey && storedKey !== getProfileKey()) return null;
+    return data;
   } catch(e) { return null; }
 }
 
@@ -1157,7 +1168,7 @@ async function generateReport() {
     const { data } = await sb.from('reports').insert({
       user_id: _user.id,
       report_type: _type,
-      content: results,
+      content: [...results, getProfileKey()],
       orb_spent: _config.orb,
       created_at: new Date().toISOString()
     }).select().maybeSingle();
@@ -1179,7 +1190,8 @@ function renderReport(sections, createdAt) {
 
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
-  sections.forEach((text, i) => {
+  const _sectionCount = (TYPE_SECTIONS[_type] || TYPE_SECTIONS.character).length;
+  sections.slice(0, _sectionCount).forEach((text, i) => {
     const card = document.createElement('div');
     card.className = 'section-card';
     card.style.animationDelay = (i * 0.08) + 's';
@@ -1436,7 +1448,7 @@ async function generateCharacterReport() {
     const allTexts = Array.from({length: 5}, (_, i) => document.getElementById(`sbody-${i}`)?.innerText || '');
     const { data } = await sb.from('reports').insert({
       user_id: _user.id, report_type: _type,
-      content: allTexts, orb_spent: _config.orb,
+      content: [...allTexts, getProfileKey()], orb_spent: _config.orb,
       created_at: new Date().toISOString()
     }).select().maybeSingle();
     if (data) { _reportId = data.id; showToast('✦ 리포트가 저장되었습니다. 마이페이지에서 다시 확인할 수 있어요.'); }
