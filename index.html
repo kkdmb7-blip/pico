@@ -961,42 +961,44 @@
 </style>
 
 <!-- TODAY SCORE -->
-<section class="section-score" id="scoreSectionWrap">
-  <div class="section-label">5대 운세 교차 분석</div>
-  <h2 class="section-title" id="mainScoreTitle" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;">오늘의 <em>운세 점수</em></h2>
-  <p id="scoreTodayDate" style="font-size:14px;color:var(--muted);margin-bottom:24px;"></p>
-  <script>
-    (function(){
-      var d = new Date();
-      var days = ['일','월','화','수','목','금','토'];
-      document.getElementById('scoreTodayDate').textContent =
-        d.getFullYear() + '년 ' + (d.getMonth()+1) + '월 ' + d.getDate() + '일 (' + days[d.getDay()] + ')';
-    })();
-  </script>
+<section style="padding:24px 16px 8px;max-width:640px;margin:0 auto;position:relative;z-index:1;" id="scoreSectionWrap">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 20px 16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div>
+        <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">5대 운세 교차 분석</div>
+        <h2 id="mainScoreTitle" style="font-size:18px;font-weight:700;margin:0;color:var(--text);">오늘의 <em>운세 점수</em></h2>
+      </div>
+      <p id="scoreTodayDate" style="font-size:11px;color:var(--muted);margin:0;text-align:right;"></p>
+    </div>
+    <script>
+      (function(){
+        var d = new Date();
+        var days = ['일','월','화','수','목','금','토'];
+        document.getElementById('scoreTodayDate').textContent =
+          (d.getMonth()+1) + '/' + d.getDate() + ' (' + days[d.getDay()] + ')';
+      })();
+    </script>
 
-  <!-- 로그인 전 -->
-  <div id="scoreLoginPrompt" class="score-login-prompt"></div>
+    <!-- 로그인 전 -->
+    <div id="scoreLoginPrompt" class="score-login-prompt"></div>
 
-  <!-- 로딩 -->
-  <div id="scoreLoadingRow" class="score-loading-row" style="display:none;">
-    <div class="score-loading-spinner"></div>
-    <span>운세 점수 계산 중…</span>
-  </div>
+    <!-- 로딩 -->
+    <div id="scoreLoadingRow" class="score-loading-row" style="display:none;">
+      <div class="score-loading-spinner"></div>
+      <span>운세 점수 계산 중…</span>
+    </div>
 
-  <!-- 결과 -->
-  <div id="scoreMiniResult" style="display:none;">
-    <div class="score-mini-grid" id="scoreMiniGrid"></div>
-    <div class="score-summary-text" id="scoreSummaryText" style="margin-bottom:10px;"></div>
-    <p style="margin:0 auto 14px;text-align:center;max-width:320px;">
-      <span style="display:block;font-size:12px;font-weight:600;color:rgba(200,180,255,0.85);line-height:1.6;">⏱ 기문둔갑 · 베딕점성술은 실시간 반영됩니다</span>
-      <span style="display:block;font-size:11px;font-weight:400;color:rgba(180,160,240,0.6);line-height:1.7;margin-top:3px;">기문은 2시간마다 시(時)가 바뀌고, 베딕은 행성 위치에 따라 점수가 달라질 수 있습니다.</span>
-    </p>
-    <div class="score-bottom-row">
-      <div class="score-overall-chip">
-        <span>종합</span>
-        <span class="score-overall-num" id="scoreOverallNum">–</span>
-        <span style="font-size:12px;color:var(--muted);">점</span>
-        <a class="score-detail-btn" id="scoreDetailLink" href="score.html" style="margin-left:10px;">자세히 보기 →</a>
+    <!-- 결과 -->
+    <div id="scoreMiniResult" style="display:none;">
+      <div class="score-mini-grid" id="scoreMiniGrid" style="gap:8px;margin-bottom:12px;"></div>
+      <div class="score-summary-text" id="scoreSummaryText" style="margin-bottom:8px;font-size:12px;"></div>
+      <div class="score-bottom-row" style="margin-top:0;">
+        <div class="score-overall-chip">
+          <span>종합</span>
+          <span class="score-overall-num" id="scoreOverallNum">–</span>
+          <span style="font-size:12px;color:var(--muted);">점</span>
+          <a class="score-detail-btn" id="scoreDetailLink" href="score.html" style="margin-left:10px;">자세히 보기 →</a>
+        </div>
       </div>
     </div>
   </div>
