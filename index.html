@@ -862,6 +862,8 @@
     <div class="memox-banner-btn">상담 시작 →</div>
   </div>
 </div>
+<!-- 오늘의 명언 카드 -->
+<div id="picoQuoteCardWrap" style="padding:8px 16px 0;display:none;"></div>
 <!-- HERO (비로그인 전용) -->
 <script>(function(){try{if(localStorage.getItem('pico_user')){document.write('<style>.hero,#heroInputWrap{display:none}</style>');}}catch(e){}})();</script>
 <section class="hero">
@@ -4536,6 +4538,47 @@ window.togglePushSubscription = async function() {
   }
 };
 
+// ── 오늘의 명언 카드 (홈 화면) ────────────────────────────────────
+(async function loadPicoQuoteCard() {
+  var today = (function() {
+    var d = new Date(Date.now() + 9 * 3600000);
+    return d.getUTCFullYear() + '-' + String(d.getUTCMonth()+1).padStart(2,'0') + '-' + String(d.getUTCDate()).padStart(2,'0');
+  })();
+  if (localStorage.getItem('pico_quote_dismissed') === today) return;
+
+  try {
+    var res = await fetch('https://fortuna-silk.vercel.app/api/daily-quote');
+    if (!res.ok) return;
+    var data = await res.json();
+    if (!data || !data.quote) return;
+
+    var wrap = document.getElementById('picoQuoteCardWrap');
+    if (!wrap) return;
+
+    wrap.style.display = 'block';
+    wrap.innerHTML =
+      '<div style="background:linear-gradient(160deg,var(--surface) 0%,rgba(45,27,78,0.6) 100%);border:1px solid rgba(212,175,55,0.2);border-radius:18px;padding:16px 18px;position:relative;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+          '<span style="font-size:10px;color:rgba(212,175,55,0.55);letter-spacing:0.12em;font-weight:600;">✦ 오늘의 우주 메시지</span>' +
+          '<button id="btnDismissQuote" style="background:none;border:none;color:rgba(255,255,255,0.25);font-size:16px;cursor:pointer;line-height:1;padding:0 2px;">✕</button>' +
+        '</div>' +
+        '<p style="font-size:14px;font-style:italic;color:var(--text);line-height:1.75;margin:0 0 8px;font-family:\'Noto Serif KR\',serif;">' +
+          '&ldquo;' + (data.quote || '').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '&rdquo;' +
+        '</p>' +
+        '<p style="font-size:11px;color:rgba(212,175,55,0.55);margin:0 0 ' + (data.message ? '10px' : '0') + ';letter-spacing:0.04em;">— ' + (data.source || '').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</p>' +
+        (data.message
+          ? '<p style="font-size:12px;color:var(--muted);line-height:1.6;margin:0;background:rgba(212,175,55,0.05);border-radius:10px;padding:10px 12px;">' +
+              (data.message).replace(/</g,'&lt;').replace(/>/g,'&gt;') +
+            '</p>'
+          : '') +
+      '</div>';
+
+    document.getElementById('btnDismissQuote').addEventListener('click', function() {
+      localStorage.setItem('pico_quote_dismissed', today);
+      wrap.style.display = 'none';
+    });
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
