@@ -1009,7 +1009,7 @@ async function fetchExistingReport() {
     // 프로필 키 불일치 시 무효 처리 (다른 프로필로 생성된 캐시 방지)
     const sectionCount = (TYPE_SECTIONS[_type] || TYPE_SECTIONS.character).length;
     const storedKey = Array.isArray(data.content) ? data.content[sectionCount] : null;
-    if (storedKey && storedKey !== getProfileKey()) return null;
+    if (!storedKey || storedKey !== getProfileKey()) return null;
     return data;
   } catch(e) { return null; }
 }
