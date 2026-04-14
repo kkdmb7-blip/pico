@@ -1011,48 +1011,58 @@
 <div class="section-divider"></div>
 
 <!-- QIMEN WEEKLY -->
-<section class="section-score" id="qimenWeeklyWrap" style="display:none;">
-  <div class="section-label" style="letter-spacing:0.15em;">奇門遁甲 · 일가 기반</div>
-  <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;font-weight:300;">이번 주 <em style="font-weight:700;">기문 일운</em></h2>
-  <p style="font-size:12px;color:var(--muted);margin-bottom:24px;letter-spacing:0.03em;">直使門 기준 · 일간 오행 맞춤 분석</p>
-  <div id="qimenWeeklyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:18px;"></div>
-  <div id="qimenWeeklyDetail" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 16px;display:none;"></div>
-  <p style="margin-top:14px;text-align:center;font-size:10px;color:rgba(107,107,133,0.6);letter-spacing:0.05em;">탭하면 상세 보기 · 기문둔갑 페이지에서 전체 포국 확인</p>
+<section style="display:none;padding:8px 16px;max-width:640px;margin:0 auto;position:relative;z-index:1;" id="qimenWeeklyWrap">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 20px 16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div>
+        <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">奇門遁甲 · 일가 기반</div>
+        <h2 style="font-size:20px;font-weight:700;margin:0;color:var(--text);">이번 주 <span style="color:#d4af37;">기문 일운</span></h2>
+      </div>
+      <div style="font-size:10px;color:rgba(107,107,133,0.6);text-align:right;">直使門 기준<br>일간 오행 맞춤</div>
+    </div>
+    <div id="qimenWeeklyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px;"></div>
+    <div id="qimenWeeklyDetail" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;display:none;font-size:13px;"></div>
+    <p style="margin-top:10px;margin-bottom:0;text-align:center;font-size:10px;color:rgba(107,107,133,0.5);">탭하면 상세 보기 · 기문둔갑 페이지에서 전체 포국 확인</p>
+  </div>
 </section>
 
 <div class="section-divider"></div>
 
 <!-- NAME SCORE WIDGET -->
-<section class="section-score" id="nameScoreWrap" style="text-align:center;overflow:hidden;">
-  <div class="section-label" style="display:none;">✨ 이름 수리 무료 체험</div>
-  <h2 class="section-title" style="font-size:clamp(22px,3.5vw,38px);margin-bottom:8px;">내 이름은 <em>몇 점</em>일까?</h2>
-  <p style="font-size:13px;color:var(--muted);margin-bottom:28px;letter-spacing:0.04em;">이름 획수로 알아보는 81수리 점수</p>
+<section style="padding:8px 16px 24px;max-width:640px;margin:0 auto;position:relative;z-index:1;" id="nameScoreWrap">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 20px 16px;overflow:hidden;">
+    <div style="margin-bottom:14px;">
+      <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">이름 수리 무료 체험</div>
+      <h2 style="font-size:20px;font-weight:700;margin:0 0 4px;color:var(--text);">내 이름은 <span style="color:#d4af37;">몇 점</span>일까?</h2>
+      <p style="font-size:12px;color:var(--muted);margin:0;">이름 획수로 알아보는 81수리 점수</p>
+    </div>
 
-  <!-- 입력 -->
-  <div style="display:flex;gap:10px;max-width:400px;margin:0 auto 16px;padding:0 16px;box-sizing:border-box;">
-    <input id="nsSur" type="text" maxlength="3" placeholder="성(姓)"
-      style="flex:1;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 10px;color:var(--text);font-size:15px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:border-color 0.2s;"
-      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-    <input id="nsName" type="text" maxlength="4" placeholder="이름"
-      style="flex:2;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 10px;color:var(--text);font-size:15px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:border-color 0.2s;"
-      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-    <button onclick="nsCalc()" id="nsBtn"
-      style="flex-shrink:0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);border:none;border-radius:10px;padding:12px 16px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.25s;"
-      onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
-      점수 확인
-    </button>
-  </div>
+    <!-- 입력 -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <input id="nsSur" type="text" maxlength="3" placeholder="성(姓)"
+        style="flex:1;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 8px;color:var(--text);font-size:14px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+      <input id="nsName" type="text" maxlength="4" placeholder="이름"
+        style="flex:2;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 8px;color:var(--text);font-size:14px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+      <button onclick="nsCalc()" id="nsBtn"
+        style="flex-shrink:0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);border:none;border-radius:10px;padding:11px 14px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.25s;"
+        onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        점수 확인
+      </button>
+    </div>
 
-  <!-- 결과 카드 -->
-  <div id="nsResult" style="display:none;max-width:480px;margin:0 auto;padding:0 16px;box-sizing:border-box;">
-    <div id="nsGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;"></div>
-    <div id="nsTotalScore" style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);border-radius:16px;padding:20px;text-align:center;margin-bottom:14px;"></div>
-    <a id="nsCtaBtn" href="/name-score.html" target="_blank"
-      style="display:block;background:linear-gradient(135deg,#d4af37,#f0d060,#d4af37);background-size:200% 200%;border-radius:12px;padding:14px;color:#06020f;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:all 0.3s;"
-      onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 30px rgba(212,175,55,0.35)'"
-      onmouseout="this.style.transform='';this.style.boxShadow=''">
-      AI 심층 분석 받기 →
-    </a>
+    <!-- 결과 카드 -->
+    <div id="nsResult" style="display:none;">
+      <div id="nsGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;"></div>
+      <div id="nsTotalScore" style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:16px;text-align:center;margin-bottom:12px;"></div>
+      <a id="nsCtaBtn" href="/name-score.html" target="_blank"
+        style="display:block;background:linear-gradient(135deg,#d4af37,#f0d060,#d4af37);background-size:200% 200%;border-radius:12px;padding:13px;color:#06020f;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:all 0.3s;"
+        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 30px rgba(212,175,55,0.35)'"
+        onmouseout="this.style.transform='';this.style.boxShadow=''">
+        AI 심층 분석 받기 →
+      </a>
+    </div>
   </div>
 </section>
 
