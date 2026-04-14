@@ -3343,6 +3343,11 @@ function checkAuth() {
     history.replaceState({}, '', window.location.pathname);
     kakaoLogin();
   }
+  // 딥링크: #gunghap → 궁합 모달 자동 오픈
+  if (window.location.hash === '#gunghap') {
+    history.replaceState({}, '', window.location.pathname);
+    setTimeout(function() { openGunghapModal(); }, 300);
+  }
 }
 
 function shareMainKakao() {
