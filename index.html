@@ -864,6 +864,16 @@
 </div>
 <!-- 오늘의 명언 카드 -->
 <div id="picoQuoteCardWrap" style="padding:8px 16px 0;display:none;"></div>
+<!-- 사주일기 CTA -->
+<div id="diaryCtaWrap" style="padding:8px 16px 0;display:none;">
+  <div id="diaryCta" onclick="window.location.href='diary.html'" style="background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.22);border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(212,175,55,0.45)'" onmouseout="this.style.borderColor='rgba(212,175,55,0.22)'">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--gold);" id="diaryCtaTitle">오늘 일기 써봐 ✏️</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;" id="diaryCtaSub">일진과 하루를 기록하면 AI가 코멘트해줘</div>
+    </div>
+    <div style="font-size:28px;" id="diaryCtaEmoji">📔</div>
+  </div>
+</div>
 <!-- HERO (비로그인 전용) -->
 <script>(function(){try{if(localStorage.getItem('pico_user')){document.write('<style>.hero,#heroInputWrap{display:none}</style>');}}catch(e){}})();</script>
 <section class="hero">
@@ -4652,6 +4662,26 @@ window.togglePushSubscription = async function() {
       localStorage.setItem('pico_quote_dismissed', today);
       wrap.style.display = 'none';
     });
+  } catch(e) {}
+})();
+
+// ── 사주일기 CTA ─────────────────────────────────────────────
+(function loadDiaryCta() {
+  try {
+    var user = JSON.parse(localStorage.getItem('pico_user'));
+    if (!user || !user.id) return;
+    var d = new Date(Date.now() + 9 * 3600000);
+    var todayStr = d.getUTCFullYear() + '-' + String(d.getUTCMonth()+1).padStart(2,'0') + '-' + String(d.getUTCDate()).padStart(2,'0');
+    var wrap = document.getElementById('diaryCtaWrap');
+    if (!wrap) return;
+    wrap.style.display = 'block';
+    var cached = localStorage.getItem('pico_diary_' + todayStr);
+    var MOOD_EMOJI = {good:'😊',normal:'😐',bad:'😔',energetic:'🔥',tired:'💤'};
+    if (cached && MOOD_EMOJI[cached]) {
+      document.getElementById('diaryCtaTitle').textContent = '오늘 일기 기록 완료 ' + MOOD_EMOJI[cached];
+      document.getElementById('diaryCtaSub').textContent = '일진 코멘트 다시 보기';
+      document.getElementById('diaryCtaEmoji').textContent = MOOD_EMOJI[cached];
+    }
   } catch(e) {}
 })();
 </script>
