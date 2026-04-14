@@ -374,21 +374,26 @@
     margin-bottom: 24px;
   }
   .score-mini-card {
-    background: var(--surface);
+    background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 18px 12px 16px;
+    padding: 14px 10px 12px;
     text-align: center;
     transition: all 0.3s;
-    cursor: default;
+    cursor: pointer;
   }
-  .score-mini-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  .score-mini-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .score-mini-card.active { border-color: var(--accent); background: rgba(123,94,167,0.12); }
+  .score-mini-card.highest { border-color: #d4af37; box-shadow: 0 0 12px rgba(212,175,55,0.25); }
+  .score-mini-card.highest .score-mini-num { color: #d4af37 !important; }
+  .score-mini-emoji { display: none; }
+  .score-mini-label { font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+  #scoreMiniDesc {
+    margin-top: 10px; padding: 12px 14px;
+    background: rgba(123,94,167,0.1); border: 1px solid rgba(123,94,167,0.25);
+    border-radius: 12px; font-size: 13px; color: var(--text2); line-height: 1.6;
+    display: none;
   }
-  .score-mini-emoji { font-size: 22px; margin-bottom: 8px; }
-  .score-mini-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
   .score-mini-gauge {
     height: 5px;
     background: var(--surface2);
@@ -421,9 +426,7 @@
   }
   .score-overall-chip {
     display: flex; align-items: center; gap: 8px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 100px; padding: 8px 18px;
-    font-size: 14px;
+    font-size: 14px; padding: 4px 0;
   }
   .score-overall-num {
     font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 700;
@@ -966,7 +969,7 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div>
         <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">5대 운세 교차 분석</div>
-        <h2 id="mainScoreTitle" style="font-size:18px;font-weight:700;margin:0;color:var(--text);">오늘의 <em>운세 점수</em></h2>
+        <h2 id="mainScoreTitle" style="font-size:20px;font-weight:700;margin:0;color:var(--text);"><span style="color:#d4af37;">오늘의 운세</span> 점수</h2>
       </div>
       <p id="scoreTodayDate" style="font-size:11px;color:var(--muted);margin:0;text-align:right;"></p>
     </div>
@@ -990,8 +993,9 @@
 
     <!-- 결과 -->
     <div id="scoreMiniResult" style="display:none;">
-      <div class="score-mini-grid" id="scoreMiniGrid" style="gap:8px;margin-bottom:12px;"></div>
-      <div class="score-summary-text" id="scoreSummaryText" style="margin-bottom:8px;font-size:12px;"></div>
+      <div class="score-mini-grid" id="scoreMiniGrid" style="gap:8px;margin-bottom:8px;"></div>
+      <div id="scoreMiniDesc"></div>
+      <div class="score-summary-text" id="scoreSummaryText" style="margin-bottom:8px;font-size:12px;display:none;"></div>
       <div class="score-bottom-row" style="margin-top:0;">
         <div class="score-overall-chip">
           <span>종합</span>
@@ -3888,19 +3892,57 @@ async function loadMiniScore() {
     travel:{emoji:'🌍',label:'이동/변화'},
   };
 
+  var _domainDesc = {
+    money: { high:'재물·사업 운이 강합니다. 투자나 중요한 결정에 좋은 시기입니다.', mid:'재물 흐름은 평이합니다. 큰 지출은 신중히 검토하세요.', low:'재물 운이 약합니다. 섣부른 투자나 지출을 삼가세요.' },
+    love:  { high:'관계·연애 운이 좋습니다. 새로운 만남이나 고백에 유리한 날입니다.', mid:'관계는 무난합니다. 오해가 생기지 않도록 소통에 신경 쓰세요.', low:'감정 기복이 있을 수 있습니다. 중요한 대화는 내일로 미루세요.' },
+    health:{ high:'체력과 활력이 넘칩니다. 운동이나 야외 활동을 적극 추천합니다.', mid:'건강은 보통입니다. 무리하지 말고 적당한 휴식을 취하세요.', low:'피로가 쌓이기 쉬운 날입니다. 충분한 수면과 수분 섭취를 권합니다.' },
+    wisdom:{ high:'집중력과 창의력이 높습니다. 중요한 공부·기획·발표에 좋습니다.', mid:'학업·업무 흐름은 평범합니다. 꼼꼼히 검토하는 습관을 유지하세요.', low:'집중력이 흐트러지기 쉽습니다. 복잡한 결정은 미루는 게 좋습니다.' },
+    travel:{ high:'이동·변화 운이 좋습니다. 여행·출장·새로운 시도에 길한 날입니다.', mid:'이동은 무난합니다. 시간 여유를 두고 움직이세요.', low:'이동 중 변수가 생길 수 있습니다. 여유 있게 출발하고 주의하세요.' }
+  };
+  function _domainDescText(d, sc) {
+    var t = _domainDesc[d];
+    if (!t) return '';
+    return sc >= 75 ? t.high : sc >= 50 ? t.mid : t.low;
+  }
+
+  // 최고 점수 도메인 찾기
+  var _maxScore = -1, _maxDomain = '';
+  domainOrder.forEach(function(d) { if (result.final[d] > _maxScore) { _maxScore = result.final[d]; _maxDomain = d; } });
+
   var grid = document.getElementById('scoreMiniGrid');
   grid.innerHTML = '';
+  var _cards = {};
   domainOrder.forEach(function(d, i) {
     var info = domainInfo[d];
     var sc   = result.final[d];
     var col  = _scoreColor(sc);
     var card = document.createElement('div');
-    card.className = 'score-mini-card';
+    card.className = 'score-mini-card' + (d === _maxDomain ? ' highest' : '');
     card.innerHTML =
-      '<div class="score-mini-emoji">' + info.emoji + '</div>' +
       '<div class="score-mini-label">' + info.label + '</div>' +
-      '<div class="score-mini-gauge"><div class="score-mini-fill" id="mfill_' + d + '" style="background:' + col + ';"></div></div>' +
-      '<div class="score-mini-num" id="mnum_' + d + '" style="color:' + col + ';">0</div>';
+      '<div class="score-mini-gauge"><div class="score-mini-fill" id="mfill_' + d + '" style="background:' + (d === _maxDomain ? '#d4af37' : col) + ';"></div></div>' +
+      '<div class="score-mini-num" id="mnum_' + d + '" style="color:' + (d === _maxDomain ? '#d4af37' : col) + ';">0</div>';
+    _cards[d] = card;
+
+    // 클릭 시 설명
+    (function(domain, score) {
+      card.addEventListener('click', function() {
+        var descEl = document.getElementById('scoreMiniDesc');
+        var allCards = grid.querySelectorAll('.score-mini-card');
+        allCards.forEach(function(c) { c.classList.remove('active'); });
+        if (descEl.dataset.open === domain) {
+          descEl.style.display = 'none';
+          descEl.dataset.open = '';
+          return;
+        }
+        card.classList.add('active');
+        var info2 = domainInfo[domain];
+        descEl.innerHTML = '<strong style="color:var(--text);">' + info2.label + ' · ' + score + '점</strong><br>' + _domainDescText(domain, score);
+        descEl.style.display = 'block';
+        descEl.dataset.open = domain;
+      });
+    })(d, sc);
+
     grid.appendChild(card);
 
     // 애니메이션
