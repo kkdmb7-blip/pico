@@ -3480,7 +3480,7 @@ function updateAuthUI() {
     try { var pp = JSON.parse(localStorage.getItem('pico_profile')); profileName = pp && pp.name; } catch(e) {}
     var _displayName = profileName || currentUser.name;
     if (titleEl && _displayName) {
-      titleEl.innerHTML = _displayName + '님의 <em>오늘의 운세 점수</em>';
+      titleEl.innerHTML = _displayName + '님의 <span style="color:#d4af37;">오늘의 운세</span> 점수';
     }
     var _ctn = document.getElementById('cosmicTitleName');
     if (_ctn && _displayName) _ctn.textContent = _displayName + '님의';
@@ -3492,7 +3492,7 @@ function updateAuthUI() {
     if (heroEl) heroEl.style.display = '';
     if (heroInputEl) heroInputEl.style.display = '';
     if (p && p.name) {
-      if (titleEl) titleEl.innerHTML = p.name + '님의 <em>오늘의 운세 점수</em>';
+      if (titleEl) titleEl.innerHTML = p.name + '님의 <span style="color:#d4af37;">오늘의 운세</span> 점수';
       var _ctn2 = document.getElementById('cosmicTitleName');
       if (_ctn2) _ctn2.textContent = p.name + '님의';
     }
