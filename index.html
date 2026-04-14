@@ -210,61 +210,61 @@
 
   /* ── WHY SECTION ── */
   .section-why {
-    padding: 96px 24px 80px;
-    max-width: 960px;
+    padding: 8px 16px 24px;
+    max-width: 640px;
     margin: 0 auto;
-    text-align: center;
     position: relative;
     z-index: 1;
   }
   .why-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
   .why-tagline {
-    margin-top: 40px;
-    font-size: 15px;
+    margin-top: 16px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--accent2);
     letter-spacing: 0.3px;
     line-height: 1.6;
+    text-align: center;
   }
   .why-card {
-    background: var(--surface);
+    background: var(--surface2);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px 24px;
+    border-radius: 14px;
+    padding: 14px 12px;
     transition: all 0.3s;
   }
   .why-card:hover {
     border-color: var(--accent);
     background: var(--surface2);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(123,94,167,0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(123,94,167,0.12);
   }
-  .why-icon { font-size: 36px; margin-bottom: 16px; }
+  .why-icon { display: none; }
   .why-card h3 {
     font-family: 'Noto Serif KR', serif;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
+    color: #d4af37;
   }
-  .why-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .why-card p { font-size: 12px; color: var(--muted); line-height: 1.6; }
   /* 궁합 카드: 풀너비 가로형 */
   .why-card.why-card-full {
     grid-column: 1 / -1;
-    display: flex; align-items: center; gap: 32px;
-    padding: 28px 40px;
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 16px;
     border-color: rgba(255,130,170,0.3);
     background: linear-gradient(135deg, var(--surface), rgba(255,130,170,0.04));
   }
   .why-card.why-card-full:hover { border-color: rgba(255,130,170,0.6); }
-  .why-card.why-card-full .why-icon { font-size: 44px; margin-bottom: 0; flex-shrink: 0; }
   .why-card.why-card-full .why-card-body { flex: 1; }
-  .why-card.why-card-full h3 { margin-bottom: 4px; font-size: 18px; }
+  .why-card.why-card-full h3 { margin-bottom: 4px; font-size: 14px; color: #ff8ab0; }
   .why-card.why-card-full p { margin: 0; }
-  .why-card.why-card-full .why-card-link { flex-shrink: 0; font-size: 13px; font-weight: 700; color: #ff8ab0; }
+  .why-card.why-card-full .why-card-link { flex-shrink: 0; font-size: 12px; font-weight: 700; color: #ff8ab0; }
 
   /* ── SERVICES SECTION ── */
   .section-services {
@@ -451,12 +451,12 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
-    .why-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .why-card.why-card-full { grid-column: 1 / -1; padding: 20px 20px; gap: 16px; }
-    .why-card.why-card-full h3 { font-size: 16px; }
-    .why-card.why-card-full .why-icon { font-size: 32px; }
+    .why-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .why-card.why-card-full { grid-column: 1 / -1; padding: 12px 14px; gap: 12px; }
+    .why-card.why-card-full h3 { font-size: 14px; }
     .service-grid { grid-template-columns: 1fr; gap: 14px; }
-    .section-why, .section-services { padding: 64px 20px 48px; }
+    .section-why { padding: 8px 16px 16px; }
+    .section-services { padding: 64px 20px 48px; }
     .hero { padding: 72px 20px 60px; }
     .saju-pillars { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .saju-pillar { padding: 16px 10px; }
@@ -1199,55 +1199,50 @@
 
 <!-- WHY PICOLAB -->
 <section class="section-why">
-  <div class="section-label">PICO Lab의 6중 교차검증 시스템</div>
-  <h2 class="section-title" style="font-size:clamp(24px,3.8vw,44px)">5,000년 인류의 지혜를<br><em>AI가 동시에 교차 분석합니다</em></h2>
-  <div class="why-grid">
-    <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
-      <div class="why-icon">🏛️</div>
-      <h3>사주 (四柱)</h3>
-      <p>당신의 리더십 DNA</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
-    </div>
-    <div class="why-card" onclick="openBirthModal('astro')" style="cursor:pointer;">
-      <div class="why-icon">🌟</div>
-      <h3>서양 점성술</h3>
-      <p>당신의 우주 에너지</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
-    </div>
-    <div class="why-card" onclick="openBirthModal('vedic')" style="cursor:pointer;">
-      <div class="why-icon">🕉️</div>
-      <h3>베딕 점성술</h3>
-      <p>카르마와 세부 운의 변화. 달의 별자리(낙샤트라)로 읽는<br>정밀한 운의 리듬.</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
-    </div>
-    <div class="why-card" onclick="openBirthModal('ziwei')" style="cursor:pointer;">
-      <div class="why-icon">⭐</div>
-      <h3>자미두수<br>紫微斗數</h3>
-      <p>당신의 내면 심리</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
-    </div>
-    <div class="why-card" onclick="openQimenModal()" style="cursor:pointer;">
-      <div class="why-icon">🗺️</div>
-      <h3>기문둔갑<br>奇門遁甲</h3>
-      <p>당신의 결정적 타이밍</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
-    </div>
-    <div class="why-card" onclick="openTarotIntro()" style="cursor:pointer;">
-      <div class="why-icon">🔮</div>
-      <h3>타로카드</h3>
-      <p>당신의 직관 신호</p>
-      <div style="margin-top:14px;font-size:12px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
-    </div>
-    <div class="why-card why-card-full" onclick="openGunghapModal()" style="cursor:pointer;">
-      <div class="why-icon">💕</div>
-      <div class="why-card-body">
-        <h3>궁합</h3>
-        <p>사주 오행·띠·계절 조화로 보는 두 사람의 인연. AI가 심층 궁합 해석을 도와드립니다.</p>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 16px 16px;">
+    <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;color:var(--muted);text-align:center;margin-bottom:8px;text-transform:uppercase;">PICO Lab의 6중 교차검증 시스템</div>
+    <h2 style="font-family:'Noto Serif KR',serif;font-size:clamp(16px,3.2vw,22px);font-weight:700;text-align:center;margin-bottom:16px;line-height:1.5;">5,000년 인류의 지혜를<br><span style="color:#d4af37;">AI가 동시에 교차 분석합니다</span></h2>
+    <div class="why-grid">
+      <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
+        <h3>사주 (四柱)</h3>
+        <p>당신의 리더십 DNA</p>
+        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
       </div>
-      <div class="why-card-link">바로 보기 →</div>
+      <div class="why-card" onclick="openBirthModal('astro')" style="cursor:pointer;">
+        <h3>서양 점성술</h3>
+        <p>당신의 우주 에너지</p>
+        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      </div>
+      <div class="why-card" onclick="openBirthModal('vedic')" style="cursor:pointer;">
+        <h3>베딕 점성술</h3>
+        <p>카르마와 세부 운의 변화</p>
+        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      </div>
+      <div class="why-card" onclick="openBirthModal('ziwei')" style="cursor:pointer;">
+        <h3>자미두수 紫微斗數</h3>
+        <p>당신의 내면 심리</p>
+        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      </div>
+      <div class="why-card" onclick="openQimenModal()" style="cursor:pointer;">
+        <h3>기문둔갑 奇門遁甲</h3>
+        <p>당신의 결정적 타이밍</p>
+        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      </div>
+      <div class="why-card" onclick="openTarotIntro()" style="cursor:pointer;">
+        <h3>타로카드</h3>
+        <p>당신의 직관 신호</p>
+        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#e8b86d;">바로 보기 →</div>
+      </div>
+      <div class="why-card why-card-full" onclick="openGunghapModal()" style="cursor:pointer;">
+        <div class="why-card-body">
+          <h3>궁합</h3>
+          <p>사주 오행·띠·계절 조화로 보는 두 사람의 인연</p>
+        </div>
+        <div class="why-card-link">바로 보기 →</div>
+      </div>
     </div>
+    <p class="why-tagline">6가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
   </div>
-  <p class="why-tagline">6가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
 </section>
 
 
