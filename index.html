@@ -2110,10 +2110,76 @@ function calcGunghapScore(mySaju, pSaju) {
   var s1=SEASON[mySaju.monthBranch], s2=SEASON[pSaju.monthBranch];
   var sScore = (s1===s2) ? 30 : (Math.abs(s1-s2)===1||Math.abs(s1-s2)===3) ? 20 : 10;
 
-  var total = Math.round(oScore + tScore + sScore);
+  // ── 보너스 항목 ──────────────────────────────────────────────
+  var bonus = 0;
+
+  // 1. 오행 보완: 한쪽에 없는 오행을 상대가 채워주는지 (+10)
+  var EL_LIST = ['목','화','토','금','수'];
+  var fp1 = mySaju.fivePct, fp2 = pSaju.fivePct;
+  var complementCount = 0;
+  EL_LIST.forEach(function(el) {
+    if ((fp1[el]||0) === 0 && (fp2[el]||0) > 0) complementCount++;
+    if ((fp2[el]||0) === 0 && (fp1[el]||0) > 0) complementCount++;
+  });
+  if (complementCount >= 2) bonus += 10;
+  else if (complementCount === 1) bonus += 5;
+
+  // 2. 음양 비율 균형: 양일간(갑병무경임)과 음일간(을정기신계) 조합 (+10)
+  var YANG_STEMS = ['갑','병','무','경','임'];
+  var YIN_STEMS  = ['을','정','기','신','계'];
+  var STEM_KOR   = ['갑','을','병','정','무','기','경','신','임','계'];
+  var d1stem = STEM_KOR[mySaju.pillars && mySaju.pillars.day ? ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'].indexOf((mySaju.stemH||{}).day||'') : -1] || '';
+  // 일간 한자→한글 변환
+  var HAN_TO_KOR = {'甲':'갑','乙':'을','丙':'병','丁':'정','戊':'무','己':'기','庚':'경','辛':'신','壬':'임','癸':'계'};
+  var d1stemK = HAN_TO_KOR[mySaju.stemH && mySaju.stemH.day] || '';
+  var d2stemK = HAN_TO_KOR[pSaju.stemH  && pSaju.stemH.day]  || '';
+  var d1yang = YANG_STEMS.indexOf(d1stemK) >= 0;
+  var d1yin  = YIN_STEMS.indexOf(d1stemK)  >= 0;
+  var d2yang = YANG_STEMS.indexOf(d2stemK) >= 0;
+  var d2yin  = YIN_STEMS.indexOf(d2stemK)  >= 0;
+  if ((d1yang && d2yin) || (d1yin && d2yang)) bonus += 10;
+
+  // 3. 일간합(천간합): 갑기/을경/병신/정임/무계 (+15)
+  var CHUNGAN_HAP = [['갑','기'],['을','경'],['병','신'],['정','임'],['무','계']];
+  var hasChunganHap = CHUNGAN_HAP.some(function(pair) {
+    return (d1stemK===pair[0]&&d2stemK===pair[1]) || (d1stemK===pair[1]&&d2stemK===pair[0]);
+  });
+  if (hasChunganHap) bonus += 15;
+
+  // 4. 지지합 (연주/월주/일주/시주 중 육합 또는 삼합 구성) — 이미 띠 점수에 반영돼 있으므로 일주 지지만 추가
+  var BRANCH_IDX = {자:0,축:1,인:2,묘:3,진:4,사:5,오:6,미:7,신:8,유:9,술:10,해:11};
+  var dayB1 = BRANCH_IDX[mySaju.branchH && mySaju.branchH.day ? (function(h){ var MAP={'子':'자','丑':'축','寅':'인','卯':'묘','辰':'진','巳':'사','午':'오','未':'미','申':'신','酉':'유','戌':'술','亥':'해'}; return MAP[h]||''; })(mySaju.branchH.day) : ''];
+  var dayB2 = BRANCH_IDX[pSaju.branchH  && pSaju.branchH.day  ? (function(h){ var MAP={'子':'자','丑':'축','寅':'인','卯':'묘','辰':'진','巳':'사','午':'오','未':'미','申':'신','酉':'유','戌':'술','亥':'해'}; return MAP[h]||''; })(pSaju.branchH.day) : ''];
+  if (dayB1 !== undefined && dayB2 !== undefined && dayB1 !== '' && dayB2 !== '') {
+    var dayBonusCheck = false;
+    if (YUKHAP.some(function(g){return g.includes(dayB1)&&g.includes(dayB2);})) dayBonusCheck=true;
+    if (SAMHAP.some(function(g){return g.includes(dayB1)&&g.includes(dayB2);})) dayBonusCheck=true;
+    if (dayBonusCheck) bonus += 8;
+  }
+
+  // 5. 간접 상생 (A의 지지 오행이 B의 일간 오행을 상생하는 관계) (+5)
+  // 예: A의 수기(해,자)가 B의 금(경신)을 수생금
+  var BRANCH_EL_MAP = {자:'수',축:'토',인:'목',묘:'목',진:'토',사:'화',오:'화',미:'토',신:'금',유:'금',술:'토',해:'수'};
+  var aBranchEls = ['year','month','day','hour'].map(function(k){
+    var bh = mySaju.branchH && mySaju.branchH[k] ? mySaju.branchH[k] : '';
+    var MAP={'子':'자','丑':'축','寅':'인','卯':'묘','辰':'진','巳':'사','午':'오','未':'미','申':'신','酉':'유','戌':'술','亥':'해'};
+    return BRANCH_EL_MAP[MAP[bh]||''] || '';
+  });
+  var bBranchEls = ['year','month','day','hour'].map(function(k){
+    var bh = pSaju.branchH && pSaju.branchH[k] ? pSaju.branchH[k] : '';
+    var MAP={'子':'자','丑':'축','寅':'인','卯':'묘','辰':'진','巳':'사','午':'오','未':'미','申':'신','酉':'유','戌':'술','亥':'해'};
+    return BRANCH_EL_MAP[MAP[bh]||''] || '';
+  });
+  // A 지지가 B 일간 상생, 또는 B 지지가 A 일간 상생
+  var indirectSaeng = false;
+  aBranchEls.forEach(function(el){ if(el && SENG[el]===e2) indirectSaeng=true; });
+  bBranchEls.forEach(function(el){ if(el && SENG[el]===e1) indirectSaeng=true; });
+  if (indirectSaeng && oScore < 40) bonus += 5; // 이미 직접 상생이면 중복 미적용
+
+  var total = Math.min(100, Math.round(oScore + tScore + sScore + bonus));
   return {
     total: total,
-    oScore: oScore, tScore: tScore, sScore: sScore,
+    oScore: oScore, tScore: tScore, sScore: sScore, bonus: bonus,
     comment: total>=85?'천생연분이에요 ✨':total>=70?'좋은 인연이에요 💕':total>=55?'보완하며 성장할 수 있어요 🌱':'서로 노력이 필요해요 💪'
   };
 }
