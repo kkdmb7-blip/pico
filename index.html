@@ -2394,8 +2394,9 @@ async function requestGunghapAI() {
   try {
     var r1 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, orb_override:80,
-        system_prompt: '사주명리 궁합 전문가. 두 사람의 연애 스타일과 감정 궁합만 분석해. 톤: 따뜻하고 희망적. 부정적 요소도 성장 포인트로 표현. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜/오행관계 설명 금지(이미 위에서 했음). **볼드**는 핵심 단어에만 3~5개.',
+        system_prompt: '사주명리 궁합 전문가. 두 사람의 연애 스타일과 감정 궁합만 분석해. 톤: 따뜻하고 희망적. 부정적 요소도 성장 포인트로 표현. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜/오행관계 설명 금지. **볼드**는 핵심 단어에만 3~5개.',
         messages: [{ role:'user', content: '【'+myName+' & '+pNameDisp+' 연애 스타일 분석】\n'
+          +'궁합 점수: '+score.total+'점\n'
           +myName+'('+gA+'): 일주 '+iljuA+', '+ohaengA+', '+strA+'\n'
           +pNameDisp+'('+gB+'): 일주 '+iljuB+', '+ohaengB+', '+strB+'\n\n'
           +'▸ '+myName+' 성격: '+(ctx.a_personality||'정보 없음')+'\n'
@@ -2404,7 +2405,11 @@ async function requestGunghapAI() {
           +'▸ '+pNameDisp+' 연애: '+(ctx.b_yeonae||'정보 없음')+'\n'
           +'▸ '+myName+'→'+pNameDisp+' 공략법: '+(ctx.a_gongreak||'정보 없음')+'\n'
           +'▸ '+pNameDisp+'→'+myName+' 공략법: '+(ctx.b_gongreak||'정보 없음')+'\n\n'
-          +'위 DB 정보를 바탕으로 두 사람만의 연애 패턴, 끌림 포인트, 주의할 갈등 요소를 구체적으로 분석해줘. 600~800자.' }]
+          +'위 DB 정보를 바탕으로 두 사람만의 연애 패턴, 끌림 포인트를 분석해줘.\n'
+          +'점수가 80점 이상이면 → 강한 시너지와 특별한 끌림 포인트 중심으로.\n'
+          +'점수가 60~79점이면 → 균형 잡힌 관계, 서로 보완하는 부분 중심으로.\n'
+          +'점수가 60점 미만이면 → 다름을 이해하고 성장하는 관계 중심으로.\n'
+          +'600~800자.' }]
       })
     });
     if (!r1.ok) {
@@ -2425,8 +2430,9 @@ async function requestGunghapAI() {
   try {
     var r2 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, skip_orb:true,
-        system_prompt: '사주명리 궁합 전문가. 현재 시기 궁합만 분석해. 톤: 따뜻하고 희망적. "지금 만난 건 우연이 아니다" 느낌. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
+        system_prompt: '사주명리 궁합 전문가. 현재 시기 궁합만 분석해. 톤: 따뜻하고 신비로운 느낌. "지금 이 만남은 우연이 아니다"는 감성을 자연스럽게 녹여. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
         messages: [{ role:'user', content: '【'+myName+' & '+pNameDisp+' 현재 시기 분석】\n'
+          +'궁합 점수: '+score.total+'점\n'
           +myName+': 일주 '+iljuA+', '+myAge+'\n'
           +pNameDisp+': 일주 '+iljuB+', '+pAge+'\n\n'
           +'▸ '+myName+' '+myAge+' 시기: '+(ctx.a_age_advice||'정보 없음')+'\n'
@@ -2435,7 +2441,11 @@ async function requestGunghapAI() {
           +'▸ '+pNameDisp+' 대운: '+(ctx.b_daeun||'정보 없음')+'\n'
           +'▸ '+myName+' 이달: '+(ctx.a_monthly||'정보 없음')+'\n'
           +'▸ '+pNameDisp+' 이달: '+(ctx.b_monthly||'정보 없음')+'\n\n'
-          +'지금 이 시기에 두 사람이 만난 의미, 시너지, 주의점을 구체적으로 분석해줘. 600~800자.' }]
+          +'지금 이 시기에 두 사람이 만난 우주적 의미, 대운/월운이 만들어내는 시너지를 중심으로 분석해줘.\n'
+          +'"왜 하필 지금인가"에 대한 사주적 답을 줘.\n'
+          +'점수가 높을수록 → 운명적 만남 강조.\n'
+          +'점수가 낮을수록 → 서로를 성장시키는 만남 강조.\n'
+          +'600~800자.' }]
       })
     });
     if (r2.ok) { var d2 = await r2.json(); showChunk('chunk-ai2', '⏰ 지금 이 시기의 의미', boldPink(d2.reply)); }
