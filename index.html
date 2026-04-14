@@ -4540,16 +4540,21 @@ window.togglePushSubscription = async function() {
 
 // ── 오늘의 명언 카드 (홈 화면) ────────────────────────────────────
 (async function loadPicoQuoteCard() {
-  var today = (function() {
-    var d = new Date(Date.now() + 9 * 3600000);
-    return d.getUTCFullYear() + '-' + String(d.getUTCMonth()+1).padStart(2,'0') + '-' + String(d.getUTCDate()).padStart(2,'0');
-  })();
+  var d = new Date(Date.now() + 9 * 3600000);
+  var today = d.getUTCFullYear() + '-' + String(d.getUTCMonth()+1).padStart(2,'0') + '-' + String(d.getUTCDate()).padStart(2,'0');
   if (localStorage.getItem('pico_quote_dismissed') === today) return;
 
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
   try {
-    var res = await fetch('https://fortuna-silk.vercel.app/api/daily-quote');
+    var res = await fetch('/data/quotes.json');
     if (!res.ok) return;
-    var data = await res.json();
+    var quotes = await res.json();
+    if (!Array.isArray(quotes) || quotes.length === 0) return;
+
+    // 날짜 기반 인덱스 (매일 같은 명언)
+    var idx = (d.getUTCFullYear() * 365 + d.getUTCMonth() * 30 + d.getUTCDate()) % quotes.length;
+    var data = quotes[idx];
     if (!data || !data.quote) return;
 
     var wrap = document.getElementById('picoQuoteCardWrap');
@@ -4557,20 +4562,14 @@ window.togglePushSubscription = async function() {
 
     wrap.style.display = 'block';
     wrap.innerHTML =
-      '<div style="background:linear-gradient(160deg,var(--surface) 0%,rgba(45,27,78,0.6) 100%);border:1px solid rgba(212,175,55,0.2);border-radius:18px;padding:16px 18px;position:relative;">' +
+      '<div style="background:linear-gradient(160deg,var(--surface) 0%,rgba(45,27,78,0.6) 100%);border:1px solid rgba(212,175,55,0.2);border-radius:18px;padding:16px 18px;">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
-          '<span style="font-size:10px;color:rgba(212,175,55,0.55);letter-spacing:0.12em;font-weight:600;">✦ 오늘의 우주 메시지</span>' +
+          '<span style="font-size:10px;color:rgba(212,175,55,0.55);letter-spacing:0.12em;font-weight:600;">✨ 오늘의 우주 메시지</span>' +
           '<button id="btnDismissQuote" style="background:none;border:none;color:rgba(255,255,255,0.25);font-size:16px;cursor:pointer;line-height:1;padding:0 2px;">✕</button>' +
         '</div>' +
-        '<p style="font-size:14px;font-style:italic;color:var(--text);line-height:1.75;margin:0 0 8px;font-family:\'Noto Serif KR\',serif;">' +
-          '&ldquo;' + (data.quote || '').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '&rdquo;' +
-        '</p>' +
-        '<p style="font-size:11px;color:rgba(212,175,55,0.55);margin:0 0 ' + (data.message ? '10px' : '0') + ';letter-spacing:0.04em;">— ' + (data.source || '').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</p>' +
-        (data.message
-          ? '<p style="font-size:12px;color:var(--muted);line-height:1.6;margin:0;background:rgba(212,175,55,0.05);border-radius:10px;padding:10px 12px;">' +
-              (data.message).replace(/</g,'&lt;').replace(/>/g,'&gt;') +
-            '</p>'
-          : '') +
+        '<p style="font-size:14px;font-style:italic;color:var(--text);line-height:1.75;margin:0 0 6px;font-family:\'Noto Serif KR\',serif;">&ldquo;' + esc(data.quote) + '&rdquo;</p>' +
+        '<p style="font-size:11px;color:rgba(212,175,55,0.6);margin:0 0 10px;letter-spacing:0.04em;">— ' + esc(data.source) + '</p>' +
+        '<p style="font-size:12px;color:var(--muted);line-height:1.65;margin:0;background:rgba(212,175,55,0.05);border-radius:10px;padding:10px 12px;">' + esc(data.message) + '</p>' +
       '</div>';
 
     document.getElementById('btnDismissQuote').addEventListener('click', function() {
