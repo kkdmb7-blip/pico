@@ -850,6 +850,21 @@ async function loadVedicData() {
 
   document.getElementById('navTitle').textContent = _config.title;
 
+  // 준비중 타입
+  if (_type !== 'character') {
+    document.getElementById('stateLoading').style.display = 'none';
+    document.getElementById('stateIntro').style.display = 'none';
+    const comingSoon = document.createElement('div');
+    comingSoon.style.cssText = 'text-align:center;padding:80px 24px;';
+    comingSoon.innerHTML =
+      '<div style="font-size:48px;margin-bottom:20px;">🔮</div>' +
+      '<div style="font-family:\'Noto Serif KR\',serif;font-size:20px;font-weight:700;color:#d4af37;margin-bottom:12px;">준비 중입니다</div>' +
+      '<div style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:32px;">더 정확하고 깊은 분석을 위해<br>열심히 준비하고 있어요. 곧 만나요!</div>' +
+      '<a href="index.html#tab=report" onclick="history.back();return false;" style="display:inline-block;padding:12px 28px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;text-decoration:none;">돌아가기</a>';
+    document.querySelector('.wrap').appendChild(comingSoon);
+    return;
+  }
+
   // 로그인 확인
   try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
   if (!_user || !_user.id) { location.href = 'index.html'; return; }
