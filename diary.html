@@ -302,11 +302,29 @@ var _userYongshin = ''; // pico_push_subscriptions에서 로드
 window.addEventListener('DOMContentLoaded', function() {
   try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
 
-  // 용신 로드 (pico_push_subscriptions)
+  // 용신 로드: pico_push_subscriptions 우선 → 없으면 pico_profile로 /saju-test 호출
   if (_user) {
     fetch(SB_URL+'/rest/v1/pico_push_subscriptions?user_id=eq.'+encodeURIComponent(_user.id)+'&select=yongshin',{ headers:sbH })
       .then(function(r){ return r.json(); })
-      .then(function(rows){ if (Array.isArray(rows) && rows[0] && rows[0].yongshin) _userYongshin = rows[0].yongshin; })
+      .then(function(rows){
+        if (Array.isArray(rows) && rows[0] && rows[0].yongshin) {
+          _userYongshin = rows[0].yongshin;
+        } else {
+          // 푸시 미구독자 → pico_profile로 직접 계산
+          try {
+            var prof = JSON.parse(localStorage.getItem('pico_profile')||'{}');
+            if (prof.year && prof.month && prof.day) {
+              var birth = prof.year+'-'+(String(prof.month).padStart(2,'0'))+'-'+(String(prof.day).padStart(2,'0'))+(prof.hour!=null?'T'+(String(prof.hour).padStart(2,'0'))+':00':'');
+              fetch('https://fortuna.kkdmb7.workers.dev/saju-test',{
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({ birth:birth, gender:prof.gender||'M', calendar:'solar' })
+              }).then(function(r2){ return r2.json(); })
+                .then(function(sd){ _userYongshin = (sd.yongshin && sd.yongshin.primary) || ''; })
+                .catch(function(){});
+            }
+          } catch(e) {}
+        }
+      })
       .catch(function(){});
   }
 
