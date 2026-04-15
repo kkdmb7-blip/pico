@@ -428,12 +428,15 @@ async function submitDiary(skipMemo) {
 
   // Supabase 저장
   try {
-    await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=eq.'+ds, { method:'DELETE', headers:sbH });
-    await fetch(SB_URL+'/rest/v1/saju_diary', {
+    var delRes = await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=eq.'+ds, { method:'DELETE', headers:sbH });
+    console.log('[diary] DELETE status:', delRes.status);
+    var insRes = await fetch(SB_URL+'/rest/v1/saju_diary', {
       method:'POST',
-      headers:Object.assign({},sbH,{Prefer:'return=minimal'}),
+      headers:Object.assign({},sbH,{Prefer:'return=representation'}),
       body:JSON.stringify({ user_id:_user.id, date:ds, mood:_currentMood, events:_selectedEvents, memo:memo||null, ilgan:p.stem, ai_feedback:null })
     });
+    var insBody = await insRes.json();
+    console.log('[diary] INSERT status:', insRes.status, insBody);
   } catch(e) { console.warn('[diary save]',e); }
 
   // localStorage 캐시 (홈 CTA용)
@@ -487,7 +490,8 @@ async function resetTodayDiary() {
 async function loadCalendar() {
   if (!_user) { showLoginPromptInEl('calGrid',7); return; }
   document.getElementById('calMonthTitle').textContent = _calY+'년 '+_calM+'월';
-  var sd = dateStr(_calY,_calM,1), ed = dateStr(_calY,_calM,31);
+  var lastDay = new Date(_calY,_calM,0).getDate();
+  var sd = dateStr(_calY,_calM,1), ed = dateStr(_calY,_calM,lastDay);
   _calDiaries = {};
   try {
     var r = await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=gte.'+sd+'&date=lte.'+ed+'&select=date,mood',{ headers:sbH });
@@ -554,7 +558,8 @@ function closeDetail(e){ if(e.target.id==='detailOverlay') document.getElementBy
 async function loadMonthlyStats() {
   if (!_user) { return; }
   document.getElementById('statsMonthTitle').textContent = _calY+'년 '+_calM+'월 통계';
-  var sd = dateStr(_calY,_calM,1), ed = dateStr(_calY,_calM,31);
+  var lastDay = new Date(_calY,_calM,0).getDate();
+  var sd = dateStr(_calY,_calM,1), ed = dateStr(_calY,_calM,lastDay);
   try {
     var r = await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=gte.'+sd+'&date=lte.'+ed+'&select=date,mood,ilgan',{ headers:sbH });
     var rows = await r.json();
