@@ -296,10 +296,19 @@ function dateStr(y, m, d) {
 // ── 상태 ────────────────────────────────────────────────────
 var _user = null, _currentMood = null, _selectedEvents = [];
 var _calY, _calM, _calDiaries = {};
+var _userYongshin = ''; // pico_push_subscriptions에서 로드
 
 // ── 초기화 ──────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
   try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+
+  // 용신 로드 (pico_push_subscriptions)
+  if (_user) {
+    fetch(SB_URL+'/rest/v1/pico_push_subscriptions?user_id=eq.'+encodeURIComponent(_user.id)+'&select=yongshin',{ headers:sbH })
+      .then(function(r){ return r.json(); })
+      .then(function(rows){ if (Array.isArray(rows) && rows[0] && rows[0].yongshin) _userYongshin = rows[0].yongshin; })
+      .catch(function(){});
+  }
 
   var t = getTodayKST();
   renderIlganCard(t.y, t.m, t.d);
@@ -549,25 +558,34 @@ async function loadMonthlyStats() {
       chartHtml+='<div class="stat-row"><div class="stat-label">'+MOOD_EMOJI[k]+' '+MOOD_LABEL[k]+'</div><div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:'+pct+'%"></div></div><div class="stat-count">'+mc[k]+'일</div></div>';
     });
     document.getElementById('moodChart').innerHTML=chartHtml;
-    // 적중률
-    var YANG=['갑','병','무','경','임'];
-    var gDays=0,gHit=0,bDays=0,bHit=0;
+    // 일진 적중률 (오행 상생/상극 기반)
+    var STEM_EL={'갑':'목','을':'목','병':'화','정':'화','무':'토','기':'토','경':'금','신':'금','임':'수','계':'수'};
+    var 生Map={'목':'화','화':'토','토':'금','금':'수','수':'목'};
+    var 克Map={'목':'토','화':'금','토':'수','금':'목','수':'화'};
+    function getDayTone(stemEl, yongshin) {
+      if (!yongshin || !stemEl) return 'neutral';
+      if (stemEl===yongshin || 生Map[stemEl]===yongshin) return 'good';
+      if (克Map[stemEl]===yongshin) return 'caution';
+      return 'neutral';
+    }
+    var gDays=0,gHit=0,bDays=0,bHit=0,nDays=0;
     rows.forEach(function(row){
       var pts=row.date.split('-'),y2=parseInt(pts[0]),m2=parseInt(pts[1]),d2=parseInt(pts[2]);
       var p=calcDayPillar(y2,m2,d2);
-      var isYang=YANG.indexOf(p.stem)>=0;
-      var isGoodBranch=['자','인','오','술'].indexOf(p.branch)>=0;
-      var isGoodDay=isYang&&isGoodBranch;
-      var isBadDay=!isYang;
+      var stemEl=STEM_EL[p.stem]||'';
+      var tone=getDayTone(stemEl,_userYongshin);
       var gMood=(row.mood==='good'||row.mood==='energetic');
       var bMood=(row.mood==='bad'||row.mood==='tired');
-      if(isGoodDay){gDays++;if(gMood)gHit++;}
-      if(isBadDay) {bDays++;if(bMood)bHit++;}
+      if(tone==='good')   { gDays++; if(gMood) gHit++; }
+      else if(tone==='caution') { bDays++; if(bMood) bHit++; }
+      else nDays++;
     });
     var total=gDays+bDays, match=gHit+bHit;
     var pct=total>0?Math.round(match/total*100):0;
-    document.getElementById('accuracyPct').textContent=pct+'%';
-    document.getElementById('accuracyDesc').textContent='길일×좋은 하루 '+gHit+'/'+gDays+'  ·  흉일×힘든 하루 '+bHit+'/'+bDays;
+    document.getElementById('accuracyPct').textContent= _userYongshin ? pct+'%' : '—%';
+    document.getElementById('accuracyDesc').textContent= _userYongshin
+      ? '길일(용신상생)×좋은 하루 '+gHit+'/'+gDays+'  ·  흉일(용신상극)×힘든 하루 '+bHit+'/'+bDays
+      : '사주 분석 후 이용 가능';
   } catch(e) { document.getElementById('statsTotalDays').textContent='통계를 불러오지 못했어'; }
 }
 
