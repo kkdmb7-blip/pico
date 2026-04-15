@@ -236,6 +236,7 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(10,10,15,0.92); backdr
       <div class="accuracy-pct" id="accuracyPct">—%</div>
       <div style="font-size:12px;color:var(--muted);margin-top:4px;" id="accuracyDesc"></div>
     </div>
+    <div id="accuracyGrade" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;"></div>
   </div>
 </div>
 
@@ -581,34 +582,51 @@ async function loadMonthlyStats() {
       chartHtml+='<div class="stat-row"><div class="stat-label">'+MOOD_EMOJI[k]+' '+MOOD_LABEL[k]+'</div><div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:'+pct+'%"></div></div><div class="stat-count">'+mc[k]+'일</div></div>';
     });
     document.getElementById('moodChart').innerHTML=chartHtml;
-    // 일진 적중률 (오행 상생/상극 기반)
-    var STEM_EL={'갑':'목','을':'목','병':'화','정':'화','무':'토','기':'토','경':'금','신':'금','임':'수','계':'수'};
-    var 生Map={'목':'화','화':'토','토':'금','금':'수','수':'목'};
-    var 克Map={'목':'토','화':'금','토':'수','금':'목','수':'화'};
-    function getDayTone(stemEl, yongshin) {
-      if (!yongshin || !stemEl) return 'neutral';
-      if (stemEl===yongshin || 生Map[stemEl]===yongshin) return 'good';
-      if (克Map[stemEl]===yongshin) return 'caution';
-      return 'neutral';
+    // 일진 적중률 — 5단계 점수제 (부분 점수 포함)
+    var _STEL={'갑':'목','을':'목','병':'화','정':'화','무':'토','기':'토','경':'금','신':'금','임':'수','계':'수'};
+    var _生={'목':'화','화':'토','토':'금','금':'수','수':'목'};
+    var _克={'목':'토','화':'금','토':'수','금':'목','수':'화'};
+    // 일진 등급 0~4: 흉(0) 약흉(1) 소길(2) 길(3) 최길(4)
+    function _dayGrade(stemEl, ys) {
+      if (!ys || !stemEl) return 2;
+      if (stemEl===ys)           return 4; // 동일: 최길
+      if (_生[stemEl]===ys)      return 3; // 일간이 용신 生: 길
+      if (_生[ys]===stemEl)      return 2; // 용신이 일간 生: 소길
+      if (_克[ys]===stemEl)      return 1; // 용신이 일간 克: 약흉
+      if (_克[stemEl]===ys)      return 0; // 일간이 용신 克: 흉
+      return 2;
     }
-    var gDays=0,gHit=0,bDays=0,bHit=0,nDays=0;
+    var _MOOD_G={energetic:4,good:3,normal:2,tired:1,bad:0};
+    var _GRADE_LABEL=['흉','약흉','소길','길','최길'];
+    var _GRADE_COLOR=['#ef5350','#ff8a65','#9575cd','#66bb6a','#ffd54f'];
+    var totalScore=0, perfectHit=0, nearHit=0, missHit=0;
+    var gradeDist=[0,0,0,0,0]; // 일진 등급별 일수
     rows.forEach(function(row){
       var pts=row.date.split('-'),y2=parseInt(pts[0]),m2=parseInt(pts[1]),d2=parseInt(pts[2]);
       var p=calcDayPillar(y2,m2,d2);
-      var stemEl=STEM_EL[p.stem]||'';
-      var tone=getDayTone(stemEl,_userYongshin);
-      var gMood=(row.mood==='good'||row.mood==='energetic');
-      var bMood=(row.mood==='bad'||row.mood==='tired');
-      if(tone==='good')   { gDays++; if(gMood) gHit++; }
-      else if(tone==='caution') { bDays++; if(bMood) bHit++; }
-      else nDays++;
+      var stemEl=_STEL[p.stem]||'';
+      var dg=_dayGrade(stemEl,_userYongshin);
+      var mg=(_MOOD_G[row.mood]!==undefined)?_MOOD_G[row.mood]:2;
+      gradeDist[dg]++;
+      var diff=Math.abs(dg-mg);
+      if(diff===0){ totalScore+=2; perfectHit++; }
+      else if(diff===1){ totalScore+=1; nearHit++; }
+      else { missHit++; }
     });
-    var total=gDays+bDays, match=gHit+bHit;
-    var pct=total>0?Math.round(match/total*100):0;
+    var maxScore=rows.length*2;
+    var pct=maxScore>0?Math.round(totalScore/maxScore*100):0;
     document.getElementById('accuracyPct').textContent= _userYongshin ? pct+'%' : '—%';
     document.getElementById('accuracyDesc').textContent= _userYongshin
-      ? '길일(용신상생)×좋은 하루 '+gHit+'/'+gDays+'  ·  흉일(용신상극)×힘든 하루 '+bHit+'/'+bDays
+      ? '완전 적중 '+perfectHit+'일 · 근접 '+nearHit+'일 · 빗나감 '+missHit+'일'
       : '사주 분석 후 이용 가능';
+    // 등급 분포 뱃지
+    var gradeHtml='';
+    if (_userYongshin) {
+      [4,3,2,1,0].forEach(function(g){
+        if(gradeDist[g]>0) gradeHtml+='<span style="font-size:11px;padding:3px 8px;border-radius:20px;background:'+_GRADE_COLOR[g]+'22;color:'+_GRADE_COLOR[g]+';border:1px solid '+_GRADE_COLOR[g]+'44;">'+_GRADE_LABEL[g]+' '+gradeDist[g]+'일</span>';
+      });
+    }
+    document.getElementById('accuracyGrade').innerHTML=gradeHtml;
   } catch(e) { document.getElementById('statsTotalDays').textContent='통계를 불러오지 못했어'; }
 }
 
