@@ -557,6 +557,13 @@ const TYPE_SECTIONS = {
     { name: '분야별 운세 (재물·직업·연애·건강)',   chars: 600 },
     { name: '월별 주요 흐름',                     chars: 500 },
     { name: '2026년 실천 전략',                   chars: 400 }
+  ],
+  month: [
+    { name: '이달 핵심 요약',              chars: 250 },
+    { name: '월건 천간·지지 십신 분석',    chars: 500 },
+    { name: '분야별 이달 흐름',            chars: 500 },
+    { name: '이달 주의사항과 기회',        chars: 400 },
+    { name: '이달 실천 전략',              chars: 300 }
   ]
 };
 
@@ -595,6 +602,13 @@ const SECTION_FOCUS = {
     '2026년 재물·직업·연애·건강 각 분야별 흐름을 구체적으로 분석하라.',
     '상반기(1~6월)와 하반기(7~12월) 흐름, 특히 주의할 월과 기회의 월을 분석하라.',
     '2026년을 잘 보내기 위한 구체적 전략, 해야 할 것과 피해야 할 것을 제시하라.'
+  ],
+  month: [
+    '이달 월건과 내 사주의 관계, 이달의 핵심 에너지를 압축 정리하라.',
+    '월건 천간이 일간에 미치는 십신 작용, 월건 지지의 합충형파 영향을 분석하라.',
+    '이달 재물·직업·연애·건강 각 분야의 구체적 흐름을 분석하라.',
+    '이달 특히 조심해야 할 것과 가장 큰 기회를 분석하라.',
+    '이달을 잘 보내기 위한 구체적 실천 방향 3가지를 제시하라.'
   ]
 };
 
@@ -718,6 +732,30 @@ const TYPE_DETAIL = {
       { q: "작년에 생성한 리포트와 어떻게 다른가요?", a: "세운이 매년 바뀌므로 분석 결과가 달라집니다. 2026년 병오년에 맞춰 새롭게 분석됩니다." },
       { q: "리포트는 얼마나 걸리나요?", a: "AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다." }
     ]
+  },
+  month: {
+    emoji: '🌙',
+    subtitle: '이번 달, 나에게 어떤 흐름이 오는가?',
+    desc: '월건(이달 간지)이 내 사주에 미치는 에너지를 정밀 분석합니다. 재물·직업·연애·건강 분야별 이달 흐름과 베딕 트랜짓을 교차하여 지금 가장 집중해야 할 것을 알려드립니다.',
+    recommend: [
+      '이번 달 운세가 좋은지 나쁜지 알고 싶은 분',
+      '이달 중요한 결정이나 이벤트가 있는 분',
+      '월별로 흐름을 파악하고 싶은 분',
+      '지금 당장 어떻게 행동해야 할지 방향이 필요한 분'
+    ],
+    sectionDesc: [
+      '이달 월건과 내 사주 에너지 압축 요약',
+      '월건 천간지지 십신 작용과 합충형파 분석',
+      '재물·직업·연애·건강 이달 분야별 흐름',
+      '이달 주의사항과 가장 큰 기회의 시기',
+      '이달을 잘 보내는 실천 전략 3가지'
+    ],
+    preview: '이달 월건이 내 사주와 어떤 십신 관계인지, 어떤 에너지가 강하고 약한지를 분석합니다. 베딕 트랜짓과 교차하여 이달 가장 중요한 흐름과 실천 방향을 제시합니다.',
+    faq: [
+      { q: '매달 새로 생성해야 하나요?', a: '네, 월건이 매달 바뀌므로 이달 운세는 매달 새로 생성하는 것이 가장 정확합니다.' },
+      { q: '올해 운세와 어떻게 다른가요?', a: '올해 운세는 세운(년운) 전체 흐름을 보고, 이달 운세는 월건(월운)을 기반으로 이번 한 달을 세밀하게 분석합니다.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ]
   }
 };
 
@@ -740,6 +778,13 @@ let _sewun = null;
 let _ohaeng = null;
 let _vedicData = null;
 let _personality = {};
+let _sdFull = null;
+let _rptFull = null;
+let _ziweiData = null;
+let _astroData = null;
+let _daeunList = null;
+let _sewunFull = null;
+let _personality_db = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -843,6 +888,109 @@ async function loadVedicData() {
   } catch(e) { /* API 실패 시 null 유지 */ }
 }
 
+// ── 전체 데이터 일괄 로드 ──
+async function loadAllData(withZiwei, withAstro) {
+  const p = _profile;
+  const gender = p.gender === 'F' ? 'female' : 'male';
+  const hour = (p.hour != null && p.hour !== 'unknown') ? parseInt(p.hour) : 12;
+  const minute = parseInt(p.minute) || 0;
+  const birthISO = `${p.year}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:00`;
+  const now = new Date();
+  const promises = [
+    fetch(`${WORKER_BASE}/saju-test`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({birth:birthISO,gender,calendar:'solar'})}),
+    fetch(`${WORKER_BASE}/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&current_year=${now.getFullYear()}&current_month=${now.getMonth()+1}&current_day=${now.getDate()}`),
+    fetch(`${WORKER_BASE}/vedic?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&tz=9`)
+  ];
+  if (withZiwei) promises.push(fetch(`${WORKER_BASE}/ziwei?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&gender=${gender}`));
+  if (withAstro)  promises.push(fetch(`${WORKER_BASE}/astro?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&lat=37.5&lng=127.0`));
+  const results = await Promise.allSettled(promises);
+  try { if (results[0].status==='fulfilled'&&results[0].value.ok) _sdFull = await results[0].value.json(); } catch(e){}
+  try {
+    if (results[1].status==='fulfilled'&&results[1].value.ok) {
+      _rptFull = await results[1].value.json();
+      _sajuData = _rptFull;
+      _ilju = _rptFull['일주']||null; _singang = _rptFull['신강약']||null;
+      _yongsin = _rptFull['용신']||null; _ohaeng = _rptFull['오행비율']||null;
+      _geokguk = _rptFull['오행패턴'] ? (_rptFull['오행패턴'].type||null) : null;
+      if (Array.isArray(_rptFull['대운분석'])) {
+        _daeunList = _rptFull['대운분석'];
+        const cur = _daeunList.find(d => { const r=(d.year_range||'').split(/[–\-]/); return new Date().getFullYear()>=parseInt(r[0])&&new Date().getFullYear()<=parseInt(r[1]); }) || _daeunList[0];
+        _daeun = cur ? `${cur.ganjee||''}(${cur.year_range||''})` : null;
+      }
+      if (_rptFull['리포트']?.['올해운세']) { _sewunFull=_rptFull['리포트']['올해운세']; _sewun=_sewunFull['년도']||null; }
+      _personality_db = _rptFull?.['리포트']?.['기본']?.['성격']||null;
+    }
+  } catch(e){}
+  try {
+    if (results[2].status==='fulfilled'&&results[2].value.ok) {
+      const vd = await results[2].value.json();
+      _vedicData = { nakshatra:vd.nakshatra||null, rashi:vd.moonSign||null, ascendant:vd.ascendant||null,
+        dasha:vd.currentDasha?`${vd.currentDasha.planet||''} (${vd.currentDasha.end?new Date(vd.currentDasha.end).getFullYear()+'년까지':''})`:null,
+        antardasha:vd.antardasha?(vd.antardasha.planet||null):null, planets:vd.planets||null };
+    }
+  } catch(e){}
+  const zIdx = withZiwei ? 3 : -1;
+  const aIdx = withAstro ? (withZiwei ? 4 : 3) : -1;
+  try { if (zIdx>=0&&results[zIdx]?.status==='fulfilled'&&results[zIdx].value.ok) _ziweiData=await results[zIdx].value.json(); } catch(e){}
+  try { if (aIdx>=0&&results[aIdx]?.status==='fulfilled'&&results[aIdx].value.ok) _astroData=await results[aIdx].value.json(); } catch(e){}
+}
+
+// ── 공통 블록 빌더 ──
+function buildSajuBlock() {
+  const sd = _sdFull; const rpt = _rptFull;
+  const pillars = sd?.summary?.pillars || {};
+  return `【사주 원국】
+일주: ${_ilju||'미확인'}  성별: ${_profile?.gender==='F'?'여성':'남성'}
+사주: 연주 ${pillars.year||'?'} / 월주 ${pillars.month||'?'} / 일주 ${pillars.day||'?'} / 시주 ${pillars.hour||'?'}
+신강신약: ${_singang||sd?.strength_level_5||'미확인'} (${sd?.strength_score||''}점)
+격국: ${_geokguk||sd?.geokguk?.geok_kor||'미확인'}
+용신: ${_yongsin||sd?.yongshin?.primary||'미확인'}
+조후용신: ${sd?.johu?.needs_kor?.join('/')||'미확인'}
+오행수: 목${sd?.five_count?.wood||0} 화${sd?.five_count?.fire||0} 토${sd?.five_count?.earth||0} 금${sd?.five_count?.metal||0} 수${sd?.five_count?.water||0}
+오행%: ${sd?.five_pct?Object.entries(sd.five_pct).map(([k,v])=>`${k}:${v}%`).join(' '):'미확인'}
+패턴: ${sd?.pattern?.type||''} ${sd?.pattern?.subtype||''}
+십신맵: ${sd?.ten_gods_map?JSON.stringify(sd.ten_gods_map):'미확인'}
+공망: ${sd?.gongmang||'미확인'}
+충합형파: ${sd?.branch_relations_kor?.join(', ')||'없음'}`;
+}
+function buildVedicBlock() {
+  if (!_vedicData) return '';
+  return `【베딕 점성술】
+낙샤트라: ${_vedicData.nakshatra||'미확인'}  라시(월궁): ${_vedicData.rashi||'미확인'}
+어센던트: ${_vedicData.ascendant||'미확인'}
+현재 다샤: ${_vedicData.dasha||'미확인'}  안타르다샤: ${_vedicData.antardasha||'미확인'}`;
+}
+function buildDaeunBlock() {
+  if (!_daeunList) return `현재 대운: ${_daeun||'미확인'}`;
+  const now = new Date().getFullYear();
+  const cur = _daeunList.find(d=>{const r=(d.year_range||'').split(/[–\-]/);return now>=parseInt(r[0])&&now<=parseInt(r[1]);})||_daeunList[0];
+  const past = _daeunList.filter(d=>{const r=(d.year_range||'').split(/[–\-]/);return parseInt(r[1])<now;});
+  const future = _daeunList.filter(d=>{const r=(d.year_range||'').split(/[–\-]/);return parseInt(r[0])>now;});
+  return `【대운 흐름】
+현재 대운: ${_daeun||'미확인'}
+과거 대운: ${past.map(d=>`${d.ganjee}(${d.year_range})`).join(' → ')||'없음'}
+미래 대운: ${future.slice(0,3).map(d=>`${d.ganjee}(${d.year_range})`).join(' → ')||'없음'}
+전체: ${JSON.stringify(_daeunList.slice(0,8))}`;
+}
+function buildZiweiBlock() {
+  if (!_ziweiData) return '';
+  const sp = _ziweiData.soulPalace;
+  const cd = _ziweiData.currentDecade;
+  const cy = _ziweiData.currentYear;
+  return `【자미두수】
+명궁: ${sp?`${sp.name}(${sp.heavenlyStem}${sp.earthlyBranch}) 주성:${sp.majorStars?.join(',')||''}`:' 미확인'}
+현재 대한: ${cd?`${cd.name} ${cd.heavenlyStem}${cd.earthlyBranch} ${cd.ageRange} 주성:${cd.stars?.join(',')||''}`:' 미확인'}
+현재 유년: ${cy?`${cy.year}년 ${cy.name} ${cy.heavenlyStem}${cy.earthlyBranch}`:' 미확인'}`;
+}
+function buildAstroBlock() {
+  if (!_astroData) return '';
+  const venus = _astroData.planets?.find?.(p=>p.name==='금성'||p.name==='Venus');
+  const mars  = _astroData.planets?.find?.(p=>p.name==='화성'||p.name==='Mars');
+  return `【서양 점성술】
+금성: ${venus?`${venus.sign||''} ${Math.floor(venus.degree||0)}°`:'미확인'}
+화성: ${mars?`${mars.sign||''} ${Math.floor(mars.degree||0)}°`:'미확인'}`;
+}
+
 // ── 초기화 ──
 (async function init() {
   const params = new URLSearchParams(location.search);
@@ -851,21 +999,6 @@ async function loadVedicData() {
   if (!_config) { setLoading('잘못된 접근', '리포트 타입이 올바르지 않아요'); return; }
 
   document.getElementById('navTitle').textContent = _config.title;
-
-  // 준비중 타입
-  if (_type !== 'character') {
-    document.getElementById('stateLoading').style.display = 'none';
-    document.getElementById('stateIntro').style.display = 'none';
-    const comingSoon = document.createElement('div');
-    comingSoon.style.cssText = 'text-align:center;padding:80px 24px;';
-    comingSoon.innerHTML =
-      '<div style="font-size:48px;margin-bottom:20px;">🔮</div>' +
-      '<div style="font-family:\'Noto Serif KR\',serif;font-size:20px;font-weight:700;color:#d4af37;margin-bottom:12px;">준비 중입니다</div>' +
-      '<div style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:32px;">더 정확하고 깊은 분석을 위해<br>열심히 준비하고 있어요. 곧 만나요!</div>' +
-      '<a href="index.html#tab=report" onclick="history.back();return false;" style="display:inline-block;padding:12px 28px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;text-decoration:none;">돌아가기</a>';
-    document.querySelector('.wrap').appendChild(comingSoon);
-    return;
-  }
 
   // 로그인 확인
   try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
@@ -887,8 +1020,8 @@ async function loadVedicData() {
     }
   };
 
-  // 사주+베딕 병렬 선제 로드 (stateIntro 표시하면서 백그라운드)
-  Promise.all([loadSajuData(), loadVedicData()]).catch(() => {});
+  // 사주+베딕 선제 로드 (stateIntro 표시하면서 백그라운드)
+  loadAllData(false, false).catch(() => {});
 
   renderIntro();
   showState('intro');
@@ -983,7 +1116,11 @@ async function startGeneration() {
   setLoading('사주 정보 불러오는 중...', '');
 
   // 사주+베딕 병렬 조회 (이미 init에서 로드됐으면 skip)
-  if (!_sajuData) await Promise.all([loadSajuData(), loadVedicData()]);
+  if (!_sdFull && !_rptFull) {
+    const withZiwei = (_type === 'daeun' || _type === 'year');
+    const withAstro  = (_type === 'love');
+    await loadAllData(withZiwei, withAstro);
+  }
 
   setLoading('기존 리포트 확인 중...', '');
   const existing = await fetchExistingReport();
@@ -1023,6 +1160,14 @@ async function fetchExistingReport() {
       .limit(1)
       .maybeSingle();
     if (!data) return null;
+    // month 타입은 이번 달 생성분만 유효
+    if (_type === 'month') {
+      const reportDate = data.created_at ? new Date(data.created_at) : null;
+      if (reportDate) {
+        const now2 = new Date();
+        if (reportDate.getFullYear() !== now2.getFullYear() || reportDate.getMonth() !== now2.getMonth()) return null;
+      }
+    }
     // 프로필 키 불일치 시 무효 처리 (다른 프로필로 생성된 캐시 방지)
     const sectionCount = (TYPE_SECTIONS[_type] || TYPE_SECTIONS.character).length;
     const storedKey = Array.isArray(data.content) ? data.content[sectionCount] : null;
@@ -1104,98 +1249,17 @@ ${prevText}
   return { systemPrompt, userMsg };
 }
 
-// ── 리포트 생성 ──
+// ── 리포트 생성 (타입별 분기) ──
 async function generateReport() {
+  if (_type === 'money')  { await generateMoneyReport();  return; }
+  if (_type === 'love')   { await generateLoveReport();   return; }
+  if (_type === 'daeun')  { await generateDaeunReport();  return; }
+  if (_type === 'year')   { await generateYearReport();   return; }
+  if (_type === 'month')  { await generateMonthReport();  return; }
+  // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = '생성 중...';
-
-  const wrap = document.getElementById('sectionsWrap');
-  wrap.innerHTML = '';
-  const genSections = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
-  genSections.forEach((s, i) => {
-    const card = document.createElement('div');
-    card.className = 'section-card';
-    card.id = `section-${i}`;
-    card.innerHTML = `
-      <div class="section-header">
-        <div class="section-num">${i+1}</div>
-        <div class="section-name">${s.name}</div>
-      </div>
-      <div class="section-loading" id="sloading-${i}">
-        <div class="dot-spin"></div> 분석 중...
-      </div>
-      <div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
-    wrap.appendChild(card);
-  });
-
-  const results = [];
-  let genOk = true;
-
-  for (let i = 0; i < genSections.length; i++) {
-    const { systemPrompt, userMsg } = buildSectionPrompt(i, results);
-    const body = {
-      user_id: _user.id,
-      messages: [{ role: 'user', content: userMsg }],
-      system_prompt: systemPrompt,
-      mode: 'saju',
-      max_tokens: 1500
-    };
-    if (i === 0) {
-      body.orb_override = _config.orb;
-    } else {
-      body.skip_orb = true;
-    }
-
-    try {
-      const res = await fetch(CHAT_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        if (err.error === 'orb_insufficient') {
-          document.getElementById('orbModalSub').textContent =
-            `Orb가 부족해요. 현재 잔액: ${(err.orb_balance||0).toLocaleString()} Orb`;
-          document.getElementById('orbModal').classList.add('open');
-          genOk = false; break;
-        }
-        throw new Error(err.error || 'API 오류');
-      }
-      const data = await res.json();
-      const text = (data.reply || '').trim();
-      results.push(text);
-
-      document.getElementById(`sloading-${i}`).style.display = 'none';
-      const bodyEl = document.getElementById(`sbody-${i}`);
-      bodyEl.innerHTML = renderMarkdown(text);
-      bodyEl.style.display = 'block';
-
-    } catch(e) {
-      document.getElementById(`sloading-${i}`).innerHTML = `<span style="color:#e05c6a;">생성 실패: ${e.message}</span>`;
-      genOk = false; break;
-    }
-  }
-
-  if (!genOk || results.length < genSections.length) return;
-
-  try {
-    const sb = getSb();
-    const { data } = await sb.from('reports').insert({
-      user_id: _user.id,
-      report_type: _type,
-      content: [...results, getProfileKey()],
-      orb_spent: _config.orb,
-      created_at: new Date().toISOString()
-    }).select().maybeSingle();
-    if (data) { _reportId = data.id; showToast('✦ 리포트가 저장되었습니다. 마이페이지에서 다시 확인할 수 있어요.'); }
-  } catch(e) {}
-
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
-  document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display = 'flex';
+  document.getElementById('reportMeta').textContent = '지원되지 않는 타입입니다.';
 }
 
 // ── 기존 리포트 렌더 ──
@@ -1261,7 +1325,7 @@ function selectPersonality(btn) {
 async function startCharacterGeneration() {
   showState('loading');
   setLoading('사주 정보 불러오는 중...', '');
-  if (!_sajuData) await Promise.all([loadSajuData(), loadVedicData()]);
+  if (!_sdFull && !_rptFull) await loadAllData(false, false);
 
   setLoading('기존 리포트 확인 중...', '');
   const existing = await fetchExistingReport();
@@ -1303,19 +1367,21 @@ async function generateCharacterReport() {
   const birthISO = `${p.year}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:00`;
   const gender = p.gender === 'F' ? 'female' : 'male';
 
-  let sd = null;
-  let rpt = {};
-  try {
-    const [sdRes, rptRes] = await Promise.all([
-      fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({birth: birthISO, gender, calendar: 'solar'})
-      }),
-      fetch(`https://fortuna.kkdmb7.workers.dev/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&current_year=${new Date().getFullYear()}&current_month=${new Date().getMonth()+1}&current_day=${new Date().getDate()}`)
-    ]);
-    if (sdRes.ok) sd = await sdRes.json();
-    if (rptRes.ok) rpt = await rptRes.json();
-  } catch(e) { console.warn('[character] 데이터 로드 실패:', e); }
+  let sd = _sdFull;
+  let rpt = _rptFull || {};
+  if (!sd || !rpt['일주']) {
+    try {
+      const [sdRes, rptRes] = await Promise.all([
+        fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({birth: birthISO, gender, calendar: 'solar'})
+        }),
+        fetch(`https://fortuna.kkdmb7.workers.dev/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&current_year=${new Date().getFullYear()}&current_month=${new Date().getMonth()+1}&current_day=${new Date().getDate()}`)
+      ]);
+      if (sdRes.ok) { sd = await sdRes.json(); _sdFull = sd; }
+      if (rptRes.ok) { rpt = await rptRes.json(); _rptFull = rpt; }
+    } catch(e) { console.warn('[character] 데이터 로드 실패:', e); }
+  }
 
   console.log('[character] sd:', sd);
   console.log('[character] rpt:', rpt);
@@ -1475,6 +1541,426 @@ async function generateCharacterReport() {
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display = 'flex';
+}
+
+// ── 재물/사업 리포트 생성 ──
+async function generateMoneyReport() {
+  showState('report');
+  document.getElementById('reportTitle').textContent = _config.title;
+  document.getElementById('reportMeta').textContent = '생성 중...';
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.innerHTML = '';
+  TYPE_SECTIONS.money.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'section-card'; card.id = `section-${i}`;
+    card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
+    wrap.appendChild(card);
+  });
+  const sb2 = buildSajuBlock(), vb = buildVedicBlock(), db = buildDaeunBlock(), profileStr = buildProfileStr();
+  const ysFinal = _sdFull?.yongshin?.primary || _yongsin || '미확인';
+  let wealthFrame = { wealth_type:'미확인', primary_path:'미확인', income_style:'미확인', risk_factors:[], writing_guidelines:[] };
+  try {
+    const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+        system_prompt:`당신은 사주 재물 구조 분석 엔진입니다. JSON만 반환. 해설 금지.
+wealth_type: "식상생재형"|"재성독립형"|"비겁탈재위험"|"관인재물형"|"재성약형"
+income_style: "사업"|"직장"|"투자"|"전문직"|"복합"
+primary_path: 재물 핵심 경로 한 문장
+risk_factors: 손실 위험 배열 최대3개
+partner_wealth: 배우자 재물 기여 한 문장
+daeun_phase: 현재 대운 재물 흐름 한 문장
+writing_guidelines: 이 사주에서 절대 쓰면 안 될 표현 배열`,
+        messages:[{role:'user',content:`재물 구조:\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}`}]
+      })
+    });
+    if (r0.ok) {
+      const d0 = await r0.json();
+      if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
+      const raw=(d0.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
+      if (m) { try { wealthFrame={...wealthFrame,...JSON.parse(m[1])}; } catch(e){} }
+    }
+  } catch(e) { console.warn('[money] STEP1 실패:',e); }
+  const wg = wealthFrame.writing_guidelines?.length ? '\n\n금지 표현:\n'+wealthFrame.writing_guidelines.map(g=>'- '+g).join('\n') : '';
+  const prompt2A = `${profileStr}
+
+${sb2}
+
+【재물 구조 분석】
+유형: ${wealthFrame.wealth_type} | 수입방식: ${wealthFrame.income_style}
+핵심경로: ${wealthFrame.primary_path}
+위험요소: ${(wealthFrame.risk_factors||[]).join(', ')||'없음'}
+
+${db}
+${vb}
+성격DB: ${_personality_db||''}
+
+섹션 구성 (각 번호 붙여 작성):
+1. 재물 구조 핵심 요약 — 이 사주에서 돈이 어떻게 들어오고 어디서 새는지. 재물 에너지 전체 구조를 3~4문장으로 압축.
+2. 재성·식상 심층 분석 — 정재/편재의 위치(연월일시 어느 기둥)와 강약, 식상이 재성을 생하는 흐름 유무, 비겁탈재 패턴 여부. 실제 사주 구조 인용.
+3. 사업 적성과 직업 방향 — 격국/용신/신강신약 기반. 사업 vs 직장 중 무엇이 맞는지, 적합한 업종·분야, 재물 극대화 커리어 전략.
+
+총 900~1300자.`;
+  await streamToSections(prompt2A, [0,1,2], '재물 구조 분석', ysFinal, wg, false);
+  const prompt2B = `${profileStr}
+
+${sb2}
+${db}
+올해 세운: ${_sewun||'미확인'} / 세운 상세: ${_sewunFull?JSON.stringify(_sewunFull):''}
+${vb}
+
+섹션 구성:
+4. 재물 대운·세운 흐름 — 현재 대운 ${_daeun||'미확인'}에서 재물 흐름 분석. 베딕 다샤 ${_vedicData?.dasha||'미확인'}와 교차. 언제 기회가 오고 언제 조심해야 하는지 구체적 시기 포함.
+5. 재물을 키우는 실천 전략 — 지금 당장 실행 가능한 구체적 전략 3가지. 이 사주 구조에 맞는 재테크/투자/사업 방식, 절대 피해야 할 패턴.
+
+총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(prompt2B, [3,4], '재물 구조 분석', ysFinal, wg, true);
+  try {
+    const sb = getSb();
+    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
+    if (data) showToast('✦ 리포트가 저장되었습니다.');
+  } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex';
+}
+
+// ── 연애/결혼 리포트 생성 ──
+async function generateLoveReport() {
+  showState('report');
+  document.getElementById('reportTitle').textContent = _config.title;
+  document.getElementById('reportMeta').textContent = '생성 중...';
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.innerHTML = '';
+  TYPE_SECTIONS.love.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'section-card'; card.id = `section-${i}`;
+    card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
+    wrap.appendChild(card);
+  });
+  const sb2 = buildSajuBlock(), vb = buildVedicBlock(), db = buildDaeunBlock(), ab = buildAstroBlock(), profileStr = buildProfileStr();
+  const ysFinal = _sdFull?.yongshin?.primary || _yongsin || '미확인';
+  let loveFrame = { love_type:'미확인', partner_element:'미확인', romance_style:'미확인', marriage_timing:'미확인', writing_guidelines:[] };
+  try {
+    const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+        system_prompt:`당신은 사주 연애 구조 분석 엔진입니다. JSON만 반환. 해설 금지.
+love_type: "관성강형"|"관성약형"|"상관견관형"|"식신생재연애형"|"인성연애형" 중 하나
+partner_element: 배우자성 오행 (예: "금(金)형")
+romance_style: 연애 스타일 한 문장
+marriage_timing: 결혼 인연 기운이 강한 대운/세운 패턴
+attraction_type: 끌리는 상대 유형 한 문장
+writing_guidelines: 절대 쓰면 안 될 표현 배열`,
+        messages:[{role:'user',content:`연애 구조:\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}`}]
+      })
+    });
+    if (r0.ok) {
+      const d0 = await r0.json();
+      if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
+      const raw=(d0.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
+      if (m) { try { loveFrame={...loveFrame,...JSON.parse(m[1])}; } catch(e){} }
+    }
+  } catch(e) { console.warn('[love] STEP1 실패:',e); }
+  const wg = loveFrame.writing_guidelines?.length ? '\n\n금지 표현:\n'+loveFrame.writing_guidelines.map(g=>'- '+g).join('\n') : '';
+  const prompt2A = `${profileStr}
+
+${sb2}
+
+【연애 구조 분석】
+연애유형: ${loveFrame.love_type} | 배우자성: ${loveFrame.partner_element}
+연애스타일: ${loveFrame.romance_style}
+끌리는 상대: ${loveFrame.attraction_type||'미확인'}
+
+${vb}
+${ab}
+
+섹션 구성:
+1. 연애 패턴 핵심 요약 — 관성 에너지 전반, 이 사람이 연애에서 반복하는 패턴을 압축.
+2. 관성·배우자궁(일지) 심층 분석 — 정관/편관 위치와 강약, 일지가 배우자궁으로서 가진 특성, 십신으로 본 연애 스타일 심층 분석. 남성이면 재성, 여성이면 관성 위주.
+3. 이상형과 잘 맞는 유형 — 배우자성 오행으로 본 이상형 조건, 잘 맞는 일간과 맞지 않는 유형, 베딕 금성 위치가 암시하는 파트너 특성.
+
+총 900~1300자.`;
+  await streamToSections(prompt2A, [0,1,2], '연애 구조 분석', ysFinal, wg, false);
+  const prompt2B = `${profileStr}
+
+${sb2}
+${db}
+올해 세운: ${_sewun||'미확인'}
+${vb}
+
+섹션 구성:
+4. 인연 시기 분석 — 현재 대운 ${_daeun||'미확인'}에서 관성이 활성화되는 시기, 베딕 다샤 ${_vedicData?.dasha||'미확인'} 기간의 연애 에너지, 올해 ${_sewun||''}년 인연 기운.
+5. 지금 연애에서 해야 할 것 — 현재 시기 연애 전략, 만남을 위한 구체적 행동 3가지, 절대 피해야 할 연애 패턴.
+
+총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(prompt2B, [3,4], '연애 구조 분석', ysFinal, wg, true);
+  try {
+    const sb = getSb();
+    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
+    if (data) showToast('✦ 리포트가 저장되었습니다.');
+  } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex';
+}
+
+// ── 대운 흐름 리포트 생성 ──
+async function generateDaeunReport() {
+  showState('report');
+  document.getElementById('reportTitle').textContent = _config.title;
+  document.getElementById('reportMeta').textContent = '생성 중...';
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.innerHTML = '';
+  TYPE_SECTIONS.daeun.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'section-card'; card.id = `section-${i}`;
+    card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
+    wrap.appendChild(card);
+  });
+  const sb2 = buildSajuBlock(), vb = buildVedicBlock(), db = buildDaeunBlock(), zb = buildZiweiBlock(), profileStr = buildProfileStr();
+  const ysFinal = _sdFull?.yongshin?.primary || _yongsin || '미확인';
+  const nowYear = new Date().getFullYear();
+  const curDaeun = _daeunList?.find(d=>{const r=(d.year_range||'').split(/[–\-]/);return nowYear>=parseInt(r[0])&&nowYear<=parseInt(r[1]);})||_daeunList?.[0];
+  let daeunFrame = { current_phase:'미확인', key_theme:'미확인', opportunities:[], risks:[], writing_guidelines:[] };
+  try {
+    const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+        system_prompt:`당신은 사주 대운 분석 엔진입니다. JSON만 반환. 해설 금지.
+current_phase: "성장기"|"전환기"|"수확기"|"정비기"|"도약기" 중 하나
+key_theme: 현재 대운 핵심 테마 한 문장
+opportunities: 이 대운의 기회 배열 최대3개
+risks: 이 대운의 위험 배열 최대3개
+daeun_ten_god: 현재 대운 천간의 일간 대비 십신
+writing_guidelines: 절대 쓰면 안 될 과장 표현 배열 (황금기/최고/폭발 등 확정적 표현)`,
+        messages:[{role:'user',content:`대운 분석:\n${sb2}\n${db}\n현재 대운 상세: ${JSON.stringify(curDaeun||{})}`}]
+      })
+    });
+    if (r0.ok) {
+      const d0 = await r0.json();
+      if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
+      const raw=(d0.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
+      if (m) { try { daeunFrame={...daeunFrame,...JSON.parse(m[1])}; } catch(e){} }
+    }
+  } catch(e) { console.warn('[daeun] STEP1 실패:',e); }
+  const wg = (daeunFrame.writing_guidelines?.length ? '\n\n금지 표현:\n'+daeunFrame.writing_guidelines.map(g=>'- '+g).join('\n') : '') + '\n- "황금기" "최고의 대운" "성과 폭발" 같은 확정적 표현 절대 금지\n- 구체적 금액 예측 금지';
+  const prompt2A = `${profileStr}
+
+${sb2}
+
+${db}
+
+【현재 대운 분석】
+국면: ${daeunFrame.current_phase} | 핵심테마: ${daeunFrame.key_theme}
+십신: ${daeunFrame.daeun_ten_god||'미확인'}
+기회: ${(daeunFrame.opportunities||[]).join(', ')||'없음'}
+위험: ${(daeunFrame.risks||[]).join(', ')||'없음'}
+
+${zb}
+
+섹션 구성:
+1. 현재 대운 핵심 요약 — 대운 ${_daeun||'미확인'}, 지금 어떤 조류 위에 있는지, 이 대운의 핵심 키워드와 에너지를 압축.
+2. 대운 천간·지지 심층 분석 — 대운 천간이 일간에 미치는 십신 작용 상세, 대운 지지와 원국 지지의 합충형파 분석, 천간이 지지를 생하는지 극하는지.
+3. 이 대운의 재물·직업·관계 흐름 — 각 영역별로 이 대운이 가져오는 구체적 변화와 흐름, 자미두수 대한과 교차 분석.
+
+총 900~1400자.`;
+  await streamToSections(prompt2A, [0,1,2], '대운 분석', ysFinal, wg, false);
+  const nextDaeun = _daeunList?.find(d=>{const r=(d.year_range||'').split(/[–\-]/);return parseInt(r[0])>new Date().getFullYear();});
+  const prompt2B = `${profileStr}
+
+${sb2}
+${vb}
+${db}
+올해 세운: ${_sewun||'미확인'}
+
+섹션 구성:
+4. 베딕 다샤 교차 분석 — 현재 다샤 ${_vedicData?.dasha||'미확인'}, 안타르다샤 ${_vedicData?.antardasha||'미확인'}와 사주 대운이 겹치는 에너지 교차 분석. 두 시스템이 같은 방향을 가리키는 영역과 서로 상충하는 영역.
+5. 이 대운의 전략과 다음 대운 준비 — 이 대운에서 반드시 해야 할 것 3가지, 절대 하지 말아야 할 것, 다음 대운 ${nextDaeun?`${nextDaeun.ganjee}대운`:'다음 대운'} 준비 방향.
+
+총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(prompt2B, [3,4], '대운 분석', ysFinal, wg, true);
+  try {
+    const sb = getSb();
+    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
+    if (data) showToast('✦ 리포트가 저장되었습니다.');
+  } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex';
+}
+
+// ── 올해 운세 리포트 생성 ──
+async function generateYearReport() {
+  showState('report');
+  const thisYear = new Date().getFullYear();
+  document.getElementById('reportTitle').textContent = _config.title;
+  document.getElementById('reportMeta').textContent = '생성 중...';
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.innerHTML = '';
+  TYPE_SECTIONS.year.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'section-card'; card.id = `section-${i}`;
+    card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
+    wrap.appendChild(card);
+  });
+  const sb2 = buildSajuBlock(), vb = buildVedicBlock(), db = buildDaeunBlock(), zb = buildZiweiBlock(), profileStr = buildProfileStr();
+  const ysFinal = _sdFull?.yongshin?.primary || _yongsin || '미확인';
+  const sewunStr = _sewunFull ? JSON.stringify(_sewunFull) : (_sewun || '미확인');
+  let yearFrame = { year_theme:'미확인', strong_areas:[], weak_areas:[], key_months:[], writing_guidelines:[] };
+  try {
+    const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+        system_prompt:`당신은 사주 세운 분석 엔진입니다. JSON만 반환. 해설 금지.
+year_theme: 올해 세운 핵심 테마 한 문장
+year_ten_god: 올해 세운 천간의 일간 대비 십신
+strong_areas: 올해 유리한 분야 배열 최대3개 (재물/직업/건강/연애 중)
+weak_areas: 올해 불리한 분야 배열 최대3개
+key_months: 특히 중요한 월 배열 (예: ["3월","9월"])
+writing_guidelines: 절대 쓰면 안 될 확정적 표현 배열`,
+        messages:[{role:'user',content:`세운 분석:\n${sb2}\n${db}\n올해 세운 상세: ${sewunStr}`}]
+      })
+    });
+    if (r0.ok) {
+      const d0 = await r0.json();
+      if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
+      const raw=(d0.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
+      if (m) { try { yearFrame={...yearFrame,...JSON.parse(m[1])}; } catch(e){} }
+    }
+  } catch(e) { console.warn('[year] STEP1 실패:',e); }
+  const wg = yearFrame.writing_guidelines?.length ? '\n\n금지 표현:\n'+yearFrame.writing_guidelines.map(g=>'- '+g).join('\n') : '';
+  const prompt2A = `${profileStr}
+
+${sb2}
+
+【${thisYear}년 세운 분석】
+핵심테마: ${yearFrame.year_theme}
+십신: ${yearFrame.year_ten_god||'미확인'}
+유리한분야: ${(yearFrame.strong_areas||[]).join(', ')||'없음'}
+불리한분야: ${(yearFrame.weak_areas||[]).join(', ')||'없음'}
+세운 상세: ${sewunStr}
+
+${db}
+${zb}
+
+섹션 구성:
+1. ${thisYear}년 핵심 요약 — 올해 세운이 내 사주에 미치는 핵심 에너지를 3~4문장으로 압축. 이 해의 전체 색깔과 방향.
+2. 세운 천간·지지 분석 — 올해 천간이 일간에 미치는 십신 작용, 올해 지지와 원국 지지의 합충형파, 대운과의 중첩 에너지.
+3. 분야별 흐름 — 재물·직업·연애·건강 각 분야의 올해 구체적 흐름. 각 분야 2~3문장씩.
+
+총 900~1300자.`;
+  await streamToSections(prompt2A, [0,1,2], `${thisYear}년 세운 분석`, ysFinal, wg, false);
+  const prompt2B = `${profileStr}
+
+${sb2}
+${vb}
+세운 상세: ${sewunStr}
+
+섹션 구성:
+4. 월별 주요 흐름 — 상반기(1~6월)와 하반기(7~12월) 흐름, 특히 기회의 달과 주의해야 할 달을 구체적으로. 중요 월건 포함.
+5. ${thisYear}년 실천 전략 — 올해를 잘 보내기 위한 구체적 전략 3가지, 해야 할 것과 절대 피해야 할 것, 올해 가장 중요한 한 가지.
+
+총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(prompt2B, [3,4], `${thisYear}년 세운 분석`, ysFinal, wg, true);
+  try {
+    const sb = getSb();
+    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
+    if (data) showToast('✦ 리포트가 저장되었습니다.');
+  } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex';
+}
+
+// ── 이번달 운세 리포트 생성 ──
+async function generateMonthReport() {
+  showState('report');
+  const now = new Date();
+  const thisYear = now.getFullYear(), thisMonth = now.getMonth()+1;
+  document.getElementById('reportTitle').textContent = _config.title;
+  document.getElementById('reportMeta').textContent = '생성 중...';
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.innerHTML = '';
+  TYPE_SECTIONS.month.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'section-card'; card.id = `section-${i}`;
+    card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
+    wrap.appendChild(card);
+  });
+  const sb2 = buildSajuBlock(), vb = buildVedicBlock(), db = buildDaeunBlock(), profileStr = buildProfileStr();
+  const ysFinal = _sdFull?.yongshin?.primary || _yongsin || '미확인';
+  const monthStr = `${thisYear}년 ${thisMonth}월`;
+  let monthFrame = { month_theme:'미확인', month_ten_god:'미확인', opportunities:[], cautions:[], writing_guidelines:[] };
+  try {
+    const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+        system_prompt:`당신은 사주 월운 분석 엔진입니다. JSON만 반환. 해설 금지.
+현재: ${monthStr}
+month_ten_god: 이달 월건 천간의 일간 대비 십신
+month_theme: 이달 핵심 테마 한 문장
+opportunities: 이달 기회 배열 최대2개
+cautions: 이달 주의사항 배열 최대2개
+best_area: 이달 가장 유리한 분야
+writing_guidelines: 절대 쓰면 안 될 표현 배열`,
+        messages:[{role:'user',content:`월운 분석:\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n이달: ${monthStr}`}]
+      })
+    });
+    if (r0.ok) {
+      const d0 = await r0.json();
+      if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
+      const raw=(d0.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
+      if (m) { try { monthFrame={...monthFrame,...JSON.parse(m[1])}; } catch(e){} }
+    }
+  } catch(e) { console.warn('[month] STEP1 실패:',e); }
+  const wg = monthFrame.writing_guidelines?.length ? '\n\n금지 표현:\n'+monthFrame.writing_guidelines.map(g=>'- '+g).join('\n') : '';
+  const prompt2A = `${profileStr}
+
+${sb2}
+
+【${monthStr} 월운 분석】
+이달월건 십신: ${monthFrame.month_ten_god}
+이달테마: ${monthFrame.month_theme}
+기회: ${(monthFrame.opportunities||[]).join(', ')||'없음'}
+주의: ${(monthFrame.cautions||[]).join(', ')||'없음'}
+유리한분야: ${monthFrame.best_area||'미확인'}
+
+${db}
+올해 세운: ${_sewun||'미확인'}
+
+섹션 구성:
+1. 이달 핵심 요약 — ${monthStr} 에너지를 2~3문장으로 압축. 이달의 색깔과 방향.
+2. 월건 천간·지지 십신 분석 — 이달 천간이 일간에 미치는 십신 작용, 이달 지지와 원국 지지의 합충형파, 대운·세운과의 중첩.
+3. 분야별 이달 흐름 — 재물·직업·연애·건강 각 분야의 이달 구체적 흐름. 베딕 트랜짓도 반영.
+
+총 800~1100자.`;
+  await streamToSections(prompt2A, [0,1,2], `${monthStr} 월운 분석`, ysFinal, wg, false);
+  const prompt2B = `${profileStr}
+
+${sb2}
+${vb}
+이달: ${monthStr} / 대운: ${_daeun||'미확인'} / 세운: ${_sewun||'미확인'}
+
+섹션 구성:
+4. 이달 주의사항과 기회 — 이달 특히 조심해야 할 것과 가장 큰 기회, 유리한 날과 불리한 시기 경향.
+5. 이달 실천 전략 — 지금 당장 실행할 수 있는 구체적 행동 3가지. 이달을 잘 보내는 핵심 포인트.
+
+총 500~700자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(prompt2B, [3,4], `${monthStr} 월운 분석`, ysFinal, wg, true);
+  try {
+    const sb = getSb();
+    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
+    if (data) showToast('✦ 리포트가 저장되었습니다.');
+  } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')} (${monthStr})`;
+  document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex';
 }
 
 // ── 응답을 섹션 배열에 나눠 표시 ──
