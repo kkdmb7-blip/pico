@@ -304,12 +304,14 @@ window.addEventListener('DOMContentLoaded', function() {
   try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
 
   // 용신 로드: pico_push_subscriptions 우선 → 없으면 pico_profile로 /saju-test 호출
+  var _YS_KO = {metal:'금',wood:'목',fire:'화',water:'수',earth:'토'};
+  function _toKoEl(v) { return _YS_KO[v] || v; } // 영어 오행 → 한글 정규화
   if (_user) {
     fetch(SB_URL+'/rest/v1/pico_push_subscriptions?user_id=eq.'+encodeURIComponent(_user.id)+'&select=yongshin',{ headers:sbH })
       .then(function(r){ return r.json(); })
       .then(function(rows){
         if (Array.isArray(rows) && rows[0] && rows[0].yongshin) {
-          _userYongshin = rows[0].yongshin;
+          _userYongshin = _toKoEl(rows[0].yongshin);
         } else {
           // 푸시 미구독자 → pico_profile로 직접 계산
           try {
@@ -320,7 +322,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({ birth:birth, gender:prof.gender||'M', calendar:'solar' })
               }).then(function(r2){ return r2.json(); })
-                .then(function(sd){ _userYongshin = (sd.yongshin && sd.yongshin.primary) || ''; })
+                .then(function(sd){ _userYongshin = _toKoEl((sd.yongshin && sd.yongshin.primary) || ''); })
                 .catch(function(){});
             }
           } catch(e) {}
