@@ -373,6 +373,7 @@ function renderIlganCard(y, m, d) {
   var stemColor = EL_COLOR[p.el] || '#c4a7f0';
   document.getElementById('ilganStemH').textContent = p.stemH;
   document.getElementById('ilganStemH').style.color = stemColor;
+  document.getElementById('ilganTitle').style.color = stemColor;
   document.getElementById('ilganBranchH').textContent = p.branchH;
   document.getElementById('ilganDate').textContent = (isToday ? '오늘 · ' : (m+'월 '+d+'일 · ')) + p.stem+p.branch+'일';
   document.getElementById('ilganTitle').textContent = EL_EMOJI[p.el] + ' ' + EL_DESC[p.el];
