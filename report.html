@@ -530,7 +530,9 @@ const TYPE_CONFIG = {
   year:      { title: '올해 운세 리포트',   orb: 500,  emoji: '✨', focus: '2026년 운세, 상반기/하반기 흐름, 월별 포인트, 주의사항',
     desc: '올해 세운 + 베딕 트랜짓 + 자미두수 유년 월별 흐름' },
   month:     { title: '이번달 운세 리포트', orb: 300,  emoji: '🌙', focus: '이번달 월운, 주요 흐름, 주의사항, 기회의 날',
-    desc: '월운 + 베딕 트랜짓으로 보는 이번달 상세 흐름' }
+    desc: '월운 + 베딕 트랜짓으로 보는 이번달 상세 흐름' },
+  yongsin:   { title: '용신 생활 가이드',   orb: 400,  emoji: '⚡', focus: '용신 오행에 맞는 색상·방위·음식·직업·환경·실천 전략',
+    desc: '내 용신 오행으로 보는 실생활 개운법 + 일주별 맞춤 전략' }
 };
 
 const TYPE_SECTIONS = {
@@ -575,6 +577,13 @@ const TYPE_SECTIONS = {
     { name: '분야별 이달 흐름',            chars: 500 },
     { name: '이달 주의사항과 기회',        chars: 400 },
     { name: '이달 실천 전략',              chars: 300 }
+  ],
+  yongsin: [
+    { name: '용신 핵심 개요',              chars: 300 },
+    { name: '색상·방위 활용법',            chars: 400 },
+    { name: '음식·건강 관리법',            chars: 400 },
+    { name: '직업·환경 구성',              chars: 500 },
+    { name: '일주별 맞춤 실천 전략',       chars: 500 }
   ]
 };
 
@@ -620,6 +629,13 @@ const SECTION_FOCUS = {
     '이달 재물·직업·연애·건강 각 분야의 구체적 흐름을 분석하라.',
     '이달 특히 조심해야 할 것과 가장 큰 기회를 분석하라.',
     '이달을 잘 보내기 위한 구체적 실천 방향 3가지를 제시하라.'
+  ],
+  yongsin: [
+    '용신 오행의 의미, 왜 이 사주에서 이 오행이 용신인지, 일상에서 어떤 효과가 있는지 압축 정리하라.',
+    '용신 색상과 방위를 실생활에서 활용하는 구체적 방법을 제시하라.',
+    '용신 음식과 건강 관리법, 신체 기관과의 연관성을 구체적으로 제시하라.',
+    '용신 오행에 맞는 직업군·활동 방향·환경 구성 방법을 제시하라.',
+    '이 일주의 창업/커리어/투자/관계 조언을 종합해 지금 실행할 수 있는 맞춤 전략을 제시하라.'
   ]
 };
 
@@ -821,6 +837,39 @@ const TYPE_DETAIL = {
       '이달 특히 피해야 할 상황과 패턴, 가장 큰 기회가 오는 시기와 분야를 구체적으로 분석합니다.',
       '지금 당장 실행할 수 있는 이달 전략 3가지. 이달을 잘 보내는 가장 핵심적인 포인트.'
     ]
+  },
+  yongsin: {
+    emoji: '⚡',
+    subtitle: '내 용신 오행으로 매일을 개운하는 법',
+    desc: '용신은 내 사주의 균형을 맞춰주는 핵심 오행입니다. 색상·방위·음식·직업·인테리어에 용신 에너지를 더하면 일상이 조금씩 달라집니다. 일주별 맞춤 전략까지 함께 제공합니다.',
+    recommend: [
+      '사주를 실생활에 적용하고 싶은 분',
+      '개운법이나 풍수에 관심 있는 분',
+      '직업·투자·관계에서 방향이 필요한 분',
+      '일주별 맞춤 커리어·재테크 전략이 필요한 분'
+    ],
+    sectionDesc: [
+      '용신 오행의 의미와 내 사주에서 왜 중요한지',
+      '용신 색상·방위 실생활 활용법',
+      '용신 음식·건강 관리법',
+      '용신에 맞는 직업군과 환경 구성',
+      '내 일주에 맞춘 창업·커리어·투자·관계 전략'
+    ],
+    preview: '내 용신 오행을 일상에 적용하는 실용적 가이드입니다. 어떤 색을 입고, 어느 방향을 활용하고, 어떤 음식을 먹어야 하는지. 내 일주에 맞는 커리어·투자·관계 전략까지 함께 분석합니다.',
+    faq: [
+      { q: '용신이 뭔가요?', a: '용신은 내 사주의 오행 균형을 보완해주는 핵심 에너지입니다. 부족한 오행을 보충하거나 과잉 에너지를 조절해 삶의 흐름을 개선합니다.' },
+      { q: '매일 실천해야 하나요?', a: '색상, 음식, 방위는 일상에서 자연스럽게 적용할 수 있습니다. 강제로 모두 따를 필요는 없고 편한 것부터 시작해보세요.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['내 용신 오행은 무엇이고 왜 중요한가?', '용신을 살리는 색상·방위·음식은?', '내 용신에 맞는 직업과 환경은?', '내 일주에 맞는 맞춤 전략은?'],
+    sectionDetail: [
+      '내 사주에서 용신 오행이 왜 필요한지, 이 오행이 일상에 어떤 영향을 주는지 압축합니다.',
+      '용신 색상을 옷·인테리어에 적용하는 법, 용신 방위를 집·사무실에서 활용하는 구체적 방법.',
+      '용신 오행에 해당하는 음식과 신체 기관, 건강 관리 포인트와 피해야 할 음식·습관.',
+      '용신 오행에 맞는 직업군, 유리한 업종, 일하기 좋은 환경과 공간 구성 방법.',
+      '이 일주만을 위한 창업·커리어·투자·대인관계 맞춤 전략. 지금 당장 실행할 수 있는 것들.'
+    ]
   }
 };
 
@@ -850,6 +899,8 @@ let _astroData = null;
 let _daeunList = null;
 let _sewunFull = null;
 let _personality_db = null;
+let _ageAdvice = null;
+let _ageBracket = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -961,11 +1012,13 @@ async function loadAllData(withZiwei, withAstro) {
   const minute = parseInt(p.minute) || 0;
   const birthISO = `${p.year}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:00`;
   const now = new Date();
+  const userAge = now.getFullYear() - parseInt(p.year);
+  _ageBracket = userAge < 35 ? '20' : userAge < 55 ? '40' : '60';
   const loadCtrl = new AbortController();
   const loadTid = setTimeout(() => loadCtrl.abort(), 20000);
   const promises = [
     fetch(`${WORKER_BASE}/saju-test`, {signal:loadCtrl.signal,method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({birth:birthISO,gender,calendar:'solar'})}),
-    fetch(`${WORKER_BASE}/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&current_year=${now.getFullYear()}&current_month=${now.getMonth()+1}&current_day=${now.getDate()}`, {signal:loadCtrl.signal}),
+    fetch(`${WORKER_BASE}/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&age=${_ageBracket}&current_year=${now.getFullYear()}&current_month=${now.getMonth()+1}&current_day=${now.getDate()}`, {signal:loadCtrl.signal}),
     fetch(`${WORKER_BASE}/vedic?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&tz=9`, {signal:loadCtrl.signal})
   ];
   if (withZiwei) promises.push(fetch(`${WORKER_BASE}/ziwei?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&gender=${gender}`, {signal:loadCtrl.signal}));
@@ -987,6 +1040,7 @@ async function loadAllData(withZiwei, withAstro) {
       }
       if (_rptFull['리포트']?.['올해운세']) { _sewunFull=_rptFull['리포트']['올해운세']; _sewun=_sewunFull['년도']||null; }
       _personality_db = _rptFull?.['리포트']?.['기본']?.['성격']||null;
+      if (_rptFull['리포트']?.['연령대조언']) _ageAdvice = _rptFull['리포트']['연령대조언']['조언']||null;
     }
   } catch(e){}
   try {
@@ -1057,6 +1111,36 @@ function buildAstroBlock() {
   return `【서양 점성술】
 금성: ${venus?`${venus.sign||''} ${Math.floor(venus.degree||0)}°`:'미확인'}
 화성: ${mars?`${mars.sign||''} ${Math.floor(mars.degree||0)}°`:'미확인'}`;
+}
+
+function buildAdviceBlock(keys) {
+  const advice = _rptFull?.['리포트']?.['조언'];
+  if (!advice) return '';
+  const items = (keys || Object.keys(advice)).map(k => advice[k] ? `[${k}] ${advice[k]}` : '').filter(Boolean);
+  if (!items.length) return '';
+  return `\n【일주별 맞춤 조언】\n${items.join('\n')}`;
+}
+
+function buildYongsinBlock(fields) {
+  const ys = _rptFull?.['용신활용'];
+  if (!ys) return '';
+  const all = fields || ['색상','방위','음식','직업','인테리어','피해야할것'];
+  const items = all.map(f => ys[f] ? `[${f}] ${ys[f]}` : '').filter(Boolean);
+  if (!items.length) return '';
+  return `\n【용신(${_yongsin||'미확인'}) 활용법】\n${items.join('\n')}`;
+}
+
+function buildFamousBlock() {
+  const f = _rptFull?.['유명인'];
+  if (!f) return '';
+  const list = Array.isArray(f) ? f : (f.names ? f.names : []);
+  if (!list.length) return '';
+  return `\n【같은 일주(${_ilju||''}) 유명인】${list.slice(0,5).join(', ')} — 이들의 공통 기질 패턴을 참고하되 직접 언급하지 말고 기질 분석에 반영할 것.`;
+}
+
+function buildAgeAdviceBlock() {
+  if (!_ageAdvice) return '';
+  return `\n【${_ageBracket}대 연령대 조언】\n${_ageAdvice}`;
 }
 
 // ── 초기화 ──
@@ -1346,11 +1430,12 @@ ${prevText}
 
 // ── 리포트 생성 (타입별 분기) ──
 async function generateReport() {
-  if (_type === 'money')  { await generateMoneyReport();  return; }
-  if (_type === 'love')   { await generateLoveReport();   return; }
-  if (_type === 'daeun')  { await generateDaeunReport();  return; }
-  if (_type === 'year')   { await generateYearReport();   return; }
-  if (_type === 'month')  { await generateMonthReport();  return; }
+  if (_type === 'money')   { await generateMoneyReport();   return; }
+  if (_type === 'love')    { await generateLoveReport();    return; }
+  if (_type === 'daeun')   { await generateDaeunReport();   return; }
+  if (_type === 'year')    { await generateYearReport();    return; }
+  if (_type === 'month')   { await generateMonthReport();   return; }
+  if (_type === 'yongsin') { await generateYongsinReport(); return; }
   // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
@@ -1612,10 +1697,13 @@ async function generateCharacterReport() {
 핵심키워드: ${pkw}
 성향: ${pk.join(', ')}
 주의점: ${theoryFrame.주의점 || ''}
+${buildFamousBlock()}
+${buildYongsinBlock(['직업','피해야할것'])}
+${buildAgeAdviceBlock()}
 
 섹션 구성:
 4. 베딕 낙샤트라로 본 패턴 — 낙샤트라·라시로 본 삶의 패턴과 기질, 사주와 교차 분석.
-5. 기질을 활용하는 실천 방향 — 지금 이 기질을 가장 잘 활용하는 구체적 실천 방향. 현재 대운 연계.
+5. 기질을 활용하는 실천 방향 — 지금 이 기질을 가장 잘 활용하는 구체적 실천 방향. 현재 대운 연계. 용신 직업 방향 포함. 연령대 조언 반영.
 700~900자.`;
 
   await streamToSections(strategyPrompt, [3, 4], theoryName, ysFinal, wg, true);
@@ -1702,10 +1790,12 @@ ${sb2}
 ${db}
 올해 세운: ${_sewun||'미확인'} / 세운 상세: ${_sewunFull?JSON.stringify(_sewunFull):''}
 ${vb}
+${buildAdviceBlock(['창업/비즈니스','이직/커리어','투자/재테크'])}
+${buildYongsinBlock(['직업','피해야할것'])}
 
 섹션 구성:
 4. 재물 대운·세운 흐름 — 현재 대운 ${_daeun||'미확인'}에서 재물 흐름 분석. 베딕 다샤 ${_vedicData?.dasha||'미확인'}와 교차. 언제 기회가 오고 언제 조심해야 하는지 구체적 시기 포함.
-5. 재물을 키우는 실천 전략 — 지금 당장 실행 가능한 구체적 전략 3가지. 이 사주 구조에 맞는 재테크/투자/사업 방식, 절대 피해야 할 패턴.
+5. 재물을 키우는 실천 전략 — 이 일주에 맞는 창업·커리어·투자 조언을 반드시 반영. 지금 당장 실행 가능한 구체적 전략 3가지. 이 사주 구조에 맞는 재테크/투자/사업 방식, 절대 피해야 할 패턴.
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '재물 구조 분석', ysFinal, wg, true);
@@ -1783,10 +1873,11 @@ ${sb2}
 ${db}
 올해 세운: ${_sewun||'미확인'}
 ${vb}
+${buildAdviceBlock(['대인관계/부부'])}
 
 섹션 구성:
 4. 인연 시기 분석 — 현재 대운 ${_daeun||'미확인'}에서 관성이 활성화되는 시기, 베딕 다샤 ${_vedicData?.dasha||'미확인'} 기간의 연애 에너지, 올해 ${_sewun||''}년 인연 기운.
-5. 지금 연애에서 해야 할 것 — 현재 시기 연애 전략, 만남을 위한 구체적 행동 3가지, 절대 피해야 할 연애 패턴.
+5. 지금 연애에서 해야 할 것 — 이 일주의 대인관계/부부 조언을 반드시 반영. 현재 시기 연애 전략, 만남을 위한 구체적 행동 3가지, 절대 피해야 할 연애 패턴.
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '연애 구조 분석', ysFinal, wg, true);
@@ -1869,10 +1960,13 @@ ${sb2}
 ${vb}
 ${db}
 올해 세운: ${_sewun||'미확인'}
+${buildAdviceBlock()}
+${buildYongsinBlock()}
+${buildAgeAdviceBlock()}
 
 섹션 구성:
 4. 베딕 다샤 교차 분석 — 현재 다샤 ${_vedicData?.dasha||'미확인'}, 안타르다샤 ${_vedicData?.antardasha||'미확인'}와 사주 대운이 겹치는 에너지 교차 분석. 두 시스템이 같은 방향을 가리키는 영역과 서로 상충하는 영역.
-5. 이 대운의 전략과 다음 대운 준비 — 이 대운에서 반드시 해야 할 것 3가지, 절대 하지 말아야 할 것, 다음 대운 ${nextDaeun?`${nextDaeun.ganjee}대운`:'다음 대운'} 준비 방향.
+5. 이 대운의 전략과 다음 대운 준비 — 이 일주의 창업·커리어·투자·관계 조언과 용신 활용법을 반드시 반영. 이 대운에서 반드시 해야 할 것 3가지, 절대 하지 말아야 할 것, 다음 대운 ${nextDaeun?`${nextDaeun.ganjee}대운`:'다음 대운'} 준비 방향.
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '대운 분석', ysFinal, wg, true);
@@ -1953,10 +2047,11 @@ ${zb}
 ${sb2}
 ${vb}
 세운 상세: ${sewunStr}
+${buildAdviceBlock(['이직/커리어','투자/재테크'])}
 
 섹션 구성:
 4. 월별 주요 흐름 — 상반기(1~6월)와 하반기(7~12월) 흐름, 특히 기회의 달과 주의해야 할 달을 구체적으로. 중요 월건 포함.
-5. ${thisYear}년 실천 전략 — 올해를 잘 보내기 위한 구체적 전략 3가지, 해야 할 것과 절대 피해야 할 것, 올해 가장 중요한 한 가지.
+5. ${thisYear}년 실천 전략 — 이 일주의 커리어·투자 조언을 반드시 반영. 올해를 잘 보내기 위한 구체적 전략 3가지, 해야 할 것과 절대 피해야 할 것, 올해 가장 중요한 한 가지.
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], `${thisYear}년 세운 분석`, ysFinal, wg, true);
@@ -2065,6 +2160,93 @@ ${vb}
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display='flex';
+}
+
+// ── 용신 생활 가이드 리포트 생성 ──
+async function generateYongsinReport() {
+  showState('report');
+  document.getElementById('reportTitle').textContent = _config.title;
+  document.getElementById('reportMeta').textContent = '생성 중...';
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.innerHTML = '';
+  TYPE_SECTIONS.yongsin.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'section-card'; card.id = `section-${i}`;
+    card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
+    wrap.appendChild(card);
+  });
+  const sb2 = buildSajuBlock(), profileStr = buildProfileStr();
+  const ysFinal = _sdFull?.yongshin?.primary || _yongsin || '미확인';
+  const ysBlock = buildYongsinBlock();
+  const advBlock = buildAdviceBlock();
+  const ageBlock = buildAgeAdviceBlock();
+  let wg = '';
+  // STEP1: JSON 프레임 (Orb 차감)
+  let ysFrame = { yongsin_element: ysFinal, daily_tips: [], writing_guidelines: [] };
+  try {
+    const step1Ctrl = new AbortController();
+    const step1Tid = setTimeout(() => step1Ctrl.abort(), 30000);
+    const r0 = await fetch(CHAT_API, { signal: step1Ctrl.signal, method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id: _user.id, orb_override: _config.orb,
+        system_prompt: `당신은 사주 용신 분석 엔진입니다. JSON만 반환. 해설 금지.
+yongsin_element: 용신 오행 한 글자 (목/화/토/금/수)
+yongsin_reason: 이 사주에서 이 오행이 용신인 이유 한 문장
+daily_tips: 오늘 당장 실천할 수 있는 팁 배열 최대3개
+writing_guidelines: 절대 쓰면 안 될 과장 표현 배열`,
+        messages: [{ role: 'user', content: `용신 분석:\n${sb2}\n용신: ${ysFinal}` }]
+      })
+    });
+    clearTimeout(step1Tid);
+    if (r0.ok) {
+      const d0 = await r0.json();
+      if (d0.error === 'orb_insufficient') { document.getElementById('orbModalSub').textContent = `Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
+      const raw = (d0.reply||'').trim(); const m = raw.match(/```json?\s*([\s\S]*?)```/) || raw.match(/(\{[\s\S]*\})/);
+      if (m) { try { ysFrame = {...ysFrame, ...JSON.parse(m[1])}; } catch(e){} }
+    }
+  } catch(e) { console.warn('[yongsin] STEP1 실패:', e); }
+  wg = ysFrame.writing_guidelines?.length ? '\n\n금지 표현:\n' + ysFrame.writing_guidelines.map(g => '- ' + g).join('\n') : '';
+
+  const prompt2A = `${profileStr}
+
+${sb2}
+
+【용신(${ysFinal}) 기반 생활 가이드】
+용신 이유: ${ysFrame.yongsin_reason || ''}
+오늘 팁: ${(ysFrame.daily_tips||[]).join(', ')||''}
+${ysBlock}
+
+섹션 구성:
+1. 용신 핵심 개요 — 용신 ${ysFinal} 오행의 의미, 이 사주에서 왜 이 오행이 필요한지, 용신을 살리면 어떤 변화가 생기는지 3~4문장으로 압축.
+2. 색상·방위 활용법 — 용신 색상을 일상(옷·소품·인테리어)에 활용하는 구체적 방법, 용신 방위를 집·사무실에서 활용하는 실용적 방법.
+3. 음식·건강 관리법 — 용신 오행에 해당하는 음식과 신체 기관, 지금 이 시기 건강 관리 포인트, 피해야 할 음식과 습관.
+
+총 800~1100자.`;
+  await streamToSections(prompt2A, [0,1,2], '용신 생활 가이드', ysFinal, wg, false);
+
+  const prompt2B = `${profileStr}
+
+${sb2}
+${ysBlock}
+${advBlock}
+${ageBlock}
+
+섹션 구성:
+4. 직업·환경 구성 — 용신 오행에 맞는 직업군과 업종, 일하기 좋은 환경과 공간 구성 방법, 피해야 할 환경.
+5. 일주별 맞춤 실천 전략 — 이 일주의 창업·커리어·투자·대인관계 조언을 종합해 지금 바로 실행할 수 있는 구체적 전략 3가지. 연령대와 현재 대운 ${_daeun||'미확인'}을 반영.
+
+총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(prompt2B, [3,4], '용신 생활 가이드', ysFinal, wg, true);
+
+  try {
+    const sb = getSb();
+    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
+    if (data) showToast('✦ 리포트가 저장되었습니다.');
+  } catch(e){}
+  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
+  document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display = 'flex';
 }
 
 // ── 응답을 섹션 배열에 나눠 표시 ──
