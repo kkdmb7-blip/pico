@@ -24,8 +24,8 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(10,10,15,0.92); backdr
 /* ILGAN CARD */
 .ilgan-card{ margin:14px 16px 0; background:linear-gradient(135deg,rgba(123,94,167,0.14),rgba(212,175,55,0.07)); border:1px solid rgba(123,94,167,0.28); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:14px; }
 .ilgan-pillar{ text-align:center; flex-shrink:0; width:44px; }
-.ilgan-stem-h{ font-family:'Noto Serif KR',serif; font-size:26px; font-weight:700; line-height:1.1; }
-.ilgan-branch-h{ font-family:'Noto Serif KR',serif; font-size:18px; color:rgba(240,240,245,0.5); line-height:1.1; }
+.ilgan-stem-h{ font-family:'Noto Serif KR',serif; font-size:22px; font-weight:700; line-height:1.1; }
+.ilgan-branch-h{ font-family:'Noto Serif KR',serif; font-size:22px; font-weight:700; line-height:1.1; }
 .ilgan-info{ flex:1; }
 .ilgan-date{ font-size:11px; color:var(--muted); margin-bottom:2px; }
 .ilgan-title{ font-size:14px; font-weight:600; margin-bottom:3px; }
@@ -273,7 +273,8 @@ var STEMS    = ['갑','을','병','정','무','기','경','신','임','계'];
 var BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
 var STEM_H   = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 var BRANCH_H = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-var STEM_EL  = ['목','목','화','화','토','토','금','금','수','수'];
+var STEM_EL   = ['목','목','화','화','토','토','금','금','수','수'];
+var BRANCH_EL = ['수','토','목','목','토','화','화','토','금','금','토','수']; // 자축인묘진사오미신유술해
 var EL_COLOR = {목:'#4caf50',화:'#ff5252',토:'#ffca28',금:'#bdbdbd',수:'#64b5f6'};
 var EL_EMOJI = {목:'🌿',화:'🔥',토:'🌍',금:'⚡',수:'🌊'};
 var EL_DESC  = {
@@ -370,11 +371,14 @@ function renderIlganCard(y, m, d) {
   var t = getTodayKST();
   var p = calcDayPillar(y, m, d);
   var isToday = (y===t.y && m===t.m && d===t.d);
-  var stemColor = EL_COLOR[p.el] || '#c4a7f0';
-  document.getElementById('ilganStemH').textContent = p.stemH;
-  document.getElementById('ilganStemH').style.color = stemColor;
-  document.getElementById('ilganTitle').style.color = stemColor;
-  document.getElementById('ilganBranchH').textContent = p.branchH;
+  var stemColor   = EL_COLOR[p.el] || '#c4a7f0';
+  var branchEl    = BRANCH_EL[BRANCHES.indexOf(p.branch)] || p.el;
+  var branchColor = EL_COLOR[branchEl] || '#c4a7f0';
+  document.getElementById('ilganStemH').textContent        = p.stemH;
+  document.getElementById('ilganStemH').style.color        = stemColor;
+  document.getElementById('ilganTitle').style.color        = stemColor;
+  document.getElementById('ilganBranchH').textContent      = p.branchH;
+  document.getElementById('ilganBranchH').style.color      = branchColor;
   document.getElementById('ilganDate').textContent = (isToday ? '오늘 · ' : (m+'월 '+d+'일 · ')) + p.stem+p.branch+'일';
   document.getElementById('ilganTitle').textContent = EL_EMOJI[p.el] + ' ' + EL_DESC[p.el];
   document.getElementById('ilganDesc').textContent = BRANCH_DESC[p.branch] || '';
