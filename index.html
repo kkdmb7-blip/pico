@@ -4743,21 +4743,26 @@ window.togglePushSubscription = async function() {
     wrap.style.display = 'block';
 
     // 오늘 일진 계산 (diary.html과 동일 공식)
-    var STEMS_D   = ['갑','을','병','정','무','기','경','신','임','계'];
-    var BRANCHES_D= ['자','축','인','묘','진','사','오','미','신','유','술','해'];
-    var STEM_H_D  = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-    var BRANCH_H_D= ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-    var STEM_EL_D = ['목','목','화','화','토','토','금','금','수','수'];
-    var EL_LABEL  = {목:'木 목',화:'火 화',토:'土 토',금:'金 금',수:'水 수'};
+    var STEMS_D    = ['갑','을','병','정','무','기','경','신','임','계'];
+    var BRANCHES_D = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+    var STEM_H_D   = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    var BRANCH_H_D = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    var STEM_EL_D  = ['목','목','화','화','토','토','금','금','수','수'];
+    var BRANCH_EL_D= ['수','토','목','목','토','화','화','토','금','금','토','수'];
+    var EL_COLOR_D = {목:'#4caf50',화:'#ff5252',토:'#ffca28',금:'#bdbdbd',수:'#64b5f6'};
+    var EL_LABEL   = {목:'木 목',화:'火 화',토:'土 토',금:'金 금',수:'水 수'};
     var birthMs = Date.UTC(y, mo-1, dd);
     var di = (((Math.round((birthMs - Date.UTC(2024,1,10)) / 86400000)) + 40) % 60 + 60) % 60;
     var dSi = di % 10, dBi = di % 12;
     var stemK = STEMS_D[dSi], branchK = BRANCHES_D[dBi];
     var stemH = STEM_H_D[dSi], branchH = BRANCH_H_D[dBi];
-    var el = STEM_EL_D[dSi];
-    var ilganText = stemH+'('+stemK+') '+branchH+'('+branchK+') · '+(EL_LABEL[el]||el)+'의 날';
+    var el = STEM_EL_D[dSi], bEl = BRANCH_EL_D[dBi];
+    var sColor = EL_COLOR_D[el]||'#c4a7f0', bColor = EL_COLOR_D[bEl]||'#c4a7f0';
     var ilganEl = document.getElementById('diaryCtaIlganText');
-    if (ilganEl) ilganEl.textContent = ilganText;
+    if (ilganEl) ilganEl.innerHTML =
+      '<span style="color:'+sColor+';font-weight:700;">'+stemH+'</span>('+stemK+') '
+      +'<span style="color:'+bColor+';font-weight:700;">'+branchH+'</span>('+branchK+') · '
+      +(EL_LABEL[el]||el)+'의 날';
 
     // 기록 완료 상태
     var cached = localStorage.getItem('pico_diary_' + todayStr);
