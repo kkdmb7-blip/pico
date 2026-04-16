@@ -896,14 +896,17 @@ async function loadAllData(withZiwei, withAstro) {
   const minute = parseInt(p.minute) || 0;
   const birthISO = `${p.year}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:00`;
   const now = new Date();
+  const loadCtrl = new AbortController();
+  const loadTid = setTimeout(() => loadCtrl.abort(), 20000);
   const promises = [
-    fetch(`${WORKER_BASE}/saju-test`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({birth:birthISO,gender,calendar:'solar'})}),
-    fetch(`${WORKER_BASE}/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&current_year=${now.getFullYear()}&current_month=${now.getMonth()+1}&current_day=${now.getDate()}`),
-    fetch(`${WORKER_BASE}/vedic?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&tz=9`)
+    fetch(`${WORKER_BASE}/saju-test`, {signal:loadCtrl.signal,method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({birth:birthISO,gender,calendar:'solar'})}),
+    fetch(`${WORKER_BASE}/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&current_year=${now.getFullYear()}&current_month=${now.getMonth()+1}&current_day=${now.getDate()}`, {signal:loadCtrl.signal}),
+    fetch(`${WORKER_BASE}/vedic?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&tz=9`, {signal:loadCtrl.signal})
   ];
-  if (withZiwei) promises.push(fetch(`${WORKER_BASE}/ziwei?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&gender=${gender}`));
-  if (withAstro)  promises.push(fetch(`${WORKER_BASE}/astro?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&lat=37.5&lng=127.0`));
+  if (withZiwei) promises.push(fetch(`${WORKER_BASE}/ziwei?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&gender=${gender}`, {signal:loadCtrl.signal}));
+  if (withAstro)  promises.push(fetch(`${WORKER_BASE}/astro?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&lat=37.5&lng=127.0`, {signal:loadCtrl.signal}));
   const results = await Promise.allSettled(promises);
+  clearTimeout(loadTid);
   try { if (results[0].status==='fulfilled'&&results[0].value.ok) _sdFull = await results[0].value.json(); } catch(e){}
   try {
     if (results[1].status==='fulfilled'&&results[1].value.ok) {
@@ -1897,7 +1900,9 @@ async function generateMonthReport() {
   const monthStr = `${thisYear}년 ${thisMonth}월`;
   let monthFrame = { month_theme:'미확인', month_ten_god:'미확인', opportunities:[], cautions:[], writing_guidelines:[] };
   try {
-    const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
+    const step1Ctrl = new AbortController();
+    const step1Tid = setTimeout(() => step1Ctrl.abort(), 30000);
+    const r0 = await fetch(CHAT_API, { signal:step1Ctrl.signal, method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
         system_prompt:`당신은 사주 월운 분석 엔진입니다. JSON만 반환. 해설 금지.
 현재: ${monthStr}
@@ -1910,6 +1915,7 @@ writing_guidelines: 절대 쓰면 안 될 표현 배열`,
         messages:[{role:'user',content:`월운 분석:\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n이달: ${monthStr}`}]
       })
     });
+    clearTimeout(step1Tid);
     if (r0.ok) {
       const d0 = await r0.json();
       if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
@@ -1965,6 +1971,8 @@ ${vb}
 
 // ── 응답을 섹션 배열에 나눠 표시 ──
 async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isFirst) {
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), 55000);
   try {
     const sysPrompt = `당신은 ${theoryName || '억부지전'} 기반 사주 분석가입니다.
 절대 규칙:
@@ -1976,6 +1984,7 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 - 요청한 섹션 구성대로 번호를 붙여 작성${wg || ''}`;
 
     const res = await fetch(CHAT_API, {
+      signal: controller.signal,
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         user_id: _user.id,
@@ -1985,6 +1994,7 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
         skip_orb: true
       })
     });
+    clearTimeout(tid);
     if (!res.ok) throw new Error('API 오류');
     const data = await res.json();
     const text = (data.reply || '').trim();
@@ -1998,9 +2008,10 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
       body.style.display = 'block';
     });
   } catch(e) {
+    clearTimeout(tid);
     secIndices.forEach(i => {
       const el = document.getElementById(`sloading-${i}`);
-      if (el) el.innerHTML = `<span style="color:#e05c6a;">생성 실패</span>`;
+      if (el) el.innerHTML = `<span style="color:#e05c6a;">${e.name === 'AbortError' ? '시간 초과 — 다시 시도해주세요' : '생성 실패'}</span>`;
     });
   }
 }
