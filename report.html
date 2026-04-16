@@ -514,7 +514,7 @@ const TYPE_CONFIG = {
     desc: '재성 분석부터 베딕 2하우스까지 재물 구조 완전 해석' },
   love:      { title: '연애/결혼 리포트',   orb: 700,  emoji: '💕', focus: '연애 패턴, 이상형, 결혼운, 파트너십의 특성',
     desc: '관성/재성 분석 + 베딕 7하우스로 보는 연애/결혼 구조' },
-  daeun:     { title: '대운 흐름 리포트',   orb: 1000, emoji: '📈', focus: '현재 대운의 의미, 앞으로의 대운 흐름, 인생 타이밍',
+  daeun:     { title: '대운 흐름 리포트',   orb: 800,  emoji: '📈', focus: '현재 대운의 의미, 앞으로의 대운 흐름, 인생 타이밍',
     desc: '현재 대운 심층 분석 + 다샤 + 자미두수 대한 융합' },
   year:      { title: '올해 운세 리포트',   orb: 500,  emoji: '✨', focus: '2026년 운세, 상반기/하반기 흐름, 월별 포인트, 주의사항',
     desc: '올해 세운 + 베딕 트랜짓 + 자미두수 유년 월별 흐름' },
@@ -540,7 +540,7 @@ const TYPE_SECTIONS = {
   love: [
     { name: '연애 패턴 핵심 요약',       chars: 300 },
     { name: '관성·배우자궁 분석',        chars: 600 },
-    { name: '이상형과 궁합 조건',        chars: 500 },
+    { name: '이상형과 잘 맞는 유형',      chars: 500 },
     { name: '인연 시기 (대운·세운·베딕)', chars: 500 },
     { name: '지금 연애에서 해야 할 것',  chars: 400 }
   ],
@@ -549,7 +549,7 @@ const TYPE_SECTIONS = {
     { name: '대운 천간·지지 심층 분석',     chars: 600 },
     { name: '대운별 재물·직업·관계 흐름',   chars: 500 },
     { name: '베딕 다샤 교차 분석',          chars: 500 },
-    { name: '이 대운의 전략과 주의점',      chars: 400 }
+    { name: '이 대운의 전략과 다음 대운 준비', chars: 400 }
   ],
   year: [
     { name: '2026년 핵심 요약',                   chars: 300 },
@@ -1502,9 +1502,9 @@ async function generateCharacterReport() {
 구조: ① 적천수 천간론 원문을 1~2구절 인용하고, 자연 현상에 비유하여 이 사주의 핵심 구조를 설명 ② 성격·기질·강점 ③ 약점과 보완점 ④ 왜 이런 패턴인지 사주 구조로 설명
 적천수 원문 참조 - ${stemHanja}일간: ${CHEONSU[stemHanja] || ''}
 섹션 구성:
-1. 타고난 기질의 본질 (일주+격국 기반)
-2. 강점과 약점 (오행분포+성향 반영)
-3. 삶의 방식과 대인관계 패턴
+1. 핵심 기질 요약 — 일주+격국+신강신약으로 타고난 기질의 본질을 3~4문장으로 압축.
+2. 일간과 격국 분석 — 일간의 오행 특성, 격국 구조, 십신 배치로 성격의 뿌리 심층 분석. 적천수 원문 인용 포함.
+3. 강점·약점과 오행 균형 — 오행 분포 %를 기반으로 강점과 약점, 보완 방향 구체적 분석.
 800~1200자.`;
 
   await streamToSections(analysisPrompt, [0, 1, 2], theoryName, ysFinal, wg, false);
@@ -1522,8 +1522,8 @@ async function generateCharacterReport() {
 주의점: ${theoryFrame.주의점 || ''}
 
 섹션 구성:
-4. 베딕/낙샤트라로 본 기질 교차 분석
-5. 지금 이 기질을 활용하는 실천 방향 (현재 대운 연계)
+4. 베딕 낙샤트라로 본 패턴 — 낙샤트라·라시로 본 삶의 패턴과 기질, 사주와 교차 분석.
+5. 기질을 활용하는 실천 방향 — 지금 이 기질을 가장 잘 활용하는 구체적 실천 방향. 현재 대운 연계.
 700~900자.`;
 
   await streamToSections(strategyPrompt, [3, 4], theoryName, ysFinal, wg, true);
