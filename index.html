@@ -2558,8 +2558,8 @@ async function openHistoryModal() {
   list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">불러오는 중...</div>';
 
   var allItems = [];
-  var TYPE_ICON = { character:'🌟', money:'💰', love:'💕', daeun:'🔮', year:'📅', gunghap:'💕', saju:'🏛️' };
-  var TYPE_LABEL = { character:'기질 분석', money:'재물·직업 운', love:'연애·인연 운', daeun:'대운 흐름', year:'신년운' };
+  var TYPE_ICON = { character:'🌟', money:'💰', love:'💕', daeun:'🔮', year:'📅', month:'📆', yongsin:'⚡', gunghap:'💕', saju:'🏛️' };
+  var TYPE_LABEL = { character:'기질 분석', money:'재물·직업 운', love:'연애·인연 운', daeun:'대운 흐름', year:'신년운', month:'이달 월운', yongsin:'용신 생활 가이드' };
 
   // 기존 analysis-history 조회
   try {
@@ -4411,6 +4411,7 @@ function updateMypageTab() {
       updateNavOrb(u && u.id ? u.id : null);
     } catch(e) {}
   };
+  window.getSb = getSb;
 })();
 </script>
 <script>
