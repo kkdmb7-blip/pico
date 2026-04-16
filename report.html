@@ -2586,8 +2586,42 @@ ${ageBlock}
   document.getElementById('reportActions').style.display = 'flex';
 }
 
+// ── 신규 리포트 공통: 섹션 카드 생성 + Orb 차감 ──
+async function setupSectionsAndDeductOrb() {
+  showState('report');
+  document.getElementById('reportTitle').textContent = _config.title;
+  document.getElementById('reportMeta').textContent = '생성 중...';
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.innerHTML = '';
+  (TYPE_SECTIONS[_type] || []).forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'section-card'; card.id = `section-${i}`;
+    card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
+    wrap.appendChild(card);
+  });
+  // Orb 차감 (최소 호출로 deduct)
+  try {
+    const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+        system_prompt:'사주 분석 준비 엔진. "READY"만 반환.',
+        messages:[{role:'user', content:'준비'}]
+      })
+    });
+    if (r0.ok) {
+      const d0 = await r0.json();
+      if (d0.error === 'orb_insufficient') {
+        document.getElementById('orbModalSub').textContent = `Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`;
+        document.getElementById('orbModal').classList.add('open');
+        return false;
+      }
+    }
+  } catch(e) { console.warn('[deductOrb] 실패:', e); }
+  return true;
+}
+
 // ── 베딕 심층 분석 ──
 async function generateVedicFullReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
   const sb2 = buildSajuBlock();
   const vb = buildVedicBlock();
   const db = buildDaeunBlock();
@@ -2643,6 +2677,7 @@ ${buildYongsinBlock()}
 
 // ── 서양 점성술 심층 분석 ──
 async function generateAstroFullReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
   const sb2 = buildSajuBlock();
   const ab = buildFullAstroBlock();
   const db = buildDaeunBlock();
@@ -2694,6 +2729,7 @@ ${buildYongsinBlock()}
 
 // ── 자미두수 심층 분석 ──
 async function generateZiweiFullReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
   const sb2 = buildSajuBlock();
   const zb = buildFullZiweiBlock();
   const db = buildDaeunBlock();
@@ -2745,6 +2781,7 @@ ${buildAdviceBlock(['대인관계/부부'])}
 
 // ── 동서양 통합 분석 ──
 async function generateTripleReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
   const sb2 = buildSajuBlock();
   const vb = buildVedicBlock();
   const ab = buildFullAstroBlock();
@@ -2804,6 +2841,7 @@ ${buildYongsinBlock()}
 
 // ── 직업·사업 심층 분석 ──
 async function generateCareerDeepReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
   const sb2 = buildSajuBlock();
   const vb = buildVedicBlock();
   const ab = buildFullAstroBlock();
