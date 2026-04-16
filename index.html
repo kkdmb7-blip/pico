@@ -1320,6 +1320,48 @@
     </div>
   </div>
 
+  <!-- 동서양 교차 분석 -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 16px 16px;">
+    <div style="margin-bottom:14px;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">동서양 교차 분석</div>
+      <div style="font-size:11px;color:var(--muted);">베딕·서양·자미두수로 보는 심층 분석</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div onclick="window.location.href='report.html?type=vedic_full'" style="background:var(--surface2);border:1px solid rgba(148,130,220,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(148,130,220,0.6)'" onmouseout="this.style.borderColor='rgba(148,130,220,0.25)'">
+        <div style="font-size:20px;margin-bottom:6px;">🪐</div>
+        <div style="font-size:13px;font-weight:700;color:#9482dc;margin-bottom:4px;">베딕 심층 분석</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.4;">낙샤트라·다샤·라시로 보는 운명 패턴</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#9482dc;">500 Orb</div>
+      </div>
+      <div onclick="window.location.href='report.html?type=astro_full'" style="background:var(--surface2);border:1px solid rgba(255,220,100,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,220,100,0.6)'" onmouseout="this.style.borderColor='rgba(255,220,100,0.25)'">
+        <div style="font-size:20px;margin-bottom:6px;">⭐</div>
+        <div style="font-size:13px;font-weight:700;color:#ffd864;margin-bottom:4px;">서양 점성술</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.4;">행성 배치로 보는 기질·관계·운기</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#ffd864;">500 Orb</div>
+      </div>
+      <div onclick="window.location.href='report.html?type=ziwei_full'" style="background:var(--surface2);border:1px solid rgba(100,180,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,180,255,0.6)'" onmouseout="this.style.borderColor='rgba(100,180,255,0.25)'">
+        <div style="font-size:20px;margin-bottom:6px;">🌌</div>
+        <div style="font-size:13px;font-weight:700;color:#64b4ff;margin-bottom:4px;">자미두수 심층</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.4;">명궁·재백·관록궁으로 보는 운명</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#64b4ff;">500 Orb</div>
+      </div>
+      <div onclick="window.location.href='report.html?type=career_deep'" style="background:var(--surface2);border:1px solid rgba(100,220,150,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,220,150,0.6)'" onmouseout="this.style.borderColor='rgba(100,220,150,0.25)'">
+        <div style="font-size:20px;margin-bottom:6px;">🚀</div>
+        <div style="font-size:13px;font-weight:700;color:#64dc96;margin-bottom:4px;">직업·사업 심층</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.4;">3시스템으로 보는 직업 구조 분석</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#64dc96;">600 Orb</div>
+      </div>
+      <div onclick="window.location.href='report.html?type=triple'" style="background:linear-gradient(135deg,rgba(100,130,220,0.15),rgba(220,130,100,0.15));border:1px solid rgba(180,160,240,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(180,160,240,0.7)'" onmouseout="this.style.borderColor='rgba(180,160,240,0.3)'">
+        <div style="font-size:28px;">🔭</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:#c8b4f0;margin-bottom:3px;">동서양 통합 분석 <span style="font-size:10px;background:linear-gradient(90deg,#c8b4f0,#f0c8b4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">PREMIUM</span></div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5;">사주·베딕·서양·자미두수 4개 시스템이 동시에 가리키는 운명의 교차점</div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:#c8b4f0;background:rgba(180,160,240,0.15);border:1px solid rgba(180,160,240,0.4);border-radius:8px;padding:4px 10px;flex-shrink:0;">800 Orb</div>
+      </div>
+    </div>
+  </div>
+
   <!-- PDF 리포트 -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 16px 16px;">
     <div style="margin-bottom:14px;">
@@ -2567,8 +2609,8 @@ async function openHistoryModal() {
   list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">불러오는 중...</div>';
 
   var allItems = [];
-  var TYPE_ICON = { character:'🌟', money:'💰', love:'💕', daeun:'🔮', year:'📅', month:'📆', yongsin:'⚡', gunghap:'💕', saju:'🏛️' };
-  var TYPE_LABEL = { character:'기질 분석', money:'재물·직업 운', love:'연애·인연 운', daeun:'대운 흐름', year:'신년운', month:'이달 월운', yongsin:'용신 생활 가이드' };
+  var TYPE_ICON = { character:'🌟', money:'💰', love:'💕', daeun:'🔮', year:'📅', month:'📆', yongsin:'⚡', vedic_full:'🪐', astro_full:'⭐', ziwei_full:'🌌', triple:'🔭', career_deep:'🚀', gunghap:'💕', saju:'🏛️' };
+  var TYPE_LABEL = { character:'기질 분석', money:'재물·직업 운', love:'연애·인연 운', daeun:'대운 흐름', year:'신년운', month:'이달 월운', yongsin:'용신 생활 가이드', vedic_full:'베딕 운명 분석', astro_full:'서양 점성술 분석', ziwei_full:'자미두수 분석', triple:'동서양 통합 분석', career_deep:'직업·사업 심층' };
 
   // 기존 analysis-history 조회
   try {
