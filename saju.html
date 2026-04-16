@@ -1759,12 +1759,14 @@ async function requestSajuAI() {
       strength_score: sd.strength_score, strength_level_5: sd.strength_level_5,
       pattern: sd.pattern, ten_gods_map: sd.ten_gods_map, johu: sd.johu,
       branch_relations_kor: sd.branch_relations_kor,
+      bijob_pct: sd.bijob_pct,
+      month_branch_kor: sd.month_branch_kor,
       user_tendency: _userTendency
     };
 
     var r0 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, orb_override:500,
-        system_prompt: '당신은 사주 이론 판별 엔진입니다. JSON만 반환하세요. 텍스트 해석 절대 금지.\n\n판단 규칙:\n- pattern.type이 "양신성상" 또는 "독상" → primary_theory: "적천수"\n- strength_level_5가 "극왕" 또는 "극약" → primary_theory: "적천수"\n- strength_level_5가 "신강" 또는 "신약" + pattern.type이 "정격" → primary_theory: "억부지전"\n- johu.needs의 원소가 five_count에서 0개 → secondary_theory: "궁통보감"\n\n용신 재확인:\n- 양신성상이면: 象을 疏(통하게)하는 오행 = 용신\n- 정격이면: yongshin.primary 그대로\n- 극왕 종격이면: 비겁/인성이 포섭, 식상이 용신\n\n성향 보정:\n- social=introvert + 비겁과다 → personality_keywords에 "내향적" 포함\n- action=impulsive_start → "아이디어다발_마무리약" 포함\n- stress=need_alone_time → "독립선호" 포함',
+        system_prompt: '당신은 사주 이론 판별 엔진입니다. JSON만 반환하세요. 텍스트 해석 절대 금지.\n\n판단 규칙:\n- pattern.type이 "양신성상" 또는 "독상" → primary_theory: "적천수"\n- strength_level_5가 "극왕" 또는 "극약" → primary_theory: "적천수"\n- strength_level_5가 "신강" 또는 "신약" + pattern.type이 "정격" → primary_theory: "억부지전"\n- johu.needs의 원소가 five_count에서 0개 → secondary_theory: "궁통보감"\n\n비겁과다 판별 (자평진전 월령론):\n- bijob_pct >= 50 → bijob_dominant: true, 월지특성우선: true\n  ↳ 이 경우 일간 고유 특성보다 month_branch_kor 월지의 오행 특성이 강하게 발현됨을 personality_keywords에 반영\n  ↳ personality_keywords에 "[month_branch_kor]월지기질우세" 추가\n- five_pct.water >= 40 AND five_pct.wood >= 30 AND five_pct.earth < 10 → 수다목부 경고\n  ↳ personality_keywords에 "수다목부_방향상실위험" 추가\n  ↳ writing_guidelines에 "일간 고유 특성(뿌리내림, 안정감)을 단정적으로 서술하지 말 것" 추가\n\n용신 재확인:\n- 양신성상이면: 象을 疏(통하게)하는 오행 = 용신\n- 정격이면: yongshin.primary 그대로\n- 극왕 종격이면: 비겁/인성이 포섭, 식상이 용신\n\n성향 보정:\n- social=introvert + 비겁과다 → personality_keywords에 "내향적" 포함\n- action=impulsive_start → "아이디어다발_마무리약" 포함\n- stress=need_alone_time → "독립선호" 포함',
         messages: [{ role:'user', content: '분석 데이터:\n'+JSON.stringify(step2Body)+'\n\nJSON만 반환. 필드: primary_theory, secondary_theory, yongshin_final:{primary,primary_element,in_chart}, structure_summary, strength_interpretation, bijob_role, personality_keywords[], wealth_structure:{type,note}, career_tendency, writing_guidelines[]' }]
       })
     });
@@ -1794,6 +1796,17 @@ async function requestSajuAI() {
   var pkw = theoryFrame && theoryFrame.personality_keywords ? theoryFrame.personality_keywords.join(', ') : '';
   var theoryName = theoryFrame ? (theoryFrame.primary_theory||'억부지전') : '억부지전';
   var ysFinal = theoryFrame && theoryFrame.yongshin_final ? theoryFrame.yongshin_final.primary : (rpt.용신||'');
+  // 비겁과다·수다목부 경고 주석 (STEP3-A user_message 주입용)
+  var _bijobPct = sd.bijob_pct || 0;
+  var _monthBr = sd.month_branch_kor || '';
+  var _fp = sd.five_pct || {};
+  var _bijobNote = '';
+  if (_bijobPct >= 50) {
+    _bijobNote += '\n⚠️ 비겁과다(' + _bijobPct + '%): 자평진전 월령론에 따라 일간 고유 특성보다 ' + _monthBr + '월지 기질이 강하게 발현됨. 일간 특성을 단정적으로 서술하지 말 것.';
+  }
+  if ((_fp.water||0) >= 40 && (_fp.wood||0) >= 30 && (_fp.earth||0) < 10) {
+    _bijobNote += '\n⚠️ 수다목부(水多木浮): 적천수 이론 — 수(水) ' + Math.round(_fp.water||0) + '%로 과다하여 목 일간이 뿌리를 내리지 못함. 방향감 상실·정착 어려움·우유부단을 자연 현상 비유로 반드시 서술. "안정적" "뿌리 깊은" 같은 표현 사용 금지.';
+  }
 
   try {
     var r1 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
@@ -1812,6 +1825,7 @@ async function requestSajuAI() {
           +'성격 키워드: '+pkw+'\n\n'
           +'▸ 성격 DB: '+(personality||'')+'\n'
           +'▸ '+ageBracket+'대 조언: '+(ageAdvice||'정보 없음')+'\n\n'
+          +(_bijobNote ? _bijobNote+'\n\n' : '')
           +'위 확정 사실을 바탕으로 원국 분석을 작성해주세요.\n'
           +'구조: ① 적천수 천간론 원문을 1~2구절 인용하고, 자연 현상에 비유하여 이 사주의 핵심 구조를 설명 (예: "봄 숲에 비가 계속 내리는 상태", "한겨울 얼어붙은 호수 위의 큰 나무"처럼 일상적 이미지로) ② 성격·기질·강점 ③ 약점과 보완점 ④ 왜 이런 패턴인지 사주 구조로 설명\n'
           +'적천수 원문 참조 - '+stemHanja+'일간: '+(({'甲':'甲木參天，莫論要火。春不容金，秋不容土。','乙':'乙木雖柔，刲羊解牛。懷丁抱丁，跨鳳乘猴。','丙':'丙火猛烈，欺霜侮雪。能鍛庚鐵，逢辛會折。','丁':'丁火柔中，內性昭融。抱乙而孝，合壬而忠。','戊':'戊唯厚壤，既中且正。靜翕動闢，萬物司命。','己':'己唯臥田，中正蓄藏。不懼木盛，不怕水旺。','庚':'庚金帶殺，剛健為最。得水而清，得火而銳。','辛':'辛金軟弱，溫潤而清。畏土之多，樂水之盈。','壬':'壬水通河，能泄能氣。剛中之德，周流不滯。','癸':'癸水至弱，達於天津。得龍而運，功化斯神。'})[stemHanja]||'')+'\n'
