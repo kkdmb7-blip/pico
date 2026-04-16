@@ -101,6 +101,14 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(10,10,15,0.92); backdr
 .empty-state{ text-align:center; padding:52px 24px; color:var(--muted); }
 .empty-state .ei{ font-size:36px; margin-bottom:10px; }
 .empty-state p{ font-size:13px; line-height:1.6; }
+
+/* SAME ILGAN MOODS */
+.ilgan-moods-card{ margin:12px 16px 0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; }
+.ilgan-moods-title{ font-size:12px; color:var(--muted); margin-bottom:10px; }
+.mood-share-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.mood-share-item{ display:flex; flex-direction:column; align-items:center; gap:3px; }
+.mood-share-item .ms-emoji{ font-size:22px; line-height:1; }
+.mood-share-item .ms-info{ font-size:11px; color:var(--muted); }
 </style>
 </head>
 <body>
@@ -127,6 +135,12 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(10,10,15,0.92); backdr
     <div class="ilgan-title" id="ilganTitle"></div>
     <div class="ilgan-desc"  id="ilganDesc"></div>
   </div>
+</div>
+
+<!-- 같은 일간 오늘의 기분 -->
+<div id="sameIlganCard" class="ilgan-moods-card" style="display:none;">
+  <div class="ilgan-moods-title" id="sameIlganTitle"></div>
+  <div class="mood-share-row" id="sameIlganMoods"></div>
 </div>
 
 <!-- ═══ WRITE VIEW ═══ -->
@@ -298,6 +312,7 @@ function dateStr(y, m, d) {
 var _user = null, _currentMood = null, _selectedEvents = [];
 var _calY, _calM, _calDiaries = {};
 var _userYongshin = ''; // pico_push_subscriptions에서 로드
+var _birthIlgan = '';   // 출생 일주의 일간
 
 // ── 초기화 ──────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
@@ -331,12 +346,23 @@ window.addEventListener('DOMContentLoaded', function() {
       .catch(function(){});
   }
 
+  // 출생 일간 계산 (pico_profile에서)
+  try {
+    var _prof = JSON.parse(localStorage.getItem('pico_profile')||'{}');
+    if (_prof.year && _prof.month && _prof.day) {
+      _birthIlgan = calcDayPillar(parseInt(_prof.year), parseInt(_prof.month), parseInt(_prof.day)).stem;
+    }
+  } catch(e) {}
+
   var t = getTodayKST();
   renderIlganCard(t.y, t.m, t.d);
   _calY = t.y; _calM = t.m;
 
   var params = new URLSearchParams(window.location.search);
   setView(params.get('view') || 'write', true);
+
+  // 같은 일간 오늘의 기분 로드
+  if (_birthIlgan) loadSameIlganMoods();
 });
 
 // ── 일진 카드 ────────────────────────────────────────────────
@@ -364,6 +390,41 @@ function setView(v, init) {
   if (v==='write'    && _user) loadTodayDiary();
   if (v==='calendar')          loadCalendar();
   if (v==='monthly')           loadMonthlyStats();
+}
+
+// ── 같은 일간 오늘의 기분 ─────────────────────────────────────
+async function loadSameIlganMoods() {
+  if (!_birthIlgan) return;
+  var t = getTodayKST();
+  var ds = dateStr(t.y, t.m, t.d);
+  try {
+    // 같은 출생 일간 유저 목록 조회
+    var subR = await fetch(SB_URL+'/rest/v1/pico_push_subscriptions?ilgan=eq.'+encodeURIComponent(_birthIlgan)+'&select=user_id', {headers:sbH});
+    var subs = await subR.json();
+    if (!Array.isArray(subs) || subs.length === 0) return;
+    var ids = subs.map(function(s){return s.user_id;}).filter(Boolean);
+
+    // 오늘 해당 유저들의 기분 조회
+    var moodR = await fetch(SB_URL+'/rest/v1/saju_diary?date=eq.'+ds+'&user_id=in.('+ids.join(',')+')'+'&select=mood', {headers:sbH});
+    var entries = await moodR.json();
+    if (!Array.isArray(entries) || entries.length === 0) return;
+
+    var mc={good:0,normal:0,bad:0,energetic:0,tired:0};
+    entries.forEach(function(e){ if(mc[e.mood]!==undefined) mc[e.mood]++; });
+    var total = entries.length;
+
+    var html = '';
+    ['energetic','good','normal','tired','bad'].forEach(function(k){
+      if(mc[k]===0) return;
+      var pct = Math.round(mc[k]/total*100);
+      html += '<div class="mood-share-item"><span class="ms-emoji">'+MOOD_EMOJI[k]+'</span><span class="ms-info">'+mc[k]+'명 · '+pct+'%</span></div>';
+    });
+
+    var card = document.getElementById('sameIlganCard');
+    document.getElementById('sameIlganTitle').textContent = _birthIlgan+'일간 친구들 오늘의 기분 · '+total+'명 기록';
+    document.getElementById('sameIlganMoods').innerHTML = html;
+    card.style.display = '';
+  } catch(e) {}
 }
 
 // ── 오늘 일기 로드 ───────────────────────────────────────────
@@ -449,6 +510,7 @@ async function submitDiary(skipMemo) {
   _calDiaries[ds] = { date: ds, mood: _currentMood };
   renderCalendar();
   loadMonthlyStats();
+  loadSameIlganMoods();
 
   // AI 피드백
   var feedback = '';
