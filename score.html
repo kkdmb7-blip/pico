@@ -318,7 +318,7 @@ nav {
 
 <nav>
   <a href="javascript:location.reload()" class="logo"><img src="img/goddess.png" alt="FORTUNA"><span class="logo-text">FORTUNA</span></a>
-  <a href="index.html" class="nav-back">← 메인으로</a>
+  <a onclick="history.back()" class="nav-back" style="cursor:pointer;">← 돌아가기</a>
 </nav>
 
 <div class="main-wrap">
@@ -874,8 +874,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 run();
-history.pushState(null, '', location.href);
-window.addEventListener('popstate', function() { window.location.href = '/'; });
 </script>
 </body>
 </html>

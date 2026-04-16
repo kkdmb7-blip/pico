@@ -1874,8 +1874,6 @@ function renderInterp(data) {
     doFetch();
   }
 })();
-history.pushState(null, '', location.href);
-window.addEventListener('popstate', function() { window.location.href = '/'; });
 // bfcache 복원 시 강제 새로고침 (이전 명국이 그대로 보이는 문제 방지)
 window.addEventListener('pageshow', function(e) { if (e.persisted) location.reload(); });
 

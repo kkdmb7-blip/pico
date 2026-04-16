@@ -670,9 +670,6 @@ async function loadVedic(year, month, day, hour, gender) {
 
   loadVedic(year, month, day, hour, gender);
 })();
-history.pushState(null, '', location.href);
-window.addEventListener('popstate', function() { window.location.href = '/'; });
-
 // ── 공유 카드 ─────────────────────────────────────────────
 function _vedicShowToast(msg) {
   var t = document.getElementById('_vedicToast');
