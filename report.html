@@ -1249,12 +1249,35 @@ async function loadVedicData() {
     if (!res.ok) return;
     const data = await res.json();
     _vedicData = {
-      nakshatra: data.nakshatra || null,
-      rashi:     data.moonSign  || null,
-      dasha:     data.currentDasha ? `${data.currentDasha.planet || ''} (${data.currentDasha.end ? new Date(data.currentDasha.end).getFullYear() + '년까지' : ''})` : null,
+      nakshatra:  data.nakshatra || null,
+      rashi:      data.moonSign  || null,
+      ascendant:  data.ascendant || null,
+      dasha:      data.currentDasha ? `${data.currentDasha.planet || ''} (${data.currentDasha.end ? new Date(data.currentDasha.end).getFullYear() + '년까지' : ''})` : null,
       antardasha: data.antardasha ? (data.antardasha.planet || null) : null,
+      planets:    data.planets || null,
     };
   } catch(e) { /* API 실패 시 null 유지 */ }
+}
+
+// ── ziwei/astro만 추가 로드 (사주 이미 로드된 경우) ──
+async function loadExtraData(withZiwei, withAstro) {
+  const p = _profile;
+  const gender = p.gender === 'F' ? 'female' : 'male';
+  const hour = (p.hour != null && p.hour !== 'unknown') ? parseInt(p.hour) : 12;
+  const promises = [];
+  const flags = [];
+  if (withZiwei) { promises.push(fetch(`${WORKER_BASE}/ziwei?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&gender=${gender}`)); flags.push('ziwei'); }
+  if (withAstro)  { promises.push(fetch(`${WORKER_BASE}/astro?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&lat=37.5&lng=127.0`)); flags.push('astro'); }
+  const results = await Promise.allSettled(promises);
+  for (let i = 0; i < flags.length; i++) {
+    try {
+      if (results[i].status==='fulfilled' && results[i].value.ok) {
+        const data = await results[i].value.json();
+        if (flags[i] === 'ziwei') _ziweiData = data;
+        if (flags[i] === 'astro') _astroData = data;
+      }
+    } catch(e) {}
+  }
 }
 
 // ── 전체 데이터 일괄 로드 ──
@@ -1468,8 +1491,10 @@ function buildOhangWarningBlock() {
     }
   };
 
-  // 사주+베딕 선제 로드 (stateIntro 표시하면서 백그라운드)
-  loadAllData(false, false).catch(() => {});
+  // 사주+베딕+필요한 외부 데이터 선제 로드 (stateIntro 표시하면서 백그라운드)
+  const _bgWithZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
+  const _bgWithAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
+  loadAllData(_bgWithZiwei, _bgWithAstro).catch(() => {});
 
   renderIntro();
   showState('intro');
@@ -1590,11 +1615,16 @@ async function startGeneration() {
   showState('loading');
   setLoading('사주 정보 불러오는 중...', '');
 
-  // 사주+베딕 병렬 조회 (이미 init에서 로드됐으면 skip)
+  // 사주+베딕 조회 (백그라운드 로드됐더라도 ziwei/astro가 필요한 타입은 추가 로드)
+  const withZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
+  const withAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
+  const needsZiwei = withZiwei && !_ziweiData;
+  const needsAstro = withAstro && !_astroData;
   if (!_sdFull && !_rptFull) {
-    const withZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
-    const withAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
     await loadAllData(withZiwei, withAstro);
+  } else if (needsZiwei || needsAstro) {
+    // 사주 데이터는 있지만 ziwei/astro가 아직 없는 경우만 추가 로드
+    await loadExtraData(needsZiwei, needsAstro);
   }
 
   setLoading('기존 리포트 확인 중...', '');
