@@ -1972,7 +1972,7 @@ ${vb}
 // ── 응답을 섹션 배열에 나눠 표시 ──
 async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isFirst) {
   const controller = new AbortController();
-  const tid = setTimeout(() => controller.abort(), 55000);
+  const tid = setTimeout(() => controller.abort(), 65000);
   try {
     const sysPrompt = `당신은 ${theoryName || '억부지전'} 기반 사주 분석가입니다.
 절대 규칙:
