@@ -1074,6 +1074,37 @@
 </section>
 
 <script>
+// ── 내 사주 오행 정보 미리 로드 (이름 위젯에서 비교용) ───────────────
+(async function loadMySajuForName() {
+  try {
+    var prof = JSON.parse(localStorage.getItem('pico_profile') || 'null');
+    if (!prof || !prof.year) return;
+    var cacheKey = 'pico_name_saju_' + prof.year + '_' + prof.month + '_' + prof.day + '_' + prof.hour + '_' + (prof.gender||'');
+    try {
+      var cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (cached && cached.exp > Date.now()) { window._mySajuInfo = cached.data; return; }
+    } catch(e) {}
+    var hour = (prof.hour != null && prof.hour !== 'unknown') ? parseInt(prof.hour) : 12;
+    var birth = prof.year + '-' + String(prof.month).padStart(2,'0') + '-' + String(prof.day).padStart(2,'0') + 'T' + String(hour).padStart(2,'0') + ':00:00';
+    var gender = prof.gender === 'F' ? 'female' : 'male';
+    var res = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({birth: birth, gender: gender, calendar:'solar'})
+    });
+    if (!res.ok) return;
+    var sd = await res.json();
+    var ELMAP = { wood:'木', fire:'火', earth:'土', metal:'金', water:'水' };
+    var KMAP  = { '목':'木','화':'火','토':'土','금':'金','수':'水' };
+    var ysRaw = sd && sd.yongshin || {};
+    var yongshinEl = ysRaw.primary_element ? (ELMAP[ysRaw.primary_element] || null) : (ysRaw.primary ? (KMAP[ysRaw.primary] || null) : null);
+    var fc = sd && sd.five_count || {};
+    var countH = { '木': fc.wood||0, '火': fc.fire||0, '土': fc.earth||0, '金': fc.metal||0, '水': fc.water||0 };
+    var info = { yongshinEl: yongshinEl, countH: countH };
+    window._mySajuInfo = info;
+    try { localStorage.setItem(cacheKey, JSON.stringify({data: info, exp: Date.now() + 7*24*3600*1000})); } catch(e) {}
+  } catch(e) {}
+})();
+
 // ── name-score 위젯 한글 획수 계산 ────────────────────────────────
 (function() {
   var _CHO  = {'ㄱ':2,'ㄴ':2,'ㄷ':3,'ㄹ':5,'ㅁ':4,'ㅂ':4,'ㅅ':2,'ㅇ':1,'ㅈ':3,'ㅊ':4,'ㅋ':3,'ㅌ':4,'ㅍ':4,'ㅎ':3};
@@ -1268,6 +1299,67 @@
         '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">오행 조화 판정</div>' +
         '<div style="font-size:15px;font-weight:700;color:'+ohengVerdictColor+';">'+ohengVerdict+'</div>' +
       '</div>';
+
+    // ── 내 사주와 비교 ──
+    if (window._mySajuInfo) {
+      var my = window._mySajuInfo;
+      var nameOhengs = ohengList.map(function(o){ return o.oh; }).filter(Boolean);
+      var uniqueNameOhengs = nameOhengs.filter(function(v,i,a){ return a.indexOf(v)===i; });
+      var hasYongshin = my.yongshinEl && nameOhengs.indexOf(my.yongshinEl) !== -1;
+      // 부족 오행(0~1개), 과다 오행(3개 이상)
+      var weak = [], strong = [];
+      ['木','火','土','金','水'].forEach(function(el){
+        var c = my.countH[el]||0;
+        if (c <= 1) weak.push(el);
+        if (c >= 3) strong.push(el);
+      });
+      var fillsWeak  = uniqueNameOhengs.filter(function(el){ return weak.indexOf(el) !== -1; });
+      var addsStrong = uniqueNameOhengs.filter(function(el){ return strong.indexOf(el) !== -1; });
+      // 기신 = 용신을 극하는 오행
+      var kisinEl = my.yongshinEl ? _SANGKUK[my.yongshinEl] : null;
+      var hasKisin = kisinEl && nameOhengs.indexOf(kisinEl) !== -1;
+
+      var verdictLine = '', verdictColor = '', verdictIcon = '';
+      if (hasYongshin && !hasKisin) {
+        verdictLine = '용신('+my.yongshinEl+') 보강 — 사주 균형에 매우 좋음';
+        verdictColor = '#d4af37'; verdictIcon = '<i class="pi pi-check"></i>';
+      } else if (fillsWeak.length > 0 && !hasKisin) {
+        verdictLine = '부족한 '+fillsWeak.join('·')+' 보강 — 이로운 이름';
+        verdictColor = '#4caf7a'; verdictIcon = '<i class="pi pi-check"></i>';
+      } else if (hasKisin && !hasYongshin) {
+        verdictLine = '기신('+kisinEl+')이 용신을 극 — 주의 필요';
+        verdictColor = '#f44336'; verdictIcon = '<i class="pi pi-warning"></i>';
+      } else if (addsStrong.length === uniqueNameOhengs.length && addsStrong.length > 0) {
+        verdictLine = '과다 오행('+addsStrong.join('·')+') 편중 심화';
+        verdictColor = '#ff9800'; verdictIcon = '<i class="pi pi-warning"></i>';
+      } else {
+        verdictLine = '사주와 무난한 관계';
+        verdictColor = '#8b8ba8'; verdictIcon = '';
+      }
+
+      var yEl = my.yongshinEl;
+      var sajuMiniHtml = '<div style="display:flex;justify-content:center;gap:4px;margin:8px 0 10px;flex-wrap:wrap;">';
+      ['木','火','土','金','水'].forEach(function(el){
+        var c = my.countH[el]||0;
+        var active = c > 0;
+        sajuMiniHtml +=
+          '<div style="font-size:10px;padding:2px 7px;border-radius:10px;background:'+(active?_OHENG_BG[el]:'rgba(255,255,255,0.03)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;">'+el+' '+c+'</div>';
+      });
+      sajuMiniHtml += '</div>';
+
+      ohengHtml +=
+        '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);text-align:center;">' +
+          '<div style="font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:6px;">내 사주와 비교</div>' +
+          (yEl ? '<div style="font-size:12px;color:var(--muted);margin-bottom:2px;">내 용신 <span style="font-size:14px;font-weight:700;color:'+_OHENG_COLOR[yEl]+';">'+yEl+'</span></div>' : '') +
+          sajuMiniHtml +
+          '<div style="font-size:13px;font-weight:700;color:'+verdictColor+';line-height:1.5;">'+verdictIcon+' '+verdictLine+'</div>' +
+        '</div>';
+    } else {
+      ohengHtml +=
+        '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);text-align:center;font-size:11px;color:var(--muted);line-height:1.5;">' +
+          '사주 프로필을 저장하면<br>내 용신과 이름 오행을 비교해드려요' +
+        '</div>';
+    }
     document.getElementById('nsOheng').innerHTML = ohengHtml;
 
     // 종합 점수 카드
