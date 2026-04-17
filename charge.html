@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0a0a0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -211,7 +211,12 @@ var sb = window.supabase.createClient(SB_URL, SB_KEY);
 
 var currentUserId = null;
 var currentBalance = 0;
+var currentFreeBalance = 0;
+var currentPaidBalance = 0;
+var currentTotalCharged = 0;
 var isFirstCharge = true;
+var currentUserName = '';
+var currentUserEmail = '';
 
 // 충전 팩 정의
 var PACKS = [
@@ -287,6 +292,8 @@ async function loadUser() {
     try {
       kakaoData = JSON.parse(kakaoRaw);
       currentUserId = kakaoData.id || (kakaoData.profile && kakaoData.profile.id);
+      currentUserName = kakaoData.name || (kakaoData.profile && kakaoData.profile.nickname) || '';
+      currentUserEmail = kakaoData.email || '';
     } catch(e) {}
   }
   // _v:2 미설정이면 fortuna-silk로 UUID 재검증 (one-time migration)
@@ -325,12 +332,18 @@ async function loadUser() {
 
 async function loadBalance() {
   try {
-    var res = await sb.from('orb_balance').select('balance,is_first_charge,total_charged').eq('user_id', currentUserId).maybeSingle();
+    var res = await sb.from('orb_balance').select('balance,free_balance,paid_balance,is_first_charge,total_charged').eq('user_id', currentUserId).maybeSingle();
     if (res.data) {
-      currentBalance = res.data.balance || 0;
-      isFirstCharge = res.data.is_first_charge !== false || (res.data.total_charged || 0) === 0;
+      currentFreeBalance = res.data.free_balance || 0;
+      currentPaidBalance = res.data.paid_balance || 0;
+      currentBalance = res.data.balance || (currentFreeBalance + currentPaidBalance);
+      currentTotalCharged = res.data.total_charged || 0;
+      isFirstCharge = res.data.is_first_charge !== false || currentTotalCharged === 0;
     } else {
+      currentFreeBalance = 0;
+      currentPaidBalance = 0;
       currentBalance = 0;
+      currentTotalCharged = 0;
       isFirstCharge = true;
     }
   } catch(e) { console.warn('잔액 로드 실패', e.message); }
@@ -380,32 +393,44 @@ function renderPacks() {
   });
 }
 
-function doPay(pack) {
-  if (typeof IMP === 'undefined') { toast('결제 모듈 로드 중이에요. 잠시 후 다시 시도해주세요.'); return; }
+async function doPay(pack) {
+  if (typeof PortOne === 'undefined') { toast('결제 모듈 로드 중이에요. 잠시 후 다시 시도해주세요.'); return; }
 
   var totalOrb = pack.orb + (pack.firstOnly && isFirstCharge ? (pack.bonus || 0) : 0);
-  var merchantUid = 'ORB-' + pack.id + '-' + Date.now();
+  var paymentId = 'ORB-' + pack.id + '-' + Date.now();
   var packName = '포르투나 ' + totalOrb.toLocaleString() + ' Orb 충전';
 
-  IMP.init('imp63718155');
-  IMP.request_pay({
-    pg: 'html5_inicis.MOI3302087',
-    pay_method: 'card',
-    merchant_uid: merchantUid,
-    name: packName,
-    amount: pack.price,
-    buyer_name: '',
-    buyer_email: '',
-  }, async function(rsp) {
-    if (!rsp.success) {
-      if (rsp.error_msg && !rsp.error_msg.includes('취소')) {
+  showLoading();
+  try {
+    var rsp = await PortOne.requestPayment({
+      storeId: 'store-1139f195-d75f-44ca-bed6-c2c89c59e913',
+      channelKey: 'channel-key-c7608d6b-f758-4bbb-a0ad-252c5141c50c',
+      paymentId: paymentId,
+      orderName: packName,
+      totalAmount: pack.price,
+      currency: 'KRW',
+      payMethod: 'CARD',
+      customer: {
+        fullName: currentUserName || '포르투나 사용자',
+        email: currentUserEmail || 'user@fortuna.app',
+        phoneNumber: '01000000000',
+      },
+      redirectUrl: 'https://picolab.kr/charge.html',
+    });
+    hideLoading();
+    if (rsp && rsp.code) {
+      var msg = rsp.message || rsp.code;
+      if (msg.includes('취소') || !msg) {
         toast('결제가 취소되었어요.');
+      } else {
+        toast('결제 실패: ' + msg);
       }
+      console.warn('[결제 실패]', rsp);
       return;
     }
     showLoading();
     try {
-      await chargeOrb(pack, totalOrb, rsp.imp_uid, merchantUid);
+      await chargeOrb(pack, totalOrb, rsp.paymentId, paymentId);
       hideLoading();
       toast('✅ ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
       setTimeout(function() { location.href = 'https://picolab.kr'; }, 2000);
@@ -414,31 +439,32 @@ function doPay(pack) {
       console.error('[charge] chargeOrb 에러:', e);
       toast('결제는 완료됐으나 저장 중 오류가 발생했어요. 고객센터에 문의해주세요. ('+e.message+')');
     }
-  });
+  } catch(e) {
+    hideLoading();
+    toast('결제 오류: ' + e.message);
+    console.warn('[결제 오류]', e);
+  }
 }
 
 async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
   console.log('[charge] 시작 user_id='+currentUserId+', totalOrb='+totalOrb+', balance='+currentBalance);
   var newBalance = currentBalance + totalOrb;
+  var newPaidBalance = currentPaidBalance + totalOrb;
+  var newTotalCharged = currentTotalCharged + totalOrb;
 
-  // orb_balance 업데이트 (기존 row가 있으면 PATCH, 없으면 INSERT)
+  // orb_balance upsert (balance + paid_balance 동시 업데이트)
   try {
-    // 먼저 기존 row 확인
-    var check = await sb.from('orb_balance').select('balance').eq('user_id', currentUserId).maybeSingle();
-    if (check.data) {
-      // 기존 row 있음 → PATCH
-      var r1 = await sb.from('orb_balance')
-        .update({ balance: newBalance, is_first_charge: false, updated_at: new Date().toISOString() })
-        .eq('user_id', currentUserId);
-      console.log('[charge] orb_balance PATCH:', r1.error ? r1.error.message : 'OK');
-      if (r1.error) throw new Error('balance 업데이트 실패: ' + r1.error.message);
-    } else {
-      // 없음 → INSERT
-      var r1 = await sb.from('orb_balance')
-        .insert({ user_id: currentUserId, balance: newBalance, is_first_charge: false, updated_at: new Date().toISOString() });
-      console.log('[charge] orb_balance INSERT:', r1.error ? r1.error.message : 'OK');
-      if (r1.error) throw new Error('balance 생성 실패: ' + r1.error.message);
-    }
+    var r1 = await sb.from('orb_balance').upsert({
+      user_id: currentUserId,
+      balance: newBalance,
+      free_balance: currentFreeBalance,
+      paid_balance: newPaidBalance,
+      total_charged: newTotalCharged,
+      is_first_charge: false,
+      updated_at: new Date().toISOString(),
+    });
+    console.log('[charge] orb_balance upsert:', r1.error ? r1.error.message : 'OK');
+    if (r1.error) throw new Error('balance 업데이트 실패: ' + r1.error.message);
   } catch(e) {
     console.error('[charge] orb_balance 실패:', e);
     throw e;
@@ -460,6 +486,8 @@ async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
   }
 
   currentBalance = newBalance;
+  currentPaidBalance = newPaidBalance;
+  currentTotalCharged = newTotalCharged;
   isFirstCharge = false;
   document.getElementById('currentBalance').textContent = currentBalance + ' Orb';
   renderPacks();
@@ -481,10 +509,51 @@ function handleInviteCharge() {
   }
 }
 
+// 모바일 리다이렉트 결제 결과 처리
+async function handleRedirectResult() {
+  var params = new URLSearchParams(window.location.search);
+  var paymentId = params.get('paymentId');
+  if (!paymentId) return false;
+
+  window.history.replaceState({}, '', window.location.pathname);
+
+  var code = params.get('code');
+  if (code) {
+    toast('결제가 취소되었어요.');
+    return true;
+  }
+
+  showLoading();
+  try {
+    var packId = null;
+    var match = paymentId.match(/^ORB-(.+)-\d+$/);
+    if (match) packId = match[1];
+
+    var pack = PACKS.find(function(p) { return p.id === packId; });
+    if (!pack) {
+      hideLoading();
+      toast('충전 팩 정보를 찾을 수 없어요. 고객센터에 문의해주세요.');
+      return true;
+    }
+
+    var totalOrb = pack.orb + (pack.firstOnly && isFirstCharge ? (pack.bonus || 0) : 0);
+    await chargeOrb(pack, totalOrb, paymentId, paymentId);
+    hideLoading();
+    toast('✅ ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
+  } catch(e) {
+    hideLoading();
+    toast('결제는 완료됐으나 저장 중 오류가 발생했어요. 고객센터에 문의해주세요.');
+    console.warn('[리다이렉트 충전 오류]', e);
+  }
+  return true;
+}
+
 // 초기화
 (async function() {
   var ok = await loadUser();
-  if (ok) await loadBalance();
+  if (!ok) return;
+  await loadBalance();
+  await handleRedirectResult();
 })();
 </script>
 </body>
