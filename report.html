@@ -609,7 +609,7 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
-const REPORT_VERSION = 10;
+const REPORT_VERSION = 11;
 
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
@@ -1291,6 +1291,12 @@ let _johuPreciseData = null;
 let _tenGodPosData = null;
 let _sinsalSummaryData = null;
 let _sewunMonthlyData = null;
+// Level 9
+let _iljuProfileData = null;
+let _stemInterData = null;
+let _geokDetailData = null;
+let _strengthScoreData = null;
+let _interpretGuideData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1502,6 +1508,12 @@ async function loadAllData(withZiwei, withAstro) {
       _tenGodPosData = _rptFull['십신궁위'] || null;
       _sinsalSummaryData = _rptFull['신살종합'] || null;
       _sewunMonthlyData = _rptFull['세운월별'] || null;
+      // Level 9
+      _iljuProfileData = _rptFull['일주론'] || null;
+      _stemInterData = _rptFull['천간합충'] || null;
+      _geokDetailData = _rptFull['격국세분'] || null;
+      _strengthScoreData = _rptFull['강약수치'] || null;
+      _interpretGuideData = _rptFull['해석지침'] || null;
     }
   } catch(e){}
   try {
@@ -2062,6 +2074,73 @@ function buildSewunMonthlyBlock() {
   return s;
 }
 
+// Level 9 block builders
+function buildIljuProfileBlock() {
+  if (!_iljuProfileData) return '';
+  const d = _iljuProfileData;
+  if (!d.성격) return `\n【60갑자 일주론】\n${d.일주} 일주 — 데이터 없음.\n`;
+  let s = `\n【60갑자 일주론】\n`;
+  s += `${d.일주}일주: ${d.납음참고}\n`;
+  s += `성격: ${d.성격}\n`;
+  s += `직업: ${d.직업적성}\n`;
+  s += `연애: ${d.연애패턴}\n`;
+  s += `건강: ${d.건강주의}\n`;
+  s += '(60갑자 일주론은 일주별 고유 특성. AI는 이 키워드를 반드시 반영하여 해석)\n';
+  return s;
+}
+
+function buildStemInterBlock() {
+  if (!_stemInterData) return '';
+  const d = _stemInterData;
+  let s = `\n【천간 합충 상세】\n`;
+  if (d.합충목록 && d.합충목록.length) {
+    d.합충목록.forEach(r => {
+      s += `${r.유형} ${r.위치}: ${r.내용}${r.합화오행 ? ' (합화→'+r.합화오행+')' : ''}\n`;
+    });
+  } else {
+    s += '천간 합충 없음.\n';
+  }
+  s += '(천간합은 두 천간의 결합/변질, 천간충은 정면 갈등. 세운합충은 올해 한시적 작용)\n';
+  return s;
+}
+
+function buildGeokDetailBlock() {
+  if (!_geokDetailData) return '';
+  const d = _geokDetailData;
+  let s = `\n【격국 세분화】\n`;
+  s += `격국: ${d.격국명} (월지:${d.월지} 본기:${d.월지본기} → ${d.월지십신})\n`;
+  s += `특징: ${d.격특징}\n`;
+  if (d.용신방향) s += `용신방향: ${d.용신방향}\n`;
+  if (d.기신경계) s += `기신경계: ${d.기신경계}\n`;
+  if (d.주의사항) s += `주의: ${d.주의사항}\n`;
+  s += '(격국은 사주 해석의 기본 틀. 정격 8격 또는 특수격에 따라 용신·기신 해석 달라짐)\n';
+  return s;
+}
+
+function buildStrengthScoreBlock() {
+  if (!_strengthScoreData) return '';
+  const d = _strengthScoreData;
+  let s = `\n【일간 강약 수치화】\n`;
+  s += `강약점수: ${d.종합점수}/100 → ${d.판정}\n`;
+  s += `산출: ${d.산출근거}\n`;
+  s += `${d.해석}\n`;
+  if (d.기존판정) s += `(기존판정: ${d.기존판정})\n`;
+  s += '(월령+통근+천간도움-억부감점 종합. 수치가 높을수록 일간 강함)\n';
+  return s;
+}
+
+function buildInterpretGuideBlock() {
+  if (!_interpretGuideData) return '';
+  const d = _interpretGuideData;
+  let s = `\n【AI 해석 지침】\n`;
+  s += `핵심: ${d.핵심요약}\n`;
+  if (d.해석규칙) {
+    d.해석규칙.forEach((r, i) => { s += `${i+1}. ${r}\n`; });
+  }
+  s += '(이 지침은 AI가 사주를 해석할 때 반드시 따라야 할 규칙)\n';
+  return s;
+}
+
 function buildAccuracyLayerBlock() {
   return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
     + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
@@ -2075,7 +2154,9 @@ function buildAccuracyLayerBlock() {
     + buildGuiinBlock() + buildYanginBlock() + buildDaeunTrendBlock()
     + buildBalanceBlock() + buildSpecialPatternBlock()
     + buildHyungChungBlock() + buildJohuPreciseBlock() + buildTenGodPosBlock()
-    + buildSinsalSummaryBlock() + buildSewunMonthlyBlock();
+    + buildSinsalSummaryBlock() + buildSewunMonthlyBlock()
+    + buildIljuProfileBlock() + buildStemInterBlock() + buildGeokDetailBlock()
+    + buildStrengthScoreBlock() + buildInterpretGuideBlock();
 }
 
 // ── 초기화 ──
