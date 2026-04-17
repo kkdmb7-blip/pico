@@ -1348,6 +1348,9 @@ async function loadAllData(withZiwei, withAstro) {
       _baekhoData = _rptFull['백호대살'] || null;
       _daeunTransitionData = _rptFull['대운전환기'] || null;
       _haphwaData = _rptFull['합화검증'] || null;
+      _tenGodsDistData = _rptFull['십성분포'] || null;
+      _geokgukValidData = _rptFull['격국검증'] || null;
+      _sewunInterData = _rptFull['세운상호작용'] || null;
     }
   } catch(e){}
   try {
@@ -1560,10 +1563,38 @@ function buildHaphwaBlock() {
 (합이 있더라도 합화 미성립이면 실질적 변환이 없음을 분석에 반영할 것)\n`;
 }
 
+function buildTenGodsDistBlock() {
+  if (!_tenGodsDistData) return '';
+  const d = _tenGodsDistData;
+  let lines = [`균형도: ${d.균형도}`];
+  if (d.과다 && d.과다.length) lines.push(...d.과다.map(g => `${g.그룹} 과다(${g.개수}개): ${g.설명}`));
+  if (d.결핍 && d.결핍.length) lines.push(...d.결핍.map(g => `${g.그룹} 결핍: ${g.설명}`));
+  return `\n【십성 분포 분석】\n${lines.join('\n')}
+(십성 편중·결핍 패턴을 분석에 반영할 것. 과다한 십성은 성향의 극단화, 결핍은 보완 필요 영역)\n`;
+}
+
+function buildGeokgukValidBlock() {
+  if (!_geokgukValidData) return '';
+  const d = _geokgukValidData;
+  let lines = [`기본격국: ${d.기본격국} → 최종: ${d.최종격국}`];
+  if (d.보정사항 && d.보정사항.length) lines.push(...d.보정사항.map(s => '⚠ ' + s));
+  return `\n【격국 정밀 검증】\n${lines.join('\n')}
+(격국 보정사항이 있으면 기본 격국 대신 최종격국 기준으로 분석할 것)\n`;
+}
+
+function buildSewunInterBlock() {
+  if (!_sewunInterData || !_sewunInterData.상호작용 || !_sewunInterData.상호작용.length) return '';
+  const d = _sewunInterData;
+  const lines = d.상호작용.map(i => `[${i.유형}] 세운(${i.세운지지||i.세운천간})↔${i.사주위치}(${i.사주지지||i.사주천간})${i.궁의미?' — 궁:'+i.궁의미:''}`);
+  return `\n【${d.세운} 세운 합충형파해】\n${d.요약}\n${lines.join('\n')}
+(세운과 사주 간 상호작용을 올해 운세·흐름 분석에 반드시 반영할 것)\n`;
+}
+
 function buildAccuracyLayerBlock() {
   return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
     + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
-    + buildDaeunTransitionBlock() + buildHaphwaBlock();
+    + buildDaeunTransitionBlock() + buildHaphwaBlock()
+    + buildTenGodsDistBlock() + buildGeokgukValidBlock() + buildSewunInterBlock();
 }
 
 // ── 초기화 ──
