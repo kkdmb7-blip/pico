@@ -2719,9 +2719,6 @@ async function requestGunghapAI() {
 
   // ── 이상형 매칭도 (analyzeIljuCompatibility 기반, 즉시) ──
   (function renderIdealMatch() {
-    if (!iljuA || iljuA.length < 2 || !iljuB || iljuB.length < 2) {
-      document.getElementById('chunk-idealmatch').style.display = 'none'; return;
-    }
     var STEM_HAP_MAP = {'갑':'기','을':'경','병':'신','정':'임','무':'계','기':'갑','경':'을','신':'병','임':'정','계':'무'};
     var BRANCH_HAP_MAP = {'자':'축','축':'자','인':'해','묘':'술','진':'유','사':'신','오':'미','미':'오','신':'사','유':'진','술':'묘','해':'인'};
     var BRANCH_CHUNG_MAP = {'자':'오','축':'미','인':'신','묘':'유','진':'술','사':'해','오':'자','미':'축','신':'인','유':'묘','술':'진','해':'사'};
@@ -2730,6 +2727,10 @@ async function requestGunghapAI() {
 
     var idealStem = STEM_HAP_MAP[ilganA];
     var idealBranch = BRANCH_HAP_MAP[iljiA];
+    // 매핑 실패(빈값/한자/이상값) 방어
+    if (!iljuA || iljuA.length < 2 || !iljuB || iljuB.length < 2 || !idealStem || !idealBranch || !OH_MAP[ilganB] || !OH_MAP[ilganA]) {
+      var el0 = document.getElementById('chunk-idealmatch'); if (el0) el0.style.display = 'none'; return;
+    }
     var idealIlju = idealStem + idealBranch;
 
     var score = 0, reasons = [];
@@ -2748,6 +2749,7 @@ async function requestGunghapAI() {
     score = Math.max(0, Math.min(100, score));
     var grade = score >= 70 ? '천생연분' : score >= 50 ? '좋은 궁합' : score >= 30 ? '보통 궁합' : score >= 10 ? '노력 필요' : '주의 관계';
     var color = score >= 70 ? '#ff8ab0' : score >= 50 ? '#e8b86d' : score >= 30 ? '#b89dc9' : '#8a8aa0';
+    if (!reasons.length) reasons.push('합·충·상생 모두 비활성 — 끌림보다 무관심 가능성, 의식적 노력 필요');
 
     var html =
       '<div style="margin-bottom:10px;font-size:13px;color:rgba(255,255,255,0.7);">' + myName + '(' + iljuA + ')의 이상형 일주는 <strong style="color:#ff8ab0;">' + idealIlju + '</strong> — ' + pNameDisp + '의 실제 일주는 <strong style="color:#ff8ab0;">' + iljuB + '</strong></div>' +
@@ -2758,7 +2760,7 @@ async function requestGunghapAI() {
         '<div style="font-size:20px;font-weight:700;color:' + color + ';min-width:60px;text-align:right;">' + score + '점</div>' +
       '</div>' +
       '<div style="font-size:14px;font-weight:700;color:' + color + ';margin-bottom:8px;">' + grade + '</div>' +
-      (reasons.length ? '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.7;color:rgba(255,255,255,0.75);">' + reasons.map(function(r){return '<li>' + r + '</li>';}).join('') + '</ul>' : '');
+      '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.7;color:rgba(255,255,255,0.75);">' + reasons.map(function(r){return '<li>' + r + '</li>';}).join('') + '</ul>';
 
     showChunk('chunk-idealmatch', '<i class="pi pi-heart"></i> 이상형 매칭도', html);
   })();
