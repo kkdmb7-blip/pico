@@ -335,17 +335,26 @@
   </div>
 
   <!-- 리포트 훅 -->
-  <div id="astroReportHook" style="display:none;padding:0 20px;max-width:440px;margin:0 auto;">
+  <div id="astroReportHook" style="display:none;padding:0 20px 10px;max-width:440px;margin:0 auto;">
     <a href="report.html?type=astro_full" style="display:block;padding:16px 20px;background:linear-gradient(135deg,rgba(122,196,255,0.12),rgba(100,160,255,0.08));border:1px solid rgba(122,196,255,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(122,196,255,0.7)';this.style.background='linear-gradient(135deg,rgba(122,196,255,0.22),rgba(100,160,255,0.15))'" onmouseout="this.style.borderColor='rgba(122,196,255,0.35)';this.style.background='linear-gradient(135deg,rgba(122,196,255,0.12),rgba(100,160,255,0.08))'">
       <div style="font-size:15px;font-weight:700;color:#7ac4ff;margin-bottom:4px;"><i class="pi pi-star"></i> 별이 말하는 나의 운명 →</div>
       <div style="font-size:11px;color:var(--muted);opacity:0.8;">AI가 읽어주는 나만의 점성술 심층 리포트</div>
     </a>
   </div>
 
-  <div id="astroShareBtnWrap" style="display:none;padding:20px 20px 32px;flex-direction:column;align-items:center;gap:10px;">
-    <button id="astroKakaoBtn" onclick="shareAstroKakao()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;letter-spacing:-0.3px;"><i class="pi pi-star"></i> 카카오톡 공유</button>
-    <a href="https://kkdmb7-blip.github.io/memox/?mode=astro" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;"><i class="pi pi-sparkle"></i> AI 점성 상담하기</a>
-    <a href="counselor.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#c2784e,#e8a87c);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;"><i class="pi pi-person"></i> 전문 상담사 연결</a>
+  <div id="astroShareBtnWrap" style="display:none;padding:0 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
+    <button id="astroKakaoBtn" onclick="shareAstroKakao()" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06));border:1px solid rgba(254,229,0,0.35);border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.borderColor='rgba(254,229,0,0.7)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.22),rgba(254,229,0,0.12))'" onmouseout="this.style.borderColor='rgba(254,229,0,0.35)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06))'">
+      <div style="font-size:15px;font-weight:700;color:#e8d44d;margin-bottom:4px;"><i class="pi pi-star"></i> 카카오톡으로 공유하기 →</div>
+      <div style="font-size:11px;color:var(--muted);opacity:0.8;">내 점성술 결과를 친구에게 보내보세요</div>
+    </button>
+    <a href="https://kkdmb7-blip.github.io/memox/?mode=astro" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06));border:1px solid rgba(232,184,109,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,184,109,0.7)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.22),rgba(201,168,76,0.12))'" onmouseout="this.style.borderColor='rgba(232,184,109,0.35)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06))'">
+      <div style="font-size:15px;font-weight:700;color:#e8b86d;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 점성 상담하기 →</div>
+      <div style="font-size:11px;color:var(--muted);opacity:0.8;">대화로 풀어보는 나만의 별자리 이야기</div>
+    </a>
+    <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10));border:1px solid rgba(232,168,124,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,168,124,0.7)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.18))'" onmouseout="this.style.borderColor='rgba(232,168,124,0.35)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10))'">
+      <div style="font-size:15px;font-weight:700;color:#e8a87c;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
+      <div style="font-size:11px;color:var(--muted);opacity:0.8;">점성술 전문가와 1:1 깊은 상담</div>
+    </a>
   </div>
   <div class="action-row" id="action-row"></div>
 </main>
