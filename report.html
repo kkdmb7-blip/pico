@@ -3408,6 +3408,10 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
   }
 }
 
+function cleanSectionText(s) {
+  // AI가 "**4. 제목**" 형태로 쓸 때 여는 **는 번호 regex가 제거하지만 닫는 **가 첫줄에 남는 버그 수정
+  return s.replace(/^([^\n]*?)\*{2}\s*/, '$1').trim();
+}
 function splitIntoSections(text, count, startNum) {
   startNum = startNum || 1;
   // 전략1: 기대하는 섹션 번호(startNum ~ startNum+count-1)만 정확히 매칭
@@ -3427,7 +3431,7 @@ function splitIntoSections(text, count, startNum) {
     return positions.map((p, i) => {
       const start = p.idx + p.len;
       const end = i + 1 < positions.length ? positions[i+1].idx : text.length;
-      return text.slice(start, end).trim();
+      return cleanSectionText(text.slice(start, end));
     });
   }
   // 전략2: 아무 "N." 패턴이든 순서대로 count개 분할
@@ -3437,7 +3441,7 @@ function splitIntoSections(text, count, startNum) {
     return Array.from({length: count}, (_, i) => {
       const start = matches[i].index + matches[i][0].length;
       const end = i + 1 < matches.length ? matches[i+1].index : text.length;
-      return text.slice(start, end).trim();
+      return cleanSectionText(text.slice(start, end));
     });
   }
   // 전략3: ① ② ③ 기준
@@ -3447,7 +3451,7 @@ function splitIntoSections(text, count, startNum) {
     return Array.from({length: count}, (_, i) => {
       const start = matches2[i].index + matches2[i][0].length;
       const end = i + 1 < matches2.length ? matches2[i+1].index : text.length;
-      return text.slice(start, end).trim();
+      return cleanSectionText(text.slice(start, end));
     });
   }
   // 전략4: 빈줄 기준으로 단락 분할 시도
