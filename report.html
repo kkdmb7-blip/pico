@@ -522,7 +522,7 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
-const REPORT_VERSION = 3;
+const REPORT_VERSION = 4;
 
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
@@ -1169,6 +1169,9 @@ let _gwimungwanData = null;
 let _baekhoData = null;
 let _daeunTransitionData = null;
 let _haphwaData = null;
+let _tenGodsDistData = null;
+let _geokgukValidData = null;
+let _sewunInterData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1216,6 +1219,9 @@ function renderMarkdown(text) {
   text = text.replace(/\n/g, '<br>');
   return '<p>' + text + '</p>';
 }
+
+// 안전한 배열→문자열 변환 (API가 문자열을 반환할 수 있음)
+function safeJoin(v, sep) { return Array.isArray(v) ? v.join(sep||', ') : (v||''); }
 
 // ── 사주 전체 데이터 조회 ──
 async function loadSajuData() {
@@ -1435,11 +1441,11 @@ function buildFullZiweiBlock() {
   const IMPORTANT = ['재백','관록','부처','교우','복덕','천이'];
   const palaceLines = palaces
     .filter(p => IMPORTANT.some(n => (p.name||p.palaceName||'').includes(n)))
-    .map(p => `${p.name||p.palaceName}: ${p.heavenlyStem||''}${p.earthlyBranch||''} 주성:${(p.majorStars||p.stars||[]).join(',')||'없음'}`)
+    .map(p => `${p.name||p.palaceName}: ${p.heavenlyStem||''}${p.earthlyBranch||''} 주성:${safeJoin(p.majorStars||p.stars,',')||'없음'}`)
     .join('\n');
   return `【자미두수 전체 궁위】
-명궁: ${sp?`${sp.name||''} ${sp.heavenlyStem||''}${sp.earthlyBranch||''} 주성:${(sp.majorStars||[]).join(',')||'없음'}`:'미확인'}
-현재 대한: ${cd?`${cd.name||''} ${cd.heavenlyStem||''}${cd.earthlyBranch||''} ${cd.ageRange||''} 주성:${(cd.stars||cd.majorStars||[]).join(',')||'없음'}`:'미확인'}
+명궁: ${sp?`${sp.name||''} ${sp.heavenlyStem||''}${sp.earthlyBranch||''} 주성:${safeJoin(sp.majorStars,',')||'없음'}`:'미확인'}
+현재 대한: ${cd?`${cd.name||''} ${cd.heavenlyStem||''}${cd.earthlyBranch||''} ${cd.ageRange||''} 주성:${safeJoin(cd.stars||cd.majorStars,',')||'없음'}`:'미확인'}
 현재 유년: ${cy?`${cy.year||''}년 ${cy.name||''} ${cy.heavenlyStem||''}${cy.earthlyBranch||''}`:'미확인'}
 ${palaceLines||''}
 전체 데이터: ${JSON.stringify(_ziweiData).slice(0,1500)}`;
@@ -2212,7 +2218,7 @@ ${sb2}
 【재물 구조 분석】
 유형: ${wealthFrame.wealth_type} | 수입방식: ${wealthFrame.income_style}
 핵심경로: ${wealthFrame.primary_path}
-위험요소: ${(wealthFrame.risk_factors||[]).join(', ')||'없음'}
+위험요소: ${safeJoin(wealthFrame.risk_factors)||'없음'}
 
 ${db}
 ${vb}
@@ -2383,8 +2389,8 @@ ${db}
 【현재 대운 분석】
 국면: ${daeunFrame.current_phase} | 핵심테마: ${daeunFrame.key_theme}
 십신: ${daeunFrame.daeun_ten_god||'미확인'}
-기회: ${(daeunFrame.opportunities||[]).join(', ')||'없음'}
-위험: ${(daeunFrame.risks||[]).join(', ')||'없음'}
+기회: ${safeJoin(daeunFrame.opportunities)||'없음'}
+위험: ${safeJoin(daeunFrame.risks)||'없음'}
 
 ${zb}
 
@@ -2472,8 +2478,8 @@ ${sb2}
 【${thisYear}년 세운 분석】
 핵심테마: ${yearFrame.year_theme}
 십신: ${yearFrame.year_ten_god||'미확인'}
-유리한분야: ${(yearFrame.strong_areas||[]).join(', ')||'없음'}
-불리한분야: ${(yearFrame.weak_areas||[]).join(', ')||'없음'}
+유리한분야: ${safeJoin(yearFrame.strong_areas)||'없음'}
+불리한분야: ${safeJoin(yearFrame.weak_areas)||'없음'}
 세운 상세: ${sewunStr}
 
 ${db}
@@ -2533,7 +2539,7 @@ async function generateMonthReport() {
   // 일주별 월운 DB 데이터
   const monthlyIljuData = _rptFull?.월별운세 || null;
   const monthlyIljuBlock = monthlyIljuData
-    ? `\n【일주별 ${monthStr} 월운 참고자료】\n테마: ${monthlyIljuData.테마||''}\n키워드: ${(monthlyIljuData.키워드||[]).join(', ')}\n월운설명: ${monthlyIljuData.월운||''}\n기회: ${monthlyIljuData.기회||''}\n주의: ${monthlyIljuData.주의||''}\n행운요소: ${monthlyIljuData.행운요소||''}\n(위 참고자료를 반드시 반영하되, 원문을 그대로 쓰지 말고 사주 분석과 통합해 재해석할 것)`
+    ? `\n【일주별 ${monthStr} 월운 참고자료】\n테마: ${monthlyIljuData.테마||''}\n키워드: ${Array.isArray(monthlyIljuData.키워드)?monthlyIljuData.키워드.join(', '):(monthlyIljuData.키워드||'')}\n월운설명: ${monthlyIljuData.월운||''}\n기회: ${monthlyIljuData.기회||''}\n주의: ${monthlyIljuData.주의||''}\n행운요소: ${monthlyIljuData.행운요소||''}\n(위 참고자료를 반드시 반영하되, 원문을 그대로 쓰지 말고 사주 분석과 통합해 재해석할 것)`
     : '';
   let monthFrame = { month_theme:'미확인', month_ten_god:'미확인', opportunities:[], cautions:[], writing_guidelines:[] };
   try {
@@ -2568,8 +2574,8 @@ ${sb2}
 【${monthStr} 월운 분석】
 이달월건 십신: ${monthFrame.month_ten_god}
 이달테마: ${monthFrame.month_theme}
-기회: ${(monthFrame.opportunities||[]).join(', ')||'없음'}
-주의: ${(monthFrame.cautions||[]).join(', ')||'없음'}
+기회: ${safeJoin(monthFrame.opportunities)||'없음'}
+주의: ${safeJoin(monthFrame.cautions)||'없음'}
 유리한분야: ${monthFrame.best_area||'미확인'}
 ${monthlyIljuBlock}
 
@@ -2658,7 +2664,7 @@ ${sb2}
 
 【용신(${ysFinal}) 기반 생활 가이드】
 용신 이유: ${ysFrame.yongsin_reason || ''}
-오늘 팁: ${(ysFrame.daily_tips||[]).join(', ')||''}
+오늘 팁: ${safeJoin(ysFrame.daily_tips)||''}
 ${ysBlock}
 
 섹션 구성:
