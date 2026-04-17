@@ -796,9 +796,8 @@ function runRecommend() {
       var yi = normalize81(A + C);
       var jung = normalize81(A + B + C);
       var grades = [SURI_TABLE[won], SURI_TABLE[hyun], SURI_TABLE[yi], SURI_TABLE[jung]];
-      var goodCnt = grades.filter(function(g){ return g==='대길' || g==='길'; }).length;
-      var badCnt  = grades.filter(function(g){ return g==='흉' || g==='대흉'; }).length;
-      if (goodCnt < 3 || badCnt > 0) continue; // 길수 3개 이상 + 흉수 없음
+      var sumScoreRaw = grades.reduce(function(acc,g){ return acc + (GRADE_SCORE[g]||0); }, 0) / 4;
+      if (sumScoreRaw < 95) continue; // 평균 95점 이상만 (사실상 4격 전부 대길)
 
       // 음오행 상극 배제
       var allChars = sur.split('').concat([a.syl, b.syl]);
@@ -810,7 +809,7 @@ function runRecommend() {
       if (hasGeuk) continue;
 
       // 점수: 4격 + 용신 + 성별
-      var sumScore = grades.reduce(function(acc,g){ return acc + (GRADE_SCORE[g]||0); }, 0) / 4;
+      var sumScore = sumScoreRaw;
       var ysBonus = 0;
       if (yongsinHan) {
         if (a.oh === yongsinHan) ysBonus += 15;
@@ -849,10 +848,10 @@ function runRecommend() {
 function renderRecommend(sur, surHanja, top) {
   var el = document.getElementById('recommendResult');
   if (!top.length) {
-    el.innerHTML = '<div class="analysis-card" style="text-align:center; color:var(--text-dim);">조건에 맞는 이름을 찾지 못했습니다. 다른 성씨로 시도해주세요.</div>';
+    el.innerHTML = '<div class="analysis-card" style="text-align:center; color:var(--text-dim); line-height:1.8;">95점 이상 조건을 만족하는 이름을 찾지 못했습니다.<br><span style="font-size:11px;">성씨 획수에 따라 4격 모두 대길 조합이 나오지 않을 수 있습니다.</span></div>';
     return;
   }
-  var html = '<div class="section-label">' + sur + '씨 추천 이름 TOP ' + top.length + '</div>';
+  var html = '<div class="section-label">' + sur + '씨 추천 이름 TOP ' + top.length + ' · 95점 이상</div>';
   top.forEach(function(c, idx) {
     var ok = c.grades.filter(function(g){ return g==='대길'; }).length;
     html += '<div class="analysis-card" style="margin-bottom:12px;">';
