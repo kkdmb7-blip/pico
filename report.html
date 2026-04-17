@@ -168,11 +168,27 @@ nav {
 .btn-intro-gen {
   display: block; width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #7b5ea7, #a07fd4);
-  border: none; border-radius: 14px;
-  color: #fff; font-size: 15px; font-weight: 700;
+  background: transparent;
+  border: 1.5px solid rgba(212,175,55,0.5);
+  border-radius: 14px;
+  color: var(--gold);
+  font-size: 15px; font-weight: 700;
   cursor: pointer; font-family: var(--fn);
   margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 0 20px rgba(212,175,55,0.08);
+}
+.btn-intro-gen:hover {
+  border-color: rgba(212,175,55,0.8);
+  box-shadow: 0 0 30px rgba(212,175,55,0.15);
+}
+.btn-intro-gen::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(123,94,167,0.06) 50%, rgba(212,175,55,0.08) 100%);
+  pointer-events: none;
 }
 .btn-intro-back {
   display: block; width: 100%;
