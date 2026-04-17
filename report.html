@@ -636,7 +636,23 @@ const TYPE_CONFIG = {
   triple:     { title: '동서양 통합 분석', orb: 800, emoji: '<i class="pi pi-eye"></i>', focus: '사주·베딕·서양 점성술·자미두수 4개 시스템 교차 분석',
     desc: '45종 정밀 데이터 + 4개 동서양 시스템 동시 교차 — 최고 정밀도 분석' },
   career_deep:{ title: '직업·사업 심층 분석', orb: 600, emoji: '<i class="pi pi-target"></i>', focus: '사주 관록·자미두수 관록궁·서양 토성·목성으로 보는 직업 구조',
-    desc: '격국·직업적성·십성분포 정밀 데이터 + 3시스템 교차 직업 분석' }
+    desc: '격국·직업적성·십성분포 정밀 데이터 + 3시스템 교차 직업 분석' },
+  summary:    { title: '사주 포인트 요약', orb: 200, emoji: '<i class="pi pi-sparkle"></i>', focus: '사주 핵심 요약, 올해 포인트, 즉시 실천법',
+    desc: '45종 정밀 데이터에서 핵심만 뽑은 3분 사주 요약' },
+  balance:    { title: '오행 밸런스 가이드', orb: 300, emoji: '<i class="pi pi-yinyang"></i>', focus: '오행 균형 분석, 부족 오행 보완, 색상·음식·방위 실천법',
+    desc: '강약수치·조후·통근 정밀 데이터 기반 오행 균형 진단' },
+  sinsal:     { title: '신살 총정리', orb: 300, emoji: '<i class="pi pi-scroll"></i>', focus: '길신·흉신 총정리, 올해 활성 신살, 활용/해소법',
+    desc: '귀인·삼재·양인살·원진살 등 전체 신살 한눈에 정리' },
+  health:     { title: '건강·체질 분석', orb: 400, emoji: '<i class="pi pi-medical"></i>', focus: '오행 체질 구조, 취약 장기, 계절별 건강 관리법',
+    desc: '오행 건강 지도 — 체질·취약장기·계절 관리법 정밀 분석' },
+  family:     { title: '가족·인연 분석', orb: 400, emoji: '<i class="pi pi-people"></i>', focus: '부모·배우자·자녀 인연 구조, 관계 개선 전략',
+    desc: '십신궁위·원진살·귀인 데이터로 보는 가족 인연 구조' },
+  timing:     { title: '인생 타이밍 가이드', orb: 500, emoji: '<i class="pi pi-calendar"></i>', focus: '대운 전환기, 월별 타이밍, 결정·이직·투자 최적 시기',
+    desc: '대운전환기·세운교차·십이운성 데이터 기반 타이밍 분석' },
+  wealth_timing:{ title: '재물 타이밍 특화', orb: 500, emoji: '<i class="pi pi-chart"></i>', focus: '재물 유입 시기, 대운별 재물 흐름, 월별 재물 포인트',
+    desc: '재물운·대운교차·운세종합점수 기반 재물 타이밍 분석' },
+  classic:    { title: '고전 명리 해석', orb: 600, emoji: '<i class="pi pi-book"></i>', focus: '적천수·자평진전·납음·조후 고전 원문 기반 해석',
+    desc: '적천수 일간론·자평진전 격국론·납음·조후 고전 심층 해석' }
 };
 
 const TYPE_SECTIONS = {
@@ -723,6 +739,52 @@ const TYPE_SECTIONS = {
     { name: '자미두수 관록궁과 베딕 교차',   chars: 500 },
     { name: '지금 대운의 커리어 흐름',       chars: 500 },
     { name: '직업·창업·성장 맞춤 전략',      chars: 400 }
+  ],
+  summary: [
+    { name: '나의 사주 핵심 프로필',          chars: 300 },
+    { name: '올해 운세 핵심 포인트',          chars: 300 },
+    { name: '지금 실천할 것 3가지',           chars: 300 }
+  ],
+  balance: [
+    { name: '오행 분포 현황',                chars: 300 },
+    { name: '부족·과잉 오행의 영향',          chars: 400 },
+    { name: '오행 보완 실천법',              chars: 400 }
+  ],
+  sinsal: [
+    { name: '나의 길신 총정리',              chars: 400 },
+    { name: '주의 신살과 해소법',            chars: 400 },
+    { name: '올해 신살 영향과 전략',          chars: 300 }
+  ],
+  health: [
+    { name: '체질 구조와 오행 건강 지도',     chars: 400 },
+    { name: '취약 장기와 건강 주의 시기',     chars: 400 },
+    { name: '체질 맞춤 건강 관리법',          chars: 400 }
+  ],
+  family: [
+    { name: '부모·윗사람 인연 구조',          chars: 400 },
+    { name: '배우자·자녀 인연 구조',          chars: 400 },
+    { name: '가족 관계 개선 전략',            chars: 300 }
+  ],
+  timing: [
+    { name: '현재 인생 국면 진단',            chars: 300 },
+    { name: '향후 3년 핵심 타이밍',           chars: 400 },
+    { name: '대운 전환기 분석',              chars: 400 },
+    { name: '올해 월별 타이밍 포인트',        chars: 400 },
+    { name: '타이밍 활용 실전 전략',          chars: 400 }
+  ],
+  wealth_timing: [
+    { name: '재물 에너지 구조 핵심',          chars: 300 },
+    { name: '대운별 재물 흐름',              chars: 400 },
+    { name: '올해 재물 타이밍',              chars: 400 },
+    { name: '월별 재물 포인트',              chars: 400 },
+    { name: '재물 극대화 실천 전략',          chars: 400 }
+  ],
+  classic: [
+    { name: '적천수 일간론 해석',            chars: 400 },
+    { name: '자평진전 격국 분석',            chars: 400 },
+    { name: '조후·납음 해석',               chars: 400 },
+    { name: '통근·일주 종합론',              chars: 400 },
+    { name: '고전 관점 인생 방향',            chars: 400 }
   ]
 };
 
@@ -1215,6 +1277,243 @@ const TYPE_DETAIL = {
       '용신 오행에 해당하는 식재료와 음식, 관련 신체 기관, 이 사주가 주의해야 할 건강 포인트와 피해야 할 음식·생활 습관을 구체적으로 제시합니다.',
       '용신 오행에 맞는 직업군과 업종, 일하기 좋은 환경(실내·실외·조직 규모), 집과 사무실의 공간 구성 방법을 제시합니다.',
       '이 일주(60갑자)만을 위해 작성된 창업·커리어·투자·대인관계 조언을 종합합니다. 현재 대운과 연령대를 반영해 지금 당장 실행할 수 있는 맞춤 전략 3가지를 제시합니다.'
+    ]
+  },
+  summary: {
+    emoji: '<i class="pi pi-sparkle"></i>',
+    subtitle: '3분이면 충분한 내 사주의 핵심',
+    desc: '45종 정밀 데이터에서 핵심만 뽑아 간결하게 정리합니다. 내 사주가 어떤 사람인지 3줄 요약, 올해 운세 포인트, 지금 당장 할 수 있는 실천법까지.',
+    recommend: [
+      '사주를 처음 접해서 가볍게 시작하고 싶은 분',
+      '긴 리포트보다 핵심만 빠르게 파악하고 싶은 분',
+      '다른 리포트를 선택하기 전 방향을 잡고 싶은 분'
+    ],
+    sectionDesc: [
+      '일간·격국·오행·용신을 한 문단으로 압축',
+      '올해 세운의 핵심 기회와 주의 포인트',
+      '용신 기반 즉시 실천 가능한 액션 3가지'
+    ],
+    preview: '일간, 격국, 신강/신약, 오행 분포, 용신을 읽기 쉽게 정리하고, 올해 세운이 이 사주에 미치는 영향의 핵심만 뽑아 기회 1가지·주의 1가지를 제시합니다. 마지막으로 용신 기반 색상·방위·행동 중심의 실천법 3가지를 알려드립니다.',
+    faq: [
+      { q: '다른 리포트와 어떻게 다른가요?', a: '포인트 요약은 핵심만 빠르게 정리합니다. 특정 주제를 깊이 분석하려면 기질·재물·대운 등 전문 리포트를 추천드립니다.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 30초~1분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['내 사주를 한 문단으로 요약하면?', '올해 가장 중요한 포인트는?', '지금 당장 뭘 하면 좋을까?'],
+    sectionDetail: [
+      '일간의 본질, 격국 유형, 신강/신약, 오행 비율, 용신을 한 문단으로 압축합니다. 이 사주가 어떤 에너지를 가진 사람인지 핵심 3줄.',
+      '올해 세운이 이 사주에 미치는 영향 중 가장 중요한 기회 1가지와 주의 1가지를 명확히 제시합니다.',
+      '용신 오행을 기반으로 색상·방위·행동 중심의 즉시 실천 가능한 구체적 액션 3가지를 제시합니다.'
+    ]
+  },
+  balance: {
+    emoji: '<i class="pi pi-yinyang"></i>',
+    subtitle: '오행의 균형이 삶의 균형이다',
+    desc: '오행(목·화·토·금·수) 분포와 강약수치로 이 사주의 에너지 구조를 진단하고, 부족한 오행이 성격·건강·재물·관계에 미치는 구체적 영향을 분석합니다. 용신 기반으로 색상·방위·음식·생활습관까지 실천법을 제시합니다.',
+    recommend: [
+      '왜 특정 분야만 잘 안 풀리는지 이유가 궁금한 분',
+      '오행 보완으로 생활에 변화를 주고 싶은 분',
+      '색상·방위·음식 등 개운법을 구체적으로 알고 싶은 분'
+    ],
+    sectionDesc: [
+      '오행 개수·비율·신강신약으로 본 에너지 구조',
+      '부족 오행이 성격·건강·재물·관계에 미치는 영향',
+      '부족 오행 보완 색상·방위·음식·생활습관 5가지'
+    ],
+    preview: '오행 개수와 비율, 강약수치, 조후(계절 에너지), 통근(뿌리 강도)을 종합해 에너지 구조를 진단합니다. 부족한 오행이 만드는 구체적 약점과 과잉 에너지의 편향을 분석하고, 용신 기반으로 색상·방위·음식·계절별 생활습관 등 실천법을 제시합니다.',
+    faq: [
+      { q: '용신 생활 가이드와 어떻게 다른가요?', a: '용신 가이드는 용신 오행 중심으로 개운법을 제시하고, 오행 밸런스는 전체 5행의 균형 분석에 초점을 맞춥니다. 함께 보면 더 효과적입니다.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['내 오행 분포는 균형적인가?', '부족한 오행이 내 삶에 어떤 영향을 주고 있나?', '오행 균형을 맞추는 구체적 방법은?'],
+    sectionDetail: [
+      '오행 개수와 비율, 강약수치, 신강/신약을 종합해 이 사주의 에너지 구조를 한눈에 보여줍니다. 가장 강한 오행과 가장 약한 오행이 만드는 체질적 특성.',
+      '부족 오행이 성격(우유부단, 폭발적 등), 건강(취약 장기), 재물(돈이 새는 구조), 관계(갈등 패턴)에 미치는 구체적 영향. 과잉 오행의 편향도 분석합니다.',
+      '부족 오행을 보완하는 색상(옷·소품), 방위(집·사무실), 음식, 계절별 생활습관. 용신 오행 중심으로 지금 당장 실천할 구체적 방법 5가지.'
+    ]
+  },
+  sinsal: {
+    emoji: '<i class="pi pi-scroll"></i>',
+    subtitle: '길신은 살리고, 흉신은 풀어야 한다',
+    desc: '이 사주에 존재하는 모든 신살을 한눈에 정리합니다. 천을귀인·문창귀인 등 길신의 위치와 활용법, 삼재·양인살·원진살·귀문관살 등 흉신의 영향과 해소법, 올해 세운에서 활성화되는 신살까지.',
+    recommend: [
+      '내 사주에 어떤 신살이 있는지 총정리가 궁금한 분',
+      '흉신(삼재, 양인살 등)의 실제 영향과 해소법을 알고 싶은 분',
+      '올해 특히 조심하거나 활용해야 할 신살이 궁금한 분'
+    ],
+    sectionDesc: [
+      '천을귀인, 문창, 역마 등 길신 위치와 활용법',
+      '삼재, 양인살, 원진살, 귀문관살 등 흉신 해소법',
+      '올해 세운에서 활성화되는 신살과 대응 전략'
+    ],
+    preview: '이 사주의 모든 길신(천을귀인, 문창귀인, 천덕·월덕귀인, 학당, 역마 등)과 흉신(삼재, 양인살, 원진살, 귀문관살, 백호대살 등)을 빠짐없이 정리합니다. 각 신살이 어느 기둥에 있고 실생활에서 어떻게 발현되는지, 올해 세운에서 새로 활성화되는 신살은 무엇인지까지 분석합니다.',
+    faq: [
+      { q: '삼재가 있으면 정말 나쁜 건가요?', a: '삼재는 3년 주기로 돌아오는 자연스러운 에너지 변화입니다. 무조건 나쁜 것이 아니라 주의와 정비의 시기로 이해하는 것이 정확합니다.' },
+      { q: '흉신이 많으면 어떻게 하나요?', a: '흉신의 에너지를 이해하고 적절히 해소하면 오히려 삶의 전환점이 됩니다. 이 리포트에서 구체적 해소법을 제시합니다.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['내 사주에 어떤 길신이 있고 어떻게 활용할까?', '주의해야 할 흉신은 무엇이고 해소법은?', '올해 특히 주의하거나 활용할 신살은?'],
+    sectionDetail: [
+      '이 사주에 존재하는 모든 길신을 정리합니다. 천을귀인·문창귀인·천덕·월덕귀인·학당·역마 등이 어느 기둥에 있고 실생활에서 어떤 복으로 나타나는지.',
+      '삼재·양인살·원진살·귀문관살·백호대살·겁살·화개살 등 주의 신살의 실제 영향과 발현 패턴. 각 흉신별 구체적 해소·완화 방법을 제시합니다.',
+      '올해 세운에서 새로 활성화되거나 해소되는 신살을 분석합니다. 올해 특히 주의할 흉신과 적극 활용할 길신, 신살 기반 올해 전략.'
+    ]
+  },
+  health: {
+    emoji: '<i class="pi pi-medical"></i>',
+    subtitle: '오행이 가리키는 내 몸의 약한 고리',
+    desc: '오행(목·화·토·금·수)은 각각 특정 장기와 연결됩니다. 이 사주의 오행 분포로 체질 유형을 진단하고, 부족·과잉 오행이 만드는 취약 장기와 건강 위험을 분석합니다. 현재 대운이 건강에 미치는 영향과 계절별 관리법까지.',
+    recommend: [
+      '건강이 안 좋아지는 시기가 반복되는 분',
+      '오행과 장기의 관계를 구체적으로 알고 싶은 분',
+      '체질에 맞는 음식·운동·생활습관이 궁금한 분',
+      '현재 대운이 건강에 어떤 영향을 주는지 알고 싶은 분'
+    ],
+    sectionDesc: [
+      '오행 분포로 본 체질 유형과 장기 매핑',
+      '부족·과잉 오행의 건강 위험과 주의 시기',
+      '용신 기반 음식·운동·생활습관 관리법'
+    ],
+    preview: '오행↔장기 매핑(목→간/담/눈, 화→심장/소장, 토→비위/위장, 금→폐/대장/피부, 수→신장/방광/뼈)으로 이 사주의 강한 장기와 약한 장기를 진단합니다. 현재 대운과 올해 세운이 건강에 미치는 영향, 특히 조심할 계절과 시기, 체질에 맞는 음식·운동·생활습관까지 제시합니다.',
+    faq: [
+      { q: '의학적 진단을 대체할 수 있나요?', a: '이 리포트는 오행 기반 체질 분석입니다. 의학적 진단을 대체하지 않으며, 건강 관리 방향을 참고하는 용도로 활용하세요.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['내 체질은 어떤 유형이고 어떤 장기가 약한가?', '건강이 특히 나빠지는 시기는 언제인가?', '체질에 맞는 음식·운동·생활습관은?'],
+    sectionDetail: [
+      '오행 분포와 강약수치로 체질 유형을 진단합니다. 강한 오행이 지배하는 장기(과잉 주의)와 약한 오행의 취약 장기(보강 필요)를 구체적으로 매핑합니다.',
+      '오행 부족·과잉이 만드는 구체적 건강 증상과 위험. 현재 대운과 올해 세운이 건강에 미치는 영향. 특히 조심할 계절과 시기를 분석합니다.',
+      '용신 오행 기반 보강 음식과 피해야 할 음식, 체질에 맞는 운동 유형, 계절별 주의사항. 지금 당장 실천할 건강 전략 3가지.'
+    ]
+  },
+  family: {
+    emoji: '<i class="pi pi-people"></i>',
+    subtitle: '사주가 말하는 가족과의 인연 구조',
+    desc: '사주의 4기둥(년·월·일·시)은 각각 부모·형제·배우자·자녀의 궁위입니다. 각 궁의 십신과 에너지를 분석해 가족 인연의 구조를 읽고, 원진살·귀문관살 등 관계 갈등의 원인과 개선 전략까지 제시합니다.',
+    recommend: [
+      '부모와의 관계가 어렵거나 패턴이 반복되는 분',
+      '배우자·자녀 인연의 구조를 이해하고 싶은 분',
+      '가족 관계를 개선하는 구체적 방법이 필요한 분'
+    ],
+    sectionDesc: [
+      '년주·월주 십신으로 본 부모·윗사람 인연',
+      '일지·시주로 본 배우자·자녀 인연과 기질',
+      '관계 갈등 원인과 귀인 활용 개선 전략'
+    ],
+    preview: '년주(부모/조상궁)·월주(어머니/형제궁)의 십신으로 부모 인연의 에너지를 분석합니다. 일지(배우자궁)의 십신으로 배우자 기질과 궁합 패턴을, 시주(자녀궁)로 자녀 인연을 읽습니다. 원진살·귀문관살이 가족궁에 있을 때의 영향과 구체적 개선법까지.',
+    faq: [
+      { q: '특정 가족과의 궁합도 분석되나요?', a: '이 리포트는 내 사주 구조에서 가족 인연의 패턴을 분석합니다. 특정 상대와의 궁합은 궁합 분석 기능을 이용하세요.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['부모와의 인연 구조는 어떻게 생겼나?', '배우자궁이 말하는 배우자의 기질은?', '자녀 인연은 어떻고, 관계 개선법은?'],
+    sectionDetail: [
+      '년주·월주의 십신으로 부모(아버지=편재/정재, 어머니=인성)와의 인연을 분석합니다. 귀인이 년월에 있으면 부모 복, 충극이 있으면 갈등 패턴.',
+      '일지(배우자궁)의 십신으로 배우자의 기질과 관계 패턴을 읽습니다. 시주의 십신으로 자녀 인연과 성향. 원진살·귀문관살이 해당 궁에 있으면 구체적 영향.',
+      '약한 인연을 보완하는 구체적 방법, 갈등이 예상되는 관계의 소통 전략, 귀인 활용법. 용신 기반 가족 관계 개운법 3가지.'
+    ]
+  },
+  timing: {
+    emoji: '<i class="pi pi-calendar"></i>',
+    subtitle: '언제 뛰고 언제 기다릴지, 타이밍이 답이다',
+    desc: '대운 전환기, 세운 교차, 십이운성으로 인생의 최적 타이밍을 분석합니다. 지금이 공격적으로 나갈 때인지 내실을 다질 때인지, 이직·투자·결혼의 최적 시기는 언제인지, 월별 에너지까지 세밀하게.',
+    recommend: [
+      '중요한 결정(이직·창업·결혼·투자)의 시기가 고민인 분',
+      '지금이 전진할 때인지 기다릴 때인지 모르는 분',
+      '향후 몇 년의 큰 흐름을 미리 파악하고 싶은 분',
+      '월별로 적합한 행동을 계획하고 싶은 분'
+    ],
+    sectionDesc: [
+      '현재 대운 위치와 인생 국면(성장기/수확기/전환기)',
+      '올해~내후년 3년간 핵심 타이밍 분석',
+      '다음 대운 전환까지 남은 시간과 예상 변화',
+      '올해 12개월 중 에너지 강한 달·주의할 달',
+      '이직·투자·결혼 최적 시기 종합 전략'
+    ],
+    preview: '현재 대운이 이 사주에 어떤 에너지로 작용하는지, 지금이 성장기·수확기·전환기·정비기 중 어디인지를 진단합니다. 향후 3년 세운 분석, 다음 대운 전환기까지의 준비 사항, 올해 월별 타이밍 포인트, 이직·투자·결혼의 최적 시기까지 종합합니다.',
+    faq: [
+      { q: '대운 흐름 리포트와 어떻게 다른가요?', a: '대운 리포트는 현재 대운의 심층 분석에 초점을 맞추고, 타이밍 가이드는 "언제 무엇을 해야 하는가"에 초점을 맞춥니다. 결정의 시기를 찾는 분께 추천합니다.' },
+      { q: '정확한 날짜까지 알 수 있나요?', a: '월 단위의 에너지 흐름을 분석합니다. 특정 날짜보다 흐름과 국면을 파악하는 데 활용하세요.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['지금 내 인생은 어떤 국면인가?', '향후 3년 중 가장 중요한 해는?', '이직·투자·결혼의 최적 시기는?', '올해 어떤 달에 행동하고 어떤 달에 기다려야 하나?'],
+    sectionDetail: [
+      '현재 대운 천간·지지의 십신 작용, 대운 전환기 여부, 지금이 공격적으로 나갈 시기인지 내실을 다질 시기인지 진단합니다.',
+      '올해~내후년까지 각 세운이 이 사주에 미치는 핵심 에너지. 가장 기회가 큰 해와 주의할 해, 각 해의 핵심 키워드.',
+      '다음 대운 전환까지 남은 시간, 전환 시 예상되는 에너지 변화. 전환 전 준비해야 할 것.',
+      '올해 12개월 중 에너지가 강한 달(행동 적기), 주의할 달(방어 시기), 결정에 좋은 달을 월별로 제시합니다.',
+      '이직·전직·투자·계약·연애·결혼의 최적 시기를 종합합니다. 지금 당장 타이밍에 맞춰 실행할 액션 3가지.'
+    ]
+  },
+  wealth_timing: {
+    emoji: '<i class="pi pi-chart"></i>',
+    subtitle: '재물에도 때가 있다 — 돈이 오는 시기를 읽어라',
+    desc: '재성의 위치와 강약으로 이 사주의 재물 구조를 파악하고, 대운별·세운별·월별로 재물 에너지가 강해지고 약해지는 타이밍을 분석합니다. 투자·저축·지출의 최적 시기와 절대 피해야 할 패턴까지.',
+    recommend: [
+      '돈이 들어오는 시기와 나가는 시기를 미리 알고 싶은 분',
+      '투자·창업·이직의 재물 관점 타이밍이 궁금한 분',
+      '재물 에너지가 강한 대운인지 약한 대운인지 확인하고 싶은 분',
+      '월별 재물 흐름을 파악해 전략적으로 관리하고 싶은 분'
+    ],
+    sectionDesc: [
+      '재성 위치·강약, 식상생재·비겁탈재 패턴',
+      '과거~현재~미래 대운별 재물 에너지 흐름',
+      '올해 세운이 재성에 미치는 영향과 투자 적기',
+      '올해 12개월 재물 활성화·주의 월',
+      '이 사주 구조에 맞는 재물 전략과 즉시 액션'
+    ],
+    preview: '재성(정재·편재)이 어느 기둥에 있고 얼마나 강한지, 식상이 재성을 잘 생해주는 구조인지, 비겁이 재를 뺏는 위험이 있는지 분석합니다. 대운별 재물 에너지 흐름, 올해 재물 타이밍, 월별 투자·지출 포인트, 이 사주에 맞는 재물 전략까지.',
+    faq: [
+      { q: '재물/사업 리포트와 어떻게 다른가요?', a: '재물 리포트는 재물 구조 전반을 분석하고, 재물 타이밍은 "언제 돈이 오고 가는가"에 초점을 맞춥니다. 투자·계약 시기가 궁금한 분께 추천합니다.' },
+      { q: '구체적 종목이나 금액을 알려주나요?', a: '특정 종목이나 금액 예측은 하지 않습니다. 재물 에너지가 강한 시기·방향·구조를 분석해 전략적 판단을 돕습니다.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['내 사주에서 돈이 들어오는 구조는?', '대운별 재물 에너지가 강한 시기는?', '올해 투자·계약에 유리한 달은?', '이 사주에 맞는 재물 관리 방식은?'],
+    sectionDetail: [
+      '재성(정재·편재) 위치와 강약, 식상생재 흐름 유무, 비겁탈재 위험. 이 사주의 돈이 들어오는 경로와 나가는 경로.',
+      '과거 대운~현재 대운~다음 대운의 재물 에너지 변화. 재성이 강해지는 대운과 약해지는 대운. 지금 대운의 재물 에너지 진단.',
+      '올해 세운이 재성에 미치는 영향. 돈이 들어오는 시기와 큰 지출 주의 시기. 투자·계약에 유리한 시점.',
+      '올해 12개월 중 재물 에너지가 활성화되는 달과 지출 주의 달. 월별 재성·식상 활성도 기반 분석.',
+      '이 사주 구조에 맞는 재물 전략(저축형·투자형·사업형). 용신 기반 재물 개운법. 지금 당장 실행할 재물 액션 3가지.'
+    ]
+  },
+  classic: {
+    emoji: '<i class="pi pi-book"></i>',
+    subtitle: '천 년의 지혜로 읽는 나의 사주',
+    desc: '적천수(滴天髓) 일간론, 자평진전(子平眞詮) 격국론, 조후(調候), 납음(納音) — 동양 명리학의 4대 고전이 이 사주를 어떻게 해석하는지를 원문 인용과 함께 심층 분석합니다.',
+    recommend: [
+      '명리학에 관심이 있고 고전 관점의 해석이 궁금한 분',
+      '적천수·자평진전 원문이 내 사주를 어떻게 보는지 알고 싶은 분',
+      '납음·조후 등 깊이 있는 명리 분석을 원하는 분',
+      '다른 리포트와 차별화된 고전 명리의 관점이 필요한 분'
+    ],
+    sectionDesc: [
+      '해당 천간의 적천수 원문과 현대 해석',
+      '자평진전 관점의 격국 성패 분석',
+      '계절 에너지(조후)와 납음 오행의 의미',
+      '통근 강약과 일주 60갑자 고전 특성',
+      '고전 명리가 권하는 인생 방향과 처세 지침'
+    ],
+    preview: '적천수 원문("甲木參天 脂地合德..." 등)을 인용하고 이 사주에 구체적으로 적용해 해석합니다. 자평진전 관점에서 격국의 성패를 분석하고, 조후(계절 에너지)와 납음 오행의 의미를 풀이합니다. 통근 강약과 일주 특성을 고전 관점으로 종합해 인생 방향을 제시합니다.',
+    faq: [
+      { q: '적천수가 뭔가요?', a: '적천수(滴天髓)는 명리학의 최고 고전 중 하나로, 10천간 각각의 본질을 시적 문장으로 압축한 것입니다. 수백 년간 명리의 교과서 역할을 해왔습니다.' },
+      { q: '한문을 모르는데 이해할 수 있나요?', a: '한문 원문과 함께 현대 한국어 해석을 병기합니다. 명리학 지식이 없어도 충분히 이해할 수 있도록 작성됩니다.' },
+      { q: '기질 리포트와 어떻게 다른가요?', a: '기질 리포트는 현대적 관점의 성격 분석에 초점을 맞추고, 고전 명리는 적천수·자평진전 등 원전 기반의 전통적 해석을 제공합니다.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['적천수가 내 일간을 어떻게 보는가?', '자평진전 관점에서 내 격국의 성패는?', '조후와 납음이 가리키는 에너지는?', '고전 명리가 권하는 나의 인생 방향은?'],
+    sectionDetail: [
+      '해당 천간(甲~癸)의 적천수 원문을 인용하고 현대어로 풀이합니다. 이 사주에 구체적으로 어떻게 적용되는지, 일간의 핵심 본질.',
+      '격국을 자평진전 관점에서 분석합니다. 격국의 성(成)과 패(敗) 조건, 용신이 격국을 돕는 구조인지, 격국이 깨지는 위험 요소.',
+      '월지 기준 조후(계절 에너지) 분석. 조후 용신과 억부 용신의 일치/불일치. 일주의 납음 오행이 가리키는 에너지 특성.',
+      '일간의 통근(뿌리) 강약을 고전 관점에서 분석. 일주(60갑자)의 전통적 특성과 의미.',
+      '적천수·자평진전·조후·납음을 종합한 인생 방향과 처세 지침. 고전 명리가 권하는 삶의 자세와 실생활 적용 3가지.'
     ]
   }
 };
@@ -1958,6 +2257,14 @@ function buildAccuracyLayerBlock() {
     vedic_full: ['강약수치','격국세분','조후','특수패턴','사주균형','통근분석','적천수일간론','대운세운교차','대운트렌드'],
     astro_full: ['강약수치','격국세분','십신궁위','특수패턴','사주균형','건강경향','대운세운교차','세운월별'],
     ziwei_full: ['강약수치','격국세분','재물운','직업적성','십신궁위','대운세운교차','대운트렌드','십성분포'],
+    summary:    ['강약수치','격국세분','일주론','대운세운교차','운세종합점수','재물운'],
+    balance:    ['사주균형','조후','강약수치','통근분석','조후용신분석','지장간분석','합화검증'],
+    sinsal:     ['신살종합','삼재','특수신살','귀인','양인살','원진살','귀문관살','백호대살','십이신살'],
+    health:     ['건강경향','조후','사주균형','강약수치','특수패턴','통근분석','조후용신분석'],
+    family:     ['십신궁위','특수패턴','귀인','원진살','귀문관살','특수신살','사주균형','일주궁합'],
+    timing:     ['대운전환기','대운세운교차','십이운성확장','세운상호작용','대운트렌드','대운분리분석','운세종합점수','세운월별'],
+    wealth_timing:['재물운','대운세운교차','세운확장분석','운세종합점수','대운트렌드','대운분리분석','격국검증','세운상호작용','세운월별'],
+    classic:    ['적천수일간론','자평진전분석','납음분석','조후용신분석','격국세분','통근분석','일주론','조후','천간합충','지장간분석'],
   };
   const detailSet = new Set(DETAIL_MAP[_type] || []);
 
@@ -2368,6 +2675,14 @@ async function generateReport() {
   if (_type === 'ziwei_full')  { await generateZiweiFullReport();  return; }
   if (_type === 'triple')      { await generateTripleReport();     return; }
   if (_type === 'career_deep') { await generateCareerDeepReport(); return; }
+  if (_type === 'summary')      { await generateSummaryReport();     return; }
+  if (_type === 'balance')      { await generateBalanceReport();     return; }
+  if (_type === 'sinsal')       { await generateSinsalReport();      return; }
+  if (_type === 'health')       { await generateHealthReport();      return; }
+  if (_type === 'family')       { await generateFamilyReport();      return; }
+  if (_type === 'timing')       { await generateTimingReport();      return; }
+  if (_type === 'wealth_timing'){ await generateWealthTimingReport(); return; }
+  if (_type === 'classic')      { await generateClassicReport();     return; }
   // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
@@ -3519,6 +3834,146 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
+}
+
+// ── 사주 포인트 요약 ──
+async function generateSummaryReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const db = buildDaeunBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 나의 사주 핵심 프로필 — 일간 ${_ilju||''}, 격국 ${_geokguk||''}, 신강/신약(${_singang||''}), 오행 분포(${_sdFull?.five_pct?Object.entries(_sdFull.five_pct).map(([k,v])=>\`\${k}:\${v}%\`).join(' '):'미확인'}), 용신(${ysFinal})을 읽기 쉽게 한 문단으로 압축. 이 사주가 어떤 사람인지 핵심 3줄.\n2. 올해 운세 핵심 포인트 — 올해 세운 ${_sewun||''}이 이 사주에 미치는 영향 핵심만. 기회 1가지, 주의 1가지를 명확히.\n3. 지금 실천할 것 3가지 — 용신(${ysFinal}) 기반 즉시 실천 가능한 구체적 액션 3가지. 색상·방위·행동 중심.\n\n총 400~600자. 섹션 번호(1. 2. 3.) 붙여 작성. 간결하고 임팩트 있게.`;
+  await streamToSections(prompt, [0,1,2], '사주 포인트 요약', ysFinal, '', true);
+  try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
+// ── 오행 밸런스 가이드 ──
+async function generateBalanceReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const fivePctStr = _sdFull?.five_pct ? Object.entries(_sdFull.five_pct).map(([k,v])=>`${k}:${v}%`).join(' ') : '미확인';
+  const fiveCountStr = _sdFull?.five_count ? Object.entries(_sdFull.five_count).map(([k,v])=>`${k}:${v}개`).join(' ') : '미확인';
+  const prompt = `${profileStr}\n\n${sb2}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 오행 분포 현황 — 오행 개수(${fiveCountStr})와 비율(${fivePctStr}), 신강/신약(${_singang||'미확인'})으로 본 이 사주의 에너지 구조. 가장 강한 오행과 가장 약한 오행이 만드는 체질적 특성.\n2. 부족·과잉 오행의 영향 — 부족한 오행이 성격·건강·재물·관계에 미치는 구체적 영향. 과잉된 오행이 만드는 편향과 약점. 용신(${ysFinal})이 이 불균형을 어떻게 보완하는지.\n3. 오행 보완 실천법 — 부족 오행을 보완하는 색상(옷·소품), 방위(집·사무실), 음식, 계절별 생활습관. 용신 오행 중심으로 지금 당장 실천할 구체적 방법 5가지.\n\n총 500~700자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+  await streamToSections(prompt, [0,1,2], '오행 밸런스 분석', ysFinal, '', true);
+  try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
+// ── 신살 총정리 ──
+async function generateSinsalReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const db = buildDaeunBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 나의 길신 총정리 — 이 사주에 존재하는 모든 길신(천을귀인, 문창귀인, 천덕귀인, 월덕귀인, 학당, 역마 등)을 빠짐없이 정리. 각 길신이 어느 기둥에 있고 실생활에서 어떻게 발현되는지 구체적으로.\n2. 주의 신살과 해소법 — 삼재, 양인살, 원진살, 귀문관살, 백호대살, 겁살, 화개살 등 주의 필요한 신살 총정리. 각 흉신의 실제 영향과 구체적인 해소·완화 방법.\n3. 올해 신살 영향과 전략 — 올해 세운 ${_sewun||''}에서 새로 활성화되거나 해소되는 신살. 올해 특히 주의할 신살과 활용할 길신. 신살 기반 올해 전략.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성. 【사주 정밀분석】 블록의 신살 데이터를 정확히 인용.`;
+  await streamToSections(prompt, [0,1,2], '신살 종합 분석', ysFinal, '', true);
+  try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
+// ── 건강·체질 분석 ──
+async function generateHealthReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const db = buildDaeunBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const fivePctStr = _sdFull?.five_pct ? Object.entries(_sdFull.five_pct).map(([k,v])=>`${k}:${v}%`).join(' ') : '미확인';
+  const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock()}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n오행↔장기 매핑: 목(간·담·눈·근육), 화(심장·소장·혀·혈관), 토(비위·위장·입·살), 금(폐·대장·코·피부), 수(신장·방광·귀·뼈)\n\n섹션 구성:\n1. 체질 구조와 오행 건강 지도 — 오행 분포(${fivePctStr})와 신강/신약(${_singang||'미확인'})으로 본 체질 유형. 강한 오행이 지배하는 장기(과잉 주의)와 약한 오행이 취약한 장기(보강 필요)를 구체적으로 매핑.\n2. 취약 장기와 건강 주의 시기 — 오행 부족/과잉이 만드는 구체적 건강 위험과 증상. 현재 대운 ${_daeun||'미확인'}과 올해 세운이 건강에 미치는 영향. 특히 조심할 계절과 시기.\n3. 체질 맞춤 건강 관리법 — 용신 오행(${ysFinal}) 기반 보강 음식·운동·생활습관. 부족 오행 보완 식단. 계절별 주의사항. 지금 당장 실천할 건강 전략 3가지.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+  await streamToSections(prompt, [0,1,2], '건강·체질 분석', ysFinal, '', true);
+  try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
+// ── 가족·인연 분석 ──
+async function generateFamilyReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const pillars = _sdFull?.summary?.pillars || {};
+  const prompt = `${profileStr}\n\n${sb2}\n${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n십신궁위 참고: 년주=조상·부모(아버지) 궁, 월주=부모(어머니)·형제 궁, 일지=배우자 궁, 시주=자녀 궁\n\n섹션 구성:\n1. 부모·윗사람 인연 구조 — 년주·월주의 십신과 관계로 본 부모와의 인연. 인성(어머니)·편재/정재(아버지) 위치와 강약. 부모로부터 받는 에너지와 갈등 패턴. 귀인이 년월에 있으면 부모 복.\n2. 배우자·자녀 인연 구조 — 일지(배우자궁)의 십신으로 본 배우자 기질과 궁합 패턴. 시주의 십신으로 본 자녀 인연과 자녀 성향. 원진살·귀문관살이 배우자·자녀궁에 있으면 구체적 영향.\n3. 가족 관계 개선 전략 — 약한 인연을 보완하는 구체적 방법. 갈등이 예상되는 관계의 소통 전략. 귀인 활용법. 용신(${ysFinal}) 기반 가족 관계 개운법 3가지.\n\n총 600~800자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+  await streamToSections(prompt, [0,1,2], '가족·인연 분석', ysFinal, '', true);
+  try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
+// ── 인생 타이밍 가이드 ──
+async function generateTimingReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const db = buildDaeunBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const prompt2A = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['이직/커리어','투자/재테크'])}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 현재 인생 국면 진단 — 현재 대운 ${_daeun||'미확인'}의 위치에서 이 사주가 어떤 국면(성장기/수확기/전환기/정비기)에 있는지 진단. 대운 천간·지지가 일간에 어떤 십신으로 작용하는지. 지금이 공격적으로 나갈 때인지, 내실을 다질 때인지.\n2. 향후 3년 핵심 타이밍 — 올해~내후년까지 세운이 이 사주에 미치는 영향. 각 해의 핵심 에너지와 기회/주의 포인트. 가장 중요한 해와 이유.\n3. 대운 전환기 분석 — 다음 대운 전환까지 남은 시간과 전환 시 예상되는 에너지 변화. 전환 전 준비해야 할 것. 이전 대운에서 현재 대운으로 바뀔 때의 패턴 참고.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+  await streamToSections(prompt2A, [0,1,2], '인생 타이밍 분석', ysFinal, '', false);
+  const prompt2B = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['창업/비즈니스','대인관계/부부'])}\n${buildYongsinBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 올해 월별 타이밍 포인트 — 올해 12개월 중 에너지가 강한 달, 주의할 달, 결정에 좋은 달을 구체적으로. 월별 천간·지지와 일간의 관계 기반.\n5. 타이밍 활용 실전 전략 — 이직·전직 최적 시기, 투자·계약 적기, 연애·결혼 유리한 시기, 건강 주의 시기를 종합. 지금 당장 타이밍에 맞춰 실행할 액션 3가지.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(prompt2B, [3,4], '인생 타이밍 분석', ysFinal, '', true);
+  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
+// ── 재물 타이밍 특화 ──
+async function generateWealthTimingReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const db = buildDaeunBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const prompt2A = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['투자/재테크','창업/비즈니스'])}\n${buildYongsinBlock(['직업'])}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 재물 에너지 구조 핵심 — 재성(정재·편재)의 위치와 강약, 식상생재 흐름 유무, 비겁이 재를 뺏는 구조인지. 이 사주의 돈이 들어오는 경로와 나가는 경로.\n2. 대운별 재물 흐름 — 과거 대운~현재 대운~다음 대운에서 재물 에너지가 어떻게 변하는지. 재성이 강해지는 대운, 약해지는 대운. 지금 대운 ${_daeun||'미확인'}의 재물 에너지.\n3. 올해 재물 타이밍 — 올해 세운 ${_sewun||''}이 재성에 미치는 영향. 돈이 들어오는 시기, 큰 지출 주의 시기. 투자·계약에 유리한 시점.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성. 구체적 금액 예측 절대 금지.`;
+  await streamToSections(prompt2A, [0,1,2], '재물 타이밍 분석', ysFinal, '', false);
+  const prompt2B = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['투자/재테크'])}\n${buildYongsinBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 월별 재물 포인트 — 올해 12개월 중 재물 에너지가 활성화되는 달, 지출 주의 달, 투자 적기를 구체적으로. 월별 재성·식상 활성도 기반.\n5. 재물 극대화 실천 전략 — 이 사주 구조에 맞는 재물 전략(저축형/투자형/사업형). 용신(${ysFinal}) 기반 재물 개운법. 지금 당장 실행할 재물 액션 3가지와 절대 피해야 할 재물 패턴.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성. 구체적 금액·종목 예측 절대 금지.`;
+  await streamToSections(prompt2B, [3,4], '재물 타이밍 분석', ysFinal, '', true);
+  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
+// ── 고전 명리 해석 ──
+async function generateClassicReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const CHEONSU_MAP = {'甲':'甲木參天 脂地合德 虛心以待 棟梁之材','乙':'乙木雖柔 刲羊解牛 懷丁抱丙 跨鳳乘猴','丙':'丙火猛烈 欺霜侮雪 能鍛庚金 逢辛反怯','丁':'丁火柔中 內性昭融 抱乙而孝 合壬而忠','戊':'戊土固重 旣中且正 靜翕動闢 萬物司命','己':'己土卑濕 中正蓄藏 不愁木盛 不畏水狂','庚':'庚金帶煞 剛健爲最 得水而淸 得火而銳','辛':'辛金軟弱 溫潤而淸 畏土之多 樂水之盈','壬':'壬水通河 能泄金氣 剛中之德 周流不滯','癸':'癸水至弱 達於天津 龍德而運 功化斯神'};
+  const STEM_H = {'갑':'甲','을':'乙','병':'丙','정':'丁','무':'戊','기':'己','경':'庚','신':'辛','임':'壬','계':'癸'};
+  const dayStem = (_ilju||'')[0] || '';
+  const stemH = STEM_H[dayStem] || '';
+  const cheonsuText = CHEONSU_MAP[stemH] || '';
+  const prompt2A = `${profileStr}\n\n${sb2}\n${buildAccuracyLayerBlock()}\n\n적천수 원문 (${stemH} 일간): ${cheonsuText}\n\n섹션 구성:\n1. 적천수 일간론 해석 — 위 적천수 원문을 현대 한국어로 풀이하고 이 사주에 구체적으로 어떻게 적용되는지 해석. 원문의 핵심 의미와 이 사람의 일간 특성을 연결.\n2. 자평진전 격국 분석 — 격국(${_geokguk||'미확인'})을 자평진전 관점에서 분석. 격국의 성패(成敗), 용신이 격국을 돕는 구조인지, 격국이 깨지는 조건은 무엇인지. 정격/변격 판단 근거.\n3. 조후·납음 해석 — 이 사주의 월지 기준 조후(계절 에너지) 분석. 조후 용신과 억부 용신의 일치/불일치. 일주의 납음 오행이 가리키는 에너지 특성과 의미.\n\n총 700~1000자. 섹션 번호(1. 2. 3.) 붙여 작성. 고전 원문 인용 시 한문+한글 병기.`;
+  await streamToSections(prompt2A, [0,1,2], '고전 명리 해석', ysFinal, '', false);
+  const prompt2B = `${profileStr}\n\n${sb2}\n${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 통근·일주 종합론 — 일간의 통근(뿌리) 강약을 고전 관점에서 분석. 어느 기둥에 뿌리가 있고 얼마나 강한지. 일주(${_ilju||''}) 60갑자 특성을 고전 명리 관점으로 해석.\n5. 고전 관점 인생 방향 — 적천수·자평진전·조후·납음을 종합한 이 사주의 인생 방향과 처세 지침. 고전 명리가 권하는 삶의 자세와 주의점. 실생활 적용 방향 3가지.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(prompt2B, [3,4], '고전 명리 해석', ysFinal, '', true);
+  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
 // ── 응답을 섹션 배열에 나눠 표시 ──
