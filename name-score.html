@@ -8,38 +8,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --void: #0a0a1a;
+  --bg: #0d0d14;
+  --surface: #13131a;
+  --surface2: #1c1c28;
+  --border: #2a2a3d;
+  --text: #e8e0f0;
+  --muted: #6b6b85;
   --gold: #d4af37;
-  --gold-dim: rgba(212,175,55,0.15);
-  --gold-border: rgba(212,175,55,0.25);
-  --text: #ede6f8;
-  --text-dim: #9b8fb0;
-  --card: rgba(255,255,255,0.03);
-  --border: rgba(255,255,255,0.07);
+  --gold-dim: rgba(212,175,55,0.12);
+  --gold-border: rgba(212,175,55,0.3);
+  --text-dim: #6b6b85;
+  --card: #13131a;
+  --void: #0d0d14;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
-  background: var(--void);
+  background: var(--bg);
   color: var(--text);
   font-family: 'Noto Serif KR', serif;
   min-height: 100vh;
   overflow-x: hidden;
 }
-.bg { position:fixed; inset:0; z-index:0; pointer-events:none; }
-.bg-nebula {
-  position:absolute; inset:0;
-  background:
-    radial-gradient(ellipse 70% 50% at 15% 20%, rgba(60,20,100,0.5) 0%, transparent 65%),
-    radial-gradient(ellipse 50% 70% at 85% 80%, rgba(20,8,50,0.65) 0%, transparent 65%);
-}
-.star { position:absolute; border-radius:50%; background:#fff; animation:twinkle var(--d,3s) ease-in-out infinite; }
-@keyframes twinkle { 0%,100%{opacity:var(--o,0.3)}50%{opacity:calc(var(--o,0.3)*0.2)} }
 nav {
-  position: fixed; top:0; left:0; right:0; z-index:100;
-  padding: 14px 20px;
+  position: sticky; top:0; left:0; right:0; z-index:100;
+  background: rgba(13,13,20,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px; height:56px;
   display: flex; align-items:center; justify-content:space-between;
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(212,175,55,0.07);
 }
 .nav-brand {
   display:flex; align-items:center; gap:8px;
@@ -47,39 +43,52 @@ nav {
   font-size:14px; letter-spacing:0.2em; font-weight:700;
   font-family:'Noto Serif KR',serif;
 }
-.nav-brand img { height:44px; object-fit:contain; flex-shrink:0; }
+.nav-brand img { height:40px; object-fit:contain; flex-shrink:0; }
 .nav-back {
-  font-size:11px; color:var(--text-dim); text-decoration:none;
-  letter-spacing:0.1em; transition:color 0.2s; cursor:pointer;
+  font-size:13px; color:var(--muted); text-decoration:none;
+  transition:color 0.2s; cursor:pointer;
   background:none; border:none; font-family:inherit;
 }
 .nav-back:hover { color:var(--gold); }
 .wrap {
   position:relative; z-index:1;
   max-width: 480px; margin:0 auto;
-  padding: 90px 20px 80px;
+  padding: 20px 16px 60px;
+}
+.page-header {
+  margin-bottom: 16px; padding: 0 4px;
+}
+.page-header-tag {
+  font-size:10px; letter-spacing:0.15em; color:var(--muted);
+  text-transform:uppercase; margin-bottom:4px;
+}
+.page-header-title {
+  font-size:22px; font-weight:700; color:var(--text);
+  margin:0 0 4px; font-family:'Noto Serif KR',serif;
+}
+.page-header-sub {
+  font-size:12px; color:var(--muted);
 }
 .section-label {
-  font-size:10px; letter-spacing:0.4em; color:var(--gold);
-  text-transform:uppercase; margin-bottom:20px; opacity:0.7;
+  font-size:10px; letter-spacing:0.15em; color:var(--muted);
+  text-transform:uppercase; margin-bottom:12px;
 }
 .mode-tabs {
-  display:grid; grid-template-columns:repeat(3,1fr);
-  gap:6px; margin-bottom:18px;
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:6px; margin-bottom:14px;
 }
 .mode-tab {
-  background: var(--card); border:1px solid var(--border);
-  border-radius:10px; padding:10px 6px;
+  background: var(--surface2); border:1px solid var(--border);
+  border-radius:10px; padding:10px 4px;
   text-align:center; cursor:pointer;
   font-family:'Noto Serif KR',serif; font-size:12px;
-  color:var(--text-dim); transition:all 0.22s; letter-spacing:0.04em;
+  color:var(--muted); transition:all 0.22s;
 }
 .mode-tab:hover { border-color:var(--gold-border); color:var(--text); }
 .mode-tab.active { background:var(--gold-dim); border-color:var(--gold); color:var(--gold); }
 .input-card {
-  background: var(--card); border:1px solid var(--border);
-  border-radius:18px; padding:24px; margin-bottom:14px;
-  backdrop-filter:blur(10px);
+  background: var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:20px; margin-bottom:14px;
 }
 .name-row { display:grid; grid-template-columns:1fr 2fr; gap:12px; margin-bottom:18px; }
 .field-label { font-size:11px; color:var(--text-dim); margin-bottom:8px; letter-spacing:0.08em; display:block; }
@@ -318,10 +327,6 @@ nav {
 </head>
 <body>
 
-<div class="bg">
-  <div class="bg-nebula"></div>
-  <div id="bgStars"></div>
-</div>
 <div class="toast" id="toast"></div>
 
 <nav>
@@ -333,13 +338,20 @@ nav {
 </nav>
 
 <div class="wrap">
+  <div class="page-header">
+    <div class="page-header-tag">NAME · 성명학</div>
+    <h1 class="page-header-title">내 이름은 몇 점일까?</h1>
+    <div class="page-header-sub">81수리 · 음오행 · 음양 배합 · 용신 매칭</div>
+  </div>
+
   <div class="mode-tabs">
     <div class="mode-tab active" id="tabAuto" onclick="setMode('auto')">한글 자동</div>
     <div class="mode-tab" id="tabSelect" onclick="setMode('select')">한자 선택</div>
     <div class="mode-tab" id="tabManual" onclick="setMode('manual')">한자 수동</div>
+    <div class="mode-tab" id="tabRecommend" onclick="setMode('recommend')">이름 추천</div>
   </div>
 
-  <div class="input-card">
+  <div class="input-card" id="inputCardMain">
     <div class="name-row">
       <div>
         <label class="field-label">성(姓)</label>
@@ -358,6 +370,28 @@ nav {
     </div>
     <button class="btn-gold" id="btnCalc" onclick="calcScore()">점수 확인</button>
   </div>
+
+  <div class="input-card" id="recommendCard" style="display:none;">
+    <div style="margin-bottom:14px;">
+      <label class="field-label">성(姓)</label>
+      <input class="name-input" id="recSur" type="text" maxlength="3" placeholder="김">
+    </div>
+    <div style="margin-bottom:14px;">
+      <label class="field-label">성별 (선택)</label>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="mode-tab active" id="recGenderAll" onclick="setRecGender('all')" style="flex:1;">전체</button>
+        <button type="button" class="mode-tab" id="recGenderM" onclick="setRecGender('M')" style="flex:1;">남아</button>
+        <button type="button" class="mode-tab" id="recGenderF" onclick="setRecGender('F')" style="flex:1;">여아</button>
+      </div>
+    </div>
+    <div id="recYongsinHint" style="font-size:11px; color:var(--text-dim); margin-bottom:14px; padding:10px; background:rgba(255,255,255,0.03); border-radius:8px; border-left:2px solid rgba(212,175,55,0.3); line-height:1.6;">
+      로그인 후 프로필을 등록하시면 내 사주 용신과 매칭되는 이름을 우선 추천해드립니다.
+    </div>
+    <button class="btn-gold" id="btnRecommend" onclick="runRecommend()">이름 추천받기</button>
+    <div class="orb-hint">길수 4격 중심으로 5개 추천</div>
+  </div>
+
+  <div id="recommendResult" style="display:none; margin-bottom:14px;"></div>
 
   <div class="result-area" id="resultArea">
     <div class="section-label">4격 수리 결과</div>
@@ -394,17 +428,6 @@ nav {
 </div>
 
 <script>
-(function() {
-  var c = document.getElementById('bgStars');
-  for (var i = 0; i < 60; i++) {
-    var s = document.createElement('div');
-    s.className = 'star';
-    var size = Math.random() * 1.8 + 0.4;
-    s.style.cssText = 'width:'+size+'px;height:'+size+'px;left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;--o:'+(Math.random()*0.25+0.05)+';--d:'+(Math.random()*4+2)+'s;';
-    c.appendChild(s);
-  }
-})();
-
 var GRADE_SCORE = { '대길': 100, '길': 75, '반길': 50, '흉': 25, '대흉': 0 };
 
 function getScoreComment(score) {
@@ -679,14 +702,201 @@ var hanjaManual   = {};
 
 function setMode(m) {
   currentMode = m;
-  ['auto','select','manual'].forEach(function(id) {
+  ['auto','select','manual','recommend'].forEach(function(id) {
     var el = document.getElementById('tab' + id.charAt(0).toUpperCase() + id.slice(1));
     if (el) el.classList.toggle('active', id === m);
   });
-  document.getElementById('hanjaArea').style.display  = (m === 'select') ? 'block' : 'none';
-  document.getElementById('strokeArea').style.display = (m === 'manual') ? 'block' : 'none';
-  if (m === 'select') renderHanjaSelect();
-  if (m === 'manual') renderStrokeArea();
+  var isRec = (m === 'recommend');
+  document.getElementById('inputCardMain').style.display = isRec ? 'none' : 'block';
+  document.getElementById('recommendCard').style.display = isRec ? 'block' : 'none';
+  document.getElementById('resultArea').classList.toggle('show', !isRec && lastScores);
+  document.getElementById('recommendResult').style.display = isRec ? 'block' : 'none';
+  if (!isRec) {
+    document.getElementById('hanjaArea').style.display  = (m === 'select') ? 'block' : 'none';
+    document.getElementById('strokeArea').style.display = (m === 'manual') ? 'block' : 'none';
+    if (m === 'select') renderHanjaSelect();
+    if (m === 'manual') renderStrokeArea();
+  } else {
+    prefillRecommend();
+  }
+}
+
+var recGender = 'all';
+function setRecGender(g) {
+  recGender = g;
+  ['all','M','F'].forEach(function(x){
+    var el = document.getElementById('recGender' + x);
+    if (el) el.classList.toggle('active', x === g);
+  });
+}
+
+function prefillRecommend() {
+  var curSur = document.getElementById('inputSur').value.trim();
+  var recSur = document.getElementById('recSur');
+  if (curSur && !recSur.value) recSur.value = curSur;
+  var hint = document.getElementById('recYongsinHint');
+  if (_yongsin) {
+    var ys = getYongsinOhaeng(_yongsin);
+    var KO_OH = {'목':'木','화':'火','토':'土','금':'金','수':'水'};
+    hint.innerHTML = '내 용신: <b style="color:var(--gold);">' + _yongsin + '</b> (' + ys + '오행) — 이 오행을 가진 한자를 우선 추천합니다.';
+  } else {
+    var user = null;
+    try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+    if (!user) {
+      hint.innerHTML = '로그인 후 프로필을 등록하시면 내 사주 용신과 매칭되는 이름을 우선 추천해드립니다.';
+    } else {
+      hint.innerHTML = '프로필 등록 시 내 사주 용신과 매칭되는 이름을 우선 추천해드립니다.';
+    }
+  }
+}
+
+// 여아/남아 선호 오행 키워드 (의미 기반 대략 분류)
+var MALE_PREF_MEAN = ['굳세다','강하다','크다','높다','세우다','건강하다','빛나다','이루다','용','뛰어나다','임금','장수','나라','하늘','무예','준마','의롭다','지혜','명예','온전하다','건장하다','받들다','공경하다'];
+var FEMALE_PREF_MEAN = ['아름답다','예쁘다','상서롭다','맑다','꽃답다','옥','향기롭다','꽃','연꽃','난초','기쁘다','편안하다','착하다','부드럽다','은혜','우아하다','빛나다','구슬','보배','사랑'];
+
+function scoreGenderFit(meaning, gender) {
+  if (gender === 'all' || !meaning) return 0;
+  var list = gender === 'M' ? MALE_PREF_MEAN : FEMALE_PREF_MEAN;
+  for (var i=0; i<list.length; i++) if (meaning.indexOf(list[i]) >= 0) return 3;
+  return 0;
+}
+
+function runRecommend() {
+  var sur = document.getElementById('recSur').value.trim();
+  if (!sur) { showToast('성(姓)을 입력해주세요', true); return; }
+  var surList = SURNAME_HANJA[sur];
+  if (!surList || !surList.length) { showToast('등록된 성씨가 아닙니다', true); return; }
+  var surItem = surList[0]; // [hanja, strokes, oheng]
+  var surHanja = surItem[0], surSt = surItem[1];
+  var yongsinHan = null;
+  if (_yongsin) {
+    var yoh = getYongsinOhaeng(_yongsin);
+    var KO_OH = {'목':'木','화':'火','토':'土','금':'金','수':'水'};
+    yongsinHan = KO_OH[yoh];
+  }
+
+  // 모든 이름 한자 flatten
+  var all = [];
+  Object.keys(NAME_HANJA).forEach(function(sy) {
+    NAME_HANJA[sy].forEach(function(item) {
+      all.push({ syl: sy, hj: item[0], st: item[1], mean: item[2], oh: item[3] });
+    });
+  });
+
+  // 외자 2자 조합에 대해 점수 계산
+  var cands = [];
+  for (var i=0; i<all.length; i++) {
+    for (var j=0; j<all.length; j++) {
+      if (i === j) continue;
+      var a = all[i], b = all[j];
+      if (a.syl === b.syl) continue; // 동일 음절 배제
+      var A = surSt, B = a.st, C = b.st;
+      var won = normalize81(B + C);
+      var hyun = normalize81(A + B);
+      var yi = normalize81(A + C);
+      var jung = normalize81(A + B + C);
+      var grades = [SURI_TABLE[won], SURI_TABLE[hyun], SURI_TABLE[yi], SURI_TABLE[jung]];
+      var goodCnt = grades.filter(function(g){ return g==='대길' || g==='길'; }).length;
+      var badCnt  = grades.filter(function(g){ return g==='흉' || g==='대흉'; }).length;
+      if (goodCnt < 3 || badCnt > 0) continue; // 길수 3개 이상 + 흉수 없음
+
+      // 음오행 상극 배제
+      var allChars = sur.split('').concat([a.syl, b.syl]);
+      var eumOhs = allChars.map(function(c){ return getEumOhaeng(c); });
+      var hasGeuk = false;
+      for (var k=0; k<eumOhs.length-1; k++) {
+        if (checkRelation(eumOhs[k], eumOhs[k+1]) === '상극') { hasGeuk = true; break; }
+      }
+      if (hasGeuk) continue;
+
+      // 점수: 4격 + 용신 + 성별
+      var sumScore = grades.reduce(function(acc,g){ return acc + (GRADE_SCORE[g]||0); }, 0) / 4;
+      var ysBonus = 0;
+      if (yongsinHan) {
+        if (a.oh === yongsinHan) ysBonus += 15;
+        if (b.oh === yongsinHan) ysBonus += 15;
+      }
+      var gBonus = scoreGenderFit(a.mean, recGender) + scoreGenderFit(b.mean, recGender);
+      cands.push({
+        name: a.syl + b.syl,
+        hanja: a.hj + b.hj,
+        strokes: [surSt, a.st, b.st],
+        ohs: [surItem[2], a.oh, b.oh],
+        means: [a.mean, b.mean],
+        gyek: { won: won, hyun: hyun, yi: yi, jung: jung },
+        grades: grades,
+        total: Math.round(sumScore + ysBonus + gBonus),
+        baseTotal: Math.round(sumScore),
+        ysMatch: yongsinHan ? (a.oh === yongsinHan ? 1 : 0) + (b.oh === yongsinHan ? 1 : 0) : 0
+      });
+    }
+  }
+
+  cands.sort(function(x,y){ return y.total - x.total; });
+
+  // 중복(같은 이름) 제거
+  var seen = {}, top = [];
+  for (var n=0; n<cands.length && top.length<5; n++) {
+    var key = cands[n].name;
+    if (seen[key]) continue;
+    seen[key] = 1;
+    top.push(cands[n]);
+  }
+
+  renderRecommend(sur, surHanja, top);
+}
+
+function renderRecommend(sur, surHanja, top) {
+  var el = document.getElementById('recommendResult');
+  if (!top.length) {
+    el.innerHTML = '<div class="analysis-card" style="text-align:center; color:var(--text-dim);">조건에 맞는 이름을 찾지 못했습니다. 다른 성씨로 시도해주세요.</div>';
+    return;
+  }
+  var html = '<div class="section-label">' + sur + '씨 추천 이름 TOP ' + top.length + '</div>';
+  top.forEach(function(c, idx) {
+    var ok = c.grades.filter(function(g){ return g==='대길'; }).length;
+    html += '<div class="analysis-card" style="margin-bottom:12px;">';
+    html += '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">';
+    html += '<div><span style="font-size:11px; color:var(--gold); letter-spacing:0.15em;">#' + (idx+1) + '</span>';
+    html += '<div style="font-size:22px; font-weight:600; color:var(--text); margin-top:4px;">' + sur + c.name + ' <span style="color:var(--gold); font-size:18px;">(' + surHanja + c.hanja + ')</span></div></div>';
+    html += '<div style="text-align:right;"><div style="font-size:10px; color:var(--text-dim); letter-spacing:0.1em;">TOTAL</div><div style="font-size:28px; color:var(--gold); font-weight:700; line-height:1;">' + c.baseTotal + '</div><div style="font-size:10px; color:var(--text-dim);">/100</div></div>';
+    html += '</div>';
+
+    // 4격 뱃지
+    html += '<div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">';
+    var gyekLabels = [
+      { k:'정격', v:c.gyek.jung, g:c.grades[3] },
+      { k:'형격', v:c.gyek.hyun, g:c.grades[1] },
+      { k:'원격', v:c.gyek.won,  g:c.grades[0] },
+      { k:'이격', v:c.gyek.yi,   g:c.grades[2] }
+    ];
+    gyekLabels.forEach(function(gy) {
+      html += '<span class="score-badge grade-' + gy.g + '" style="font-size:11px;">' + gy.k + ' ' + gy.v + ' · ' + gy.g + '</span>';
+    });
+    html += '</div>';
+
+    // 오행 + 의미
+    html += '<div style="font-size:12px; color:var(--text-dim); line-height:1.8;">';
+    html += '한자: <b style="color:var(--text);">' + c.hanja + '</b> — ';
+    html += c.means.map(function(m, i){ return m + '(' + c.ohs[i+1] + ')'; }).join(', ');
+    if (c.ysMatch > 0) html += '<br><span style="color:#4caf7a;"><i class="pi pi-check"></i> 용신 오행 ' + c.ysMatch + '자 일치</span>';
+    html += '</div>';
+
+    // 액션 버튼
+    html += '<div style="margin-top:12px; display:flex; gap:8px;">';
+    html += '<button class="mode-tab" style="flex:1; cursor:pointer;" onclick="applyRecommend(\'' + sur + '\',\'' + c.name + '\')">이 이름 상세보기</button>';
+    html += '</div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function applyRecommend(sur, name) {
+  setMode('auto');
+  document.getElementById('inputSur').value = sur;
+  document.getElementById('inputName').value = name;
+  calcScore();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function onNameInput() {
