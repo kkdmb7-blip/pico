@@ -563,15 +563,17 @@
   .saju-submit-btn {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #7b5ea7, #a07fd4);
-    color: #fff;
-    border: none;
+    background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(123,94,167,0.06));
+    color: var(--gold, #d4af37);
+    border: 1.5px solid rgba(212,175,55,0.5);
     border-radius: 12px;
     font-size: 15px;
     font-weight: 700;
     font-family: 'Noto Serif KR', serif;
     cursor: pointer;
     margin-top: 8px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0 0 20px rgba(212,175,55,0.08);
     transition: all 0.2s;
   }
   .saju-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(123,94,167,0.4); }
@@ -634,9 +636,9 @@
     display: block;
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #7b5ea7, #a07fd4);
-    color: #fff;
-    border: none;
+    background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(123,94,167,0.06));
+    color: var(--gold, #d4af37);
+    border: 1.5px solid rgba(212,175,55,0.5);
     border-radius: 12px;
     font-size: 15px;
     font-weight: 700;
@@ -644,10 +646,13 @@
     cursor: pointer;
     text-decoration: none;
     text-align: center;
-    transition: all 0.2s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0 0 20px rgba(212,175,55,0.08);
+    position: relative;
+    overflow: hidden;
     margin-top: 4px;
   }
-  .saju-cta-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(123,94,167,0.4); }
+  .saju-cta-btn:hover { transform: translateY(-1px); border-color: rgba(212,175,55,0.8); box-shadow: 0 0 30px rgba(212,175,55,0.15); }
   .saju-back-btn {
     background: none;
     border: none;
@@ -1047,8 +1052,8 @@
         style="flex:2;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 8px;color:var(--text);font-size:14px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:border-color 0.2s;"
         onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
       <button onclick="nsCalc()" id="nsBtn"
-        style="flex-shrink:0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);border:none;border-radius:10px;padding:11px 14px;color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.25s;"
-        onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        style="flex-shrink:0;background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(123,94,167,0.06));border:1.5px solid rgba(212,175,55,0.5);border-radius:10px;padding:11px 14px;color:#d4af37;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:border-color 0.3s,box-shadow 0.3s;box-shadow:0 0 20px rgba(212,175,55,0.08);"
+        onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(212,175,55,0.8)';this.style.boxShadow='0 0 30px rgba(212,175,55,0.15)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(212,175,55,0.5)';this.style.boxShadow='0 0 20px rgba(212,175,55,0.08)'">
         점수 확인
       </button>
     </div>
