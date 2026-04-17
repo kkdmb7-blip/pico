@@ -349,7 +349,7 @@ function revealCards() {
     wrap.appendChild(lbl);
     var cardEl = document.createElement('div'); cardEl.className = 'tarot-card';
     var inner = document.createElement('div'); inner.className = 'tarot-card-inner';
-    var back = document.createElement('div'); back.className = 'tarot-card-back'; back.textContent = '<i class="pi pi-crystal"></i>';
+    var back = document.createElement('div'); back.className = 'tarot-card-back'; back.innerHTML = '<i class="pi pi-crystal"></i>';
     var front = document.createElement('div'); front.className = 'tarot-card-front';
     var img = new Image();
     img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';

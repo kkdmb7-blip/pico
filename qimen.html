@@ -828,7 +828,7 @@
         </div>
         <div class="interp-paid-desc">격국 전체 해설 · 시간대별 행동 전략 · 맞춤 조언 · 운세 종합 리포트</div>
       </div>
-      <button class="btn-paid" onclick="alert('준비 중입니다. 곧 오픈될 예정이에요! <i class="pi pi-crystal"></i>')"><i class="pi pi-lock"></i> AI 정밀 해석 받기 <i class="pi pi-crystal"></i><br><span style="font-size:10px;font-weight:400;opacity:0.7">20 Orb 사용</span></button>
+      <button class="btn-paid" onclick="alert('준비 중입니다. 곧 오픈될 예정이에요! 🔮')">🔒 AI 정밀 해석 받기 🔮<br><span style="font-size:10px;font-weight:400;opacity:0.7">20 Orb 사용</span></button>
     </div>
   </div>
 
@@ -2151,7 +2151,7 @@ function _drawQimenCard(cb) {
   y += 38;
   ctx.font = '700 30px "Noto Sans KR", sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.fillText('<i class="pi pi-compass"></i> 오늘의 최길 방향', W/2, y);
+  ctx.fillText('🧭 오늘의 최길 방향', W/2, y);
 
   y += 44;
   var chipW = 200, chipH = 72, chipGap = 16;
@@ -2202,7 +2202,7 @@ function shareQimenKakao() {
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
 
   _drawQimenCard(function(canvas) {
-    if (btn) { btn.disabled = false; btn.textContent = '<i class="pi pi-compass"></i> 카카오톡 공유'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="pi pi-compass"></i> 카카오톡 공유'; }
     if (!canvas) { _qimenShowToast('카드 생성 실패 <i class="pi pi-sad"></i>'); return; }
 
     // URL 클립보드 복사

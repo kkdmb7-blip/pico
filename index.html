@@ -2318,7 +2318,7 @@ async function submitGunghap() {
   var commentEl = document.getElementById('ghResComment');
   var detailEl  = document.getElementById('ghResDetail');
 
-  if (namesEl) namesEl.textContent = myName + ' <i class="pi pi-heart"></i> ' + pNameDisp;
+  if (namesEl) namesEl.innerHTML = myName + ' ❤ ' + pNameDisp;
   if (cardsEl) cardsEl.innerHTML = _sajuMiniCard(mySaju,'나',myName,myGender) + _sajuMiniCard(pSaju,'상대방',pNameDisp,_ghPartnerGender);
   if (aiEl)    { aiEl.innerHTML = ''; aiEl.style.display = 'none'; }
   if (scoreEl) scoreEl.textContent = score.total;
@@ -2580,7 +2580,7 @@ async function requestGunghapAI() {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         user_id: user.id, type: 'gunghap',
-        title: myName + ' <i class="pi pi-heart"></i> ' + pNameDisp + ' 궁합',
+        title: myName + ' ❤ ' + pNameDisp + ' 궁합',
         result: {
           personA: { name:myName, ilju:iljuA, ohaeng:ohaengA, strength:strA, yongsin:myYS },
           personB: { name:pNameDisp, ilju:iljuB, ohaeng:ohaengB, strength:strB, yongsin:pYS },
@@ -2591,7 +2591,7 @@ async function requestGunghapAI() {
     });
     var savedMsg = document.createElement('div');
     savedMsg.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:rgba(255,255,255,0.35);margin-top:8px;';
-    savedMsg.textContent = '<i class="pi pi-check"></i> 자동 저장됨 · 지난 분석에서 다시 볼 수 있어요';
+    savedMsg.innerHTML = '<i class="pi pi-check"></i> 자동 저장됨 · 지난 분석에서 다시 볼 수 있어요';
     aiEl.appendChild(savedMsg);
   } catch(e) {}
 
@@ -2829,7 +2829,7 @@ function _drawGunghapCard(cb) {
     ctx.fillStyle = 'rgba(255,255,255,0.45)';
     ctx.font = '12px "Noto Serif KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(myName + '  <i class="pi pi-heart"></i>  ' + pName, W/2, y + H_NAMES/2);
+    ctx.fillText(myName + '  ❤  ' + pName, W/2, y + H_NAMES/2);
     y += H_NAMES + GAP;
 
     // ── 점수 (48px, 실제화면과 동일)
@@ -2976,7 +2976,7 @@ function shareGunghapKakao() {
   var pName  = window._ghLastPName  || '상대방';
   var score  = calcGunghapScore(window._ghLastMySaju, window._ghLastPSaju);
   var pageUrl = 'https://picolab.kr';
-  var text = '<i class="pi pi-heart"></i> FORTUNA 궁합 결과\n' + myName + ' <i class="pi pi-heart"></i> ' + pName + '\n' + score.total + '점 · ' + score.comment + '\n\n나도 확인해봐 <i class="pi pi-down"></i>\n' + pageUrl;
+  var text = '❤ FORTUNA 궁합 결과\n' + myName + ' ❤ ' + pName + '\n' + score.total + '점 · ' + score.comment + '\n\n나도 확인해봐 👇\n' + pageUrl;
 
   function resetBtn() {
     if (btn) { btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="#3c1e1e"><path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.07 1.7 5.78 4.32 7.46L5.5 22l4.27-2.14C10.47 20.28 11.22 20.4 12 20.4c5.52 0 10-3.92 10-8.8C22 5.92 17.52 2 12 2z"/></svg> 카카오톡 공유'; btn.disabled = false; }
@@ -3004,7 +3004,7 @@ function shareGunghapKakao() {
           Kakao.Share.sendDefault({
             objectType: 'feed',
             content: {
-              title: '<i class="pi pi-heart"></i> FORTUNA 궁합 · ' + myName + ' <i class="pi pi-heart"></i> ' + pName,
+              title: '❤ FORTUNA 궁합 · ' + myName + ' ❤ ' + pName,
               description: score2.total + '점 · ' + score2.comment + '\n두 사람의 인연을 확인해보세요!',
               imageUrl: 'https://picolab.kr/og-image.png',
               link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
@@ -3255,8 +3255,8 @@ var _birthGender = 'M';
 var _qimenGender = 'M';
 
 var BIRTH_CONFIG = {
-  astro:  { title: '<i class="pi pi-star"></i> 서양 점성술', url: 'astro.html', extra: {} },
-  vedic:  { title: '<i class="pi pi-om"></i>️ 베딕 점성술', url: 'vedic.html', extra: {} },
+  astro:  { title: '🌟 서양 점성술', url: 'astro.html', extra: {} },
+  vedic:  { title: '🕉️ 베딕 점성술', url: 'vedic.html', extra: {} },
   ziwei:  { title: '⭐ 자미두수',     url: 'ziwei.html', extra: {} },
 };
 
@@ -3426,12 +3426,12 @@ function checkAuth() {
 
 function shareMainKakao() {
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '<i class="pi pi-crystal"></i> 포르투나 운세 - 사주·기문·점성·베딕·자미 5개 엔진 교차 분석!\n\n오늘 내 운세 점수가 궁금하면 확인해봐 <i class="pi pi-down"></i>\n무료로 바로 볼 수 있어!';
+  var text = '🔮 포르투나 운세 - 사주·기문·점성·베딕·자미 5개 엔진 교차 분석!\n\n오늘 내 운세 점수가 궁금하면 확인해봐 👇\n무료로 바로 볼 수 있어!';
   if (navigator.share) {
     navigator.share({ title: 'FORTUNA 운세', text: text, url: pageUrl }).catch(function(){});
   } else {
     navigator.clipboard && navigator.clipboard.writeText(text + '\n' + pageUrl)
-      .then(function() { alert('<i class="pi pi-notepad"></i> 클립보드에 복사됐어요! 카카오톡에 붙여넣어 주세요'); });
+      .then(function() { alert('📝 클립보드에 복사됐어요! 카카오톡에 붙여넣어 주세요'); });
   }
 }
 
@@ -4291,10 +4291,10 @@ initHeroSelects();
         var s = document.createElement('div');
         s.id = 'cosmicSummary';
         s.style.cssText = 'margin-top:16px;padding:14px 20px;background:rgba(155,127,212,0.07);border:1px solid rgba(155,127,212,0.15);border-radius:14px;font-size:13px;color:rgba(237,232,245,0.8);text-align:center;font-family:\'Noto Serif KR\',serif;font-weight:300;line-height:1.8;';
-        s.textContent = '<i class="pi pi-sparkle"></i> ' + interp.summary;
+        s.innerHTML = '<i class="pi pi-sparkle"></i> ' + interp.summary;
         grid.parentNode.appendChild(s);
       } else {
-        summaryEl.textContent = '<i class="pi pi-sparkle"></i> ' + interp.summary;
+        summaryEl.innerHTML = '<i class="pi pi-sparkle"></i> ' + interp.summary;
       }
     }
   }
@@ -4407,7 +4407,7 @@ function updateMypageTab() {
         if (!sb) return;
         sb.from('orb_balance').select('balance').eq('user_id', uid).maybeSingle().then(function(res) {
           var badge = document.getElementById('mypageOrbBadge');
-          if (badge) badge.textContent = '<i class="pi pi-sparkle"></i> ' + ((res.data && res.data.balance != null) ? res.data.balance.toLocaleString() : '0') + ' Orb';
+          if (badge) badge.innerHTML = '<i class="pi pi-sparkle"></i> ' + ((res.data && res.data.balance != null) ? res.data.balance.toLocaleString() : '0') + ' Orb';
         });
       } catch(e) {}
     })(currentUser.id);
@@ -4442,7 +4442,7 @@ function updateMypageTab() {
       if (!sb) return;
       var res = await sb.from('orb_balance').select('balance').eq('user_id', userId).maybeSingle();
       var bal = (res.data && res.data.balance != null) ? res.data.balance : 0;
-      el.textContent = '<i class="pi pi-sparkle"></i> ' + bal.toLocaleString() + ' Orb';
+      el.innerHTML = '<i class="pi pi-sparkle"></i> ' + bal.toLocaleString() + ' Orb';
       el.style.display = 'block';
     } catch(e) {}
   }
@@ -4633,14 +4633,14 @@ async function refreshPushBtnLabel() {
   var btn = document.getElementById('btnPushLabel');
   if (!btn) return;
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    btn.textContent = '<i class="pi pi-bell"></i> 알림 미지원 브라우저';
+    btn.innerHTML = '<i class="pi pi-bell"></i> 알림 미지원 브라우저';
     document.getElementById('btnPushToggle').disabled = true;
     return;
   }
   try {
     var reg = await navigator.serviceWorker.ready;
     var sub = await reg.pushManager.getSubscription();
-    btn.textContent = sub ? '<i class="pi pi-bell"></i> 오늘의 명언 알림 끄기' : '<i class="pi pi-bell"></i> 오늘의 명언 알림 켜기';
+    btn.innerHTML = sub ? '<i class="pi pi-bell"></i> 오늘의 명언 알림 끄기' : '<i class="pi pi-bell"></i> 오늘의 명언 알림 켜기';
   } catch(e) {}
 }
 
@@ -4696,7 +4696,7 @@ window.togglePushSubscription = async function() {
     // 구독 해제
     await existing.unsubscribe();
     await deletePicoSubscription(user.id);
-    document.getElementById('btnPushLabel').textContent = '<i class="pi pi-bell"></i> 오늘의 명언 알림 켜기';
+    document.getElementById('btnPushLabel').innerHTML = '<i class="pi pi-bell"></i> 오늘의 명언 알림 켜기';
     return;
   }
 
@@ -4734,8 +4734,8 @@ window.togglePushSubscription = async function() {
     } catch(e2) {}
 
     await savePicoSubscription(user.id, user.name, sub, ilgan, geokguk, yongshin);
-    document.getElementById('btnPushLabel').textContent = '<i class="pi pi-bell"></i> 오늘의 명언 알림 끄기';
-    alert('<i class="pi pi-check"></i> 매일 아침 8시에 사주 맞춤 명언을 보내드릴게요!');
+    document.getElementById('btnPushLabel').innerHTML = '<i class="pi pi-bell"></i> 오늘의 명언 알림 끄기';
+    alert('✅ 매일 아침 8시에 사주 맞춤 명언을 보내드릴게요!');
   } catch(e) {
     console.error('[push]', e);
     alert('알림 설정 중 오류가 발생했어요.');

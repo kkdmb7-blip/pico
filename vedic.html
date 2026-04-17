@@ -208,7 +208,7 @@
         <div class="paid-title"><i class="pi pi-lock"></i> AI 심층 분석</div>
         <div class="paid-desc">낙샤트라 전체 해설 · 다샤 전략 · 카르마 분석 · 맞춤 운세 리포트</div>
       </div>
-      <button class="btn-paid" onclick="alert('AI 심층 분석은 곧 오픈됩니다! <i class="pi pi-crystal"></i>')">
+      <button class="btn-paid" onclick="alert('AI 심층 분석은 곧 오픈됩니다! 🔮')">
         <i class="pi pi-lock"></i> AI 정밀 해석 받기 <i class="pi pi-crystal"></i><br>
         <span style="font-size:10px;font-weight:400;opacity:.7">20 Orb 사용</span>
       </button>
@@ -751,7 +751,7 @@ function _drawVedicCard(cb) {
     ctx.fillStyle='rgba(232,184,109,0.06)';fRR(PAD,y,W-PAD*2,nakInterpH,20);
     ctx.strokeStyle='rgba(232,184,109,0.3)';ctx.lineWidth=1.5;sRR(PAD,y,W-PAD*2,nakInterpH,20);
     ctx.font='600 21px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(232,184,109,0.7)';
-    ctx.fillText('<i class="pi pi-sparkle"></i> '+(d.nakshatra||'')+' 낙샤트라 해석',W/2,y+46);
+    ctx.fillText('✨ '+(d.nakshatra||'')+' 낙샤트라 해석',W/2,y+46);
     ctx.font='400 25px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';
     fillWrapped(nakText,W/2,y+88,W-PAD*2-80,38);
     y+=nakInterpH+28;
@@ -759,7 +759,7 @@ function _drawVedicCard(cb) {
 
   // ── 다샤
   drawLine(y,180,0.3);y+=44;
-  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillText('<i class="pi pi-crystal"></i> 현재 다샤 (행성 대운)',W/2,y);y+=48;
+  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillText('🔮 현재 다샤 (행성 대운)',W/2,y);y+=48;
   if(d.dasha){
     var dashaItems=[];
     if(d.dasha.mahadasha)dashaItems.push({label:'마하다샤',val:d.dasha.mahadasha});
@@ -775,7 +775,7 @@ function _drawVedicCard(cb) {
 
   // ── 행성 배치 (2열, PLANET_KO_MAP2 사용)
   drawLine(y,180,0.3);y+=44;
-  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillText('<i class="pi pi-star"></i> 주요 행성 배치',W/2,y);y+=42;
+  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillText('🌟 주요 행성 배치',W/2,y);y+=42;
   var planets=(d.planets||[]).slice(0,9);
   var colW2=(W-PAD*2-20)/2;
   planets.forEach(function(p,i){
@@ -806,7 +806,7 @@ function shareVedicKakao() {
   preview.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
   modal.style.display = 'flex';
   _drawVedicCard(function(canvas){
-    if(btn){ btn.disabled=false; btn.textContent='<i class="pi pi-om"></i>️ 카카오톡 공유'; }
+    if(btn){ btn.disabled=false; btn.innerHTML='<i class="pi pi-om"></i>️ 카카오톡 공유'; }
     if(!canvas){ preview.innerHTML='<div style="color:#ff6b6b;padding:20px;">카드 생성 실패 <i class="pi pi-sad"></i></div>'; return; }
     window._vedicCanvas = canvas;
     var img = new Image(); img.src = canvas.toDataURL('image/png');

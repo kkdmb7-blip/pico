@@ -671,7 +671,7 @@ function _drawZiweiCard(cb) {
 
   // ── 현재 대한
   drawLine(y,220,0.4);y+=42;
-  ctx.font='600 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';ctx.fillText('<i class="pi pi-wave"></i> 현재 대한 大限',W/2,y);y+=40;
+  ctx.font='600 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';ctx.fillText('🌊 현재 대한 大限',W/2,y);y+=40;
   var dec=d.currentDecade;
   if(dec){
     ctx.font='bold 52px "Noto Serif KR",serif';ctx.fillStyle='#e8b86d';ctx.fillText(dec.name||'—',W/2,y);y+=44;
@@ -693,7 +693,7 @@ function _drawZiweiCard(cb) {
   var yr=d.currentYear;
   if(yr){
     drawLine(y,180,0.3);y+=36;
-    ctx.font='600 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fillText('<i class="pi pi-sparkle"></i> 유년 流年',W/2,y);y+=34;
+    ctx.font='600 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fillText('✨ 유년 流年',W/2,y);y+=34;
     ctx.font='700 32px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(232,184,109,0.85)';
     ctx.fillText((yr.heavenlyStem||'')+(yr.earthlyBranch||'')+' '+(yr.year||'')+'년 · '+(yr.palace||''),W/2,y);
   }

@@ -719,7 +719,7 @@ function openScoreShareCard() {
   }).catch(function() {
     var el = document.getElementById('_ssmCardEl');
     if (el) document.body.removeChild(el);
-    loading.textContent = '카드 생성 실패 <i class="pi pi-sad"></i>';
+    loading.innerHTML = '카드 생성 실패 <i class="pi pi-sad"></i>';
   });
 }
 
@@ -745,7 +745,7 @@ function shareScoreDirectKakao() {
   var overall = _scoreResult ? _scoreResult.overall : 0;
   var today = _scoreResult ? _scoreResult.today : '';
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '<i class="pi pi-crystal"></i> 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n재물/관계/건강/학업/이동 5개 분야 종합\n나도 확인해봐 <i class="pi pi-down"></i>';
+  var text = '🔮 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n재물/관계/건강/학업/이동 5개 분야 종합\n나도 확인해봐 👇';
   try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
 
   if (!_ssmCanvas) {
@@ -756,14 +756,14 @@ function shareScoreDirectKakao() {
         _doShareCanvas(btn, text, pageUrl);
       }
     }, 200);
-    setTimeout(function() { clearInterval(wait); if (btn) { btn.disabled=false; btn.textContent='<i class="pi pi-coin"></i> 카카오톡 공유'; } }, 8000);
+    setTimeout(function() { clearInterval(wait); if (btn) { btn.disabled=false; btn.innerHTML='<i class="pi pi-coin"></i> 카카오톡 공유'; } }, 8000);
   } else {
     _doShareCanvas(btn, text, pageUrl);
   }
 }
 
 function _doShareCanvas(btn, text, pageUrl) {
-  if (btn) { btn.disabled=false; btn.textContent='<i class="pi pi-coin"></i> 카카오톡 공유'; }
+  if (btn) { btn.disabled=false; btn.innerHTML='<i class="pi pi-coin"></i> 카카오톡 공유'; }
   document.getElementById('scoreShareModal').style.display = 'none';
   if (!_ssmCanvas) {
     if (navigator.share) { navigator.share({ title:'FORTUNA 운세점수', text:text, url:pageUrl }).catch(function(){}); }
@@ -787,7 +787,7 @@ function shareScoreKakao() {
   var overall = _scoreResult ? _scoreResult.overall : 0;
   var today = _scoreResult ? _scoreResult.today : '';
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '<i class="pi pi-crystal"></i> 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n\n재물/관계/건강/학업/이동 5개 분야 종합\n\n나도 확인해봐 <i class="pi pi-down"></i>';
+  var text = '🔮 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n\n재물/관계/건강/학업/이동 5개 분야 종합\n\n나도 확인해봐 👇';
   if (navigator.share) {
     navigator.share({ title: 'FORTUNA 운세점수', text: text, url: pageUrl }).catch(function(){});
   } else {

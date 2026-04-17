@@ -572,7 +572,7 @@ async function _updateNavOrb(userId) {
   try {
     var res = await sb.from('orb_balance').select('balance').eq('user_id', userId).maybeSingle();
     var bal = (res.data && res.data.balance != null) ? res.data.balance : 0;
-    el.textContent = '<i class="pi pi-sparkle"></i> ' + bal.toLocaleString() + ' Orb';
+    el.innerHTML = '<i class="pi pi-sparkle"></i> ' + bal.toLocaleString() + ' Orb';
     el.style.display = 'block';
   } catch(e) {}
 }
@@ -907,7 +907,7 @@ function shareKakao() {
   var ilju = (_workerData && _workerData.일주) || '';
   Kakao.Share.sendDefault({
     objectType: 'text',
-    text: '<i class="pi pi-sparkle"></i> ' + ilju + ' 일주 나만의 사주 리포트\n\nFORTUNA에서 AI 심층 사주 분석을 받아보세요!',
+    text: '✨ ' + ilju + ' 일주 나만의 사주 리포트\n\nFORTUNA에서 AI 심층 사주 분석을 받아보세요!',
     link: {
       mobileWebUrl: 'https://picolab.kr/report-saju.html',
       webUrl: 'https://picolab.kr/report-saju.html',

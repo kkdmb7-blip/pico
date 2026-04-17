@@ -699,7 +699,7 @@ function _drawAstroCard(cb) {
   // ── 헤더
   var y=100;
   ctx.font='600 22px sans-serif'; ctx.fillStyle='rgba(116,185,255,0.55)'; ctx.letterSpacing='4px';
-  ctx.fillText('<i class="pi pi-sparkle"></i>  F O R T U N A  <i class="pi pi-sparkle"></i>',W/2,y); ctx.letterSpacing='0px';
+  ctx.fillText('✨  F O R T U N A  ✨',W/2,y); ctx.letterSpacing='0px';
   y+=44; ctx.font='700 52px "Noto Sans KR",sans-serif'; ctx.fillStyle='#ffffff'; ctx.fillText('나의 별자리 차트',W/2,y);
   y+=40; ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fillText(dateStr,W/2,y);
   y+=36; drawLine(y,260,0.4);
@@ -759,7 +759,7 @@ function _drawAstroCard(cb) {
 
   // ── 행성 배치 간결하게 (2열 compact)
   y+=10; drawLine(y,260,0.3);
-  y+=40; ctx.font='600 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.fillText('<i class="pi pi-star"></i> 행성 배치',W/2,y); y+=32;
+  y+=40; ctx.font='600 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.fillText('🌟 행성 배치',W/2,y); y+=32;
   var pNames=['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn'];
   var pIcons={'Sun':'☀️','Moon':'<i class="pi pi-moon"></i>','Mercury':'☿','Venus':'♀','Mars':'♂','Jupiter':'♃','Saturn':'♄'};
   var colW2=(W-PAD*2-20)/2, gx=PAD, sy2=y;
@@ -790,7 +790,7 @@ function shareAstroKakao() {
   preview.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
   modal.style.display = 'flex';
   _drawAstroCard(function(canvas){
-    if(btn){ btn.disabled=false; btn.textContent='<i class="pi pi-star"></i> 카카오톡 공유'; }
+    if(btn){ btn.disabled=false; btn.innerHTML='<i class="pi pi-star"></i> 카카오톡 공유'; }
     if(!canvas){ preview.innerHTML='<div style="color:#ff6b6b;padding:20px;">카드 생성 실패 <i class="pi pi-sad"></i></div>'; return; }
     window._astroCanvas = canvas;
     var img = new Image(); img.src = canvas.toDataURL('image/png');
