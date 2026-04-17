@@ -1670,276 +1670,6 @@ function buildOhangWarningBlock() {
   return `\n【오행 구조 경고 패턴】\n${parts.join('\n')}\n(이 패턴을 분석에 반드시 반영하되 원문 그대로 쓰지 말고 자연스럽게 통합할 것)`;
 }
 
-function buildSamjaeBlock() {
-  if (!_samjaeData) return '';
-  if (!_samjaeData.삼재여부) return '\n【삼재】올해 삼재에 해당하지 않음 (삼재 지지: '+(_samjaeData.삼재지지||'')+')\n';
-  return `\n【삼재 경고 — ${_samjaeData.삼재종류}】
-올해 지지: ${_samjaeData.올해지지} / 삼재 지지: ${_samjaeData.삼재지지}
-${_samjaeData.설명}
-(삼재 정보를 분석에 자연스럽게 반영하되 과도한 공포 조성 금지, 실용적 대처법 중심으로 서술할 것)\n`;
-}
-
-function buildTwelveStarsBlock() {
-  if (!_twelveStarsData || !_twelveStarsData.올해활성) return '';
-  const stars = _twelveStarsData.올해활성;
-  const lines = stars.map(s => `${s.신살명}(${s.해당지지}): ${s.설명}`);
-  return `\n【올해 작동 중인 신살】\n${lines.join('\n')}
-(해당 신살이 이 분석 주제와 관련될 경우 자연스럽게 반영할 것)\n`;
-}
-
-function buildJeolgiBlock() {
-  if (!_jeolgiData) return '';
-  return `\n【절기 정보】현재: ${_jeolgiData.현재절기}(${_jeolgiData.절기시작일}) → 다음: ${_jeolgiData.다음절기}(${_jeolgiData.다음절기일}, ${_jeolgiData.남은일수}일 후)
-(절기 전환이 임박하면 기운 변화를 분석에 반영할 것)\n`;
-}
-
-function buildMoonPhaseBlock() {
-  if (!_moonPhaseData) return '';
-  const mp = _moonPhaseData;
-  const phaseKor = {'New Moon':'삭(新月)','Waxing Crescent':'초승달','First Quarter':'상현달','Waxing Gibbous':'볼록달(차오름)','Full Moon':'보름달(望)','Waning Gibbous':'볼록달(이지러짐)','Last Quarter':'하현달','Waning Crescent':'그믐달'}[mp.phase] || mp.phase;
-  return `\n【달의 상(Moon Phase)】${phaseKor} (조도 ${Math.round((mp.illumination||0)*100)}%)
-(달의 위상에 따른 에너지 흐름 — 삭: 새로운 시작, 보름: 결실·감정 고조, 하현: 정리·마무리)\n`;
-}
-
-function buildWonjinBlock() {
-  if (!_wonjinData || !_wonjinData.원진여부) return '';
-  const lines = _wonjinData.목록.map(w => `${w.관계}: ${w.설명}`);
-  return `\n【원진살】\n${lines.join('\n')}
-(원진살이 있는 주(柱) 간 관계에서 갈등·오해 가능성을 분석에 반영할 것)\n`;
-}
-
-function buildGwimungwanBlock() {
-  if (!_gwimungwanData || !_gwimungwanData.귀문관여부) return '';
-  const lines = _gwimungwanData.목록.map(g => `${g.관계}: ${g.설명}`);
-  return `\n【귀문관살】\n${lines.join('\n')}
-(영적 감수성·직관력 관련 내용을 분석에 자연스럽게 반영하되 공포 조성 금지)\n`;
-}
-
-function buildBaekhoBlock() {
-  if (!_baekhoData || !_baekhoData.백호여부) return '';
-  return `\n【백호대살 — ${_baekhoData.해당일주}】\n${_baekhoData.설명}
-(백호대살의 강렬한 에너지를 분석 주제에 맞게 자연스럽게 반영할 것)\n`;
-}
-
-function buildDaeunTransitionBlock() {
-  if (!_daeunTransitionData || !_daeunTransitionData.전환기여부) return '';
-  const lines = _daeunTransitionData.전환목록.map(t =>
-    `${t.이전대운} → ${t.새대운} (전환시점: ${t.전환시점}년, 현재차이: ${t.현재차이>0?'+':''}${t.현재차이}년)\n${t.설명}`
-  );
-  return `\n【대운 전환기 감지】\n${lines.join('\n')}
-(대운 전환기의 혼란·변동 가능성을 분석에 반드시 반영할 것. 단정적 예언은 금지)\n`;
-}
-
-function buildHaphwaBlock() {
-  if (!_haphwaData || !_haphwaData.합화검증) return '';
-  const items = _haphwaData.합화검증;
-  const lines = items.map(h => `[${h.유형}] ${h.관계} → 합화오행:${h.합화오행} / 월지:${h.월지}(${h.월지오행}) → ${h.성립여부 ? '합화 성립' : '합화 미성립'}\n  ${h.설명}`);
-  return `\n【합화(合化) 성립 검증】\n${lines.join('\n')}
-(합이 있더라도 합화 미성립이면 실질적 변환이 없음을 분석에 반영할 것)\n`;
-}
-
-function buildTenGodsDistBlock() {
-  if (!_tenGodsDistData) return '';
-  const d = _tenGodsDistData;
-  let lines = [`균형도: ${d.균형도}`];
-  if (d.과다 && d.과다.length) lines.push(...d.과다.map(g => `${g.그룹} 과다(${g.개수}개): ${g.설명}`));
-  if (d.결핍 && d.결핍.length) lines.push(...d.결핍.map(g => `${g.그룹} 결핍: ${g.설명}`));
-  return `\n【십성 분포 분석】\n${lines.join('\n')}
-(십성 편중·결핍 패턴을 분석에 반영할 것. 과다한 십성은 성향의 극단화, 결핍은 보완 필요 영역)\n`;
-}
-
-function buildGeokgukValidBlock() {
-  if (!_geokgukValidData) return '';
-  const d = _geokgukValidData;
-  let lines = [`기본격국: ${d.기본격국} → 최종: ${d.최종격국}`];
-  if (d.보정사항 && d.보정사항.length) lines.push(...d.보정사항.map(s => '<i class="pi pi-warning"></i> ' + s));
-  return `\n【격국 정밀 검증】\n${lines.join('\n')}
-(격국 보정사항이 있으면 기본 격국 대신 최종격국 기준으로 분석할 것)\n`;
-}
-
-function buildSewunInterBlock() {
-  if (!_sewunInterData || !_sewunInterData.상호작용 || !_sewunInterData.상호작용.length) return '';
-  const d = _sewunInterData;
-  const lines = d.상호작용.map(i => `[${i.유형}] 세운(${i.세운지지||i.세운천간})↔${i.사주위치}(${i.사주지지||i.사주천간})${i.궁의미?' — 궁:'+i.궁의미:''}`);
-  return `\n【${d.세운} 세운 합충형파해】\n${d.요약}\n${lines.join('\n')}
-(세운과 사주 간 상호작용을 올해 운세·흐름 분석에 반드시 반영할 것)\n`;
-}
-
-function buildJijangganBlock() {
-  if (!_jijangganData || !_jijangganData.투출요약 || !_jijangganData.투출요약.length) return '';
-  return `\n【지장간 투출 현황】\n${_jijangganData.투출요약.join('\n')}
-(투출된 천간은 표면에 드러나 실질적 영향력을 가짐. 투출되지 않은 지장간은 잠재력에 머묾)\n`;
-}
-
-function buildRootStrengthBlock() {
-  if (!_rootStrengthData || !_rootStrengthData.천간별분석) return '';
-  const dayAnalysis = _rootStrengthData.천간별분석.find(s => s.위치 === '일간');
-  if (!dayAnalysis) return '';
-  const rootLines = dayAnalysis.통근처.length
-    ? dayAnalysis.통근처.map(r => `${r.위치}(${r.지지}) ${r.유형} — ${r.관계} 강도${r.강도}`).join(', ')
-    : '없음(무근)';
-  return `\n【일간 통근·생왕 분석】\n일간: ${dayAnalysis.천간}(${dayAnalysis.오행}) | 통근강도: ${dayAnalysis.통근강도} | ${dayAnalysis.판정} | ${dayAnalysis.생왕여부}
-통근처: ${rootLines}
-(통근이 강하면 자기 뜻대로 할 힘이 있고, 무근이면 환경에 끌려다닐 수 있음)\n`;
-}
-
-function buildYongshinRevalidBlock() {
-  if (!_yongshinRevalidData) return '';
-  const d = _yongshinRevalidData;
-  const lines = d.검증결과 || [];
-  const validStr = d.유효 === true ? '억부 원칙 부합' : d.유효 === false ? '<i class="pi pi-warning"></i> 억부 원칙 불일치 가능' : '검증 불가';
-  return `\n【용신 재검증】${d.용신}(${d.용신오행||''}) — ${validStr}\n${lines.join('\n')}
-(용신 재검증 결과를 분석의 방향성 설정에 참고할 것)\n`;
-}
-
-// Level 4 블록 빌더
-function buildJapyeongjinjeonBlock() {
-  if (!_japyeongjinjeonData) return '';
-  const d = _japyeongjinjeonData;
-  let s = `\n【자평진전 격국용신론】\n격국: ${d.격국} (${d.격국근거||''})\n`;
-  if (d.특수격여부) s += `특수격: ${d.특수격} — 정격 체계 대신 적천수 적용\n`;
-  s += `자평진전 규칙: ${d.자평진전규칙||''}\n격국 상태: ${d.격국상태||''}\n`;
-  if (d.상신분석 && d.상신분석.length > 0) {
-    s += '상신(相神): ' + d.상신분석.map(function(a){return a.상신+'(사주'+a.사주내개수+'개,'+(a.충족?'충족':'미충족')+')'}).join(', ') + '\n';
-  }
-  if (d.기신분석 && d.기신분석.length > 0) {
-    s += '기신(忌神): ' + d.기신분석.map(function(a){return a.기신+'(사주'+a.사주내개수+'개,'+(a.활성?'활성<i class="pi pi-warning"></i>':'비활성')+')'}).join(', ') + '\n';
-  }
-  if (d.격국용신) s += `격국용신: ${d.격국용신.격국용신} — ${d.격국용신.근거}\n`;
-  s += '(자평진전 격국용신론을 격국 해석과 용신 활용 방향에 반드시 반영할 것)\n';
-  return s;
-}
-function buildCheonsuIlganBlock() {
-  if (!_cheonsuIlganData) return '';
-  const d = _cheonsuIlganData;
-  let s = `\n【적천수 일간론】${d.일간}(${d.일간오행}) × ${d.계절}\n`;
-  if (d.적천수원문) s += `원문: ${d.적천수원문}\n`;
-  s += `환경: ${d.환경분석||''}\n핵심: ${d.핵심||''}\n주의: ${d.주의사항||''}\n`;
-  s += `용신경향: ${d.용신경향||''}\n강약해석: ${d.강약해석||''}\n`;
-  s += '(적천수 원문과 일간×계절 분석을 원국 해석의 근거로 활용할 것)\n';
-  return s;
-}
-function buildJohuYongshinBlock() {
-  if (!_johuYongshinData) return '';
-  const d = _johuYongshinData;
-  let s = `\n【궁통보감 조후용신】\n한난: ${d.한난}(${d.한난점수}) / 조습: ${d.조습}(${d.조습점수})\n`;
-  s += `조후긴급도: ${d.조후긴급도}/10 — ${d.긴급설명||''}\n`;
-  s += `조후용신: ${safeJoin(d.조후용신)} / 억부용신: ${d.억부용신||''}\n`;
-  s += `일치여부: ${d.일치여부 ? '✓ 일치(최상)' : '✗ 불일치'}\n`;
-  s += `우선순위: ${d.우선순위||''}\n`;
-  if (d.월지기후) s += `월지기후: ${d.월지기후}\n`;
-  s += '(조후용신 분석을 용신 활용 및 대운 해석에 반영. 긴급도 높으면 조후 우선)\n';
-  return s;
-}
-
-function buildDaeunSplitBlock() {
-  if (!_daeunSplitData) return '';
-  const d = _daeunSplitData;
-  let s = `\n【대운 천간/지지 분리분석】\n현재대운: ${d.현재대운}(${d.대운기간}) ${d.구간}\n`;
-  s += `천간: ${d.천간.글자}(${d.천간.오행}/${d.천간.십신}) 영향력${d.천간.영향력}\n`;
-  s += `→ ${d.천간.평가}\n`;
-  s += `지지: ${d.지지.글자}(${d.지지.오행}/${d.지지.십신}) 영향력${d.지지.영향력}\n`;
-  s += `→ ${d.지지.평가}\n`;
-  if (d.지지.지장간 && d.지지.지장간.length) {
-    s += `지장간: ${d.지지.지장간.map(j => j.천간+'('+j.유형+'/'+j.십신+')').join(', ')}\n`;
-  }
-  if (d.전환설명) s += `전환: ${d.전환설명}\n`;
-  s += `종합: ${d.종합등급}\n`;
-  s += '(대운 전반5년은 천간, 후반5년은 지지 위주로 해석. 용신과의 관계를 대운 분석에 반영)\n';
-  return s;
-}
-
-function buildSewunAdvancedBlock() {
-  if (!_sewunAdvancedData) return '';
-  const d = _sewunAdvancedData;
-  let s = `\n【세운 확장분석 (삼합/방합/삼형)】\n세운: ${d.세운} 천간십신: ${d.세운천간십신}(${d.세운천간오행})\n`;
-  if (d.확장상호작용 && d.확장상호작용.length) {
-    d.확장상호작용.forEach(i => { s += `• ${i.유형}: ${i.설명}\n`; });
-  }
-  if (d.대운세운복합) s += `★ ${d.대운세운복합.유형}: ${d.대운세운복합.설명}\n`;
-  s += `용신관계: ${d.세운용신관계}\n`;
-  s += `종합: ${d.종합평가}\n`;
-  s += '(세운의 삼합/방합/삼형은 특정 오행을 크게 강화/약화시키므로 올해 운세 해석에 필수 반영)\n';
-  return s;
-}
-
-function buildMonthlyJeolgiBlock() {
-  if (!_monthlyJeolgiData) return '';
-  const d = _monthlyJeolgiData;
-  let s = `\n【월운 절기 세분화】\n이달 월건: ${d.현재월건} 절기: ${d.절기}(${d.계절})\n`;
-  s += `천간십신: ${d.천간십신} / 지지십신: ${d.지지십신}\n`;
-  if (d.지장간 && d.지장간.length) {
-    s += `월지 지장간: ${d.지장간.map(j => j.천간+'('+j.유형+'/'+j.십신+')').join(', ')}\n`;
-  }
-  if (d.월지상호작용 && d.월지상호작용.length) {
-    d.월지상호작용.forEach(i => { s += `• ${i.유형}: ${i.설명}\n`; });
-  }
-  if (d.월간일간합) s += `★ ${d.월간일간합}\n`;
-  s += `용신관계: ${d.월운용신관계}\n`;
-  s += `요약: ${d.요약}\n`;
-  s += '(월운은 실제 절기 경계 기준. 이달 운세/조언에 월건 십신과 합충을 반영)\n';
-  return s;
-}
-
-function buildGongmangBlock() {
-  if (!_gongmangData) return '';
-  const d = _gongmangData;
-  let s = `\n【공망(空亡) 분석】\n공망지지: ${safeJoin(d.공망지지)} (${d.순})\n`;
-  if (d.사주내공망 && d.사주내공망.length) {
-    d.사주내공망.forEach(g => { s += `• ${g.위치}(${g.지지}) — ${g.궁}: ${g.영향}\n`; });
-  } else { s += '사주 4지지에 공망 해당 없음.\n'; }
-  if (d.세운해소) s += `세운해소: ${d.세운해소}\n`;
-  s += '(공망 위치의 궁은 실속 점검 필요. 대운/세운에서 해소되면 오히려 활성화)\n';
-  return s;
-}
-
-function buildNapeumBlock() {
-  if (!_napeumData) return '';
-  const d = _napeumData;
-  let s = '\n【납음(納音) 오행】\n';
-  if (d.사주납음) d.사주납음.forEach(n => { s += `${n.위치}: ${n.간지} → ${n.납음}(${n.오행}) — ${n.이미지}\n`; });
-  if (d.일주납음) s += `★ 일주핵심: ${d.일주납음.납음}(${d.일주납음.오행}) — 내면 깊이 작용하는 기질.\n`;
-  s += '(납음은 겉으로 드러나지 않는 내면 기질. 성격 분석 시 보조 참고)\n';
-  return s;
-}
-
-function buildSpecialShinsalBlock() {
-  if (!_specialShinsalData) return '';
-  const d = _specialShinsalData;
-  let s = '\n【역마·도화·화개살 정밀분석】\n';
-  ['역마','도화','화개'].forEach(key => {
-    const sal = d[key];
-    if (!sal) return;
-    s += `${sal.살명}(${sal.해당지지}): ${sal.올해상태}`;
-    if (sal.원국보유) s += ` [원국: ${safeJoin(sal.원국위치)}]`;
-    if (sal.대운활성) s += ` [${sal.대운활성}]`;
-    s += '\n';
-  });
-  s += '(역마=이동변동, 도화=매력인기, 화개=학문영적성장. 활성 시기에 해당 분야 적극 활용)\n';
-  return s;
-}
-
-function build12UnseongExtBlock() {
-  if (!_twelveUnseongExtData) return '';
-  const d = _twelveUnseongExtData;
-  let s = '\n【12운성 확장 (대운/세운)】\n';
-  if (d.세운운성) s += `세운: ${d.세운운성.세운지지} → ${d.세운운성.운성} — ${d.세운운성.설명} (${d.세운운성.평가})\n`;
-  if (d.대운운성) s += `대운: ${d.대운운성.대운} → ${d.대운운성.운성} — ${d.대운운성.설명} (${d.대운운성.평가})\n`;
-  s += `종합: ${d.종합}\n`;
-  s += '(12운성 왕상기=적극행동, 휴수기=보수운영. 대운/세운 운성을 운세 해석에 반영)\n';
-  return s;
-}
-
-function buildFortuneScoreBlock() {
-  if (!_fortuneScoreData) return '';
-  const d = _fortuneScoreData;
-  let s = `\n【올해 운세 종합점수】\n점수: ${d.점수}/100 등급: ${d.등급}\n`;
-  if (d.산출근거 && d.산출근거.length) s += `근거: ${d.산출근거.join(', ')}\n`;
-  s += `${d.해석}\n`;
-  s += '(종합점수는 대운+세운+월운+12운성+합충형+조후를 합산한 참고 지표. 절대적 수치가 아닌 상대적 경향)\n';
-  return s;
-}
-
 // Level 7 block builders
 function buildGuiinBlock() {
   if (!_guiinData) return '';
@@ -2251,53 +1981,52 @@ function buildAccuracyLayerBlock() {
     { name:'일주궁합', data:_iljuCompatData, builder:buildIljuCompatBlock },
   ];
 
-  // Level 1~6 블록도 문장 기반 통합 — LEGACY_BLOCKS 배열
+  // Level 1~6 블록 — 문장 기반 (서버 계산 완료)
   const LEGACY_BLOCKS = [
-    { name:'삼재', data:_samjaeData, builder:buildSamjaeBlock },
-    { name:'십이신살', data:_twelveStarsData, builder:buildTwelveStarsBlock },
-    { name:'절기정보', data:_jeolgiData, builder:buildJeolgiBlock },
-    { name:'달의상', data:_moonPhaseData, builder:buildMoonPhaseBlock },
-    { name:'원진살', data:_wonjinData, builder:buildWonjinBlock },
-    { name:'귀문관살', data:_gwimungwanData, builder:buildGwimungwanBlock },
-    { name:'백호대살', data:_baekhoData, builder:buildBaekhoBlock },
-    { name:'대운전환기', data:_daeunTransitionData, builder:buildDaeunTransitionBlock },
-    { name:'합화검증', data:_haphwaData, builder:buildHaphwaBlock },
-    { name:'십성분포', data:_tenGodsDistData, builder:buildTenGodsDistBlock },
-    { name:'격국검증', data:_geokgukValidData, builder:buildGeokgukValidBlock },
-    { name:'세운상호작용', data:_sewunInterData, builder:buildSewunInterBlock },
-    { name:'지장간분석', data:_jijangganData, builder:buildJijangganBlock },
-    { name:'통근분석', data:_rootStrengthData, builder:buildRootStrengthBlock },
-    { name:'용신재검증', data:_yongshinRevalidData, builder:buildYongshinRevalidBlock },
-    { name:'자평진전분석', data:_japyeongjinjeonData, builder:buildJapyeongjinjeonBlock },
-    { name:'적천수일간론', data:_cheonsuIlganData, builder:buildCheonsuIlganBlock },
-    { name:'조후용신분석', data:_johuYongshinData, builder:buildJohuYongshinBlock },
-    { name:'대운분리분석', data:_daeunSplitData, builder:buildDaeunSplitBlock },
-    { name:'세운확장분석', data:_sewunAdvancedData, builder:buildSewunAdvancedBlock },
-    { name:'월운절기분석', data:_monthlyJeolgiData, builder:buildMonthlyJeolgiBlock },
-    { name:'공망분석', data:_gongmangData, builder:buildGongmangBlock },
-    { name:'납음분석', data:_napeumData, builder:buildNapeumBlock },
-    { name:'특수신살', data:_specialShinsalData, builder:buildSpecialShinsalBlock },
-    { name:'십이운성확장', data:_twelveUnseongExtData, builder:build12UnseongExtBlock },
-    { name:'운세종합점수', data:_fortuneScoreData, builder:buildFortuneScoreBlock },
+    { name:'삼재', data:_samjaeData },
+    { name:'십이신살', data:_twelveStarsData },
+    { name:'절기정보', data:_jeolgiData },
+    { name:'달의상', data:_moonPhaseData },
+    { name:'원진살', data:_wonjinData },
+    { name:'귀문관살', data:_gwimungwanData },
+    { name:'백호대살', data:_baekhoData },
+    { name:'대운전환기', data:_daeunTransitionData },
+    { name:'합화검증', data:_haphwaData },
+    { name:'십성분포', data:_tenGodsDistData },
+    { name:'격국검증', data:_geokgukValidData },
+    { name:'세운상호작용', data:_sewunInterData },
+    { name:'지장간분석', data:_jijangganData },
+    { name:'통근분석', data:_rootStrengthData },
+    { name:'용신재검증', data:_yongshinRevalidData },
+    { name:'자평진전분석', data:_japyeongjinjeonData },
+    { name:'적천수일간론', data:_cheonsuIlganData },
+    { name:'조후용신분석', data:_johuYongshinData },
+    { name:'대운분리분석', data:_daeunSplitData },
+    { name:'세운확장분석', data:_sewunAdvancedData },
+    { name:'월운절기분석', data:_monthlyJeolgiData },
+    { name:'공망분석', data:_gongmangData },
+    { name:'납음분석', data:_napeumData },
+    { name:'특수신살', data:_specialShinsalData },
+    { name:'십이운성확장', data:_twelveUnseongExtData },
+    { name:'운세종합점수', data:_fortuneScoreData },
   ];
 
-  // 전체 블록(Level 1~10) 통합 처리: 문장 있으면 문장, 없으면 builder fallback
+  // 전체 블록(Level 1~10) 통합 처리
   const ALL_BLOCKS = [...LEGACY_BLOCKS, ...BLOCKS];
   let detailSentences = '';
   const summaryLines = [];
   for (const b of ALL_BLOCKS) {
     if (!b.data) continue;
+    const sentence = b.data['문장'];
     if (detailSet.has(b.name)) {
-      // 타입 관련 블록: 문장 우선, fallback builder
-      const sentence = b.data['문장'];
+      // 타입 관련 블록: 문장 우선, Level 7+ builder fallback
       if (sentence) {
         detailSentences += `\n[${b.name}] ${sentence}\n`;
-      } else {
+      } else if (b.builder) {
         detailSentences += b.builder();
       }
     } else {
       // 비관련 블록: 문장 → 요약 → 종합 순으로 1줄 요약
-      const sentence = b.data['문장'];
       if (sentence) {
         summaryLines.push(`${b.name}: ${sentence.length > 80 ? sentence.substring(0, 80) + '...' : sentence}`);
       } else {
@@ -2860,24 +2589,25 @@ async function generateCharacterReport() {
 일간: ${dayStem}(${stemHanja}), 일주: ${ilju}
 사주: ${sd?.summary ? JSON.stringify(sd.summary.pillars) : '미확인'}
 오행 개수: 목${fiveCount.wood||0} 화${fiveCount.fire||0} 토${fiveCount.earth||0} 금${fiveCount.metal||0} 수${fiveCount.water||0}
-오행 비율: ${JSON.stringify(fivePct)}
 신강도: ${strengthLevel} (${sd?.strength_score || ''}점)
 패턴: ${pattern.type || ''} ${pattern.subtype || ''}
 격국: ${geokguk}
 용신: ${ysFinal}
-십신: ${JSON.stringify(tenGods)}
 성격 키워드: ${pkw}
 성향 데이터: ${pk.join(', ')}
 
 ▸ 성격 DB: ${personality}
 
-위 확정 사실을 바탕으로 원국 분석을 작성해주세요.
-구조: ① 적천수 천간론 원문을 1~2구절 인용하고, 자연 현상에 비유하여 이 사주의 핵심 구조를 설명 ② 성격·기질·강점 ③ 약점과 보완점 ④ 왜 이런 패턴인지 사주 구조로 설명
 적천수 원문 참조 - ${stemHanja}일간: ${CHEONSU[stemHanja] || ''}
+${buildAccuracyLayerBlock()}
+
+위 확정 사실과 서버 계산 문장을 바탕으로 원국 분석을 작성해주세요.
+【사주 정밀분석】 블록의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 이 문장의 수치·판정을 그대로 반영하고, 당신은 문체·흐름·연결만 다듬으세요.
+구조: ① 적천수 천간론 원문을 1~2구절 인용하고, 자연 현상에 비유하여 이 사주의 핵심 구조를 설명 ② 성격·기질·강점 ③ 약점과 보완점 ④ 왜 이런 패턴인지 사주 구조로 설명
 섹션 구성:
 1. 핵심 기질 요약 — 일주+격국+신강신약으로 타고난 기질의 본질을 3~4문장으로 압축.
 2. 일간과 격국 분석 — 일간의 오행 특성, 격국 구조, 십신 배치로 성격의 뿌리 심층 분석. 적천수 원문 인용 포함.
-3. 강점·약점과 오행 균형 — 오행 분포 %를 기반으로 강점과 약점, 보완 방향 구체적 분석.
+3. 강점·약점과 오행 균형 — 오행 분포를 기반으로 강점과 약점, 보완 방향 구체적 분석.
 800~1200자.`;
 
   await streamToSections(analysisPrompt, [0, 1, 2], theoryName, ysFinal, wg, false);
@@ -2897,6 +2627,8 @@ ${buildFamousBlock()}
 ${buildYongsinBlock(['직업','피해야할것'])}
 ${buildAgeAdviceBlock()}
 ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
+
+【사주 정밀분석】 블록의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 이 문장의 수치·판정을 그대로 반영하고, 당신은 문체·흐름·연결만 다듬으세요.
 
 섹션 구성:
 4. 베딕 낙샤트라로 본 패턴 — 낙샤트라·라시로 본 삶의 패턴과 기질, 사주와 교차 분석.
@@ -2973,6 +2705,7 @@ ${sb2}
 ${db}
 ${vb}
 성격DB: ${_personality_db||''}
+${buildAccuracyLayerBlock()}
 
 섹션 구성 (각 번호 붙여 작성):
 1. 재물 구조 핵심 요약 — 이 사주에서 돈이 어떻게 들어오고 어디서 새는지. 재물 에너지 전체 구조를 3~4문장으로 압축.
@@ -3072,6 +2805,7 @@ ${db}
 올해 세운: ${_sewun||'미확인'}
 ${vb}
 ${buildAdviceBlock(['대인관계/부부'])}
+${buildAccuracyLayerBlock()}
 
 섹션 구성:
 4. 인연 시기 분석 — 현재 대운 ${_daeun||'미확인'}에서 관성이 활성화되는 시기, 베딕 다샤 ${_vedicData?.dasha||'미확인'} 기간의 연애 에너지, 올해 ${_sewun||''}년 인연 기운.
@@ -3143,6 +2877,7 @@ ${db}
 위험: ${safeJoin(daeunFrame.risks)||'없음'}
 
 ${zb}
+${buildAccuracyLayerBlock()}
 
 섹션 구성:
 1. 현재 대운 핵심 요약 — 대운 ${_daeun||'미확인'}, 지금 어떤 조류 위에 있는지, 이 대운의 핵심 키워드와 에너지를 압축.
@@ -3234,6 +2969,7 @@ ${sb2}
 
 ${db}
 ${zb}
+${buildAccuracyLayerBlock()}
 
 섹션 구성:
 1. ${thisYear}년 핵심 요약 — 올해 세운이 내 사주에 미치는 핵심 에너지를 3~4문장으로 압축. 이 해의 전체 색깔과 방향.
@@ -3357,6 +3093,7 @@ ${sb2}
 ${vb}
 이달: ${monthStr} / 월건: ${monthPillarStr} / 대운: ${_daeun||'미확인'} / 세운: ${_sewun||'미확인'}
 ${monthlyIljuBlock}
+${buildAccuracyLayerBlock()}
 
 섹션 구성:
 4. 이달 주의사항과 기회 — 이달 특히 조심해야 할 것과 가장 큰 기회, 유리한 영역과 불리한 시기 경향. 일주별 월운 주의 키워드 반영.
@@ -3449,6 +3186,7 @@ ${sb2}
 ${ysBlock}
 ${advBlock}
 ${ageBlock}
+${buildAccuracyLayerBlock()}
 
 섹션 구성:
 4. 직업·환경 구성 — 용신 오행에 맞는 직업군과 업종, 일하기 좋은 환경과 공간 구성 방법, 피해야 할 환경.
@@ -3794,7 +3532,8 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 - 각 섹션 시작 전에 반드시 ===N=== 구분자를 넣을 것 (N은 섹션 번호). 예: ===1===, ===2===
 - 섹션 본문에 섹션 제목 반복 금지 (제목은 구분자가 대체)
 - 본문 안에서 소항목 번호 쓸 때는 가), 나), 다) 형식 사용 (1. 2. 3. 사용 금지)
-- 분석 범위를 벗어난 미래 시점(다음 달, 내년 등) 예측·대비·언급 절대 금지. 해당 기간 안의 조언만 작성${wg || ''}`;
+- 분석 범위를 벗어난 미래 시점(다음 달, 내년 등) 예측·대비·언급 절대 금지. 해당 기간 안의 조언만 작성
+- 【사주 정밀분석】 블록이 포함된 경우, 그 안의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 수치·판정·결론을 절대 변경하지 마세요. 당신의 역할은 문체와 흐름만 다듬는 것입니다.${wg || ''}`;
 
     const res = await fetch(CHAT_API, {
       signal: controller.signal,
