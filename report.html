@@ -522,7 +522,7 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
-const REPORT_VERSION = 4;
+const REPORT_VERSION = 5;
 
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
@@ -1172,6 +1172,9 @@ let _haphwaData = null;
 let _tenGodsDistData = null;
 let _geokgukValidData = null;
 let _sewunInterData = null;
+let _jijangganData = null;
+let _rootStrengthData = null;
+let _yongshinRevalidData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1351,6 +1354,9 @@ async function loadAllData(withZiwei, withAstro) {
       _tenGodsDistData = _rptFull['십성분포'] || null;
       _geokgukValidData = _rptFull['격국검증'] || null;
       _sewunInterData = _rptFull['세운상호작용'] || null;
+      _jijangganData = _rptFull['지장간분석'] || null;
+      _rootStrengthData = _rptFull['통근분석'] || null;
+      _yongshinRevalidData = _rptFull['용신재검증'] || null;
     }
   } catch(e){}
   try {
@@ -1590,11 +1596,39 @@ function buildSewunInterBlock() {
 (세운과 사주 간 상호작용을 올해 운세·흐름 분석에 반드시 반영할 것)\n`;
 }
 
+function buildJijangganBlock() {
+  if (!_jijangganData || !_jijangganData.투출요약 || !_jijangganData.투출요약.length) return '';
+  return `\n【지장간 투출 현황】\n${_jijangganData.투출요약.join('\n')}
+(투출된 천간은 표면에 드러나 실질적 영향력을 가짐. 투출되지 않은 지장간은 잠재력에 머묾)\n`;
+}
+
+function buildRootStrengthBlock() {
+  if (!_rootStrengthData || !_rootStrengthData.천간별분석) return '';
+  const dayAnalysis = _rootStrengthData.천간별분석.find(s => s.위치 === '일간');
+  if (!dayAnalysis) return '';
+  const rootLines = dayAnalysis.통근처.length
+    ? dayAnalysis.통근처.map(r => `${r.위치}(${r.지지}) ${r.유형} — ${r.관계} 강도${r.강도}`).join(', ')
+    : '없음(무근)';
+  return `\n【일간 통근·생왕 분석】\n일간: ${dayAnalysis.천간}(${dayAnalysis.오행}) | 통근강도: ${dayAnalysis.통근강도} | ${dayAnalysis.판정} | ${dayAnalysis.생왕여부}
+통근처: ${rootLines}
+(통근이 강하면 자기 뜻대로 할 힘이 있고, 무근이면 환경에 끌려다닐 수 있음)\n`;
+}
+
+function buildYongshinRevalidBlock() {
+  if (!_yongshinRevalidData) return '';
+  const d = _yongshinRevalidData;
+  const lines = d.검증결과 || [];
+  const validStr = d.유효 === true ? '억부 원칙 부합' : d.유효 === false ? '⚠ 억부 원칙 불일치 가능' : '검증 불가';
+  return `\n【용신 재검증】${d.용신}(${d.용신오행||''}) — ${validStr}\n${lines.join('\n')}
+(용신 재검증 결과를 분석의 방향성 설정에 참고할 것)\n`;
+}
+
 function buildAccuracyLayerBlock() {
   return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
     + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
     + buildDaeunTransitionBlock() + buildHaphwaBlock()
-    + buildTenGodsDistBlock() + buildGeokgukValidBlock() + buildSewunInterBlock();
+    + buildTenGodsDistBlock() + buildGeokgukValidBlock() + buildSewunInterBlock()
+    + buildJijangganBlock() + buildRootStrengthBlock() + buildYongshinRevalidBlock();
 }
 
 // ── 초기화 ──
