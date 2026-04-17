@@ -3396,7 +3396,7 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
     secIndices.forEach((secIdx, i) => {
       document.getElementById(`sloading-${secIdx}`).style.display = 'none';
       const body = document.getElementById(`sbody-${secIdx}`);
-      var partText = parts[i] || (i === 0 ? text : '');
+      var partText = parts[i] || (i === 0 ? cleanSectionText(text) : '');
       partText = stripDuplicateTitle(partText, typeSec[secIdx]?.name || '');
       body.innerHTML = renderMarkdown(partText);
       body.style.display = 'block';
@@ -3411,8 +3411,13 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 }
 
 function cleanSectionText(s) {
-  // 고아 ** 제거: "제목**" → "제목"
-  return s.replace(/^([^\n]*?)\*{2}\s*/, '$1').trim();
+  // 1) ===N=== 구분자 잔여물 제거
+  s = s.replace(/={3}\d+={3}/g, '');
+  // 2) 고아 ** 제거: "제목**" → "제목"
+  s = s.replace(/^([^\n]*?)\*{2}\s*/, '$1');
+  // 3) 첫줄이 "N. 제목" 패턴이면 제목 줄 제거 (카드 헤더와 중복)
+  s = s.replace(/^\s*\*{0,2}\s*\d+[.)]\s*\*{0,2}\s*([^\n]{0,35})\s*\*{0,2}\s*\n/, '');
+  return s.trim();
 }
 function stripDuplicateTitle(s, sectionName) {
   // 카드 헤더와 중복되는 첫 줄 제거 (공백·특수문자 무시 비교)
@@ -3505,17 +3510,18 @@ function splitIntoSections(text, count, startNum) {
     });
   }
   // 전략4: 빈줄 기준으로 단락 분할 시도
-  const paragraphs = text.split(/\n{2,}/).filter(p => p.trim());
+  const cleaned = text.replace(/={3}\d+={3}/g, '').trim();
+  const paragraphs = cleaned.split(/\n{2,}/).filter(p => p.trim());
   if (paragraphs.length >= count) {
     const result = [];
     const perSection = Math.ceil(paragraphs.length / count);
     for (let i = 0; i < count; i++) {
-      result.push(paragraphs.slice(i * perSection, (i+1) * perSection).join('\n\n').trim());
+      result.push(cleanSectionText(paragraphs.slice(i * perSection, (i+1) * perSection).join('\n\n')));
     }
     return result;
   }
   // 분할 실패: 전체를 첫 섹션에
-  return [text, ...Array(count - 1).fill('')];
+  return [cleanSectionText(cleaned), ...Array(count - 1).fill('')];
 }
 
 // ── 공유 ──
