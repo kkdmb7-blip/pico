@@ -1230,18 +1230,15 @@ function safeJoin(v, sep) { return Array.isArray(v) ? v.join(sep||', ') : (v||''
 function calcCurrentMonthPillar(y, m) {
   const STEMS = ['갑','을','병','정','무','기','경','신','임','계'];
   const BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
-  // 년간 index: (year - 4) % 10
-  const yearStemIdx = ((y - 4) % 10 + 10) % 10;
-  // 월지: 1월=축(1), 2월=인(2), 3월=묘(3), 4월=진(4)...12월=자(0)
-  const MONTH_TO_BRANCH = [0,1,2,3,4,5,6,7,8,9,10,11]; // 양력월→지지idx (1월=축=1, 2월=인=2 등)
-  // 절기 기반 사주월: 양력 m월 → 대략 절기 후 m월의 지지
-  // 인월(2)=1월, 묘(3)=2월... 자(0)=11월, 축(1)=12월
-  // 양력 월 → 지지: 양력1월=축(1), 2월=인(2), 3월=묘(3)... 11월=해(11), 12월=자(0)
+  // 1월은 입춘(~2/4) 이전이므로 전년 년간 사용
+  const sajuYear = (m <= 1) ? y - 1 : y;
+  const yearStemIdx = ((sajuYear - 4) % 10 + 10) % 10;
+  // 양력 월 → 지지: 1월=축(1), 2월=인(2)... 11월=해(11), 12월=자(0)
   const branchIdx = m === 12 ? 0 : m;
   // 월간 기준표: 갑기→병인, 을경→무인, 병신→경인, 정임→임인, 무계→갑인
-  const MONTH_STEM_BASE = [2,4,6,8,0]; // index = yearStemIdx % 5
+  const MONTH_STEM_BASE = [2,4,6,8,0];
   const base = MONTH_STEM_BASE[yearStemIdx % 5];
-  // 인월(branch=2)부터 시작, 월 순서 = branchIdx에서 인(2)까지의 거리
+  // 인월(branch=2)부터 순서
   const BRANCH_ORDER = [2,3,4,5,6,7,8,9,10,11,0,1];
   const monthOrder = BRANCH_ORDER.indexOf(branchIdx);
   const monthStemIdx = (base + monthOrder) % 10;
