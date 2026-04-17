@@ -1631,8 +1631,10 @@ function showState(state) {
   document.getElementById('stateLoading').style.display     = state === 'loading'     ? 'flex'  : 'none';
   document.getElementById('stateIntro').style.display       = state === 'intro'       ? 'block' : 'none';
   document.getElementById('statePersonality').style.display = state === 'personality' ? 'block' : 'none';
+  document.getElementById('stateDetail').style.display      = state === 'detail'      ? 'block' : 'none';
   document.getElementById('stateReport').style.display      = state === 'report'      ? 'block' : 'none';
 }
+function hideDetail() { showState('intro'); }
 
 // ── 마크다운 인라인 렌더러 ──
 function renderMarkdown(text) {
@@ -4179,7 +4181,7 @@ function showConsultBanner() {
 // ── 카카오 공유 ──
 function shareKakao() {
   const url = location.href;
-  const title = '<i class="pi pi-sparkle"></i> ' + (_config?.title || 'AI 운세 리포트');
+  const title = '✨ ' + (_config?.title || 'AI 운세 리포트');
   const desc = 'FORTUNA에서 AI가 분석한 나만의 운세 리포트를 확인해보세요!';
   if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
     Kakao.Share.sendDefault({
