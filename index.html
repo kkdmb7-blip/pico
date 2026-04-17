@@ -1277,8 +1277,6 @@
     var ohengVerdict = badCnt >= 1 ? '부딪히는 기운' : (goodCnt === relations.length ? '아주 잘 흐름' : goodCnt > 0 ? '순조롭게 흐름' : '무난함');
     var ohengVerdictColor = badCnt >= 1 ? '#f44336' : (goodCnt === relations.length ? '#d4af37' : goodCnt > 0 ? '#4caf7a' : '#8b8ba8');
 
-    // 한자 오행 → 한글
-    var _OH_KR = { '木':'나무', '火':'불', '土':'흙', '金':'쇠', '水':'물' };
     // 관계 라벨 → 쉬운 말
     var _RELMAP = {
       '상생(相生)': { simple: '받침', color: '#4caf7a' },
@@ -1295,11 +1293,10 @@
       var o = ohengList[i];
       var col = o.oh ? _OHENG_COLOR[o.oh] : '#555';
       var bg  = o.oh ? _OHENG_BG[o.oh] : 'rgba(255,255,255,0.05)';
-      var ohKr = o.oh ? (_OH_KR[o.oh]||o.oh) : '-';
       ohengHtml +=
-        '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;" title="'+(o.oh||'')+'('+ohKr+') 오행">' +
+        '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">' +
           '<div style="width:44px;height:44px;border-radius:50%;background:'+bg+';border:1.5px solid '+col+';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--text);font-family:\'Noto Serif KR\',serif;">'+o.ch+'</div>' +
-          '<div style="font-size:11px;font-weight:700;color:'+col+';">'+ohKr+'</div>' +
+          '<div style="font-size:11px;font-weight:700;color:'+col+';">'+(o.oh||'-')+'</div>' +
         '</div>';
       if (i < relations.length) {
         var r = relations[i];
@@ -1313,13 +1310,12 @@
     }
     ohengHtml += '</div>';
 
-    ohengHtml += '<div style="display:flex;justify-content:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">';
+    ohengHtml += '<div style="display:flex;justify-content:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
     ['木','火','土','金','水'].forEach(function(el) {
       var c = counts[el];
       var active = c > 0;
-      var elKr = _OH_KR[el];
       ohengHtml +=
-        '<div style="font-size:10px;padding:3px 8px;border-radius:12px;background:'+(active?_OHENG_BG[el]:'rgba(255,255,255,0.03)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;" title="'+el+'('+elKr+')">'+elKr+' '+c+'</div>';
+        '<div style="font-size:10px;padding:3px 8px;border-radius:12px;background:'+(active?_OHENG_BG[el]:'rgba(255,255,255,0.03)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;">'+el+' '+c+'</div>';
     });
     ohengHtml += '</div>';
 
@@ -1348,18 +1344,20 @@
       var kisinEl = my.yongshinEl ? _SANGKUK[my.yongshinEl] : null;
       var hasKisin = kisinEl && nameOhengs.indexOf(kisinEl) !== -1;
 
+      var _colorize = function(el){ return '<span style="color:'+_OHENG_COLOR[el]+';font-weight:800;">'+el+'</span>'; };
+      var _colorList = function(arr){ return arr.map(_colorize).join('·'); };
       var verdictLine = '', verdictColor = '', verdictIcon = '';
       if (hasYongshin && !hasKisin) {
-        verdictLine = '용신('+my.yongshinEl+') 보강 — 사주 균형에 매우 좋음';
+        verdictLine = '용신('+_colorize(my.yongshinEl)+') 보강 — 사주 균형에 매우 좋음';
         verdictColor = '#d4af37'; verdictIcon = '<i class="pi pi-check"></i>';
       } else if (fillsWeak.length > 0 && !hasKisin) {
-        verdictLine = '부족한 '+fillsWeak.join('·')+' 보강 — 이로운 이름';
+        verdictLine = '부족한 '+_colorList(fillsWeak)+' 보강 — 이로운 이름';
         verdictColor = '#4caf7a'; verdictIcon = '<i class="pi pi-check"></i>';
       } else if (hasKisin && !hasYongshin) {
-        verdictLine = '기신('+kisinEl+')이 용신을 극 — 주의 필요';
+        verdictLine = '기신('+_colorize(kisinEl)+')이 용신을 극 — 주의 필요';
         verdictColor = '#f44336'; verdictIcon = '<i class="pi pi-warning"></i>';
       } else if (addsStrong.length === uniqueNameOhengs.length && addsStrong.length > 0) {
-        verdictLine = '과다 오행('+addsStrong.join('·')+') 편중 심화';
+        verdictLine = '과다 오행('+_colorList(addsStrong)+') 편중 심화';
         verdictColor = '#ff9800'; verdictIcon = '<i class="pi pi-warning"></i>';
       } else {
         verdictLine = '사주와 무난한 관계';
