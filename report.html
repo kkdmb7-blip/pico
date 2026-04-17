@@ -2216,15 +2216,15 @@ function buildIljuCompatBlock() {
 function buildAccuracyLayerBlock() {
   // 타입별 상세 블록 매핑 — 해당 타입에 필요한 블록은 상세, 나머지는 요약
   const DETAIL_MAP = {
-    character: ['일주론','격국세분','강약수치','십신궁위','특수패턴','사주균형','조후'],
-    money:     ['재물운','직업적성','대운세운교차','세운월별','대운트렌드','강약수치'],
-    love:      ['일주궁합','십신궁위','귀인','특수패턴','건강경향','사주균형'],
-    daeun:     ['대운세운교차','대운트렌드','세운월별','형충회합','강약수치','천간합충'],
-    year:      ['대운세운교차','세운월별','형충회합','신살종합','건강경향','대운트렌드'],
-    month:     ['세운월별','대운세운교차','형충회합','신살종합'],
-    yongsin:   ['강약수치','격국세분','조후','천간합충','대운트렌드'],
-    career_deep: ['직업적성','재물운','격국세분','대운트렌드','대운세운교차'],
-    triple:    ['대운세운교차','세운월별','형충회합','건강경향','재물운'],
+    character: ['일주론','격국세분','강약수치','십신궁위','특수패턴','사주균형','조후','적천수일간론','자평진전분석','십성분포','납음분석','통근분석'],
+    money:     ['재물운','직업적성','대운세운교차','세운월별','대운트렌드','강약수치','대운분리분석','세운확장분석','운세종합점수','격국검증'],
+    love:      ['일주궁합','십신궁위','귀인','특수패턴','건강경향','사주균형','원진살','귀문관살','특수신살'],
+    daeun:     ['대운세운교차','대운트렌드','세운월별','형충회합','강약수치','천간합충','대운분리분석','대운전환기','십이운성확장','세운상호작용'],
+    year:      ['대운세운교차','세운월별','형충회합','신살종합','건강경향','대운트렌드','삼재','세운상호작용','세운확장분석','운세종합점수','십이운성확장'],
+    month:     ['세운월별','대운세운교차','형충회합','신살종합','월운절기분석','세운상호작용'],
+    yongsin:   ['강약수치','격국세분','조후','천간합충','대운트렌드','용신재검증','조후용신분석','자평진전분석','통근분석','적천수일간론'],
+    career_deep: ['직업적성','재물운','격국세분','대운트렌드','대운세운교차','십성분포','격국검증'],
+    triple:    ['대운세운교차','세운월별','형충회합','건강경향','재물운','세운확장분석','삼재','운세종합점수'],
   };
   const detailSet = new Set(DETAIL_MAP[_type] || []);
 
@@ -2251,23 +2251,44 @@ function buildAccuracyLayerBlock() {
     { name:'일주궁합', data:_iljuCompatData, builder:buildIljuCompatBlock },
   ];
 
-  // Level 1~6 기존 블록 (상세 유지)
-  let legacy = buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
-    + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
-    + buildDaeunTransitionBlock() + buildHaphwaBlock()
-    + buildTenGodsDistBlock() + buildGeokgukValidBlock() + buildSewunInterBlock()
-    + buildJijangganBlock() + buildRootStrengthBlock() + buildYongshinRevalidBlock()
-    + buildJapyeongjinjeonBlock() + buildCheonsuIlganBlock() + buildJohuYongshinBlock()
-    + buildDaeunSplitBlock() + buildSewunAdvancedBlock() + buildMonthlyJeolgiBlock()
-    + buildGongmangBlock() + buildNapeumBlock() + buildSpecialShinsalBlock()
-    + build12UnseongExtBlock() + buildFortuneScoreBlock();
+  // Level 1~6 블록도 문장 기반 통합 — LEGACY_BLOCKS 배열
+  const LEGACY_BLOCKS = [
+    { name:'삼재', data:_samjaeData, builder:buildSamjaeBlock },
+    { name:'십이신살', data:_twelveStarsData, builder:buildTwelveStarsBlock },
+    { name:'절기정보', data:_jeolgiData, builder:buildJeolgiBlock },
+    { name:'달의상', data:_moonPhaseData, builder:buildMoonPhaseBlock },
+    { name:'원진살', data:_wonjinData, builder:buildWonjinBlock },
+    { name:'귀문관살', data:_gwimungwanData, builder:buildGwimungwanBlock },
+    { name:'백호대살', data:_baekhoData, builder:buildBaekhoBlock },
+    { name:'대운전환기', data:_daeunTransitionData, builder:buildDaeunTransitionBlock },
+    { name:'합화검증', data:_haphwaData, builder:buildHaphwaBlock },
+    { name:'십성분포', data:_tenGodsDistData, builder:buildTenGodsDistBlock },
+    { name:'격국검증', data:_geokgukValidData, builder:buildGeokgukValidBlock },
+    { name:'세운상호작용', data:_sewunInterData, builder:buildSewunInterBlock },
+    { name:'지장간분석', data:_jijangganData, builder:buildJijangganBlock },
+    { name:'통근분석', data:_rootStrengthData, builder:buildRootStrengthBlock },
+    { name:'용신재검증', data:_yongshinRevalidData, builder:buildYongshinRevalidBlock },
+    { name:'자평진전분석', data:_japyeongjinjeonData, builder:buildJapyeongjinjeonBlock },
+    { name:'적천수일간론', data:_cheonsuIlganData, builder:buildCheonsuIlganBlock },
+    { name:'조후용신분석', data:_johuYongshinData, builder:buildJohuYongshinBlock },
+    { name:'대운분리분석', data:_daeunSplitData, builder:buildDaeunSplitBlock },
+    { name:'세운확장분석', data:_sewunAdvancedData, builder:buildSewunAdvancedBlock },
+    { name:'월운절기분석', data:_monthlyJeolgiData, builder:buildMonthlyJeolgiBlock },
+    { name:'공망분석', data:_gongmangData, builder:buildGongmangBlock },
+    { name:'납음분석', data:_napeumData, builder:buildNapeumBlock },
+    { name:'특수신살', data:_specialShinsalData, builder:buildSpecialShinsalBlock },
+    { name:'십이운성확장', data:_twelveUnseongExtData, builder:build12UnseongExtBlock },
+    { name:'운세종합점수', data:_fortuneScoreData, builder:buildFortuneScoreBlock },
+  ];
 
-  // Level 7~10: 해당 타입 관련 → 완성 문장(서버 계산 결과), 나머지 → 요약 1줄
+  // 전체 블록(Level 1~10) 통합 처리: 문장 있으면 문장, 없으면 builder fallback
+  const ALL_BLOCKS = [...LEGACY_BLOCKS, ...BLOCKS];
   let detailSentences = '';
   const summaryLines = [];
-  for (const b of BLOCKS) {
+  for (const b of ALL_BLOCKS) {
     if (!b.data) continue;
     if (detailSet.has(b.name)) {
+      // 타입 관련 블록: 문장 우선, fallback builder
       const sentence = b.data['문장'];
       if (sentence) {
         detailSentences += `\n[${b.name}] ${sentence}\n`;
@@ -2275,8 +2296,14 @@ function buildAccuracyLayerBlock() {
         detailSentences += b.builder();
       }
     } else {
-      const s = b.data['요약'] || b.data['종합'] || null;
-      if (s) summaryLines.push(`${b.name}: ${s}`);
+      // 비관련 블록: 문장 → 요약 → 종합 순으로 1줄 요약
+      const sentence = b.data['문장'];
+      if (sentence) {
+        summaryLines.push(`${b.name}: ${sentence.length > 80 ? sentence.substring(0, 80) + '...' : sentence}`);
+      } else {
+        const s = b.data['요약'] || b.data['종합'] || null;
+        if (s) summaryLines.push(`${b.name}: ${s}`);
+      }
     }
   }
 
@@ -2286,7 +2313,7 @@ function buildAccuracyLayerBlock() {
   }
 
   // 해석지침은 AI 규칙이므로 항상 전문 유지
-  return legacy + (detailSentences ? '\n【사주 정밀분석 (서버 계산 완료, 아래 문장을 그대로 활용)】' + detailSentences : '') + compressed + buildInterpretGuideBlock();
+  return (detailSentences ? '\n【사주 정밀분석 (서버 계산 완료, 아래 문장을 그대로 활용)】' + detailSentences : '') + compressed + buildInterpretGuideBlock();
 }
 
 // ── 초기화 ──
