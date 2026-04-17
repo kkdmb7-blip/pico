@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 <style>
 :root {
   --bg: #0a0614;
@@ -286,9 +287,14 @@ nav {
   color: var(--muted);
 }
 .btn-share {
-  background: rgba(201,168,76,0.1);
-  border: 1px solid var(--golddim);
-  color: var(--gold);
+  background: #fee500;
+  border: none;
+  color: #3c1e1e;
+}
+.btn-consult {
+  background: linear-gradient(135deg, #7b5ea7, #a07fd4);
+  border: none;
+  color: #fff;
 }
 .orb-note {
   font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px;
@@ -497,7 +503,8 @@ nav {
     </div>
     <div id="sectionsWrap"></div>
     <div class="report-actions" id="reportActions" style="display:none;">
-      <button class="btn-action btn-share" onclick="shareReport()">🔗 공유하기</button>
+      <button class="btn-action btn-share" onclick="shareKakao()">💬 카카오로 공유하기</button>
+      <button class="btn-action btn-consult" onclick="window.open('http://pf.kakao.com/_krjxjn/chat','_blank')">🔮 상담사에게 묻기</button>
       <button class="btn-action btn-regen" onclick="regenReport()">🔄 다시 생성하기</button>
       <div class="orb-note" id="regenNote"></div>
     </div>
@@ -3610,14 +3617,35 @@ function splitIntoSections(text, count, startNum) {
   return [cleanSectionText(cleaned), ...Array(count - 1).fill('')];
 }
 
-// ── 공유 ──
-function shareReport() {
+// ── Kakao SDK 초기화 ──
+if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
+  Kakao.init('0c8f16db31d8b01ae2fc9cc2c7c56ea7');
+}
+
+// ── 카카오 공유 ──
+function shareKakao() {
   const url = location.href;
-  if (navigator.share) {
-    navigator.share({ title: _config.title, text: `AI가 분석한 나의 ${_config.title}`, url });
+  const title = '✨ ' + (_config?.title || 'AI 운세 리포트');
+  const desc = 'FORTUNA에서 AI가 분석한 나만의 운세 리포트를 확인해보세요!';
+  if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: title,
+        description: desc,
+        imageUrl: 'https://picolab.kr/og-image.png',
+        link: { mobileWebUrl: url, webUrl: url }
+      },
+      buttons: [{ title: '리포트 보기', link: { mobileWebUrl: url, webUrl: url } }]
+    });
   } else {
-    navigator.clipboard && navigator.clipboard.writeText(url)
-      .then(() => alert('링크가 복사됐어요!'));
+    // SDK 로드 실패 시 fallback
+    if (navigator.share) {
+      navigator.share({ title: title, text: desc, url: url });
+    } else {
+      navigator.clipboard && navigator.clipboard.writeText(url)
+        .then(() => alert('링크가 복사됐어요!'));
+    }
   }
 }
 </script>
