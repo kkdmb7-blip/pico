@@ -3984,6 +3984,18 @@ async function generateClassicReport() {
 // ── 응답을 섹션별 순차 호출로 표시 (1섹션 = 1 API 호출) ──
 async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isFirst) {
   const typeSec = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
+  // system prompt는 모든 섹션에서 동일 → 프롬프트 캐싱 히트
+  const sysPrompt = `당신은 ${theoryName || '억부지전'} 기반 사주 분석가입니다.
+절대 규칙:
+- #헤더 금지, 표 금지
+- **볼드**는 핵심 단어에만 3~5개
+- 톤: 따뜻하고 정확한 친구 같은 전문가
+- 없는 오행을 "있다"고 쓰면 안 됨
+- 용신(${ysFinal || ''})을 기신/불리로 쓰면 안 됨
+- 섹션 제목 쓰지 마세요 (카드 헤더에 이미 표시됨)
+- 본문 안에서 소항목 번호 쓸 때는 가), 나), 다) 형식 사용 (1. 2. 3. 사용 금지)
+- 분석 범위를 벗어난 미래 시점(다음 달, 내년 등) 예측·대비·언급 절대 금지
+- 【사주 정밀분석】 블록이 포함된 경우, 그 안의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 수치·판정·결론을 절대 변경하지 마세요.${wg || ''}`;
 
   for (let i = 0; i < secIndices.length; i++) {
     const secIdx = secIndices[i];
@@ -3994,26 +4006,15 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
     const controller = new AbortController();
     const tid = setTimeout(() => controller.abort(), 45000);
     try {
-      const sysPrompt = `당신은 ${theoryName || '억부지전'} 기반 사주 분석가입니다.
-절대 규칙:
-- #헤더 금지, 표 금지
-- **볼드**는 핵심 단어에만 3~5개
-- 톤: 따뜻하고 정확한 친구 같은 전문가
-- 없는 오행을 "있다"고 쓰면 안 됨
-- 용신(${ysFinal || ''})을 기신/불리로 쓰면 안 됨
-- 섹션 제목 쓰지 마세요 (카드 헤더에 이미 표시됨)
-- 본문 안에서 소항목 번호 쓸 때는 가), 나), 다) 형식 사용 (1. 2. 3. 사용 금지)
-- 분석 범위를 벗어난 미래 시점(다음 달, 내년 등) 예측·대비·언급 절대 금지
-- 【사주 정밀분석】 블록이 포함된 경우, 그 안의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 수치·판정·결론을 절대 변경하지 마세요.
-- 지금 섹션 ${secNum}번 "${secName}"만 작성하세요. 다른 섹션은 절대 쓰지 마세요.
-- 분량: 약 ${secChars}자.${wg || ''}`;
+      // 섹션별 지시는 user message 끝에 추가 → system이 동일하므로 캐시 히트
+      const sectionPrompt = prompt + `\n\n[작성 지시] 위 내용에서 섹션 ${secNum}번 "${secName}"만 작성하세요. 다른 섹션은 절대 쓰지 마세요. 분량: 약 ${secChars}자. 섹션 제목 반복 금지.`;
 
       const res = await fetch(CHAT_API, {
         signal: controller.signal,
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           user_id: _user.id,
-          messages: [{role: 'user', content: prompt}],
+          messages: [{role: 'user', content: sectionPrompt}],
           system_prompt: sysPrompt,
           mode: 'saju', max_tokens: Math.min(Math.round(secChars * 2.5), 1500),
           skip_orb: true
