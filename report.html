@@ -518,6 +518,9 @@ const SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
 const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
+// 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
+const REPORT_VERSION = 2;
+
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
     desc: '사주+베딕+자미두수로 보는 타고난 성격과 잠재력' },
@@ -1694,7 +1697,7 @@ async function startGeneration() {
 function getProfileKey() {
   const p = _profile;
   if (!p) return '';
-  return `${p.year}-${p.month}-${p.day}-${p.hour || 0}-${p.gender}`;
+  return `${p.year}-${p.month}-${p.day}-${p.hour || 0}-${p.gender}-v${REPORT_VERSION}`;
 }
 
 async function fetchExistingReport() {
