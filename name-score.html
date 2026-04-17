@@ -1537,7 +1537,33 @@ loadSajuData();
   setMode('auto');
   if (sur) document.getElementById('inputSur').value = sur;
   if (nm)  document.getElementById('inputName').value = nm;
-  if (sur && nm) setTimeout(calcScore, 150);
+  if (sur && nm) {
+    var card = document.getElementById('inputCardMain');
+    if (card) card.style.display = 'none';
+    setTimeout(function(){
+      calcScore();
+      var ra = document.getElementById('resultArea');
+      if (ra && !document.getElementById('retryNameBtn')) {
+        var btn = document.createElement('button');
+        btn.id = 'retryNameBtn';
+        btn.className = 'btn-gold';
+        btn.textContent = '다른 이름 확인하기';
+        btn.style.marginTop = '16px';
+        btn.onclick = function(){
+          if (card) card.style.display = '';
+          document.getElementById('inputSur').value = '';
+          document.getElementById('inputName').value = '';
+          btn.remove();
+          ra.style.display = 'none';
+          card.scrollIntoView({behavior:'smooth', block:'start'});
+        };
+        ra.parentNode.insertBefore(btn, ra.nextSibling);
+      }
+      setTimeout(function(){
+        if (ra) ra.scrollIntoView({behavior:'smooth', block:'start'});
+      }, 200);
+    }, 150);
+  }
 })();
 </script>
 </body>
