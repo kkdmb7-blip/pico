@@ -381,7 +381,7 @@ function renderIlganCard(y, m, d) {
   document.getElementById('ilganBranchH').textContent      = p.branchH;
   document.getElementById('ilganBranchH').style.color      = branchColor;
   document.getElementById('ilganDate').textContent = (isToday ? '오늘 · ' : (m+'월 '+d+'일 · ')) + p.stem+p.branch+'일';
-  document.getElementById('ilganTitle').textContent = EL_EMOJI[p.el] + ' ' + EL_DESC[p.el];
+  document.getElementById('ilganTitle').innerHTML = EL_EMOJI[p.el] + ' ' + EL_DESC[p.el];
   document.getElementById('ilganDesc').textContent = BRANCH_DESC[p.branch] || '';
 }
 
@@ -454,7 +454,7 @@ function showCompletedState(row) {
   document.getElementById('writeSteps').style.display = 'none';
   var t = getTodayKST();
   document.getElementById('completedDateLabel').textContent = t.m+'월 '+t.d+'일 기록 완료';
-  document.getElementById('completedMoodEmoji').textContent = MOOD_EMOJI[row.mood] || '—';
+  document.getElementById('completedMoodEmoji').innerHTML = MOOD_EMOJI[row.mood] || '—';
   var tags = document.getElementById('completedEventTags');
   tags.innerHTML = (row.events||[]).map(function(ev){ return '<span class="ev-tag">'+ev+'</span>'; }).join('');
   var memoEl = document.getElementById('completedMemo');
