@@ -2214,14 +2214,44 @@ function buildIljuCompatBlock() {
   return s;
 }
 function buildAccuracyLayerBlock() {
-  // 압축 요약 방식 — 각 분석의 핵심 결론만 1줄씩 모아 AI에 전달
-  const lines = [];
-  const add = (label, data, summaryKey) => {
-    if (!data) return;
-    const s = data[summaryKey || '요약'] || data['종합'] || null;
-    if (s) lines.push(`${label}: ${s}`);
+  // 타입별 상세 블록 매핑 — 해당 타입에 필요한 블록은 상세, 나머지는 요약
+  const DETAIL_MAP = {
+    character: ['일주론','격국세분','강약수치','십신궁위','특수패턴','사주균형','조후'],
+    money:     ['재물운','직업적성','대운세운교차','세운월별','대운트렌드','강약수치'],
+    love:      ['일주궁합','십신궁위','귀인','특수패턴','건강경향','사주균형'],
+    daeun:     ['대운세운교차','대운트렌드','세운월별','형충회합','강약수치','천간합충'],
+    year:      ['대운세운교차','세운월별','형충회합','신살종합','건강경향','대운트렌드'],
+    month:     ['세운월별','대운세운교차','형충회합','신살종합'],
+    yongsin:   ['강약수치','격국세분','조후','천간합충','대운트렌드'],
+    career_deep: ['직업적성','재물운','격국세분','대운트렌드','대운세운교차'],
+    triple:    ['대운세운교차','세운월별','형충회합','건강경향','재물운'],
   };
-  // Level 1~6 (기존 블록 — 요약 없는 것은 상세 블록 유지)
+  const detailSet = new Set(DETAIL_MAP[_type] || []);
+
+  // 블록 이름 → {data, builder} 매핑
+  const BLOCKS = [
+    { name:'귀인', data:_guiinData, builder:buildGuiinBlock },
+    { name:'양인살', data:_yanginData, builder:buildYanginBlock },
+    { name:'대운트렌드', data:_daeunTrendData, builder:buildDaeunTrendBlock },
+    { name:'사주균형', data:_balanceData, builder:buildBalanceBlock },
+    { name:'특수패턴', data:_specialPatternData, builder:buildSpecialPatternBlock },
+    { name:'형충회합', data:_hyungChungData, builder:buildHyungChungBlock },
+    { name:'조후', data:_johuPreciseData, builder:buildJohuPreciseBlock },
+    { name:'십신궁위', data:_tenGodPosData, builder:buildTenGodPosBlock },
+    { name:'신살종합', data:_sinsalSummaryData, builder:buildSinsalSummaryBlock },
+    { name:'세운월별', data:_sewunMonthlyData, builder:buildSewunMonthlyBlock },
+    { name:'일주론', data:_iljuProfileData, builder:buildIljuProfileBlock },
+    { name:'천간합충', data:_stemInterData, builder:buildStemInterBlock },
+    { name:'격국세분', data:_geokDetailData, builder:buildGeokDetailBlock },
+    { name:'강약수치', data:_strengthScoreData, builder:buildStrengthScoreBlock },
+    { name:'대운세운교차', data:_daeunSewunCrossData, builder:buildDaeunSewunCrossBlock },
+    { name:'재물운', data:_wealthDetailData, builder:buildWealthDetailBlock },
+    { name:'건강경향', data:_healthTrendData, builder:buildHealthTrendBlock },
+    { name:'직업적성', data:_careerFitData, builder:buildCareerFitBlock },
+    { name:'일주궁합', data:_iljuCompatData, builder:buildIljuCompatBlock },
+  ];
+
+  // Level 1~6 기존 블록 (상세 유지)
   let legacy = buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
     + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
     + buildDaeunTransitionBlock() + buildHaphwaBlock()
@@ -2232,34 +2262,26 @@ function buildAccuracyLayerBlock() {
     + buildGongmangBlock() + buildNapeumBlock() + buildSpecialShinsalBlock()
     + build12UnseongExtBlock() + buildFortuneScoreBlock();
 
-  // Level 7~10 — 요약만 압축
-  add('귀인', _guiinData);
-  add('양인살', _yanginData);
-  add('대운트렌드', _daeunTrendData);
-  add('사주균형', _balanceData);
-  add('특수패턴', _specialPatternData);
-  add('형충회합', _hyungChungData);
-  add('조후', _johuPreciseData);
-  add('십신궁위', _tenGodPosData);
-  add('신살종합', _sinsalSummaryData);
-  add('세운월별', _sewunMonthlyData);
-  add('일주론', _iljuProfileData);
-  add('천간합충', _stemInterData);
-  add('격국세분', _geokDetailData);
-  add('강약수치', _strengthScoreData);
-  add('대운세운교차', _daeunSewunCrossData);
-  add('재물운', _wealthDetailData);
-  add('건강경향', _healthTrendData);
-  add('직업적성', _careerFitData);
-  add('일주궁합', _iljuCompatData);
-
-  let compressed = '';
-  if (lines.length) {
-    compressed = '\n【사주 정밀분석 요약 (계산완료)】\n' + lines.join('\n') + '\n(위 데이터는 서버에서 사전 계산된 결과. 그대로 활용하여 해석할 것)\n';
+  // Level 7~10: 해당 타입 관련 → 상세, 나머지 → 요약 1줄
+  let detailBlocks = '';
+  const summaryLines = [];
+  for (const b of BLOCKS) {
+    if (!b.data) continue;
+    if (detailSet.has(b.name)) {
+      detailBlocks += b.builder();
+    } else {
+      const s = b.data['요약'] || b.data['종합'] || null;
+      if (s) summaryLines.push(`${b.name}: ${s}`);
+    }
   }
 
-  // 해석지침은 AI 규칙이므로 전문 유지
-  return legacy + compressed + buildInterpretGuideBlock();
+  let compressed = '';
+  if (summaryLines.length) {
+    compressed = '\n【참고 데이터 요약】\n' + summaryLines.join('\n') + '\n';
+  }
+
+  // 해석지침은 AI 규칙이므로 항상 전문 유지
+  return legacy + detailBlocks + compressed + buildInterpretGuideBlock();
 }
 
 // ── 초기화 ──
