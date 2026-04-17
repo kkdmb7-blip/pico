@@ -1329,7 +1329,7 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <div onclick="window.location.href='report.html?type=vedic_full'" style="background:var(--surface2);border:1px solid rgba(148,130,220,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(148,130,220,0.6)'" onmouseout="this.style.borderColor='rgba(148,130,220,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-galaxy"></i></div>
+        <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-lotus"></i></div>
         <div style="font-size:13px;font-weight:700;color:#9482dc;margin-bottom:4px;">베딕 심층 분석</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">낙샤트라·다샤·라시로 보는 운명 패턴</div>
         <div style="margin-top:8px;font-size:10px;font-weight:600;color:#9482dc;">500 Orb</div>
@@ -1341,13 +1341,13 @@
         <div style="margin-top:8px;font-size:10px;font-weight:600;color:#ffd864;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=ziwei_full'" style="background:var(--surface2);border:1px solid rgba(100,180,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,180,255,0.6)'" onmouseout="this.style.borderColor='rgba(100,180,255,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-galaxy"></i></div>
+        <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-ziwei"></i></div>
         <div style="font-size:13px;font-weight:700;color:#64b4ff;margin-bottom:4px;">자미두수 심층</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">명궁·재백·관록궁으로 보는 운명</div>
         <div style="margin-top:8px;font-size:10px;font-weight:600;color:#64b4ff;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=career_deep'" style="background:var(--surface2);border:1px solid rgba(100,220,150,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,220,150,0.6)'" onmouseout="this.style.borderColor='rgba(100,220,150,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-rocket"></i></div>
+        <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-target"></i></div>
         <div style="font-size:13px;font-weight:700;color:#64dc96;margin-bottom:4px;">직업·사업 심층</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">3시스템으로 보는 직업 구조 분석</div>
         <div style="margin-top:8px;font-size:10px;font-weight:600;color:#64dc96;">600 Orb</div>
@@ -2610,7 +2610,7 @@ async function openHistoryModal() {
   list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">불러오는 중...</div>';
 
   var allItems = [];
-  var TYPE_ICON = { character:'<i class="pi pi-star"></i>', money:'<i class="pi pi-coin"></i>', love:'<i class="pi pi-heart"></i>', daeun:'<i class="pi pi-crystal"></i>', year:'<i class="pi pi-calendar"></i>', month:'<i class="pi pi-calendar"></i>', yongsin:'<i class="pi pi-bolt"></i>', vedic_full:'<i class="pi pi-galaxy"></i>', astro_full:'⭐', ziwei_full:'<i class="pi pi-galaxy"></i>', triple:'<i class="pi pi-eye"></i>', career_deep:'<i class="pi pi-rocket"></i>', gunghap:'<i class="pi pi-heart"></i>', saju:'<i class="pi pi-temple"></i>️' };
+  var TYPE_ICON = { character:'<i class="pi pi-star"></i>', money:'<i class="pi pi-coin"></i>', love:'<i class="pi pi-heart"></i>', daeun:'<i class="pi pi-crystal"></i>', year:'<i class="pi pi-calendar"></i>', month:'<i class="pi pi-calendar"></i>', yongsin:'<i class="pi pi-bolt"></i>', vedic_full:'<i class="pi pi-lotus"></i>', astro_full:'⭐', ziwei_full:'<i class="pi pi-ziwei"></i>', triple:'<i class="pi pi-eye"></i>', career_deep:'<i class="pi pi-target"></i>', gunghap:'<i class="pi pi-heart"></i>', saju:'<i class="pi pi-temple"></i>️' };
   var TYPE_LABEL = { character:'기질 분석', money:'재물·직업 운', love:'연애·인연 운', daeun:'대운 흐름', year:'신년운', month:'이달 월운', yongsin:'용신 생활 가이드', vedic_full:'베딕 운명 분석', astro_full:'서양 점성술 분석', ziwei_full:'자미두수 분석', triple:'동서양 통합 분석', career_deep:'직업·사업 심층' };
 
   // 기존 analysis-history 조회
