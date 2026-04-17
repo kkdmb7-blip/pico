@@ -737,7 +737,6 @@ function prefillRecommend() {
   var hint = document.getElementById('recYongsinHint');
   if (_yongsin) {
     var ys = getYongsinOhaeng(_yongsin);
-    var KO_OH = {'목':'木','화':'火','토':'土','금':'金','수':'水'};
     hint.innerHTML = '내 용신: <b style="color:var(--gold);">' + _yongsin + '</b> (' + ys + '오행) — 이 오행을 가진 한자를 우선 추천합니다.';
   } else {
     var user = null;
@@ -750,9 +749,9 @@ function prefillRecommend() {
   }
 }
 
-// 여아/남아 선호 오행 키워드 (의미 기반 대략 분류)
-var MALE_PREF_MEAN = ['굳세다','강하다','크다','높다','세우다','건강하다','빛나다','이루다','용','뛰어나다','임금','장수','나라','하늘','무예','준마','의롭다','지혜','명예','온전하다','건장하다','받들다','공경하다'];
-var FEMALE_PREF_MEAN = ['아름답다','예쁘다','상서롭다','맑다','꽃답다','옥','향기롭다','꽃','연꽃','난초','기쁘다','편안하다','착하다','부드럽다','은혜','우아하다','빛나다','구슬','보배','사랑'];
+// 여아/남아 선호 의미 키워드 (중립 키워드는 양쪽에서 제외)
+var MALE_PREF_MEAN = ['굳세다','강하다','크다','높다','세우다','건강하다','이루다','용','뛰어나다','임금','장수','나라','무예','준마','의롭다','명예','온전하다','건장하다','받들다','공경하다'];
+var FEMALE_PREF_MEAN = ['아름답다','예쁘다','상서롭다','맑다','꽃답다','옥','향기롭다','꽃','연꽃','난초','기쁘다','편안하다','착하다','부드럽다','은혜','우아하다','구슬','보배','사랑'];
 
 function scoreGenderFit(meaning, gender) {
   if (gender === 'all' || !meaning) return 0;
