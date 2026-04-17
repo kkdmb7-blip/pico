@@ -1164,6 +1164,9 @@ let _samjaeData = null;
 let _twelveStarsData = null;
 let _jeolgiData = null;
 let _moonPhaseData = null;
+let _currentMonthPillar = null;  // API에서 계산된 현재 월건 (e.g. "임진")
+let _currentMonthPillarHanja = null;
+let _currentMonthTenGod = null;  // 이달 천간의 일간 대비 십신
 let _wonjinData = null;
 let _gwimungwanData = null;
 let _baekhoData = null;
@@ -1225,25 +1228,6 @@ function renderMarkdown(text) {
 
 // 안전한 배열→문자열 변환 (API가 문자열을 반환할 수 있음)
 function safeJoin(v, sep) { return Array.isArray(v) ? v.join(sep||', ') : (v||''); }
-
-// 현재 월건(월주) 계산 — 년간 기준 월간 산출
-function calcCurrentMonthPillar(y, m) {
-  const STEMS = ['갑','을','병','정','무','기','경','신','임','계'];
-  const BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
-  // 1월은 입춘(~2/4) 이전이므로 전년 년간 사용
-  const sajuYear = (m <= 1) ? y - 1 : y;
-  const yearStemIdx = ((sajuYear - 4) % 10 + 10) % 10;
-  // 양력 월 → 지지: 1월=축(1), 2월=인(2)... 11월=해(11), 12월=자(0)
-  const branchIdx = m === 12 ? 0 : m;
-  // 월간 기준표: 갑기→병인, 을경→무인, 병신→경인, 정임→임인, 무계→갑인
-  const MONTH_STEM_BASE = [2,4,6,8,0];
-  const base = MONTH_STEM_BASE[yearStemIdx % 5];
-  // 인월(branch=2)부터 순서
-  const BRANCH_ORDER = [2,3,4,5,6,7,8,9,10,11,0,1];
-  const monthOrder = BRANCH_ORDER.indexOf(branchIdx);
-  const monthStemIdx = (base + monthOrder) % 10;
-  return STEMS[monthStemIdx] + BRANCHES[branchIdx];
-}
 
 // ── 사주 전체 데이터 조회 ──
 async function loadSajuData() {
@@ -1365,6 +1349,9 @@ async function loadAllData(withZiwei, withAstro) {
       _twelveStarsData = _rptFull['십이신살'] || null;
       _jeolgiData = _rptFull['절기정보'] || null;
       _moonPhaseData = _rptFull['달의상'] || null;
+      _currentMonthPillar = _rptFull['현재월건'] || null;
+      _currentMonthPillarHanja = _rptFull['현재월건한자'] || null;
+      _currentMonthTenGod = _rptFull['이달십신'] || null;
       _wonjinData = _rptFull['원진살'] || null;
       _gwimungwanData = _rptFull['귀문관살'] || null;
       _baekhoData = _rptFull['백호대살'] || null;
@@ -2620,9 +2607,10 @@ async function generateMonthReport() {
   const sb2 = buildSajuBlock(), vb = buildVedicBlock(), db = buildDaeunBlock(), profileStr = buildProfileStr();
   const ysFinal = _sdFull?.yongshin?.primary || _yongsin || '미확인';
   const monthStr = `${thisYear}년 ${thisMonth}월`;
-  // 정확한 월건(월주) 계산
-  const currentMonthPillar = calcCurrentMonthPillar(thisYear, thisMonth);
-  const monthPillarStr = `${currentMonthPillar}월(${thisYear}년 ${thisMonth}월 월건)`;
+  // 월건(월주) — Worker API에서 계산된 값 사용
+  const currentMonthPillar = _currentMonthPillar || '미확인';
+  const monthTenGodFromAPI = _currentMonthTenGod || '미확인';
+  const monthPillarStr = `${currentMonthPillar}월(${_currentMonthPillarHanja||''}) — ${thisYear}년 ${thisMonth}월 월건`;
   // 일주별 월운 DB 데이터
   const monthlyIljuData = _rptFull?.월별운세 || null;
   const monthlyIljuBlock = monthlyIljuData
@@ -2637,13 +2625,14 @@ async function generateMonthReport() {
         system_prompt:`당신은 사주 월운 분석 엔진입니다. JSON만 반환. 해설 금지.
 현재: ${monthStr}
 이달 월건(월주): ${monthPillarStr}
-month_ten_god: 이달 월건 천간(${currentMonthPillar.charAt(0)})의 일간 대비 십신
-month_theme: 이달 ��심 ���마 한 문장
-opportunities: 이달 기회 배열 최대2���
+이달 월건 천간의 십신: ${monthTenGodFromAPI}
+month_ten_god: "${monthTenGodFromAPI}" (위 �� 그대로 사용)
+month_theme: 이달 핵심 테마 한 문장
+opportunities: 이달 기회 배열 최대2개
 cautions: 이달 주의사항 배열 최대2개
-best_area: 이달 가장 유리한 ���야
+best_area: 이달 가장 유리한 분야
 writing_guidelines: 절대 쓰면 안 될 표현 배열`,
-        messages:[{role:'user',content:`월운 분석:\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n이달: ${monthStr}\n이달 월건: ${monthPillarStr}`}]
+        messages:[{role:'user',content:`월운 분석:\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n이달: ${monthStr}\n이달 월건: ${monthPillarStr}\n이달 십신: ${monthTenGodFromAPI}`}]
       })
     });
     clearTimeout(step1Tid);
@@ -2661,8 +2650,8 @@ ${sb2}
 
 【${monthStr} 월운 분석】
 이달 월건(월주): ${monthPillarStr}
-이달월건 십신: ${monthFrame.month_ten_god}
-���달테마: ${monthFrame.month_theme}
+이달월건 십신: ${monthTenGodFromAPI}
+이달테마: ${monthFrame.month_theme}
 기회: ${safeJoin(monthFrame.opportunities)||'없음'}
 주의: ${safeJoin(monthFrame.cautions)||'없음'}
 유리한분야: ${monthFrame.best_area||'미확인'}
