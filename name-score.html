@@ -378,6 +378,36 @@ nav {
       <label class="field-label">성(姓)</label>
       <input class="name-input" id="recSur" type="text" maxlength="3" placeholder="김">
     </div>
+
+    <div style="margin-bottom:14px;padding:12px;background:rgba(123,94,167,0.06);border:1px solid rgba(212,175,55,0.2);border-radius:10px;">
+      <div style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.1em;margin-bottom:10px;">누구의 이름인가요?</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
+        <button type="button" class="mode-tab active" id="recTargetSelf" onclick="setRecTarget('self')">내 프로필 기준</button>
+        <button type="button" class="mode-tab" id="recTargetOther" onclick="setRecTarget('other')">다른 사람 입력</button>
+      </div>
+      <div id="recTargetForm" style="display:none;">
+        <label class="field-label">생년월일</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+          <select id="recTargetYear" class="name-input" style="font-size:13px;padding:10px 8px;"><option value="">년</option></select>
+          <select id="recTargetMonth" class="name-input" style="font-size:13px;padding:10px 8px;"><option value="">월</option></select>
+          <select id="recTargetDay" class="name-input" style="font-size:13px;padding:10px 8px;"><option value="">일</option></select>
+        </div>
+        <label class="field-label">태어난 시간 (선택)</label>
+        <select id="recTargetHour" class="name-input" style="font-size:13px;padding:10px 8px;">
+          <option value="">시 모름</option>
+          <option value="0">0시 (자시)</option>
+          <option value="1">1시</option><option value="2">2시</option><option value="3">3시</option>
+          <option value="4">4시</option><option value="5">5시</option><option value="6">6시</option>
+          <option value="7">7시</option><option value="8">8시</option><option value="9">9시</option>
+          <option value="10">10시</option><option value="11">11시</option><option value="12">12시</option>
+          <option value="13">13시</option><option value="14">14시</option><option value="15">15시</option>
+          <option value="16">16시</option><option value="17">17시</option><option value="18">18시</option>
+          <option value="19">19시</option><option value="20">20시</option><option value="21">21시</option>
+          <option value="22">22시</option><option value="23">23시</option>
+        </select>
+      </div>
+    </div>
+
     <div style="margin-bottom:14px;">
       <label class="field-label">성별 (선택)</label>
       <div style="display:flex; gap:8px;">
@@ -732,23 +762,90 @@ function setRecGender(g) {
   });
 }
 
+var recTarget = 'self'; // 'self' | 'other'
+var _targetYongsin = null; // 직접 입력 모드에서 받은 용신
+function _populateRecSelect(selId, type) {
+  var el = document.getElementById(selId);
+  if (!el || el.options.length > 1) return;
+  if (type === 'year') {
+    for (var y = new Date().getFullYear(); y >= 1930; y--) {
+      var o = document.createElement('option'); o.value = y; o.textContent = y + '년'; el.appendChild(o);
+    }
+  } else if (type === 'month') {
+    for (var m = 1; m <= 12; m++) {
+      var o = document.createElement('option'); o.value = m; o.textContent = m + '월'; el.appendChild(o);
+    }
+  } else if (type === 'day') {
+    for (var d = 1; d <= 31; d++) {
+      var o = document.createElement('option'); o.value = d; o.textContent = d + '일'; el.appendChild(o);
+    }
+  }
+}
+function setRecTarget(t) {
+  recTarget = t;
+  document.getElementById('recTargetSelf').classList.toggle('active', t === 'self');
+  document.getElementById('recTargetOther').classList.toggle('active', t === 'other');
+  document.getElementById('recTargetForm').style.display = (t === 'other') ? 'block' : 'none';
+  if (t === 'other') {
+    _populateRecSelect('recTargetYear','year');
+    _populateRecSelect('recTargetMonth','month');
+    _populateRecSelect('recTargetDay','day');
+  }
+  _targetYongsin = null;
+  updateTargetHint();
+}
+function updateTargetHint() {
+  var hint = document.getElementById('recYongsinHint');
+  if (recTarget === 'other') {
+    if (_targetYongsin) {
+      var ys = getYongsinOhaeng(_targetYongsin);
+      hint.innerHTML = '입력한 사주의 용신: <b style="color:var(--gold);">' + _targetYongsin + '</b> (' + ys + '오행) — 이 오행을 우선 추천합니다.';
+    } else {
+      hint.innerHTML = '생년월일을 입력하면 해당 사주의 용신을 기준으로 추천합니다.';
+    }
+  } else {
+    if (_yongsin) {
+      var ys = getYongsinOhaeng(_yongsin);
+      hint.innerHTML = '내 용신: <b style="color:var(--gold);">' + _yongsin + '</b> (' + ys + '오행) — 이 오행을 가진 한자를 우선 추천합니다.';
+    } else {
+      var user = null;
+      try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+      hint.innerHTML = user
+        ? '프로필 등록 시 내 사주 용신과 매칭되는 이름을 우선 추천해드립니다.'
+        : '로그인 후 프로필을 등록하시면 내 사주 용신과 매칭되는 이름을 우선 추천해드립니다.';
+    }
+  }
+}
+function fetchTargetYongsin(cb) {
+  var y = parseInt(document.getElementById('recTargetYear').value);
+  var m = parseInt(document.getElementById('recTargetMonth').value);
+  var d = parseInt(document.getElementById('recTargetDay').value);
+  var hRaw = document.getElementById('recTargetHour').value;
+  var h = hRaw === '' ? -1 : parseInt(hRaw);
+  if (!y || !m || !d) { showToast('생년월일을 모두 입력해주세요', true); return; }
+  var g = recGender === 'F' ? 'F' : 'M';
+  fetch('https://fortuna.kkdmb7.workers.dev/saju-report', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ name: '대상', gender: g, year: y, month: m, day: d, hour: h })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    _targetYongsin = data.yongshin || data.yongsin || null;
+    updateTargetHint();
+    if (cb) cb();
+  })
+  .catch(function(){
+    showToast('사주 계산 실패. 다시 시도해주세요', true);
+    if (cb) cb();
+  });
+}
+
 function prefillRecommend() {
   var curSur = document.getElementById('inputSur').value.trim();
   var recSur = document.getElementById('recSur');
   if (curSur && !recSur.value) recSur.value = curSur;
-  var hint = document.getElementById('recYongsinHint');
-  if (_yongsin) {
-    var ys = getYongsinOhaeng(_yongsin);
-    hint.innerHTML = '내 용신: <b style="color:var(--gold);">' + _yongsin + '</b> (' + ys + '오행) — 이 오행을 가진 한자를 우선 추천합니다.';
-  } else {
-    var user = null;
-    try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
-    if (!user) {
-      hint.innerHTML = '로그인 후 프로필을 등록하시면 내 사주 용신과 매칭되는 이름을 우선 추천해드립니다.';
-    } else {
-      hint.innerHTML = '프로필 등록 시 내 사주 용신과 매칭되는 이름을 우선 추천해드립니다.';
-    }
-  }
+  updateTargetHint();
 }
 
 // 여아/남아 선호 의미 키워드 (중립 키워드는 양쪽에서 제외)
@@ -767,11 +864,23 @@ function runRecommend() {
   if (!sur) { showToast('성(姓)을 입력해주세요', true); return; }
   var surList = SURNAME_HANJA[sur];
   if (!surList || !surList.length) { showToast('등록된 성씨가 아닙니다', true); return; }
+  // 직접 입력 모드인데 아직 용신 미계산이면 먼저 fetch
+  if (recTarget === 'other' && !_targetYongsin) {
+    var y = parseInt(document.getElementById('recTargetYear').value);
+    var m = parseInt(document.getElementById('recTargetMonth').value);
+    var d = parseInt(document.getElementById('recTargetDay').value);
+    if (y && m && d) {
+      showToast('사주 계산 중...');
+      fetchTargetYongsin(function(){ runRecommend(); });
+      return;
+    }
+  }
   var surItem = surList[0]; // [hanja, strokes, oheng]
   var surHanja = surItem[0], surSt = surItem[1];
   var yongsinHan = null;
-  if (_yongsin) {
-    var yoh = getYongsinOhaeng(_yongsin);
+  var activeYongsin = (recTarget === 'other') ? _targetYongsin : _yongsin;
+  if (activeYongsin) {
+    var yoh = getYongsinOhaeng(activeYongsin);
     var KO_OH = {'목':'木','화':'火','토':'土','금':'金','수':'水'};
     yongsinHan = KO_OH[yoh];
   }
