@@ -522,7 +522,7 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
-const REPORT_VERSION = 5;
+const REPORT_VERSION = 6;
 
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
@@ -1178,6 +1178,10 @@ let _sewunInterData = null;
 let _jijangganData = null;
 let _rootStrengthData = null;
 let _yongshinRevalidData = null;
+// Level 4
+let _japyeongjinjeonData = null;
+let _cheonsuIlganData = null;
+let _johuYongshinData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1363,6 +1367,10 @@ async function loadAllData(withZiwei, withAstro) {
       _jijangganData = _rptFull['지장간분석'] || null;
       _rootStrengthData = _rptFull['통근분석'] || null;
       _yongshinRevalidData = _rptFull['용신재검증'] || null;
+      // Level 4
+      _japyeongjinjeonData = _rptFull['자평진전분석'] || null;
+      _cheonsuIlganData = _rptFull['적천수일간론'] || null;
+      _johuYongshinData = _rptFull['조후용신분석'] || null;
     }
   } catch(e){}
   try {
@@ -1629,12 +1637,53 @@ function buildYongshinRevalidBlock() {
 (용신 재검증 결과를 분석의 방향성 설정에 참고할 것)\n`;
 }
 
+// Level 4 블록 빌더
+function buildJapyeongjinjeonBlock() {
+  if (!_japyeongjinjeonData) return '';
+  const d = _japyeongjinjeonData;
+  let s = `\n【자평진전 격국용신론】\n격국: ${d.격국} (${d.격국근거||''})\n`;
+  if (d.특수격여부) s += `특수격: ${d.특수격} — 정격 체계 대신 적천수 적용\n`;
+  s += `자평진전 규칙: ${d.자평진전규칙||''}\n격국 상태: ${d.격국상태||''}\n`;
+  if (d.상신분석 && d.상신분석.length > 0) {
+    s += '상신(相神): ' + d.상신분석.map(function(a){return a.상신+'(사주'+a.사주내개수+'개,'+(a.충족?'충족':'미충족')+')'}).join(', ') + '\n';
+  }
+  if (d.기신분석 && d.기신분석.length > 0) {
+    s += '기신(忌神): ' + d.기신분석.map(function(a){return a.기신+'(사주'+a.사주내개수+'개,'+(a.활성?'활성⚠':'비활성')+')'}).join(', ') + '\n';
+  }
+  if (d.격국용신) s += `격국용신: ${d.격국용신.격국용신} — ${d.격국용신.근거}\n`;
+  s += '(자평진전 격국용신론을 격국 해석과 용신 활용 방향에 반드시 반영할 것)\n';
+  return s;
+}
+function buildCheonsuIlganBlock() {
+  if (!_cheonsuIlganData) return '';
+  const d = _cheonsuIlganData;
+  let s = `\n【적천수 일간론】${d.일간}(${d.일간오행}) × ${d.계절}\n`;
+  if (d.적천수원문) s += `원문: ${d.적천수원문}\n`;
+  s += `환경: ${d.환경분석||''}\n핵심: ${d.핵심||''}\n주의: ${d.주의사항||''}\n`;
+  s += `용신경향: ${d.용신경향||''}\n강약해석: ${d.강약해석||''}\n`;
+  s += '(적천수 원문과 일간×계절 분석을 원국 해석의 근거로 활용할 것)\n';
+  return s;
+}
+function buildJohuYongshinBlock() {
+  if (!_johuYongshinData) return '';
+  const d = _johuYongshinData;
+  let s = `\n【궁통보감 조후용신】\n한난: ${d.한난}(${d.한난점수}) / 조습: ${d.조습}(${d.조습점수})\n`;
+  s += `조후긴급도: ${d.조후긴급도}/10 — ${d.긴급설명||''}\n`;
+  s += `조후용신: ${safeJoin(d.조후용신)} / 억부용신: ${d.억부용신||''}\n`;
+  s += `일치여부: ${d.일치여부 ? '✓ 일치(최상)' : '✗ 불일치'}\n`;
+  s += `우선순위: ${d.우선순위||''}\n`;
+  if (d.월지기후) s += `월지기후: ${d.월지기후}\n`;
+  s += '(조후용신 분석을 용신 활용 및 대운 해석에 반영. 긴급도 높으면 조후 우선)\n';
+  return s;
+}
+
 function buildAccuracyLayerBlock() {
   return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
     + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
     + buildDaeunTransitionBlock() + buildHaphwaBlock()
     + buildTenGodsDistBlock() + buildGeokgukValidBlock() + buildSewunInterBlock()
-    + buildJijangganBlock() + buildRootStrengthBlock() + buildYongshinRevalidBlock();
+    + buildJijangganBlock() + buildRootStrengthBlock() + buildYongshinRevalidBlock()
+    + buildJapyeongjinjeonBlock() + buildCheonsuIlganBlock() + buildJohuYongshinBlock();
 }
 
 // ── 초기화 ──
