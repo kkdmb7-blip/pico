@@ -400,11 +400,11 @@ async function interpretWithAI() {
   resultBox.className = 'result-box loading';
   var waitMsgs = ['<i class="pi pi-star"></i> 타로가 메시지를 읽는 중...','<i class="pi pi-sparkle"></i> 별자리와 연결 중...','<i class="pi pi-crystal"></i> 운명을 살펴보는 중...','<i class="pi pi-sparkle"></i> 해석하는 중...'];
   var msgIdx = 0;
-  resultBox.textContent = waitMsgs[0];
+  resultBox.innerHTML = waitMsgs[0];
   var waitTimer = setInterval(function() {
     msgIdx = (msgIdx + 1) % waitMsgs.length;
     resultBox.style.opacity = '0';
-    setTimeout(function() { resultBox.textContent = waitMsgs[msgIdx]; resultBox.style.opacity = '1'; }, 300);
+    setTimeout(function() { resultBox.innerHTML = waitMsgs[msgIdx]; resultBox.style.opacity = '1'; }, 300);
   }, 2500);
   var labels = ['현재 상황', '핵심 원인', '앞으로의 흐름'];
   var question = document.getElementById('tarotQuestion').value.trim();
