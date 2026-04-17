@@ -3369,7 +3369,9 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 - 톤: 따뜻하고 정확한 친구 같은 전문가
 - 없는 오행을 "있다"고 쓰면 안 됨
 - 용신(${ysFinal || ''})을 기신/불리로 쓰면 안 됨
-- 요청한 섹션 구성대로 번호를 붙여 작성${wg || ''}`;
+- 각 섹션 시작 전에 반드시 ===N=== 구분자를 넣을 것 (N은 섹션 번호). 예: ===1===, ===2===
+- 섹션 본문에 섹션 제목 반복 금지 (제목은 구분자가 대체)
+- 본문 안에서 소항목 번호 쓸 때는 가), 나), 다) 형식 사용 (1. 2. 3. 사용 금지)${wg || ''}`;
 
     const res = await fetch(CHAT_API, {
       signal: controller.signal,
@@ -3426,18 +3428,44 @@ function stripDuplicateTitle(s, sectionName) {
 }
 function splitIntoSections(text, count, startNum) {
   startNum = startNum || 1;
-  // 전략1: 기대하는 섹션 번호(startNum ~ startNum+count-1)만 정확히 매칭
+  // 전략0 (최우선): ===N=== 구분자 매칭
+  const delimPositions = [];
+  for (let n = startNum; n < startNum + count; n++) {
+    const re = new RegExp('={3}' + n + '={3}', 'g');
+    const ms = [...text.matchAll(re)];
+    if (ms.length === 0) { delimPositions.length = 0; break; }
+    const prevEnd = delimPositions.length > 0 ? delimPositions[delimPositions.length-1].idx + 1 : 0;
+    const valid = ms.filter(m => m.index >= prevEnd);
+    if (valid.length === 0) { delimPositions.length = 0; break; }
+    delimPositions.push({ idx: valid[0].index, len: valid[0][0].length });
+  }
+  if (delimPositions.length === count) {
+    return delimPositions.map((p, i) => {
+      const start = p.idx + p.len;
+      const end = i + 1 < delimPositions.length ? delimPositions[i+1].idx : text.length;
+      return cleanSectionText(text.slice(start, end));
+    });
+  }
+  // 전략1: 기대하는 섹션 번호 매칭 (빈줄 뒤 N. 우선)
   const positions = [];
   for (let n = startNum; n < startNum + count; n++) {
-    // "N." 이 줄 시작에 오는 패턴 (볼드 마크 허용)
-    const re = new RegExp('(?:^|\\n)\\s*\\*{0,2}\\s*' + n + '\\.\\s', 'g');
-    const ms = [...text.matchAll(re)];
-    if (ms.length === 0) { positions.length = 0; break; }
-    // 여러 매치가 있으면, 이전 섹션 위치 이후의 첫 매치 사용
+    // 빈줄(또는 텍스트 시작) 뒤에 오는 N. 패턴 — 본문 내 소항목과 구분
+    const reStrong = new RegExp('(?:^|\\n\\n)\\s*\\*{0,2}\\s*' + n + '[.):]?\\*{0,2}\\s', 'g');
+    const reWeak = new RegExp('(?:^|\\n)\\s*\\*{0,2}\\s*' + n + '\\.\\*{0,2}\\s', 'g');
     const prevEnd = positions.length > 0 ? positions[positions.length-1].idx + 1 : 0;
-    const valid = ms.filter(m => m.index >= prevEnd);
-    if (valid.length === 0) { positions.length = 0; break; }
-    positions.push({ idx: valid[0].index, len: valid[0][0].length });
+    // 빈줄 매치 먼저 시도
+    let msStrong = [...text.matchAll(reStrong)].filter(m => m.index >= prevEnd);
+    if (msStrong.length > 0) {
+      positions.push({ idx: msStrong[0].index, len: msStrong[0][0].length });
+      continue;
+    }
+    // fallback: 단일 줄바꿈 매치
+    let msWeak = [...text.matchAll(reWeak)].filter(m => m.index >= prevEnd);
+    if (msWeak.length > 0) {
+      positions.push({ idx: msWeak[0].index, len: msWeak[0][0].length });
+      continue;
+    }
+    positions.length = 0; break;
   }
   if (positions.length === count) {
     return positions.map((p, i) => {
@@ -3446,13 +3474,23 @@ function splitIntoSections(text, count, startNum) {
       return cleanSectionText(text.slice(start, end));
     });
   }
-  // 전략2: 아무 "N." 패턴이든 순서대로 count개 분할
-  const regex = /(?:^|\n)\s*\d+\.\s+/g;
+  // 전략2: 아무 "N." 패턴이든 빈줄 뒤만 순서대로 count개 분할
+  const regex = /(?:^|\n\n)\s*\d+[.)]\s+/g;
   const matches = [...text.matchAll(regex)];
   if (matches.length >= count) {
     return Array.from({length: count}, (_, i) => {
       const start = matches[i].index + matches[i][0].length;
       const end = i + 1 < matches.length ? matches[i+1].index : text.length;
+      return cleanSectionText(text.slice(start, end));
+    });
+  }
+  // 전략2b: 단일 줄바꿈도 허용
+  const regex1b = /(?:^|\n)\s*\d+[.)]\s+/g;
+  const matches1b = [...text.matchAll(regex1b)];
+  if (matches1b.length >= count) {
+    return Array.from({length: count}, (_, i) => {
+      const start = matches1b[i].index + matches1b[i][0].length;
+      const end = i + 1 < matches1b.length ? matches1b[i+1].index : text.length;
       return cleanSectionText(text.slice(start, end));
     });
   }
