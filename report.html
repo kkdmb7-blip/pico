@@ -1882,13 +1882,10 @@ function buildSpecialPatternBlock() {
   let s = `\n【일주 특수 패턴】\n`;
   if (d.패턴목록 && d.패턴목록.length) {
     d.패턴목록.forEach(p => {
-      s += `${p.패턴명}: ${p.설명}\n`;
+      s += `${p.유형}: ${p.설명}\n`;
     });
   } else {
     s += '특수 패턴 없음\n';
-  }
-  if (d.세운패턴 && d.세운패턴.length) {
-    s += `올해 세운 패턴: ${d.세운패턴.map(p => p.패턴명).join(', ')}\n`;
   }
   s += '(간여지동=복음, 천지합, 천충지합, 천합지충, 반음 등 일주·세운 간 특수 관계)\n';
   return s;
@@ -3393,10 +3390,13 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
     // 번호 기준 분할 시도 (기대 섹션 번호 전달)
     const startNum = secIndices[0] + 1; // secIndices[0]=0 → 1번부터, [3] → 4번부터
     const parts = splitIntoSections(text, secIndices.length, startNum);
+    const typeSec = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
     secIndices.forEach((secIdx, i) => {
       document.getElementById(`sloading-${secIdx}`).style.display = 'none';
       const body = document.getElementById(`sbody-${secIdx}`);
-      body.innerHTML = renderMarkdown(parts[i] || (i === 0 ? text : ''));
+      var partText = parts[i] || (i === 0 ? text : '');
+      partText = stripDuplicateTitle(partText, typeSec[secIdx]?.name || '');
+      body.innerHTML = renderMarkdown(partText);
       body.style.display = 'block';
     });
   } catch(e) {
@@ -3409,8 +3409,20 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 }
 
 function cleanSectionText(s) {
-  // AI가 "**4. 제목**" 형태로 쓸 때 여는 **는 번호 regex가 제거하지만 닫는 **가 첫줄에 남는 버그 수정
+  // 고아 ** 제거: "제목**" → "제목"
   return s.replace(/^([^\n]*?)\*{2}\s*/, '$1').trim();
+}
+function stripDuplicateTitle(s, sectionName) {
+  // 카드 헤더와 중복되는 첫 줄 제거 (공백·특수문자 무시 비교)
+  if (!sectionName) return s;
+  var lines = s.split('\n');
+  if (lines.length <= 1) return s;
+  var first = lines[0].replace(/[\s\*·\-—:]/g, '');
+  var name = sectionName.replace(/[\s\*·\-—:]/g, '');
+  if (first && name && (first === name || first.includes(name) || name.includes(first))) {
+    return lines.slice(1).join('\n').trim();
+  }
+  return s;
 }
 function splitIntoSections(text, count, startNum) {
   startNum = startNum || 1;
