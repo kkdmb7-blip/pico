@@ -1616,7 +1616,7 @@ function showToast(msg) {
     t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(123,94,167,0.95);color:#fff;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity .4s;white-space:nowrap;';
     document.body.appendChild(t);
   }
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.style.opacity = '1';
   clearTimeout(t._tid);
   t._tid = setTimeout(function(){ t.style.opacity = '0'; }, 2800);

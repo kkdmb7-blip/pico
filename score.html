@@ -621,7 +621,7 @@ function showToast(msg) {
     t.id = '_toast'; t.className = 'toast';
     document.body.appendChild(t);
   }
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
