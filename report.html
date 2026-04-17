@@ -522,7 +522,7 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
-const REPORT_VERSION = 6;
+const REPORT_VERSION = 7;
 
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
@@ -1182,6 +1182,10 @@ let _yongshinRevalidData = null;
 let _japyeongjinjeonData = null;
 let _cheonsuIlganData = null;
 let _johuYongshinData = null;
+// Level 5
+let _daeunSplitData = null;
+let _sewunAdvancedData = null;
+let _monthlyJeolgiData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1371,6 +1375,10 @@ async function loadAllData(withZiwei, withAstro) {
       _japyeongjinjeonData = _rptFull['자평진전분석'] || null;
       _cheonsuIlganData = _rptFull['적천수일간론'] || null;
       _johuYongshinData = _rptFull['조후용신분석'] || null;
+      // Level 5
+      _daeunSplitData = _rptFull['대운분리분석'] || null;
+      _sewunAdvancedData = _rptFull['세운확장분석'] || null;
+      _monthlyJeolgiData = _rptFull['월운절기분석'] || null;
     }
   } catch(e){}
   try {
@@ -1677,13 +1685,63 @@ function buildJohuYongshinBlock() {
   return s;
 }
 
+function buildDaeunSplitBlock() {
+  if (!_daeunSplitData) return '';
+  const d = _daeunSplitData;
+  let s = `\n【대운 천간/지지 분리분석】\n현재대운: ${d.현재대운}(${d.대운기간}) ${d.구간}\n`;
+  s += `천간: ${d.천간.글자}(${d.천간.오행}/${d.천간.십신}) 영향력${d.천간.영향력}\n`;
+  s += `→ ${d.천간.평가}\n`;
+  s += `지지: ${d.지지.글자}(${d.지지.오행}/${d.지지.십신}) 영향력${d.지지.영향력}\n`;
+  s += `→ ${d.지지.평가}\n`;
+  if (d.지지.지장간 && d.지지.지장간.length) {
+    s += `지장간: ${d.지지.지장간.map(j => j.천간+'('+j.유형+'/'+j.십신+')').join(', ')}\n`;
+  }
+  if (d.전환설명) s += `전환: ${d.전환설명}\n`;
+  s += `종합: ${d.종합등급}\n`;
+  s += '(대운 전반5년은 천간, 후반5년은 지지 위주로 해석. 용신과의 관계를 대운 분석에 반영)\n';
+  return s;
+}
+
+function buildSewunAdvancedBlock() {
+  if (!_sewunAdvancedData) return '';
+  const d = _sewunAdvancedData;
+  let s = `\n【세운 확장분석 (삼합/방합/삼형)】\n세운: ${d.세운} 천간십신: ${d.세운천간십신}(${d.세운천간오행})\n`;
+  if (d.확장상호작용 && d.확장상호작용.length) {
+    d.확장상호작용.forEach(i => { s += `• ${i.유형}: ${i.설명}\n`; });
+  }
+  if (d.대운세운복합) s += `★ ${d.대운세운복합.유형}: ${d.대운세운복합.설명}\n`;
+  s += `용신관계: ${d.세운용신관계}\n`;
+  s += `종합: ${d.종합평가}\n`;
+  s += '(세운의 삼합/방합/삼형은 특정 오행을 크게 강화/약화시키므로 올해 운세 해석에 필수 반영)\n';
+  return s;
+}
+
+function buildMonthlyJeolgiBlock() {
+  if (!_monthlyJeolgiData) return '';
+  const d = _monthlyJeolgiData;
+  let s = `\n【월운 절기 세분화】\n이달 월건: ${d.현재월건} 절기: ${d.절기}(${d.계절})\n`;
+  s += `천간십신: ${d.천간십신} / 지지십신: ${d.지지십신}\n`;
+  if (d.지장간 && d.지장간.length) {
+    s += `월지 지장간: ${d.지장간.map(j => j.천간+'('+j.유형+'/'+j.십신+')').join(', ')}\n`;
+  }
+  if (d.월지상호작용 && d.월지상호작용.length) {
+    d.월지상호작용.forEach(i => { s += `• ${i.유형}: ${i.설명}\n`; });
+  }
+  if (d.월간일간합) s += `★ ${d.월간일간합}\n`;
+  s += `용신관계: ${d.월운용신관계}\n`;
+  s += `요약: ${d.요약}\n`;
+  s += '(월운은 실제 절기 경계 기준. 이달 운세/조언에 월건 십신과 합충을 반영)\n';
+  return s;
+}
+
 function buildAccuracyLayerBlock() {
   return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
     + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
     + buildDaeunTransitionBlock() + buildHaphwaBlock()
     + buildTenGodsDistBlock() + buildGeokgukValidBlock() + buildSewunInterBlock()
     + buildJijangganBlock() + buildRootStrengthBlock() + buildYongshinRevalidBlock()
-    + buildJapyeongjinjeonBlock() + buildCheonsuIlganBlock() + buildJohuYongshinBlock();
+    + buildJapyeongjinjeonBlock() + buildCheonsuIlganBlock() + buildJohuYongshinBlock()
+    + buildDaeunSplitBlock() + buildSewunAdvancedBlock() + buildMonthlyJeolgiBlock();
 }
 
 // ── 초기화 ──
