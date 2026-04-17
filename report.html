@@ -3843,7 +3843,12 @@ async function generateSummaryReport() {
   const db = buildDaeunBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
-  const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 나의 사주 핵심 프로필 — 일간 ${_ilju||''}, 격국 ${_geokguk||''}, 신강/신약(${_singang||''}), 오행 분포(${_sdFull?.five_pct?Object.entries(_sdFull.five_pct).map(([k,v])=>\`\${k}:\${v}%\`).join(' '):'미확인'}), 용신(${ysFinal})을 읽기 쉽게 한 문단으로 압축. 이 사주가 어떤 사람인지 핵심 3줄.\n2. 올해 운세 핵심 포인트 — 올해 세운 ${_sewun||''}이 이 사주에 미치는 영향 핵심만. 기회 1가지, 주의 1가지를 명확히.\n3. 지금 실천할 것 3가지 — 용신(${ysFinal}) 기반 즉시 실천 가능한 구체적 액션 3가지. 색상·방위·행동 중심.\n\n총 400~600자. 섹션 번호(1. 2. 3.) 붙여 작성. 간결하고 임팩트 있게.`;
+  const fivePctStr = _sdFull?.five_pct ? Object.entries(_sdFull.five_pct).map(([k,v])=>k+':'+v+'%').join(' ') : '미확인';
+  const prompt = profileStr + '\n\n' + sb2 + '\n' + db + '\n올해 세운: ' + (_sewun||'미확인') + '\n' + buildOhangWarningBlock() + buildAccuracyLayerBlock() +
+    '\n\n섹션 구성:\n1. 나의 사주 핵심 프로필 — 일간 ' + (_ilju||'') + ', 격국 ' + (_geokguk||'') + ', 신강/신약(' + (_singang||'') + '), 오행 분포(' + fivePctStr + '), 용신(' + ysFinal + ')을 읽기 쉽게 한 문단으로 압축. 이 사주가 어떤 사람인지 핵심 3줄.' +
+    '\n2. 올해 운세 핵심 포인트 — 올해 세운 ' + (_sewun||'') + '이 이 사주에 미치는 영향 핵심만. 기회 1가지, 주의 1가지를 명확히.' +
+    '\n3. 지금 실천할 것 3가지 — 용신(' + ysFinal + ') 기반 즉시 실천 가능한 구체적 액션 3가지. 색상·방위·행동 중심.' +
+    '\n\n총 400~600자. 섹션 번호(1. 2. 3.) 붙여 작성. 간결하고 임팩트 있게.';
   await streamToSections(prompt, [0,1,2], '사주 포인트 요약', ysFinal, '', true);
   try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
