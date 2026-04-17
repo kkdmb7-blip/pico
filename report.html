@@ -1740,6 +1740,21 @@ async function fetchOrbBalance() {
 }
 
 // ── 프로필 문자열 빌드 ──
+// orb 부족 체크 (429 포함 모든 응답에서)
+async function checkOrbResponse(r0) {
+  try {
+    const d0 = await r0.json();
+    if (d0.error === 'orb_insufficient') {
+      document.getElementById('orbModalSub').textContent = `Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`;
+      document.getElementById('orbModal').classList.add('open');
+      return { insufficient: true, data: d0 };
+    }
+    return { insufficient: false, data: d0 };
+  } catch(e) {
+    return { insufficient: false, data: null };
+  }
+}
+
 function buildProfileStr() {
   const p = _profile;
   const gStr = p.gender === 'F' ? '여성' : '남성';
@@ -2001,14 +2016,10 @@ async function generateCharacterReport() {
         messages: [{ role: 'user', content: '분석 데이터:\n' + JSON.stringify(step2Body) + '\n\nJSON만 반환. 필드: primary_theory, secondary_theory, yongshin_final:{primary,primary_element,in_chart}, structure_summary, strength_interpretation, bijob_role, personality_keywords[], wealth_structure:{type,note}, career_tendency, writing_guidelines[], 격국유형, 분석프레임, 핵심키워드[], 성향반영, 주의점' }]
       })
     });
-    if (r0.ok) {
-      const d0 = await r0.json();
-      if (d0.error === 'orb_insufficient') {
-        document.getElementById('orbModalSub').textContent = `Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`;
-        document.getElementById('orbModal').classList.add('open');
-        return;
-      }
-      const raw = (d0.reply || '').trim();
+    const chk0 = await checkOrbResponse(r0);
+    if (chk0.insufficient) return;
+    if (r0.ok && chk0.data) {
+      const raw = (chk0.data.reply || '').trim();
       const m = raw.match(/```json?\s*([\s\S]*?)```/) || raw.match(/(\{[\s\S]*\})/);
       if (m) theoryFrame = { ...theoryFrame, ...JSON.parse(m[1]) };
     }
@@ -2134,10 +2145,10 @@ writing_guidelines: 이 사주에서 절대 쓰면 안 될 표현 배열`,
         messages:[{role:'user',content:`재물 구조:\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}`}]
       })
     });
-    if (r0.ok) {
-      const d0 = await r0.json();
-      if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
-      const raw=(d0.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
+    const chk0 = await checkOrbResponse(r0);
+    if (chk0.insufficient) return;
+    if (r0.ok && chk0.data) {
+      const raw=(chk0.data.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
       if (m) { try { wealthFrame={...wealthFrame,...JSON.parse(m[1])}; } catch(e){} }
     }
   } catch(e) { console.warn('[money] STEP1 실패:',e); }
@@ -2219,10 +2230,10 @@ writing_guidelines: 절대 쓰면 안 될 표현 배열`,
         messages:[{role:'user',content:`연애 구조:\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}`}]
       })
     });
-    if (r0.ok) {
-      const d0 = await r0.json();
-      if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
-      const raw=(d0.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
+    const chk0 = await checkOrbResponse(r0);
+    if (chk0.insufficient) return;
+    if (r0.ok && chk0.data) {
+      const raw=(chk0.data.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
       if (m) { try { loveFrame={...loveFrame,...JSON.parse(m[1])}; } catch(e){} }
     }
   } catch(e) { console.warn('[love] STEP1 실패:',e); }
@@ -2303,10 +2314,10 @@ writing_guidelines: 절대 쓰면 안 될 과장 표현 배열 (황금기/최고
         messages:[{role:'user',content:`대운 분석:\n${sb2}\n${db}\n현재 대운 상세: ${JSON.stringify(curDaeun||{})}`}]
       })
     });
-    if (r0.ok) {
-      const d0 = await r0.json();
-      if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
-      const raw=(d0.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
+    const chk0 = await checkOrbResponse(r0);
+    if (chk0.insufficient) return;
+    if (r0.ok && chk0.data) {
+      const raw=(chk0.data.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
       if (m) { try { daeunFrame={...daeunFrame,...JSON.parse(m[1])}; } catch(e){} }
     }
   } catch(e) { console.warn('[daeun] STEP1 실패:',e); }
@@ -2394,10 +2405,10 @@ writing_guidelines: 절대 쓰면 안 될 확정적 표현 배열`,
         messages:[{role:'user',content:`세운 분석:\n${sb2}\n${db}\n올해 세운 상세: ${sewunStr}`}]
       })
     });
-    if (r0.ok) {
-      const d0 = await r0.json();
-      if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
-      const raw=(d0.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
+    const chk0 = await checkOrbResponse(r0);
+    if (chk0.insufficient) return;
+    if (r0.ok && chk0.data) {
+      const raw=(chk0.data.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
       if (m) { try { yearFrame={...yearFrame,...JSON.parse(m[1])}; } catch(e){} }
     }
   } catch(e) { console.warn('[year] STEP1 실패:',e); }
@@ -2490,10 +2501,10 @@ writing_guidelines: 절대 쓰면 안 될 표현 배열`,
       })
     });
     clearTimeout(step1Tid);
-    if (r0.ok) {
-      const d0 = await r0.json();
-      if (d0.error==='orb_insufficient') { document.getElementById('orbModalSub').textContent=`Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
-      const raw=(d0.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
+    const chk0 = await checkOrbResponse(r0);
+    if (chk0.insufficient) return;
+    if (r0.ok && chk0.data) {
+      const raw=(chk0.data.reply||'').trim(); const m=raw.match(/```json?\s*([\s\S]*?)```/)||raw.match(/(\{[\s\S]*\})/);
       if (m) { try { monthFrame={...monthFrame,...JSON.parse(m[1])}; } catch(e){} }
     }
   } catch(e) { console.warn('[month] STEP1 실패:',e); }
@@ -2580,10 +2591,10 @@ writing_guidelines: 절대 쓰면 안 될 과장 표현 배열`,
       })
     });
     clearTimeout(step1Tid);
-    if (r0.ok) {
-      const d0 = await r0.json();
-      if (d0.error === 'orb_insufficient') { document.getElementById('orbModalSub').textContent = `Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`; document.getElementById('orbModal').classList.add('open'); return; }
-      const raw = (d0.reply||'').trim(); const m = raw.match(/```json?\s*([\s\S]*?)```/) || raw.match(/(\{[\s\S]*\})/);
+    const chk0 = await checkOrbResponse(r0);
+    if (chk0.insufficient) return;
+    if (r0.ok && chk0.data) {
+      const raw = (chk0.data.reply||'').trim(); const m = raw.match(/```json?\s*([\s\S]*?)```/) || raw.match(/(\{[\s\S]*\})/);
       if (m) { try { ysFrame = {...ysFrame, ...JSON.parse(m[1])}; } catch(e){} }
     }
   } catch(e) { console.warn('[yongsin] STEP1 실패:', e); }
@@ -2653,14 +2664,8 @@ async function setupSectionsAndDeductOrb() {
         messages:[{role:'user', content:'준비'}]
       })
     });
-    if (r0.ok) {
-      const d0 = await r0.json();
-      if (d0.error === 'orb_insufficient') {
-        document.getElementById('orbModalSub').textContent = `Orb가 부족해요. 현재 잔액: ${(d0.orb_balance||0).toLocaleString()} Orb`;
-        document.getElementById('orbModal').classList.add('open');
-        return false;
-      }
-    }
+    const chk0 = await checkOrbResponse(r0);
+    if (chk0.insufficient) return false;
   } catch(e) { console.warn('[deductOrb] 실패:', e); }
   return true;
 }
