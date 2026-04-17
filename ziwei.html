@@ -366,6 +366,14 @@
     <div class="interp-grid" id="interpGrid"></div>
 
     <!-- 하단 버튼 -->
+    <!-- 리포��� 훅 -->
+    <div id="ziweiReportHook" style="display:none;padding:0 20px;max-width:440px;margin:0 auto;">
+      <a href="report.html?type=ziwei_full" style="display:block;padding:16px 20px;background:linear-gradient(135deg,rgba(180,143,255,0.12),rgba(140,100,220,0.08));border:1px solid rgba(180,143,255,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(180,143,255,0.7)';this.style.background='linear-gradient(135deg,rgba(180,143,255,0.22),rgba(140,100,220,0.15))'" onmouseout="this.style.borderColor='rgba(180,143,255,0.35)';this.style.background='linear-gradient(135deg,rgba(180,143,255,0.12),rgba(140,100,220,0.08))'">
+        <div style="font-size:15px;font-weight:700;color:#b48fff;margin-bottom:4px;"><i class="pi pi-ziwei"></i> 명반 속 숨은 운명의 열쇠 →</div>
+        <div style="font-size:11px;color:var(--muted);opacity:0.8;">AI가 풀어내는 자미두수 심층 리포트</div>
+      </a>
+    </div>
+
     <div id="ziweiShareBtnWrap" style="display:none;padding:20px 0 32px;flex-direction:column;align-items:center;gap:10px;">
       <button id="ziweiKakaoBtn" onclick="shareZiweiKakao()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;letter-spacing:-0.3px;">⭐ 카카오톡 공유</button>
       <a id="consultBtn" href="#" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;"><i class="pi pi-sparkle"></i> AI 운세 상담하기</a>
@@ -576,6 +584,7 @@ function render(d) {
   window._ziweiData = d;
   var wrap = document.getElementById('ziweiShareBtnWrap');
   wrap.style.display = 'flex';
+  document.getElementById('ziweiReportHook').style.display = 'block';
 }
 
 function addInterp(container, icon, label, text) {

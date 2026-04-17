@@ -334,6 +334,14 @@
     </div>
   </div>
 
+  <!-- 리포트 훅 -->
+  <div id="astroReportHook" style="display:none;padding:0 20px;max-width:440px;margin:0 auto;">
+    <a href="report.html?type=astro_full" style="display:block;padding:16px 20px;background:linear-gradient(135deg,rgba(122,196,255,0.12),rgba(100,160,255,0.08));border:1px solid rgba(122,196,255,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(122,196,255,0.7)';this.style.background='linear-gradient(135deg,rgba(122,196,255,0.22),rgba(100,160,255,0.15))'" onmouseout="this.style.borderColor='rgba(122,196,255,0.35)';this.style.background='linear-gradient(135deg,rgba(122,196,255,0.12),rgba(100,160,255,0.08))'">
+      <div style="font-size:15px;font-weight:700;color:#7ac4ff;margin-bottom:4px;"><i class="pi pi-star"></i> 별이 말하는 나의 운명 →</div>
+      <div style="font-size:11px;color:var(--muted);opacity:0.8;">AI가 읽어주는 나만의 점성술 심층 리포트</div>
+    </a>
+  </div>
+
   <div id="astroShareBtnWrap" style="display:none;padding:20px 20px 32px;flex-direction:column;align-items:center;gap:10px;">
     <button id="astroKakaoBtn" onclick="shareAstroKakao()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;letter-spacing:-0.3px;"><i class="pi pi-star"></i> 카카오톡 공유</button>
     <a href="https://kkdmb7-blip.github.io/memox/?mode=astro" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;"><i class="pi pi-sparkle"></i> AI 점성 상담하기</a>
@@ -628,6 +636,7 @@ async function loadChart(year, month, day, hour, min) {
     window._astroData = { planets, aspects };
     var wrap = document.getElementById('astroShareBtnWrap');
     wrap.style.display = 'flex';
+    document.getElementById('astroReportHook').style.display = 'block';
 
   } catch(e) {
     status.className = 'status-msg visible err';

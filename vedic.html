@@ -215,6 +215,14 @@
     </div>
   </div>
 
+  <!-- 리포트 훅 -->
+  <div id="vedicReportHook" style="display:none;padding:0 20px;max-width:440px;margin:0 auto;">
+    <a href="report.html?type=vedic_full" style="display:block;padding:16px 20px;background:linear-gradient(135deg,rgba(255,170,80,0.12),rgba(255,200,120,0.08));border:1px solid rgba(255,170,80,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(255,170,80,0.7)';this.style.background='linear-gradient(135deg,rgba(255,170,80,0.22),rgba(255,200,120,0.15))'" onmouseout="this.style.borderColor='rgba(255,170,80,0.35)';this.style.background='linear-gradient(135deg,rgba(255,170,80,0.12),rgba(255,200,120,0.08))'">
+      <div style="font-size:15px;font-weight:700;color:#ffaa50;margin-bottom:4px;"><i class="pi pi-lotus"></i> 베딕이 읽어낸 내 카르마 →</div>
+      <div style="font-size:11px;color:var(--muted);opacity:0.8;">AI가 풀어내는 베딕 운명 심층 리포트</div>
+    </a>
+  </div>
+
   <div id="vedicShareBtnWrap" style="display:none;padding:20px 20px 32px;flex-direction:column;align-items:center;gap:10px;">
     <button id="vedicKakaoBtn" onclick="shareVedicKakao()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;letter-spacing:-0.3px;"><i class="pi pi-om"></i>️ 카카오톡 공유</button>
     <a href="https://kkdmb7-blip.github.io/memox/?mode=vedic" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;"><i class="pi pi-sparkle"></i> AI 베딕 상담하기</a>
@@ -624,6 +632,7 @@ async function loadVedic(year, month, day, hour, gender) {
     window._vedicData = d;
     var wrap = document.getElementById('vedicShareBtnWrap');
     wrap.style.display = 'flex';
+    document.getElementById('vedicReportHook').style.display = 'block';
   } catch(e) {
     status.className = 'status-msg visible err';
     status.textContent = '차트 로드 오류: ' + e.message;
