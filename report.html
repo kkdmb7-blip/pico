@@ -522,7 +522,7 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
-const REPORT_VERSION = 7;
+const REPORT_VERSION = 8;
 
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
@@ -1186,6 +1186,12 @@ let _johuYongshinData = null;
 let _daeunSplitData = null;
 let _sewunAdvancedData = null;
 let _monthlyJeolgiData = null;
+// Level 6
+let _gongmangData = null;
+let _napeumData = null;
+let _specialShinsalData = null;
+let _twelveUnseongExtData = null;
+let _fortuneScoreData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1379,6 +1385,12 @@ async function loadAllData(withZiwei, withAstro) {
       _daeunSplitData = _rptFull['대운분리분석'] || null;
       _sewunAdvancedData = _rptFull['세운확장분석'] || null;
       _monthlyJeolgiData = _rptFull['월운절기분석'] || null;
+      // Level 6
+      _gongmangData = _rptFull['공망분석'] || null;
+      _napeumData = _rptFull['납음분석'] || null;
+      _specialShinsalData = _rptFull['특수신살'] || null;
+      _twelveUnseongExtData = _rptFull['십이운성확장'] || null;
+      _fortuneScoreData = _rptFull['운세종합점수'] || null;
     }
   } catch(e){}
   try {
@@ -1734,6 +1746,65 @@ function buildMonthlyJeolgiBlock() {
   return s;
 }
 
+function buildGongmangBlock() {
+  if (!_gongmangData) return '';
+  const d = _gongmangData;
+  let s = `\n【공망(空亡) 분석】\n공망지지: ${safeJoin(d.공망지지)} (${d.순})\n`;
+  if (d.사주내공망 && d.사주내공망.length) {
+    d.사주내공망.forEach(g => { s += `• ${g.위치}(${g.지지}) — ${g.궁}: ${g.영향}\n`; });
+  } else { s += '사주 4지지에 공망 해당 없음.\n'; }
+  if (d.세운해소) s += `세운해소: ${d.세운해소}\n`;
+  s += '(공망 위치의 궁은 실속 점검 필요. 대운/세운에서 해소되면 오히려 활성화)\n';
+  return s;
+}
+
+function buildNapeumBlock() {
+  if (!_napeumData) return '';
+  const d = _napeumData;
+  let s = '\n【납음(納音) 오행】\n';
+  if (d.사주납음) d.사주납음.forEach(n => { s += `${n.위치}: ${n.간지} → ${n.납음}(${n.오행}) — ${n.이미지}\n`; });
+  if (d.일주납음) s += `★ 일주핵심: ${d.일주납음.납음}(${d.일주납음.오행}) — 내면 깊이 작용하는 기질.\n`;
+  s += '(납음은 겉으로 드러나지 않는 내면 기질. 성격 분석 시 보조 참고)\n';
+  return s;
+}
+
+function buildSpecialShinsalBlock() {
+  if (!_specialShinsalData) return '';
+  const d = _specialShinsalData;
+  let s = '\n【역마·도화·화개살 정밀분석】\n';
+  ['역마','도화','화개'].forEach(key => {
+    const sal = d[key];
+    if (!sal) return;
+    s += `${sal.살명}(${sal.해당지지}): ${sal.올해상태}`;
+    if (sal.원국보유) s += ` [원국: ${safeJoin(sal.원국위치)}]`;
+    if (sal.대운활성) s += ` [${sal.대운활성}]`;
+    s += '\n';
+  });
+  s += '(역마=이동변동, 도화=매력인기, 화개=학문영적성장. 활성 시기에 해당 분야 적극 활용)\n';
+  return s;
+}
+
+function build12UnseongExtBlock() {
+  if (!_twelveUnseongExtData) return '';
+  const d = _twelveUnseongExtData;
+  let s = '\n【12운성 확장 (대운/세운)】\n';
+  if (d.세운운성) s += `세운: ${d.세운운성.세운지지} → ${d.세운운성.운성} — ${d.세운운성.설명} (${d.세운운성.평가})\n`;
+  if (d.대운운성) s += `대운: ${d.대운운성.대운} → ${d.대운운성.운성} — ${d.대운운성.설명} (${d.대운운성.평가})\n`;
+  s += `종합: ${d.종합}\n`;
+  s += '(12운성 왕상기=적극행동, 휴수기=보수운영. 대운/세운 운성을 운세 해석에 반영)\n';
+  return s;
+}
+
+function buildFortuneScoreBlock() {
+  if (!_fortuneScoreData) return '';
+  const d = _fortuneScoreData;
+  let s = `\n【올해 운세 종합점수】\n점수: ${d.점수}/100 등급: ${d.등급}\n`;
+  if (d.산출근거 && d.산출근거.length) s += `근거: ${d.산출근거.join(', ')}\n`;
+  s += `${d.해석}\n`;
+  s += '(종합점수는 대운+세운+월운+12운성+합충형+조후를 합산한 참고 지표. 절대적 수치가 아닌 상대적 경향)\n';
+  return s;
+}
+
 function buildAccuracyLayerBlock() {
   return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
     + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
@@ -1741,7 +1812,9 @@ function buildAccuracyLayerBlock() {
     + buildTenGodsDistBlock() + buildGeokgukValidBlock() + buildSewunInterBlock()
     + buildJijangganBlock() + buildRootStrengthBlock() + buildYongshinRevalidBlock()
     + buildJapyeongjinjeonBlock() + buildCheonsuIlganBlock() + buildJohuYongshinBlock()
-    + buildDaeunSplitBlock() + buildSewunAdvancedBlock() + buildMonthlyJeolgiBlock();
+    + buildDaeunSplitBlock() + buildSewunAdvancedBlock() + buildMonthlyJeolgiBlock()
+    + buildGongmangBlock() + buildNapeumBlock() + buildSpecialShinsalBlock()
+    + build12UnseongExtBlock() + buildFortuneScoreBlock();
 }
 
 // ── 초기화 ──
