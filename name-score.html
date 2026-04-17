@@ -451,6 +451,7 @@ nav {
 
     <div class="interpret-card" id="interpretCard"></div>
     <div id="yongsinMatchBox"></div>
+    <div id="hookCard"></div>
     <div id="aiAnalysisWrap" style="display:none;margin-top:16px;">
       <button class="btn-gold" id="btnAiAnalysis" onclick="onAiAnalysisClick()">AI 심층분석 · 500 Orb</button>
       <div class="orb-hint">로그인 후 이용 · Orb로 결제</div>
@@ -963,37 +964,55 @@ function renderRecommend(sur, surHanja, top) {
   }
   var html = '<div class="section-label">' + sur + '씨 추천 이름 TOP ' + top.length + ' · 95점 이상</div>';
   top.forEach(function(c, idx) {
-    var ok = c.grades.filter(function(g){ return g==='대길'; }).length;
+    // c.ohs = [성오행, 이름1오행, 이름2오행]
+    var n0 = c.name[0], n1 = c.name[1] || '';
+    var h0 = c.hanja[0], h1 = c.hanja[1] || '';
+    var surOh = c.ohs[0], oh0 = c.ohs[1], oh1 = c.ohs[2];
+    var coloredHangul = _colorHanja(sur, surOh) + _colorHanja(n0, oh0) + (n1 ? _colorHanja(n1, oh1) : '');
+    var coloredHanja  = _colorHanja(surHanja, surOh) + _colorHanja(h0, oh0) + (h1 ? _colorHanja(h1, oh1) : '');
+
     html += '<div class="analysis-card" style="margin-bottom:12px;">';
-    html += '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">';
-    html += '<div><span style="font-size:11px; color:var(--gold); letter-spacing:0.15em;">#' + (idx+1) + '</span>';
-    html += '<div style="font-size:22px; font-weight:600; color:var(--text); margin-top:4px;">' + sur + c.name + ' <span style="color:var(--gold); font-size:18px;">(' + surHanja + c.hanja + ')</span></div></div>';
-    html += '<div style="text-align:right;"><div style="font-size:10px; color:var(--text-dim); letter-spacing:0.1em;">TOTAL</div><div style="font-size:28px; color:var(--gold); font-weight:700; line-height:1;">' + c.baseTotal + '</div><div style="font-size:10px; color:var(--text-dim);">/100</div></div>';
+    html += '<div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; gap:10px;">';
+    html += '<div><div style="font-size:11px; color:var(--gold); letter-spacing:0.15em; margin-bottom:4px;">#' + (idx+1) + '</div>';
+    html += '<div style="font-size:22px; font-weight:700; line-height:1.2; font-family:\'Noto Serif KR\',serif;">' + coloredHangul + '</div>';
+    html += '<div style="font-size:15px; margin-top:4px; font-family:\'Noto Serif KR\',serif;">(' + coloredHanja + ')</div></div>';
+    html += '<div style="text-align:right; flex-shrink:0;"><div style="font-size:10px; color:var(--text-dim); letter-spacing:0.1em;">TOTAL</div><div style="font-size:28px; color:var(--gold); font-weight:700; line-height:1;">' + c.baseTotal + '</div><div style="font-size:10px; color:var(--text-dim);">/100</div></div>';
     html += '</div>';
 
-    // 4격 뱃지
-    html += '<div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">';
+    // 4격 카드 (사용자 친화)
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">';
     var gyekLabels = [
-      { k:'정격', v:c.gyek.jung, g:c.grades[3] },
-      { k:'형격', v:c.gyek.hyun, g:c.grades[1] },
-      { k:'원격', v:c.gyek.won,  g:c.grades[0] },
-      { k:'이격', v:c.gyek.yi,   g:c.grades[2] }
+      { k:'원격', easy:'청소년·20대', v:c.gyek.won,  g:c.grades[0] },
+      { k:'형격', easy:'30~50대',    v:c.gyek.hyun, g:c.grades[1] },
+      { k:'이격', easy:'인간관계',   v:c.gyek.yi,   g:c.grades[2] },
+      { k:'정격', easy:'인생 전체',  v:c.gyek.jung, g:c.grades[3] }
     ];
     gyekLabels.forEach(function(gy) {
-      html += '<span class="score-badge grade-' + gy.g + '" style="font-size:11px;">' + gy.k + ' ' + gy.v + ' · ' + gy.g + '</span>';
+      var col = _GRADE_COL[gy.g]||'#8b8ba8';
+      var bg  = _GRADE_BG[gy.g]||'rgba(255,255,255,0.03)';
+      var bd  = _GRADE_BORDER[gy.g]||'var(--border)';
+      var easy = _SIMPLE_GRADE[gy.g] || gy.g;
+      html += '<div title="'+gy.k+' '+gy.v+' · '+gy.g+'" style="background:'+bg+';border:1px solid '+bd+';border-radius:10px;padding:8px 4px;text-align:center;">';
+      html += '<div style="font-size:10px;color:var(--text-dim);margin-bottom:3px;line-height:1.2;">'+gy.easy+'</div>';
+      html += '<div style="font-size:12px;font-weight:700;color:'+col+';">'+easy+'</div>';
+      html += '</div>';
     });
     html += '</div>';
 
-    // 오행 + 의미
-    html += '<div style="font-size:12px; color:var(--text-dim); line-height:1.8;">';
-    html += '한자: <b style="color:var(--text);">' + c.hanja + '</b> — ';
-    html += c.means.map(function(m, i){ return m + '(' + c.ohs[i+1] + ')'; }).join(', ');
-    if (c.ysMatch > 0) html += '<br><span style="color:#4caf7a;"><i class="pi pi-check"></i> 용신 오행 ' + c.ysMatch + '자 일치</span>';
+    // 한자 의미 (색상 적용)
+    html += '<div style="font-size:12px; color:var(--text-dim); line-height:1.9; padding:10px 12px; background:rgba(255,255,255,0.02); border-radius:8px;">';
+    html += '<div style="font-size:10px; color:var(--gold); letter-spacing:0.1em; margin-bottom:4px;">한자 의미</div>';
+    var meanArr = c.means.map(function(m, i){
+      var hjChar = c.hanja[i], ohEl = c.ohs[i+1];
+      return _colorHanja(hjChar, ohEl) + ' ' + m;
+    });
+    html += meanArr.join(' · ');
+    if (c.ysMatch > 0) html += '<br><span style="color:#4caf7a;margin-top:4px;display:inline-block;"><i class="pi pi-check"></i> 용신 오행 ' + c.ysMatch + '자 일치</span>';
     html += '</div>';
 
-    // 액션 버튼
-    html += '<div style="margin-top:12px; display:flex; gap:8px;">';
-    html += '<button class="mode-tab" style="flex:1; cursor:pointer;" onclick="applyRecommend(\'' + sur + '\',\'' + c.name + '\')">이 이름 상세보기</button>';
+    // 액션
+    html += '<div style="margin-top:12px;">';
+    html += '<button class="mode-tab" style="width:100%; cursor:pointer; padding:11px;" onclick="applyRecommend(\'' + sur + '\',\'' + c.name + '\')">이 이름 상세보기 →</button>';
     html += '</div>';
     html += '</div>';
   });
@@ -1231,16 +1250,17 @@ function renderYongsinMatch(allChars, allJawon, allEumOh) {
   var KIJIN   = {'木':'金','火':'水','土':'木','金':'火','水':'土'};
   var yongsinHan = KO_OH[yongsinOh];
   var kijinHan   = KIJIN[yongsinHan];
-  var ohaengList = (currentMode === 'select') ? allJawon : allEumOh;
+  var ohaengList = (currentMode === 'select' || currentMode === 'manual') ? allJawon : allEumOh;
   var matchChars = [], kijinChars = [];
   allChars.forEach(function(ch, i) {
     var oh = ohaengList[i];
-    if (oh === yongsinHan) matchChars.push(ch);
-    else if (oh === kijinHan) kijinChars.push(ch);
+    if (oh === yongsinHan) matchChars.push({ch:ch, oh:oh});
+    else if (oh === kijinHan) kijinChars.push({ch:ch, oh:oh});
   });
   var charDesc = allChars.map(function(ch, i) {
     var oh = ohaengList[i];
-    return ch + '=' + (HAN_OH[oh] || oh || '?') + '오행';
+    var col = oh ? _OHENG_COLOR[oh] : '#d4af37';
+    return '<span style="color:'+col+';font-weight:700;">'+ch+'</span>='+_colorize(oh)+'오행';
   }).join(', ');
   var matchCount = matchChars.length;
   var overall = matchCount >= 2
@@ -1256,18 +1276,23 @@ function renderYongsinMatch(allChars, allJawon, allEumOh) {
       });
     });
   }
-  var recText = recList.slice(0, 8).join(' ');
+  var recText = recList.slice(0, 8).map(function(s){
+    // 예: "旻(민)" → 한자만 금색
+    var m = s.match(/^(.)\((.+)\)$/);
+    if (m) return _colorHanja(m[1], yongsinHan) + '(' + m[2] + ')';
+    return s;
+  }).join(' ');
   var html = '<div class="yongsin-match-box">';
   html += '<div class="yongsin-match-title">용신 매칭 분석</div>';
-  html += '<div class="yongsin-match-item">당신의 용신은 <b>' + _yongsin + '(' + yongsinOh + ')</b>입니다.' + (_geokguk ? '&nbsp; 격국: ' + _geokguk : '') + '</div>';
-  html += '<div class="yongsin-match-item">이름 ' + allChars.join('') + '의 오행 구성: ' + charDesc + '</div>';
+  html += '<div class="yongsin-match-item">당신의 용신은 <b>' + _yongsin + '(' + _colorize(yongsinHan) + ')</b>입니다.' + (_geokguk ? '&nbsp; 격국: ' + _geokguk : '') + '</div>';
+  html += '<div class="yongsin-match-item">이름 오행 구성: ' + charDesc + '</div>';
   if (matchChars.length > 0)
-    html += '<div class="yongsin-match-item yongsin-ok"><i class="pi pi-check"></i> 용신 일치: ' + matchChars.join(', ') + '</div>';
+    html += '<div class="yongsin-match-item yongsin-ok"><i class="pi pi-check"></i> 용신 일치: ' + matchChars.map(function(o){return _colorHanja(o.ch, o.oh);}).join(', ') + '</div>';
   if (kijinChars.length > 0)
-    html += '<div class="yongsin-match-item yongsin-warn"><i class="pi pi-warning"></i>️ 기신 주의: ' + kijinChars.join(', ') + '</div>';
+    html += '<div class="yongsin-match-item yongsin-warn"><i class="pi pi-warning"></i>️ 기신 주의: ' + kijinChars.map(function(o){return _colorHanja(o.ch, o.oh);}).join(', ') + '</div>';
   html += '<div class="yongsin-match-item" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(212,175,55,0.2);">' + overall + '</div>';
   if (recText)
-    html += '<div class="yongsin-match-item" style="margin-top:8px;font-size:12px;color:var(--text-dim);">용신 오행(' + yongsinOh + ') 추천 한자: ' + recText + '</div>';
+    html += '<div class="yongsin-match-item" style="margin-top:8px;font-size:12px;color:var(--text-dim);">용신(' + _colorize(yongsinHan) + ') 추천 한자: ' + recText + '</div>';
   html += '</div>';
   box.innerHTML = html;
 }
@@ -1295,39 +1320,68 @@ function calcScore() {
   renderResult(gyek, allChars, allStrokes, allJawon, allHanja);
 }
 
+// ── 공용 상수 (사용자 친화 redesign) ──
+var _OHENG_COLOR = { '木':'#00C853', '火':'#FF1744', '土':'#FFD600', '金':'#E0E0E0', '水':'#1565C0' };
+var _OHENG_BG    = { '木':'rgba(0,200,83,0.18)', '火':'rgba(255,23,68,0.18)', '土':'rgba(255,214,0,0.18)', '金':'rgba(224,224,224,0.18)', '水':'rgba(21,101,192,0.25)' };
+var _SIMPLE_LABEL = {
+  '원격': { title: '청소년·20대',   sub: '재능 · 초년 흐름' },
+  '형격': { title: '30~50대',       sub: '사회 · 커리어 기운' },
+  '이격': { title: '인간관계',      sub: '가족 · 주변 사람' },
+  '정격': { title: '인생 전체',     sub: '평생 종합 흐름' }
+};
+var _SIMPLE_GRADE = { '대길':'최상', '길':'좋음', '반길':'보통', '흉':'주의', '대흉':'위험' };
+var _REL_SIMPLE = {
+  '상생': { simple:'받침',   color:'#4caf7a' },
+  '상극': { simple:'부딪힘', color:'#f44336' },
+  '비화': { simple:'같음',   color:'#8b8ba8' },
+  '중화': { simple:'무난',   color:'#8ba0c0' }
+};
+var _GRADE_COL    = { '대길':'#d4af37','길':'#4caf7a','반길':'#ff9800','흉':'#f44336','대흉':'#e91e63' };
+var _GRADE_BG     = { '대길':'rgba(212,175,55,0.1)','길':'rgba(76,175,122,0.1)','반길':'rgba(255,152,0,0.1)','흉':'rgba(244,67,54,0.08)','대흉':'rgba(233,30,99,0.08)' };
+var _GRADE_BORDER = { '대길':'rgba(212,175,55,0.35)','길':'rgba(76,175,122,0.35)','반길':'rgba(255,152,0,0.35)','흉':'rgba(244,67,54,0.3)','대흉':'rgba(233,30,99,0.3)' };
+function _colorize(el) { return el ? '<span style="color:'+_OHENG_COLOR[el]+';font-weight:800;">'+el+'</span>' : ''; }
+function _colorHanja(hj, el) {
+  var col = _OHENG_COLOR[el] || '#d4af37';
+  return '<span style="color:'+col+';font-weight:700;">'+hj+'</span>';
+}
+
 function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
-  // 4격 카드
+  // ── 4격 카드 (사용자 친화) ──
   var cards = [
-    {label:'정격',val:gyek.jung,desc:'전체운'},
-    {label:'형격',val:gyek.hyun,desc:'사회운'},
-    {label:'원격',val:gyek.won, desc:'내면·재능'},
-    {label:'이격',val:gyek.yi,  desc:'가정·말년'},
+    {label:'정격',val:gyek.jung},
+    {label:'형격',val:gyek.hyun},
+    {label:'원격',val:gyek.won},
+    {label:'이격',val:gyek.yi}
   ];
   var grid = document.getElementById('scoreGrid');
   grid.innerHTML = '';
   cards.forEach(function(c) {
-    var g = SURI_TABLE[c.val]||'흉', sn = SURI_NAME[c.val]||'';
+    var g = SURI_TABLE[c.val]||'흉';
+    var sn = SURI_NAME[c.val]||'';
+    var col = _GRADE_COL[g]||'#8b8ba8';
+    var lbl = _SIMPLE_LABEL[c.label];
+    var easy = _SIMPLE_GRADE[g] || g;
+    var tip = c.label + ' (' + c.val + ') · ' + sn + ' — ' + (SURI_DESC[c.val]||'');
     var el = document.createElement('div');
-    el.className = 'score-card grade-'+g;
+    el.style.cssText = 'background:'+_GRADE_BG[g]+';border:1px solid '+_GRADE_BORDER[g]+';border-radius:14px;padding:14px 12px;text-align:center;';
+    el.title = tip;
     el.innerHTML =
-      '<div class="score-gye">'+c.label+' · '+c.desc+'</div>' +
-      '<div class="score-num">'+c.val+'</div>' +
-      '<span class="score-badge grade-'+g+'">'+g+'</span>' +
-      '<div class="score-name">'+sn+'</div>' +
-      '<div class="score-desc">'+(SURI_DESC[c.val]||'')+'</div>';
+      '<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;">'+lbl.title+'</div>' +
+      '<div style="font-size:10px;color:var(--text-dim);margin-bottom:10px;">'+lbl.sub+'</div>' +
+      '<div style="display:inline-block;font-size:16px;font-weight:700;color:'+col+';background:'+_GRADE_BG[g]+';border:1.5px solid '+_GRADE_BORDER[g]+';border-radius:20px;padding:6px 16px;margin-bottom:6px;letter-spacing:0.06em;">'+easy+'</div>' +
+      '<div style="font-size:10px;color:var(--text-dim);margin-top:4px;">수리 '+c.val+'</div>';
     grid.appendChild(el);
   });
 
   var grades = [gyek.jung,gyek.hyun,gyek.won,gyek.yi].map(function(v){return SURI_TABLE[v]||'흉';});
   var goodCnt = grades.filter(function(g){return g==='대길'||g==='길';}).length;
   var badCnt  = grades.filter(function(g){return g==='대흉'||g==='흉';}).length;
-  var jg = SURI_TABLE[gyek.jung]||'흉';
-  var sumText = goodCnt>=3 ? '전반적으로 좋은 수리 배합입니다. 정격('+gyek.jung+'·'+jg+')이 이름 전체의 운을 이끕니다.'
-    : badCnt>=3 ? '수리 배합에 주의가 필요합니다. 정격('+gyek.jung+'·'+jg+')을 중심으로 검토하세요.'
-    : '길흉이 혼재합니다. 정격('+gyek.jung+'·'+jg+')이 핵심 운의 방향을 결정합니다.';
+  var sumText = goodCnt>=3 ? '전반적으로 좋은 수리 배합입니다. 인생 전체 흐름이 이름 전체의 운을 이끕니다.'
+    : badCnt>=3 ? '수리 배합에 주의가 필요합니다. 인생 전체 흐름을 중심으로 검토하세요.'
+    : '길흉이 혼재합니다. 인생 전체 흐름이 핵심 운의 방향을 결정합니다.';
   document.getElementById('summaryCard').textContent = sumText;
 
-  // 종합 점수 카드
+  // ── 종합 점수 ──
   var scores = grades.map(function(g){ return GRADE_SCORE[g] || 0; });
   var totalScore = Math.round(scores.reduce(function(a,b){return a+b;},0) / 4);
   document.getElementById('totalScoreCard').innerHTML =
@@ -1338,21 +1392,30 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
     '<div class="total-score-comment">' + getScoreComment(totalScore) + '</div>';
   setTimeout(function(){ var f=document.getElementById('totalScoreFill'); if(f) f.style.width=totalScore+'%'; }, 50);
 
-  // 음오행
+  // ── 음오행 · 발음 흐름 (원형 노드 + 색상) ──
   var allEumOh = allChars.map(function(ch){ return getEumOhaeng(ch); });
   var flowEl = document.getElementById('ohaengFlow');
   flowEl.innerHTML = '';
+  flowEl.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;';
   allChars.forEach(function(ch, i) {
     var oh = allEumOh[i];
+    var col = oh ? _OHENG_COLOR[oh] : '#555';
+    var bg  = oh ? _OHENG_BG[oh] : 'rgba(255,255,255,0.05)';
     var node = document.createElement('div');
-    node.className = 'oh-node';
-    node.innerHTML = '<span class="oh-char">'+ch+'</span><span class="oh-badge '+(oh||'')+'">'+( oh||'?' )+'</span>';
+    node.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
+    node.innerHTML =
+      '<div style="width:44px;height:44px;border-radius:50%;background:'+bg+';border:1.5px solid '+col+';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--text);font-family:\'Noto Serif KR\',serif;">'+ch+'</div>' +
+      '<div style="font-size:11px;font-weight:700;color:'+col+';">'+(oh||'-')+'</div>';
     flowEl.appendChild(node);
     if (i < allChars.length - 1) {
       var rel = checkRelation(allEumOh[i], allEumOh[i+1]);
+      var r = _REL_SIMPLE[rel] || {simple:rel, color:'#8b8ba8'};
       var arr = document.createElement('div');
-      arr.className = 'oh-arrow ' + rel;
-      arr.textContent = rel==='상생' ? '▶' : rel==='상극' ? '✕' : '→';
+      arr.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;padding-top:4px;';
+      arr.title = rel;
+      arr.innerHTML =
+        '<div style="font-size:16px;color:'+r.color+';line-height:1;">→</div>' +
+        '<div style="font-size:9px;color:'+r.color+';font-weight:700;white-space:nowrap;">'+r.simple+'</div>';
       flowEl.appendChild(arr);
     }
   });
@@ -1362,11 +1425,11 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
   var hasGeuk  = rels.some(function(r){return r==='상극';});
   var allSaeng = rels.every(function(r){return r==='상생'||r==='비화';});
   var ohResEl = document.getElementById('ohaengResult');
-  if (allSaeng) { ohResEl.className='oh-result all-good'; ohResEl.textContent='발음 오행이 상생하여 기운이 원활하게 흐릅니다'; }
-  else if (hasGeuk) { ohResEl.className='oh-result has-bad'; ohResEl.textContent='발음 오행에 상극 관계가 있습니다 — 기운의 충돌이 발생합니다'; }
-  else { ohResEl.className='oh-result mixed'; ohResEl.textContent='발음 오행 흐름이 중화적입니다'; }
+  if (allSaeng) { ohResEl.className='oh-result all-good'; ohResEl.textContent='발음 오행이 받쳐주어 기운이 원활하게 흐릅니다'; }
+  else if (hasGeuk) { ohResEl.className='oh-result has-bad'; ohResEl.textContent='발음 오행에 부딪히는 관계가 있습니다 — 기운의 충돌이 발생합니다'; }
+  else { ohResEl.className='oh-result mixed'; ohResEl.textContent='발음 오행 흐름이 무난합니다'; }
 
-  // 음양
+  // ── 음양 ──
   var eyRow = document.getElementById('eumyangRow');
   eyRow.innerHTML = '';
   var eyPat = [];
@@ -1386,35 +1449,105 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
   else if (Math.abs(yangCnt-(eyPat.length-yangCnt))<=1) { eyResEl.className='oh-result all-good'; eyResEl.textContent='음양이 균형 있게 배합되어 있습니다'; }
   else { eyResEl.className='oh-result mixed'; eyResEl.textContent='음양 배합이 다소 치우쳐 있습니다'; }
 
-  // 자원오행 / 음오행 카드 (항상 표시)
+  // ── 자원오행 / 음오행 카드 (한자 색상) ──
   var jwCard = document.getElementById('jawonCard');
   jwCard.style.display = '';
   var jwTitle = document.getElementById('jawonTitle');
   var jwNotice = document.getElementById('jawonNotice');
   var jwRow = document.getElementById('jawonRow');
-  if (currentMode === 'select') {
-    jwTitle.textContent = '자원오행 · 한자 기운';
-    jwNotice.textContent = '자원오행은 한자의 부수(部首) 기준입니다. 학파에 따라 해석이 다를 수 있으며 참고용으로 활용하세요.';
+  if (currentMode === 'select' || currentMode === 'manual') {
+    jwTitle.textContent = '한자 기운 · 자원오행';
+    jwNotice.textContent = '자원오행은 한자의 부수(部首) 기준입니다. 참고용으로 활용하세요.';
   } else {
-    jwTitle.textContent = '음오행 · 자음 오행';
+    jwTitle.textContent = '자음 오행 · 음오행';
     jwNotice.textContent = '한글 자동 모드는 음오행(音五行) 기준입니다. 정확한 작명은 한자 기준을 권장합니다.';
   }
   jwRow.innerHTML = '';
   allChars.forEach(function(ch, i) {
-    var hj = allHanja[i]||ch, oh = allJawon[i]||'?';
+    var hj = allHanja[i]||ch, oh = allJawon[i]||null;
+    var col = oh ? _OHENG_COLOR[oh] : '#d4af37';
     var node = document.createElement('div');
     node.className = 'jw-node';
-    node.innerHTML = '<span class="jw-hanja">'+hj+'</span><span class="jw-badge oh-badge '+oh+'">'+oh+'</span>';
+    node.innerHTML =
+      '<span class="jw-hanja" style="color:'+col+';font-weight:700;">'+hj+'</span>' +
+      '<span class="jw-badge oh-badge '+(oh||'')+'">'+(oh||'?')+'</span>';
     jwRow.appendChild(node);
   });
 
-  // 종합 해석
+  // ── 해석 / 용신 매칭 / 훅 ──
   renderInterpret(gyek, grades, rels, eyPat, allJawon, hasGeuk, allSaeng, allYang, allEum, yangCnt);
   renderYongsinMatch(allChars, allJawon, allEumOh);
+  renderHook(totalScore, allEumOh, allJawon);
+
   document.getElementById('aiAnalysisWrap').style.display = 'block';
   document.getElementById('aiAnalysisResult').style.display = 'none';
   document.getElementById('aiAnalysisResult').textContent = '';
   document.getElementById('resultArea').classList.add('show');
+}
+
+function renderHook(totalScore, allEumOh, allJawon) {
+  var hookEl = document.getElementById('hookCard');
+  if (!hookEl) return;
+  var hookTitle, hookSub;
+  if (totalScore >= 85) {
+    hookTitle = '운이 따르는 이름이에요';
+    hookSub = '하지만 이 이름의 <b style="color:#d4af37;">진짜 힘</b>은 언제, 어떻게 쓰이는지가 더 중요해요';
+  } else if (totalScore >= 65) {
+    hookTitle = '빛과 그림자가 섞인 이름';
+    hookSub = '<b style="color:#d4af37;">언제 빛나고 언제 주의</b>해야 하는지, 타이밍이 핵심이에요';
+  } else {
+    hookTitle = '흐름을 되짚어볼 이름';
+    hookSub = '개명하기 전에 <b style="color:#d4af37;">반드시 확인</b>해야 할 것들이 있어요';
+  }
+
+  var hookPoints = [{
+    icon:'<i class="pi pi-clock"></i>',
+    head:'인생 단계별 운의 흐름',
+    body:'초년 · 청년 · 장년 · 말년 — 이 이름이 <b>언제 가장 빛나는지</b>'
+  }];
+
+  if (_yongsin) {
+    var KO_OH = {'목':'木','화':'火','토':'土','금':'金','수':'水'};
+    var ysOh = getYongsinOhaeng(_yongsin);
+    var yongsinHan = KO_OH[ysOh];
+    var SGK = {'木':'土','火':'金','土':'水','金':'木','水':'火'};
+    var kijinHan = SGK[yongsinHan];
+    var ohList = (currentMode === 'select' || currentMode === 'manual') ? allJawon : allEumOh;
+    var hasYs = yongsinHan && ohList.indexOf(yongsinHan) !== -1;
+    var hasKi = kijinHan && ohList.indexOf(kijinHan) !== -1;
+    if (hasYs) {
+      hookPoints.push({ icon:'<i class="pi pi-check"></i>', head:'내 사주 기운을 받쳐주는 이름', body:'이 궁합을 <b>어떻게 더 강하게</b> 끌어올릴 수 있는지' });
+    } else if (hasKi) {
+      hookPoints.push({ icon:'<i class="pi pi-warning"></i>', head:'사주를 누르는 오행이 섞여있어요', body:'개명 없이 <b>이름 에너지를 돌리는 방법</b>이 있어요' });
+    } else {
+      hookPoints.push({ icon:'<i class="pi pi-star"></i>', head:'내 사주와 이름의 실제 궁합', body:'단순 매칭이 아닌 <b>강화·약화 작용</b>을 정밀 분석' });
+    }
+  } else {
+    hookPoints.push({ icon:'<i class="pi pi-star"></i>', head:'내 사주와 이 이름의 실제 궁합', body:'사주 프로필 등록 후 <b>개인 맞춤 궁합</b>을 확인할 수 있어요' });
+  }
+
+  hookPoints.push({ icon:'<i class="pi pi-target"></i>', head:'돈 · 사람 · 일 — 3가지 방향 분석', body:'이 이름이 끌어당기는 <b>재물운 · 관계운 · 직업운</b>의 실제 영향' });
+
+  var html =
+    '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(123,94,167,0.08));border:1px solid rgba(212,175,55,0.35);border-radius:14px;padding:18px 16px;margin-top:16px;">' +
+      '<div style="text-align:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(212,175,55,0.2);">' +
+        '<div style="font-size:10px;letter-spacing:0.2em;color:#d4af37;margin-bottom:6px;font-weight:700;">정밀 분석 예고</div>' +
+        '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;">'+hookTitle+'</div>' +
+        '<div style="font-size:12px;color:var(--text-dim);line-height:1.6;">'+hookSub+'</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">';
+  hookPoints.forEach(function(p){
+    html +=
+      '<div style="display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(212,175,55,0.18);border-radius:10px;padding:10px 12px;">' +
+        '<span style="color:#d4af37;font-size:16px;flex-shrink:0;line-height:1.4;">'+p.icon+'</span>' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.4;">'+p.head+'</div>' +
+          '<div style="font-size:11px;color:var(--text-dim);line-height:1.5;">'+p.body+'</div>' +
+        '</div>' +
+      '</div>';
+  });
+  html += '</div></div>';
+  hookEl.innerHTML = html;
 }
 
 function renderInterpret(gyek, grades, rels, eyPat, jawon, hasGeuk, allSaeng, allYang, allEum, yangCnt) {
@@ -1450,8 +1583,8 @@ function renderInterpret(gyek, grades, rels, eyPat, jawon, hasGeuk, allSaeng, al
     var ohCnt = {};
     ohs.forEach(function(o){ohCnt[o]=(ohCnt[o]||0)+1;});
     var dom = Object.keys(ohCnt).sort(function(a,b){return ohCnt[b]-ohCnt[a];})[0];
-    var label = (currentMode==='select') ? '한자 자원오행' : '음오행';
-    jawonText = label+' '+ohs.join('·')+' — '+dom+'의 기운이 가장 강하게 작용합니다.';
+    var label = (currentMode==='select'||currentMode==='manual') ? '한자 자원오행' : '음오행';
+    jawonText = label+' '+ohs.map(_colorize).join('·')+' — '+_colorize(dom)+'의 기운이 가장 강하게 작용합니다.';
   }
 
   var score = 0;
