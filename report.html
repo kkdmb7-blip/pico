@@ -1154,6 +1154,10 @@ let _personality_db = null;
 let _ageAdvice = null;
 let _ageBracket = null;
 let _ohangWarning = null;
+let _samjaeData = null;
+let _twelveStarsData = null;
+let _jeolgiData = null;
+let _moonPhaseData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1318,6 +1322,10 @@ async function loadAllData(withZiwei, withAstro) {
       _personality_db = _rptFull?.['리포트']?.['기본']?.['성격']||null;
       if (_rptFull['리포트']?.['연령대조언']) _ageAdvice = _rptFull['리포트']['연령대조언']['조언']||null;
       _ohangWarning = _rptFull['오행경고패턴'] || null;
+      _samjaeData = _rptFull['삼재'] || null;
+      _twelveStarsData = _rptFull['십이신살'] || null;
+      _jeolgiData = _rptFull['절기정보'] || null;
+      _moonPhaseData = _rptFull['달의상'] || null;
     }
   } catch(e){}
   try {
@@ -1460,6 +1468,41 @@ function buildOhangWarningBlock() {
   if (w['경고']) parts.push(`[경고] ${w['경고']}`);
   if (w['우선순위']) parts.push(`[우선순위] ${w['우선순위']}`);
   return `\n【오행 구조 경고 패턴】\n${parts.join('\n')}\n(이 패턴을 분석에 반드시 반영하되 원문 그대로 쓰지 말고 자연스럽게 통합할 것)`;
+}
+
+function buildSamjaeBlock() {
+  if (!_samjaeData) return '';
+  if (!_samjaeData.삼재여부) return '\n【삼재】올해 삼재에 해당하지 않음 (삼재 지지: '+(_samjaeData.삼재지지||'')+')\n';
+  return `\n【삼재 경고 — ${_samjaeData.삼재종류}】
+올해 지지: ${_samjaeData.올해지지} / 삼재 지지: ${_samjaeData.삼재지지}
+${_samjaeData.설명}
+(삼재 정보를 분석에 자연스럽게 반영하되 과도한 공포 조성 금지, 실용적 대처법 중심으로 서술할 것)\n`;
+}
+
+function buildTwelveStarsBlock() {
+  if (!_twelveStarsData || !_twelveStarsData.올해활성) return '';
+  const stars = _twelveStarsData.올해활성;
+  const lines = stars.map(s => `${s.신살명}(${s.해당지지}): ${s.설명}`);
+  return `\n【올해 작동 중인 신살】\n${lines.join('\n')}
+(해당 신살이 이 분석 주제와 관련될 경우 자연스럽게 반영할 것)\n`;
+}
+
+function buildJeolgiBlock() {
+  if (!_jeolgiData) return '';
+  return `\n【절기 정보】현재: ${_jeolgiData.현재절기}(${_jeolgiData.절기시작일}) → 다음: ${_jeolgiData.다음절기}(${_jeolgiData.다음절기일}, ${_jeolgiData.남은일수}일 후)
+(절기 전환이 임박하면 기운 변화를 분석에 반영할 것)\n`;
+}
+
+function buildMoonPhaseBlock() {
+  if (!_moonPhaseData) return '';
+  const mp = _moonPhaseData;
+  const phaseKor = {'New Moon':'삭(新月)','Waxing Crescent':'초승달','First Quarter':'상현달','Waxing Gibbous':'볼록달(차오름)','Full Moon':'보름달(望)','Waning Gibbous':'볼록달(이지러짐)','Last Quarter':'하현달','Waning Crescent':'그믐달'}[mp.phase] || mp.phase;
+  return `\n【달의 상(Moon Phase)】${phaseKor} (조도 ${Math.round((mp.illumination||0)*100)}%)
+(달의 위상에 따른 에너지 흐름 — 삭: 새로운 시작, 보름: 결실·감정 고조, 하현: 정리·마무리)\n`;
+}
+
+function buildAccuracyLayerBlock() {
+  return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock();
 }
 
 // ── 초기화 ──
@@ -2031,7 +2074,7 @@ async function generateCharacterReport() {
 ${buildFamousBlock()}
 ${buildYongsinBlock(['직업','피해야할것'])}
 ${buildAgeAdviceBlock()}
-${buildOhangWarningBlock()}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
 4. 베딕 낙샤트라로 본 패턴 — 낙샤트라·라시로 본 삶의 패턴과 기질, 사주와 교차 분석.
@@ -2124,7 +2167,7 @@ ${db}
 ${vb}
 ${buildAdviceBlock(['창업/비즈니스','이직/커리어','투자/재테크'])}
 ${buildYongsinBlock(['직업','피해야할것'])}
-${buildOhangWarningBlock()}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
 4. 재물 대운·세운 흐름 — 현재 대운 ${_daeun||'미확인'}에서 재물 흐름 분석. 베딕 다샤 ${_vedicData?.dasha||'미확인'}와 교차. 언제 기회가 오고 언제 조심해야 하는지 구체적 시기 포함.
@@ -2297,7 +2340,7 @@ ${db}
 ${buildAdviceBlock()}
 ${buildYongsinBlock()}
 ${buildAgeAdviceBlock()}
-${buildOhangWarningBlock()}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
 4. 베딕 다샤·자미두수 대한 교차 분석 — 현재 다샤 ${_vedicData?.dasha||'미확인'}, 안타르다샤 ${_vedicData?.antardasha||'미확인'}와 사주 대운이 겹치는 에너지 교차 분석. 자미두수 현재 대한과도 비교해 두 시스템이 같은 방향을 가리키는 영역과 서로 상충하는 영역.
@@ -2383,7 +2426,7 @@ ${sb2}
 ${vb}
 세운 상세: ${sewunStr}
 ${buildAdviceBlock(['이직/커리어','투자/재테크'])}
-${buildOhangWarningBlock()}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
 4. 월별 주요 흐름 — 상반기(1~6월)와 하반기(7~12월) 흐름, 특히 기회의 달과 주의해야 할 달을 구체적으로. 중요 월건 포함.
@@ -2638,7 +2681,7 @@ ${vedicPlanets}
 ${buildAdviceBlock()}
 ${buildYongsinBlock(['직업','피해야할것'])}
 ${buildAgeAdviceBlock()}
-${buildOhangWarningBlock()}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
 1. 낙샤트라 핵심 기질 — 낙샤트라 ${_vedicData?.nakshatra||'미확인'}의 신화적 상징·기질과 사주 일주 ${_ilju||''}가 공통으로 가리키는 기질 핵심. 두 시스템이 교차하는 가장 강한 패턴.
@@ -2690,7 +2733,7 @@ ${sb2}
 ${ab}
 ${buildAdviceBlock()}
 ${buildYongsinBlock(['직업','피해야할것'])}
-${buildOhangWarningBlock()}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
 1. 출생 차트 핵심 요약 — 태양별자리, 달별자리, 어센던트와 사주 일주 ${_ilju||''}·신강신약 ${_singang||''}이 공통으로 가리키는 기질 핵심 압축.
@@ -2743,7 +2786,7 @@ ${zb}
 ${buildAdviceBlock(['창업/비즈니스','이직/커리어','투자/재테크'])}
 ${buildYongsinBlock()}
 ${buildAgeAdviceBlock()}
-${buildOhangWarningBlock()}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
 1. 명궁 주성 기질 (사주 교차) — 명궁에 위치한 주성·보성의 기질과 사주 일주 ${_ilju||''}·일간이 공통으로 가리키는 기질 핵심. 두 시스템의 교차점이 가장 강한 운명 패턴.
@@ -2800,7 +2843,7 @@ ${buildAdviceBlock()}
 ${buildYongsinBlock()}
 ${buildFamousBlock()}
 ${buildAgeAdviceBlock()}
-${buildOhangWarningBlock()}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
 1. 3시스템 공통 기질 분석 — 사주 일주 ${_ilju||''}, 베딕 낙샤트라 ${_vedicData?.nakshatra||'미확인'}, 서양 태양·달별자리, 자미두수 명궁이 공통으로 강조하는 기질과 운명 패턴. 상충하는 부분도 정직하게.
@@ -2865,7 +2908,7 @@ ${jupiterStr}
 ${buildAdviceBlock(['창업/비즈니스','이직/커리어'])}
 ${buildYongsinBlock(['직업','피해야할것'])}
 ${buildAgeAdviceBlock()}
-${buildOhangWarningBlock()}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
 1. 직업 구조 핵심 요약 — 격국(${_geokguk||'미확인'}), 관성 유무·강약, 식상의 재생 흐름으로 이 사주의 직업 에너지 압축. 사업형인지 직장형인지 핵심 판단.
@@ -2882,7 +2925,7 @@ ${db}
 올해 세운: ${_sewun||'미확인'}
 ${buildAdviceBlock(['창업/비즈니스','이직/커리어'])}
 ${buildYongsinBlock(['직업','피해야할것'])}
-${buildOhangWarningBlock()}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
 4. 지금 대운의 커리어 흐름 — 현재 대운 ${_daeun||'미확인'}이 관록에 어떤 십신으로 작용하는지, 올해 세운이 직업·사업에 미치는 영향. 지금이 전진할 시기인지 내실을 다질 시기인지.
