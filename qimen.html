@@ -666,6 +666,7 @@
     .meta-divider { display: none; }
   }
 </style>
+  <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
 <div id="starCanvas"></div>
@@ -717,7 +718,7 @@
   <div class="status-msg" id="status"></div>
 
   <div id="wonmyong-notice" style="display:none;background:rgba(123,94,167,0.1);border:1px solid rgba(123,94,167,0.3);border-radius:12px;padding:12px 20px;margin-bottom:16px;">
-    <div id="wonmyong-date-label" style="font-size:13px;font-weight:700;color:var(--accent2);">📅 원명국</div>
+    <div id="wonmyong-date-label" style="font-size:13px;font-weight:700;color:var(--accent2);"><i class="pi pi-calendar"></i> 원명국</div>
     <div style="font-size:12px;color:var(--muted);margin-top:4px;">이 판은 태어난 순간의 고정된 기운입니다.</div>
   </div>
 
@@ -730,7 +731,7 @@
     </div>
     <div class="qm-rec-grid" id="qm-rec-grid"></div>
     <div class="qm-warn-box" id="qm-warn-box">
-      <div class="qm-warn-title">⚠️ 주의할 점</div>
+      <div class="qm-warn-title"><i class="pi pi-warning"></i>️ 주의할 점</div>
       <div class="qm-warn-text" id="qm-warn-text"></div>
     </div>
     <button class="qm-detail-toggle" id="qm-detail-toggle" onclick="toggleQmDetail()">▼ 기문둔갑 포국 상세 보기</button>
@@ -823,11 +824,11 @@
     <div class="interp-paid">
       <div class="interp-paid-left">
         <div class="interp-paid-title">
-          <span class="lock-icon">🔒</span> AI 심층 분석
+          <span class="lock-icon"><i class="pi pi-lock"></i></span> AI 심층 분석
         </div>
         <div class="interp-paid-desc">격국 전체 해설 · 시간대별 행동 전략 · 맞춤 조언 · 운세 종합 리포트</div>
       </div>
-      <button class="btn-paid" onclick="alert('준비 중입니다. 곧 오픈될 예정이에요! 🔮')">🔒 AI 정밀 해석 받기 🔮<br><span style="font-size:10px;font-weight:400;opacity:0.7">20 Orb 사용</span></button>
+      <button class="btn-paid" onclick="alert('준비 중입니다. 곧 오픈될 예정이에요! <i class="pi pi-crystal"></i>')"><i class="pi pi-lock"></i> AI 정밀 해석 받기 <i class="pi pi-crystal"></i><br><span style="font-size:10px;font-weight:400;opacity:0.7">20 Orb 사용</span></button>
     </div>
   </div>
 
@@ -835,9 +836,9 @@
 
   <!-- 버튼 그룹 -->
   <div id="qimenShareBtnWrap" style="display:none;padding:20px 20px 32px;display:none;flex-direction:column;align-items:center;gap:10px;">
-    <button onclick="shareQimenKakao()" id="qimenKakaoBtn" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;letter-spacing:-0.3px;">🧭 카카오톡 공유</button>
-    <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;">✦ AI 운세 상담하기</a>
-    <a href="counselor.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#c2784e,#e8a87c);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;">👤 전문 상담사 연결</a>
+    <button onclick="shareQimenKakao()" id="qimenKakaoBtn" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;letter-spacing:-0.3px;"><i class="pi pi-compass"></i> 카카오톡 공유</button>
+    <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;"><i class="pi pi-sparkle"></i> AI 운세 상담하기</a>
+    <a href="counselor.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#c2784e,#e8a87c);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;"><i class="pi pi-person"></i> 전문 상담사 연결</a>
   </div>
 
   <div class="action-row" id="action-row"></div>
@@ -955,7 +956,7 @@ function setType(t, silent) {
       document.getElementById('inp-hour').value   = _wh;
       document.getElementById('inp-minute').value = _wmin;
       document.getElementById('wonmyong-date-label').textContent =
-        '📅 원명국 · ' + _wy + '.' + String(_wm).padStart(2,'0') + '.' + String(_wd).padStart(2,'0');
+        '<i class="pi pi-calendar"></i> 원명국 · ' + _wy + '.' + String(_wm).padStart(2,'0') + '.' + String(_wd).padStart(2,'0');
       notice.style.display = 'block';
     } else {
       notice.style.display = 'none';
@@ -1137,11 +1138,11 @@ function renderSummaryCard(data) {
 
   var recGrid = document.getElementById('qm-rec-grid');
   recGrid.innerHTML = '';
-  recGrid.appendChild(buildRecItem('🧭', '좋은 방향', '분석 중…', ''));
+  recGrid.appendChild(buildRecItem('<i class="pi pi-compass"></i>', '좋은 방향', '분석 중…', ''));
   var timeItem = buildRecItem('⏰', '좋은 시간', '분석 중…', '');
   timeItem.id = 'qm-rec-time';
   recGrid.appendChild(timeItem);
-  recGrid.appendChild(buildRecItem('💼', '오늘 하면 좋은 일', '분석 중…', ''));
+  recGrid.appendChild(buildRecItem('<i class="pi pi-briefcase"></i>', '오늘 하면 좋은 일', '분석 중…', ''));
 
   document.getElementById('qm-warn-box').classList.remove('visible');
 
@@ -1297,7 +1298,7 @@ function updateSummaryPersonal(userDayEl, ymGong, currentData, shichenList, grad
     dirVal = dirLines.length ? dirLines.map(function(d) { return d.dir; }).join(', ') : '—';
     dirSub = dirLines.length ? dirLines.map(function(d) { return d.desc + ': ' + d.dir + '쪽'; }).join('<br>') : '해당 없음';
   }
-  recGrid.appendChild(buildRecItem('🧭', '나의 좋은 방향', dirVal, dirSub));
+  recGrid.appendChild(buildRecItem('<i class="pi pi-compass"></i>', '나의 좋은 방향', dirVal, dirSub));
 
   // 3-2. 좋은 시간 (개인화 — 시간대별 운표 결과)
   var timeItem = buildRecItem('⏰', '나의 좋은 시간', '—', '');
@@ -1317,7 +1318,7 @@ function updateSummaryPersonal(userDayEl, ymGong, currentData, shichenList, grad
   } else {
     actVal = '정상적인 일과 진행';
   }
-  recGrid.appendChild(buildRecItem('💼', '나에게 좋은 활동', actVal, ''));
+  recGrid.appendChild(buildRecItem('<i class="pi pi-briefcase"></i>', '나에게 좋은 활동', actVal, ''));
 
   // ── 4. 주의할 점 (개인화: 연명궁 흉문이면 경고) ──
   var warnBox = document.getElementById('qm-warn-box');
@@ -1610,7 +1611,7 @@ function renderTaegil(data) {
   // 적합도 계산
   var CATS = [
     {
-      icon: '💼', label: '사업·계약',
+      icon: '<i class="pi pi-briefcase"></i>', label: '사업·계약',
       score: (function() {
         var s = 0;
         if (hasDoor('生')) s += 2;
@@ -1621,7 +1622,7 @@ function renderTaegil(data) {
       })()
     },
     {
-      icon: '✈️', label: '이동·여행',
+      icon: '<i class="pi pi-rocket"></i>️', label: '이동·여행',
       score: (function() {
         var s = 0;
         if (hasDoor('開')) s += 2;
@@ -1632,7 +1633,7 @@ function renderTaegil(data) {
       })()
     },
     {
-      icon: '💕', label: '연애·만남',
+      icon: '<i class="pi pi-heart"></i>', label: '연애·만남',
       score: (function() {
         var s = 0;
         if (samePalace('生', '六合')) s += 3;
@@ -1643,7 +1644,7 @@ function renderTaegil(data) {
       })()
     },
     {
-      icon: '📝', label: '시험·면접',
+      icon: '<i class="pi pi-notepad"></i>', label: '시험·면접',
       score: (function() {
         var s = 0;
         if (hasStar('天輔')) s += 2;
@@ -1654,7 +1655,7 @@ function renderTaegil(data) {
       })()
     },
     {
-      icon: '💰', label: '재물·투자',
+      icon: '<i class="pi pi-coin"></i>', label: '재물·투자',
       score: (function() {
         var s = 0;
         if (samePalace('開', '直符') || samePalace('開', '値符')) s += 3;
@@ -1766,10 +1767,10 @@ function renderInterp(data) {
 
   const rowData = [
     { key: '格局',      val: 격국텍스트, html: true },
-    { key: '🧭 방향',   val: 길방.length ? 길방.join(' · ') : '해당 없음' },
+    { key: '<i class="pi pi-compass"></i> 방향',   val: 길방.length ? 길방.join(' · ') : '해당 없음' },
     { key: '⏰ 시간',   val: 최적시간 },
-    { key: '💼 행동',   val: 추천Set.size ? [...추천Set].join(', ') : '정상적인 일과 진행' },
-    { key: '⚠️ 주의',  val: 주의Set.size ? [...주의Set].join(' / ') : '특이 사항 없음' },
+    { key: '<i class="pi pi-briefcase"></i> 행동',   val: 추천Set.size ? [...추천Set].join(', ') : '정상적인 일과 진행' },
+    { key: '<i class="pi pi-warning"></i>️ 주의',  val: 주의Set.size ? [...주의Set].join(' / ') : '특이 사항 없음' },
   ];
 
   rowData.forEach(r => {
@@ -1791,7 +1792,7 @@ function renderInterp(data) {
     '生':'생기', '開':'왕성한 활동', '休':'안정', '景':'밝은 기운',
     '傷':'주의', '杜':'막힘', '驚':'긴장', '死':'침체'
   };
-  summary.innerHTML = '<span style="font-size:13px;color:var(--muted);font-family:\'Noto Sans KR\',sans-serif;font-weight:700;letter-spacing:0.5px;">📝 요약&nbsp;&nbsp;</span>'
+  summary.innerHTML = '<span style="font-size:13px;color:var(--muted);font-family:\'Noto Sans KR\',sans-serif;font-weight:700;letter-spacing:0.5px;"><i class="pi pi-notepad"></i> 요약&nbsp;&nbsp;</span>'
     + (matched.length ? matched[0].요약
       : '직사문 ' + (data.직사문 || '') + '門 — ' + (직사문명[data.직사문] || '보통') + '의 기운이 흐르는 날입니다.');
 
@@ -2150,7 +2151,7 @@ function _drawQimenCard(cb) {
   y += 38;
   ctx.font = '700 30px "Noto Sans KR", sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.fillText('🧭 오늘의 최길 방향', W/2, y);
+  ctx.fillText('<i class="pi pi-compass"></i> 오늘의 최길 방향', W/2, y);
 
   y += 44;
   var chipW = 200, chipH = 72, chipGap = 16;
@@ -2201,26 +2202,26 @@ function shareQimenKakao() {
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
 
   _drawQimenCard(function(canvas) {
-    if (btn) { btn.disabled = false; btn.textContent = '🧭 카카오톡 공유'; }
-    if (!canvas) { _qimenShowToast('카드 생성 실패 😢'); return; }
+    if (btn) { btn.disabled = false; btn.textContent = '<i class="pi pi-compass"></i> 카카오톡 공유'; }
+    if (!canvas) { _qimenShowToast('카드 생성 실패 <i class="pi pi-sad"></i>'); return; }
 
     // URL 클립보드 복사
     try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
 
     canvas.toBlob(function(blob) {
-      if (!blob) { _qimenShowToast('이미지 생성 실패 😢'); return; }
+      if (!blob) { _qimenShowToast('이미지 생성 실패 <i class="pi pi-sad"></i>'); return; }
       var file = new File([blob], 'fortuna_qimen.png', { type: 'image/png' });
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         navigator.share({ files: [file], title: 'FORTUNA 기문둔갑' })
-          .then(function() { _qimenShowToast('🔗 링크가 클립보드에 복사됐어요!'); })
+          .then(function() { _qimenShowToast('<i class="pi pi-link"></i> 링크가 클립보드에 복사됐어요!'); })
           .catch(function() {});
       } else if (navigator.share) {
         navigator.share({ title: 'FORTUNA 기문둔갑', url: pageUrl })
           .catch(function() {});
-        _qimenShowToast('🔗 링크가 클립보드에 복사됐어요!');
+        _qimenShowToast('<i class="pi pi-link"></i> 링크가 클립보드에 복사됐어요!');
       } else {
         try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
-        _qimenShowToast('🔗 링크가 클립보드에 복사됐어요!');
+        _qimenShowToast('<i class="pi pi-link"></i> 링크가 클립보드에 복사됐어요!');
       }
     }, 'image/png');
   });
@@ -2440,7 +2441,7 @@ function shareQimenKakao() {
       titleEl.innerHTML = '오늘의 시간대별 운표 '
         + '<span style="font-size:10px;font-weight:400;opacity:0.55;">진태양시 기준</span>'
         + '<br><span style="font-size:11px;font-weight:700;color:var(--accent2);margin-top:4px;display:inline-block;">'
-        + '✦ ' + userDayStem + '(' + EL_HAN[userDayEl] + ') 일간 · '
+        + '<i class="pi pi-sparkle"></i> ' + userDayStem + '(' + EL_HAN[userDayEl] + ') 일간 · '
         + ymGong + '궁(' + (GONG_NAME[ymGong]||'') + ') 연명 맞춤</span>';
     }
 

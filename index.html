@@ -758,7 +758,7 @@
   animation: tcShuffle 1.2s ease-out forwards;
 }
 .tarot-shuffle .tc::after {
-  content: '✦';
+  content: '<i class="pi pi-sparkle"></i>';
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
   font-size: 28px; color: #8e7dff88;
@@ -820,6 +820,7 @@
   flex-shrink: 0;
 }
 </style>
+  <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
 
@@ -830,7 +831,7 @@
     <div class="tc"></div>
     <div class="tc"></div>
   </div>
-  <div class="tarot-intro-text">오늘 가장 궁금한 것을<br>마음속으로 떠올리세요 🔮</div>
+  <div class="tarot-intro-text">오늘 가장 궁금한 것을<br>마음속으로 떠올리세요 <i class="pi pi-crystal"></i></div>
   <div class="tarot-intro-sub">잠시 후 타로가 시작됩니다…</div>
 </div>
 
@@ -859,7 +860,7 @@
 <div style="padding:16px 16px 0;">
   <div class="memox-banner" onclick="window.location.href='https://kkdmb7-blip.github.io/memox/'" >
     <div class="memox-banner-left">
-      <div class="memox-banner-title">✦ AI 사주 상담</div>
+      <div class="memox-banner-title"><i class="pi pi-sparkle"></i> AI 사주 상담</div>
       <div class="memox-banner-desc">사주+베딕+기문+자미두수 융합 실시간 채팅</div>
     </div>
     <div class="memox-banner-btn">상담 시작 →</div>
@@ -875,9 +876,9 @@
         <div style="font-size:10px;font-weight:700;color:var(--gold);letter-spacing:0.8px;opacity:0.75;">사주일기</div>
         <div id="diaryCtaBadge" style="display:none;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.3);border-radius:20px;padding:1px 8px;font-size:10px;color:var(--gold);">오늘 완료 ✓</div>
       </div>
-      <div style="font-size:26px;line-height:1;" id="diaryCtaEmoji">📔</div>
+      <div style="font-size:26px;line-height:1;" id="diaryCtaEmoji"><i class="pi pi-book"></i></div>
     </div>
-    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;" id="diaryCtaTitle">오늘 하루 어땠어? ✏️</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;" id="diaryCtaTitle">오늘 하루 어땠어? <i class="pi pi-pencil"></i>️</div>
     <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px;" id="diaryCtaSub">일진 기운과 하루를 기록하면 AI가 오늘을 해석해줘</div>
     <div style="display:flex;align-items:center;justify-content:space-between;">
       <div style="background:rgba(123,94,167,0.15);border:1px solid rgba(123,94,167,0.3);border-radius:8px;padding:4px 10px;font-size:12px;color:#c4a7f0;" id="diaryCtaIlganText">오늘의 일진…</div>
@@ -901,8 +902,8 @@
   </p>
   <div style="margin-top:0;font-size:12px;color:var(--muted);display:flex;gap:20px;justify-content:center;flex-wrap:wrap;position:relative;">
     <span>⭐ 사주 + 점성 + 베딕 통합</span>
-    <span>⚡ 실시간 기문둔갑</span>
-    <span>🔮 AI 1:1 해석</span>
+    <span><i class="pi pi-bolt"></i> 실시간 기문둔갑</span>
+    <span><i class="pi pi-crystal"></i> AI 1:1 해석</span>
   </div>
 </section>
 
@@ -945,14 +946,14 @@
         <button class="saju-gender-btn" id="heroGenderF" onclick="selectHeroGender('F')">여성 ♀</button>
       </div>
     </div>
-    <button class="saju-submit-btn" onclick="goScoreHero()">내 운세 바로 확인하기 ✦</button>
+    <button class="saju-submit-btn" onclick="goScoreHero()">내 운세 바로 확인하기 <i class="pi pi-sparkle"></i></button>
   </div>
 </section>
 
 <!-- TODAY COSMIC ENERGY -->
 <section id="todayCosmicWrap" style="padding:48px 24px 48px;max-width:960px;margin:0 auto;position:relative;z-index:1;display:none;">
   <div style="text-align:center;margin-bottom:24px;font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:#f5c842;letter-spacing:1px;">
-    ✦ <span id="cosmicTitleName">당신의</span> 우주 에너지
+    <i class="pi pi-sparkle"></i> <span id="cosmicTitleName">당신의</span> 우주 에너지
   </div>
   <div id="cosmicGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;"></div>
 </section>
@@ -1311,7 +1312,7 @@
       <div onclick="window.location.href='report.html?type=yongsin'" style="background:var(--surface2);border:1px solid rgba(255,200,80,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(255,200,80,0.6)'" onmouseout="this.style.borderColor='rgba(255,200,80,0.25)'">
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <div style="font-size:13px;font-weight:700;color:#ffc850;">⚡ 용신 생활 가이드</div>
+            <div style="font-size:13px;font-weight:700;color:#ffc850;"><i class="pi pi-bolt"></i> 용신 생활 가이드</div>
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">내 용신 오행으로 보는 실생활 개운법 + 일주별 맞춤 전략</div>
         </div>
@@ -1328,7 +1329,7 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <div onclick="window.location.href='report.html?type=vedic_full'" style="background:var(--surface2);border:1px solid rgba(148,130,220,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(148,130,220,0.6)'" onmouseout="this.style.borderColor='rgba(148,130,220,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;">🪐</div>
+        <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-galaxy"></i></div>
         <div style="font-size:13px;font-weight:700;color:#9482dc;margin-bottom:4px;">베딕 심층 분석</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">낙샤트라·다샤·라시로 보는 운명 패턴</div>
         <div style="margin-top:8px;font-size:10px;font-weight:600;color:#9482dc;">500 Orb</div>
@@ -1340,19 +1341,19 @@
         <div style="margin-top:8px;font-size:10px;font-weight:600;color:#ffd864;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=ziwei_full'" style="background:var(--surface2);border:1px solid rgba(100,180,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,180,255,0.6)'" onmouseout="this.style.borderColor='rgba(100,180,255,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;">🌌</div>
+        <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-galaxy"></i></div>
         <div style="font-size:13px;font-weight:700;color:#64b4ff;margin-bottom:4px;">자미두수 심층</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">명궁·재백·관록궁으로 보는 운명</div>
         <div style="margin-top:8px;font-size:10px;font-weight:600;color:#64b4ff;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=career_deep'" style="background:var(--surface2);border:1px solid rgba(100,220,150,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,220,150,0.6)'" onmouseout="this.style.borderColor='rgba(100,220,150,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;">🚀</div>
+        <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-rocket"></i></div>
         <div style="font-size:13px;font-weight:700;color:#64dc96;margin-bottom:4px;">직업·사업 심층</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">3시스템으로 보는 직업 구조 분석</div>
         <div style="margin-top:8px;font-size:10px;font-weight:600;color:#64dc96;">600 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=triple'" style="background:linear-gradient(135deg,rgba(100,130,220,0.15),rgba(220,130,100,0.15));border:1px solid rgba(180,160,240,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(180,160,240,0.7)'" onmouseout="this.style.borderColor='rgba(180,160,240,0.3)'">
-        <div style="font-size:28px;">🔭</div>
+        <div style="font-size:28px;"><i class="pi pi-eye"></i></div>
         <div style="flex:1;">
           <div style="font-size:13px;font-weight:700;color:#c8b4f0;margin-bottom:3px;">동서양 통합 분석 <span style="font-size:10px;background:linear-gradient(90deg,#c8b4f0,#f0c8b4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">PREMIUM</span></div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">사주·베딕·서양·자미두수 4개 시스템이 동시에 가리키는 운명의 교차점</div>
@@ -1413,7 +1414,7 @@
   </div>
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;">
     <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--surface2);border:1px solid rgba(123,94,167,0.3);border-radius:14px;text-decoration:none;color:var(--text);transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(123,94,167,0.6)'" onmouseout="this.style.borderColor='rgba(123,94,167,0.3)'">
-      <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(123,94,167,0.3),rgba(160,127,212,0.15));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✦</div>
+      <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(123,94,167,0.3),rgba(160,127,212,0.15));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;"><i class="pi pi-sparkle"></i></div>
       <div style="flex:1;">
         <div style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;margin-bottom:3px;">AI 운세 상담</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.5;">사주·점성술·기문 기반의 AI 심층 분석</div>
@@ -1421,7 +1422,7 @@
       <div style="font-size:11px;font-weight:600;color:#b48fff;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">무료</div>
     </a>
     <a href="counselor.html" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--surface2);border:1px solid rgba(194,120,78,0.3);border-radius:14px;text-decoration:none;color:var(--text);transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(194,120,78,0.6)'" onmouseout="this.style.borderColor='rgba(194,120,78,0.3)'">
-      <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.1));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👤</div>
+      <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.1));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;"><i class="pi pi-person"></i></div>
       <div style="flex:1;">
         <div style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;margin-bottom:3px;">전문 상담사 연결</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.5;">사주·타로 전문가에게 1:1 직접 상담</div>
@@ -1453,20 +1454,20 @@
         <div id="mypageName" style="font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;margin-bottom:2px;"></div>
         <div style="font-size:11px;color:var(--muted);">PICO Lab 회원</div>
       </div>
-      <div id="mypageOrbBadge" style="font-size:12px;font-weight:700;color:#7ac4ff;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:20px;padding:5px 12px;white-space:nowrap;">✦ — Orb</div>
+      <div id="mypageOrbBadge" style="font-size:12px;font-weight:700;color:#7ac4ff;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:20px;padding:5px 12px;white-space:nowrap;"><i class="pi pi-sparkle"></i> — Orb</div>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;">
       <button onclick="openProfilesModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span>👥 프로필 관리</span><span style="color:var(--muted);">›</span>
+        <span><i class="pi pi-people"></i> 프로필 관리</span><span style="color:var(--muted);">›</span>
       </button>
       <button onclick="openProfileModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span>👤 내 프로필 설정</span><span style="color:var(--muted);">›</span>
+        <span><i class="pi pi-person"></i> 내 프로필 설정</span><span style="color:var(--muted);">›</span>
       </button>
       <button onclick="openHistoryModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span>📜 지난 분석 보기</span><span style="color:var(--muted);">›</span>
+        <span><i class="pi pi-scroll"></i> 지난 분석 보기</span><span style="color:var(--muted);">›</span>
       </button>
       <button id="btnPushToggle" onclick="togglePushSubscription()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span id="btnPushLabel">🔔 오늘의 명언 알림 켜기</span><span style="color:var(--muted);">›</span>
+        <span id="btnPushLabel"><i class="pi pi-bell"></i> 오늘의 명언 알림 켜기</span><span style="color:var(--muted);">›</span>
       </button>
       <button onclick="logout()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;color:#f87171;font-size:14px;cursor:pointer;text-align:left;width:100%;">
         <span>로그아웃</span><span style="color:var(--muted);">›</span>
@@ -1482,7 +1483,7 @@
 
     <!-- 입력 폼 -->
     <div id="sajuForm">
-      <h3>🏛️ 만세력 보기</h3>
+      <h3><i class="pi pi-temple"></i>️ 만세력 보기</h3>
       <p class="saju-modal-sub">생년월일을 입력하면 사주 8자를 바로 확인할 수 있어요</p>
       <div class="modal-profile-row">
         <button class="modal-profile-btn" onclick="fillSajuFromMine()">내 정보</button>
@@ -1534,7 +1535,7 @@
           <button class="saju-gender-btn" id="genderF" onclick="selectGender('F')">여성 ♀</button>
         </div>
       </div>
-      <button class="saju-submit-btn" id="sajuSubmitBtn" onclick="submitSaju()">사주 보기 ✦</button>
+      <button class="saju-submit-btn" id="sajuSubmitBtn" onclick="submitSaju()">사주 보기 <i class="pi pi-sparkle"></i></button>
     </div>
   </div>
 </div>
@@ -1543,7 +1544,7 @@
 <div class="saju-overlay" id="qimenOverlay" onclick="if(event.target===this)closeQimenModal()">
   <div class="saju-modal">
     <button class="saju-modal-close" onclick="closeQimenModal()">✕</button>
-    <h3>🗺️ 기문둔갑 포국반</h3>
+    <h3><i class="pi pi-globe"></i>️ 기문둔갑 포국반</h3>
     <p class="saju-modal-sub">날짜와 시간을 입력하면 9궁 포국을 즉시 확인할 수 있어요</p>
     <div class="modal-profile-row">
       <button class="modal-profile-btn" onclick="fillQimenFromMine()">내 정보</button>
@@ -1588,7 +1589,7 @@
         <button class="saju-gender-btn" id="qmGenderF" onclick="selectQimenGender('F')">여성 ♀</button>
       </div>
     </div>
-    <button class="saju-submit-btn" onclick="submitQimen()">기문 보기 ✦</button>
+    <button class="saju-submit-btn" onclick="submitQimen()">기문 보기 <i class="pi pi-sparkle"></i></button>
   </div>
 </div>
 
@@ -1597,7 +1598,7 @@
 <div class="saju-overlay" id="gunghapOverlay" onclick="if(event.target===this)closeGunghapModal()">
   <div class="saju-modal">
     <button class="saju-modal-close" onclick="closeGunghapModal()">✕</button>
-    <h3>💕 궁합 보기</h3>
+    <h3><i class="pi pi-heart"></i> 궁합 보기</h3>
     <p class="saju-modal-sub">사주로 두 사람의 인연을 분석해 드려요</p>
 
     <div style="font-size:11px;font-weight:700;color:var(--accent2);letter-spacing:1px;margin-bottom:8px;">내 정보</div>
@@ -1645,7 +1646,7 @@
       </div>
     </div>
 
-    <button class="saju-submit-btn" onclick="submitGunghap()" style="background:linear-gradient(135deg,#c2185b,#e91e8c);">궁합 보기 ✦</button>
+    <button class="saju-submit-btn" onclick="submitGunghap()" style="background:linear-gradient(135deg,#c2185b,#e91e8c);">궁합 보기 <i class="pi pi-sparkle"></i></button>
   </div>
 </div>
 
@@ -1653,7 +1654,7 @@
 <div class="saju-overlay" id="gunghapResultOverlay" onclick="if(event.target===this)closeGunghapResult()" style="display:none;padding:12px;">
   <div class="saju-modal" style="padding:20px 16px 24px;max-height:92vh;overflow-y:auto;width:100%;">
     <button class="saju-modal-close" onclick="closeGunghapResult()">✕</button>
-    <h3 style="color:#ff8ab0;font-size:18px;margin-bottom:4px;">💕 궁합 결과</h3>
+    <h3 style="color:#ff8ab0;font-size:18px;margin-bottom:4px;"><i class="pi pi-heart"></i> 궁합 결과</h3>
     <div id="ghResultNames" style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:12px;"></div>
 
     <!-- 무료: 점수 -->
@@ -1672,7 +1673,7 @@
 
     <!-- 유료: AI 분석 버튼 -->
     <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px;">
-      <div style="font-size:12px;font-weight:700;color:#e8b86d;margin-bottom:3px;">🔮 AI 정밀 분석 받기</div>
+      <div style="font-size:12px;font-weight:700;color:#e8b86d;margin-bottom:3px;"><i class="pi pi-crystal"></i> AI 정밀 분석 받기</div>
       <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px;">두 사람의 깊은 인연을 AI가 분석합니다 · <span style="color:rgba(255,200,100,0.6);">80 Orb 사용</span></div>
       <button id="ghAiBtn" onclick="requestGunghapAI()" style="padding:10px 24px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:10px;color:#e8b86d;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">AI 분석 시작</button>
     </div>
@@ -1686,7 +1687,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#3c1e1e"><path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.07 1.7 5.78 4.32 7.46L5.5 22l4.27-2.14C10.47 20.28 11.22 20.4 12 20.4c5.52 0 10-3.92 10-8.8C22 5.92 17.52 2 12 2z"/></svg>
         카카오톡 공유
       </button>
-      <a href="counselor.html" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:linear-gradient(135deg,#c2784e,#e8a87c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Noto Serif KR',sans-serif;cursor:pointer;text-decoration:none;margin-top:10px;box-sizing:border-box;">👤 전문 상담사 연결</a>
+      <a href="counselor.html" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:linear-gradient(135deg,#c2784e,#e8a87c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Noto Serif KR',sans-serif;cursor:pointer;text-decoration:none;margin-top:10px;box-sizing:border-box;"><i class="pi pi-person"></i> 전문 상담사 연결</a>
     </div>
   </div>
 </div>
@@ -1695,7 +1696,7 @@
 <div class="saju-overlay" id="historyOverlay" onclick="if(event.target===this)closeHistoryModal()" style="display:none;padding:12px;">
   <div class="saju-modal" style="padding:20px 16px 24px;max-height:92vh;overflow-y:auto;">
     <button class="saju-modal-close" onclick="closeHistoryModal()">✕</button>
-    <h3 style="font-size:18px;margin-bottom:4px;">📜 지난 분석</h3>
+    <h3 style="font-size:18px;margin-bottom:4px;"><i class="pi pi-scroll"></i> 지난 분석</h3>
     <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">저장된 AI 정밀분석 결과를 다시 볼 수 있어요</p>
     <div id="historyList" style="display:flex;flex-direction:column;gap:8px;">
       <div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">불러오는 중...</div>
@@ -1716,7 +1717,7 @@
 <div class="saju-overlay" id="birthOverlay" onclick="if(event.target===this)closeBirthModal()">
   <div class="saju-modal">
     <button class="saju-modal-close" onclick="closeBirthModal()">✕</button>
-    <h3 id="birthModalTitle">🌟 서양 점성술</h3>
+    <h3 id="birthModalTitle"><i class="pi pi-star"></i> 서양 점성술</h3>
     <p class="saju-modal-sub">생년월일을 입력하면 바로 확인할 수 있어요</p>
     <div class="modal-profile-row">
       <button class="modal-profile-btn" onclick="fillBirthFromMine()">내 정보</button>
@@ -1761,14 +1762,14 @@
         <button class="saju-gender-btn" id="birthGenderF" onclick="selectBirthGender('F')">여성 ♀</button>
       </div>
     </div>
-    <button class="saju-submit-btn" onclick="submitBirth()">바로 보기 ✦</button>
+    <button class="saju-submit-btn" onclick="submitBirth()">바로 보기 <i class="pi pi-sparkle"></i></button>
   </div>
 </div>
 
 <!-- PROFILES MANAGEMENT MODAL -->
 <div class="profile-overlay" id="profilesOverlay">
   <div class="profile-modal" style="max-width:440px;">
-    <h3>👥 프로필 관리</h3>
+    <h3><i class="pi pi-people"></i> 프로필 관리</h3>
     <p>저장된 프로필로 각 페이지를 빠르게 조회합니다 (최대 10명)</p>
 
     <!-- My Profile -->
@@ -1839,7 +1840,7 @@
 <!-- PROFILE MODAL -->
 <div class="profile-overlay" id="profileOverlay">
   <div class="profile-modal">
-    <h3>👤 프로필 설정</h3>
+    <h3><i class="pi pi-person"></i> 프로필 설정</h3>
     <p>사주 분석에 사용할 기본 정보를 입력해주세요. 한 번만 입력하면 자동으로 채워집니다.</p>
     <div class="saju-form-group">
       <label>이름</label>
@@ -1899,14 +1900,14 @@
         <option value="시드니|-33.8688|151.2093|10">시드니</option>
       </select>
     </div>
-    <button class="saju-submit-btn" onclick="saveProfile()">저장하기 ✦</button>
+    <button class="saju-submit-btn" onclick="saveProfile()">저장하기 <i class="pi pi-sparkle"></i></button>
   </div>
 </div>
 
 <footer id="mainFooter">
   <div>© 2026 PICO Lab · AI 운세 연구소</div>
   <div>
-    <a href="http://pf.kakao.com/_krjxjn" target="_blank">💬 카카오 채널 고객센터</a>
+    <a href="http://pf.kakao.com/_krjxjn" target="_blank"><i class="pi pi-chat"></i> 카카오 채널 고객센터</a>
   </div>
 </footer>
 
@@ -2263,7 +2264,7 @@ function calcGunghapScore(mySaju, pSaju) {
   return {
     total: total,
     oScore: oScore, tScore: tScore, sScore: sScore, bonus: bonus,
-    comment: total>=85?'천생연분이에요 ✨':total>=70?'좋은 인연이에요 💕':total>=55?'보완하며 성장할 수 있어요 🌱':'서로 노력이 필요해요 💪'
+    comment: total>=85?'천생연분이에요 <i class="pi pi-sparkle"></i>':total>=70?'좋은 인연이에요 <i class="pi pi-heart"></i>':total>=55?'보완하며 성장할 수 있어요 <i class="pi pi-clover"></i>':'서로 노력이 필요해요 <i class="pi pi-muscle"></i>'
   };
 }
 
@@ -2317,7 +2318,7 @@ async function submitGunghap() {
   var commentEl = document.getElementById('ghResComment');
   var detailEl  = document.getElementById('ghResDetail');
 
-  if (namesEl) namesEl.textContent = myName + ' ❤ ' + pNameDisp;
+  if (namesEl) namesEl.textContent = myName + ' <i class="pi pi-heart"></i> ' + pNameDisp;
   if (cardsEl) cardsEl.innerHTML = _sajuMiniCard(mySaju,'나',myName,myGender) + _sajuMiniCard(pSaju,'상대방',pNameDisp,_ghPartnerGender);
   if (aiEl)    { aiEl.innerHTML = ''; aiEl.style.display = 'none'; }
   if (scoreEl) scoreEl.textContent = score.total;
@@ -2437,14 +2438,14 @@ async function requestGunghapAI() {
   // ── DB 1: 오행 궁합 (즉시) ──
   var ohText = ctx.ohaeng_text;
   if (ohText && ohText.텍스트) {
-    showChunk('chunk-db1', '🔥 오행 궁합 · ' + myName + '의 ' + ohaengA + ' × ' + pNameDisp + '의 ' + ohaengB, ohText.텍스트.replace(/\n/g, '<br>'));
+    showChunk('chunk-db1', '<i class="pi pi-fire"></i> 오행 궁합 · ' + myName + '의 ' + ohaengA + ' × ' + pNameDisp + '의 ' + ohaengB, ohText.텍스트.replace(/\n/g, '<br>'));
   } else {
-    showChunk('chunk-db1', '🔥 오행 궁합', ohaengA + ' × ' + ohaengB);
+    showChunk('chunk-db1', '<i class="pi pi-fire"></i> 오행 궁합', ohaengA + ' × ' + ohaengB);
   }
 
   // ── 천간합 (즉시) ──
   if (ctx.chungan_text) {
-    var cgTitle = ctx.chungan_text.합 ? '✨ 천간합 · ' + ilganA + ' + ' + ilganB + ' = ' + ctx.chungan_text.합화 + '으로 합화!' : '✨ 천간 관계';
+    var cgTitle = ctx.chungan_text.합 ? '<i class="pi pi-sparkle"></i> 천간합 · ' + ilganA + ' + ' + ilganB + ' = ' + ctx.chungan_text.합화 + '으로 합화!' : '<i class="pi pi-sparkle"></i> 천간 관계';
     showChunk('chunk-cg', cgTitle, ctx.chungan_text.텍스트.replace(/\n/g,'<br>'));
   } else {
     document.getElementById('chunk-cg').style.display = 'none';
@@ -2453,23 +2454,23 @@ async function requestGunghapAI() {
   // ── 일지 관계 (즉시) ──
   if (ctx.ilji_text && ctx.ilji_text.텍스트) {
     var KOR_HANJA = {자:'子',축:'丑',인:'寅',묘:'卯',진:'辰',사:'巳',오:'午',미:'未',신:'申',유:'酉',술:'戌',해:'亥'};
-    showChunk('chunk-ij', '💫 일지 궁합 · ' + (KOR_HANJA[iljiA]||iljiA) + ' × ' + (KOR_HANJA[iljiB]||iljiB) + ' (' + iljiType + ')', ctx.ilji_text.텍스트.replace(/\n/g,'<br>'));
+    showChunk('chunk-ij', '<i class="pi pi-sparkle"></i> 일지 궁합 · ' + (KOR_HANJA[iljiA]||iljiA) + ' × ' + (KOR_HANJA[iljiB]||iljiB) + ' (' + iljiType + ')', ctx.ilji_text.텍스트.replace(/\n/g,'<br>'));
   } else {
     document.getElementById('chunk-ij').style.display = 'none';
   }
 
   // ── DB 2: 체질 궁합 (즉시) ──
   if (ctx.singang_text && ctx.singang_text.텍스트) {
-    showChunk('chunk-db2', '⚖️ 체질 궁합 · ' + myName + ' ' + strKeyA + ' × ' + pNameDisp + ' ' + strKeyB, ctx.singang_text.텍스트.replace(/\n/g,'<br>'));
+    showChunk('chunk-db2', '<i class="pi pi-scale"></i>️ 체질 궁합 · ' + myName + ' ' + strKeyA + ' × ' + pNameDisp + ' ' + strKeyB, ctx.singang_text.텍스트.replace(/\n/g,'<br>'));
   } else {
-    showChunk('chunk-db2', '⚖️ 체질 궁합', strKeyA + ' × ' + strKeyB + ' 조합');
+    showChunk('chunk-db2', '<i class="pi pi-scale"></i>️ 체질 궁합', strKeyA + ' × ' + strKeyB + ' 조합');
   }
 
   // ── DB 3: 띠 궁합 (즉시) ──
   if (ctx.ddi_text && ctx.ddi_text.텍스트) {
-    showChunk('chunk-db3', '🐾 띠 궁합 · ' + mySaju.zodiac + '띠 × ' + pSaju.zodiac + '띠 (' + ddiType + ')', ctx.ddi_text.텍스트.replace(/\n/g,'<br>'));
+    showChunk('chunk-db3', '<i class="pi pi-clover"></i> 띠 궁합 · ' + mySaju.zodiac + '띠 × ' + pSaju.zodiac + '띠 (' + ddiType + ')', ctx.ddi_text.텍스트.replace(/\n/g,'<br>'));
   } else {
-    showChunk('chunk-db3', '🐾 띠 궁합', ddiType + ' 관계');
+    showChunk('chunk-db3', '<i class="pi pi-clover"></i> 띠 궁합', ddiType + ' 관계');
   }
 
   // ── AI 1: 연애 스타일 (80 Orb) ──
@@ -2501,9 +2502,9 @@ async function requestGunghapAI() {
       throw new Error(e1.error||r1.status);
     }
     var d1 = await r1.json();
-    showChunk('chunk-ai1', '💕 ' + myName + ' & ' + pNameDisp + '의 연애 스타일', boldPink(d1.reply));
+    showChunk('chunk-ai1', '<i class="pi pi-heart"></i> ' + myName + ' & ' + pNameDisp + '의 연애 스타일', boldPink(d1.reply));
   } catch(e) {
-    showError('chunk-ai1','💕 연애 스타일'); showError('chunk-ai2','⏰ 지금 이 시기');
+    showError('chunk-ai1','<i class="pi pi-heart"></i> 연애 스타일'); showError('chunk-ai2','⏰ 지금 이 시기');
     aiBtn.disabled=false; aiBtn.textContent='AI 분석 시작';
     return;
   }
@@ -2548,7 +2549,7 @@ async function requestGunghapAI() {
   else bowanType = '한쪽_채움';
 
   yongsinHtml += '<div style="margin-bottom:16px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">';
-  yongsinHtml += '<div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:8px;">🧩 두 사람의 보완 관계</div>';
+  yongsinHtml += '<div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:8px;"><i class="pi pi-compass"></i> 두 사람의 보완 관계</div>';
   if (ctx.bowan_text && ctx.bowan_text.텍스트) {
     yongsinHtml += '<div style="font-size:14px;color:#e8e0f0;line-height:1.7;margin-bottom:12px;">' + ctx.bowan_text.텍스트.replace(/\n/g,'<br>') + '</div>';
   } else {
@@ -2561,16 +2562,16 @@ async function requestGunghapAI() {
   function yongsinCard(name, ys, data) {
     if (!data) return '';
     return '<div style="margin-bottom:12px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">'
-      +'<div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:8px;">✦ '+name+'이 채울 기운: '+ys+'</div>'
+      +'<div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:8px;"><i class="pi pi-sparkle"></i> '+name+'이 채울 기운: '+ys+'</div>'
       +'<div style="font-size:13px;color:#e8e0f0;line-height:1.7;">'
-      +'<div style="margin-bottom:4px;">🎨 <strong style="color:#ff8ab0;">색상</strong>: '+(data.색상||'')+'</div>'
-      +'<div style="margin-bottom:4px;">🧭 <strong style="color:#ff8ab0;">방위</strong>: '+(data.방위||'')+'</div>'
-      +'<div style="margin-bottom:4px;">🍽️ <strong style="color:#ff8ab0;">음식</strong>: '+(data.음식||'')+'</div>'
+      +'<div style="margin-bottom:4px;"><i class="pi pi-palette"></i> <strong style="color:#ff8ab0;">색상</strong>: '+(data.색상||'')+'</div>'
+      +'<div style="margin-bottom:4px;"><i class="pi pi-compass"></i> <strong style="color:#ff8ab0;">방위</strong>: '+(data.방위||'')+'</div>'
+      +'<div style="margin-bottom:4px;"><i class="pi pi-utensils"></i>️ <strong style="color:#ff8ab0;">음식</strong>: '+(data.음식||'')+'</div>'
       +'</div></div>';
   }
   yongsinHtml += yongsinCard(myName, myYS, ctx.a_yongsin);
   yongsinHtml += yongsinCard(pNameDisp, pYS, ctx.b_yongsin);
-  showChunk('chunk-db4', '🌟 서로를 위한 실천 가이드', yongsinHtml);
+  showChunk('chunk-db4', '<i class="pi pi-star"></i> 서로를 위한 실천 가이드', yongsinHtml);
 
   // ── 자동 저장 ──
   try {
@@ -2579,7 +2580,7 @@ async function requestGunghapAI() {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         user_id: user.id, type: 'gunghap',
-        title: myName + ' ❤ ' + pNameDisp + ' 궁합',
+        title: myName + ' <i class="pi pi-heart"></i> ' + pNameDisp + ' 궁합',
         result: {
           personA: { name:myName, ilju:iljuA, ohaeng:ohaengA, strength:strA, yongsin:myYS },
           personB: { name:pNameDisp, ilju:iljuB, ohaeng:ohaengB, strength:strB, yongsin:pYS },
@@ -2590,7 +2591,7 @@ async function requestGunghapAI() {
     });
     var savedMsg = document.createElement('div');
     savedMsg.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:rgba(255,255,255,0.35);margin-top:8px;';
-    savedMsg.textContent = '✅ 자동 저장됨 · 지난 분석에서 다시 볼 수 있어요';
+    savedMsg.textContent = '<i class="pi pi-check"></i> 자동 저장됨 · 지난 분석에서 다시 볼 수 있어요';
     aiEl.appendChild(savedMsg);
   } catch(e) {}
 
@@ -2609,7 +2610,7 @@ async function openHistoryModal() {
   list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">불러오는 중...</div>';
 
   var allItems = [];
-  var TYPE_ICON = { character:'🌟', money:'💰', love:'💕', daeun:'🔮', year:'📅', month:'📆', yongsin:'⚡', vedic_full:'🪐', astro_full:'⭐', ziwei_full:'🌌', triple:'🔭', career_deep:'🚀', gunghap:'💕', saju:'🏛️' };
+  var TYPE_ICON = { character:'<i class="pi pi-star"></i>', money:'<i class="pi pi-coin"></i>', love:'<i class="pi pi-heart"></i>', daeun:'<i class="pi pi-crystal"></i>', year:'<i class="pi pi-calendar"></i>', month:'<i class="pi pi-calendar"></i>', yongsin:'<i class="pi pi-bolt"></i>', vedic_full:'<i class="pi pi-galaxy"></i>', astro_full:'⭐', ziwei_full:'<i class="pi pi-galaxy"></i>', triple:'<i class="pi pi-eye"></i>', career_deep:'<i class="pi pi-rocket"></i>', gunghap:'<i class="pi pi-heart"></i>', saju:'<i class="pi pi-temple"></i>️' };
   var TYPE_LABEL = { character:'기질 분석', money:'재물·직업 운', love:'연애·인연 운', daeun:'대운 흐름', year:'신년운', month:'이달 월운', yongsin:'용신 생활 가이드', vedic_full:'베딕 운명 분석', astro_full:'서양 점성술 분석', ziwei_full:'자미두수 분석', triple:'동서양 통합 분석', career_deep:'직업·사업 심층' };
 
   // 기존 analysis-history 조회
@@ -2647,7 +2648,7 @@ async function openHistoryModal() {
   allItems.forEach(function(r) {
     var d = new Date(r.created_at);
     var dateStr = d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-    var icon = TYPE_ICON[r.type] || '💬';
+    var icon = TYPE_ICON[r.type] || '<i class="pi pi-chat"></i>';
     var item = document.createElement('div');
     item.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .2s;';
     item.onmouseover = function(){ this.style.borderColor='var(--accent)'; };
@@ -2706,9 +2707,9 @@ async function openHistoryDetail(id) {
     }
     // 구 구조 호환
     else {
-      if (r.step1) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">💕 연애 궁합</h4><div>'+r.step1+'</div></div>';
+      if (r.step1) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;"><i class="pi pi-heart"></i> 연애 궁합</h4><div>'+r.step1+'</div></div>';
       if (r.step2) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">⏰ 지금 이 시기</h4><div>'+r.step2+'</div></div>';
-      if (r.step3) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">🌟 서로를 위한 조언</h4><div>'+r.step3+'</div></div>';
+      if (r.step3) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;"><i class="pi pi-star"></i> 서로를 위한 조언</h4><div>'+r.step3+'</div></div>';
     }
     contentEl.innerHTML = html || '<div style="color:var(--muted);">저장된 내용이 없습니다.</div>';
   } catch(e) { titleEl.textContent = '오류'; contentEl.textContent = e.message; }
@@ -2824,11 +2825,11 @@ function _drawGunghapCard(cb) {
     ctx.beginPath(); ctx.moveTo(PAD, y+28); ctx.lineTo(W-PAD, y+28); ctx.stroke();
     y += H_HEADER + GAP;
 
-    // ── 이름 행: "나 ❤ 상대방"
+    // ── 이름 행: "나 <i class="pi pi-heart"></i> 상대방"
     ctx.fillStyle = 'rgba(255,255,255,0.45)';
     ctx.font = '12px "Noto Serif KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(myName + '  ❤  ' + pName, W/2, y + H_NAMES/2);
+    ctx.fillText(myName + '  <i class="pi pi-heart"></i>  ' + pName, W/2, y + H_NAMES/2);
     y += H_NAMES + GAP;
 
     // ── 점수 (48px, 실제화면과 동일)
@@ -2975,7 +2976,7 @@ function shareGunghapKakao() {
   var pName  = window._ghLastPName  || '상대방';
   var score  = calcGunghapScore(window._ghLastMySaju, window._ghLastPSaju);
   var pageUrl = 'https://picolab.kr';
-  var text = '💕 FORTUNA 궁합 결과\n' + myName + ' ❤ ' + pName + '\n' + score.total + '점 · ' + score.comment + '\n\n나도 확인해봐 👇\n' + pageUrl;
+  var text = '<i class="pi pi-heart"></i> FORTUNA 궁합 결과\n' + myName + ' <i class="pi pi-heart"></i> ' + pName + '\n' + score.total + '점 · ' + score.comment + '\n\n나도 확인해봐 <i class="pi pi-down"></i>\n' + pageUrl;
 
   function resetBtn() {
     if (btn) { btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="#3c1e1e"><path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.07 1.7 5.78 4.32 7.46L5.5 22l4.27-2.14C10.47 20.28 11.22 20.4 12 20.4c5.52 0 10-3.92 10-8.8C22 5.92 17.52 2 12 2z"/></svg> 카카오톡 공유'; btn.disabled = false; }
@@ -3003,7 +3004,7 @@ function shareGunghapKakao() {
           Kakao.Share.sendDefault({
             objectType: 'feed',
             content: {
-              title: '💕 FORTUNA 궁합 · ' + myName + ' ❤ ' + pName,
+              title: '<i class="pi pi-heart"></i> FORTUNA 궁합 · ' + myName + ' <i class="pi pi-heart"></i> ' + pName,
               description: score2.total + '점 · ' + score2.comment + '\n두 사람의 인연을 확인해보세요!',
               imageUrl: 'https://picolab.kr/og-image.png',
               link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
@@ -3254,8 +3255,8 @@ var _birthGender = 'M';
 var _qimenGender = 'M';
 
 var BIRTH_CONFIG = {
-  astro:  { title: '🌟 서양 점성술', url: 'astro.html', extra: {} },
-  vedic:  { title: '🕉️ 베딕 점성술', url: 'vedic.html', extra: {} },
+  astro:  { title: '<i class="pi pi-star"></i> 서양 점성술', url: 'astro.html', extra: {} },
+  vedic:  { title: '<i class="pi pi-om"></i>️ 베딕 점성술', url: 'vedic.html', extra: {} },
   ziwei:  { title: '⭐ 자미두수',     url: 'ziwei.html', extra: {} },
 };
 
@@ -3425,12 +3426,12 @@ function checkAuth() {
 
 function shareMainKakao() {
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '🔮 포르투나 운세 - 사주·기문·점성·베딕·자미 5개 엔진 교차 분석!\n\n오늘 내 운세 점수가 궁금하면 확인해봐 👇\n무료로 바로 볼 수 있어!';
+  var text = '<i class="pi pi-crystal"></i> 포르투나 운세 - 사주·기문·점성·베딕·자미 5개 엔진 교차 분석!\n\n오늘 내 운세 점수가 궁금하면 확인해봐 <i class="pi pi-down"></i>\n무료로 바로 볼 수 있어!';
   if (navigator.share) {
     navigator.share({ title: 'FORTUNA 운세', text: text, url: pageUrl }).catch(function(){});
   } else {
     navigator.clipboard && navigator.clipboard.writeText(text + '\n' + pageUrl)
-      .then(function() { alert('📋 클립보드에 복사됐어요! 카카오톡에 붙여넣어 주세요'); });
+      .then(function() { alert('<i class="pi pi-notepad"></i> 클립보드에 복사됐어요! 카카오톡에 붙여넣어 주세요'); });
   }
 }
 
@@ -3946,9 +3947,9 @@ async function loadMiniScore() {
 
   var domainOrder = ['money','love','health','wisdom','travel'];
   var domainInfo  = {
-    money:{emoji:'💼',label:'재물/사업'}, love:{emoji:'❤️',label:'관계/연애'},
-    health:{emoji:'🏃',label:'건강/활력'}, wisdom:{emoji:'🧠',label:'학업/창의'},
-    travel:{emoji:'🌍',label:'이동/변화'},
+    money:{emoji:'<i class="pi pi-briefcase"></i>',label:'재물/사업'}, love:{emoji:'<i class="pi pi-heart"></i>️',label:'관계/연애'},
+    health:{emoji:'<i class="pi pi-rocket"></i>',label:'건강/활력'}, wisdom:{emoji:'<i class="pi pi-eye"></i>',label:'학업/창의'},
+    travel:{emoji:'<i class="pi pi-globe"></i>',label:'이동/변화'},
   };
 
   var _domainDesc = {
@@ -4196,7 +4197,7 @@ initHeroSelects();
     '쉬라바나':'학습·경청·연결', '다니쉬타':'부·리듬·사교성', '샤타비샤':'치유·신비·진실',
     '푸르바바드라파다':'불꽃·열정·혁신', '우타라바드라파다':'지혜·깊이·연민', '레바티':'풍요·완성·여정'
   };
-  var PLANET_SYM = { 'Moon':'🌙', 'Venus':'♀', 'Mars':'♂', '달':'🌙', '금성':'♀', '화성':'♂' };
+  var PLANET_SYM = { 'Moon':'<i class="pi pi-moon"></i>', 'Venus':'♀', 'Mars':'♂', '달':'<i class="pi pi-moon"></i>', '금성':'♀', '화성':'♂' };
   var PLANET_KOR = { 'Moon':'달', 'Venus':'금성', 'Mars':'화성' };
   var SIGN_KOR = {
     'Aries':'양자리','Taurus':'황소자리','Gemini':'쌍둥이자리','Cancer':'게자리',
@@ -4267,7 +4268,7 @@ initHeroSelects();
     var cards = [];
     // 카드1: 낙샤트라
     if (data.nakshatra) {
-      cards.push(cardHTML('🌙', '달 낙샤트라', data.nakshatra, NAK_KW[data.nakshatra] || '',
+      cards.push(cardHTML('<i class="pi pi-moon"></i>', '달 낙샤트라', data.nakshatra, NAK_KW[data.nakshatra] || '',
         null, {}, interp && interp.nakshatra ? interp.nakshatra : null));
     }
     // 카드3: 행성
@@ -4276,7 +4277,7 @@ initHeroSelects();
         if (!data.planets[name]) return null;
         return '<div style="font-size:12px;color:var(--text);margin:2px 0;">' + PLANET_SYM[name] + ' ' + PLANET_KOR[name] + ' · ' + data.planets[name] + '</div>';
       }).filter(Boolean);
-      cards.push(cardHTML('✦', '행성 에너지', '', '', null, {},
+      cards.push(cardHTML('<i class="pi pi-sparkle"></i>', '행성 에너지', '', '', null, {},
         interp && interp.planets ? interp.planets : null,
         lines.join('')));
     }
@@ -4290,10 +4291,10 @@ initHeroSelects();
         var s = document.createElement('div');
         s.id = 'cosmicSummary';
         s.style.cssText = 'margin-top:16px;padding:14px 20px;background:rgba(155,127,212,0.07);border:1px solid rgba(155,127,212,0.15);border-radius:14px;font-size:13px;color:rgba(237,232,245,0.8);text-align:center;font-family:\'Noto Serif KR\',serif;font-weight:300;line-height:1.8;';
-        s.textContent = '✦ ' + interp.summary;
+        s.textContent = '<i class="pi pi-sparkle"></i> ' + interp.summary;
         grid.parentNode.appendChild(s);
       } else {
-        summaryEl.textContent = '✦ ' + interp.summary;
+        summaryEl.textContent = '<i class="pi pi-sparkle"></i> ' + interp.summary;
       }
     }
   }
@@ -4406,7 +4407,7 @@ function updateMypageTab() {
         if (!sb) return;
         sb.from('orb_balance').select('balance').eq('user_id', uid).maybeSingle().then(function(res) {
           var badge = document.getElementById('mypageOrbBadge');
-          if (badge) badge.textContent = '✦ ' + ((res.data && res.data.balance != null) ? res.data.balance.toLocaleString() : '0') + ' Orb';
+          if (badge) badge.textContent = '<i class="pi pi-sparkle"></i> ' + ((res.data && res.data.balance != null) ? res.data.balance.toLocaleString() : '0') + ' Orb';
         });
       } catch(e) {}
     })(currentUser.id);
@@ -4441,7 +4442,7 @@ function updateMypageTab() {
       if (!sb) return;
       var res = await sb.from('orb_balance').select('balance').eq('user_id', userId).maybeSingle();
       var bal = (res.data && res.data.balance != null) ? res.data.balance : 0;
-      el.textContent = '✦ ' + bal.toLocaleString() + ' Orb';
+      el.textContent = '<i class="pi pi-sparkle"></i> ' + bal.toLocaleString() + ' Orb';
       el.style.display = 'block';
     } catch(e) {}
   }
@@ -4470,7 +4471,7 @@ function updateMypageTab() {
 (function(){
   var WORKER = 'https://fortuna.kkdmb7.workers.dev/qimen';
   var DOOR_KW = {'生':'계약·서명·창업','開':'활동·투자·확장','休':'안정·화해·양생','景':'문서·공부·창작','傷':'이동·충돌 주의','杜':'막힘·정체 조심','驚':'긴장·놀람 주의','死':'중요결정 보류'};
-  var DOOR_ICON = {'生':'🌱','開':'🚀','休':'☕','景':'📖','傷':'⚡','杜':'🔒','驚':'😮','死':'🛑'};
+  var DOOR_ICON = {'生':'<i class="pi pi-clover"></i>','開':'<i class="pi pi-rocket"></i>','休':'<i class="pi pi-utensils"></i>','景':'<i class="pi pi-book"></i>','傷':'<i class="pi pi-bolt"></i>','杜':'<i class="pi pi-lock"></i>','驚':'<i class="pi pi-sparkle"></i>','死':'<i class="pi pi-warning"></i>'};
   var DOOR_SCORE = {'生':2,'開':2,'休':1,'景':1,'傷':-1,'杜':-1,'驚':-1,'死':-2};
   var DOOR_EL = {'生':'목','傷':'목','杜':'목','景':'화','死':'토','開':'금','驚':'금','休':'수'};
   var SAENG = {목:'화',화:'토',토:'금',금:'수',수:'목'};
@@ -4549,7 +4550,7 @@ function updateMypageTab() {
         grade=DG[door]||'평';
         kw=DOOR_KW[door]||'';
       }
-      weekData.push({door:door,grade:grade,kw:kw,icon:DOOR_ICON[door]||'🔮',dt:dt,data:data});
+      weekData.push({door:door,grade:grade,kw:kw,icon:DOOR_ICON[door]||'<i class="pi pi-crystal"></i>',dt:dt,data:data});
     }
 
     weekData.forEach(function(item,idx){
@@ -4632,14 +4633,14 @@ async function refreshPushBtnLabel() {
   var btn = document.getElementById('btnPushLabel');
   if (!btn) return;
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    btn.textContent = '🔔 알림 미지원 브라우저';
+    btn.textContent = '<i class="pi pi-bell"></i> 알림 미지원 브라우저';
     document.getElementById('btnPushToggle').disabled = true;
     return;
   }
   try {
     var reg = await navigator.serviceWorker.ready;
     var sub = await reg.pushManager.getSubscription();
-    btn.textContent = sub ? '🔕 오늘의 명언 알림 끄기' : '🔔 오늘의 명언 알림 켜기';
+    btn.textContent = sub ? '<i class="pi pi-bell"></i> 오늘의 명언 알림 끄기' : '<i class="pi pi-bell"></i> 오늘의 명언 알림 켜기';
   } catch(e) {}
 }
 
@@ -4695,7 +4696,7 @@ window.togglePushSubscription = async function() {
     // 구독 해제
     await existing.unsubscribe();
     await deletePicoSubscription(user.id);
-    document.getElementById('btnPushLabel').textContent = '🔔 오늘의 명언 알림 켜기';
+    document.getElementById('btnPushLabel').textContent = '<i class="pi pi-bell"></i> 오늘의 명언 알림 켜기';
     return;
   }
 
@@ -4733,8 +4734,8 @@ window.togglePushSubscription = async function() {
     } catch(e2) {}
 
     await savePicoSubscription(user.id, user.name, sub, ilgan, geokguk, yongshin);
-    document.getElementById('btnPushLabel').textContent = '🔕 오늘의 명언 알림 끄기';
-    alert('✅ 매일 아침 8시에 사주 맞춤 명언을 보내드릴게요!');
+    document.getElementById('btnPushLabel').textContent = '<i class="pi pi-bell"></i> 오늘의 명언 알림 끄기';
+    alert('<i class="pi pi-check"></i> 매일 아침 8시에 사주 맞춤 명언을 보내드릴게요!');
   } catch(e) {
     console.error('[push]', e);
     alert('알림 설정 중 오류가 발생했어요.');
@@ -4767,7 +4768,7 @@ window.togglePushSubscription = async function() {
     wrap.innerHTML =
       '<div style="background:linear-gradient(160deg,var(--surface) 0%,rgba(45,27,78,0.6) 100%);border:1px solid rgba(212,175,55,0.2);border-radius:18px;padding:16px 18px;">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
-          '<span style="font-size:10px;color:rgba(212,175,55,0.55);letter-spacing:0.12em;font-weight:600;">✨ 오늘의 우주 메시지</span>' +
+          '<span style="font-size:10px;color:rgba(212,175,55,0.55);letter-spacing:0.12em;font-weight:600;"><i class="pi pi-sparkle"></i> 오늘의 우주 메시지</span>' +
           '<button id="btnDismissQuote" style="background:none;border:none;color:rgba(255,255,255,0.25);font-size:16px;cursor:pointer;line-height:1;padding:0 2px;">✕</button>' +
         '</div>' +
         '<p style="font-size:14px;font-style:italic;color:var(--text);line-height:1.75;margin:0 0 6px;font-family:\'Noto Serif KR\',serif;">&ldquo;' + esc(data.quote) + '&rdquo;</p>' +
@@ -4818,7 +4819,7 @@ window.togglePushSubscription = async function() {
 
     // 기록 완료 상태
     var cached = localStorage.getItem('pico_diary_' + todayStr);
-    var MOOD_EMOJI = {good:'😊',normal:'😐',bad:'😔',energetic:'🔥',tired:'💤'};
+    var MOOD_EMOJI = {good:'<i class="pi pi-smile"></i>',normal:'<i class="pi pi-neutral"></i>',bad:'<i class="pi pi-sad"></i>',energetic:'<i class="pi pi-fire"></i>',tired:'<i class="pi pi-sleep"></i>'};
     var MOOD_LABEL_D = {good:'좋은 하루',normal:'평범한 하루',bad:'힘든 하루',energetic:'에너지 넘친 하루',tired:'지친 하루'};
     if (cached && MOOD_EMOJI[cached]) {
       document.getElementById('diaryCtaTitle').textContent = MOOD_EMOJI[cached] + ' ' + (MOOD_LABEL_D[cached]||'오늘 기록 완료');

@@ -168,6 +168,7 @@
     font-size: 13px; color: var(--text3); text-align: center; line-height: 1.6;
   }
 </style>
+  <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
 
@@ -185,7 +186,7 @@
     <p class="step-sub">카드를 고르기 전, 질문을 적어주세요<br>질문이 구체적일수록 정확한 해석이 나옵니다</p>
     <textarea class="question-input" id="tarotQuestion" rows="3"
       placeholder="예: 이 관계는 어떻게 될까요?" oninput="onQuestionInput()"></textarea>
-    <button class="draw-btn" id="drawBtn" onclick="goSelect()" disabled>✨ 카드 고르기</button>
+    <button class="draw-btn" id="drawBtn" onclick="goSelect()" disabled><i class="pi pi-sparkle"></i> 카드 고르기</button>
   </div>
 
   <!-- STEP 2: 카드 선택 -->
@@ -200,10 +201,10 @@
     <div class="cards-area" id="cardsArea"></div>
     <div class="result-box loading" id="resultBox" style="display:none;"></div>
     <div class="login-notice" id="loginNotice" style="display:none;">
-      🔑 카카오 로그인 후 AI 타로 해석을 받을 수 있어요<br>
+      <i class="pi pi-key"></i> 카카오 로그인 후 AI 타로 해석을 받을 수 있어요<br>
       <a href="../" style="color:var(--accent2);text-decoration:none;">picolab.kr에서 로그인하기 →</a>
     </div>
-    <button class="retry-btn" onclick="restart()">🔄 다시 뽑기</button>
+    <button class="retry-btn" onclick="restart()"><i class="pi pi-refresh"></i> 다시 뽑기</button>
   </div>
 
 </div>
@@ -255,11 +256,11 @@ var TAROT_CARDS = (function() {
     'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg&w=300'
   ];
   var majorNames = ['바보','마법사','여교황','여황제','황제','교황','연인','전차','힘','은둔자','운명의 바퀴','정의','매달린 사람','죽음','절제','악마','탑','별','달','태양','심판','세계'];
-  var majorEmoji = ['🃏','🪄','🌙','👑','👸','⛪','💑','🏆','💪','🕯️','☸️','⚖️','🙃','💀','🏺','😈','🗼','⭐','🌛','☀️','📯','🌍'];
+  var majorEmoji = ['🃏','<i class="pi pi-sparkle"></i>','<i class="pi pi-moon"></i>','<i class="pi pi-crown"></i>','<i class="pi pi-person"></i>','<i class="pi pi-temple"></i>','<i class="pi pi-heart"></i>','<i class="pi pi-trophy"></i>','<i class="pi pi-muscle"></i>','<i class="pi pi-sparkle"></i>️','<i class="pi pi-compass"></i>️','<i class="pi pi-scale"></i>️','<i class="pi pi-smile"></i>','<i class="pi pi-sad"></i>','<i class="pi pi-crystal"></i>','<i class="pi pi-bolt"></i>','<i class="pi pi-temple"></i>','⭐','<i class="pi pi-moon"></i>','☀️','<i class="pi pi-bell"></i>','<i class="pi pi-globe"></i>'];
   var suits = [
-    { name:'완드', emoji:'🪄', color:'#e07020', imgs:['https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/1/11/Wands01.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/0/0f/Wands02.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/ff/Wands03.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/a/a4/Wands04.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/9/9d/Wands05.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/3/3b/Wands06.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/e/e4/Wands07.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/6b/Wands08.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/4/4d/Tarot_Nine_of_Wands.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/0/0b/Wands10.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/6a/Wands11.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/0/0d/Wands12.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/1/16/Wands13.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/c/ce/Wands14.jpg&w=300'] },
-    { name:'컵', emoji:'🏆', color:'#2060c0', imgs:['https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/3/36/Cups01.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/f8/Cups02.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/7/7a/Cups03.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/3/35/Cups04.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/d/d7/Cups05.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/1/17/Cups06.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/a/ae/Cups07.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/60/Cups08.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/2/2f/Cups09.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/8/84/Cups10.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/a/ad/Cups11.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/62/Cups12.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/62/Cups13.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/fa/Cups14.jpg&w=300'] },
-    { name:'검', emoji:'⚔️', color:'#a0a0c0', imgs:['https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/1/1a/Swords01.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/9/9e/Swords02.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/0/02/Swords03.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/b/bf/Swords04.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/2/23/Swords05.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/2/29/Swords06.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/3/34/Swords07.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/a/a7/Swords08.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/2/2f/Swords09.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/d/d4/Swords10.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/4/4c/Swords11.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/b/b0/Swords12.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/d/d4/Swords13.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/f5/Swords14.jpg&w=300'] },
+    { name:'완드', emoji:'<i class="pi pi-sparkle"></i>', color:'#e07020', imgs:['https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/1/11/Wands01.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/0/0f/Wands02.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/ff/Wands03.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/a/a4/Wands04.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/9/9d/Wands05.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/3/3b/Wands06.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/e/e4/Wands07.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/6b/Wands08.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/4/4d/Tarot_Nine_of_Wands.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/0/0b/Wands10.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/6a/Wands11.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/0/0d/Wands12.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/1/16/Wands13.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/c/ce/Wands14.jpg&w=300'] },
+    { name:'컵', emoji:'<i class="pi pi-trophy"></i>', color:'#2060c0', imgs:['https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/3/36/Cups01.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/f8/Cups02.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/7/7a/Cups03.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/3/35/Cups04.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/d/d7/Cups05.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/1/17/Cups06.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/a/ae/Cups07.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/60/Cups08.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/2/2f/Cups09.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/8/84/Cups10.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/a/ad/Cups11.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/62/Cups12.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/62/Cups13.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/fa/Cups14.jpg&w=300'] },
+    { name:'검', emoji:'<i class="pi pi-bolt"></i>️', color:'#a0a0c0', imgs:['https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/1/1a/Swords01.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/9/9e/Swords02.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/0/02/Swords03.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/b/bf/Swords04.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/2/23/Swords05.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/2/29/Swords06.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/3/34/Swords07.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/a/a7/Swords08.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/2/2f/Swords09.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/d/d4/Swords10.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/4/4c/Swords11.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/b/b0/Swords12.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/d/d4/Swords13.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/f5/Swords14.jpg&w=300'] },
     { name:'펜타클', emoji:'⭐', color:'#40a040', imgs:['https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/fd/Pents01.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/9/9f/Pents02.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/4/42/Pents03.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/3/35/Pents04.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/9/96/Pents05.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/a/a6/Pents06.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/6/6a/Pents07.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/4/49/Pents08.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/f0/Pents09.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/4/42/Pents10.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/e/ec/Pents11.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/d/d5/Pents12.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/8/88/Pents13.jpg&w=300','https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/1/1c/Pents14.jpg&w=300'] }
   ];
   var numNames = ['에이스','2','3','4','5','6','7','8','9','10','페이지','나이트','퀸','킹'];
@@ -291,7 +292,7 @@ function goSelect() {
   shuffled.forEach(function(card) {
     var div = document.createElement('div');
     div.className = 'sel-card';
-    div.innerHTML = '🔮';
+    div.innerHTML = '<i class="pi pi-crystal"></i>';
     div.dataset.cardId = card.id;
     div.onclick = (function(el, c) { return function() { onSelectCard(el, c); }; })(div, card);
     grid.appendChild(div);
@@ -326,7 +327,7 @@ function toRoman(n) {
   return r[n] || '';
 }
 function makeFallback(card) {
-  var cfg = { '메이저':{sym:'✨'}, '완드':{sym:'🔥'}, '컵':{sym:'🌊'}, '검':{sym:'⚡'}, '펜타클':{sym:'⭐'} };
+  var cfg = { '메이저':{sym:'<i class="pi pi-sparkle"></i>'}, '완드':{sym:'<i class="pi pi-fire"></i>'}, '컵':{sym:'<i class="pi pi-wave"></i>'}, '검':{sym:'<i class="pi pi-bolt"></i>'}, '펜타클':{sym:'⭐'} };
   var cc = cfg[card.suit] || cfg['메이저'];
   var num = card.suit === '메이저' ? toRoman(card.number) : String(card.number);
   return '<div class="fb"><span class="fb-sym">' + cc.sym + '</span><span class="fb-num">' + num + '</span><span class="fb-name">' + card.name + '</span></div>';
@@ -348,7 +349,7 @@ function revealCards() {
     wrap.appendChild(lbl);
     var cardEl = document.createElement('div'); cardEl.className = 'tarot-card';
     var inner = document.createElement('div'); inner.className = 'tarot-card-inner';
-    var back = document.createElement('div'); back.className = 'tarot-card-back'; back.textContent = '🔮';
+    var back = document.createElement('div'); back.className = 'tarot-card-back'; back.textContent = '<i class="pi pi-crystal"></i>';
     var front = document.createElement('div'); front.className = 'tarot-card-front';
     var img = new Image();
     img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
@@ -397,7 +398,7 @@ async function interpretWithAI() {
   }
   resultBox.style.display = 'block';
   resultBox.className = 'result-box loading';
-  var waitMsgs = ['🌟 타로가 메시지를 읽는 중...','✨ 별자리와 연결 중...','🔮 운명을 살펴보는 중...','💫 해석하는 중...'];
+  var waitMsgs = ['<i class="pi pi-star"></i> 타로가 메시지를 읽는 중...','<i class="pi pi-sparkle"></i> 별자리와 연결 중...','<i class="pi pi-crystal"></i> 운명을 살펴보는 중...','<i class="pi pi-sparkle"></i> 해석하는 중...'];
   var msgIdx = 0;
   resultBox.textContent = waitMsgs[0];
   var waitTimer = setInterval(function() {

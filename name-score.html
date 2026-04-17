@@ -314,6 +314,7 @@ nav {
   letter-spacing:0.08em; text-decoration:none;
 }
 </style>
+  <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
 
@@ -942,9 +943,9 @@ function renderYongsinMatch(allChars, allJawon, allEumOh) {
   html += '<div class="yongsin-match-item">당신의 용신은 <b>' + _yongsin + '(' + yongsinOh + ')</b>입니다.' + (_geokguk ? '&nbsp; 격국: ' + _geokguk : '') + '</div>';
   html += '<div class="yongsin-match-item">이름 ' + allChars.join('') + '의 오행 구성: ' + charDesc + '</div>';
   if (matchChars.length > 0)
-    html += '<div class="yongsin-match-item yongsin-ok">✅ 용신 일치: ' + matchChars.join(', ') + '</div>';
+    html += '<div class="yongsin-match-item yongsin-ok"><i class="pi pi-check"></i> 용신 일치: ' + matchChars.join(', ') + '</div>';
   if (kijinChars.length > 0)
-    html += '<div class="yongsin-match-item yongsin-warn">⚠️ 기신 주의: ' + kijinChars.join(', ') + '</div>';
+    html += '<div class="yongsin-match-item yongsin-warn"><i class="pi pi-warning"></i>️ 기신 주의: ' + kijinChars.join(', ') + '</div>';
   html += '<div class="yongsin-match-item" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(212,175,55,0.2);">' + overall + '</div>';
   if (recText)
     html += '<div class="yongsin-match-item" style="margin-top:8px;font-size:12px;color:var(--text-dim);">용신 오행(' + yongsinOh + ') 추천 한자: ' + recText + '</div>';

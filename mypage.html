@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#0a0a0f">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pico-icons.css">
 <style>
 :root {
   --bg: #0a0a0f;
@@ -165,7 +166,7 @@ nav {
   <div id="myContent" style="display:none;">
     <!-- 프로필 -->
     <div class="profile-card">
-      <div class="profile-avatar" id="avatarWrap">👤</div>
+      <div class="profile-avatar" id="avatarWrap"><i class="pi pi-person"></i></div>
       <div class="profile-info">
         <div class="profile-name" id="myName">-</div>
         <div class="profile-sub" id="myId">-</div>
@@ -174,12 +175,12 @@ nav {
 
     <!-- Orb 잔액 -->
     <div class="orb-card">
-      <div class="orb-label">✦ Orb 잔액</div>
+      <div class="orb-label"><i class="pi pi-sparkle"></i> Orb 잔액</div>
       <div class="orb-amount">
         <span id="myOrbBalance">-</span>
         <span class="orb-unit">Orb</span>
       </div>
-      <button class="orb-charge-btn" onclick="location.href='charge.html'">✦ Orb 충전하기</button>
+      <button class="orb-charge-btn" onclick="location.href='charge.html'"><i class="pi pi-sparkle"></i> Orb 충전하기</button>
     </div>
 
     <!-- 사주 프로필 -->

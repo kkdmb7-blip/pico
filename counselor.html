@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>전문 상담사 · FORTUNA</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pico-icons.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
@@ -163,7 +164,7 @@
 
   <div class="profile-card" id="profileCard">
     <div class="profile-header">
-      <div class="profile-avatar">🔮</div>
+      <div class="profile-avatar"><i class="pi pi-crystal"></i></div>
       <div class="profile-name" id="dName">윤은채</div>
       <div class="profile-title" id="dTitle">10년 경력의 운세 상담 전문가</div>
     </div>
@@ -184,7 +185,7 @@
       <div class="info-section">
         <div class="info-label">상담 방식</div>
         <div class="method-row">
-          <div class="method-icon">💬</div>
+          <div class="method-icon"><i class="pi pi-chat"></i></div>
           <div>
             <div class="method-text" id="dMethod">카카오톡 채팅 상담</div>
             <div class="method-sub" id="dMethodSub">편하게 채팅으로 상담받으세요</div>
@@ -201,7 +202,7 @@
     </div>
     <div class="cta-section">
       <a id="dKakaoLink" href="http://pf.kakao.com/_krjxjn/chat" target="_blank" class="btn-counselor">
-        💬 카카오톡으로 상담 신청하기
+        <i class="pi pi-chat"></i> 카카오톡으로 상담 신청하기
       </a>
       <div class="notice" id="dNotice">
         상담 가능 시간: 평일 10:00 ~ 20:00<br>
@@ -212,12 +213,12 @@
 </div>
 
 <!-- 수정 버튼 (권한 있는 사용자만) -->
-<button class="btn-edit" id="btnEdit" onclick="openEdit()">✏️ 수정하기</button>
+<button class="btn-edit" id="btnEdit" onclick="openEdit()"><i class="pi pi-pencil"></i>️ 수정하기</button>
 
 <!-- 수정 패널 -->
 <div class="edit-overlay" id="editOverlay" onclick="if(event.target===this)closeEdit()">
   <div class="edit-panel">
-    <h2>✏️ 상담사 프로필 수정</h2>
+    <h2><i class="pi pi-pencil"></i>️ 상담사 프로필 수정</h2>
     <div class="edit-group">
       <label>이름</label>
       <input type="text" id="eName">

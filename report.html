@@ -45,7 +45,7 @@ nav {
 #stateLoading { display: flex; flex-direction: column; align-items: center; padding: 60px 0; gap: 20px; }
 .star-loader { position: relative; width: 60px; height: 60px; }
 .star-loader::before {
-  content: '✦';
+  content: '<i class="pi pi-sparkle"></i>';
   font-size: 32px; color: var(--gold);
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
   animation: pulse 1.4s ease-in-out infinite;
@@ -474,6 +474,7 @@ nav {
   cursor: pointer; font-family: var(--fn);
 }
 </style>
+  <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
 
@@ -505,7 +506,7 @@ nav {
       <div class="intro-orb-label">리포트 비용</div>
       <div class="intro-orb-cost" id="introOrbCost"></div>
     </div>
-    <button class="btn-intro-gen" id="btnGenerate">✦ 리포트 생성하기</button>
+    <button class="btn-intro-gen" id="btnGenerate"><i class="pi pi-sparkle"></i> 리포트 생성하기</button>
     <button class="btn-intro-back" onclick="history.back()">돌아가기</button>
   </div>
 
@@ -555,7 +556,7 @@ nav {
       <div class="detail-preview-label">미리보기</div>
       <div class="detail-preview-text" id="detailPreview"></div>
       <div class="detail-preview-fade">
-        <span class="detail-preview-lock">🔒 전체 내용은 리포트 생성 후 확인 가능합니다</span>
+        <span class="detail-preview-lock"><i class="pi pi-lock"></i> 전체 내용은 리포트 생성 후 확인 가능합니다</span>
       </div>
     </div>
     <div class="detail-orb-box">
@@ -565,7 +566,7 @@ nav {
       </div>
       <div class="detail-balance" id="detailBalance"></div>
     </div>
-    <p class="detail-save-note">✦ 생성 후 영구 저장 · 언제든 다시 확인 가능</p>
+    <p class="detail-save-note"><i class="pi pi-sparkle"></i> 생성 후 영구 저장 · 언제든 다시 확인 가능</p>
     <button class="btn-intro-gen" id="detailBtnGen"></button>
   </div>
 
@@ -595,10 +596,10 @@ nav {
 <!-- 충전 모달 -->
 <div id="orbModal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="modal-sheet">
-    <div class="modal-icon">💎</div>
+    <div class="modal-icon"><i class="pi pi-gem"></i></div>
     <div class="modal-title">Orb가 부족해요</div>
     <div class="modal-sub" id="orbModalSub">Orb를 충전하고 리포트를 받아보세요.</div>
-    <button class="modal-btn modal-btn-primary" onclick="location.href='charge.html'">💎 충전하기</button>
+    <button class="modal-btn modal-btn-primary" onclick="location.href='charge.html'"><i class="pi pi-gem"></i> 충전하기</button>
     <button class="modal-btn modal-btn-cancel" onclick="document.getElementById('orbModal').classList.remove('open');history.back()">돌아가기</button>
   </div>
 </div>
@@ -612,29 +613,29 @@ const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 const REPORT_VERSION = 12;
 
 const TYPE_CONFIG = {
-  character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
+  character: { title: '타고난 기질 리포트', orb: 500,  emoji: '<i class="pi pi-crystal"></i>', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
     desc: '사주+베딕+자미두수로 보는 타고난 성격과 잠재력' },
-  money:     { title: '재물/사업 리포트',   orb: 700,  emoji: '💰', focus: '재물운, 사업 적성, 투자 패턴, 돈과의 관계',
+  money:     { title: '재물/사업 리포트',   orb: 700,  emoji: '<i class="pi pi-coin"></i>', focus: '재물운, 사업 적성, 투자 패턴, 돈과의 관계',
     desc: '재성 분석부터 베딕 2하우스까지 재물 구조 완전 해석' },
-  love:      { title: '연애/결혼 리포트',   orb: 700,  emoji: '💕', focus: '연애 패턴, 이상형, 결혼운, 파트너십의 특성',
+  love:      { title: '연애/결혼 리포트',   orb: 700,  emoji: '<i class="pi pi-heart"></i>', focus: '연애 패턴, 이상형, 결혼운, 파트너십의 특성',
     desc: '관성/재성 분석 + 베딕 7하우스로 보는 연애/결혼 구조' },
-  daeun:     { title: '대운 흐름 리포트',   orb: 800,  emoji: '📈', focus: '현재 대운의 의미, 앞으로의 대운 흐름, 인생 타이밍',
+  daeun:     { title: '대운 흐름 리포트',   orb: 800,  emoji: '<i class="pi pi-asc"></i>', focus: '현재 대운의 의미, 앞으로의 대운 흐름, 인생 타이밍',
     desc: '현재 대운 심층 분석 + 다샤 + 자미두수 대한 융합' },
-  year:      { title: '올해 운세 리포트',   orb: 500,  emoji: '✨', focus: '2026년 운세, 상반기/하반기 흐름, 월별 포인트, 주의사항',
+  year:      { title: '올해 운세 리포트',   orb: 500,  emoji: '<i class="pi pi-sparkle"></i>', focus: '2026년 운세, 상반기/하반기 흐름, 월별 포인트, 주의사항',
     desc: '올해 세운 + 베딕 트랜짓 + 자미두수 유년 월별 흐름' },
-  month:     { title: '이번달 운세 리포트', orb: 300,  emoji: '🌙', focus: '이번달 월운, 주요 흐름, 주의사항, 기회의 날',
+  month:     { title: '이번달 운세 리포트', orb: 300,  emoji: '<i class="pi pi-moon"></i>', focus: '이번달 월운, 주요 흐름, 주의사항, 기회의 날',
     desc: '월운 + 베딕 트랜짓으로 보는 이번달 상세 흐름' },
-  yongsin:    { title: '용신 생활 가이드',   orb: 400,  emoji: '⚡', focus: '용신 오행에 맞는 색상·방위·음식·직업·환경·실천 전략',
+  yongsin:    { title: '용신 생활 가이드',   orb: 400,  emoji: '<i class="pi pi-bolt"></i>', focus: '용신 오행에 맞는 색상·방위·음식·직업·환경·실천 전략',
     desc: '내 용신 오행으로 보는 실생활 개운법 + 일주별 맞춤 전략' },
-  vedic_full: { title: '베딕 운명 심층 분석', orb: 500, emoji: '🪐', focus: '낙샤트라·라시·다샤로 보는 운명 패턴과 사주 교차 분석',
+  vedic_full: { title: '베딕 운명 심층 분석', orb: 500, emoji: '<i class="pi pi-galaxy"></i>', focus: '낙샤트라·라시·다샤로 보는 운명 패턴과 사주 교차 분석',
     desc: '베딕 점성술 전 체계(낙샤트라·라시·다샤)와 사주를 교차해 운명 구조를 입체 해석' },
   astro_full: { title: '서양 점성술 심층 분석', orb: 500, emoji: '⭐', focus: '태양·달·행성 배치와 사주 교차로 보는 기질·관계·운기',
     desc: '출생 차트 전체 행성 배치와 사주를 교차해 기질·관계·2026년 운기를 분석' },
-  ziwei_full: { title: '자미두수 심층 분석', orb: 500, emoji: '🌌', focus: '명궁·재백궁·관록궁·부처궁으로 보는 운명과 사주 교차',
+  ziwei_full: { title: '자미두수 심층 분석', orb: 500, emoji: '<i class="pi pi-galaxy"></i>', focus: '명궁·재백궁·관록궁·부처궁으로 보는 운명과 사주 교차',
     desc: '자미두수 주요 궁위(명궁·재백·관록·부처·교우)와 사주를 교차 분석' },
-  triple:     { title: '동서양 통합 분석', orb: 800, emoji: '🔭', focus: '사주·베딕·서양 점성술·자미두수 4개 시스템 교차 분석',
+  triple:     { title: '동서양 통합 분석', orb: 800, emoji: '<i class="pi pi-eye"></i>', focus: '사주·베딕·서양 점성술·자미두수 4개 시스템 교차 분석',
     desc: '4개 동서양 시스템이 동시에 가리키는 기질·재물·관계·운기의 공통점 분석' },
-  career_deep:{ title: '직업·사업 심층 분석', orb: 600, emoji: '🚀', focus: '사주 관록·자미두수 관록궁·서양 토성·목성으로 보는 직업 구조',
+  career_deep:{ title: '직업·사업 심층 분석', orb: 600, emoji: '<i class="pi pi-rocket"></i>', focus: '사주 관록·자미두수 관록궁·서양 토성·목성으로 보는 직업 구조',
     desc: '직업·사업 방향을 사주+자미두수 관록궁+서양 점성술 3중으로 분석' }
 };
 
@@ -814,7 +815,7 @@ const SECTION_FOCUS = {
 
 const TYPE_DETAIL = {
   character: {
-    emoji: "🌱",
+    emoji: "<i class="pi pi-clover"></i>",
     subtitle: "나는 어떤 사람으로 태어났을까?",
     desc: "타고난 성격의 본질, 숨겨진 재능과 약점까지. 사주·베딕·자미 3개 엔진이 당신의 본질을 입체적으로 분석합니다. 나를 이해하는 것이 모든 변화의 시작입니다.",
     recommend: [
@@ -847,7 +848,7 @@ const TYPE_DETAIL = {
     ]
   },
   money: {
-    emoji: "💰",
+    emoji: "<i class="pi pi-coin"></i>",
     subtitle: "내 사주에서 돈은 어떻게 들어오고, 어디서 새는가",
     desc: "재성의 위치와 강약, 식상이 재성을 생하는 흐름, 비겁탈재 위험까지. 왜 열심히 일해도 돈이 안 모이는지, 사업과 직장 중 어떤 길이 맞는지, 지금 대운이 상승기인지 조심기인지. 사주가 이미 알고 있는 내 재물의 설계도를 읽어드립니다.",
     recommend: [
@@ -881,7 +882,7 @@ const TYPE_DETAIL = {
     ]
   },
   love: {
-    emoji: "💕",
+    emoji: "<i class="pi pi-heart"></i>",
     subtitle: "왜 나는 이런 사람에게 끌리고, 이런 연애를 반복하는가",
     desc: "관성의 위치와 강약, 배우자궁(일지)의 특성, 인연이 오는 대운·세운의 타이밍까지. 반복되는 연애 패턴의 구조적 원인과 내게 잘 맞는 상대의 조건을 사주·베딕·점성 3개 엔진으로 입체 분석합니다.",
     recommend: [
@@ -915,7 +916,7 @@ const TYPE_DETAIL = {
     ]
   },
   daeun: {
-    emoji: "🌊",
+    emoji: "<i class="pi pi-wave"></i>",
     subtitle: "10년의 조류를 읽으면 언제 뛰고 언제 기다릴지 보인다",
     desc: "대운은 10년 단위로 바뀌는 인생의 큰 흐름입니다. 지금 이 대운이 내 사주에 어떤 십신으로 작용하는지, 재물·직업·관계에 어떤 변화를 가져오는지, 그리고 다음 대운은 어떻게 준비해야 하는지. 사주·베딕 다샤·자미두수 대한을 교차해 지금 당신이 서 있는 위치를 정확히 짚어드립니다.",
     recommend: [
@@ -949,7 +950,7 @@ const TYPE_DETAIL = {
     ]
   },
   year: {
-    emoji: "📅",
+    emoji: "<i class="pi pi-calendar"></i>",
     subtitle: "2026 병오년, 내 사주에는 어떤 에너지가 오는가",
     desc: "병(丙) 천간과 오(午) 지지가 내 일간과 원국에 어떤 십신으로 작용하는지, 현재 대운과 겹쳐 어떤 에너지가 강화되는지 분석합니다. 재물·직업·연애·건강 분야별 올해 흐름과 상반기·하반기 주요 시기, 올해를 가장 잘 보내는 전략까지 3개 엔진으로 정밀 분석합니다.",
     recommend: [
@@ -983,7 +984,7 @@ const TYPE_DETAIL = {
     ]
   },
   month: {
-    emoji: '🌙',
+    emoji: '<i class="pi pi-moon"></i>',
     subtitle: '이번 달 월건이 내 사주에 어떤 에너지를 가져오는가',
     desc: '월건(月建, 이달 간지)이 내 일간에 어떤 십신으로 작용하는지, 이달 지지가 원국 지지와 합·충하는지를 분석합니다. 대운·세운과 3중 중첩되는 에너지를 파악하고, 일주별 월운 데이터와 베딕 트랜짓까지 교차해 이달 가장 집중해야 할 것과 피해야 할 것을 알려드립니다.',
     recommend: [
@@ -1017,7 +1018,7 @@ const TYPE_DETAIL = {
     ]
   },
   vedic_full: {
-    emoji: '🪐',
+    emoji: '<i class="pi pi-galaxy"></i>',
     subtitle: '고대 인도 점성술이 읽는 당신의 운명 설계도',
     desc: '낙샤트라(달의 27별자리), 라시(월궁), 다샤(행성기) — 인도 점성술의 세 축으로 운명 패턴을 분석하고 사주와 교차 검증합니다. 두 고대 시스템이 동시에 가리키는 것이 진짜 당신의 패턴입니다.',
     recommend: [
@@ -1085,7 +1086,7 @@ const TYPE_DETAIL = {
     ]
   },
   ziwei_full: {
-    emoji: '🌌',
+    emoji: '<i class="pi pi-galaxy"></i>',
     subtitle: '자미두수 궁위로 읽는 삶의 설계도',
     desc: '자미두수는 명궁부터 부처궁·재백궁·관록궁까지 12개 궁에 별을 배치해 삶의 모든 영역을 읽습니다. 어떤 별이 재물궁에 있고, 어떤 별이 관록궁에 있는지가 인생의 기본 설계도입니다. 사주와 교차해 두 시스템이 공통으로 가리키는 운명 구조를 분석합니다.',
     recommend: [
@@ -1118,7 +1119,7 @@ const TYPE_DETAIL = {
     ]
   },
   triple: {
-    emoji: '🔭',
+    emoji: '<i class="pi pi-eye"></i>',
     subtitle: '사주·베딕·서양·자미두수 — 4개 시스템이 함께 말하는 것',
     desc: '수천 년 동안 동서양이 독립적으로 발전시킨 4개의 운명 분석 시스템이 당신에 대해 동시에 가리키는 것이 있습니다. 그 교차점이 가장 신뢰도 높은 당신의 패턴입니다. 최고 수준의 입체 분석을 원하는 분을 위한 프리미엄 리포트입니다.',
     recommend: [
@@ -1150,7 +1151,7 @@ const TYPE_DETAIL = {
     ]
   },
   career_deep: {
-    emoji: '🚀',
+    emoji: '<i class="pi pi-rocket"></i>',
     subtitle: '내 사주·자미두수·점성술이 말하는 직업과 사업의 설계도',
     desc: '사주 관록(격국·관성·식상 구조), 자미두수 관록궁 주성, 서양 점성술 토성·목성 배치 — 세 개의 시스템이 직업과 사업에 대해 동시에 가리키는 방향이 있습니다. 지금 이 대운이 커리어에 어떤 국면인지, 창업이냐 직장이냐, 어떤 업종에서 성과가 나는지를 분석합니다.',
     recommend: [
@@ -1183,7 +1184,7 @@ const TYPE_DETAIL = {
     ]
   },
   yongsin: {
-    emoji: '⚡',
+    emoji: '<i class="pi pi-bolt"></i>',
     subtitle: '용신 오행을 알면 매일의 선택이 달라진다',
     desc: '용신은 내 사주의 오행 균형을 맞춰주는 핵심 에너지입니다. 어떤 색을 입고, 어느 방향을 활용하고, 무엇을 먹어야 하는지. 작은 생활 습관 하나가 사주의 에너지를 조금씩 정렬시킵니다. 여기에 이 일주에만 맞는 창업·커리어·투자·관계 전략까지 더해드립니다.',
     recommend: [
@@ -1751,7 +1752,7 @@ function buildGeokgukValidBlock() {
   if (!_geokgukValidData) return '';
   const d = _geokgukValidData;
   let lines = [`기본격국: ${d.기본격국} → 최종: ${d.최종격국}`];
-  if (d.보정사항 && d.보정사항.length) lines.push(...d.보정사항.map(s => '⚠ ' + s));
+  if (d.보정사항 && d.보정사항.length) lines.push(...d.보정사항.map(s => '<i class="pi pi-warning"></i> ' + s));
   return `\n【격국 정밀 검증】\n${lines.join('\n')}
 (격국 보정사항이 있으면 기본 격국 대신 최종격국 기준으로 분석할 것)\n`;
 }
@@ -1786,7 +1787,7 @@ function buildYongshinRevalidBlock() {
   if (!_yongshinRevalidData) return '';
   const d = _yongshinRevalidData;
   const lines = d.검증결과 || [];
-  const validStr = d.유효 === true ? '억부 원칙 부합' : d.유효 === false ? '⚠ 억부 원칙 불일치 가능' : '검증 불가';
+  const validStr = d.유효 === true ? '억부 원칙 부합' : d.유효 === false ? '<i class="pi pi-warning"></i> 억부 원칙 불일치 가능' : '검증 불가';
   return `\n【용신 재검증】${d.용신}(${d.용신오행||''}) — ${validStr}\n${lines.join('\n')}
 (용신 재검증 결과를 분석의 방향성 설정에 참고할 것)\n`;
 }
@@ -1802,7 +1803,7 @@ function buildJapyeongjinjeonBlock() {
     s += '상신(相神): ' + d.상신분석.map(function(a){return a.상신+'(사주'+a.사주내개수+'개,'+(a.충족?'충족':'미충족')+')'}).join(', ') + '\n';
   }
   if (d.기신분석 && d.기신분석.length > 0) {
-    s += '기신(忌神): ' + d.기신분석.map(function(a){return a.기신+'(사주'+a.사주내개수+'개,'+(a.활성?'활성⚠':'비활성')+')'}).join(', ') + '\n';
+    s += '기신(忌神): ' + d.기신분석.map(function(a){return a.기신+'(사주'+a.사주내개수+'개,'+(a.활성?'활성<i class="pi pi-warning"></i>':'비활성')+')'}).join(', ') + '\n';
   }
   if (d.격국용신) s += `격국용신: ${d.격국용신.격국용신} — ${d.격국용신.근거}\n`;
   s += '(자평진전 격국용신론을 격국 해석과 용신 활용 방향에 반드시 반영할 것)\n';
@@ -2074,7 +2075,7 @@ function buildSewunMonthlyBlock() {
   if (d.월별흐름) {
     d.월별흐름.forEach(m => {
       let line = `${m.월} ${m.월건} [${m.월간십신}/${m.월지십신}] ${m.점수}점(${m.등급})`;
-      if (m.특이사항) line += ' ⚠'+m.특이사항;
+      if (m.특이사항) line += ' <i class="pi pi-warning"></i>'+m.특이사항;
       if (m.용신월) line += ' ★용신';
       s += line + '\n';
     });
@@ -2357,7 +2358,7 @@ function renderIntro() {
       <div class="intro-preview-text">${d.preview}</div>
       <div class="intro-preview-fade"></div>
     </div>
-    <div class="intro-preview-lock">✦ 전체 내용은 리포트 생성 후 확인 가능합니다</div>`;
+    <div class="intro-preview-lock"><i class="pi pi-sparkle"></i> 전체 내용은 리포트 생성 후 확인 가능합니다</div>`;
 
   // Orb 비용
   document.getElementById('introOrbCost').textContent = `${_config.orb.toLocaleString()} Orb`;
@@ -2830,7 +2831,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
       content: [...allTexts, getProfileKey()], orb_spent: _config.orb,
       created_at: new Date().toISOString()
     }).select().maybeSingle();
-    if (data) { _reportId = data.id; showToast('✦ 리포트가 저장되었습니다. 마이페이지에서 다시 확인할 수 있어요.'); }
+    if (data) { _reportId = data.id; showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다. 마이페이지에서 다시 확인할 수 있어요.'); }
   } catch(e) {}
 
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
@@ -2917,7 +2918,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
@@ -2999,7 +3000,7 @@ ${buildAdviceBlock(['대인관계/부부'])}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
@@ -3090,7 +3091,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
@@ -3176,7 +3177,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
@@ -3279,7 +3280,7 @@ ${monthlyIljuBlock}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')} (${monthStr})`;
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
@@ -3366,7 +3367,7 @@ ${ageBlock}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
@@ -3449,7 +3450,7 @@ ${buildYongsinBlock()}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
@@ -3501,7 +3502,7 @@ ${buildYongsinBlock()}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
@@ -3553,7 +3554,7 @@ ${buildAdviceBlock(['대인관계/부부'])}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
@@ -3613,7 +3614,7 @@ ${buildYongsinBlock()}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
@@ -3676,7 +3677,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('✦ 리포트가 저장되었습니다.');
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
@@ -3876,7 +3877,7 @@ function showConsultBanner() {
 // ── 카카오 공유 ──
 function shareKakao() {
   const url = location.href;
-  const title = '✨ ' + (_config?.title || 'AI 운세 리포트');
+  const title = '<i class="pi pi-sparkle"></i> ' + (_config?.title || 'AI 운세 리포트');
   const desc = 'FORTUNA에서 AI가 분석한 나만의 운세 리포트를 확인해보세요!';
   if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
     Kakao.Share.sendDefault({

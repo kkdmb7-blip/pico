@@ -313,6 +313,7 @@ nav {
   .breakdown-grid .breakdown-card:last-child { grid-column:auto; }
 }
 </style>
+  <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
 
@@ -331,7 +332,7 @@ nav {
 
   <!-- 프로필 없음 -->
   <div id="noProfileWrap" class="no-profile" style="display:none;">
-    <div class="no-profile-icon">🔮</div>
+    <div class="no-profile-icon"><i class="pi pi-crystal"></i></div>
     <h2>프로필이 필요합니다</h2>
     <p>오늘의 운세 점수를 계산하려면<br>생년월일을 먼저 등록해주세요.</p>
     <a href="index.html" class="btn-go">메인에서 설정하기</a>
@@ -389,19 +390,19 @@ nav {
     <div class="feedback-box" id="feedbackSection">
       <p class="feedback-q">오늘 이 점수가 실제와 맞았나요?</p>
       <div class="fb-btns" id="feedbackBtns">
-        <button class="btn-fb btn-fb-yes" onclick="sendFeedback('yes')">👍 맞았어요</button>
-        <button class="btn-fb btn-fb-no"  onclick="sendFeedback('no')">👎 달랐어요</button>
+        <button class="btn-fb btn-fb-yes" onclick="sendFeedback('yes')"><i class="pi pi-star"></i> 맞았어요</button>
+        <button class="btn-fb btn-fb-no"  onclick="sendFeedback('no')"><i class="pi pi-sad"></i> 달랐어요</button>
       </div>
     </div>
 
     <!-- 공유 버튼 -->
     <div class="share-btn-wrap" id="shareBtnWrap" style="display:none;">
-      <button class="btn-share-card" id="scoreKakaoBtn" onclick="openScoreShareCard()">🔗 결과 공유하기</button>
+      <button class="btn-share-card" id="scoreKakaoBtn" onclick="openScoreShareCard()"><i class="pi pi-link"></i> 결과 공유하기</button>
     </div>
 
     <!-- 로그인 넛지 -->
     <div class="login-nudge" id="loginNudge">
-      <p>💾 이 결과를 저장하고 매일 받아보려면?</p>
+      <p><i class="pi pi-save"></i> 이 결과를 저장하고 매일 받아보려면?</p>
       <a href="/" style="display:inline-block;padding:8px 20px;background:linear-gradient(135deg,var(--accent),#a07fd4);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;font-family:'Noto Sans KR',sans-serif">카카오로 저장하기</a>
     </div>
 
@@ -412,11 +413,11 @@ nav {
 <div id="scoreShareModal" role="dialog" aria-modal="true">
   <button class="ssm-close" onclick="closeScoreShareModal()">✕</button>
   <div class="ssm-preview" id="ssmPreview"></div>
-  <p class="ssm-loading" id="ssmLoading">카드 생성 중... ✨</p>
+  <p class="ssm-loading" id="ssmLoading">카드 생성 중... <i class="pi pi-sparkle"></i></p>
   <div class="ssm-actions" id="ssmActions" style="display:none;">
     <button class="ssm-btn ssm-kakao" onclick="shareScoreKakao()">카카오톡 공유</button>
     <button class="ssm-btn ssm-dl" onclick="downloadScoreCard()">이미지 저장</button>
-    <button class="ssm-btn ssm-link" onclick="copyScoreLink()">🔗 링크 복사</button>
+    <button class="ssm-btn ssm-link" onclick="copyScoreLink()"><i class="pi pi-link"></i> 링크 복사</button>
     <button class="ssm-btn ssm-x" onclick="closeScoreShareModal()">닫기</button>
   </div>
 </div>
@@ -532,10 +533,10 @@ function renderDomainCards(final) {
 // 세부 분석 렌더링
 function renderBreakdown(scores) {
   const srcs = [
-    { key:'saju',  label:'사주', badge:'🏛️' },
-    { key:'qimen', label:'기문', badge:'🗺️' },
-    { key:'astro', label:'점성', badge:'🌟' },
-    { key:'vedic', label:'베딕', badge:'🕉️' },
+    { key:'saju',  label:'사주', badge:'<i class="pi pi-temple"></i>️' },
+    { key:'qimen', label:'기문', badge:'<i class="pi pi-globe"></i>️' },
+    { key:'astro', label:'점성', badge:'<i class="pi pi-star"></i>' },
+    { key:'vedic', label:'베딕', badge:'<i class="pi pi-om"></i>️' },
     { key:'ziwei', label:'자미', badge:'⭐' },
   ];
   const grid = document.getElementById('breakdownGrid');
@@ -578,7 +579,7 @@ function _todayKST() {
 function initFeedback(today) {
   if (localStorage.getItem('score_feedback_' + today)) {
     document.getElementById('feedbackBtns').innerHTML =
-      '<div style="font-size:15px;color:var(--accent2)">소중한 피드백 감사해요 🙏</div>';
+      '<div style="font-size:15px;color:var(--accent2)">소중한 피드백 감사해요 <i class="pi pi-star"></i></div>';
   }
 }
 
@@ -594,8 +595,8 @@ async function sendFeedback(fb) {
   if (localStorage.getItem(key)) return;
   localStorage.setItem(key, fb);
   document.getElementById('feedbackBtns').innerHTML =
-    '<div style="font-size:15px;color:var(--accent2)">소중한 피드백 감사해요 🙏</div>';
-  showToast('소중한 피드백 감사해요 🙏');
+    '<div style="font-size:15px;color:var(--accent2)">소중한 피드백 감사해요 <i class="pi pi-star"></i></div>';
+  showToast('소중한 피드백 감사해요 <i class="pi pi-star"></i>');
   const user = (() => { try { return JSON.parse(localStorage.getItem('pico_user')); } catch(e) { return null; } })();
   const uid = (user && user.id) ? user.id : ('anon_' + Math.random().toString(36).slice(2,10));
   try {
@@ -636,11 +637,11 @@ function openScoreShareCard() {
   var name = (profile && profile.name) ? profile.name + '님' : '';
 
   var DOMAIN_INFO = {
-    wealth:  { emoji:'💰', label:'재물' },
-    relation:{ emoji:'❤️', label:'관계' },
-    health:  { emoji:'💪', label:'건강' },
-    study:   { emoji:'📚', label:'학업' },
-    travel:  { emoji:'✈️', label:'이동' },
+    wealth:  { emoji:'<i class="pi pi-coin"></i>', label:'재물' },
+    relation:{ emoji:'<i class="pi pi-heart"></i>️', label:'관계' },
+    health:  { emoji:'<i class="pi pi-muscle"></i>', label:'건강' },
+    study:   { emoji:'<i class="pi pi-book"></i>', label:'학업' },
+    travel:  { emoji:'<i class="pi pi-rocket"></i>️', label:'이동' },
   };
   var domains = ['wealth','relation','health','study','travel'];
 
@@ -718,7 +719,7 @@ function openScoreShareCard() {
   }).catch(function() {
     var el = document.getElementById('_ssmCardEl');
     if (el) document.body.removeChild(el);
-    loading.textContent = '카드 생성 실패 😢';
+    loading.textContent = '카드 생성 실패 <i class="pi pi-sad"></i>';
   });
 }
 
@@ -734,7 +735,7 @@ function downloadScoreCard() {
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a'); a.download = 'fortuna_score.png'; a.href = url; a.click();
     setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
-    showToast('📸 카드가 저장됐어요!');
+    showToast('<i class="pi pi-camera"></i> 카드가 저장됐어요!');
   }, 'image/png');
 }
 
@@ -744,7 +745,7 @@ function shareScoreDirectKakao() {
   var overall = _scoreResult ? _scoreResult.overall : 0;
   var today = _scoreResult ? _scoreResult.today : '';
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '🔮 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n재물/관계/건강/학업/이동 5개 분야 종합\n나도 확인해봐 👇';
+  var text = '<i class="pi pi-crystal"></i> 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n재물/관계/건강/학업/이동 5개 분야 종합\n나도 확인해봐 <i class="pi pi-down"></i>';
   try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
 
   if (!_ssmCanvas) {
@@ -755,18 +756,18 @@ function shareScoreDirectKakao() {
         _doShareCanvas(btn, text, pageUrl);
       }
     }, 200);
-    setTimeout(function() { clearInterval(wait); if (btn) { btn.disabled=false; btn.textContent='🟡 카카오톡 공유'; } }, 8000);
+    setTimeout(function() { clearInterval(wait); if (btn) { btn.disabled=false; btn.textContent='<i class="pi pi-coin"></i> 카카오톡 공유'; } }, 8000);
   } else {
     _doShareCanvas(btn, text, pageUrl);
   }
 }
 
 function _doShareCanvas(btn, text, pageUrl) {
-  if (btn) { btn.disabled=false; btn.textContent='🟡 카카오톡 공유'; }
+  if (btn) { btn.disabled=false; btn.textContent='<i class="pi pi-coin"></i> 카카오톡 공유'; }
   document.getElementById('scoreShareModal').style.display = 'none';
   if (!_ssmCanvas) {
     if (navigator.share) { navigator.share({ title:'FORTUNA 운세점수', text:text, url:pageUrl }).catch(function(){}); }
-    else { showToast('📋 링크 복사됨!'); }
+    else { showToast('<i class="pi pi-notepad"></i> 링크 복사됨!'); }
     return;
   }
   _ssmCanvas.toBlob(function(blob) {
@@ -777,7 +778,7 @@ function _doShareCanvas(btn, text, pageUrl) {
     } else if (navigator.share) {
       navigator.share({ title:'FORTUNA 운세점수', text:text, url:pageUrl }).catch(function(){});
     } else {
-      showToast('📋 링크 복사됨!');
+      showToast('<i class="pi pi-notepad"></i> 링크 복사됨!');
     }
   }, 'image/png');
 }
@@ -786,12 +787,12 @@ function shareScoreKakao() {
   var overall = _scoreResult ? _scoreResult.overall : 0;
   var today = _scoreResult ? _scoreResult.today : '';
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '🔮 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n\n재물/관계/건강/학업/이동 5개 분야 종합\n\n나도 확인해봐 👇';
+  var text = '<i class="pi pi-crystal"></i> 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n\n재물/관계/건강/학업/이동 5개 분야 종합\n\n나도 확인해봐 <i class="pi pi-down"></i>';
   if (navigator.share) {
     navigator.share({ title: 'FORTUNA 운세점수', text: text, url: pageUrl }).catch(function(){});
   } else {
     navigator.clipboard && navigator.clipboard.writeText(text + '\n' + pageUrl)
-      .then(function() { showToast('📋 링크가 복사됐어요!'); })
+      .then(function() { showToast('<i class="pi pi-notepad"></i> 링크가 복사됐어요!'); })
       .catch(function() { showToast('복사에 실패했어요'); });
   }
   closeScoreShareModal();
@@ -800,7 +801,7 @@ function shareScoreKakao() {
 function copyScoreLink() {
   var url = 'https://picolab.kr?utm_source=share&utm_medium=link';
   navigator.clipboard && navigator.clipboard.writeText(url)
-    .then(function() { showToast('🔗 링크가 복사됐어요!'); })
+    .then(function() { showToast('<i class="pi pi-link"></i> 링크가 복사됐어요!'); })
     .catch(function() { showToast('복사에 실패했어요'); });
 }
 

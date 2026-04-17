@@ -293,6 +293,7 @@
     /* 하단 버튼 */
     .action-row { display: flex; gap: 12px; flex-wrap: wrap; }
   </style>
+  <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
 
@@ -312,7 +313,7 @@
 
   <!-- 에러 -->
   <div id="error">
-    <div class="error-icon">⚠️</div>
+    <div class="error-icon"><i class="pi pi-warning"></i>️</div>
     <p class="error-msg" id="errorMsg">명반을 불러오지 못했어요. 다시 시도해주세요.</p>
     <br>
     <a href="index.html" class="back-btn" style="display:inline-block;margin-top:12px;">← 메인으로</a>
@@ -367,8 +368,8 @@
     <!-- 하단 버튼 -->
     <div id="ziweiShareBtnWrap" style="display:none;padding:20px 0 32px;flex-direction:column;align-items:center;gap:10px;">
       <button id="ziweiKakaoBtn" onclick="shareZiweiKakao()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;letter-spacing:-0.3px;">⭐ 카카오톡 공유</button>
-      <a id="consultBtn" href="#" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;">✦ AI 운세 상담하기</a>
-      <a href="counselor.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#c2784e,#e8a87c);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;">👤 전문 상담사 연결</a>
+      <a id="consultBtn" href="#" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;"><i class="pi pi-sparkle"></i> AI 운세 상담하기</a>
+      <a href="counselor.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:linear-gradient(135deg,#c2784e,#e8a87c);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;max-width:340px;text-decoration:none;letter-spacing:-0.3px;box-sizing:border-box;"><i class="pi pi-person"></i> 전문 상담사 연결</a>
     </div>
 
   </div>
@@ -556,7 +557,7 @@ function render(d) {
 
   // 대한 흐름 해석
   if (dec && dec.name) {
-    addInterp(interps, '🌊', '현재 대한 흐름', decadeInterp(dec.name, dec.stars || []));
+    addInterp(interps, '<i class="pi pi-wave"></i>', '현재 대한 흐름', decadeInterp(dec.name, dec.stars || []));
   }
 
   // 재백·관록·부처 요약
@@ -567,9 +568,9 @@ function render(d) {
   var gwanrok = findPal('관록궁') || findPal('관록');
   var bucheo  = findPal('부처궁') || findPal('부처');
 
-  if (jaebaek) addInterp(interps, '💰', '재백궁 (재물)', palaceInterp('재백궁', jaebaek.majorStars || []) || ((jaebaek.majorStars || []).join(', ') || '별 없음') + ' — 재물의 흐름을 주관합니다.');
-  if (gwanrok) addInterp(interps, '🏆', '관록궁 (직업)', palaceInterp('관록궁', gwanrok.majorStars || []) || ((gwanrok.majorStars || []).join(', ') || '별 없음') + ' — 사회적 성취와 직업의 방향.');
-  if (bucheo)  addInterp(interps, '💑', '부처궁 (인연)', palaceInterp('부처궁', bucheo.majorStars || [])  || ((bucheo.majorStars || []).join(', ')  || '별 없음') + ' — 이성 인연과 파트너십.');
+  if (jaebaek) addInterp(interps, '<i class="pi pi-coin"></i>', '재백궁 (재물)', palaceInterp('재백궁', jaebaek.majorStars || []) || ((jaebaek.majorStars || []).join(', ') || '별 없음') + ' — 재물의 흐름을 주관합니다.');
+  if (gwanrok) addInterp(interps, '<i class="pi pi-trophy"></i>', '관록궁 (직업)', palaceInterp('관록궁', gwanrok.majorStars || []) || ((gwanrok.majorStars || []).join(', ') || '별 없음') + ' — 사회적 성취와 직업의 방향.');
+  if (bucheo)  addInterp(interps, '<i class="pi pi-heart"></i>', '부처궁 (인연)', palaceInterp('부처궁', bucheo.majorStars || [])  || ((bucheo.majorStars || []).join(', ')  || '별 없음') + ' — 이성 인연과 파트너십.');
 
   // 공유 버튼 표시
   window._ziweiData = d;
@@ -670,7 +671,7 @@ function _drawZiweiCard(cb) {
 
   // ── 현재 대한
   drawLine(y,220,0.4);y+=42;
-  ctx.font='600 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';ctx.fillText('🌊 현재 대한 大限',W/2,y);y+=40;
+  ctx.font='600 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';ctx.fillText('<i class="pi pi-wave"></i> 현재 대한 大限',W/2,y);y+=40;
   var dec=d.currentDecade;
   if(dec){
     ctx.font='bold 52px "Noto Serif KR",serif';ctx.fillStyle='#e8b86d';ctx.fillText(dec.name||'—',W/2,y);y+=44;
@@ -692,7 +693,7 @@ function _drawZiweiCard(cb) {
   var yr=d.currentYear;
   if(yr){
     drawLine(y,180,0.3);y+=36;
-    ctx.font='600 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fillText('✦ 유년 流年',W/2,y);y+=34;
+    ctx.font='600 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fillText('<i class="pi pi-sparkle"></i> 유년 流年',W/2,y);y+=34;
     ctx.font='700 32px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(232,184,109,0.85)';
     ctx.fillText((yr.heavenlyStem||'')+(yr.earthlyBranch||'')+' '+(yr.year||'')+'년 · '+(yr.palace||''),W/2,y);
   }
@@ -709,11 +710,11 @@ function shareZiweiKakao() {
   if(btn){ btn.disabled=true; btn.textContent='⏳ 생성 중...'; }
   var modal = document.getElementById('ziweiShareModal');
   var preview = document.getElementById('ziweiPreviewArea');
-  preview.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... ✨</div>';
+  preview.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
   modal.style.display = 'flex';
   _drawZiweiCard(function(canvas){
     if(btn){ btn.disabled=false; btn.textContent='⭐ 카카오톡 공유'; }
-    if(!canvas){ preview.innerHTML='<div style="color:#ff6b6b;padding:20px;">카드 생성 실패 😢</div>'; return; }
+    if(!canvas){ preview.innerHTML='<div style="color:#ff6b6b;padding:20px;">카드 생성 실패 <i class="pi pi-sad"></i></div>'; return; }
     window._ziweiCanvas = canvas;
     var img = new Image(); img.src = canvas.toDataURL('image/png');
     img.style.cssText = 'width:100%;border-radius:12px;display:block;';
@@ -731,7 +732,7 @@ function doZiweiShare() {
       navigator.share({files:[file],title:'FORTUNA 자미두수'}).catch(function(){});
     } else if(navigator.share){
       navigator.share({title:'FORTUNA 자미두수',url:pageUrl}).catch(function(){});
-    } else { _ziweiShowToast('🔗 링크가 클립보드에 복사됐어요!'); }
+    } else { _ziweiShowToast('<i class="pi pi-link"></i> 링크가 클립보드에 복사됐어요!'); }
   },'image/png');
 }
 

@@ -293,6 +293,7 @@ select option { background:var(--surface2); color:var(--text); }
   body { background:white; color:#111; }
 }
 </style>
+  <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
 
@@ -317,9 +318,9 @@ select option { background:var(--surface2); color:var(--text); }
           </svg>
         </button>
         <div class="hamburger-dropdown" id="hamburgerDropdown">
-          <button onclick="location.href='mypage.html'">👤 마이페이지</button>
+          <button onclick="location.href='mypage.html'"><i class="pi pi-person"></i> 마이페이지</button>
           <div class="menu-divider"></div>
-          <button onclick="location.href='/'">🏠 홈으로</button>
+          <button onclick="location.href='/'"><i class="pi pi-home"></i> 홈으로</button>
           <div class="menu-divider"></div>
           <button onclick="logout()" style="color:#e05c6a;">로그아웃</button>
         </div>
@@ -360,13 +361,13 @@ select option { background:var(--surface2); color:var(--text); }
         <div class="form-label">관심 테마 <span class="form-hint">복수 선택 가능</span></div>
         <div class="checkbox-grid">
           <label class="check-item" id="themeA">
-            <input type="checkbox" value="코인/주식 투자"> 📈 코인/주식 투자
+            <input type="checkbox" value="코인/주식 투자"> <i class="pi pi-asc"></i> 코인/주식 투자
           </label>
           <label class="check-item" id="themeB">
-            <input type="checkbox" value="창업/플랫폼 비즈니스"> 🚀 창업/플랫폼 비즈니스
+            <input type="checkbox" value="창업/플랫폼 비즈니스"> <i class="pi pi-rocket"></i> 창업/플랫폼 비즈니스
           </label>
           <label class="check-item" id="themeC">
-            <input type="checkbox" value="디지털노마드/이직"> 💻 디지털노마드/이직
+            <input type="checkbox" value="디지털노마드/이직"> <i class="pi pi-briefcase"></i> 디지털노마드/이직
           </label>
         </div>
       </div>
@@ -571,7 +572,7 @@ async function _updateNavOrb(userId) {
   try {
     var res = await sb.from('orb_balance').select('balance').eq('user_id', userId).maybeSingle();
     var bal = (res.data && res.data.balance != null) ? res.data.balance : 0;
-    el.textContent = '✦ ' + bal.toLocaleString() + ' Orb';
+    el.textContent = '<i class="pi pi-sparkle"></i> ' + bal.toLocaleString() + ' Orb';
     el.style.display = 'block';
   } catch(e) {}
 }
@@ -906,7 +907,7 @@ function shareKakao() {
   var ilju = (_workerData && _workerData.일주) || '';
   Kakao.Share.sendDefault({
     objectType: 'text',
-    text: '✨ ' + ilju + ' 일주 나만의 사주 리포트\n\nFORTUNA에서 AI 심층 사주 분석을 받아보세요!',
+    text: '<i class="pi pi-sparkle"></i> ' + ilju + ' 일주 나만의 사주 리포트\n\nFORTUNA에서 AI 심층 사주 분석을 받아보세요!',
     link: {
       mobileWebUrl: 'https://picolab.kr/report-saju.html',
       webUrl: 'https://picolab.kr/report-saju.html',

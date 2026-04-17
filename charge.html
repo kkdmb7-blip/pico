@@ -10,6 +10,7 @@
 <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pico-icons.css">
 <style>
 :root {
   --bg: #0a0a0f;
@@ -157,19 +158,19 @@ nav {
   </a>
   <div class="nav-divider"></div>
   <span class="nav-page-title">Orb 충전</span>
-  <div class="nav-orb">💎 <span id="currentBalance">...</span></div>
+  <div class="nav-orb"><i class="pi pi-gem"></i> <span id="currentBalance">...</span></div>
 </nav>
 
 <div class="page-body">
   <div class="hero">
-    <div class="hero-icon">💎</div>
+    <div class="hero-icon"><i class="pi pi-gem pi-3x"></i></div>
     <div class="hero-title">Orb<span style="font-size:0.65em;font-weight:400;opacity:0.6;margin-left:3px;">(오르브)</span>를 충전하세요</div>
     <div class="hero-sub">AI 채팅 1회에 20 Orb가 사용됩니다<br>충전한 Orb는 만료되지 않아요</div>
   </div>
 
   <!-- 첫 충전 1+1 배너 (첫 충전자만 표시) -->
   <div id="firstChargeBanner" style="display:none;background:linear-gradient(135deg,rgba(232,184,109,0.12),rgba(232,184,109,0.04));border:1.5px solid rgba(232,184,109,0.4);border-radius:16px;padding:16px 18px;margin-bottom:16px;text-align:center;">
-    <div style="font-size:20px;margin-bottom:6px;">🎁</div>
+    <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-gift pi-xl"></i></div>
     <div style="font-size:15px;font-weight:800;color:var(--gold);margin-bottom:4px;">첫 충전 한정 1+1 이벤트</div>
     <div style="font-size:13px;color:var(--text2);line-height:1.6;">500 Orb 충전 시 1,000 Orb를 드려요<br>첫 충전에만 적용되는 특별 혜택이에요</div>
   </div>
@@ -177,7 +178,7 @@ nav {
   <!-- 친구 초대 배너 -->
   <div id="inviteBanner" onclick="handleInviteCharge()" style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,rgba(122,196,255,0.12),rgba(122,196,255,0.04));border:1.5px solid rgba(122,196,255,0.35);border-radius:16px;padding:16px 18px;margin-bottom:16px;cursor:pointer;">
     <div style="display:flex;align-items:center;gap:12px;">
-      <div style="font-size:28px;">👥</div>
+      <div style="font-size:28px;"><i class="pi pi-people pi-xl"></i></div>
       <div>
         <div style="font-size:15px;font-weight:800;color:var(--orb);margin-bottom:2px;">친구 초대하고 Orb 받기</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.5;">카카오톡으로 공유하면 친구가 가입할 때 Orb를 드려요</div>
@@ -191,10 +192,10 @@ nav {
 
   <div class="section-label">이용 안내</div>
   <div class="how-list">
-    <div class="how-item">💬 <span>AI 채팅 <strong>1회당 20 Orb</strong> 차감</span></div>
-    <div class="how-item">♾️ <span>충전한 Orb는 <strong>만료 없음</strong></span></div>
-    <div class="how-item">🔒 <span>결제는 <strong>KG이니시스</strong> 안전 처리</span></div>
-    <div class="how-item">📞 <span>문의: <strong>picolab.kr</strong></span></div>
+    <div class="how-item"><i class="pi pi-chat"></i> <span>AI 채팅 <strong>1회당 20 Orb</strong> 차감</span></div>
+    <div class="how-item"><i class="pi pi-infinity"></i> <span>충전한 Orb는 <strong>만료 없음</strong></span></div>
+    <div class="how-item"><i class="pi pi-lock"></i> <span>결제는 <strong>KG이니시스</strong> 안전 처리</span></div>
+    <div class="how-item"><i class="pi pi-phone"></i> <span>문의: <strong>picolab.kr</strong></span></div>
   </div>
 </div>
 
@@ -223,7 +224,7 @@ var PACKS = [
   {
     id: 'pack_first_1plus1',
     firstOnly: true,
-    icon: '🎁',
+    icon: '<i class="pi pi-gift"></i>',
     orb: 500,
     bonus: 500,
     label: '첫 충전 1+1',
@@ -234,7 +235,7 @@ var PACKS = [
   },
   {
     id: 'pack_950',
-    icon: '💎',
+    icon: '<i class="pi pi-gem"></i>',
     orb: 950,
     label: null,
     desc: '채팅 약 47회',
@@ -244,7 +245,7 @@ var PACKS = [
   },
   {
     id: 'pack_1650',
-    icon: '💎',
+    icon: '<i class="pi pi-gem"></i>',
     orb: 1650,
     label: 'BEST',
     desc: '채팅 약 82회',
@@ -254,7 +255,7 @@ var PACKS = [
   },
   {
     id: 'pack_2200',
-    icon: '💎',
+    icon: '<i class="pi pi-gem"></i>',
     orb: 2200,
     label: null,
     desc: '채팅 약 110회',
@@ -264,7 +265,7 @@ var PACKS = [
   },
   {
     id: 'pack_3300',
-    icon: '💎',
+    icon: '<i class="pi pi-gem"></i>',
     orb: 3300,
     label: null,
     desc: '채팅 약 165회',
@@ -369,7 +370,7 @@ function renderPacks() {
 
     var badgeHtml = '';
     if (showBonus) {
-      badgeHtml = '<div class="pack-badge">첫 충전 1+1 🎁</div>';
+      badgeHtml = '<div class="pack-badge">첫 충전 1+1 <i class="pi pi-gift"></i></div>';
     } else if (pack.label === 'BEST') {
       badgeHtml = '<div class="pack-badge pack-badge-best">BEST</div>';
     }
@@ -432,7 +433,7 @@ async function doPay(pack) {
     try {
       await chargeOrb(pack, totalOrb, rsp.paymentId, paymentId);
       hideLoading();
-      toast('✅ ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
+      toast('<i class="pi pi-check"></i> ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
       setTimeout(function() { location.href = 'https://picolab.kr'; }, 2000);
     } catch(e) {
       hideLoading();
@@ -497,14 +498,14 @@ async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
 function handleInviteCharge() {
   if (!currentUserId) return;
   var link = 'https://kkdmb7-blip.github.io/memox/?ref=' + currentUserId;
-  var msg = '🔮 포르투나 — 사주·점성술 AI 운세 상담\n' + link;
+  var msg = '<i class="pi pi-crystal"></i> 포르투나 — 사주·점성술 AI 운세 상담\n' + link;
   if (navigator.share) {
     navigator.share({ title: '포르투나 초대', text: msg, url: link });
   } else if (window.Kakao && Kakao.isInitialized && Kakao.isInitialized()) {
     Kakao.Share.sendDefault({ objectType: 'text', text: msg, link: { mobileWebUrl: link, webUrl: link } });
   } else {
     navigator.clipboard.writeText(link).then(function() {
-      toast('초대 링크가 복사됐어요! 친구에게 공유해보세요 🔮');
+      toast('초대 링크가 복사됐어요! 친구에게 공유해보세요 <i class="pi pi-crystal"></i>');
     }).catch(function() { prompt('초대 링크:', link); });
   }
 }
@@ -539,7 +540,7 @@ async function handleRedirectResult() {
     var totalOrb = pack.orb + (pack.firstOnly && isFirstCharge ? (pack.bonus || 0) : 0);
     await chargeOrb(pack, totalOrb, paymentId, paymentId);
     hideLoading();
-    toast('✅ ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
+    toast('<i class="pi pi-check"></i> ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
   } catch(e) {
     hideLoading();
     toast('결제는 완료됐으나 저장 중 오류가 발생했어요. 고객센터에 문의해주세요.');
