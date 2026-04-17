@@ -955,7 +955,7 @@ function setType(t, silent) {
       document.getElementById('inp-day').value    = _wd;
       document.getElementById('inp-hour').value   = _wh;
       document.getElementById('inp-minute').value = _wmin;
-      document.getElementById('wonmyong-date-label').textContent =
+      document.getElementById('wonmyong-date-label').innerHTML =
         '<i class="pi pi-calendar"></i> 원명국 · ' + _wy + '.' + String(_wm).padStart(2,'0') + '.' + String(_wd).padStart(2,'0');
       notice.style.display = 'block';
     } else {
@@ -1778,7 +1778,7 @@ function renderInterp(data) {
     row.className = 'interp-row';
     const key = document.createElement('div');
     key.className = 'interp-key';
-    key.textContent = r.key;
+    key.innerHTML = r.key;
     const val = document.createElement('div');
     val.className = 'interp-val';
     if (r.html) val.innerHTML = r.val; else val.textContent = r.val;
@@ -1926,7 +1926,7 @@ function _qimenShowToast(msg) {
     t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#e8e0f0;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;';
     document.body.appendChild(t);
   }
-  t.textContent = msg; t.style.opacity = '1';
+  t.innerHTML = msg; t.style.opacity = '1';
   clearTimeout(t._tid);
   t._tid = setTimeout(function() { t.style.opacity = '0'; }, 2500);
 }
