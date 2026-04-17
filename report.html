@@ -479,7 +479,7 @@ nav {
 <body>
 
 <nav>
-  <a onclick="history.back()" class="nav-back">←</a>
+  <a onclick="location.href='index.html?tab=report'" class="nav-back">←</a>
   <div class="nav-title" id="navTitle">리포트</div>
 </nav>
 
@@ -507,7 +507,7 @@ nav {
       <div class="intro-orb-cost" id="introOrbCost"></div>
     </div>
     <button class="btn-intro-gen" id="btnGenerate"><i class="pi pi-sparkle"></i> 리포트 생성하기</button>
-    <button class="btn-intro-back" onclick="history.back()">돌아가기</button>
+    <button class="btn-intro-back" onclick="location.href='index.html?tab=report'">돌아가기</button>
   </div>
 
   <!-- 성향 체크 -->
@@ -600,7 +600,7 @@ nav {
     <div class="modal-title">Orb가 부족해요</div>
     <div class="modal-sub" id="orbModalSub">Orb를 충전하고 리포트를 받아보세요.</div>
     <button class="modal-btn modal-btn-primary" onclick="location.href='charge.html'"><i class="pi pi-gem"></i> 충전하기</button>
-    <button class="modal-btn modal-btn-cancel" onclick="document.getElementById('orbModal').classList.remove('open');history.back()">돌아가기</button>
+    <button class="modal-btn modal-btn-cancel" onclick="document.getElementById('orbModal').classList.remove('open');location.href='index.html?tab=report'">돌아가기</button>
   </div>
 </div>
 

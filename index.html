@@ -3405,6 +3405,11 @@ function checkAuth() {
     }
   } catch(e) {}
   var params = new URLSearchParams(window.location.search);
+  var initTab = params.get('tab');
+  if (initTab && ['home','report','consult','mypage'].indexOf(initTab) !== -1) {
+    switchTab(initTab);
+    history.replaceState({}, '', window.location.pathname);
+  }
   var code = params.get('code');
   if (code) {
     history.replaceState({}, '', window.location.pathname);
