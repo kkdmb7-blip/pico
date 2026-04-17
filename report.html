@@ -270,10 +270,86 @@ nav {
 .modal-btn-primary { background: linear-gradient(135deg,#7b5ea7,#a07fd4); color: #fff; }
 .modal-btn-cancel { background: var(--surface); color: var(--muted); font-size: 13px; }
 
+/* ── 상담 배너 ── */
+.consult-banner {
+  margin-top: 32px;
+  background: linear-gradient(135deg, rgba(123,94,167,0.08), rgba(201,168,76,0.06));
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.consult-banner::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.consult-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: -30px;
+  width: 100px; height: 100px;
+  background: radial-gradient(circle, rgba(123,94,167,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.consult-icon {
+  font-size: 32px;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 2px 8px rgba(201,168,76,0.3));
+}
+.consult-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: -0.3px;
+  margin-bottom: 8px;
+}
+.consult-desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  word-break: keep-all;
+}
+.consult-desc em {
+  font-style: normal;
+  color: rgba(201,168,76,0.85);
+}
+.btn-consult {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 15px 24px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7b5ea7 0%, #9b7ec8 50%, #c9a84c 100%);
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 800;
+  font-family: var(--fn);
+  cursor: pointer;
+  letter-spacing: -0.2px;
+  box-shadow: 0 4px 20px rgba(123,94,167,0.25), 0 2px 8px rgba(201,168,76,0.15);
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  z-index: 1;
+}
+.btn-consult:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 12px rgba(123,94,167,0.2);
+}
+
 /* ── 하단 액션 ── */
 .report-actions {
   display: flex; flex-direction: column; gap: 10px;
-  margin-top: 20px; padding-bottom: 20px;
+  margin-top: 16px; padding-bottom: 28px;
 }
 .btn-action {
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -290,11 +366,6 @@ nav {
   background: #fee500;
   border: none;
   color: #3c1e1e;
-}
-.btn-consult {
-  background: linear-gradient(135deg, #7b5ea7, #a07fd4);
-  border: none;
-  color: #fff;
 }
 .orb-note {
   font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px;
@@ -502,9 +573,14 @@ nav {
       <div class="report-meta" id="reportMeta"></div>
     </div>
     <div id="sectionsWrap"></div>
+    <div class="consult-banner" id="consultBanner" style="display:none;">
+      <div class="consult-icon">&#x1F3AF;</div>
+      <div class="consult-title" id="consultTitle">리포트 내용이 궁금하신가요?</div>
+      <div class="consult-desc" id="consultDesc">AI 분석을 바탕으로 <em>전문 상담사</em>가 더 깊은 해석과<br>실질적인 조언을 1:1로 안내해 드립니다.</div>
+      <button class="btn-consult" onclick="window.open('http://pf.kakao.com/_krjxjn/chat','_blank')">전문 상담 받기</button>
+    </div>
     <div class="report-actions" id="reportActions" style="display:none;">
       <button class="btn-action btn-share" onclick="shareKakao()">💬 카카오로 공유하기</button>
-      <button class="btn-action btn-consult" onclick="window.open('http://pf.kakao.com/_krjxjn/chat','_blank')">🔮 상담사에게 묻기</button>
       <button class="btn-action btn-regen" onclick="regenReport()">🔄 다시 생성하기</button>
       <div class="orb-note" id="regenNote"></div>
     </div>
@@ -2348,7 +2424,7 @@ function renderReport(sections, createdAt) {
   });
 
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display = 'flex';
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
 // ── 다시 생성 ──
@@ -2602,7 +2678,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display = 'flex';
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
 // ── 재물/사업 리포트 생성 ──
@@ -2688,7 +2764,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display='flex';
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
 // ── 연애/결혼 리포트 생성 ──
@@ -2770,7 +2846,7 @@ ${buildAdviceBlock(['대인관계/부부'])}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display='flex';
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
 // ── 대운 흐름 리포트 생성 ──
@@ -2861,7 +2937,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display='flex';
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
 // ── 올해 운세 리포트 생성 ──
@@ -2947,7 +3023,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display='flex';
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
 // ── 이번달 운세 리포트 생성 ──
@@ -3050,7 +3126,7 @@ ${monthlyIljuBlock}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')} (${monthStr})`;
   document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display='flex';
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
 // ── 용신 생활 가이드 리포트 생성 ──
@@ -3137,7 +3213,7 @@ ${ageBlock}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display = 'flex';
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
 // ── 신규 리포트 공통: 섹션 카드 생성 + Orb 차감 ──
@@ -3220,7 +3296,7 @@ ${buildYongsinBlock()}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display = 'flex';
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
 // ── 서양 점성술 심층 분석 ──
@@ -3272,7 +3348,7 @@ ${buildYongsinBlock()}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display = 'flex';
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
 // ── 자미두수 심층 분석 ──
@@ -3324,7 +3400,7 @@ ${buildAdviceBlock(['대인관계/부부'])}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display = 'flex';
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
 // ── 동서양 통합 분석 ──
@@ -3384,7 +3460,7 @@ ${buildYongsinBlock()}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display = 'flex';
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
 // ── 직업·사업 심층 분석 ──
@@ -3447,7 +3523,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
-  document.getElementById('reportActions').style.display = 'flex';
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
 // ── 응답을 섹션 배열에 나눠 표시 ──
@@ -3620,6 +3696,23 @@ function splitIntoSections(text, count, startNum) {
 // ── Kakao SDK 초기화 ──
 if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
   Kakao.init('0c8f16db31d8b01ae2fc9cc2c7c56ea7');
+}
+
+// ── 상담 배너 표시 ──
+function showConsultBanner() {
+  const bannerTexts = {
+    character: { title: '나의 기질, 더 깊이 알고 싶다면', desc: '타고난 성향과 잠재력을 <em>전문 상담사</em>가\n1:1로 풀어드립니다.' },
+    money:     { title: '재물운을 현실에 적용하고 싶다면', desc: '투자 시기, 사업 방향까지 <em>전문 상담사</em>가\n구체적으로 안내해 드립니다.' },
+    love:      { title: '연애운이 궁금하신가요?', desc: '인연의 시기와 상대방 궁합까지\n<em>전문 상담사</em>가 세밀하게 풀어드립니다.' },
+    daeun:     { title: '대운의 흐름, 전략이 필요하다면', desc: '지금 대운에서 어떻게 움직여야 하는지\n<em>전문 상담사</em>가 맞춤 전략을 세워드립니다.' },
+    year:      { title: '올해를 어떻게 보내야 할지 고민된다면', desc: '월별 핵심 전략과 주의사항을\n<em>전문 상담사</em>가 1:1로 코칭해 드립니다.' },
+    month:     { title: '이달의 운세, 실전 조언이 필요하다면', desc: '지금 이 시기에 집중해야 할 것과 피해야 할 것\n<em>전문 상담사</em>가 구체적으로 안내합니다.' },
+    yongsin:   { title: '용신 활용법, 맞춤 상담을 원한다면', desc: '나에게 맞는 색상·방위·직업 활용을\n<em>전문 상담사</em>가 생활 밀착형으로 안내합니다.' }
+  };
+  const t = bannerTexts[_type] || { title: '리포트 내용이 궁금하신가요?', desc: 'AI 분석을 바탕으로 <em>전문 상담사</em>가 더 깊은 해석과<br>실질적인 조언을 1:1로 안내해 드립니다.' };
+  document.getElementById('consultTitle').textContent = t.title;
+  document.getElementById('consultDesc').innerHTML = t.desc.replace(/\n/g, '<br>');
+  document.getElementById('consultBanner').style.display = 'block';
 }
 
 // ── 카카오 공유 ──
