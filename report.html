@@ -2326,7 +2326,7 @@ function renderIntro() {
   const d = TYPE_DETAIL[_type];
   if (!d) return;
 
-  document.getElementById('introEmoji').textContent = d.emoji;
+  document.getElementById('introEmoji').innerHTML = d.emoji;
   document.getElementById('introTitle').textContent = _config.title;
   document.getElementById('introDesc').textContent = d.subtitle;
 
@@ -2614,7 +2614,7 @@ async function generateReport() {
 function renderReport(sections, createdAt) {
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   document.getElementById('reportMeta').textContent = `생성일: ${createdAt ? new Date(createdAt).toLocaleDateString('ko-KR') : ''}`;
 
   const wrap = document.getElementById('sectionsWrap');
@@ -2886,7 +2886,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   } catch(e) {}
 
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
@@ -2972,7 +2972,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
@@ -3054,7 +3054,7 @@ ${buildAdviceBlock(['대인관계/부부'])}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
@@ -3145,7 +3145,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
@@ -3231,7 +3231,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
@@ -3345,7 +3345,7 @@ ${monthlyIljuBlock}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')} (${monthStr})`;
-  document.getElementById('reportBadge').textContent=_config.emoji+' AI REPORT';
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
@@ -3432,7 +3432,7 @@ ${ageBlock}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
@@ -3515,7 +3515,7 @@ ${buildYongsinBlock()}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
@@ -3567,7 +3567,7 @@ ${buildYongsinBlock()}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
@@ -3619,7 +3619,7 @@ ${buildAdviceBlock(['대인관계/부부'])}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
@@ -3679,7 +3679,7 @@ ${buildYongsinBlock()}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
@@ -3742,7 +3742,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
     if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
   } catch(e){}
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
-  document.getElementById('reportBadge').textContent = _config.emoji + ' AI REPORT';
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   document.getElementById('regenNote').textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
