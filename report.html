@@ -609,7 +609,7 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
-const REPORT_VERSION = 11;
+const REPORT_VERSION = 12;
 
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
@@ -1297,6 +1297,11 @@ let _stemInterData = null;
 let _geokDetailData = null;
 let _strengthScoreData = null;
 let _interpretGuideData = null;
+let _daeunSewunCrossData = null;
+let _wealthDetailData = null;
+let _healthTrendData = null;
+let _careerFitData = null;
+let _iljuCompatData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1514,6 +1519,12 @@ async function loadAllData(withZiwei, withAstro) {
       _geokDetailData = _rptFull['격국세분'] || null;
       _strengthScoreData = _rptFull['강약수치'] || null;
       _interpretGuideData = _rptFull['해석지침'] || null;
+      // Level 10
+      _daeunSewunCrossData = _rptFull['대운세운교차'] || null;
+      _wealthDetailData = _rptFull['재물운'] || null;
+      _healthTrendData = _rptFull['건강경향'] || null;
+      _careerFitData = _rptFull['직업적성'] || null;
+      _iljuCompatData = _rptFull['일주궁합'] || null;
     }
   } catch(e){}
   try {
@@ -2141,6 +2152,66 @@ function buildInterpretGuideBlock() {
   return s;
 }
 
+function buildDaeunSewunCrossBlock() {
+  if (!_daeunSewunCrossData) return '';
+  const d = _daeunSewunCrossData;
+  let s = `\n【대운×세운 교차분석】\n`;
+  s += `현재대운: ${d.현재대운} (${d.대운십신})\n`;
+  s += `세운: ${d.세운} (${d.세운십신})\n`;
+  s += `종합: ${d.판정}(${d.종합점수}점)\n`;
+  if (d.천간이벤트?.length) d.천간이벤트.forEach(e => { s += `  ${e.유형}: ${e.내용}\n`; });
+  if (d.지지이벤트?.length) d.지지이벤트.forEach(e => { s += `  ${e.유형}: ${e.내용}\n`; });
+  if (d.원국교차?.length) d.원국교차.forEach(e => { s += `  교차: ${e}\n`; });
+  return s;
+}
+function buildWealthDetailBlock() {
+  if (!_wealthDetailData) return '';
+  const d = _wealthDetailData;
+  let s = `\n【재물운 세분화】\n`;
+  s += `재성: 정재${d.정재수}/편재${d.편재수} (총${d.재성총수}개)\n`;
+  s += `통근: ${d.재성통근}\n`;
+  s += `강약: ${d.재성강약}\n`;
+  s += `성향: ${d.재물성향}\n`;
+  if (d.재성위치?.length) d.재성위치.forEach(w => { s += `  ${w.위치}(${w.궁위}): ${w.재성유형}\n`; });
+  if (d.재물대운?.length) d.재물대운.forEach(w => { s += `  ${w.대운} ${w.시기}: ${w.유형}\n`; });
+  s += `올해: ${d.올해재물}\n`;
+  return s;
+}
+function buildHealthTrendBlock() {
+  if (!_healthTrendData) return '';
+  const d = _healthTrendData;
+  let s = `\n【건강경향 분석】\n`;
+  s += `체질: ${d.체질}\n`;
+  if (d.건강주의?.length) d.건강주의.forEach(h => { s += `  ${h.오행}(${h.상태}) ${h.장부}: ${h.증상} → 보완: ${h.보완}\n`; });
+  if (d.건강강점?.length) d.건강강점.forEach(h => { s += `  ${h.상태}\n`; });
+  if (d.대운건강?.length) d.대운건강.forEach(h => { s += `  ${h.대운} ${h.시기}: ${h.주의}\n`; });
+  return s;
+}
+function buildCareerFitBlock() {
+  if (!_careerFitData) return '';
+  const d = _careerFitData;
+  let s = `\n【직업적성 정밀】\n`;
+  if (d.월주직업성향) s += `월주: ${d.월주직업성향.십신} — ${d.월주직업성향.직업군} (${d.월주직업성향.특성})\n`;
+  if (d.시주부업성향) s += `시주: ${d.시주부업성향.십신} — ${d.시주부업성향.직업군} (${d.시주부업성향.특성})\n`;
+  s += `격국: ${d.격국적성}\n`;
+  s += `용신산업: ${d.용신산업}\n`;
+  s += `신강약: ${d.신강약조언}\n`;
+  s += `추천: ${d.추천직업?.join(', ')}\n`;
+  return s;
+}
+function buildIljuCompatBlock() {
+  if (!_iljuCompatData) return '';
+  const d = _iljuCompatData;
+  let s = `\n【일주 궁합 기본】\n`;
+  s += `내 일주: ${d.내일주}\n`;
+  s += `천간합 상대: ${d.천간합상대}\n`;
+  s += `지지합 상대: ${d.지지합상대}\n`;
+  s += `최적 일주: ${d.최적일주}\n`;
+  s += `주의 일주: ${d.주의일주}\n`;
+  s += `음양: ${d.음양선호}\n`;
+  if (d.궁합유형?.length) d.궁합유형.forEach(t => { s += `  ${t.유형}: ${t.설명}\n`; });
+  return s;
+}
 function buildAccuracyLayerBlock() {
   return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
     + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
@@ -2156,7 +2227,9 @@ function buildAccuracyLayerBlock() {
     + buildHyungChungBlock() + buildJohuPreciseBlock() + buildTenGodPosBlock()
     + buildSinsalSummaryBlock() + buildSewunMonthlyBlock()
     + buildIljuProfileBlock() + buildStemInterBlock() + buildGeokDetailBlock()
-    + buildStrengthScoreBlock() + buildInterpretGuideBlock();
+    + buildStrengthScoreBlock() + buildInterpretGuideBlock()
+    + buildDaeunSewunCrossBlock() + buildWealthDetailBlock() + buildHealthTrendBlock()
+    + buildCareerFitBlock() + buildIljuCompatBlock();
 }
 
 // ── 초기화 ──
