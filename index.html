@@ -3477,11 +3477,6 @@ function checkAuth() {
     }
   } catch(e) {}
   var params = new URLSearchParams(window.location.search);
-  var initTab = params.get('tab');
-  if (initTab && ['home','report','consult','mypage'].indexOf(initTab) !== -1) {
-    switchTab(initTab);
-    history.replaceState({}, '', window.location.pathname);
-  }
   var code = params.get('code');
   if (code) {
     history.replaceState({}, '', window.location.pathname);
@@ -4491,10 +4486,17 @@ function updateMypageTab() {
     user.style.display = 'none';
   }
 }
-// 초기 홈 탭 활성화
+// 초기 탭 활성화 (URL ?tab= 파라미터 지원)
 (function() {
-  var btn = document.getElementById('tnHome');
-  if (btn) btn.style.color = '#e8b86d';
+  var params = new URLSearchParams(window.location.search);
+  var initTab = params.get('tab');
+  if (initTab && ['home','report','consult','mypage'].indexOf(initTab) !== -1) {
+    switchTab(initTab);
+    history.replaceState({}, '', window.location.pathname);
+  } else {
+    var btn = document.getElementById('tnHome');
+    if (btn) btn.style.color = '#e8b86d';
+  }
 })();
 
 // 스크롤 위치 저장/복원 제거됨 — 항상 맨 위부터 시작
