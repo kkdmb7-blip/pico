@@ -2352,7 +2352,9 @@ function buildAccuracyLayerBlock() {
     { name:'신살시기', data:_sinsalTimingData },
   ];
 
-  // 전체 블록(Level 1~10) 통합 처리
+  // 전체 블록(Level 1~11) 통합 처리
+  // FOUNDATIONAL: 어떤 리포트 타입이든 기본 사주 컨텍스트로 반드시 필요한 블록 (요약 형태로만)
+  const FOUNDATIONAL = new Set(['강약수치','격국세분','일주론','사주균형','용신재검증','조후']);
   const ALL_BLOCKS = [...LEGACY_BLOCKS, ...BLOCKS];
   let detailSentences = '';
   const summaryLines = [];
@@ -2366,20 +2368,21 @@ function buildAccuracyLayerBlock() {
       } else if (b.builder) {
         detailSentences += b.builder();
       }
-    } else {
-      // 비관련 블록: 문장 → 요약 → 종합 순으로 1줄 요약
+    } else if (FOUNDATIONAL.has(b.name)) {
+      // 기본 컨텍스트 블록만 짧은 요약으로 유지 (60자 cap)
       if (sentence) {
-        summaryLines.push(`${b.name}: ${sentence.length > 80 ? sentence.substring(0, 80) + '...' : sentence}`);
+        summaryLines.push(`${b.name}: ${sentence.length > 60 ? sentence.substring(0, 60) + '...' : sentence}`);
       } else {
         const s = b.data['요약'] || b.data['종합'] || null;
-        if (s) summaryLines.push(`${b.name}: ${s}`);
+        if (s) summaryLines.push(`${b.name}: ${s.length > 60 ? s.substring(0, 60) + '...' : s}`);
       }
     }
+    // 그 외 비관련 비기본 블록: 노이즈 + 토큰 낭비 → 프롬프트에서 제외
   }
 
   let compressed = '';
   if (summaryLines.length) {
-    compressed = '\n【참고 요약】\n' + summaryLines.join('\n') + '\n';
+    compressed = '\n【사주 기본 컨텍스트】\n' + summaryLines.join('\n') + '\n';
   }
 
   // 해석지침은 AI 규칙이므로 항상 전문 유지
