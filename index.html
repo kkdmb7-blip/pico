@@ -1228,6 +1228,17 @@
     var gradeBg    = { '대길':'rgba(212,175,55,0.1)','길':'rgba(76,175,122,0.1)','반길':'rgba(255,152,0,0.1)','흉':'rgba(244,67,54,0.08)','대흉':'rgba(233,30,99,0.08)' };
     var gradeBorder= { '대길':'rgba(212,175,55,0.35)','길':'rgba(76,175,122,0.35)','반길':'rgba(255,152,0,0.35)','흉':'rgba(244,67,54,0.3)','대흉':'rgba(233,30,99,0.3)' };
 
+    // 전문용어 → 쉬운 말 매핑
+    var _simpleLabel = {
+      '원격': { title: '청소년·20대',   sub: '재능 · 초년 흐름' },
+      '형격': { title: '30~50대',       sub: '사회 · 커리어 기운' },
+      '이격': { title: '인간관계',      sub: '가족 · 주변 사람' },
+      '정격': { title: '인생 전체',     sub: '평생 종합 흐름' }
+    };
+    var _simpleGrade = {
+      '대길': '최상', '길': '좋음', '반길': '보통', '흉': '주의', '대흉': '위험'
+    };
+
     var grid = document.getElementById('nsGrid');
     grid.innerHTML = '';
     ['정격','형격','원격','이격'].forEach(function(key) {
@@ -1235,14 +1246,17 @@
       var g = _SURI[s.val] || '흉';
       var sn = _SURI_NAME[s.val] || '';
       var col = gradeColor[g]||'#8b8ba8';
+      var lbl = _simpleLabel[key];
+      var easyGrade = _simpleGrade[g] || g;
+      var tip = key + ' (' + s.val + ') · ' + sn + ' — ' + (_SURI_DESC[s.val]||'');
       var card = document.createElement('div');
-      card.style.cssText = 'background:'+gradeBg[g]+';border:1px solid '+gradeBorder[g]+';border-radius:14px;padding:16px 12px;text-align:center;';
+      card.style.cssText = 'background:'+gradeBg[g]+';border:1px solid '+gradeBorder[g]+';border-radius:14px;padding:14px 12px;text-align:center;';
+      card.title = tip; // 전문용어는 툴팁으로 숨김
       card.innerHTML =
-        '<div style="font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:6px;">'+key+' · '+s.desc+'</div>' +
-        '<div style="font-size:36px;font-weight:300;color:'+col+';line-height:1;margin-bottom:8px;font-family:\'Noto Serif KR\',serif;">'+s.val+'</div>' +
-        '<span style="display:inline-block;font-size:11px;font-weight:700;color:'+col+';background:'+gradeBg[g]+';border:1px solid '+gradeBorder[g]+';border-radius:20px;padding:2px 10px;margin-bottom:4px;">'+g+'</span>' +
-        '<div style="font-size:10px;color:var(--muted);">'+sn+'</div>' +
-        '<div style="font-size:10px;color:rgba(255,255,255,0.45);line-height:1.4;margin-top:4px;">'+(_SURI_DESC[s.val]||'')+'</div>';
+        '<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;">'+lbl.title+'</div>' +
+        '<div style="font-size:10px;color:var(--muted);margin-bottom:10px;">'+lbl.sub+'</div>' +
+        '<div style="display:inline-block;font-size:16px;font-weight:700;color:'+col+';background:'+gradeBg[g]+';border:1.5px solid '+gradeBorder[g]+';border-radius:20px;padding:6px 16px;margin-bottom:6px;letter-spacing:0.06em;">'+easyGrade+'</div>' +
+        '<div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px;">수리 '+s.val+'</div>';
       grid.appendChild(card);
     });
 
@@ -1260,44 +1274,58 @@
     ohengList.forEach(function(o){ if(o.oh) counts[o.oh]++; });
     var goodCnt = relations.filter(function(r){ return r.grade==='길'; }).length;
     var badCnt  = relations.filter(function(r){ return r.grade==='흉'; }).length;
-    var ohengVerdict = badCnt >= 1 ? '주의 필요' : (goodCnt === relations.length ? '매우 조화로움' : goodCnt > 0 ? '조화로움' : '무난');
+    var ohengVerdict = badCnt >= 1 ? '부딪히는 기운' : (goodCnt === relations.length ? '아주 잘 흐름' : goodCnt > 0 ? '순조롭게 흐름' : '무난함');
     var ohengVerdictColor = badCnt >= 1 ? '#f44336' : (goodCnt === relations.length ? '#d4af37' : goodCnt > 0 ? '#4caf7a' : '#8b8ba8');
 
+    // 한자 오행 → 한글
+    var _OH_KR = { '木':'나무', '火':'불', '土':'흙', '金':'쇠', '水':'물' };
+    // 관계 라벨 → 쉬운 말
+    var _RELMAP = {
+      '상생(相生)': { simple: '받침', color: '#4caf7a' },
+      '역생(逆生)': { simple: '순환', color: '#8ba0c0' },
+      '상극(相剋)': { simple: '부딪힘', color: '#f44336' },
+      '극복(剋伏)': { simple: '버팀', color: '#ff9800' },
+      '비화(比和)': { simple: '같음', color: '#8b8ba8' }
+    };
+
     var ohengHtml =
-      '<div style="font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:10px;">음령오행 · 초성 자음의 오행</div>' +
+      '<div style="font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:10px;" title="음령오행 · 초성 자음의 오행">이름 속 기운의 흐름</div>' +
       '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;">';
     for (var i = 0; i < ohengList.length; i++) {
       var o = ohengList[i];
       var col = o.oh ? _OHENG_COLOR[o.oh] : '#555';
       var bg  = o.oh ? _OHENG_BG[o.oh] : 'rgba(255,255,255,0.05)';
+      var ohKr = o.oh ? (_OH_KR[o.oh]||o.oh) : '-';
       ohengHtml +=
-        '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">' +
+        '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;" title="'+(o.oh||'')+'('+ohKr+') 오행">' +
           '<div style="width:44px;height:44px;border-radius:50%;background:'+bg+';border:1.5px solid '+col+';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--text);font-family:\'Noto Serif KR\',serif;">'+o.ch+'</div>' +
-          '<div style="font-size:11px;font-weight:700;color:'+col+';">'+(o.oh||'-')+'</div>' +
+          '<div style="font-size:11px;font-weight:700;color:'+col+';">'+ohKr+'</div>' +
         '</div>';
       if (i < relations.length) {
         var r = relations[i];
+        var simple = _RELMAP[r.label] ? _RELMAP[r.label].simple : r.label.split('(')[0];
         ohengHtml +=
-          '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding-top:4px;">' +
+          '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding-top:4px;" title="'+r.label+'">' +
             '<div style="font-size:16px;color:'+r.color+';line-height:1;">→</div>' +
-            '<div style="font-size:9px;color:'+r.color+';font-weight:700;white-space:nowrap;">'+r.label.split('(')[0]+'</div>' +
+            '<div style="font-size:9px;color:'+r.color+';font-weight:700;white-space:nowrap;">'+simple+'</div>' +
           '</div>';
       }
     }
     ohengHtml += '</div>';
 
-    ohengHtml += '<div style="display:flex;justify-content:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
+    ohengHtml += '<div style="display:flex;justify-content:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">';
     ['木','火','土','金','水'].forEach(function(el) {
       var c = counts[el];
       var active = c > 0;
+      var elKr = _OH_KR[el];
       ohengHtml +=
-        '<div style="font-size:10px;padding:3px 8px;border-radius:12px;background:'+(active?_OHENG_BG[el]:'rgba(255,255,255,0.03)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;">'+el+' '+c+'</div>';
+        '<div style="font-size:10px;padding:3px 8px;border-radius:12px;background:'+(active?_OHENG_BG[el]:'rgba(255,255,255,0.03)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;" title="'+el+'('+elKr+')">'+elKr+' '+c+'</div>';
     });
     ohengHtml += '</div>';
 
     ohengHtml +=
       '<div style="text-align:center;padding-top:10px;border-top:1px solid var(--border);">' +
-        '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">오행 조화 판정</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">이름 기운의 흐름</div>' +
         '<div style="font-size:15px;font-weight:700;color:'+ohengVerdictColor+';">'+ohengVerdict+'</div>' +
       '</div>';
 
@@ -1320,38 +1348,43 @@
       var kisinEl = my.yongshinEl ? _SANGKUK[my.yongshinEl] : null;
       var hasKisin = kisinEl && nameOhengs.indexOf(kisinEl) !== -1;
 
+      var fillsWeakKr  = fillsWeak.map(function(el){ return _OH_KR[el]||el; });
+      var addsStrongKr = addsStrong.map(function(el){ return _OH_KR[el]||el; });
+
       var verdictLine = '', verdictColor = '', verdictIcon = '';
       if (hasYongshin && !hasKisin) {
-        verdictLine = '용신('+my.yongshinEl+') 보강 — 사주 균형에 매우 좋음';
+        verdictLine = '내게 필요한 기운(' + (_OH_KR[my.yongshinEl]||my.yongshinEl) + ')을 채워주는 이름';
         verdictColor = '#d4af37'; verdictIcon = '<i class="pi pi-check"></i>';
       } else if (fillsWeak.length > 0 && !hasKisin) {
-        verdictLine = '부족한 '+fillsWeak.join('·')+' 보강 — 이로운 이름';
+        verdictLine = '부족한 기운(' + fillsWeakKr.join('·') + ')을 보완해주는 이름';
         verdictColor = '#4caf7a'; verdictIcon = '<i class="pi pi-check"></i>';
       } else if (hasKisin && !hasYongshin) {
-        verdictLine = '기신('+kisinEl+')이 용신을 극 — 주의 필요';
+        verdictLine = '내 기운을 누르는 요소(' + (_OH_KR[kisinEl]||kisinEl) + ')가 섞여있어요';
         verdictColor = '#f44336'; verdictIcon = '<i class="pi pi-warning"></i>';
       } else if (addsStrong.length === uniqueNameOhengs.length && addsStrong.length > 0) {
-        verdictLine = '과다 오행('+addsStrong.join('·')+') 편중 심화';
+        verdictLine = '이미 넘치는 기운(' + addsStrongKr.join('·') + ')이 더 쌓여요';
         verdictColor = '#ff9800'; verdictIcon = '<i class="pi pi-warning"></i>';
       } else {
-        verdictLine = '사주와 무난한 관계';
+        verdictLine = '사주와 크게 부딪히지 않는 이름';
         verdictColor = '#8b8ba8'; verdictIcon = '';
       }
 
       var yEl = my.yongshinEl;
-      var sajuMiniHtml = '<div style="display:flex;justify-content:center;gap:4px;margin:8px 0 10px;flex-wrap:wrap;">';
+      var yElKr = yEl ? (_OH_KR[yEl]||yEl) : '';
+      var sajuMiniHtml = '<div style="display:flex;justify-content:center;gap:6px;margin:8px 0 10px;flex-wrap:wrap;">';
       ['木','火','土','金','水'].forEach(function(el){
         var c = my.countH[el]||0;
         var active = c > 0;
+        var elKr = _OH_KR[el];
         sajuMiniHtml +=
-          '<div style="font-size:10px;padding:2px 7px;border-radius:10px;background:'+(active?_OHENG_BG[el]:'rgba(255,255,255,0.03)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;">'+el+' '+c+'</div>';
+          '<div style="font-size:10px;padding:2px 7px;border-radius:10px;background:'+(active?_OHENG_BG[el]:'rgba(255,255,255,0.03)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;">'+elKr+' '+c+'</div>';
       });
       sajuMiniHtml += '</div>';
 
       ohengHtml +=
         '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);text-align:center;">' +
-          '<div style="font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:6px;">내 사주와 비교</div>' +
-          (yEl ? '<div style="font-size:12px;color:var(--muted);margin-bottom:2px;">내 용신 <span style="font-size:14px;font-weight:700;color:'+_OHENG_COLOR[yEl]+';">'+yEl+'</span></div>' : '') +
+          '<div style="font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:6px;">내 사주와의 관계</div>' +
+          (yEl ? '<div style="font-size:12px;color:var(--muted);margin-bottom:2px;" title="용신 '+yEl+'">내게 필요한 기운 <span style="font-size:14px;font-weight:700;color:'+_OHENG_COLOR[yEl]+';">'+yElKr+'</span></div>' : '') +
           sajuMiniHtml +
           '<div style="font-size:13px;font-weight:700;color:'+verdictColor+';line-height:1.5;">'+verdictIcon+' '+verdictLine+'</div>' +
         '</div>';
