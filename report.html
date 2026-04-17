@@ -1358,13 +1358,13 @@ function buildSajuBlock() {
 신강신약: ${_singang||sd?.strength_level_5||'미확인'} (${sd?.strength_score||''}점)
 격국: ${_geokguk||sd?.geokguk?.geok_kor||'미확인'}
 용신: ${_yongsin||sd?.yongshin?.primary||'미확인'}
-조후용신: ${sd?.johu?.needs_kor?.join('/')||'미확인'}
+조후용신: ${Array.isArray(sd?.johu?.needs_kor)?sd.johu.needs_kor.join('/'):(sd?.johu?.needs_kor||'미확인')}
 오행수: 목${sd?.five_count?.wood||0} 화${sd?.five_count?.fire||0} 토${sd?.five_count?.earth||0} 금${sd?.five_count?.metal||0} 수${sd?.five_count?.water||0}
 오행%: ${sd?.five_pct?Object.entries(sd.five_pct).map(([k,v])=>`${k}:${v}%`).join(' '):'미확인'}
 패턴: ${sd?.pattern?.type||''} ${sd?.pattern?.subtype||''}
 십신맵: ${sd?.ten_gods_map?JSON.stringify(sd.ten_gods_map):'미확인'}
 공망: ${sd?.gongmang||'미확인'}
-충합형파: ${sd?.branch_relations_kor?.join(', ')||'없음'}`;
+충합형파: ${Array.isArray(sd?.branch_relations_kor)?sd.branch_relations_kor.join(', '):(sd?.branch_relations_kor||'없음')}`;
 }
 function buildVedicBlock() {
   if (!_vedicData) return '';
