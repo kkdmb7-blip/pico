@@ -522,7 +522,7 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
-const REPORT_VERSION = 8;
+const REPORT_VERSION = 9;
 
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
@@ -1192,6 +1192,12 @@ let _napeumData = null;
 let _specialShinsalData = null;
 let _twelveUnseongExtData = null;
 let _fortuneScoreData = null;
+// Level 7
+let _guiinData = null;
+let _yanginData = null;
+let _daeunTrendData = null;
+let _balanceData = null;
+let _specialPatternData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1391,6 +1397,12 @@ async function loadAllData(withZiwei, withAstro) {
       _specialShinsalData = _rptFull['특수신살'] || null;
       _twelveUnseongExtData = _rptFull['십이운성확장'] || null;
       _fortuneScoreData = _rptFull['운세종합점수'] || null;
+      // Level 7
+      _guiinData = _rptFull['귀인분석'] || null;
+      _yanginData = _rptFull['양인살분석'] || null;
+      _daeunTrendData = _rptFull['대운트렌드'] || null;
+      _balanceData = _rptFull['사주균형'] || null;
+      _specialPatternData = _rptFull['특수패턴'] || null;
     }
   } catch(e){}
   try {
@@ -1805,6 +1817,83 @@ function buildFortuneScoreBlock() {
   return s;
 }
 
+// Level 7 block builders
+function buildGuiinBlock() {
+  if (!_guiinData) return '';
+  const d = _guiinData;
+  let s = `\n【귀인(貴人) 종합】\n`;
+  if (d.천을귀인) {
+    const locs = d.천을귀인.원국위치 ? d.천을귀인.원국위치.map(l=>l.위치).join(',') : '';
+    s += `천을귀인: ${Array.isArray(d.천을귀인.해당지지) ? d.천을귀인.해당지지.join(',') : d.천을귀인.해당지지} / 원국보유: ${d.천을귀인.원국보유 ? '있음('+locs+')' : '없음'} / 세운활성: ${d.천을귀인.세운활성 ? '활성' : '비활성'}\n`;
+  }
+  if (d.문창귀인) {
+    const locs = d.문창귀인.원국위치 ? d.문창귀인.원국위치.map(l=>l.위치).join(',') : '';
+    s += `문창귀인: ${d.문창귀인.해당지지} / 원국보유: ${d.문창귀인.원국보유 ? '있음('+locs+')' : '없음'} / 세운활성: ${d.문창귀인.세운활성 ? '활성' : '비활성'}\n`;
+  }
+  if (d.천덕귀인) s += `천덕귀인: ${d.천덕귀인.해당천간} / 원국보유: ${d.천덕귀인.원국보유 ? '있음' : '없음'}\n`;
+  if (d.월덕귀인) s += `월덕귀인: ${d.월덕귀인.해당천간} / 원국보유: ${d.월덕귀인.원국보유 ? '있음' : '없음'}\n`;
+  s += `귀인총수: ${d.귀인총수 || 0}개\n`;
+  s += '(귀인은 위기 시 도움, 인맥/후원 운을 나타내며 세운에서 활성되면 해당 해 귀인 작용 강화)\n';
+  return s;
+}
+
+function buildYanginBlock() {
+  if (!_yanginData) return '';
+  const d = _yanginData;
+  let s = `\n【양인살·겁재살】\n`;
+  s += `유형: ${d.살명} / 해당지지: ${d.해당지지}\n`;
+  s += `원국보유: ${d.원국보유 ? '있음('+( Array.isArray(d.원국위치) ? d.원국위치.join(',') : d.원국위치 )+')' : '없음'}\n`;
+  s += `세운활성: ${d.세운활성 ? '활성' : '비활성'} / 대운활성: ${d.대운활성 ? '활성' : '비활성'}\n`;
+  s += `위험도: ${d.위험도}\n`;
+  s += '(양인살은 강한 추진력이나 과격함, 겁재살은 재물 손실 위험. 세운/대운 활성 시 주의 필요)\n';
+  return s;
+}
+
+function buildDaeunTrendBlock() {
+  if (!_daeunTrendData) return '';
+  const d = _daeunTrendData;
+  let s = `\n【대운 점수 트렌드】\n`;
+  if (d.트렌드 && d.트렌드.length) {
+    d.트렌드.forEach(item => {
+      s += `${item.대운}(${item.기간}): ${item.점수}점 ${item.등급} / 12운성:${item.운성}\n`;
+    });
+  }
+  if (d.최고대운) s += `최고대운: ${d.최고대운} `;
+  if (d.최저대운) s += `최저대운: ${d.최저대운}\n`;
+  s += '(대운 트렌드는 인생 전체 흐름의 상대적 고저를 보여주는 참고 지표)\n';
+  return s;
+}
+
+function buildBalanceBlock() {
+  if (!_balanceData) return '';
+  const d = _balanceData;
+  let s = `\n【사주 균형 지수】\n`;
+  s += `음양비율: 양${d.음양.양}:음${d.음양.음} (${d.음양.판정})\n`;
+  s += `오행균형점수: ${d.오행균형.점수}/100\n`;
+  if (d.결핍오행 && d.결핍오행.length) s += `결핍오행: ${d.결핍오행.join(',')}\n`;
+  if (d.과다오행 && d.과다오행.length) s += `과다오행: ${d.과다오행.join(',')}\n`;
+  s += '(균형지수는 사주 8글자의 음양/오행 분포를 수치화한 참고 지표. 불균형이 반드시 나쁜 것은 아님)\n';
+  return s;
+}
+
+function buildSpecialPatternBlock() {
+  if (!_specialPatternData) return '';
+  const d = _specialPatternData;
+  let s = `\n【일주 특수 패턴】\n`;
+  if (d.패턴목록 && d.패턴목록.length) {
+    d.패턴목록.forEach(p => {
+      s += `${p.패턴명}: ${p.설명}\n`;
+    });
+  } else {
+    s += '특수 패턴 없음\n';
+  }
+  if (d.세운패턴 && d.세운패턴.length) {
+    s += `올해 세운 패턴: ${d.세운패턴.map(p => p.패턴명).join(', ')}\n`;
+  }
+  s += '(간여지동=복음, 천지합, 천충지합, 천합지충, 반음 등 일주·세운 간 특수 관계)\n';
+  return s;
+}
+
 function buildAccuracyLayerBlock() {
   return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
     + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
@@ -1814,7 +1903,9 @@ function buildAccuracyLayerBlock() {
     + buildJapyeongjinjeonBlock() + buildCheonsuIlganBlock() + buildJohuYongshinBlock()
     + buildDaeunSplitBlock() + buildSewunAdvancedBlock() + buildMonthlyJeolgiBlock()
     + buildGongmangBlock() + buildNapeumBlock() + buildSpecialShinsalBlock()
-    + build12UnseongExtBlock() + buildFortuneScoreBlock();
+    + build12UnseongExtBlock() + buildFortuneScoreBlock()
+    + buildGuiinBlock() + buildYanginBlock() + buildDaeunTrendBlock()
+    + buildBalanceBlock() + buildSpecialPatternBlock();
 }
 
 // ── 초기화 ──
