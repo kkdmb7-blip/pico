@@ -4006,7 +4006,7 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
         user_id: _user.id,
         messages: [{role: 'user', content: prompt}],
         system_prompt: sysPrompt,
-        mode: 'saju', max_tokens: 2000,
+        mode: 'saju', max_tokens: secIndices.length >= 3 ? 3000 : 2500,
         skip_orb: true
       })
     });
