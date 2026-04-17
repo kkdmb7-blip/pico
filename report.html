@@ -522,7 +522,7 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
-const REPORT_VERSION = 2;
+const REPORT_VERSION = 3;
 
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
@@ -1164,6 +1164,11 @@ let _samjaeData = null;
 let _twelveStarsData = null;
 let _jeolgiData = null;
 let _moonPhaseData = null;
+let _wonjinData = null;
+let _gwimungwanData = null;
+let _baekhoData = null;
+let _daeunTransitionData = null;
+let _haphwaData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1332,6 +1337,11 @@ async function loadAllData(withZiwei, withAstro) {
       _twelveStarsData = _rptFull['십이신살'] || null;
       _jeolgiData = _rptFull['절기정보'] || null;
       _moonPhaseData = _rptFull['달의상'] || null;
+      _wonjinData = _rptFull['원진살'] || null;
+      _gwimungwanData = _rptFull['귀문관살'] || null;
+      _baekhoData = _rptFull['백호대살'] || null;
+      _daeunTransitionData = _rptFull['대운전환기'] || null;
+      _haphwaData = _rptFull['합화검증'] || null;
     }
   } catch(e){}
   try {
@@ -1507,8 +1517,47 @@ function buildMoonPhaseBlock() {
 (달의 위상에 따른 에너지 흐름 — 삭: 새로운 시작, 보름: 결실·감정 고조, 하현: 정리·마무리)\n`;
 }
 
+function buildWonjinBlock() {
+  if (!_wonjinData || !_wonjinData.원진여부) return '';
+  const lines = _wonjinData.목록.map(w => `${w.관계}: ${w.설명}`);
+  return `\n【원진살】\n${lines.join('\n')}
+(원진살이 있는 주(柱) 간 관계에서 갈등·오해 가능성을 분석에 반영할 것)\n`;
+}
+
+function buildGwimungwanBlock() {
+  if (!_gwimungwanData || !_gwimungwanData.귀문관여부) return '';
+  const lines = _gwimungwanData.목록.map(g => `${g.관계}: ${g.설명}`);
+  return `\n【귀문관살】\n${lines.join('\n')}
+(영적 감수성·직관력 관련 내용을 분석에 자연스럽게 반영하되 공포 조성 금지)\n`;
+}
+
+function buildBaekhoBlock() {
+  if (!_baekhoData || !_baekhoData.백호여부) return '';
+  return `\n【백호대살 — ${_baekhoData.해당일주}】\n${_baekhoData.설명}
+(백호대살의 강렬한 에너지를 분석 주제에 맞게 자연스럽게 반영할 것)\n`;
+}
+
+function buildDaeunTransitionBlock() {
+  if (!_daeunTransitionData || !_daeunTransitionData.전환기여부) return '';
+  const lines = _daeunTransitionData.전환목록.map(t =>
+    `${t.이전대운} → ${t.새대운} (전환시점: ${t.전환시점}년, 현재차이: ${t.현재차이>0?'+':''}${t.현재차이}년)\n${t.설명}`
+  );
+  return `\n【대운 전환기 감지】\n${lines.join('\n')}
+(대운 전환기의 혼란·변동 가능성을 분석에 반드시 반영할 것. 단정적 예언은 금지)\n`;
+}
+
+function buildHaphwaBlock() {
+  if (!_haphwaData || !_haphwaData.합화검증) return '';
+  const items = _haphwaData.합화검증;
+  const lines = items.map(h => `[${h.유형}] ${h.관계} → 합화오행:${h.합화오행} / 월지:${h.월지}(${h.월지오행}) → ${h.성립여부 ? '합화 성립' : '합화 미성립'}\n  ${h.설명}`);
+  return `\n【합화(合化) 성립 검증】\n${lines.join('\n')}
+(합이 있더라도 합화 미성립이면 실질적 변환이 없음을 분석에 반영할 것)\n`;
+}
+
 function buildAccuracyLayerBlock() {
-  return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock();
+  return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
+    + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
+    + buildDaeunTransitionBlock() + buildHaphwaBlock();
 }
 
 // ── 초기화 ──
