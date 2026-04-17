@@ -1147,15 +1147,19 @@
     var name = document.getElementById('nsName').value.trim();
     if (!sur || !name) { alert('성과 이름을 입력해주세요'); return; }
 
+    var surFirst = _charS(sur[0]) || 0;
+    var surLast  = _charS(sur[sur.length-1]) || 0;
     var A = _wordS(sur);
     var B = _charS(name[0]) || 0;
-    var C = name.length > 1 ? (_charS(name[1])||0) : 0;
+    var isSingleName = name.length === 1;
+    var C = isSingleName ? 1 : (_charS(name[1])||0); // 외자명은 가성수 1 적용
+    var nameLast = isSingleName ? 1 : (_charS(name[name.length-1])||0);
 
     var scores = {
-      '정격': { val: _n81(A+B+C), desc: '전체운' },
-      '형격': { val: _n81(A+B),   desc: '사회운' },
-      '원격': { val: _n81(B+C),   desc: '내면·재능' },
-      '이격': { val: _n81(C>0 ? A+C : A+B), desc: '가정·말년' },
+      '원격': { val: _n81(B+C),              desc: '초년·재능' },
+      '형격': { val: _n81(surLast + B),      desc: '중심·사회운' },
+      '이격': { val: _n81(surFirst + nameLast), desc: '대인관계' },
+      '정격': { val: _n81(A+B+(isSingleName?0:C)), desc: '말년·전체운' },
     };
 
     var gradeColor = { '대길':'#d4af37','길':'#4caf7a','반길':'#ff9800','흉':'#f44336','대흉':'#e91e63' };
