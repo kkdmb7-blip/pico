@@ -522,7 +522,7 @@ const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
-const REPORT_VERSION = 9;
+const REPORT_VERSION = 10;
 
 const TYPE_CONFIG = {
   character: { title: '타고난 기질 리포트', orb: 500,  emoji: '🔮', focus: '타고난 기질, 성격의 본질, 장단점, 삶의 방식',
@@ -1198,6 +1198,12 @@ let _yanginData = null;
 let _daeunTrendData = null;
 let _balanceData = null;
 let _specialPatternData = null;
+// Level 8
+let _hyungChungData = null;
+let _johuPreciseData = null;
+let _tenGodPosData = null;
+let _sinsalSummaryData = null;
+let _sewunMonthlyData = null;
 
 function getSb() {
   if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY);
@@ -1403,6 +1409,12 @@ async function loadAllData(withZiwei, withAstro) {
       _daeunTrendData = _rptFull['대운트렌드'] || null;
       _balanceData = _rptFull['사주균형'] || null;
       _specialPatternData = _rptFull['특수패턴'] || null;
+      // Level 8
+      _hyungChungData = _rptFull['형충회합'] || null;
+      _johuPreciseData = _rptFull['조후정밀'] || null;
+      _tenGodPosData = _rptFull['십신궁위'] || null;
+      _sinsalSummaryData = _rptFull['신살종합'] || null;
+      _sewunMonthlyData = _rptFull['세운월별'] || null;
     }
   } catch(e){}
   try {
@@ -1891,6 +1903,78 @@ function buildSpecialPatternBlock() {
   return s;
 }
 
+// Level 8 block builders
+function buildHyungChungBlock() {
+  if (!_hyungChungData) return '';
+  const d = _hyungChungData;
+  let s = `\n【형충회합 종합】\n`;
+  s += `${d.요약}\n`;
+  if (d.판정목록 && d.판정목록.length) {
+    d.판정목록.forEach(r => {
+      s += `${r.유형} ${r.이름}: ${r.관련지지} (${r.범위})${r.완성 ? ' [완성]' : ''} — ${r.설명.substring(0,60)}\n`;
+    });
+  }
+  s += '(형>충>합 우선순위. 형충은 변동·갈등, 합은 화합·결속. 세운 활성은 올해 해당 작용 발동)\n';
+  return s;
+}
+
+function buildJohuPreciseBlock() {
+  if (!_johuPreciseData) return '';
+  const d = _johuPreciseData;
+  let s = `\n【조후용신 정밀분석】\n`;
+  s += `${d.일간}일간 ${d.계절}생 (월지:${d.월지})\n`;
+  s += `조후 필요: ${d.조후필요} — ${d.설명}\n`;
+  s += `원국충족: ${d.원국충족} / 미충족: ${d.원국미충족} (${d.충족도})\n`;
+  if (d.세운보충) s += `${d.세운보충}\n`;
+  if (d.대운보충) s += `${d.대운보충}\n`;
+  s += '(조후는 계절 기후 보완. 여름생은 수가, 겨울생은 화가 급선무. 원국에 있으면 평생 안정)\n';
+  return s;
+}
+
+function buildTenGodPosBlock() {
+  if (!_tenGodPosData) return '';
+  const d = _tenGodPosData;
+  let s = `\n【십신 궁위 분석】\n`;
+  if (d.궁위분석) {
+    d.궁위분석.forEach(g => {
+      s += `${g.위치}(${g.궁위}): ${g.글자} = ${g.십신}${g.해석 ? ' — '+g.해석.split('—')[1] : ''}\n`;
+    });
+  }
+  if (d.핵심 && d.핵심.배우자궁) s += `★배우자궁(일지): ${d.핵심.배우자궁.십신}\n`;
+  s += '(궁위=사주 각 자리의 인생 영역. 해당 자리의 십신이 그 영역에 어떤 에너지를 부여하는지 해석)\n';
+  return s;
+}
+
+function buildSinsalSummaryBlock() {
+  if (!_sinsalSummaryData) return '';
+  const d = _sinsalSummaryData;
+  let s = `\n【신살 종합 등급】\n`;
+  s += `${d.종합등급}\n`;
+  s += `길신(${d.길신수}개/${d.길점}점): ${d.길신.map(g=>g.이름+'('+g.상태+')').join(', ') || '없음'}\n`;
+  s += `흉신(${d.흉신수}개/${d.흉점}점): ${d.흉신.map(g=>g.이름+'('+g.상태+')').join(', ') || '없음'}\n`;
+  if (d.올해활성신살 && d.올해활성신살.length) s += `올해 활성: ${d.올해활성신살.join(', ')}\n`;
+  s += '(길신=귀인·역마·문창 등 도움, 흉신=양인·공망·원진 등 주의. 세운에서 활성되면 해당 해 작용 강화)\n';
+  return s;
+}
+
+function buildSewunMonthlyBlock() {
+  if (!_sewunMonthlyData) return '';
+  const d = _sewunMonthlyData;
+  let s = `\n【세운 월별 상세 흐름】\n`;
+  if (d.월별흐름) {
+    d.월별흐름.forEach(m => {
+      let line = `${m.월} ${m.월건} [${m.월간십신}/${m.월지십신}] ${m.점수}점(${m.등급})`;
+      if (m.특이사항) line += ' ⚠'+m.특이사항;
+      if (m.용신월) line += ' ★용신';
+      s += line + '\n';
+    });
+  }
+  s += `최고: ${d.최고월} / 최저: ${d.최저월}\n`;
+  s += `기회월: ${d.기회월} / 주의월: ${d.주의월}\n`;
+  s += '(월별 점수는 월간·월지 십신+용신+충합을 종합한 참고 지표. 절기 기준 월 구분)\n';
+  return s;
+}
+
 function buildAccuracyLayerBlock() {
   return buildSamjaeBlock() + buildTwelveStarsBlock() + buildJeolgiBlock() + buildMoonPhaseBlock()
     + buildWonjinBlock() + buildGwimungwanBlock() + buildBaekhoBlock()
@@ -1902,7 +1986,9 @@ function buildAccuracyLayerBlock() {
     + buildGongmangBlock() + buildNapeumBlock() + buildSpecialShinsalBlock()
     + build12UnseongExtBlock() + buildFortuneScoreBlock()
     + buildGuiinBlock() + buildYanginBlock() + buildDaeunTrendBlock()
-    + buildBalanceBlock() + buildSpecialPatternBlock();
+    + buildBalanceBlock() + buildSpecialPatternBlock()
+    + buildHyungChungBlock() + buildJohuPreciseBlock() + buildTenGodPosBlock()
+    + buildSinsalSummaryBlock() + buildSewunMonthlyBlock();
 }
 
 // ── 초기화 ──
