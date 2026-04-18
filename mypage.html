@@ -189,6 +189,14 @@ nav {
       <div class="profile-list" id="profileList"></div>
     </div>
 
+    <!-- 관리자 전용 -->
+    <div id="adminSection" style="display:none; margin-top:20px;">
+      <div class="section-title" style="color:#d4af37;">관리자</div>
+      <button onclick="goAdmin()" style="width:100%; padding:14px; border-radius:12px; background:linear-gradient(135deg,#d4af37,#c9a84c); color:#1a1a2e; border:none; font-weight:700; font-size:14px; cursor:pointer; font-family:inherit;">
+        📊 피드백 대시보드
+      </button>
+    </div>
+
     <!-- 로그아웃 -->
     <button class="logout-btn" onclick="doLogout()">로그아웃</button>
   </div>
@@ -251,6 +259,31 @@ async function init() {
   renderUser();
   fetchOrb();
   renderProfiles();
+  checkAdmin();
+}
+
+var ADMIN_UUID = '99f9f77a-2f2a-4055-ab44-421d1c070341';
+
+async function checkAdmin() {
+  try {
+    if (!currentUser || !currentUser.id) return;
+    var kakaoId = currentUser.id.startsWith('kakao_') ? currentUser.id.slice(6) : currentUser.id;
+    var r = await fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kakao_id: kakaoId, name: currentUser.name || '' })
+    });
+    var data = await r.json();
+    if (data && data.id === ADMIN_UUID) {
+      document.getElementById('adminSection').style.display = 'block';
+      localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
+    }
+  } catch(e) {}
+}
+
+function goAdmin() {
+  localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
+  location.href = 'admin.html';
 }
 
 function renderUser() {
