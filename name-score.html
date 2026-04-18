@@ -1064,6 +1064,11 @@ function renderRecommend(sur, surHanja, top) {
     if (c.ysMatch > 0) html += '<br><span style="color:#4caf7a;margin-top:4px;display:inline-block;"><i class="pi pi-check"></i> 용신 오행 ' + c.ysMatch + '자 일치</span>';
     html += '</div>';
 
+    // AI 한줄평 슬롯
+    html += '<div id="nameBlurb-'+idx+'" style="font-size:12px;color:var(--text);margin-top:10px;padding:9px 11px;background:rgba(212,175,55,0.06);border-left:2px solid var(--gold);border-radius:4px;line-height:1.55;">';
+    html += '<span style="color:var(--text-dim);"><i class="pi pi-sparkle"></i> AI 한줄평 생성 중...</span>';
+    html += '</div>';
+
     // 액션
     html += '<div style="margin-top:12px;">';
     html += '<button class="mode-tab" style="width:100%; cursor:pointer; padding:11px;" onclick="applyRecommend(\'' + sur + '\',\'' + c.name + '\')">이 이름 상세보기 →</button>';
@@ -1071,6 +1076,107 @@ function renderRecommend(sur, surHanja, top) {
     html += '</div>';
   });
   el.innerHTML = html;
+
+  // AI 한줄평 + reports 저장
+  var activeYs = (recTarget === 'other') ? _targetYongsin : _yongsin;
+  fetchNameBlurbs(sur, top, activeYs);
+}
+
+function fetchNameBlurbs(sur, top, activeYs) {
+  var ysOh = activeYs ? getYongsinOhaeng(activeYs) : '';
+  var namesList = top.map(function(c, i){
+    return (i+1)+'. '+sur+c.name+' ('+c.hanja.join('')+') 오행['+c.ohs.slice(1).join('')+'] 용신매칭'+c.ysMatch+'자';
+  }).join('\n');
+  var ysLine = activeYs ? '대상 용신: '+activeYs+' ('+ysOh+'오행)\n' : '대상 사주 정보 없음\n';
+
+  var prompt = '다음 추천 이름 5개에 대해 각각 "왜 이 이름이 이 사주에 좋은지" 한 줄(40자 이내)로 평해줘.\n' +
+    ysLine + '\n' + namesList + '\n\n' +
+    '반드시 JSON 배열로만 응답. 예: ["한줄평1","한줄평2","한줄평3","한줄평4","한줄평5"]. 다른 설명·마크다운·코드펜스 금지.';
+
+  var fullText = '';
+  fetch('https://fortuna-silk.vercel.app/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      messages: [{ role: 'user', content: prompt }],
+      system: '너는 수리성명학+사주 전문가다. 간결하고 JSON 배열만 출력한다. 다른 말 절대 금지.',
+      max_tokens: 600,
+      stream: true
+    })
+  }).then(function(r){
+    if (!r.ok) throw new Error('API');
+    var reader = r.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '';
+    function read() {
+      reader.read().then(function(chunk){
+        if (chunk.done) { finish(); return; }
+        buffer += decoder.decode(chunk.value, { stream: true });
+        var lines = buffer.split('\n'); buffer = lines.pop();
+        lines.forEach(function(line){
+          if (!line.startsWith('data:')) return;
+          var d = line.slice(5).trim();
+          if (d === '[DONE]') return;
+          try {
+            var j = JSON.parse(d);
+            var delta = j.delta && j.delta.text ? j.delta.text
+              : j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content
+              ? j.choices[0].delta.content : '';
+            if (delta) fullText += delta;
+          } catch(e){}
+        });
+        read();
+      }).catch(function(){ finish(); });
+    }
+    read();
+  }).catch(function(){ finish(); });
+
+  function finish() {
+    var blurbs = [];
+    try {
+      var m = fullText.match(/\[[\s\S]*\]/);
+      if (m) blurbs = JSON.parse(m[0]);
+    } catch(e) {}
+    top.forEach(function(_, i){
+      var slot = document.getElementById('nameBlurb-'+i);
+      if (!slot) return;
+      if (blurbs[i]) {
+        slot.innerHTML = '<i class="pi pi-sparkle" style="color:var(--gold);"></i> ' + blurbs[i];
+      } else {
+        slot.style.display = 'none';
+      }
+    });
+    saveRecommendReport(sur, top, activeYs, blurbs);
+  }
+}
+
+function saveRecommendReport(sur, top, activeYs, blurbs) {
+  var user = null;
+  try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e){}
+  if (!user) return;
+  var lines = top.map(function(c, i){
+    var base = '#'+(i+1)+' '+sur+c.name+' ('+c.hanja.join('')+') — '+c.baseTotal+'점 · 용신매칭 '+c.ysMatch+'자';
+    var blurb = blurbs && blurbs[i] ? '\n   → '+blurbs[i] : '';
+    return base + blurb;
+  }).join('\n\n');
+  var content = [
+    '【이름 추천 결과】 ' + sur + '씨',
+    '기준 용신: ' + (activeYs || '없음'),
+    lines,
+    '생성일: ' + new Date().toLocaleString('ko-KR')
+  ];
+  fetch(SB_URL + '/rest/v1/reports', {
+    method: 'POST',
+    headers: {
+      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({
+      user_id: user.id, report_type: 'name_rec',
+      content: content, orb_spent: REC_ORB_COST,
+      created_at: new Date().toISOString()
+    })
+  }).then(function(){ showToast('추천 결과가 저장되었습니다'); }).catch(function(){});
 }
 
 function applyRecommend(sur, name) {
@@ -1800,6 +1906,7 @@ function runAiAnalysis() {
         if (chunk.done) {
           btn.textContent = 'AI 심층분석 완료';
           btn.disabled = false;
+          saveAiAnalysisReport(sur, name, grades, totalScore, resultEl.textContent);
           return;
         }
         buffer += decoder.decode(chunk.value, { stream: true });
@@ -1827,6 +1934,30 @@ function runAiAnalysis() {
     btn.textContent = 'AI 심층분석 · 500 Orb';
     btn.disabled = false;
   });
+}
+
+function saveAiAnalysisReport(sur, name, grades, totalScore, resultText) {
+  var user = null;
+  try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e){}
+  if (!user || !resultText) return;
+  var content = [
+    '【AI 수리성명학 심층분석】 ' + sur + name,
+    '종합점수: ' + totalScore + '/100\n정격(인생 전체): ' + grades[0] + '\n형격(30~50대): ' + grades[1] + '\n원격(청소년·20대): ' + grades[2] + '\n이격(인간관계): ' + grades[3],
+    resultText,
+    '생성일: ' + new Date().toLocaleString('ko-KR')
+  ];
+  fetch(SB_URL + '/rest/v1/reports', {
+    method: 'POST',
+    headers: {
+      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({
+      user_id: user.id, report_type: 'name_ai',
+      content: content, orb_spent: 500,
+      created_at: new Date().toISOString()
+    })
+  }).then(function(){ showToast('심층분석이 저장되었습니다'); }).catch(function(){});
 }
 
 var toastTimer = null;
