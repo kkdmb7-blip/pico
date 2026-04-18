@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>(function(){try{var t=new URLSearchParams(location.search).get('theme');if(t==='default'){try{localStorage.removeItem('pico_theme');}catch(e){}return;}if(t&&['jade','wine','midnight','ivory'].indexOf(t)>=0){document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('pico_theme',t);}catch(e){}}else{try{var s=localStorage.getItem('pico_theme');if(s&&['jade','wine','midnight','ivory'].indexOf(s)>=0)document.documentElement.setAttribute('data-theme',s);}catch(e){}}}catch(e){}})();</script>
+<script>(function(){try{var t=new URLSearchParams(location.search).get('theme');if(t==='default'){try{localStorage.removeItem('pico_theme');}catch(e){}return;}if(t&&['obsidian','jade','wine','midnight'].indexOf(t)>=0){document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('pico_theme',t);}catch(e){}}else{try{var s=localStorage.getItem('pico_theme');if(s&&['obsidian','jade','wine','midnight'].indexOf(s)>=0)document.documentElement.setAttribute('data-theme',s);}catch(e){}}}catch(e){}})();</script>
 <title>PICO Lab · AI 운세 플랫폼</title>
-<meta name="theme-color" content="#0a0a0f">
+<meta name="theme-color" content="#f5efe4">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,6 +17,21 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
+    --bg: #f5efe4;
+    --surface: #fffbf3;
+    --surface2: #ece4d3;
+    --border: #d8ccb5;
+    --accent: #8b2a1e;
+    --accent2: #2a1f1a;
+    --text: #1a120a;
+    --text2: #4a3a2a;
+    --muted: #8a7560;
+    --gold: #a8842a;
+    --radius: 16px;
+  }
+
+  /* ── 대체 테마 (URL ?theme=obsidian|jade|wine|midnight) ── */
+  :root[data-theme="obsidian"] {
     --bg: #0a0a0f;
     --surface: #13131a;
     --surface2: #1c1c28;
@@ -27,10 +42,7 @@
     --text2: #c4c4d6;
     --muted: #8b8ba8;
     --gold: #d4af37;
-    --radius: 16px;
   }
-
-  /* ── 테마 프리뷰 (URL ?theme=jade|wine|midnight|ivory) ── */
   :root[data-theme="jade"] {
     --bg: #0a1a14;
     --surface: #0f2419;
@@ -67,18 +79,6 @@
     --muted: #8088b0;
     --gold: #d4af37;
   }
-  :root[data-theme="ivory"] {
-    --bg: #f5efe4;
-    --surface: #fffbf3;
-    --surface2: #ece4d3;
-    --border: #d8ccb5;
-    --accent: #8b2a1e;
-    --accent2: #2a1f1a;
-    --text: #1a120a;
-    --text2: #4a3a2a;
-    --muted: #8a7560;
-    --gold: #a8842a;
-  }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -110,12 +110,19 @@
     opacity: 0.4;
   }
 
-  /* ── STARS ── */
+  /* ── STARS (다크 테마에서만 노출) ── */
   #starCanvas {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 0;
+    display: none;
+  }
+  :root[data-theme="obsidian"] #starCanvas,
+  :root[data-theme="jade"] #starCanvas,
+  :root[data-theme="wine"] #starCanvas,
+  :root[data-theme="midnight"] #starCanvas {
+    display: block;
   }
   .star {
     position: absolute;
@@ -135,7 +142,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(10,10,15,0.85);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
     padding: 0 24px;
@@ -193,8 +200,14 @@
     transform: translateX(-50%);
     width: 700px;
     height: 500px;
-    background: radial-gradient(ellipse, rgba(123,94,167,0.28) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(139,42,30,0.12) 0%, transparent 70%);
     pointer-events: none;
+  }
+  :root[data-theme="obsidian"] .hero-glow,
+  :root[data-theme="jade"] .hero-glow,
+  :root[data-theme="wine"] .hero-glow,
+  :root[data-theme="midnight"] .hero-glow {
+    background: radial-gradient(ellipse, rgba(123,94,167,0.28) 0%, transparent 70%);
   }
   .hero h1 {
     font-family: 'Noto Serif KR', serif;
@@ -541,7 +554,7 @@
   }
   .saju-overlay.open { display: flex; }
   .saju-modal {
-    background: #13131a;
+    background: var(--surface);
     border: 1px solid #2a2a3d;
     border-radius: 24px;
     width: 100%;
@@ -556,7 +569,7 @@
   .saju-modal-close {
     position: absolute;
     top: 16px; right: 16px;
-    background: #1c1c28;
+    background: var(--surface2);
     border: none;
     color: #6b6b85;
     width: 32px; height: 32px;
@@ -574,9 +587,9 @@
   }
   .saju-modal-sub { font-size: 13px; color: #6b6b85; margin-bottom: 18px; word-break: keep-all; }
   .modal-profile-row { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
-  .modal-profile-btn { background:rgba(142,125,255,0.13); border:1px solid rgba(142,125,255,0.35); color:#c4b8ff; border-radius:20px; padding:7px 16px; font-size:12px; font-weight:600; cursor:pointer; font-family:'Noto Serif KR',sans-serif; white-space:nowrap; transition:background 0.15s; }
+  .modal-profile-btn { background:rgba(142,125,255,0.13); border:1px solid rgba(142,125,255,0.35); color:#6a4aa0; border-radius:20px; padding:7px 16px; font-size:12px; font-weight:600; cursor:pointer; font-family:'Noto Serif KR',sans-serif; white-space:nowrap; transition:background 0.15s; }
   .modal-profile-btn:hover { background:rgba(142,125,255,0.25); }
-  .modal-profile-select { flex:1; min-width:0; background:#1a1826; border:1px solid rgba(142,125,255,0.3); border-radius:20px; padding:7px 14px; color:#c4b8ff; font-size:12px; outline:none; font-family:'Noto Serif KR',sans-serif; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238e7dff'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:28px; }
+  .modal-profile-select { flex:1; min-width:0; background:var(--surface2); border:1px solid rgba(142,125,255,0.3); border-radius:20px; padding:7px 14px; color:#6a4aa0; font-size:12px; outline:none; font-family:'Noto Serif KR',sans-serif; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238e7dff'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:28px; }
   .saju-form-group { margin-bottom: 16px; }
   .saju-form-group label {
     display: block;
@@ -591,7 +604,7 @@
   .saju-form-group select {
     width: 100%;
     padding: 11px 14px;
-    background: #1c1c28;
+    background: var(--surface2);
     border: 1px solid #2a2a3d;
     border-radius: 10px;
     color: #f0f0f5;
@@ -601,7 +614,7 @@
     transition: border-color 0.2s;
     appearance: none;
   }
-  .saju-form-group select option { background: #1c1c28; }
+  .saju-form-group select option { background: var(--surface2); }
   .saju-form-group input:focus,
   .saju-form-group select:focus { border-color: #7b5ea7; }
   .saju-date-row { display: flex; gap: 8px; }
@@ -610,7 +623,7 @@
   .saju-gender-btn {
     flex: 1;
     padding: 10px;
-    background: #1c1c28;
+    background: var(--surface2);
     border: 1px solid #2a2a3d;
     border-radius: 10px;
     color: #6b6b85;
@@ -649,7 +662,7 @@
     margin-bottom: 20px;
   }
   .saju-pillar {
-    background: #1c1c28;
+    background: var(--surface2);
     border: 1px solid #2a2a3d;
     border-radius: 14px;
     padding: 18px 10px;
@@ -667,7 +680,7 @@
     border-radius: 100px;
   }
   .saju-strength {
-    background: #1c1c28;
+    background: var(--surface2);
     border: 1px solid #2a2a3d;
     border-radius: 14px;
     padding: 16px 18px;
@@ -679,7 +692,7 @@
   .saju-strength-label { font-size: 12px; color: #6b6b85; flex-shrink: 0; }
   .saju-strength-val { font-size: 16px; font-weight: 700; font-family: 'Noto Serif KR', serif; }
   .saju-five {
-    background: #1c1c28;
+    background: var(--surface2);
     border: 1px solid #2a2a3d;
     border-radius: 14px;
     padding: 16px 18px;
@@ -689,7 +702,7 @@
   .saju-five-bars { display: flex; flex-direction: column; gap: 7px; }
   .saju-bar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
   .saju-bar-name { width: 28px; flex-shrink: 0; font-weight: 600; }
-  .saju-bar-track { flex: 1; background: #0a0a0f; border-radius: 100px; height: 7px; overflow: hidden; }
+  .saju-bar-track { flex: 1; background: var(--bg); border-radius: 100px; height: 7px; overflow: hidden; }
   .saju-bar-fill { height: 100%; border-radius: 100px; transition: width 0.6s ease; }
   .saju-bar-pct { width: 32px; text-align: right; color: #6b6b85; flex-shrink: 0; }
   .saju-cta-btn {
@@ -861,8 +874,8 @@
 #historyDetailContent .ai-chunk p { margin-bottom:8px; }
 #historyDetailContent .ai-chunk strong { color:var(--gold); font-weight:700; }
 #historyDetailContent .ai-chunk em { font-style:italic; color:rgba(240,240,245,0.95); }
-.ai-chunk-spinner { display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.35);font-size:12px;padding:8px 0; }
-.ai-chunk-spinner::before { content:'';display:inline-block;width:16px;height:16px;border:2px solid rgba(255,130,170,0.15);border-top-color:#ff8ab0;border-radius:50%;animation:ghSpin .7s linear infinite; }
+.ai-chunk-spinner { display:flex;align-items:center;gap:8px;color:rgba(0,0,0,0.45);font-size:12px;padding:8px 0; }
+.ai-chunk-spinner::before { content:'';display:inline-block;width:16px;height:16px;border:2px solid rgba(255,130,170,0.15);border-top-color:#c0306c;border-radius:50%;animation:ghSpin .7s linear infinite; }
 .ai-chunk-spinner::after { content:'분석 중...'; }
 @keyframes ghSpin { to { transform:rotate(360deg); } }
 @keyframes ghFadeIn { from { opacity:0;transform:translateY(6px); } to { opacity:1;transform:translateY(0); } }
@@ -949,7 +962,7 @@
     <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;" id="diaryCtaTitle">오늘 하루 어땠어? <i class="pi pi-pencil"></i>️</div>
     <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px;" id="diaryCtaSub">일진 기운과 하루를 기록하면 AI가 오늘을 해석해줘</div>
     <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div style="background:rgba(123,94,167,0.15);border:1px solid rgba(123,94,167,0.3);border-radius:8px;padding:4px 10px;font-size:12px;color:#c4a7f0;" id="diaryCtaIlganText">오늘의 일진…</div>
+      <div style="background:rgba(123,94,167,0.15);border:1px solid rgba(123,94,167,0.3);border-radius:8px;padding:4px 10px;font-size:12px;color:#6a4aa0;" id="diaryCtaIlganText">오늘의 일진…</div>
       <div style="font-size:11px;color:var(--gold);font-weight:600;">기록하러 가기 ›</div>
     </div>
   </div>
@@ -980,7 +993,7 @@
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;">
     <div class="saju-form-group">
       <label>이름</label>
-      <input type="text" id="heroName" placeholder="이름을 입력해주세요" style="width:100%;background:#1c1c28;border:1px solid #2a2a3d;border-radius:10px;padding:11px 14px;color:#f0f0f5;font-size:14px;outline:none;">
+      <input type="text" id="heroName" placeholder="이름을 입력해주세요" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:#1a120a;font-size:14px;outline:none;">
     </div>
     <div class="saju-form-group">
       <label>생년월일</label>
@@ -1359,7 +1372,7 @@
         '<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;">'+lbl.title+'</div>' +
         '<div style="font-size:10px;color:var(--muted);margin-bottom:10px;">'+lbl.sub+'</div>' +
         '<div style="display:inline-block;font-size:16px;font-weight:700;color:'+col+';background:'+gradeBg[g]+';border:1.5px solid '+gradeBorder[g]+';border-radius:20px;padding:6px 16px;margin-bottom:6px;letter-spacing:0.06em;">'+easyGrade+'</div>' +
-        '<div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px;">수리 '+s.val+'</div>';
+        '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-top:4px;">수리 '+s.val+'</div>';
       grid.appendChild(card);
     });
 
@@ -1395,7 +1408,7 @@
     for (var i = 0; i < ohengList.length; i++) {
       var o = ohengList[i];
       var col = o.oh ? _OHENG_COLOR[o.oh] : '#555';
-      var bg  = o.oh ? _OHENG_BG[o.oh] : 'rgba(255,255,255,0.05)';
+      var bg  = o.oh ? _OHENG_BG[o.oh] : 'rgba(0,0,0,0.04)';
       ohengHtml +=
         '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">' +
           '<div style="width:44px;height:44px;border-radius:50%;background:'+bg+';border:1.5px solid '+col+';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--text);font-family:\'Noto Serif KR\',serif;">'+o.ch+'</div>' +
@@ -1418,7 +1431,7 @@
       var c = counts[el];
       var active = c > 0;
       ohengHtml +=
-        '<div style="font-size:10px;padding:3px 8px;border-radius:12px;background:'+(active?_OHENG_BG[el]:'rgba(255,255,255,0.03)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;">'+el+' '+c+'</div>';
+        '<div style="font-size:10px;padding:3px 8px;border-radius:12px;background:'+(active?_OHENG_BG[el]:'rgba(0,0,0,0.02)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;">'+el+' '+c+'</div>';
     });
     ohengHtml += '</div>';
 
@@ -1473,7 +1486,7 @@
         var c = my.countH[el]||0;
         var active = c > 0;
         sajuMiniHtml +=
-          '<div style="font-size:10px;padding:2px 7px;border-radius:10px;background:'+(active?_OHENG_BG[el]:'rgba(255,255,255,0.03)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;">'+el+' '+c+'</div>';
+          '<div style="font-size:10px;padding:2px 7px;border-radius:10px;background:'+(active?_OHENG_BG[el]:'rgba(0,0,0,0.02)')+';border:1px solid '+(active?_OHENG_COLOR[el]:'var(--border)')+';color:'+(active?_OHENG_COLOR[el]:'#555')+';font-weight:600;">'+el+' '+c+'</div>';
       });
       sajuMiniHtml += '</div>';
 
@@ -1498,11 +1511,11 @@
     var _total = Math.round(_gradeList.reduce(function(a,g){ return a+(_GRADE_SCORE[g]||0); },0)/4);
     var _comment = _total>=90?'매우 좋은 이름입니다. 강한 길운을 가진 이름이에요.':_total>=75?'좋은 이름입니다. 전반적으로 길한 기운이 흐릅니다.':_total>=60?'무난한 이름입니다. 일부 보완이 도움될 수 있어요.':_total>=40?'주의가 필요한 이름입니다. 개명을 고려해볼 수 있어요.':'흉한 기운이 강한 이름입니다. 전문 작명가 상담을 권장합니다.';
     document.getElementById('nsTotalScore').innerHTML =
-      '<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:8px;letter-spacing:1px;">이름 종합 점수</div>'+
+      '<div style="font-size:11px;color:rgba(0,0,0,0.65);margin-bottom:8px;letter-spacing:1px;">이름 종합 점수</div>'+
       '<div style="font-size:52px;font-weight:700;color:var(--gold);line-height:1;">'+_total+'</div>'+
-      '<div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:12px;">/ 100점</div>'+
-      '<div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:10px 0;overflow:hidden;"><div id="nsTotalFill" style="height:100%;width:0%;background:linear-gradient(90deg,#d4af37,#f5d87a);border-radius:3px;transition:width 0.8s ease;"></div></div>'+
-      '<div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;">'+_comment+'</div>';
+      '<div style="font-size:13px;color:rgba(0,0,0,0.5);margin-bottom:12px;">/ 100점</div>'+
+      '<div style="height:6px;background:rgba(0,0,0,0.08);border-radius:3px;margin:10px 0;overflow:hidden;"><div id="nsTotalFill" style="height:100%;width:0%;background:linear-gradient(90deg,#d4af37,#f5d87a);border-radius:3px;transition:width 0.8s ease;"></div></div>'+
+      '<div style="font-size:13px;color:rgba(0,0,0,0.75);line-height:1.5;">'+_comment+'</div>';
     setTimeout(function(){ var f=document.getElementById('nsTotalFill'); if(f) f.style.width=_total+'%'; },50);
 
     // ── 훅 카드 (맞춤 궁금증 유발) ──
@@ -1578,7 +1591,7 @@
         '<div style="display:flex;flex-direction:column;gap:8px;">';
     hookPoints.forEach(function(p){
       hookHtml +=
-        '<div style="display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(212,175,55,0.18);border-radius:10px;padding:10px 12px;">' +
+        '<div style="display:flex;align-items:flex-start;gap:10px;background:rgba(0,0,0,0.02);border:1px solid rgba(212,175,55,0.18);border-radius:10px;padding:10px 12px;">' +
           '<span style="color:var(--gold);font-size:16px;flex-shrink:0;line-height:1.4;">'+p.icon+'</span>' +
           '<div style="flex:1;">' +
             '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.4;">'+p.head+'</div>' +
@@ -1613,22 +1626,22 @@
       <div class="why-card" onclick="openBirthModal('astro')" style="cursor:pointer;">
         <h3>서양 점성술</h3>
         <p>당신의 우주 에너지</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#7ac4ff;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:8px;padding:4px 10px;">별자리 분석</div>
+        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#2e6ba8;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:8px;padding:4px 10px;">별자리 분석</div>
       </div>
       <div class="why-card" onclick="openBirthModal('vedic')" style="cursor:pointer;">
         <h3>베딕 점성술</h3>
         <p>카르마와 세부 운의 변화</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#b48fff;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;">베딕 분석</div>
+        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#7a4aa8;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;">베딕 분석</div>
       </div>
       <div class="why-card" onclick="openBirthModal('ziwei')" style="cursor:pointer;">
         <h3>자미두수 紫微斗數</h3>
         <p>당신의 내면 심리</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#6dd5c2;background:rgba(109,213,194,0.1);border:1px solid rgba(109,213,194,0.3);border-radius:8px;padding:4px 10px;">자미 분석</div>
+        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#2a8577;background:rgba(109,213,194,0.1);border:1px solid rgba(109,213,194,0.3);border-radius:8px;padding:4px 10px;">자미 분석</div>
       </div>
       <div class="why-card" onclick="openQimenModal()" style="cursor:pointer;">
         <h3>기문둔갑 奇門遁甲</h3>
         <p>당신의 결정적 타이밍</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#7bc67e;background:rgba(123,198,126,0.1);border:1px solid rgba(123,198,126,0.3);border-radius:8px;padding:4px 10px;">기문 포국</div>
+        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#3a8f4d;background:rgba(123,198,126,0.1);border:1px solid rgba(123,198,126,0.3);border-radius:8px;padding:4px 10px;">기문 포국</div>
       </div>
       <div class="why-card" onclick="openTarotIntro()" style="cursor:pointer;">
         <h3>타로카드</h3>
@@ -1640,7 +1653,7 @@
           <h3>궁합</h3>
           <p>사주 오행·띠·계절 조화로 보는 두 사람의 인연</p>
         </div>
-        <div style="flex-shrink:0;font-size:11px;font-weight:600;color:#ff8ab0;background:rgba(255,130,170,0.1);border:1px solid rgba(255,130,170,0.3);border-radius:8px;padding:4px 10px;">궁합 보기</div>
+        <div style="flex-shrink:0;font-size:11px;font-weight:600;color:#c0306c;background:rgba(255,130,170,0.1);border:1px solid rgba(255,130,170,0.3);border-radius:8px;padding:4px 10px;">궁합 보기</div>
       </div>
     </div>
     <p class="why-tagline">6가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
@@ -1673,40 +1686,40 @@
         <div style="font-size:11px;font-weight:600;color:var(--gold);background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=money'" style="background:var(--surface2);border:1px solid rgba(109,213,194,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(109,213,194,0.6)'" onmouseout="this.style.borderColor='rgba(109,213,194,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;color:#6dd5c2;"><i class="pi pi-coin"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#6dd5c2;margin-bottom:5px;">재물/사업 분석</div>
+        <div style="font-size:20px;margin-bottom:6px;color:#2a8577;"><i class="pi pi-coin"></i></div>
+        <div style="font-size:13px;font-weight:700;color:#2a8577;margin-bottom:5px;">재물/사업 분석</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">정밀 재물운·대운교차 데이터로 보는 돈의 흐름과 직업 적성</div>
-        <div style="font-size:11px;font-weight:600;color:#6dd5c2;background:rgba(109,213,194,0.1);border:1px solid rgba(109,213,194,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">700 Orb</div>
+        <div style="font-size:11px;font-weight:600;color:#2a8577;background:rgba(109,213,194,0.1);border:1px solid rgba(109,213,194,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">700 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=love'" style="background:var(--surface2);border:1px solid rgba(255,138,176,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,138,176,0.6)'" onmouseout="this.style.borderColor='rgba(255,138,176,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;color:#ff8ab0;"><i class="pi pi-heart"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#ff8ab0;margin-bottom:5px;">연애/결혼 분석</div>
+        <div style="font-size:20px;margin-bottom:6px;color:#c0306c;"><i class="pi pi-heart"></i></div>
+        <div style="font-size:13px;font-weight:700;color:#c0306c;margin-bottom:5px;">연애/결혼 분석</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">궁합·신살·특수패턴 정밀 분석으로 보는 연애와 인연</div>
-        <div style="font-size:11px;font-weight:600;color:#ff8ab0;background:rgba(255,138,176,0.1);border:1px solid rgba(255,138,176,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">700 Orb</div>
+        <div style="font-size:11px;font-weight:600;color:#c0306c;background:rgba(255,138,176,0.1);border:1px solid rgba(255,138,176,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">700 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=daeun'" style="background:var(--surface2);border:1px solid rgba(180,143,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(180,143,255,0.6)'" onmouseout="this.style.borderColor='rgba(180,143,255,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;color:#b48fff;"><i class="pi pi-asc"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#b48fff;margin-bottom:5px;">대운 흐름 분석</div>
+        <div style="font-size:20px;margin-bottom:6px;color:#7a4aa8;"><i class="pi pi-asc"></i></div>
+        <div style="font-size:13px;font-weight:700;color:#7a4aa8;margin-bottom:5px;">대운 흐름 분석</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">대운분리·세운교차·형충회합 정밀 데이터 기반 인생 흐름</div>
-        <div style="font-size:11px;font-weight:600;color:#b48fff;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">800 Orb</div>
+        <div style="font-size:11px;font-weight:600;color:#7a4aa8;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">800 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=year'" style="background:var(--surface2);border:1px solid rgba(122,196,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(122,196,255,0.6)'" onmouseout="this.style.borderColor='rgba(122,196,255,0.25)'">
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <div style="font-size:13px;font-weight:700;color:#7ac4ff;"><i class="pi pi-sparkle"></i> 올해 운세 상세</div>
+            <div style="font-size:13px;font-weight:700;color:#2e6ba8;"><i class="pi pi-sparkle"></i> 올해 운세 상세</div>
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">세운확장·월운절기·운세종합점수 정밀 데이터 기반 올해 전략</div>
         </div>
-        <div style="font-size:11px;font-weight:600;color:#7ac4ff;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
+        <div style="font-size:11px;font-weight:600;color:#2e6ba8;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=month'" style="background:var(--surface2);border:1px solid rgba(180,143,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(180,143,255,0.6)'" onmouseout="this.style.borderColor='rgba(180,143,255,0.25)'">
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <div style="font-size:13px;font-weight:700;color:#b48fff;"><i class="pi pi-moon"></i> 이번달 운세</div>
+            <div style="font-size:13px;font-weight:700;color:#7a4aa8;"><i class="pi pi-moon"></i> 이번달 운세</div>
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">월운절기·세운교차·형충회합 정밀 분석으로 보는 이번달</div>
         </div>
-        <div style="font-size:11px;font-weight:600;color:#b48fff;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
+        <div style="font-size:11px;font-weight:600;color:#7a4aa8;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=yongsin'" style="background:var(--surface2);border:1px solid rgba(255,200,80,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(255,200,80,0.6)'" onmouseout="this.style.borderColor='rgba(255,200,80,0.25)'">
         <div style="flex:1;">
@@ -1898,7 +1911,7 @@
         <div style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;margin-bottom:3px;">AI 운세 상담</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.5;">사주·점성술·기문 기반의 AI 심층 분석</div>
       </div>
-      <div style="font-size:11px;font-weight:600;color:#b48fff;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">무료</div>
+      <div style="font-size:11px;font-weight:600;color:#7a4aa8;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">무료</div>
     </a>
     <a href="counselor.html" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--surface2);border:1px solid rgba(194,120,78,0.3);border-radius:14px;text-decoration:none;color:var(--text);transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(194,120,78,0.6)'" onmouseout="this.style.borderColor='rgba(194,120,78,0.3)'">
       <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.1));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;"><i class="pi pi-person"></i></div>
@@ -1933,7 +1946,7 @@
         <div id="mypageName" style="font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;margin-bottom:2px;"></div>
         <div style="font-size:11px;color:var(--muted);">PICO Lab 회원</div>
       </div>
-      <div id="mypageOrbBadge" style="font-size:12px;font-weight:700;color:#7ac4ff;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:20px;padding:5px 12px;white-space:nowrap;"><i class="pi pi-sparkle"></i> — Orb</div>
+      <div id="mypageOrbBadge" style="font-size:12px;font-weight:700;color:#2e6ba8;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:20px;padding:5px 12px;white-space:nowrap;"><i class="pi pi-sparkle"></i> — Orb</div>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;">
       <button onclick="openProfilesModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
@@ -1969,11 +1982,11 @@
         <select class="modal-profile-select" id="sajuProfileSelect" onchange="fillSajuFromSaved(this.value)">
           <option value="">저장된 프로필</option>
         </select>
-        <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#e8b86d;" onclick="clearSajuForm()">새로 입력</button>
+        <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#a16d1f;" onclick="clearSajuForm()">새로 입력</button>
       </div>
       <div class="saju-form-group">
         <label>이름 (선택)</label>
-        <input type="text" id="sajuName" placeholder="이름 입력" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+        <input type="text" id="sajuName" placeholder="이름 입력" style="width:100%;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
       </div>
       <div class="saju-form-group">
         <label>생년월일</label>
@@ -1986,7 +1999,7 @@
       <div class="saju-form-group">
         <label>태어난 시간</label>
         <div style="display:flex;gap:8px;align-items:center">
-          <select id="sajuHour" style="flex:1.1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none">
+          <select id="sajuHour" style="flex:1.1;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none">
             <option value="unknown">시 모름</option>
             <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
             <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
@@ -1997,7 +2010,7 @@
             <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
             <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
           </select>
-          <select id="sajuMinute" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none"></select>
+          <select id="sajuMinute" style="flex:1;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none"></select>
         </div>
       </div>
       <div id="sajuYajasiRow" style="display:none;margin-bottom:16px">
@@ -2005,7 +2018,7 @@
           <input type="checkbox" id="sajuYajasi" style="width:15px;height:15px;flex-shrink:0;accent-color:#7b5ea7;cursor:pointer;appearance:auto;-webkit-appearance:checkbox">
           야자시 (夜子時) 적용
         </label>
-        <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;margin-left:23px">23:00~00:00을 당일 자시로 처리합니다</p>
+        <p style="font-size:11px;color:rgba(0,0,0,0.4);margin-top:4px;margin-left:23px">23:00~00:00을 당일 자시로 처리합니다</p>
       </div>
       <div class="saju-form-group">
         <label>성별</label>
@@ -2030,7 +2043,7 @@
       <select class="modal-profile-select" id="qimenProfileSelect" onchange="fillQimenFromSaved(this.value)">
         <option value="">저장된 프로필</option>
       </select>
-      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#e8b86d;" onclick="clearQimenForm()">새로 입력</button>
+      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#a16d1f;" onclick="clearQimenForm()">새로 입력</button>
     </div>
     <div class="saju-form-group">
       <label>날짜</label>
@@ -2043,7 +2056,7 @@
     <div class="saju-form-group">
       <label>시간</label>
       <div style="display:flex;gap:8px;align-items:center">
-        <select id="qmHour" style="flex:1.1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none">
+        <select id="qmHour" style="flex:1.1;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none">
           <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
           <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
           <option value="6">6시</option><option value="7">7시</option><option value="8">8시</option>
@@ -2053,7 +2066,7 @@
           <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
           <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
         </select>
-        <select id="qmMinute" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none">
+        <select id="qmMinute" style="flex:1;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none">
           <option value="0">0분</option><option value="5">5분</option><option value="10">10분</option>
           <option value="15">15분</option><option value="20">20분</option><option value="25">25분</option>
           <option value="30">30분</option><option value="35">35분</option><option value="40">40분</option>
@@ -2081,14 +2094,14 @@
     <p class="saju-modal-sub">사주로 두 사람의 인연을 분석해 드려요</p>
 
     <div style="font-size:11px;font-weight:700;color:var(--accent2);letter-spacing:1px;margin-bottom:8px;">내 정보</div>
-    <div id="ghMyInfo" style="background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:12px 14px;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:20px;">
+    <div id="ghMyInfo" style="background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:12px 14px;font-size:13px;color:rgba(0,0,0,0.65);margin-bottom:20px;">
       <span id="ghMyInfoText">불러오는 중...</span>
     </div>
 
-    <div style="font-size:11px;font-weight:700;color:#ff8ab0;letter-spacing:1px;margin-bottom:8px;">상대방 정보</div>
+    <div style="font-size:11px;font-weight:700;color:#c0306c;letter-spacing:1px;margin-bottom:8px;">상대방 정보</div>
     <div class="saju-form-group">
       <label>이름 (선택)</label>
-      <input type="text" id="ghPartnerName" placeholder="상대방 이름" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+      <input type="text" id="ghPartnerName" placeholder="상대방 이름" style="width:100%;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
     </div>
     <div class="saju-form-group">
       <label>생년월일</label>
@@ -2119,8 +2132,8 @@
     <div class="saju-form-group">
       <label>성별 (선택)</label>
       <div style="display:flex;gap:8px;">
-        <button id="ghPgMale" onclick="selectGhPartnerGender('M')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;">남성</button>
-        <button id="ghPgFemale" onclick="selectGhPartnerGender('F')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;">여성</button>
+        <button id="ghPgMale" onclick="selectGhPartnerGender('M')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);background:rgba(0,0,0,0.03);color:rgba(0,0,0,0.6);font-size:13px;cursor:pointer;">남성</button>
+        <button id="ghPgFemale" onclick="selectGhPartnerGender('F')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);background:rgba(0,0,0,0.03);color:rgba(0,0,0,0.6);font-size:13px;cursor:pointer;">여성</button>
         <button id="ghPgNone" onclick="selectGhPartnerGender('')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(201,168,76,0.4);background:rgba(201,168,76,0.08);color:#c9a84c;font-size:13px;cursor:pointer;">미지정</button>
       </div>
     </div>
@@ -2133,14 +2146,14 @@
 <div class="saju-overlay" id="gunghapResultOverlay" onclick="if(event.target===this)closeGunghapResult()" style="display:none;padding:12px;">
   <div class="saju-modal" style="padding:20px 16px 24px;max-height:92vh;overflow-y:auto;width:100%;">
     <button class="saju-modal-close" onclick="closeGunghapResult()">✕</button>
-    <h3 style="color:#ff8ab0;font-size:18px;margin-bottom:4px;"><i class="pi pi-heart"></i> 궁합 결과</h3>
-    <div id="ghResultNames" style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:12px;"></div>
+    <h3 style="color:#c0306c;font-size:18px;margin-bottom:4px;"><i class="pi pi-heart"></i> 궁합 결과</h3>
+    <div id="ghResultNames" style="font-size:12px;color:rgba(0,0,0,0.55);margin-bottom:12px;"></div>
 
     <!-- 무료: 점수 -->
     <div style="text-align:center;margin-bottom:14px;">
-      <div id="ghResScore" style="font-size:48px;font-weight:900;color:#ff8ab0;line-height:1;">--</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">/ 100점</div>
-      <div style="background:rgba(255,255,255,0.06);border-radius:999px;height:8px;margin:0 4px 8px;">
+      <div id="ghResScore" style="font-size:48px;font-weight:900;color:#c0306c;line-height:1;">--</div>
+      <div style="font-size:11px;color:rgba(0,0,0,0.45);margin-bottom:8px;">/ 100점</div>
+      <div style="background:rgba(0,0,0,0.05);border-radius:999px;height:8px;margin:0 4px 8px;">
         <div id="ghResBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#c2185b,#ff8ab0);width:0%;transition:width .6s ease;"></div>
       </div>
       <div id="ghResComment" style="font-size:14px;font-weight:700;color:#f5e0ec;"></div>
@@ -2151,14 +2164,14 @@
     <div id="ghResDetail" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px;"></div>
 
     <!-- 유료: AI 분석 버튼 -->
-    <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px;">
-      <div style="font-size:12px;font-weight:700;color:#e8b86d;margin-bottom:3px;"><i class="pi pi-crystal"></i> AI 정밀 분석 받기</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px;">두 사람의 깊은 인연을 AI가 분석합니다 · <span style="color:rgba(255,200,100,0.6);">80 Orb 사용</span></div>
-      <button id="ghAiBtn" onclick="requestGunghapAI()" style="padding:10px 24px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:10px;color:#e8b86d;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">AI 분석 시작</button>
+    <div style="border:1px solid rgba(0,0,0,0.06);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px;">
+      <div style="font-size:12px;font-weight:700;color:#a16d1f;margin-bottom:3px;"><i class="pi pi-crystal"></i> AI 정밀 분석 받기</div>
+      <div style="font-size:11px;color:rgba(0,0,0,0.45);margin-bottom:10px;">두 사람의 깊은 인연을 AI가 분석합니다 · <span style="color:rgba(255,200,100,0.6);">80 Orb 사용</span></div>
+      <button id="ghAiBtn" onclick="requestGunghapAI()" style="padding:10px 24px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:10px;color:#a16d1f;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">AI 분석 시작</button>
     </div>
 
     <!-- AI 결과 -->
-    <div id="ghResultAI" style="color:#e8e0f0;display:none;"></div>
+    <div id="ghResultAI" style="color:#1a120a;display:none;"></div>
 
     <!-- 공유 버튼 -->
     <div style="margin-top:14px;">
@@ -2180,11 +2193,11 @@
 
     <div class="saju-form-group">
       <label>이름 (선택)</label>
-      <input type="text" id="guidePersonName" placeholder="예: 우리 아빠, 김민수" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+      <input type="text" id="guidePersonName" placeholder="예: 우리 아빠, 김민수" style="width:100%;background:rgba(0,0,0,0.03);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
     </div>
     <div class="saju-form-group">
       <label>관계 (선택)</label>
-      <select id="guidePersonRel" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:14px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+      <select id="guidePersonRel" style="width:100%;background:rgba(0,0,0,0.03);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:14px;outline:none;font-family:'Noto Serif KR',sans-serif;">
         <option value="">관계 선택</option>
         <option value="부모">부모</option>
         <option value="자녀">자녀</option>
@@ -2207,7 +2220,7 @@
     <div class="saju-form-group">
       <label>태어난 시간 (선택, 모르면 비워두세요)</label>
       <div class="saju-date-row">
-        <select id="guidePersonHour" style="flex:2;background:rgba(255,255,255,0.04);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:14px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+        <select id="guidePersonHour" style="flex:2;background:rgba(0,0,0,0.03);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:14px;outline:none;font-family:'Noto Serif KR',sans-serif;">
           <option value="">시 모름</option>
           <option value="0">0시 (자시)</option>
           <option value="1">1시</option><option value="2">2시</option><option value="3">3시</option>
@@ -2219,14 +2232,14 @@
           <option value="19">19시</option><option value="20">20시</option><option value="21">21시</option>
           <option value="22">22시</option><option value="23">23시</option>
         </select>
-        <select id="guidePersonMin" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:14px;outline:none;font-family:'Noto Serif KR',sans-serif;"></select>
+        <select id="guidePersonMin" style="flex:1;background:rgba(0,0,0,0.03);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:14px;outline:none;font-family:'Noto Serif KR',sans-serif;"></select>
       </div>
     </div>
     <div class="saju-form-group">
       <label>성별</label>
       <div style="display:flex;gap:8px;">
-        <button id="guidePgMale" onclick="selectGuidePersonGender('M')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">남성</button>
-        <button id="guidePgFemale" onclick="selectGuidePersonGender('F')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">여성</button>
+        <button id="guidePgMale" onclick="selectGuidePersonGender('M')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);background:rgba(0,0,0,0.03);color:rgba(0,0,0,0.6);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">남성</button>
+        <button id="guidePgFemale" onclick="selectGuidePersonGender('F')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);background:rgba(0,0,0,0.03);color:rgba(0,0,0,0.6);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">여성</button>
       </div>
     </div>
 
@@ -2250,7 +2263,7 @@
 <div class="saju-overlay" id="historyDetailOverlay" onclick="if(event.target===this)closeHistoryDetail()" style="display:none;padding:12px;">
   <div class="saju-modal" style="padding:20px 16px 24px;max-height:92vh;overflow-y:auto;">
     <button class="saju-modal-close" onclick="closeHistoryDetail()">✕</button>
-    <h3 id="historyDetailTitle" style="color:#ff8ab0;font-size:18px;margin-bottom:12px;"></h3>
+    <h3 id="historyDetailTitle" style="color:#c0306c;font-size:18px;margin-bottom:12px;"></h3>
     <div id="historyDetailContent" style="font-size:14px;line-height:1.85;color:rgba(240,240,245,0.88);"></div>
   </div>
 </div>
@@ -2266,11 +2279,11 @@
       <select class="modal-profile-select" id="birthProfileSelect" onchange="fillBirthFromSaved(this.value)">
         <option value="">저장된 프로필</option>
       </select>
-      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#e8b86d;" onclick="clearBirthForm()">새로 입력</button>
+      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#a16d1f;" onclick="clearBirthForm()">새로 입력</button>
     </div>
     <div class="saju-form-group">
       <label>이름 (선택)</label>
-      <input type="text" id="birthName" placeholder="이름 입력" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+      <input type="text" id="birthName" placeholder="이름 입력" style="width:100%;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
     </div>
     <div class="saju-form-group">
       <label>생년월일</label>
@@ -2283,7 +2296,7 @@
     <div class="saju-form-group">
       <label>태어난 시간</label>
       <div style="display:flex;gap:8px;">
-        <select id="birthHour" style="flex:1.1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none">
+        <select id="birthHour" style="flex:1.1;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none">
           <option value="unknown">시 모름</option>
           <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
           <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
@@ -2294,7 +2307,7 @@
           <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
           <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
         </select>
-        <select id="birthMinute" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none"></select>
+        <select id="birthMinute" style="flex:1;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none"></select>
       </div>
     </div>
     <div class="saju-form-group">
@@ -2327,7 +2340,7 @@
     <div style="margin-bottom:16px;">
       <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--accent2);text-transform:uppercase;margin-bottom:8px;">추가 프로필</div>
       <div id="pm-list" style="display:flex;flex-direction:column;gap:8px;"></div>
-      <button id="pm-add-btn" onclick="toggleAddProfileForm()" style="width:100%;margin-top:8px;background:rgba(255,255,255,0.04);border:1px dashed var(--border);border-radius:10px;padding:11px;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">+ 새 프로필 추가</button>
+      <button id="pm-add-btn" onclick="toggleAddProfileForm()" style="width:100%;margin-top:8px;background:rgba(0,0,0,0.03);border:1px dashed var(--border);border-radius:10px;padding:11px;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">+ 새 프로필 추가</button>
     </div>
 
     <!-- Add Form -->
@@ -2335,7 +2348,7 @@
       <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px;">새 프로필 추가</div>
       <div class="saju-form-group">
         <label>이름</label>
-        <input type="text" id="pm-name" placeholder="이름 입력" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 12px;color:#e8e0f0;font-size:14px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+        <input type="text" id="pm-name" placeholder="이름 입력" style="width:100%;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 12px;color:#1a120a;font-size:14px;outline:none;font-family:'Noto Serif KR',sans-serif;">
       </div>
       <div class="saju-form-group">
         <label>생년월일</label>
@@ -2348,7 +2361,7 @@
       <div class="saju-form-group">
         <label>태어난 시간</label>
         <div style="display:flex;gap:8px;">
-          <select id="pm-hour" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 12px;color:#e8e0f0;font-size:14px;outline:none;">
+          <select id="pm-hour" style="flex:1;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 12px;color:#1a120a;font-size:14px;outline:none;">
             <option value="unknown">시 모름</option>
             <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
             <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
@@ -2359,7 +2372,7 @@
             <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
             <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
           </select>
-          <select id="pm-minute" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 12px;color:#e8e0f0;font-size:14px;outline:none;"></select>
+          <select id="pm-minute" style="flex:1;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 12px;color:#1a120a;font-size:14px;outline:none;"></select>
         </div>
       </div>
       <div class="saju-form-group">
@@ -2371,11 +2384,11 @@
       </div>
       <div style="display:flex;gap:8px;margin-top:4px;">
         <button class="saju-submit-btn" onclick="saveNewProfile()" style="flex:1;">저장</button>
-        <button onclick="toggleAddProfileForm()" style="flex:0.4;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:13px;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">취소</button>
+        <button onclick="toggleAddProfileForm()" style="flex:0.4;background:rgba(0,0,0,0.03);border:1px solid var(--border);border-radius:10px;padding:13px;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">취소</button>
       </div>
     </div>
 
-    <button class="saju-submit-btn" onclick="closeProfilesModal()" style="background:rgba(255,255,255,0.06);color:var(--muted);">닫기</button>
+    <button class="saju-submit-btn" onclick="closeProfilesModal()" style="background:rgba(0,0,0,0.05);color:var(--muted);">닫기</button>
   </div>
 </div>
 
@@ -2386,7 +2399,7 @@
     <p>사주 분석에 사용할 기본 정보를 입력해주세요. 한 번만 입력하면 자동으로 채워집니다.</p>
     <div class="saju-form-group">
       <label>이름</label>
-      <input type="text" id="profileName" placeholder="이름 입력" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+      <input type="text" id="profileName" placeholder="이름 입력" style="width:100%;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
     </div>
     <div class="saju-form-group">
       <label>생년월일</label>
@@ -2399,7 +2412,7 @@
     <div class="saju-form-group">
       <label>태어난 시간</label>
       <div style="display:flex;gap:8px;">
-        <select id="profileHour" style="flex:1.1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none">
+        <select id="profileHour" style="flex:1.1;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none">
           <option value="unknown">시 모름</option>
           <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
           <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
@@ -2410,7 +2423,7 @@
           <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
           <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
         </select>
-        <select id="profileMinute" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none"></select>
+        <select id="profileMinute" style="flex:1;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none"></select>
       </div>
     </div>
     <div class="saju-form-group">
@@ -2422,7 +2435,7 @@
     </div>
     <div class="saju-form-group">
       <label>출생지</label>
-      <select id="profileCity" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+      <select id="profileCity" style="width:100%;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
         <option value="서울|37.5665|126.9780|9">서울</option>
         <option value="부산|35.1796|129.0756|9">부산</option>
         <option value="인천|37.4563|126.7052|9">인천</option>
@@ -2458,7 +2471,7 @@
   position:fixed;bottom:0;left:0;width:100%;
   background:rgba(10,10,15,0.97);
   backdrop-filter:blur(20px);
-  border-top:1px solid rgba(255,255,255,0.07);
+  border-top:1px solid rgba(0,0,0,0.06);
   display:flex;align-items:stretch;
   height:60px;z-index:200;
   padding-bottom:env(safe-area-inset-bottom);
@@ -2589,7 +2602,7 @@ function selectGhPartnerGender(g) {
     } else if (pair[0] === '') {
       el.style.borderColor = 'rgba(201,168,76,0.4)'; el.style.background = 'rgba(201,168,76,0.08)'; el.style.color = '#c9a84c';
     } else {
-      el.style.borderColor = 'rgba(255,255,255,0.15)'; el.style.background = 'rgba(255,255,255,0.04)'; el.style.color = 'rgba(255,255,255,0.55)';
+      el.style.borderColor = 'rgba(0,0,0,0.12)'; el.style.background = 'rgba(0,0,0,0.03)'; el.style.color = 'rgba(0,0,0,0.6)';
     }
   });
 }
@@ -2625,8 +2638,8 @@ function openGunghapModal() {
   if (infoEl) {
     if (_ghMyProfile) {
       var gTxt = _ghMyProfile.gender === 'female' ? '여성' : '남성';
-      infoEl.innerHTML = '<span style="color:#e8e0f0;font-weight:600;">' + (_ghMyProfile.name || '나') + '</span>'
-        + '&nbsp;&nbsp;<span style="color:rgba(255,255,255,0.4);">' + _ghMyProfile.year + '년 ' + _ghMyProfile.month + '월 ' + _ghMyProfile.day + '일 · ' + gTxt + '</span>';
+      infoEl.innerHTML = '<span style="color:#1a120a;font-weight:600;">' + (_ghMyProfile.name || '나') + '</span>'
+        + '&nbsp;&nbsp;<span style="color:rgba(0,0,0,0.5);">' + _ghMyProfile.year + '년 ' + _ghMyProfile.month + '월 ' + _ghMyProfile.day + '일 · ' + gTxt + '</span>';
     } else {
       infoEl.innerHTML = '<span style="color:#f87171;">프로필을 먼저 설정해주세요 (사주 분석 메뉴에서 입력)</span>';
     }
@@ -2654,10 +2667,10 @@ function selectGuidePersonGender(g) {
   var fEl = document.getElementById('guidePgFemale');
   if (g === 'M') {
     mEl.style.borderColor = '#f08cb4'; mEl.style.background = 'rgba(240,140,180,0.12)'; mEl.style.color = '#f08cb4';
-    fEl.style.borderColor = 'rgba(255,255,255,0.15)'; fEl.style.background = 'rgba(255,255,255,0.04)'; fEl.style.color = 'rgba(255,255,255,0.55)';
+    fEl.style.borderColor = 'rgba(0,0,0,0.12)'; fEl.style.background = 'rgba(0,0,0,0.03)'; fEl.style.color = 'rgba(0,0,0,0.6)';
   } else if (g === 'F') {
     fEl.style.borderColor = '#f08cb4'; fEl.style.background = 'rgba(240,140,180,0.12)'; fEl.style.color = '#f08cb4';
-    mEl.style.borderColor = 'rgba(255,255,255,0.15)'; mEl.style.background = 'rgba(255,255,255,0.04)'; mEl.style.color = 'rgba(255,255,255,0.55)';
+    mEl.style.borderColor = 'rgba(0,0,0,0.12)'; mEl.style.background = 'rgba(0,0,0,0.03)'; mEl.style.color = 'rgba(0,0,0,0.6)';
   }
 }
 
@@ -2677,7 +2690,7 @@ function openGuideModal() {
   })();
   ['guidePgMale','guidePgFemale'].forEach(function(id){
     var el = document.getElementById(id);
-    el.style.borderColor = 'rgba(255,255,255,0.15)'; el.style.background = 'rgba(255,255,255,0.04)'; el.style.color = 'rgba(255,255,255,0.55)';
+    el.style.borderColor = 'rgba(0,0,0,0.12)'; el.style.background = 'rgba(0,0,0,0.03)'; el.style.color = 'rgba(0,0,0,0.6)';
   });
   // populate selects (재사용)
   var yEl = document.getElementById('guidePersonYear');
@@ -2776,19 +2789,19 @@ function _sajuMiniCard(saju, label, name, gender) {
   var order=['hour','day','month','year'], labs=['시','일','월','년'];
   var cols=order.map(function(k,i){
     return '<div style="text-align:center;">'
-      +'<div style="font-size:8px;color:rgba(255,255,255,0.3);margin-bottom:2px;">'+labs[i]+'</div>'
+      +'<div style="font-size:8px;color:rgba(0,0,0,0.4);margin-bottom:2px;">'+labs[i]+'</div>'
       +box(saju.stemH[k],EL_BG[saju.stemEl[k]]||'#333',EL_TC[saju.stemEl[k]]||'#fff')
       +box(saju.branchH[k],EL_BG[saju.branchEl[k]]||'#333',EL_TC[saju.branchEl[k]]||'#fff')
       +'</div>';
   }).join('');
   var gText=gender==='F'?'여성':gender==='M'?'남성':'';
   var fp=saju.fivePct;
-  return '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 8px;">'
-    +'<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:3px;">'+label+'</div>'
-    +'<div style="font-size:12px;font-weight:700;color:#e8e0f0;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(name||label)
-    +(gText?' <span style="font-size:9px;color:rgba(255,255,255,0.35);">'+gText+'</span>':'')+' <span style="font-size:9px;color:rgba(255,255,255,0.35);">'+saju.zodiac+'띠</span></div>'
+  return '<div style="background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);border-radius:10px;padding:10px 8px;">'
+    +'<div style="font-size:10px;color:rgba(0,0,0,0.4);margin-bottom:3px;">'+label+'</div>'
+    +'<div style="font-size:12px;font-weight:700;color:#1a120a;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(name||label)
+    +(gText?' <span style="font-size:9px;color:rgba(0,0,0,0.45);">'+gText+'</span>':'')+' <span style="font-size:9px;color:rgba(0,0,0,0.45);">'+saju.zodiac+'띠</span></div>'
     +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;">'+cols+'</div>'
-    +'<div style="margin-top:6px;font-size:9px;color:rgba(255,255,255,0.4);line-height:1.5;">'+saju.dayEl+' · '+saju.strength+'<br>목'+fp.목+'·화'+fp.화+'·토'+fp.토+'·금'+fp.금+'·수'+fp.수+'</div>'
+    +'<div style="margin-top:6px;font-size:9px;color:rgba(0,0,0,0.5);line-height:1.5;">'+saju.dayEl+' · '+saju.strength+'<br>목'+fp.목+'·화'+fp.화+'·토'+fp.토+'·금'+fp.금+'·수'+fp.수+'</div>'
     +'</div>';
 }
 
@@ -2944,15 +2957,15 @@ async function submitGunghap() {
   if (barEl)   { barEl.style.width = '0%'; setTimeout(function(){ barEl.style.width = score.total + '%'; }, 100); }
   if (commentEl) commentEl.textContent = score.comment;
   if (detailEl) detailEl.innerHTML =
-    '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">'
-    +'<div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:2px;">오행 조화</div>'
-    +'<div style="font-size:18px;font-weight:800;color:#ff8ab0;">'+score.oScore+'</div></div>'
-    +'<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">'
-    +'<div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:2px;">띠 궁합</div>'
-    +'<div style="font-size:18px;font-weight:800;color:#ff8ab0;">'+score.tScore+'</div></div>'
-    +'<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">'
-    +'<div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:2px;">계절 조화</div>'
-    +'<div style="font-size:18px;font-weight:800;color:#ff8ab0;">'+score.sScore+'</div></div>';
+    '<div style="background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);border-radius:8px;padding:8px;text-align:center;">'
+    +'<div style="font-size:9px;color:rgba(0,0,0,0.45);margin-bottom:2px;">오행 조화</div>'
+    +'<div style="font-size:18px;font-weight:800;color:#c0306c;">'+score.oScore+'</div></div>'
+    +'<div style="background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);border-radius:8px;padding:8px;text-align:center;">'
+    +'<div style="font-size:9px;color:rgba(0,0,0,0.45);margin-bottom:2px;">띠 궁합</div>'
+    +'<div style="font-size:18px;font-weight:800;color:#c0306c;">'+score.tScore+'</div></div>'
+    +'<div style="background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);border-radius:8px;padding:8px;text-align:center;">'
+    +'<div style="font-size:9px;color:rgba(0,0,0,0.45);margin-bottom:2px;">계절 조화</div>'
+    +'<div style="font-size:18px;font-weight:800;color:#c0306c;">'+score.sScore+'</div></div>';
   var aiBtn = document.getElementById('ghAiBtn');
   if (aiBtn) aiBtn.textContent = 'AI 분석 시작';
 
@@ -3001,14 +3014,14 @@ async function requestGunghapAI() {
   if (!myYS) { var SM={목:'화',화:'토',토:'금',금:'수',수:'목'},PM={목:'수',화:'목',토:'화',금:'토',수:'금'}; myYS = strA==='신강'?SM[ohaengA]:PM[ohaengA]; }
   if (!pYS)  { var SM2={목:'화',화:'토',토:'금',금:'수',수:'목'},PM2={목:'수',화:'목',토:'화',금:'토',수:'금'}; pYS = strB==='신강'?SM2[ohaengB]:PM2[ohaengB]; }
 
-  function boldPink(s) { return (s||'').replace(/^#{1,4}\s+.+$/gm,'').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#ff8ab0;">$1</strong>').trim(); }
+  function boldPink(s) { return (s||'').replace(/^#{1,4}\s+.+$/gm,'').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#c0306c;">$1</strong>').trim(); }
   function showChunk(id, title, html) {
     var el = document.getElementById(id);
-    var processed = (html||'').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#ff8ab0;">$1</strong>');
-    if (el) el.innerHTML = '<h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">'+title+'</h4><div style="animation:ghFadeIn .4s ease;">'+processed+'</div>';
+    var processed = (html||'').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#c0306c;">$1</strong>');
+    if (el) el.innerHTML = '<h4 style="font-size:15px;font-weight:700;color:#c0306c;margin:0 0 10px;">'+title+'</h4><div style="animation:ghFadeIn .4s ease;">'+processed+'</div>';
   }
   function showSpinner(id) { var el = document.getElementById(id); if (el) el.innerHTML = '<div class="ai-chunk-spinner"></div>'; }
-  function showError(id, title) { var el = document.getElementById(id); if (el) el.innerHTML = '<h4 style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.3);margin:0 0 4px;">'+title+'</h4><div style="font-size:12px;color:rgba(255,255,255,0.25);">분석 실패</div>'; }
+  function showError(id, title) { var el = document.getElementById(id); if (el) el.innerHTML = '<h4 style="font-size:15px;font-weight:700;color:rgba(0,0,0,0.4);margin:0 0 4px;">'+title+'</h4><div style="font-size:12px;color:rgba(0,0,0,0.3);">분석 실패</div>'; }
 
   // ── 판별 로직 ──
   var strKeyA = (strA === '신강' || strA === '신강(身强)') ? '신강' : '신약';
@@ -3114,15 +3127,15 @@ async function requestGunghapAI() {
     if (!reasons.length) reasons.push('합·충·상생 모두 비활성 — 끌림보다 무관심 가능성, 의식적 노력 필요');
 
     var html =
-      '<div style="margin-bottom:10px;font-size:13px;color:rgba(255,255,255,0.7);">' + myName + '(' + iljuA + ')의 이상형 일주는 <strong style="color:#ff8ab0;">' + idealIlju + '</strong> — ' + pNameDisp + '의 실제 일주는 <strong style="color:#ff8ab0;">' + iljuB + '</strong></div>' +
+      '<div style="margin-bottom:10px;font-size:13px;color:rgba(0,0,0,0.75);">' + myName + '(' + iljuA + ')의 이상형 일주는 <strong style="color:#c0306c;">' + idealIlju + '</strong> — ' + pNameDisp + '의 실제 일주는 <strong style="color:#c0306c;">' + iljuB + '</strong></div>' +
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">' +
-        '<div style="flex:1;height:10px;background:rgba(255,255,255,0.1);border-radius:6px;overflow:hidden;">' +
+        '<div style="flex:1;height:10px;background:rgba(0,0,0,0.08);border-radius:6px;overflow:hidden;">' +
           '<div style="height:100%;width:' + score + '%;background:linear-gradient(90deg,' + color + ',#ff8ab0);border-radius:6px;transition:width .8s ease;"></div>' +
         '</div>' +
         '<div style="font-size:20px;font-weight:700;color:' + color + ';min-width:60px;text-align:right;">' + score + '점</div>' +
       '</div>' +
       '<div style="font-size:14px;font-weight:700;color:' + color + ';margin-bottom:8px;">' + grade + '</div>' +
-      '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.7;color:rgba(255,255,255,0.75);">' + reasons.map(function(r){return '<li>' + r + '</li>';}).join('') + '</ul>';
+      '<ul style="margin:0;padding-left:18px;font-size:12.5px;line-height:1.7;color:rgba(0,0,0,0.8);">' + reasons.map(function(r){return '<li>' + r + '</li>';}).join('') + '</ul>';
 
     showChunk('chunk-idealmatch', '<i class="pi pi-heart"></i> 이상형 매칭도', html);
   })();
@@ -3166,7 +3179,7 @@ async function requestGunghapAI() {
     });
     if (!r1.ok) {
       var e1 = await r1.json().catch(function(){return{};});
-      if (e1.error === 'orb_insufficient') { aiEl.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.5);">Orb가 부족해요. 충전 후 다시 시도해주세요.</div>'; aiBtn.disabled=false; aiBtn.textContent='AI 분석 시작'; return; }
+      if (e1.error === 'orb_insufficient') { aiEl.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(0,0,0,0.55);">Orb가 부족해요. 충전 후 다시 시도해주세요.</div>'; aiBtn.disabled=false; aiBtn.textContent='AI 분석 시작'; return; }
       throw new Error(e1.error||r1.status);
     }
     var d1 = await r1.json();
@@ -3216,25 +3229,25 @@ async function requestGunghapAI() {
   else if (myYS === pYS) bowanType = '함께_보충';
   else bowanType = '한쪽_채움';
 
-  yongsinHtml += '<div style="margin-bottom:16px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">';
+  yongsinHtml += '<div style="margin-bottom:16px;padding:14px;background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.05);border-radius:12px;">';
   yongsinHtml += '<div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:8px;"><i class="pi pi-compass"></i> 두 사람의 보완 관계</div>';
   if (ctx.bowan_text && ctx.bowan_text.텍스트) {
-    yongsinHtml += '<div style="font-size:14px;color:#e8e0f0;line-height:1.7;margin-bottom:12px;">' + ctx.bowan_text.텍스트.replace(/\n/g,'<br>') + '</div>';
+    yongsinHtml += '<div style="font-size:14px;color:#1a120a;line-height:1.7;margin-bottom:12px;">' + ctx.bowan_text.텍스트.replace(/\n/g,'<br>') + '</div>';
   } else {
     var bowanLabel = bowanType === '서로_채움' ? '서로의 빈자리를 채워주는 관계' : bowanType === '함께_보충' ? '같은 숙제를 함께 풀어가는 관계' : '한 명이 더 채워주는 관계';
-    yongsinHtml += '<div style="font-size:14px;color:#e8e0f0;line-height:1.7;margin-bottom:12px;">' + bowanLabel + '</div>';
+    yongsinHtml += '<div style="font-size:14px;color:#1a120a;line-height:1.7;margin-bottom:12px;">' + bowanLabel + '</div>';
   }
   yongsinHtml += '</div>';
 
   // 용신 실천 카드
   function yongsinCard(name, ys, data) {
     if (!data) return '';
-    return '<div style="margin-bottom:12px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">'
+    return '<div style="margin-bottom:12px;padding:14px;background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.05);border-radius:12px;">'
       +'<div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:8px;"><i class="pi pi-sparkle"></i> '+name+'이 채울 기운: '+ys+'</div>'
-      +'<div style="font-size:13px;color:#e8e0f0;line-height:1.7;">'
-      +'<div style="margin-bottom:4px;"><i class="pi pi-palette"></i> <strong style="color:#ff8ab0;">색상</strong>: '+(data.색상||'')+'</div>'
-      +'<div style="margin-bottom:4px;"><i class="pi pi-compass"></i> <strong style="color:#ff8ab0;">방위</strong>: '+(data.방위||'')+'</div>'
-      +'<div style="margin-bottom:4px;"><i class="pi pi-utensils"></i>️ <strong style="color:#ff8ab0;">음식</strong>: '+(data.음식||'')+'</div>'
+      +'<div style="font-size:13px;color:#1a120a;line-height:1.7;">'
+      +'<div style="margin-bottom:4px;"><i class="pi pi-palette"></i> <strong style="color:#c0306c;">색상</strong>: '+(data.색상||'')+'</div>'
+      +'<div style="margin-bottom:4px;"><i class="pi pi-compass"></i> <strong style="color:#c0306c;">방위</strong>: '+(data.방위||'')+'</div>'
+      +'<div style="margin-bottom:4px;"><i class="pi pi-utensils"></i>️ <strong style="color:#c0306c;">음식</strong>: '+(data.음식||'')+'</div>'
       +'</div></div>';
   }
   yongsinHtml += yongsinCard(myName, myYS, ctx.a_yongsin);
@@ -3258,7 +3271,7 @@ async function requestGunghapAI() {
       })
     });
     var savedMsg = document.createElement('div');
-    savedMsg.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:rgba(255,255,255,0.35);margin-top:8px;';
+    savedMsg.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:rgba(0,0,0,0.45);margin-top:8px;';
     savedMsg.innerHTML = '<i class="pi pi-check"></i> 자동 저장됨 · 지난 분석에서 다시 볼 수 있어요';
     aiEl.appendChild(savedMsg);
   } catch(e) {}
@@ -3375,7 +3388,7 @@ async function openHistoryDetail(id) {
     titleEl.textContent = data.title || '';
     var r = data.result || {};
     var html = '';
-    if (r.score != null) html += '<div style="text-align:center;margin-bottom:16px;"><span style="font-size:42px;font-weight:900;color:#ff8ab0;">'+r.score+'</span><span style="font-size:13px;color:rgba(255,255,255,0.35);"> / 100점</span></div>';
+    if (r.score != null) html += '<div style="text-align:center;margin-bottom:16px;"><span style="font-size:42px;font-weight:900;color:#c0306c;">'+r.score+'</span><span style="font-size:13px;color:rgba(0,0,0,0.45);"> / 100점</span></div>';
     // 새 구조 (6섹션)
     if (r.sections) {
       var s = r.sections;
@@ -3393,9 +3406,9 @@ async function openHistoryDetail(id) {
     }
     // 구 구조 호환
     else {
-      if (r.step1) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;"><i class="pi pi-heart"></i> 연애 궁합</h4><div>'+_renderHistoryMarkdown(r.step1)+'</div></div>';
-      if (r.step2) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">⏰ 지금 이 시기</h4><div>'+_renderHistoryMarkdown(r.step2)+'</div></div>';
-      if (r.step3) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;"><i class="pi pi-star"></i> 서로를 위한 조언</h4><div>'+_renderHistoryMarkdown(r.step3)+'</div></div>';
+      if (r.step1) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#c0306c;margin:0 0 10px;"><i class="pi pi-heart"></i> 연애 궁합</h4><div>'+_renderHistoryMarkdown(r.step1)+'</div></div>';
+      if (r.step2) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#c0306c;margin:0 0 10px;">⏰ 지금 이 시기</h4><div>'+_renderHistoryMarkdown(r.step2)+'</div></div>';
+      if (r.step3) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#c0306c;margin:0 0 10px;"><i class="pi pi-star"></i> 서로를 위한 조언</h4><div>'+_renderHistoryMarkdown(r.step3)+'</div></div>';
     }
     contentEl.innerHTML = html || '<div style="color:var(--muted);">저장된 내용이 없습니다.</div>';
   } catch(e) { titleEl.textContent = '오류'; contentEl.textContent = e.message; }
@@ -3506,13 +3519,13 @@ function _drawGunghapCard(cb) {
     ctx.font = 'bold 12px "Noto Serif KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('● F O R T U N A', W/2, y+14);
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(PAD, y+28); ctx.lineTo(W-PAD, y+28); ctx.stroke();
     y += H_HEADER + GAP;
 
     // ── 이름 행: "나 <i class="pi pi-heart"></i> 상대방"
-    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
     ctx.font = '12px "Noto Serif KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(myName + '  ❤  ' + pName, W/2, y + H_NAMES/2);
@@ -3523,14 +3536,14 @@ function _drawGunghapCard(cb) {
     ctx.font = '900 48px "Noto Serif KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(String(score.total), W/2, y + 28);
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
     ctx.font = '11px "Noto Serif KR"';
     ctx.fillText('/ 100점', W/2, y + 54);
     y += H_SCORE;
 
     // ── 게이지 바 (height:8px, 실제와 동일)
     var barW = W - PAD*2 - 8;
-    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
     rr(PAD+4, y, barW, 8, 4); ctx.fill();
     var fillW = Math.round(barW * score.total / 100);
     var grad = ctx.createLinearGradient(PAD+4, 0, PAD+4+fillW, 0);
@@ -3558,15 +3571,15 @@ function _drawGunghapCard(cb) {
       var saju = item.saju;
 
       // 카드 배경
-      ctx.fillStyle = 'rgba(255,255,255,0.04)';
-      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.fillStyle = 'rgba(0,0,0,0.03)';
+      ctx.strokeStyle = 'rgba(0,0,0,0.06)';
       ctx.lineWidth = 1;
       rr(cx, cy, cardW, CARD_H, 10); ctx.fill(); ctx.stroke();
 
       var iy = cy + CARD_PAD;
 
       // 라벨 (10px, dim)
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
       ctx.font = '10px "Noto Serif KR"';
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       ctx.fillText(item.label, cx+8, iy+5);
@@ -3588,7 +3601,7 @@ function _drawGunghapCard(cb) {
         var py = iy;
 
         // 열 라벨 (8px)
-        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
         ctx.font = '8px "Noto Serif KR"';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText(LABS[i], px + colW4/2, py + 4);
@@ -3616,7 +3629,7 @@ function _drawGunghapCard(cb) {
       // 오행% 텍스트 (9px, dim) — 실제화면과 동일
       var fp = saju.fivePct;
       iy += CARD_COL_H + 6;
-      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
       ctx.font = '9px "Noto Serif KR"';
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       ctx.fillText(saju.dayEl+' · '+saju.strength+'  목'+fp.목+'·화'+fp.화+'·토'+fp.토+'·금'+fp.금+'·수'+fp.수, cx+8, iy+5, cardW-16);
@@ -3629,11 +3642,11 @@ function _drawGunghapCard(cb) {
     var dW = (W - PAD*2 - 8) / 3;
     dLabels.forEach(function(lbl, i) {
       var dx = PAD + i*(dW+4);
-      ctx.fillStyle = 'rgba(255,255,255,0.04)';
-      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.fillStyle = 'rgba(0,0,0,0.03)';
+      ctx.strokeStyle = 'rgba(0,0,0,0.06)';
       ctx.lineWidth = 0.5;
       rr(dx, y, dW, DETAIL_H, 8); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
       ctx.font = '9px "Noto Serif KR"';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(lbl, dx+dW/2, y+14);
@@ -3644,7 +3657,7 @@ function _drawGunghapCard(cb) {
     y += DETAIL_H + GAP;
 
     // ── 푸터
-    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
     ctx.font = '10px "Noto Serif KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('picolab.kr에서 무료로 확인하세요', W/2, y+14);
@@ -3709,7 +3722,7 @@ function shareGunghapKakao() {
 function _showToast(msg) {
   var t = document.createElement('div');
   t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#e8e0f0;padding:12px 20px;border-radius:12px;font-size:13px;font-family:"Noto Serif KR",sans-serif;z-index:9999;text-align:center;white-space:pre-line;box-shadow:0 4px 20px rgba(0,0,0,0.4);pointer-events:none;';
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#1a120a;padding:12px 20px;border-radius:12px;font-size:13px;font-family:"Noto Serif KR",sans-serif;z-index:9999;text-align:center;white-space:pre-line;box-shadow:0 4px 20px rgba(0,0,0,0.4);pointer-events:none;';
   document.body.appendChild(t);
   setTimeout(function() { t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(function(){t.remove();},400); }, 2500);
 }
@@ -4466,7 +4479,7 @@ function renderProfilesModal() {
   } else {
     list.forEach(function(p) {
       var div = document.createElement('div');
-      div.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;';
+      div.style.cssText = 'background:rgba(0,0,0,0.02);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;';
       var bdate = p.birth_date ? p.birth_date.replace(/-/g, '.') : '';
       var gender = p.gender === 'male' ? '남' : '여';
       div.innerHTML =
@@ -4913,7 +4926,7 @@ initHeroSelects();
       ? '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 10px;border-radius:12px;margin-bottom:6px;background:' + badgeClr.bg + ';border:1px solid ' + badgeClr.border + ';color:' + badgeClr.text + ';">' + badgeText + '</span><br>'
       : '';
     var interpHTML = interp
-      ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);font-size:12px;color:rgba(240,240,245,0.85);line-height:1.9;text-align:left;font-family:\'Noto Serif KR\',serif;font-weight:300;">' + interp + '</div>'
+      ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.05);font-size:12px;color:rgba(240,240,245,0.85);line-height:1.9;text-align:left;font-family:\'Noto Serif KR\',serif;font-weight:300;">' + interp + '</div>'
       : '';
     return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;">' +
       '<div style="font-size:22px;line-height:1;">' + icon + '</div>' +
@@ -5287,7 +5300,7 @@ function updateMypageTab() {
             '<div style="font-size:10px;color:rgba(155,143,176,0.6);letter-spacing:0.03em;">'+doorNameMap[it.door]+'門 · 일가 포국</div></div>'+
             '<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;color:'+(GRADE_COLOR[it.grade]||'#9b8fb0')+';background:rgba(0,0,0,0.25);border:1px solid '+(GRADE_COLOR[it.grade]||'#9b8fb0')+'25;letter-spacing:0.05em;">'+it.grade+'</div>'+
           '</div>'+
-          '<div style="font-size:14px;font-weight:300;color:#e8e0f0;line-height:1.7;letter-spacing:-0.01em;">'+it.kw+'</div>'+
+          '<div style="font-size:14px;font-weight:300;color:#1a120a;line-height:1.7;letter-spacing:-0.01em;">'+it.kw+'</div>'+
           '<div style="margin-top:12px;text-align:right;"><a href="#" onclick="event.preventDefault();goQimenDetail()" style="font-size:10px;color:rgba(167,139,250,0.6);text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
         };})(item,card);
       }
@@ -5623,7 +5636,7 @@ window.togglePushSubscription = async function() {
       '<div style="background:linear-gradient(160deg,var(--surface) 0%,rgba(45,27,78,0.6) 100%);border:1px solid rgba(212,175,55,0.2);border-radius:18px;padding:16px 18px;">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
           '<span style="font-size:10px;color:rgba(212,175,55,0.55);letter-spacing:0.12em;font-weight:600;"><i class="pi pi-sparkle"></i> 오늘의 우주 메시지</span>' +
-          '<button id="btnDismissQuote" style="background:none;border:none;color:rgba(255,255,255,0.25);font-size:16px;cursor:pointer;line-height:1;padding:0 2px;">✕</button>' +
+          '<button id="btnDismissQuote" style="background:none;border:none;color:rgba(0,0,0,0.3);font-size:16px;cursor:pointer;line-height:1;padding:0 2px;">✕</button>' +
         '</div>' +
         '<p style="font-size:14px;font-style:italic;color:var(--text);line-height:1.75;margin:0 0 6px;font-family:\'Noto Serif KR\',serif;">&ldquo;' + esc(data.quote) + '&rdquo;</p>' +
         '<p style="font-size:11px;color:rgba(212,175,55,0.6);margin:0 0 10px;letter-spacing:0.04em;">— ' + esc(data.source) + '</p>' +
