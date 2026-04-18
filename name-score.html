@@ -1293,36 +1293,18 @@ function fetchNameBlurbs(sur, top, activeYs) {
       skip_orb: true,
       messages: [{ role: 'user', content: prompt }],
       system_prompt: '너는 수리성명학+사주 전문가다. 간결하고 JSON 배열만 출력한다. 다른 말 절대 금지.',
-      max_tokens: 600,
-      stream: true
+      max_tokens: 600
     })
   }).then(function(r){
-    if (!r.ok) throw new Error('API');
-    var reader = r.body.getReader();
-    var decoder = new TextDecoder();
-    var buffer = '';
-    function read() {
-      reader.read().then(function(chunk){
-        if (chunk.done) { finish(); return; }
-        buffer += decoder.decode(chunk.value, { stream: true });
-        var lines = buffer.split('\n'); buffer = lines.pop();
-        lines.forEach(function(line){
-          if (!line.startsWith('data:')) return;
-          var d = line.slice(5).trim();
-          if (d === '[DONE]') return;
-          try {
-            var j = JSON.parse(d);
-            var delta = j.delta && j.delta.text ? j.delta.text
-              : j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content
-              ? j.choices[0].delta.content : '';
-            if (delta) fullText += delta;
-          } catch(e){}
-        });
-        read();
-      }).catch(function(){ finish(); });
-    }
-    read();
-  }).catch(function(){ finish(); });
+    if (!r.ok) throw new Error('API ' + r.status);
+    return r.json();
+  }).then(function(d){
+    fullText = (d && (d.reply || d.content || d.text)) || '';
+    finish();
+  }).catch(function(err){
+    console.warn('blurb fetch 실패:', err);
+    finish();
+  });
 
   function finish() {
     var blurbs = [];
@@ -1740,35 +1722,18 @@ function fetchChildBlurbs(sur, top) {
       skip_orb: true,
       messages: [{ role: 'user', content: prompt }],
       system_prompt: '너는 작명·사주 전문가다. 간결하고 JSON 배열만 출력한다.',
-      max_tokens: 700, stream: true
+      max_tokens: 700
     })
   }).then(function(r){
-    if (!r.ok) throw new Error('API');
-    var reader = r.body.getReader();
-    var decoder = new TextDecoder();
-    var buffer = '';
-    function read() {
-      reader.read().then(function(chunk){
-        if (chunk.done) { finish(); return; }
-        buffer += decoder.decode(chunk.value, {stream:true});
-        var lines = buffer.split('\n'); buffer = lines.pop();
-        lines.forEach(function(line){
-          if (!line.startsWith('data:')) return;
-          var d = line.slice(5).trim();
-          if (d === '[DONE]') return;
-          try {
-            var j = JSON.parse(d);
-            var delta = j.delta && j.delta.text ? j.delta.text
-              : j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content
-              ? j.choices[0].delta.content : '';
-            if (delta) fullText += delta;
-          } catch(e){}
-        });
-        read();
-      }).catch(function(){ finish(); });
-    }
-    read();
-  }).catch(function(){ finish(); });
+    if (!r.ok) throw new Error('API ' + r.status);
+    return r.json();
+  }).then(function(d){
+    fullText = (d && (d.reply || d.content || d.text)) || '';
+    finish();
+  }).catch(function(err){
+    console.warn('child blurb 실패:', err);
+    finish();
+  });
 
   function finish() {
     var blurbs = [];
@@ -2537,42 +2502,19 @@ function runAiAnalysis() {
       skip_orb: true,
       messages: [{ role: 'user', content: prompt }],
       system_prompt: '당신은 수리성명학 전문가입니다. 이름의 수리 에너지를 깊이 분석하여 실질적인 조언을 제공합니다.',
-      max_tokens: 1200,
-      stream: true
+      max_tokens: 1200
     })
   })
   .then(function(r) {
     if (!r.ok) return r.text().then(function(t){ throw new Error('API ' + r.status + ': ' + (t||'').slice(0,100)); });
-    var reader = r.body.getReader();
-    var decoder = new TextDecoder();
-    var buffer = '';
-    function read() {
-      reader.read().then(function(chunk) {
-        if (chunk.done) {
-          btn.textContent = 'AI 심층분석 완료';
-          btn.disabled = false;
-          saveAiAnalysisReport(sur, name, grades, totalScore, resultEl.textContent);
-          return;
-        }
-        buffer += decoder.decode(chunk.value, { stream: true });
-        var lines = buffer.split('\n');
-        buffer = lines.pop();
-        lines.forEach(function(line) {
-          if (!line.startsWith('data:')) return;
-          var d = line.slice(5).trim();
-          if (d === '[DONE]') return;
-          try {
-            var j = JSON.parse(d);
-            var delta = j.delta && j.delta.text ? j.delta.text
-              : j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content
-              ? j.choices[0].delta.content : '';
-            if (delta) resultEl.textContent += delta;
-          } catch(e) {}
-        });
-        read();
-      }).catch(function() { btn.disabled = false; });
-    }
-    read();
+    return r.json();
+  })
+  .then(function(d){
+    var text = (d && (d.reply || d.content || d.text)) || '';
+    resultEl.textContent = text;
+    btn.textContent = 'AI 심층분석 완료';
+    btn.disabled = false;
+    if (text) saveAiAnalysisReport(sur, name, grades, totalScore, text);
   })
   .catch(function(err) {
     console.error('AI 심층분석 오류:', err);
