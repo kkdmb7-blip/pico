@@ -2537,7 +2537,7 @@ function renderIntro() {
       subjEl.style.cssText = 'margin:14px auto 4px;padding:10px 14px;background:rgba(240,140,180,0.1);border:1px solid rgba(240,140,180,0.3);border-radius:10px;font-size:13px;color:#f0c8d8;text-align:center;max-width:380px;';
       document.querySelector('.intro-header').appendChild(subjEl);
     }
-    const hourTxt = (_profile.hour === 'unknown' || _profile.hour === undefined || _profile.hour === null || _profile.hour === '') ? '시 모름' : (_profile.hour + '시');
+    const hourTxt = (_profile.hour === 'unknown' || _profile.hour === undefined || _profile.hour === null || _profile.hour === '') ? '시 모름' : (_profile.hour + '시' + (_profile.minute ? ' ' + _profile.minute + '분' : ''));
     const genTxt = (_profile.gender === 'F' || _profile.gender === 'female') ? '여성' : '남성';
     const relTxt = _profile.relation ? ' · <span style="color:#f08cb4;font-weight:700;">' + _profile.relation + '</span>' : '';
     subjEl.innerHTML = '<span style="font-size:11px;color:rgba(255,255,255,0.5);">분석 대상</span><br><span style="font-size:14px;font-weight:700;color:#fff;">' + (_profile.name || '이 사람') + '</span>' + relTxt + '<br><span style="font-size:12px;color:rgba(255,255,255,0.6);">' + _profile.year + '년 ' + _profile.month + '월 ' + _profile.day + '일 · ' + hourTxt + ' · ' + genTxt + '</span>';
@@ -2825,6 +2825,7 @@ async function generateReport() {
   if (_type === 'timing')       { await generateTimingReport();      return; }
   if (_type === 'wealth_timing'){ await generateWealthTimingReport(); return; }
   if (_type === 'classic')      { await generateClassicReport();     return; }
+  if (_type === 'guide')        { await generateGuideReport();       return; }
   // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
@@ -4063,6 +4064,30 @@ async function generateFamilyReport() {
   const prompt = `${profileStr}\n\n${sb2}\n${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n십신궁위 참고: 년주=조상·부모(아버지) 궁, 월주=부모(어머니)·형제 궁, 일지=배우자 궁, 시주=자녀 궁\n\n섹션 구성:\n1. 부모·윗사람 인연 구조 — 년주·월주의 십신과 관계로 본 부모와의 인연. 인성(어머니)·편재/정재(아버지) 위치와 강약. 부모로부터 받는 에너지와 갈등 패턴. 귀인이 년월에 있으면 부모 복.\n2. 배우자·자녀 인연 구조 — 일지(배우자궁)의 십신으로 본 배우자 기질과 궁합 패턴. 시주의 십신으로 본 자녀 인연과 자녀 성향. 원진살·귀문관살이 배우자·자녀궁에 있으면 구체적 영향.\n3. 가족 관계 개선 전략 — 약한 인연을 보완하는 구체적 방법. 갈등이 예상되는 관계의 소통 전략. 귀인 활용법. 용신(${ysFinal}) 기반 가족 관계 개운법 3가지.\n\n총 600~800자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt, [0,1,2], '가족·인연 분석', ysFinal, '', true);
   try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
+// ── 이 사람 사용설명서 (관계 매뉴얼) ──
+async function generateGuideReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const pillars = _sdFull?.summary?.pillars || {};
+  const fivePctStr = _sdFull?.five_pct ? Object.entries(_sdFull.five_pct).map(([k,v])=>`${k}:${v}%`).join(' ') : '미확인';
+  const tenGodsStr = _sdFull?.ten_gods_map ? Object.entries(_sdFull.ten_gods_map).map(([k,v])=>`${k}:${v}`).join(', ') : '미확인';
+  const relTxt = _profile?.relation ? `(독자와의 관계: ${_profile.relation})` : '';
+  const subjectStr = `분석 대상: ${_profile?.name||'이 사람'} ${relTxt} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'}`;
+
+  const promptA = `${subjectStr}\n\n${sb2}${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n오행 분포: ${fivePctStr}\n신강도: ${_singang||'미확인'} / 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal}\n십신 분포: ${tenGodsStr}\n\n중요: 이 리포트는 당사자가 아니라 그를 가까이에서 대하는 사람을 위한 가이드입니다. 반드시 제3자 관찰자 시점("이 사람은~", "상대는~")으로 작성하세요. 2인칭("당신은~") 절대 금지.\n\n섹션 구성:\n1. 이 사람의 성격 핵심 (3줄 요약) — 일간(${_ilju||'미확인'})·격국·신강도 기반으로 이 사람을 한눈에 파악할 수 있는 3줄 요약. 첫인상·진짜 모습·말 못하는 욕구 한 줄씩. 약 300자.\n2. 대화할 때 주의할 포인트 — 어떤 말투·주제에 민감한지, 어떻게 말을 꺼내야 잘 받아들이는지. 십신 분포(특히 관성·인성·식상)와 일지 배우자궁 기반으로 의사소통 스타일과 지뢰 지점을 구체적 예문과 함께. 약 600자.\n3. 스트레스 받을 때·화났을 때 대처법 — 이 사람이 화가 났을 때 보이는 패턴(억누름/폭발/회피 중 어느 쪽), 풀어주는 데 효과적인 방법, 절대 하면 안 되는 반응. 신강/신약과 비겁·식상 기반. 약 500자.\n\n총 1300~1500자. 섹션 번호(1. 2. 3.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+  await streamToSections(promptA, [0,1,2], '이 사람 사용설명서', ysFinal, '', false);
+
+  const promptB = `${subjectStr}\n\n${sb2}${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n오행 분포: ${fivePctStr}\n신강도: ${_singang||'미확인'} / 용신: ${ysFinal}\n십신 분포: ${tenGodsStr}\n\n섹션 구성:\n4. 신뢰를 얻고 마음을 여는 방법 — 이 사람이 마음을 여는 데 시간이 얼마나 걸리는지, 어떤 행동·태도가 신뢰를 쌓는지. 인성·재성·관성의 강약 기반. 구체적 행동 팁 3~4가지. 약 500자.\n5. 절대 피해야 할 말과 행동 — 이 사람을 가장 빠르게 멀어지게 하는 말·행동. 자존심·콤플렉스·가치관과 충돌하는 영역을 격국·십신·원진살 기반으로. 구체 예문 포함. 약 400자.\n\n총 800~1000자. 섹션 번호(4. 5.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+  await streamToSections(promptB, [3,4], '이 사람 사용설명서', ysFinal, '', true);
+
+  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   document.getElementById('regenNote').textContent=`다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`;
