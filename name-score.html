@@ -1199,7 +1199,9 @@ function runRecommend() {
   }
 }
 
+var _lastRecTop = [], _lastRecSur = '', _lastRecSurHanja = '';
 function renderRecommend(sur, surHanja, top) {
+  _lastRecTop = top; _lastRecSur = sur; _lastRecSurHanja = surHanja;
   var el = document.getElementById('recommendResult');
   if (!top.length) {
     el.innerHTML = '<div class="analysis-card" style="text-align:center; color:var(--text-dim); line-height:1.8;">추천 가능한 이름 조합을 찾지 못했습니다.<br><span style="font-size:11px;">음오행 상극 조건 때문에 조합이 나오지 않을 수 있습니다.</span></div>';
@@ -1260,7 +1262,7 @@ function renderRecommend(sur, surHanja, top) {
 
     // 액션
     html += '<div style="margin-top:12px;">';
-    html += '<button class="mode-tab" style="width:100%; cursor:pointer; padding:11px;" onclick="applyRecommend(\'' + sur + '\',\'' + c.name + '\')">이 이름 상세보기 →</button>';
+    html += '<button class="mode-tab" style="width:100%; cursor:pointer; padding:11px;" onclick="applyRecommend(' + idx + ')">이 이름 상세보기 →</button>';
     html += '</div>';
     html += '</div>';
   });
@@ -1785,13 +1787,39 @@ function saveChildReport(sur, top, blurbs) {
   }).then(function(){ showToast('아이 작명 결과가 저장되었습니다'); }).catch(function(){});
 }
 
-function applyRecommend(sur, name) {
-  setMode('auto');
+var _inDetailFromRec = false;
+function applyRecommend(idx) {
+  var c = _lastRecTop[idx];
+  if (!c) return;
+  var sur = _lastRecSur;
+  setMode('select');
   document.getElementById('inputSur').value = sur;
-  document.getElementById('inputName').value = name;
+  document.getElementById('inputName').value = c.name;
+  // hanjaSelected 채움: 추천된 정확한 한자/획수/오행 적용
+  hanjaSelected = {};
+  hanjaSelected['sur'] = c.strokes[0];
+  hanjaSelected['sur_hj'] = _lastRecSurHanja;
+  hanjaSelected['sur_oh'] = c.ohs[0];
+  for (var i = 0; i < c.name.length; i++) {
+    hanjaSelected['name'+i] = c.strokes[i+1];
+    hanjaSelected['name'+i+'_hj'] = c.hanja[i];
+    hanjaSelected['name'+i+'_oh'] = c.ohs[i+1];
+  }
+  _inDetailFromRec = true;
+  try { history.pushState({ view: 'name-detail' }, '', location.href); } catch(e){}
   calcScore();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+window.addEventListener('popstate', function() {
+  if (_inDetailFromRec) {
+    _inDetailFromRec = false;
+    setMode('recommend');
+    var rr = document.getElementById('recommendResult');
+    if (rr) rr.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
 
 function onNameInput() {
   if (currentMode === 'select') renderHanjaSelect();
