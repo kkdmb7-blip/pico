@@ -943,20 +943,33 @@ function fetchTargetYongsin(cb) {
   var minute = minEl ? (parseInt(minEl.value) || 0) : 0;
   if (!y || !m || !d) { showToast('생년월일을 모두 입력해주세요', true); return; }
   var g = recGender === 'F' ? 'F' : 'M';
+  var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  var timedOut = false;
+  var timer = setTimeout(function(){
+    timedOut = true;
+    if (ctrl) ctrl.abort();
+  }, 15000);
   fetch('https://fortuna.kkdmb7.workers.dev/saju-report', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ name: '대상', gender: g, year: y, month: m, day: d, hour: h, minute: minute })
+    body: JSON.stringify({ name: '대상', gender: g, year: y, month: m, day: d, hour: h, minute: minute }),
+    signal: ctrl ? ctrl.signal : undefined
   })
   .then(function(r){ return r.json(); })
   .then(function(data){
+    clearTimeout(timer);
     _targetYongsin = data.yongshin || data.yongsin || null;
     updateTargetHint();
+    if (!_targetYongsin) {
+      showToast('용신 정보를 받지 못했어요. 잠시 후 다시 시도해주세요', true);
+      return; // 재귀 차단: cb 호출하지 않음
+    }
     if (cb) cb();
   })
   .catch(function(){
-    showToast('사주 계산 실패. 다시 시도해주세요', true);
-    if (cb) cb();
+    clearTimeout(timer);
+    showToast(timedOut ? '응답 지연으로 중단했어요. 다시 시도해주세요' : '사주 계산 실패. 다시 시도해주세요', true);
+    // 재귀 차단: cb 호출하지 않음. 사용자가 버튼을 다시 눌러야 재시도
   });
 }
 
@@ -1348,24 +1361,36 @@ function fetchChildYongsin(cb) {
 
   var API = 'https://fortuna.kkdmb7.workers.dev/saju-report';
   var headers = {'Content-Type':'application/json'};
+  var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  var timedOut = false;
+  var timer = setTimeout(function(){ timedOut = true; if (ctrl) ctrl.abort(); }, 20000);
+  var fetchOpt = ctrl ? { signal: ctrl.signal } : {};
   var calls = [
-    fetch(API, { method:'POST', headers:headers, body: JSON.stringify({ name:'아이', gender:childGender, year:y, month:m, day:d, hour:h, minute:minute }) })
+    fetch(API, Object.assign({ method:'POST', headers:headers, body: JSON.stringify({ name:'아이', gender:childGender, year:y, month:m, day:d, hour:h, minute:minute }) }, fetchOpt))
       .then(function(r){ return r.json(); })
   ];
   calls.push(hasDad
-    ? fetch(API, { method:'POST', headers:headers, body: JSON.stringify({ name:'아빠', gender:'M', year:dy, month:dm, day:dd, hour:dh, minute:0 }) }).then(function(r){ return r.json(); })
+    ? fetch(API, Object.assign({ method:'POST', headers:headers, body: JSON.stringify({ name:'아빠', gender:'M', year:dy, month:dm, day:dd, hour:dh, minute:0 }) }, fetchOpt)).then(function(r){ return r.json(); })
     : Promise.resolve(null));
   calls.push(hasMom
-    ? fetch(API, { method:'POST', headers:headers, body: JSON.stringify({ name:'엄마', gender:'F', year:my, month:mm, day:md, hour:mh, minute:0 }) }).then(function(r){ return r.json(); })
+    ? fetch(API, Object.assign({ method:'POST', headers:headers, body: JSON.stringify({ name:'엄마', gender:'F', year:my, month:mm, day:md, hour:mh, minute:0 }) }, fetchOpt)).then(function(r){ return r.json(); })
     : Promise.resolve(null));
 
   Promise.all(calls).then(function(res) {
+    clearTimeout(timer);
     _childYongsin = res[0] ? (res[0].yongshin || res[0].yongsin) : null;
     _dadYongsin = res[1] ? (res[1].yongshin || res[1].yongsin) : null;
     _momYongsin = res[2] ? (res[2].yongshin || res[2].yongsin) : null;
+    if (!_childYongsin) {
+      showToast('아이 용신 정보를 받지 못했어요. 다시 시도해주세요', true);
+      _childYongsinKey = null; // 캐시 무효화
+      return; // 재귀 차단
+    }
     if (cb) cb();
   }).catch(function(){
-    showToast('사주 계산 실패', true);
+    clearTimeout(timer);
+    _childYongsinKey = null;
+    showToast(timedOut ? '응답 지연으로 중단했어요. 다시 시도해주세요' : '사주 계산 실패. 다시 시도해주세요', true);
   });
 }
 
