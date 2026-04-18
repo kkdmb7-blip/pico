@@ -4392,7 +4392,7 @@ function splitIntoSections(text, count, startNum) {
 
 // ── Kakao SDK 초기화 ──
 if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
-  Kakao.init('0c8f16db31d8b01ae2fc9cc2c7c56ea7');
+  Kakao.init('2543c896dead8185e2edfa0976396f25');
 }
 
 // ── 상담 배너 표시 ──
@@ -4523,28 +4523,46 @@ function showEasyResult(text) {
 
 // ── 카카오 공유 ──
 function shareKakao() {
-  const url = location.href;
-  const title = '✨ ' + (_config?.title || 'AI 운세 리포트');
-  const desc = 'FORTUNA에서 AI가 분석한 나만의 운세 리포트를 확인해보세요!';
-  if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
+  try {
+    const url = location.href;
+    const title = '✨ ' + (_config?.title || 'AI 운세 리포트');
+    // 쉽게설명 캐시가 있으면 그 첫 줄을 description으로
+    let desc = 'FORTUNA에서 AI가 분석한 나만의 운세 리포트를 확인해보세요!';
+    try {
+      const simpleCache = window._simpleCache;
+      if (simpleCache) {
+        const firstSimple = Object.values(simpleCache).find(v => v && v.length > 0);
+        if (firstSimple) desc = firstSimple.slice(0, 180);
+      }
+    } catch(e) {}
+
+    if (typeof Kakao === 'undefined') {
+      alert('카카오 SDK 로드 실패. 네트워크/광고차단 확인 후 다시 시도.');
+      return;
+    }
+    if (!Kakao.isInitialized()) {
+      try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {}
+    }
+    if (!Kakao.Share) {
+      alert('Kakao.Share 미지원 (SDK 버전 문제). navigator.share로 대체.');
+      if (navigator.share) return navigator.share({ title, text: desc, url });
+      navigator.clipboard?.writeText(url).then(()=>alert('링크가 복사됐어요!'));
+      return;
+    }
+
     Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
         title: title,
         description: desc,
-        imageUrl: 'https://picolab.kr/og-image.png',
+        imageUrl: 'https://picolab.kr/icon.svg',
         link: { mobileWebUrl: url, webUrl: url }
       },
       buttons: [{ title: '리포트 보기', link: { mobileWebUrl: url, webUrl: url } }]
     });
-  } else {
-    // SDK 로드 실패 시 fallback
-    if (navigator.share) {
-      navigator.share({ title: title, text: desc, url: url });
-    } else {
-      navigator.clipboard && navigator.clipboard.writeText(url)
-        .then(() => alert('링크가 복사됐어요!'));
-    }
+  } catch(e) {
+    alert('공유 실패: ' + (e && e.message ? e.message : e));
+    console.error('[shareKakao]', e);
   }
 }
 </script>
