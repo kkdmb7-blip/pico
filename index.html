@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>(function(){try{var t=new URLSearchParams(location.search).get('theme');if(t==='default'){try{localStorage.removeItem('pico_theme');}catch(e){}return;}if(t&&['jade','wine','midnight','ivory'].indexOf(t)>=0){document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('pico_theme',t);}catch(e){}}else{try{var s=localStorage.getItem('pico_theme');if(s&&['jade','wine','midnight','ivory'].indexOf(s)>=0)document.documentElement.setAttribute('data-theme',s);}catch(e){}}}catch(e){}})();</script>
 <title>PICO Lab · AI 운세 플랫폼</title>
 <meta name="theme-color" content="#0a0a0f">
 <meta name="mobile-web-app-capable" content="yes">
@@ -27,6 +28,56 @@
     --muted: #8b8ba8;
     --gold: #d4af37;
     --radius: 16px;
+  }
+
+  /* ── 테마 프리뷰 (URL ?theme=jade|wine|midnight|ivory) ── */
+  :root[data-theme="jade"] {
+    --bg: #0a1a14;
+    --surface: #0f2419;
+    --surface2: #163628;
+    --border: #2a5440;
+    --accent: #5fa878;
+    --accent2: #d4af37;
+    --text: #ecf2ea;
+    --text2: #c6d2c0;
+    --muted: #8aa496;
+    --gold: #e0c66a;
+  }
+  :root[data-theme="wine"] {
+    --bg: #1a0a10;
+    --surface: #2a1020;
+    --surface2: #3a1828;
+    --border: #5a2840;
+    --accent: #c8758f;
+    --accent2: #e8b86d;
+    --text: #f5ebe0;
+    --text2: #d8c4b0;
+    --muted: #b08a96;
+    --gold: #e8c47a;
+  }
+  :root[data-theme="midnight"] {
+    --bg: #050814;
+    --surface: #0a1028;
+    --surface2: #12183a;
+    --border: #252c58;
+    --accent: #6a7fd4;
+    --accent2: #a89bff;
+    --text: #eceff5;
+    --text2: #c4c8e0;
+    --muted: #8088b0;
+    --gold: #d4af37;
+  }
+  :root[data-theme="ivory"] {
+    --bg: #f5efe4;
+    --surface: #fffbf3;
+    --surface2: #ece4d3;
+    --border: #d8ccb5;
+    --accent: #8b2a1e;
+    --accent2: #2a1f1a;
+    --text: #1a120a;
+    --text2: #4a3a2a;
+    --muted: #8a7560;
+    --gold: #a8842a;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
