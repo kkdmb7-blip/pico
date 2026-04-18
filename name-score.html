@@ -450,7 +450,7 @@ nav {
       로그인 후 프로필을 등록하시면 내 사주 용신과 매칭되는 이름을 우선 추천해드립니다.
     </div>
     <button class="btn-gold" id="btnRecommend" onclick="runRecommend()">이름 추천받기</button>
-    <div class="orb-hint">길수 4격 중심으로 5개 추천</div>
+    <div class="orb-hint">길수 4격 + 용신 매칭 점수로 TOP 3 추천</div>
   </div>
 
   <div id="recommendResult" style="display:none; margin-bottom:14px;"></div>
@@ -557,7 +557,7 @@ nav {
     <div id="yongsinMatchBox"></div>
     <div id="hookCard"></div>
     <div id="aiAnalysisWrap" style="display:none;margin-top:16px;">
-      <button class="btn-gold" id="btnAiAnalysis" onclick="onAiAnalysisClick()">AI 심층분석 · 500 Orb</button>
+      <button class="btn-gold" id="btnAiAnalysis" onclick="onAiAnalysisClick()">AI 심층분석 · 300 Orb</button>
       <div class="orb-hint">로그인 후 이용 · Orb로 결제</div>
     </div>
     <div id="aiAnalysisResult"></div>
@@ -1141,7 +1141,6 @@ function runRecommend() {
       var jung = normalize81(A + B + C);
       var grades = [SURI_TABLE[won], SURI_TABLE[hyun], SURI_TABLE[yi], SURI_TABLE[jung]];
       var sumScoreRaw = grades.reduce(function(acc,g){ return acc + (GRADE_SCORE[g]||0); }, 0) / 4;
-      if (sumScoreRaw < 95) continue; // 평균 95점 이상만 (사실상 4격 전부 대길)
 
       // 음오행 상극 배제
       var allChars = sur.split('').concat([a.syl, b.syl]);
@@ -1179,7 +1178,7 @@ function runRecommend() {
 
   // 중복(같은 이름) 제거
   var seen = {}, top = [];
-  for (var n=0; n<cands.length && top.length<5; n++) {
+  for (var n=0; n<cands.length && top.length<3; n++) {
     var key = cands[n].name;
     if (seen[key]) continue;
     seen[key] = 1;
@@ -1193,10 +1192,10 @@ function runRecommend() {
 function renderRecommend(sur, surHanja, top) {
   var el = document.getElementById('recommendResult');
   if (!top.length) {
-    el.innerHTML = '<div class="analysis-card" style="text-align:center; color:var(--text-dim); line-height:1.8;">95점 이상 조건을 만족하는 이름을 찾지 못했습니다.<br><span style="font-size:11px;">성씨 획수에 따라 4격 모두 대길 조합이 나오지 않을 수 있습니다.</span></div>';
+    el.innerHTML = '<div class="analysis-card" style="text-align:center; color:var(--text-dim); line-height:1.8;">추천 가능한 이름 조합을 찾지 못했습니다.<br><span style="font-size:11px;">음오행 상극 조건 때문에 조합이 나오지 않을 수 있습니다.</span></div>';
     return;
   }
-  var html = '<div class="section-label">' + sur + '씨 추천 이름 TOP ' + top.length + ' · 95점 이상</div>';
+  var html = '<div class="section-label">' + sur + '씨 추천 이름 TOP ' + top.length + ' · 최고 점수순</div>';
   top.forEach(function(c, idx) {
     // c.ohs = [성오행, 이름1오행, 이름2오행]
     var n0 = c.name[0], n1 = c.name[1] || '';
@@ -2447,16 +2446,16 @@ function onAiAnalysisClick() {
   var btn = document.getElementById('btnAiAnalysis');
   btn.disabled = true;
   getOrbBalance(user.id).then(function(bal) {
-    if (bal < 500) {
+    if (bal < 300) {
       showToast('Orb가 부족합니다 (현재 ' + bal + ' Orb)', true);
       btn.disabled = false;
       return;
     }
-    if (!confirm('AI 심층분석을 실행합니다. 500 Orb가 차감됩니다.\n현재 잔액: ' + bal + ' Orb')) {
+    if (!confirm('AI 심층분석을 실행합니다. 300 Orb가 차감됩니다.\n현재 잔액: ' + bal + ' Orb')) {
       btn.disabled = false;
       return;
     }
-    deductOrb(user.id, 500).then(function() {
+    deductOrb(user.id, 300).then(function() {
       runAiAnalysis();
     }).catch(function(e) {
       showToast(e.message || '차감 중 오류가 발생했습니다', true);
@@ -2555,7 +2554,7 @@ function runAiAnalysis() {
   })
   .catch(function() {
     showToast('분석 중 오류가 발생했습니다', true);
-    btn.textContent = 'AI 심층분석 · 500 Orb';
+    btn.textContent = 'AI 심층분석 · 300 Orb';
     btn.disabled = false;
   });
 }
@@ -2578,7 +2577,7 @@ function saveAiAnalysisReport(sur, name, grades, totalScore, resultText) {
     },
     body: JSON.stringify({
       user_id: user.id, report_type: 'name_ai',
-      content: content, orb_spent: 500,
+      content: content, orb_spent: 300,
       created_at: new Date().toISOString()
     })
   }).then(function(){ showToast('심층분석이 저장되었습니다'); }).catch(function(){});
