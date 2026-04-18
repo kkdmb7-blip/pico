@@ -387,7 +387,7 @@ nav {
 
   <div class="input-card" id="recommendCard" style="display:none;">
     <div style="margin-bottom:14px;">
-      <label class="field-label">성(姓)</label>
+      <label class="field-label">성씨</label>
       <input class="name-input" id="recSur" type="text" maxlength="3" placeholder="김">
     </div>
 
@@ -775,9 +775,10 @@ function setMode(m) {
 var recGender = 'all';
 function setRecGender(g) {
   recGender = g;
-  ['all','M','F'].forEach(function(x){
-    var el = document.getElementById('recGender' + x);
-    if (el) el.classList.toggle('active', x === g);
+  var map = { 'all': 'recGenderAll', 'M': 'recGenderM', 'F': 'recGenderF' };
+  Object.keys(map).forEach(function(k){
+    var el = document.getElementById(map[k]);
+    if (el) el.classList.toggle('active', k === g);
   });
 }
 
