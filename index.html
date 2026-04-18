@@ -798,6 +798,9 @@
 #ghResultAI p { margin-bottom:20px; }
 .ai-chunk { padding:16px 0; border-bottom:1px solid rgba(255,130,170,0.12); }
 .ai-chunk:last-child { border-bottom:none; }
+#historyDetailContent .ai-chunk p { margin-bottom:8px; }
+#historyDetailContent .ai-chunk strong { color:#d4af37; font-weight:700; }
+#historyDetailContent .ai-chunk em { font-style:italic; color:rgba(240,240,245,0.95); }
 .ai-chunk-spinner { display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.35);font-size:12px;padding:8px 0; }
 .ai-chunk-spinner::before { content:'';display:inline-block;width:16px;height:16px;border:2px solid rgba(255,130,170,0.15);border-top-color:#ff8ab0;border-radius:50%;animation:ghSpin .7s linear infinite; }
 .ai-chunk-spinner::after { content:'분석 중...'; }
@@ -2188,7 +2191,7 @@
   <div class="saju-modal" style="padding:20px 16px 24px;max-height:92vh;overflow-y:auto;">
     <button class="saju-modal-close" onclick="closeHistoryDetail()">✕</button>
     <h3 id="historyDetailTitle" style="color:#ff8ab0;font-size:18px;margin-bottom:12px;"></h3>
-    <div id="historyDetailContent" style="font-size:18px;line-height:1.8;color:#e8e0f0;"></div>
+    <div id="historyDetailContent" style="font-size:14px;line-height:1.85;color:rgba(240,240,245,0.88);"></div>
   </div>
 </div>
 
@@ -3271,12 +3274,30 @@ async function openHistoryModal() {
 }
 function closeHistoryModal() { document.getElementById('historyOverlay').style.display = 'none'; }
 
+function _renderHistoryMarkdown(text) {
+  if (text == null) return '';
+  var t = String(text);
+  t = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  t = t.replace(/^#{1,3}\s+(.+)$/gm, '<div style="font-size:14px;font-weight:700;color:#d4af37;margin:12px 0 4px;">$1</div>');
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong style="color:#d4af37;font-weight:700;">$1</strong>');
+  t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  t = t.replace(/\n{2,}/g, '</p><p>');
+  t = t.replace(/\n/g, '<br>');
+  return '<p>' + t + '</p>';
+}
 function openReportDetail(title, content) {
   document.getElementById('historyDetailOverlay').style.display = 'flex';
   document.getElementById('historyDetailTitle').textContent = title;
   var html = '';
   if (Array.isArray(content)) {
-    content.forEach(function(text){ if (text) html += '<div class="ai-chunk" style="margin-bottom:12px;white-space:pre-wrap;">'+text+'</div>'; });
+    content.forEach(function(text){
+      if (!text) return;
+      // 마지막 엘리먼트가 프로필 키(getProfileKey 출력)일 수 있어 렌더 제외
+      var s = String(text);
+      // 프로필 키 스킵: "1994-3-15-7-M-v3" 형식
+      if (/^\d{4}-\d{1,2}-\d{1,2}-\w+-[MF]-v\d+$/.test(s.trim())) return;
+      html += '<div class="ai-chunk">'+_renderHistoryMarkdown(s)+'</div>';
+    });
   }
   document.getElementById('historyDetailContent').innerHTML = html || '<div style="color:var(--muted);">내용이 없습니다.</div>';
 }
@@ -3300,21 +3321,21 @@ async function openHistoryDetail(id) {
       var s = r.sections;
       // 사주 섹션 (s1~s8)
       if (s.s1||s.s2||s.s3||s.s4||s.s5||s.s6||s.s7||s.s8) {
-        ['s1','s2','s3','s4','s5','s6','s7','s8'].forEach(function(k){ if(s[k]) html += '<div class="ai-chunk">'+s[k]+'</div>'; });
+        ['s1','s2','s3','s4','s5','s6','s7','s8'].forEach(function(k){ if(s[k]) html += '<div class="ai-chunk">'+_renderHistoryMarkdown(s[k])+'</div>'; });
       }
       // 궁합 섹션 (db1~db4, ai1~ai2)
-      if (s.db1) html += '<div class="ai-chunk">'+s.db1+'</div>';
-      if (s.db2) html += '<div class="ai-chunk">'+s.db2+'</div>';
-      if (s.db3) html += '<div class="ai-chunk">'+s.db3+'</div>';
-      if (s.ai1) html += '<div class="ai-chunk">'+s.ai1+'</div>';
-      if (s.ai2) html += '<div class="ai-chunk">'+s.ai2+'</div>';
-      if (s.db4) html += '<div class="ai-chunk">'+s.db4+'</div>';
+      if (s.db1) html += '<div class="ai-chunk">'+_renderHistoryMarkdown(s.db1)+'</div>';
+      if (s.db2) html += '<div class="ai-chunk">'+_renderHistoryMarkdown(s.db2)+'</div>';
+      if (s.db3) html += '<div class="ai-chunk">'+_renderHistoryMarkdown(s.db3)+'</div>';
+      if (s.ai1) html += '<div class="ai-chunk">'+_renderHistoryMarkdown(s.ai1)+'</div>';
+      if (s.ai2) html += '<div class="ai-chunk">'+_renderHistoryMarkdown(s.ai2)+'</div>';
+      if (s.db4) html += '<div class="ai-chunk">'+_renderHistoryMarkdown(s.db4)+'</div>';
     }
     // 구 구조 호환
     else {
-      if (r.step1) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;"><i class="pi pi-heart"></i> 연애 궁합</h4><div>'+r.step1+'</div></div>';
-      if (r.step2) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">⏰ 지금 이 시기</h4><div>'+r.step2+'</div></div>';
-      if (r.step3) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;"><i class="pi pi-star"></i> 서로를 위한 조언</h4><div>'+r.step3+'</div></div>';
+      if (r.step1) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;"><i class="pi pi-heart"></i> 연애 궁합</h4><div>'+_renderHistoryMarkdown(r.step1)+'</div></div>';
+      if (r.step2) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;">⏰ 지금 이 시기</h4><div>'+_renderHistoryMarkdown(r.step2)+'</div></div>';
+      if (r.step3) html += '<div class="ai-chunk"><h4 style="font-size:15px;font-weight:700;color:#ff8ab0;margin:0 0 10px;"><i class="pi pi-star"></i> 서로를 위한 조언</h4><div>'+_renderHistoryMarkdown(r.step3)+'</div></div>';
     }
     contentEl.innerHTML = html || '<div style="color:var(--muted);">저장된 내용이 없습니다.</div>';
   } catch(e) { titleEl.textContent = '오류'; contentEl.textContent = e.message; }
