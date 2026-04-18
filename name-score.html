@@ -2537,7 +2537,7 @@ function runAiAnalysis() {
     '청소년·20대(원격), 30~50대(형격), 인간관계(이격), 인생 전체(정격) 4격 등급을 바탕으로 이 이름이 각 시기에 어떻게 작용하는지 언제 가장 빛나고 언제 주의해야 하는지 구체적으로 설명해주세요.\n\n' +
     (yongsinText ? '━━ 2. 내 사주와 이름의 궁합 ━━\n용신 오행과 이름 오행(음오행/자원오행)의 실제 매칭 상태, 강화·약화 작용을 구체적으로 분석해주세요.\n\n' : '━━ 2. 음오행 흐름 해석 ━━\n이름의 발음 오행(자음 오행) 흐름이 이 사람의 기운에 미치는 실제 영향을 설명해주세요.\n\n') +
     '━━ 3. 돈·사람·일 3방향 분석 ━━\n이 이름이 끌어당기는 재물운, 관계운, 직업운을 각각 실질적으로 설명해주세요.\n\n' +
-    '출력 형식: 반드시 위 3개 섹션 구분선(━━)을 그대로 유지. 친근하고 따뜻한 전문가 톤. #헤더/표/볼드(*) 금지. 중요한 단어는 「」로 강조.';
+    '출력 형식: 반드시 위 3개 섹션 구분선(━━)을 그대로 유지. 친근하고 따뜻한 전문가 톤. #헤더/표 금지. 각 섹션 핵심 단어 3~5개를 **볼드**(마크다운)로 강조. 마지막 섹션까지 끝까지 완성할 것 (중간에 자르지 말 것).';
 
   var _aiUser = null;
   try { _aiUser = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
@@ -2548,8 +2548,8 @@ function runAiAnalysis() {
       user_id: _aiUser ? _aiUser.id : '',
       skip_orb: true,
       messages: [{ role: 'user', content: prompt }],
-      system_prompt: '당신은 수리성명학 전문가입니다. 이름의 수리 에너지를 깊이 분석하여 실질적인 조언을 제공합니다.',
-      max_tokens: 1200
+      system_prompt: '당신은 수리성명학 전문가입니다. 이름의 수리 에너지를 깊이 분석하여 실질적인 조언을 제공합니다. 핵심 단어는 **마크다운 볼드**로 강조하세요.',
+      max_tokens: 3000
     })
   })
   .then(function(r) {
@@ -2558,7 +2558,9 @@ function runAiAnalysis() {
   })
   .then(function(d){
     var text = (d && (d.reply || d.content || d.text)) || '';
-    resultEl.textContent = text;
+    var esc = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var html = esc.replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--gold);">$1</strong>');
+    resultEl.innerHTML = html;
     btn.textContent = 'AI 심층분석 완료';
     btn.disabled = false;
     if (text) saveAiAnalysisReport(sur, name, grades, totalScore, text);
