@@ -2869,6 +2869,24 @@ async function regenReport() {
   try { localStorage.removeItem(`easy_${_user.id}_${_type}_v${REPORT_VERSION}`); } catch(e) {}
 
   showState('loading');
+
+  // 캐시 적중 후 regen인 경우 _sdFull/_rptFull이 null일 수 있음 — 재생성 전 보강
+  if (!_sdFull && !_rptFull) {
+    setLoading('사주 정보 불러오는 중...', '');
+    const withZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
+    const withAstro = ['love','astro_full','triple','career_deep'].includes(_type);
+    await loadAllData(withZiwei, withAstro);
+  } else {
+    const withZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
+    const withAstro = ['love','astro_full','triple','career_deep'].includes(_type);
+    const needsZiwei = withZiwei && !_ziweiData;
+    const needsAstro = withAstro && !_astroData;
+    if (needsZiwei || needsAstro) {
+      setLoading('사주 정보 불러오는 중...', '');
+      await loadExtraData(needsZiwei, needsAstro);
+    }
+  }
+
   setLoading('Orb 잔액 확인 중...', '');
   const balance = await fetchOrbBalance();
   if (balance < _config.orb) {
