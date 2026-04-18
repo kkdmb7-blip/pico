@@ -1282,13 +1282,17 @@ function fetchNameBlurbs(sur, top, activeYs) {
     ysLine + '\n' + namesList + '\n\n' +
     '반드시 JSON 배열로만 응답. 예: ["한줄평1","한줄평2","한줄평3","한줄평4","한줄평5"]. 다른 설명·마크다운·코드펜스 금지.';
 
+  var _blurbUser = null;
+  try { _blurbUser = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
   var fullText = '';
   fetch('https://fortuna-silk.vercel.app/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      user_id: _blurbUser ? _blurbUser.id : '',
+      skip_orb: true,
       messages: [{ role: 'user', content: prompt }],
-      system: '너는 수리성명학+사주 전문가다. 간결하고 JSON 배열만 출력한다. 다른 말 절대 금지.',
+      system_prompt: '너는 수리성명학+사주 전문가다. 간결하고 JSON 배열만 출력한다. 다른 말 절대 금지.',
       max_tokens: 600,
       stream: true
     })
@@ -1726,12 +1730,16 @@ function fetchChildBlurbs(sur, top) {
     ysLine + '\n\n' + namesList + '\n\n' +
     '반드시 JSON 배열로만 응답. 예: ["한줄평1","한줄평2","한줄평3","한줄평4","한줄평5"]. 다른 설명·마크다운·코드펜스 금지.';
 
+  var _childUser = null;
+  try { _childUser = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
   var fullText = '';
   fetch('https://fortuna-silk.vercel.app/api/chat', {
     method: 'POST', headers: {'Content-Type':'application/json'},
     body: JSON.stringify({
+      user_id: _childUser ? _childUser.id : '',
+      skip_orb: true,
       messages: [{ role: 'user', content: prompt }],
-      system: '너는 작명·사주 전문가다. 간결하고 JSON 배열만 출력한다.',
+      system_prompt: '너는 작명·사주 전문가다. 간결하고 JSON 배열만 출력한다.',
       max_tokens: 700, stream: true
     })
   }).then(function(r){
@@ -2519,18 +2527,22 @@ function runAiAnalysis() {
     '━━ 3. 돈·사람·일 3방향 분석 ━━\n이 이름이 끌어당기는 재물운, 관계운, 직업운을 각각 실질적으로 설명해주세요.\n\n' +
     '출력 형식: 반드시 위 3개 섹션 구분선(━━)을 그대로 유지. 친근하고 따뜻한 전문가 톤. #헤더/표/볼드(*) 금지. 중요한 단어는 「」로 강조.';
 
+  var _aiUser = null;
+  try { _aiUser = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
   fetch('https://fortuna-silk.vercel.app/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      user_id: _aiUser ? _aiUser.id : '',
+      skip_orb: true,
       messages: [{ role: 'user', content: prompt }],
-      system: '당신은 수리성명학 전문가입니다. 이름의 수리 에너지를 깊이 분석하여 실질적인 조언을 제공합니다.',
+      system_prompt: '당신은 수리성명학 전문가입니다. 이름의 수리 에너지를 깊이 분석하여 실질적인 조언을 제공합니다.',
       max_tokens: 1200,
       stream: true
     })
   })
   .then(function(r) {
-    if (!r.ok) throw new Error('API 오류');
+    if (!r.ok) return r.text().then(function(t){ throw new Error('API ' + r.status + ': ' + (t||'').slice(0,100)); });
     var reader = r.body.getReader();
     var decoder = new TextDecoder();
     var buffer = '';
@@ -2562,8 +2574,9 @@ function runAiAnalysis() {
     }
     read();
   })
-  .catch(function() {
-    showToast('분석 중 오류가 발생했습니다', true);
+  .catch(function(err) {
+    console.error('AI 심층분석 오류:', err);
+    showToast('분석 오류: ' + (err && err.message ? err.message : '네트워크 확인') , true);
     btn.textContent = 'AI 심층분석 · 300 Orb';
     btn.disabled = false;
   });
