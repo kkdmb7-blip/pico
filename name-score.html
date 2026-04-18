@@ -1277,7 +1277,7 @@ function renderRecommend(sur, surHanja, top) {
 function fetchNameBlurbs(sur, top, activeYs) {
   var ysOh = activeYs ? getYongsinOhaeng(activeYs) : '';
   var namesList = top.map(function(c, i){
-    return (i+1)+'. '+sur+c.name+' ('+c.hanja.join('')+') 오행['+c.ohs.slice(1).join('')+'] 용신매칭'+c.ysMatch+'자';
+    return (i+1)+'. '+sur+c.name+' ('+c.hanja+') 오행['+c.ohs.slice(1).join('')+'] 용신매칭'+c.ysMatch+'자';
   }).join('\n');
   var ysLine = activeYs ? '대상 용신: '+activeYs+' ('+ysOh+'오행)\n' : '대상 사주 정보 없음\n';
 
@@ -1333,7 +1333,7 @@ function saveRecommendReport(sur, top, activeYs, blurbs) {
   try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e){}
   if (!user) return;
   var lines = top.map(function(c, i){
-    var base = '#'+(i+1)+' '+sur+c.name+' ('+c.hanja.join('')+') — '+c.baseTotal+'점 · 용신매칭 '+c.ysMatch+'자';
+    var base = '#'+(i+1)+' '+sur+c.name+' ('+c.hanja+') — '+c.baseTotal+'점 · 용신매칭 '+c.ysMatch+'자';
     var blurb = blurbs && blurbs[i] ? '\n   → '+blurbs[i] : '';
     return base + blurb;
   }).join('\n\n');
