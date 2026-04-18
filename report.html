@@ -2648,9 +2648,17 @@ function renderIntro() {
 // ── 생성 시작 (소개 화면 → 실제 흐름) ──
 async function startGeneration() {
   showState('loading');
-  setLoading('사주 정보 불러오는 중...', '');
 
-  // 사주+베딕 조회 (백그라운드 로드됐더라도 ziwei/astro가 필요한 타입은 추가 로드)
+  // 캐시 선조회 (적중 시 Worker 호출 전부 스킵 — 속도·비용 절감)
+  setLoading('기존 리포트 확인 중...', '');
+  const existing = await fetchExistingReport();
+  if (existing) {
+    renderReport(existing.content, existing.created_at);
+    return;
+  }
+
+  // 캐시 미스 시에만 사주/ziwei/astro 로드
+  setLoading('사주 정보 불러오는 중...', '');
   const withZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
   const withAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
   const needsZiwei = withZiwei && !_ziweiData;
@@ -2658,15 +2666,7 @@ async function startGeneration() {
   if (!_sdFull && !_rptFull) {
     await loadAllData(withZiwei, withAstro);
   } else if (needsZiwei || needsAstro) {
-    // 사주 데이터는 있지만 ziwei/astro가 아직 없는 경우만 추가 로드
     await loadExtraData(needsZiwei, needsAstro);
-  }
-
-  setLoading('기존 리포트 확인 중...', '');
-  const existing = await fetchExistingReport();
-  if (existing) {
-    renderReport(existing.content, existing.created_at);
-    return;
   }
 
   setLoading('Orb 잔액 확인 중...', '');
@@ -2895,12 +2895,13 @@ function selectPersonality(btn) {
 // ── character 생성 시작 (Orb 확인 후 generateCharacterReport) ──
 async function startCharacterGeneration() {
   showState('loading');
-  setLoading('사주 정보 불러오는 중...', '');
-  if (!_sdFull && !_rptFull) await loadAllData(false, false);
 
   setLoading('기존 리포트 확인 중...', '');
   const existing = await fetchExistingReport();
   if (existing) { renderReport(existing.content, existing.created_at); return; }
+
+  setLoading('사주 정보 불러오는 중...', '');
+  if (!_sdFull && !_rptFull) await loadAllData(false, false);
 
   setLoading('Orb 잔액 확인 중...', '');
   const balance = await fetchOrbBalance();
