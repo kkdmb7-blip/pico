@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>피드백 관리 · FORTUNA</title>
+<meta name="theme-color" content="#0a0a0f">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c28;
+  --border: #2a2a3d;
+  --text: #f0f0f5;
+  --muted: #7a7a95;
+  --gold: #d4af37;
+  --good: #7fd37f;
+  --bad: #f08a80;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  min-height:100vh;
+  padding-bottom:40px;
+}
+nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px;
+  border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:100;
+  background:rgba(10,10,15,0.95);
+  backdrop-filter:blur(12px);
+}
+.logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--gold); }
+.back-btn {
+  font-size:13px; color:var(--muted); text-decoration:none;
+  background:none; border:none; cursor:pointer;
+}
+.wrap { max-width:980px; margin:0 auto; padding:24px 20px 60px; }
+h2 {
+  font-family:'Noto Serif KR',serif;
+  font-size:18px; font-weight:700; color:var(--gold);
+  margin:28px 0 14px; letter-spacing:1px;
+}
+h2:first-child { margin-top:0; }
+
+/* 관리자 인증 */
+.gate {
+  max-width:420px; margin:60px auto; padding:28px 24px;
+  background:var(--surface); border:1px solid var(--border); border-radius:16px;
+  text-align:center;
+}
+.gate h1 {
+  font-family:'Noto Serif KR',serif; color:var(--gold);
+  font-size:20px; margin-bottom:14px;
+}
+.gate input {
+  width:100%; padding:12px; border-radius:10px;
+  background:#000; border:1px solid var(--border);
+  color:var(--text); font-size:14px; margin-bottom:10px;
+  font-family:monospace;
+}
+.gate button {
+  width:100%; padding:12px; border-radius:10px;
+  background:linear-gradient(135deg,#d4af37,#c9a84c); color:#1a1a2e;
+  border:none; cursor:pointer; font-weight:700; font-size:14px;
+}
+.gate .hint { font-size:12px; color:var(--muted); margin-top:12px; }
+
+/* 카드 */
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:18px; margin-bottom:14px;
+}
+.summary-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:10px; margin-bottom:16px;
+}
+.stat {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:14px;
+}
+.stat .label { font-size:11px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; }
+.stat .value { font-size:24px; font-weight:700; color:var(--gold); font-family:'Noto Serif KR',serif; }
+.stat .sub { font-size:11px; color:var(--muted); margin-top:4px; }
+
+/* 테이블 */
+table {
+  width:100%; border-collapse:collapse;
+  background:var(--surface); border-radius:12px; overflow:hidden;
+  font-size:12px;
+}
+th, td {
+  padding:10px 12px; text-align:left;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+}
+th {
+  background:var(--surface2); color:var(--gold);
+  font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:1px;
+}
+tbody tr:hover { background:rgba(212,175,55,0.04); }
+td.rating-up { color:var(--good); font-weight:600; }
+td.rating-down { color:var(--bad); font-weight:600; }
+.pill {
+  display:inline-block; padding:3px 9px; border-radius:999px;
+  font-size:10px; background:rgba(212,175,55,0.15); color:var(--gold);
+  border:1px solid rgba(212,175,55,0.3);
+}
+.pill-chat { background:rgba(125,94,167,0.15); color:#a07fd4; border-color:rgba(160,127,212,0.3); }
+.pill-daily { background:rgba(76,175,80,0.12); color:var(--good); border-color:rgba(127,211,127,0.3); }
+
+/* 필터 */
+.filter {
+  display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center;
+}
+.filter select, .filter button {
+  padding:8px 12px; border-radius:8px;
+  background:var(--surface2); border:1px solid var(--border);
+  color:var(--text); font-size:13px; cursor:pointer;
+  font-family:inherit;
+}
+.filter button.primary {
+  background:linear-gradient(135deg,#d4af37,#c9a84c); color:#1a1a2e;
+  border:none; font-weight:700;
+}
+.filter button:hover { opacity:0.85; }
+
+/* 로딩 / 비어있음 */
+.loading, .empty {
+  padding:30px; text-align:center; color:var(--muted); font-size:13px;
+}
+
+/* 추이 막대 */
+.daily-row { display:flex; align-items:center; gap:10px; font-size:12px; padding:4px 0; }
+.daily-row .day-label { width:88px; color:var(--muted); font-family:monospace; }
+.daily-row .bar {
+  flex:1; height:18px; background:var(--surface2); border-radius:4px; overflow:hidden;
+  display:flex;
+}
+.daily-row .bar-up { background:var(--good); height:100%; }
+.daily-row .bar-down { background:var(--bad); height:100%; }
+.daily-row .count { width:110px; text-align:right; color:var(--muted); font-size:11px; }
+
+/* 코멘트 셀 */
+td.comment {
+  max-width:280px; white-space:normal; word-break:break-word;
+  color:rgba(240,240,245,0.82); line-height:1.5;
+}
+td.reasons span {
+  display:inline-block; padding:2px 7px; margin:1px;
+  background:rgba(212,175,55,0.1); color:var(--gold);
+  border-radius:999px; font-size:10px;
+}
+.csv-btn {
+  padding:6px 12px; border-radius:8px;
+  background:var(--surface2); border:1px solid var(--border);
+  color:var(--gold); font-size:12px; cursor:pointer; font-family:inherit;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo-text">FORTUNA · ADMIN</span>
+  <a href="mypage.html" class="back-btn">← 마이페이지</a>
+</nav>
+
+<div id="gateView" class="gate" style="display:none;">
+  <h1>관리자 인증</h1>
+  <input id="adminUuid" type="text" placeholder="관리자 UUID 입력" autocomplete="off">
+  <button id="gateSubmit">접속</button>
+  <div class="hint">권한이 없는 접근은 Worker에서 차단됩니다</div>
+  <div id="gateError" style="color:var(--bad); font-size:12px; margin-top:10px;"></div>
+</div>
+
+<div id="mainView" class="wrap" style="display:none;">
+  <h2>AI 피드백 대시보드</h2>
+
+  <div id="summaryGrid" class="summary-grid"></div>
+
+  <h2>소스 × 타입 집계</h2>
+  <div id="statsTable" class="card"><div class="loading">불러오는 중...</div></div>
+
+  <h2>일별 추이 (최근 30일)</h2>
+  <div id="dailyTable" class="card"><div class="loading">불러오는 중...</div></div>
+
+  <h2>
+    최근 피드백
+    <button class="csv-btn" id="csvBtn" style="float:right;">CSV 내보내기</button>
+  </h2>
+  <div class="filter">
+    <select id="fltSource">
+      <option value="">전체 소스</option>
+      <option value="report">report</option>
+      <option value="chat">chat</option>
+      <option value="daily_fortune">daily_fortune</option>
+    </select>
+    <select id="fltRating">
+      <option value="">전체 평가</option>
+      <option value="1">👍 긍정</option>
+      <option value="-1">👎 부정</option>
+    </select>
+    <select id="fltLimit">
+      <option value="50">50건</option>
+      <option value="100" selected>100건</option>
+      <option value="200">200건</option>
+      <option value="500">500건</option>
+    </select>
+    <button class="primary" id="fltApply">새로고침</button>
+  </div>
+  <div id="recentTable" class="card"><div class="loading">불러오는 중...</div></div>
+</div>
+
+<script>
+const API = 'https://fortuna.kkdmb7.workers.dev';
+const LS_KEY = 'pico_admin_uuid';
+let adminUuid = '';
+let recentRows = [];
+
+function qs(id){ return document.getElementById(id); }
+
+async function fetchJson(path) {
+  const res = await fetch(`${API}${path}${path.includes('?') ? '&' : '?'}admin=${encodeURIComponent(adminUuid)}`);
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+  return json;
+}
+
+function pillClass(source) {
+  if (source === 'chat') return 'pill pill-chat';
+  if (source === 'daily_fortune') return 'pill pill-daily';
+  return 'pill';
+}
+
+function fmtDate(s) {
+  if (!s) return '-';
+  const d = new Date(s);
+  return d.toLocaleString('ko-KR', { year:'2-digit', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+
+async function loadStats() {
+  try {
+    const { rows } = await fetchJson('/feedback-stats');
+    if (!rows || !rows.length) {
+      qs('statsTable').innerHTML = '<div class="empty">아직 피드백이 없어요</div>';
+      qs('summaryGrid').innerHTML = '';
+      return;
+    }
+    let totalUp = 0, totalDown = 0, sources = new Set();
+    rows.forEach(r => { totalUp += (r.positive||0); totalDown += (r.negative||0); sources.add(r.source); });
+    const total = totalUp + totalDown;
+    const score = total ? Math.round((totalUp / total) * 100) : 0;
+    qs('summaryGrid').innerHTML = `
+      <div class="stat"><div class="label">총 피드백</div><div class="value">${total.toLocaleString()}</div><div class="sub">소스 ${sources.size}종</div></div>
+      <div class="stat"><div class="label">👍 긍정</div><div class="value" style="color:var(--good);">${totalUp.toLocaleString()}</div></div>
+      <div class="stat"><div class="label">👎 부정</div><div class="value" style="color:var(--bad);">${totalDown.toLocaleString()}</div></div>
+      <div class="stat"><div class="label">긍정률</div><div class="value">${score}%</div></div>
+    `;
+    const headers = ['소스','타입','👍','👎','긍정률','최근'];
+    const trs = rows.map(r => {
+      const rate = r.positive_rate_pct != null ? Math.round(r.positive_rate_pct) : 0;
+      return `<tr>
+        <td><span class="${pillClass(r.source)}">${r.source}</span></td>
+        <td>${r.source_type || '-'}</td>
+        <td class="rating-up">${r.positive||0}</td>
+        <td class="rating-down">${r.negative||0}</td>
+        <td>${rate}%</td>
+        <td style="color:var(--muted); font-size:11px;">${fmtDate(r.last_at)}</td>
+      </tr>`;
+    }).join('');
+    qs('statsTable').innerHTML = `<table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table>`;
+  } catch(e) {
+    qs('statsTable').innerHTML = `<div class="empty" style="color:var(--bad);">오류: ${e.message}</div>`;
+  }
+}
+
+async function loadDaily() {
+  try {
+    const { rows } = await fetchJson('/feedback-daily');
+    if (!rows || !rows.length) {
+      qs('dailyTable').innerHTML = '<div class="empty">추이 데이터 없음</div>';
+      return;
+    }
+    // 날짜별로 묶기 (소스 합산)
+    const byDay = {};
+    rows.forEach(r => {
+      const d = String(r.day).slice(0, 10);
+      if (!byDay[d]) byDay[d] = { up:0, down:0 };
+      byDay[d].up += (r.positive||0);
+      byDay[d].down += (r.negative||0);
+    });
+    const days = Object.keys(byDay).sort().reverse().slice(0, 30);
+    const maxTotal = Math.max(1, ...days.map(d => byDay[d].up + byDay[d].down));
+    const html = days.map(d => {
+      const o = byDay[d];
+      const upPct = (o.up / maxTotal) * 100;
+      const dnPct = (o.down / maxTotal) * 100;
+      return `<div class="daily-row">
+        <div class="day-label">${d}</div>
+        <div class="bar">
+          <div class="bar-up" style="width:${upPct}%;"></div>
+          <div class="bar-down" style="width:${dnPct}%;"></div>
+        </div>
+        <div class="count">👍 ${o.up} · 👎 ${o.down}</div>
+      </div>`;
+    }).join('');
+    qs('dailyTable').innerHTML = html;
+  } catch(e) {
+    qs('dailyTable').innerHTML = `<div class="empty" style="color:var(--bad);">오류: ${e.message}</div>`;
+  }
+}
+
+async function loadRecent() {
+  try {
+    const src = qs('fltSource').value;
+    const rtg = qs('fltRating').value;
+    const lim = qs('fltLimit').value;
+    let q = `/feedback-recent?limit=${lim}`;
+    if (src) q += `&source=${encodeURIComponent(src)}`;
+    if (rtg) q += `&rating=${encodeURIComponent(rtg)}`;
+    qs('recentTable').innerHTML = '<div class="loading">불러오는 중...</div>';
+    const { rows } = await fetchJson(q);
+    recentRows = rows || [];
+    if (!rows || !rows.length) {
+      qs('recentTable').innerHTML = '<div class="empty">조건에 맞는 피드백이 없어요</div>';
+      return;
+    }
+    const trs = rows.map(r => {
+      const rs = Array.isArray(r.reasons) ? r.reasons : [];
+      const reasonsHtml = rs.map(x => `<span>${escapeHtml(x)}</span>`).join('');
+      return `<tr>
+        <td style="color:var(--muted); white-space:nowrap;">${fmtDate(r.created_at)}</td>
+        <td><span class="${pillClass(r.source)}">${r.source}</span></td>
+        <td>${r.source_type || '-'}</td>
+        <td class="${r.rating === 1 ? 'rating-up' : 'rating-down'}">${r.rating === 1 ? '👍' : '👎'}</td>
+        <td class="reasons">${reasonsHtml || '<span style="color:var(--muted); background:none; border:none; padding:0;">-</span>'}</td>
+        <td class="comment">${escapeHtml(r.comment || '') || '<span style="color:var(--muted);">-</span>'}</td>
+        <td style="color:var(--muted); font-family:monospace; font-size:10px;">${(r.user_id||'').slice(0,8)}</td>
+      </tr>`;
+    }).join('');
+    qs('recentTable').innerHTML = `<table><thead><tr>
+      <th>시각</th><th>소스</th><th>타입</th><th>평가</th><th>이유</th><th>코멘트</th><th>유저</th>
+    </tr></thead><tbody>${trs}</tbody></table>`;
+  } catch(e) {
+    qs('recentTable').innerHTML = `<div class="empty" style="color:var(--bad);">오류: ${e.message}</div>`;
+  }
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+function exportCsv() {
+  if (!recentRows.length) { alert('내보낼 데이터가 없어요'); return; }
+  const headers = ['created_at','source','source_type','source_id','rating','reasons','comment','user_id','client'];
+  const escape = v => {
+    if (v == null) return '';
+    const s = typeof v === 'object' ? JSON.stringify(v) : String(v);
+    return '"' + s.replace(/"/g,'""') + '"';
+  };
+  const lines = [headers.join(',')].concat(
+    recentRows.map(r => headers.map(h => escape(r[h])).join(','))
+  );
+  const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `feedback_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function boot() {
+  adminUuid = localStorage.getItem(LS_KEY) || '';
+  if (!adminUuid) {
+    qs('gateView').style.display = 'block';
+    return;
+  }
+  // 권한 확인 겸 초기 로드
+  try {
+    await fetchJson('/feedback-stats');
+  } catch(e) {
+    localStorage.removeItem(LS_KEY);
+    adminUuid = '';
+    qs('gateView').style.display = 'block';
+    qs('gateError').textContent = '인증 실패: ' + e.message;
+    return;
+  }
+  qs('mainView').style.display = 'block';
+  loadStats();
+  loadDaily();
+  loadRecent();
+}
+
+qs('gateSubmit').addEventListener('click', async () => {
+  const v = (qs('adminUuid').value || '').trim();
+  if (!v) return;
+  adminUuid = v;
+  try {
+    await fetchJson('/feedback-stats');
+    localStorage.setItem(LS_KEY, adminUuid);
+    qs('gateView').style.display = 'none';
+    qs('mainView').style.display = 'block';
+    loadStats(); loadDaily(); loadRecent();
+  } catch(e) {
+    qs('gateError').textContent = '인증 실패: ' + e.message;
+    adminUuid = '';
+  }
+});
+qs('adminUuid')?.addEventListener('keydown', e => { if (e.key === 'Enter') qs('gateSubmit').click(); });
+qs('fltApply').addEventListener('click', loadRecent);
+qs('csvBtn').addEventListener('click', exportCsv);
+
+boot();
+</script>
+</body>
+</html>
