@@ -2498,11 +2498,26 @@ loadSajuData();
 
 (function() {
   var p = new URLSearchParams(window.location.search);
+  var mode = p.get('mode');
   var sur = p.get('sur'), nm = p.get('name');
+  var ai = p.get('ai');
+  var validModes = { auto:1, select:1, manual:1, recommend:1, child:1 };
+  if (mode && validModes[mode]) {
+    setMode(mode);
+  } else if (sur || nm) {
+    setMode('auto');
+  } else {
+    return;
+  }
+  if (sur) { var sEl = document.getElementById('inputSur'); if (sEl) sEl.value = sur; }
+  if (nm)  { var nEl = document.getElementById('inputName'); if (nEl) nEl.value = nm; }
+  if (ai === '1') {
+    setTimeout(function(){
+      var aiBtn = document.getElementById('btnAiAnalysis');
+      if (aiBtn) aiBtn.scrollIntoView({behavior:'smooth', block:'center'});
+    }, 400);
+  }
   if (!sur && !nm) return;
-  setMode('auto');
-  if (sur) document.getElementById('inputSur').value = sur;
-  if (nm)  document.getElementById('inputName').value = nm;
   if (sur && nm) {
     var card = document.getElementById('inputCardMain');
     if (card) card.style.display = 'none';
