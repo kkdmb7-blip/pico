@@ -211,6 +211,19 @@ index.html 하단탭의 마이페이지와 **다른 별개 파일**.
 - **코드 삽입 위치 오류**: 함수 내부에 코드를 추가할 때 닫는 `}` 위치 반드시 확인
 - **Canvas roundRect 호환성**: `ctx.roundRect`는 구형 iOS Safari에서 미지원. 반드시 `if(ctx.roundRect){...}else{ctx.rect(...)}` 패턴 사용
 - **Canvas 색상 문자열 연산**: hex 색상에 투명도 추가 시 반드시 6자리 hex 사용
+- **존재하지 않는 엘리먼트 textContent 설정으로 이후 라인 실행 중단**: `document.getElementById('X').textContent=...`에서 X가 DOM에 없으면 TypeError로 async 함수가 종료. 뒤에 있는 `reportActions.display='flex'`, `showConsultBanner()` 같은 중요 라인이 실행되지 않아 하단 버튼·배너가 전부 숨겨짐. **사례**: report.html의 `regenNote`는 HTML에 정의 없이 22개 리포트 생성 함수에서 참조돼 하단 연결포인트(공유/전문상담/AI운세) 전체가 안 보이는 버그. **해결**: `{ const _el = document.getElementById('regenNote'); if (_el) _el.textContent = ...; }` 패턴으로 null-safe하게 래핑
+
+## report.html 리포트 생성 후 검증 체크리스트 (반드시 확인)
+새 리포트 타입 추가 시 함수 끝에 다음 5가지가 모두 실행되는지 확인:
+1. `reports` 테이블 insert (try/catch로 감싸기)
+2. `reportMeta.textContent` = 생성일
+3. `reportBadge.innerHTML` = emoji + 'AI REPORT'
+4. `regenNote` 설정 (null-safe 래핑)
+5. `reportActions.display='flex'` + `showConsultBanner()` — 이 두 줄이 안 돌면 하단 버튼 전체 사라짐
+
+`showConsultBanner()`의 `bannerTexts` 객체에도 새 타입 추가 (없으면 fallback 일반 문구)
+
+`generateReport()` dispatch 스위치에 새 타입 케이스 반드시 추가 (누락 시 "지원되지 않는 타입입니다" 에러)
 
 ## 공유 버튼 표준 스타일 (모든 페이지 동일)
 - 카카오 버튼: background:#fee500; color:#3c1e1e; border-radius:14px; padding:14px 0; width:100%
