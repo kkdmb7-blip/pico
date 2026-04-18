@@ -2454,6 +2454,10 @@ function onAiAnalysisClick() {
   try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
   if (!user) { showToast('로그인이 필요합니다', true); return; }
   if (!lastScores) { showToast('먼저 점수를 확인해주세요', true); return; }
+  if (currentMode === 'auto') {
+    showToast('AI 심층분석은 한자 기반입니다. 한자 선택 또는 한자 수동 모드로 전환해주세요', true);
+    return;
+  }
   var btn = document.getElementById('btnAiAnalysis');
   btn.disabled = true;
   getOrbBalance(user.id).then(function(bal) {
