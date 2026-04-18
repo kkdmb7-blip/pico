@@ -1718,7 +1718,7 @@
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">대운별·월별 재물 흐름 + 투자 적기</div>
         <div style="margin-top:8px;font-size:10px;font-weight:600;color:#dcb450;">500 Orb</div>
       </div>
-      <div onclick="window.location.href='report.html?type=guide'" style="background:linear-gradient(135deg,rgba(240,140,180,0.15),rgba(200,100,160,0.15));border:1px solid rgba(240,140,180,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(240,140,180,0.7)'" onmouseout="this.style.borderColor='rgba(240,140,180,0.3)'">
+      <div onclick="openGuideModal()" style="background:linear-gradient(135deg,rgba(240,140,180,0.15),rgba(200,100,160,0.15));border:1px solid rgba(240,140,180,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(240,140,180,0.7)'" onmouseout="this.style.borderColor='rgba(240,140,180,0.3)'">
         <div style="font-size:28px;color:#f08cb4;"><i class="pi pi-people"></i></div>
         <div style="flex:1;">
           <div style="font-size:13px;font-weight:700;color:#f08cb4;margin-bottom:3px;">이 사람 사용설명서 <span style="font-size:10px;background:linear-gradient(90deg,#f08cb4,#ffd864);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">NEW</span></div>
@@ -2105,6 +2105,66 @@
       </button>
       <a href="counselor.html" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:linear-gradient(135deg,#c2784e,#e8a87c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Noto Serif KR',sans-serif;cursor:pointer;text-decoration:none;margin-top:10px;box-sizing:border-box;"><i class="pi pi-person"></i> 전문 상담사 연결</a>
     </div>
+  </div>
+</div>
+
+<!-- GUIDE PERSON INPUT MODAL -->
+<div class="saju-overlay" id="guideOverlay" onclick="if(event.target===this)closeGuideModal()" style="display:none;">
+  <div class="saju-modal">
+    <button class="saju-modal-close" onclick="closeGuideModal()">✕</button>
+    <h3 style="color:#f08cb4;"><i class="pi pi-people"></i> 이 사람 사용설명서</h3>
+    <p class="saju-modal-sub">분석할 사람의 생년월일을 입력하세요 (가족·연인·친구·동료 등)</p>
+
+    <div class="saju-form-group">
+      <label>이름 (선택)</label>
+      <input type="text" id="guidePersonName" placeholder="예: 우리 아빠, 김민수" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+    </div>
+    <div class="saju-form-group">
+      <label>관계 (선택)</label>
+      <select id="guidePersonRel" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:14px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+        <option value="">관계 선택</option>
+        <option value="부모">부모</option>
+        <option value="자녀">자녀</option>
+        <option value="배우자">배우자</option>
+        <option value="연인">연인</option>
+        <option value="형제자매">형제자매</option>
+        <option value="친구">친구</option>
+        <option value="동료">동료/상사</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <div class="saju-form-group">
+      <label>생년월일 *</label>
+      <div class="saju-date-row">
+        <select id="guidePersonYear"><option value="">년</option></select>
+        <select id="guidePersonMonth"><option value="">월</option></select>
+        <select id="guidePersonDay"><option value="">일</option></select>
+      </div>
+    </div>
+    <div class="saju-form-group">
+      <label>태어난 시간 (선택, 모르면 비워두세요)</label>
+      <select id="guidePersonHour" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(240,140,180,0.2);border-radius:8px;padding:13px 12px;color:#e8e0f0;font-size:14px;outline:none;font-family:'Noto Serif KR',sans-serif;">
+        <option value="">시 모름</option>
+        <option value="0">0시 (자시)</option>
+        <option value="1">1시</option><option value="2">2시</option><option value="3">3시</option>
+        <option value="4">4시</option><option value="5">5시</option><option value="6">6시</option>
+        <option value="7">7시</option><option value="8">8시</option><option value="9">9시</option>
+        <option value="10">10시</option><option value="11">11시</option><option value="12">12시</option>
+        <option value="13">13시</option><option value="14">14시</option><option value="15">15시</option>
+        <option value="16">16시</option><option value="17">17시</option><option value="18">18시</option>
+        <option value="19">19시</option><option value="20">20시</option><option value="21">21시</option>
+        <option value="22">22시</option><option value="23">23시</option>
+      </select>
+    </div>
+    <div class="saju-form-group">
+      <label>성별</label>
+      <div style="display:flex;gap:8px;">
+        <button id="guidePgMale" onclick="selectGuidePersonGender('M')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">남성</button>
+        <button id="guidePgFemale" onclick="selectGuidePersonGender('F')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">여성</button>
+      </div>
+    </div>
+
+    <button class="saju-submit-btn" onclick="submitGuideProfile()" style="background:linear-gradient(135deg,#c2185b,#f08cb4);">설명서 보기 <i class="pi pi-sparkle"></i></button>
   </div>
 </div>
 
@@ -2518,6 +2578,73 @@ function closeGunghapModal() {
 function closeGunghapResult() {
   var el = document.getElementById('gunghapResultOverlay');
   if (el) el.style.display = 'none';
+}
+
+// ── 사용설명서: 다른 사람 정보 입력 ──
+var _guideGender = '';
+function selectGuidePersonGender(g) {
+  _guideGender = g;
+  var mEl = document.getElementById('guidePgMale');
+  var fEl = document.getElementById('guidePgFemale');
+  if (g === 'M') {
+    mEl.style.borderColor = '#f08cb4'; mEl.style.background = 'rgba(240,140,180,0.12)'; mEl.style.color = '#f08cb4';
+    fEl.style.borderColor = 'rgba(255,255,255,0.15)'; fEl.style.background = 'rgba(255,255,255,0.04)'; fEl.style.color = 'rgba(255,255,255,0.55)';
+  } else if (g === 'F') {
+    fEl.style.borderColor = '#f08cb4'; fEl.style.background = 'rgba(240,140,180,0.12)'; fEl.style.color = '#f08cb4';
+    mEl.style.borderColor = 'rgba(255,255,255,0.15)'; mEl.style.background = 'rgba(255,255,255,0.04)'; mEl.style.color = 'rgba(255,255,255,0.55)';
+  }
+}
+
+function openGuideModal() {
+  try { var u = JSON.parse(localStorage.getItem('pico_user')); if (!u || !u.id) { alert('로그인이 필요합니다'); return; } } catch(e) { alert('로그인이 필요합니다'); return; }
+  _guideGender = '';
+  document.getElementById('guidePersonName').value = '';
+  document.getElementById('guidePersonRel').value = '';
+  document.getElementById('guidePersonHour').value = '';
+  ['guidePgMale','guidePgFemale'].forEach(function(id){
+    var el = document.getElementById(id);
+    el.style.borderColor = 'rgba(255,255,255,0.15)'; el.style.background = 'rgba(255,255,255,0.04)'; el.style.color = 'rgba(255,255,255,0.55)';
+  });
+  // populate selects (재사용)
+  var yEl = document.getElementById('guidePersonYear');
+  yEl.innerHTML = '<option value="">년</option>';
+  for (var y = new Date().getFullYear(); y >= 1930; y--) { var o = document.createElement('option'); o.value = y; o.textContent = y + '년'; yEl.appendChild(o); }
+  var mEl = document.getElementById('guidePersonMonth');
+  mEl.innerHTML = '<option value="">월</option>';
+  for (var m = 1; m <= 12; m++) { var o = document.createElement('option'); o.value = m; o.textContent = m + '월'; mEl.appendChild(o); }
+  var dEl = document.getElementById('guidePersonDay');
+  dEl.innerHTML = '<option value="">일</option>';
+  for (var d = 1; d <= 31; d++) { var o = document.createElement('option'); o.value = d; o.textContent = d + '일'; dEl.appendChild(o); }
+  document.getElementById('guideOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  history.pushState({ modal: 'guide' }, '');
+}
+
+function closeGuideModal() {
+  document.getElementById('guideOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function submitGuideProfile() {
+  var name = (document.getElementById('guidePersonName').value || '').trim();
+  var rel  = document.getElementById('guidePersonRel').value || '';
+  var year = parseInt(document.getElementById('guidePersonYear').value);
+  var mon  = parseInt(document.getElementById('guidePersonMonth').value);
+  var day  = parseInt(document.getElementById('guidePersonDay').value);
+  var hr   = document.getElementById('guidePersonHour').value;
+  var gen  = _guideGender;
+  if (!year || !mon || !day) { alert('생년월일을 모두 선택해주세요'); return; }
+  if (!gen) { alert('성별을 선택해주세요'); return; }
+  var profile = {
+    name: name || (rel ? rel : '이 사람'),
+    relation: rel,
+    year: year, month: mon, day: day,
+    hour: (hr === '' || hr === null) ? 'unknown' : parseInt(hr),
+    gender: gen
+  };
+  try { sessionStorage.setItem('pico_guide_profile', JSON.stringify(profile)); } catch(e) {}
+  closeGuideModal();
+  window.location.href = 'report.html?type=guide&src=session';
 }
 
 function _calcSaju(year, month, day, hour) {

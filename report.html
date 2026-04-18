@@ -2485,12 +2485,22 @@ function buildAccuracyLayerBlock() {
   try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
   if (!_user || !_user.id) { location.href = 'index.html'; return; }
 
-  // 프로필 확인
-  try { _profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
-  if (!_profile || !_profile.year) {
-    setLoading('프로필 필요', '사주 정보를 먼저 입력해주세요');
-    setTimeout(() => location.href = 'index.html', 2000);
-    return;
+  // 프로필 확인 — guide 타입은 sessionStorage의 1회성 프로필 사용 (다른 사람용)
+  var _useSession = (_type === 'guide' && new URLSearchParams(location.search).get('src') === 'session');
+  if (_useSession) {
+    try { _profile = JSON.parse(sessionStorage.getItem('pico_guide_profile')); } catch(e) {}
+    if (!_profile || !_profile.year) {
+      setLoading('프로필 필요', '분석할 사람의 정보를 먼저 입력해주세요');
+      setTimeout(() => location.href = 'index.html', 2000);
+      return;
+    }
+  } else {
+    try { _profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+    if (!_profile || !_profile.year) {
+      setLoading('프로필 필요', '사주 정보를 먼저 입력해주세요');
+      setTimeout(() => location.href = 'index.html', 2000);
+      return;
+    }
   }
 
   document.getElementById('btnGenerate').onclick = function() {
@@ -2517,6 +2527,21 @@ function renderIntro() {
   document.getElementById('introEmoji').innerHTML = d.emoji;
   document.getElementById('introTitle').textContent = _config.title;
   document.getElementById('introDesc').textContent = d.subtitle;
+
+  // guide 타입: 분석 대상 표시 (다른 사람이므로 누구인지 확인용)
+  if (_type === 'guide' && _profile) {
+    let subjEl = document.getElementById('introSubject');
+    if (!subjEl) {
+      subjEl = document.createElement('div');
+      subjEl.id = 'introSubject';
+      subjEl.style.cssText = 'margin:14px auto 4px;padding:10px 14px;background:rgba(240,140,180,0.1);border:1px solid rgba(240,140,180,0.3);border-radius:10px;font-size:13px;color:#f0c8d8;text-align:center;max-width:380px;';
+      document.querySelector('.intro-header').appendChild(subjEl);
+    }
+    const hourTxt = (_profile.hour === 'unknown' || _profile.hour === undefined || _profile.hour === null || _profile.hour === '') ? '시 모름' : (_profile.hour + '시');
+    const genTxt = (_profile.gender === 'F' || _profile.gender === 'female') ? '여성' : '남성';
+    const relTxt = _profile.relation ? ' · <span style="color:#f08cb4;font-weight:700;">' + _profile.relation + '</span>' : '';
+    subjEl.innerHTML = '<span style="font-size:11px;color:rgba(255,255,255,0.5);">분석 대상</span><br><span style="font-size:14px;font-weight:700;color:#fff;">' + (_profile.name || '이 사람') + '</span>' + relTxt + '<br><span style="font-size:12px;color:rgba(255,255,255,0.6);">' + _profile.year + '년 ' + _profile.month + '월 ' + _profile.day + '일 · ' + hourTxt + ' · ' + genTxt + '</span>';
+  }
 
   // 설명문
   let descEl = document.getElementById('introFullDesc');
