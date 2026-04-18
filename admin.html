@@ -331,19 +331,37 @@ async function loadRecent() {
     const trs = rows.map(r => {
       const rs = Array.isArray(r.reasons) ? r.reasons : [];
       const reasonsHtml = rs.map(x => `<span>${escapeHtml(x)}</span>`).join('');
-      return `<tr>
+      return `<tr data-id="${escapeHtml(r.id)}">
         <td style="color:var(--muted); white-space:nowrap;">${fmtDate(r.created_at)}</td>
         <td><span class="${pillClass(r.source)}">${r.source}</span></td>
         <td>${r.source_type || '-'}</td>
         <td class="${r.rating === 1 ? 'rating-up' : 'rating-down'}">${r.rating === 1 ? '👍' : '👎'}</td>
         <td class="reasons">${reasonsHtml || '<span style="color:var(--muted); background:none; border:none; padding:0;">-</span>'}</td>
         <td class="comment">${escapeHtml(r.comment || '') || '<span style="color:var(--muted);">-</span>'}</td>
-        <td style="color:var(--muted); font-family:monospace; font-size:10px;">${(r.user_id||'').slice(0,8)}</td>
+        <td style="color:var(--muted); font-family:monospace; font-size:10px;">${(r.user_id||'').slice(0,16)}</td>
+        <td><button class="del-btn" data-id="${escapeHtml(r.id)}" style="padding:4px 8px; border-radius:6px; background:rgba(244,67,54,0.15); border:1px solid rgba(244,67,54,0.4); color:#f08a80; font-size:11px; cursor:pointer; font-family:inherit;">삭제</button></td>
       </tr>`;
     }).join('');
     qs('recentTable').innerHTML = `<table><thead><tr>
-      <th>시각</th><th>소스</th><th>타입</th><th>평가</th><th>이유</th><th>코멘트</th><th>유저</th>
+      <th>시각</th><th>소스</th><th>타입</th><th>평가</th><th>이유</th><th>코멘트</th><th>유저</th><th></th>
     </tr></thead><tbody>${trs}</tbody></table>`;
+    qs('recentTable').querySelectorAll('.del-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('이 피드백을 삭제할까요?')) return;
+        const id = btn.getAttribute('data-id');
+        btn.disabled = true; btn.textContent = '삭제중...';
+        try {
+          const res = await fetch(`${API}/feedback-row?admin=${encodeURIComponent(adminUuid)}&id=${encodeURIComponent(id)}`, { method:'DELETE' });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || 'delete failed');
+          btn.closest('tr').remove();
+          loadStats(); loadDaily();
+        } catch(e) {
+          alert('삭제 실패: ' + e.message);
+          btn.disabled = false; btn.textContent = '삭제';
+        }
+      });
+    });
   } catch(e) {
     qs('recentTable').innerHTML = `<div class="empty" style="color:var(--bad);">오류: ${e.message}</div>`;
   }
