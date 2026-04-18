@@ -3841,9 +3841,15 @@ function checkAuth() {
           syncProfilesFromServer(currentUser.id).then(function() { loadMiniScore(); });
         });
       } else if (!currentUser.email) {
-        localStorage.removeItem('pico_user');
-        currentUser = null;
-        updateAuthUI();
+        // 구버전 pico_user (email 누락) — id가 있으면 로그인 유지
+        if (currentUser.id) {
+          updateAuthUI();
+          syncProfilesFromServer(currentUser.id).then(function() { loadMiniScore(); }).catch(function(){});
+        } else {
+          localStorage.removeItem('pico_user');
+          currentUser = null;
+          updateAuthUI();
+        }
       } else {
         updateAuthUI();
         syncProfilesFromServer(currentUser.id).then(function() { loadMiniScore(); });
