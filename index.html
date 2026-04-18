@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PICO Lab · AI 운세 플랫폼</title>
+<meta name="theme-color" content="#0a0a0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="피코랩">
+<link rel="apple-touch-icon" href="/img/goddess.png">
+<link rel="manifest" href="/manifest.json?v=1.0.0">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -5261,11 +5268,155 @@ function _urlBase64ToUint8Array(b64) {
 }
 
 // SW 등록 (페이지 로드 시)
+var APP_VERSION = '1.0.0';
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(function(e) {
+  navigator.serviceWorker.register('/sw.js?v=' + APP_VERSION, { scope: '/' }).catch(function(e) {
     console.warn('[pico sw]', e);
   });
 }
+
+// ── PWA 설치 배너 ─────────────────────────────────────────────
+// TWA 또는 standalone으로 이미 실행 중이면 설치 배너 차단
+var _picoIsStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+var _picoDeferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  if (_picoIsStandalone) return;
+  _picoDeferredPrompt = e;
+  picoShowInstallBanner();
+});
+
+function picoShowInstallBanner() {
+  if (document.getElementById('picoInstallBanner')) return;
+  var banner = document.createElement('div');
+  banner.id = 'picoInstallBanner';
+  banner.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:9999;' +
+    'background:linear-gradient(135deg,#1a0533,#0a0a2e);' +
+    'border:1px solid rgba(200,162,245,0.4);border-radius:16px;' +
+    'padding:16px;display:flex;align-items:center;gap:12px;' +
+    'box-shadow:0 8px 32px rgba(124,92,252,0.3);';
+  banner.innerHTML =
+    '<div style="font-size:28px;flex-shrink:0;">🔮</div>' +
+    '<div style="flex:1;">' +
+      '<div style="font-size:13px;font-weight:700;color:#f0f0f0;margin-bottom:2px;">홈화면에 추가하기</div>' +
+      '<div style="font-size:11px;color:#aaa;">앱처럼 바로 실행할 수 있어요</div>' +
+    '</div>' +
+    '<button onclick="picoInstallApp()" style="' +
+      'background:linear-gradient(135deg,#7b5ea7,#a07fd4);' +
+      'border:none;border-radius:10px;padding:8px 14px;' +
+      'color:#fff;font-size:12px;font-weight:700;cursor:pointer;' +
+      'font-family:\"Noto Sans KR\",sans-serif;white-space:nowrap;">설치</button>' +
+    '<button onclick="document.getElementById(\'picoInstallBanner\').remove()" style="' +
+      'background:none;border:none;color:#666;font-size:18px;cursor:pointer;padding:4px;">✕</button>';
+  document.body.appendChild(banner);
+}
+
+function picoInstallApp() {
+  if (!_picoDeferredPrompt) return;
+  _picoDeferredPrompt.prompt();
+  _picoDeferredPrompt.userChoice.then(function(result) {
+    _picoDeferredPrompt = null;
+    var b = document.getElementById('picoInstallBanner');
+    if (b) b.remove();
+  });
+}
+
+window.addEventListener('appinstalled', function() {
+  var b = document.getElementById('picoInstallBanner');
+  if (b) b.remove();
+});
+
+// ── 카카오/인앱 브라우저 감지 → Chrome 전환 배너 ─────────────
+function picoIsInAppBrowser() {
+  var ua = navigator.userAgent || '';
+  return /KAKAOTALK|NAVER|FB_IAB|FBAN|FBAV|Instagram|Line|DaumApps|everytimeApp/i.test(ua);
+}
+
+function picoShowChromeBanner() {
+  if (document.getElementById('picoChromeBanner')) return;
+  if (_picoIsStandalone) return;
+  var ua = navigator.userAgent || '';
+  var isAndroid = /Android/i.test(ua);
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var banner = document.createElement('div');
+  banner.id = 'picoChromeBanner';
+  banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;' +
+    'background:linear-gradient(135deg,#1a0533,#0a0a2e);' +
+    'border-bottom:1px solid rgba(200,162,245,0.4);' +
+    'padding:14px 16px;display:flex;align-items:center;gap:10px;' +
+    'box-shadow:0 4px 20px rgba(0,0,0,0.4);';
+  if (isAndroid) {
+    var fullUrl = 'https://picolab.kr' + window.location.pathname + window.location.search;
+    var path = 'picolab.kr' + window.location.pathname + window.location.search;
+    var intentUrl = 'intent://' + path + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(fullUrl) + ';end';
+    banner.innerHTML =
+      '<div style="font-size:20px;">🌐</div>' +
+      '<div style="flex:1;font-size:12px;color:#f0f0f0;line-height:1.4;">' +
+        '<div style="font-weight:700;margin-bottom:2px;">크롬에서 열어주세요</div>' +
+        '<div style="font-size:10px;color:#aaa;">카카오 브라우저는 설치·알림 기능이 제한돼요</div>' +
+      '</div>' +
+      '<button onclick="location.href=\'' + intentUrl + '\'" style="' +
+        'background:linear-gradient(135deg,#7b5ea7,#a07fd4);border:none;border-radius:8px;' +
+        'padding:8px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;' +
+        'font-family:\"Noto Sans KR\",sans-serif;white-space:nowrap;">크롬으로 열기</button>' +
+      '<button onclick="document.getElementById(\'picoChromeBanner\').remove()" style="' +
+        'background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:2px 4px;">✕</button>';
+  } else if (isIOS) {
+    banner.innerHTML =
+      '<div style="font-size:20px;">🌐</div>' +
+      '<div style="flex:1;font-size:12px;color:#f0f0f0;line-height:1.4;">' +
+        '<div style="font-weight:700;margin-bottom:2px;">사파리에서 열어주세요</div>' +
+        '<div style="font-size:10px;color:#aaa;">우측 상단 ⋯ → "다른 브라우저로 열기"</div>' +
+      '</div>' +
+      '<button onclick="navigator.clipboard&&navigator.clipboard.writeText(\'https://picolab.kr\'+location.pathname+location.search);this.textContent=\'복사됨\';" style="' +
+        'background:linear-gradient(135deg,#7b5ea7,#a07fd4);border:none;border-radius:8px;' +
+        'padding:8px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;' +
+        'font-family:\"Noto Sans KR\",sans-serif;white-space:nowrap;">주소 복사</button>' +
+      '<button onclick="document.getElementById(\'picoChromeBanner\').remove()" style="' +
+        'background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:2px 4px;">✕</button>';
+  } else {
+    return;
+  }
+  document.body.appendChild(banner);
+}
+
+if (picoIsInAppBrowser()) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', picoShowChromeBanner);
+  } else {
+    picoShowChromeBanner();
+  }
+}
+
+// ── iOS Safari: beforeinstallprompt 없으므로 수동 안내 ─────────
+(function() {
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isSafari = /Safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS/i.test(ua);
+  if (!isIOS || !isSafari || _picoIsStandalone) return;
+  if (picoIsInAppBrowser()) return;
+  if (localStorage.getItem('pico_ios_install_dismissed')) return;
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      if (document.getElementById('picoIosInstallBanner')) return;
+      var b = document.createElement('div');
+      b.id = 'picoIosInstallBanner';
+      b.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:9999;' +
+        'background:linear-gradient(135deg,#1a0533,#0a0a2e);' +
+        'border:1px solid rgba(200,162,245,0.4);border-radius:16px;padding:16px;' +
+        'display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(124,92,252,0.3);';
+      b.innerHTML =
+        '<div style="font-size:28px;">🔮</div>' +
+        '<div style="flex:1;font-size:12px;color:#f0f0f0;line-height:1.5;">' +
+          '<div style="font-weight:700;margin-bottom:4px;">홈화면에 추가하기</div>' +
+          '<div style="font-size:11px;color:#aaa;">공유 <b>⬆</b> → "홈 화면에 추가"</div>' +
+        '</div>' +
+        '<button onclick="localStorage.setItem(\'pico_ios_install_dismissed\',\'1\');document.getElementById(\'picoIosInstallBanner\').remove();" style="' +
+          'background:none;border:none;color:#666;font-size:18px;cursor:pointer;padding:4px;">✕</button>';
+      document.body.appendChild(b);
+    }, 3000);
+  });
+})();
 
 // 현재 구독 상태 확인 후 버튼 레이블 업데이트
 async function refreshPushBtnLabel() {
