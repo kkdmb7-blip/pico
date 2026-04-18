@@ -511,7 +511,10 @@ nav {
           <select id="dadMonth" class="rec-sel"><option value="">월</option></select>
           <select id="dadDay" class="rec-sel"><option value="">일</option></select>
         </div>
-        <select id="dadHour" class="rec-sel" style="width:100%;"><option value="">시 모름</option></select>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <select id="dadHour" class="rec-sel"><option value="">시 모름</option></select>
+          <select id="dadMin" class="rec-sel"><option value="0">0분</option></select>
+        </div>
       </details>
       <details>
         <summary style="font-size:12px;color:var(--text);cursor:pointer;padding:6px 0;">👩 엄마 생년월일시 입력</summary>
@@ -520,7 +523,10 @@ nav {
           <select id="momMonth" class="rec-sel"><option value="">월</option></select>
           <select id="momDay" class="rec-sel"><option value="">일</option></select>
         </div>
-        <select id="momHour" class="rec-sel" style="width:100%;"><option value="">시 모름</option></select>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <select id="momHour" class="rec-sel"><option value="">시 모름</option></select>
+          <select id="momMin" class="rec-sel"><option value="0">0분</option></select>
+        </div>
       </details>
     </div>
 
@@ -1376,7 +1382,7 @@ var CHILD_ORB_COST = 300;
 var _childPaid = false;
 
 function _getChildInputKey() {
-  var ids = ['childYear','childMonth','childDay','childHour','childMin','dadYear','dadMonth','dadDay','dadHour','momYear','momMonth','momDay','momHour'];
+  var ids = ['childYear','childMonth','childDay','childHour','childMin','dadYear','dadMonth','dadDay','dadHour','dadMin','momYear','momMonth','momDay','momHour','momMin'];
   return ids.map(function(id){ var e=document.getElementById(id); return e ? e.value : ''; }).join('|') + '|' + childGender;
 }
 
@@ -1412,7 +1418,7 @@ function prefillChild() {
   ['childYear','dadYear','momYear'].forEach(function(id){ _populateRecSelect(id,'year'); });
   ['childMonth','dadMonth','momMonth'].forEach(function(id){ _populateRecSelect(id,'month'); });
   ['childDay','dadDay','momDay'].forEach(function(id){ _populateRecSelect(id,'day'); });
-  _populateRecSelect('childMin','min');
+  ['childMin','dadMin','momMin'].forEach(function(id){ _populateRecSelect(id,'min'); });
   ['childHour','dadHour','momHour'].forEach(_populateChildHour);
   var curSur = document.getElementById('inputSur').value.trim();
   var cSur = document.getElementById('childSur');
@@ -1433,36 +1439,46 @@ function fetchChildYongsin(cb) {
   var dd = parseInt(document.getElementById('dadDay').value);
   var dhRaw = document.getElementById('dadHour').value;
   var dh = dhRaw === '' ? -1 : parseInt(dhRaw);
+  var dMinEl = document.getElementById('dadMin');
+  var dMinute = dMinEl ? (parseInt(dMinEl.value) || 0) : 0;
   var my = parseInt(document.getElementById('momYear').value);
   var mm = parseInt(document.getElementById('momMonth').value);
   var md = parseInt(document.getElementById('momDay').value);
   var mhRaw = document.getElementById('momHour').value;
   var mh = mhRaw === '' ? -1 : parseInt(mhRaw);
+  var mMinEl = document.getElementById('momMin');
+  var mMinute = mMinEl ? (parseInt(mMinEl.value) || 0) : 0;
   var hasDad = dy && dm && dd;
   var hasMom = my && mm && md;
 
-  var API = 'https://fortuna.kkdmb7.workers.dev/saju-report';
+  function toBirthISO(yy, mo, da, hr, mi) {
+    var hh = (hr >= 0) ? hr : 0;
+    return yy + '-' + String(mo).padStart(2,'0') + '-' + String(da).padStart(2,'0') +
+           'T' + String(hh).padStart(2,'0') + ':' + String(mi).padStart(2,'0') + ':00';
+  }
+
+  var API = 'https://fortuna.kkdmb7.workers.dev/saju-test';
   var headers = {'Content-Type':'application/json'};
   var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   var timedOut = false;
   var timer = setTimeout(function(){ timedOut = true; if (ctrl) ctrl.abort(); }, 20000);
   var fetchOpt = ctrl ? { signal: ctrl.signal } : {};
   var calls = [
-    fetch(API, Object.assign({ method:'POST', headers:headers, body: JSON.stringify({ name:'아이', gender:childGender, year:y, month:m, day:d, hour:h, minute:minute }) }, fetchOpt))
+    fetch(API, Object.assign({ method:'POST', headers:headers, body: JSON.stringify({ birth: toBirthISO(y,m,d,h,minute), gender:childGender, calendar:'solar' }) }, fetchOpt))
       .then(function(r){ return r.json(); })
   ];
   calls.push(hasDad
-    ? fetch(API, Object.assign({ method:'POST', headers:headers, body: JSON.stringify({ name:'아빠', gender:'M', year:dy, month:dm, day:dd, hour:dh, minute:0 }) }, fetchOpt)).then(function(r){ return r.json(); })
+    ? fetch(API, Object.assign({ method:'POST', headers:headers, body: JSON.stringify({ birth: toBirthISO(dy,dm,dd,dh,dMinute), gender:'M', calendar:'solar' }) }, fetchOpt)).then(function(r){ return r.json(); })
     : Promise.resolve(null));
   calls.push(hasMom
-    ? fetch(API, Object.assign({ method:'POST', headers:headers, body: JSON.stringify({ name:'엄마', gender:'F', year:my, month:mm, day:md, hour:mh, minute:0 }) }, fetchOpt)).then(function(r){ return r.json(); })
+    ? fetch(API, Object.assign({ method:'POST', headers:headers, body: JSON.stringify({ birth: toBirthISO(my,mm,md,mh,mMinute), gender:'F', calendar:'solar' }) }, fetchOpt)).then(function(r){ return r.json(); })
     : Promise.resolve(null));
 
   Promise.all(calls).then(function(res) {
     clearTimeout(timer);
-    _childYongsin = res[0] ? (res[0].yongshin || res[0].yongsin) : null;
-    _dadYongsin = res[1] ? (res[1].yongshin || res[1].yongsin) : null;
-    _momYongsin = res[2] ? (res[2].yongshin || res[2].yongsin) : null;
+    _childYongsin = res[0] ? normalizeYongsin(res[0].yongshin || res[0].yongsin) : null;
+    _dadYongsin = res[1] ? normalizeYongsin(res[1].yongshin || res[1].yongsin) : null;
+    _momYongsin = res[2] ? normalizeYongsin(res[2].yongshin || res[2].yongsin) : null;
     if (!_childYongsin) {
       showToast('아이 용신 정보를 받지 못했어요. 다시 시도해주세요', true);
       _childYongsinKey = null; // 캐시 무효화
