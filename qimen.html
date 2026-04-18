@@ -6,6 +6,7 @@
 <title>기문둔갑 포국반 · FORTUNA</title>
 <meta name="description" content="기문둔갑 시가·일가 포국반. 날짜와 시각을 입력하면 9궁 포국 결과를 즉시 확인할 수 있습니다.">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <style>
   :root {
     --bg: #09090f;
@@ -2208,17 +2209,27 @@ function shareQimenKakao() {
     // URL 클립보드 복사
     try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
 
+    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    var kText = '🔮 FORTUNA 기문둔갑\n\n나도 확인해봐 👇';
     canvas.toBlob(function(blob) {
       if (!blob) { _qimenShowToast('이미지 생성 실패 <i class="pi pi-sad"></i>'); return; }
       var file = new File([blob], 'fortuna_qimen.png', { type: 'image/png' });
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         navigator.share({ files: [file], title: 'FORTUNA 기문둔갑' })
           .then(function() { _qimenShowToast('<i class="pi pi-link"></i> 링크가 클립보드에 복사됐어요!'); })
           .catch(function() {});
-      } else if (navigator.share) {
+      } else if (isMobile && navigator.share) {
         navigator.share({ title: 'FORTUNA 기문둔갑', url: pageUrl })
           .catch(function() {});
         _qimenShowToast('<i class="pi pi-link"></i> 링크가 클립보드에 복사됐어요!');
+      } else if (window.Kakao && Kakao.Share) {
+        if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
+        Kakao.Share.sendDefault({
+          objectType: 'text',
+          text: kText,
+          link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
+          buttons: [{ title: '무료로 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+        });
       } else {
         try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
         _qimenShowToast('<i class="pi pi-link"></i> 링크가 클립보드에 복사됐어요!');

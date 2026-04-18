@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>베딕 점성술 · FORTUNA</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <style>
   :root {
     --bg:#0a0a0f; --surface:#13131a; --surface2:#1c1c28;
@@ -821,13 +822,23 @@ function shareVedicKakao() {
 function doVedicShare() {
   var canvas = window._vedicCanvas; if (!canvas) return;
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
+  var text = '🔮 FORTUNA 베딕 점성술\n\n나도 확인해봐 👇';
   try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   canvas.toBlob(function(blob){
     var file=new File([blob],'fortuna_vedic.png',{type:'image/png'});
-    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+    if(isMobile && navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
       navigator.share({files:[file],title:'FORTUNA 베딕 점성술'}).catch(function(){});
-    } else if(navigator.share){
+    } else if(isMobile && navigator.share){
       navigator.share({title:'FORTUNA 베딕 점성술',url:pageUrl}).catch(function(){});
+    } else if (window.Kakao && Kakao.Share) {
+      if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
+      Kakao.Share.sendDefault({
+        objectType: 'text',
+        text: text,
+        link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
+        buttons: [{ title: '무료로 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+      });
     } else { _vedicShowToast('<i class="pi pi-link"></i> 링크가 클립보드에 복사됐어요!'); }
   },'image/png');
 }

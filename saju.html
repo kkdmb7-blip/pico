@@ -1631,12 +1631,21 @@ function doSajuShare() {
   var pageUrl = 'https://picolab.kr';
   var text = '🔮 FORTUNA 사주 분석\n일주: '+dayPillar+(yongshin?' · 용신: '+yongshin:'')+(d.summary&&d.summary.strength?' · '+d.summary.strength:'')+'\n\n나도 확인해봐 👇\n'+pageUrl;
   try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   _sajuCanvas.toBlob(function(blob) {
     var file = new File([blob], 'fortuna_saju.png', { type: 'image/png' });
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       navigator.share({ files: [file], text: text }).catch(function(){});
-    } else if (navigator.share) {
+    } else if (isMobile && navigator.share) {
       navigator.share({ title: 'FORTUNA 사주', text: text }).catch(function(){});
+    } else if (window.Kakao && Kakao.Share) {
+      if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
+      Kakao.Share.sendDefault({
+        objectType: 'text',
+        text: text,
+        link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
+        buttons: [{ title: '무료로 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+      });
     } else {
       alert('클립보드에 복사됐어요!');
     }

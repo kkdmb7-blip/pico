@@ -6,6 +6,7 @@
 <title>오늘의 운세 점수 · PICO Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <style>
 :root {
   --bg: #0a0a0f;
@@ -788,8 +789,17 @@ function shareScoreKakao() {
   var today = _scoreResult ? _scoreResult.today : '';
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
   var text = '🔮 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n\n재물/관계/건강/학업/이동 5개 분야 종합\n\n나도 확인해봐 👇';
-  if (navigator.share) {
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile && navigator.share) {
     navigator.share({ title: 'FORTUNA 운세점수', text: text, url: pageUrl }).catch(function(){});
+  } else if (window.Kakao && Kakao.Share) {
+    if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
+    Kakao.Share.sendDefault({
+      objectType: 'text',
+      text: text,
+      link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
+      buttons: [{ title: '무료로 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+    });
   } else {
     navigator.clipboard && navigator.clipboard.writeText(text + '\n' + pageUrl)
       .then(function() { showToast('<i class="pi pi-notepad"></i> 링크가 복사됐어요!'); })
