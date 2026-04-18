@@ -1025,16 +1025,19 @@ function fetchTargetYongsin(cb) {
     timedOut = true;
     if (ctrl) ctrl.abort();
   }, 15000);
-  fetch('https://fortuna.kkdmb7.workers.dev/saju-report', {
+  var hVal = (h >= 0) ? h : 0;
+  var birthISO = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0') +
+                 'T' + String(hVal).padStart(2,'0') + ':' + String(minute).padStart(2,'0') + ':00';
+  fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ name: '대상', gender: g, year: y, month: m, day: d, hour: h, minute: minute }),
+    body: JSON.stringify({ birth: birthISO, gender: g, calendar: 'solar' }),
     signal: ctrl ? ctrl.signal : undefined
   })
   .then(function(r){ return r.json(); })
   .then(function(data){
     clearTimeout(timer);
-    _targetYongsin = data.yongshin || data.yongsin || null;
+    _targetYongsin = normalizeYongsin(data.yongshin || data.yongsin);
     updateTargetHint();
     if (!_targetYongsin) {
       showToast('용신 정보를 받지 못했어요. 잠시 후 다시 시도해주세요', true);
@@ -2000,28 +2003,34 @@ function getYongsinOhaeng(yongsin) {
   return null;
 }
 
+var EN_TO_OH = { wood:'목', fire:'화', earth:'토', metal:'금', water:'수' };
+function normalizeYongsin(raw) {
+  if (!raw) return null;
+  if (typeof raw === 'string') return raw;
+  var p = raw.primary || raw.pri || '';
+  if (!p) return null;
+  return EN_TO_OH[String(p).toLowerCase()] || p;
+}
+
 function loadSajuData() {
   var user = null;
   try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
   if (!user) return;
   var profile = null;
   try { profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
-  if (!profile) return;
-  fetch('https://fortuna.kkdmb7.workers.dev/saju-report', {
+  if (!profile || !profile.year || !profile.month || !profile.day) return;
+  var hour = (profile.hour !== undefined && profile.hour !== null && profile.hour >= 0) ? profile.hour : 0;
+  var birthISO = profile.year + '-' + String(profile.month).padStart(2,'0') + '-' + String(profile.day).padStart(2,'0') +
+                 'T' + String(hour).padStart(2,'0') + ':00:00';
+  var g = (profile.gender === 'F' || profile.gender === 'female') ? 'F' : 'M';
+  fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      name: profile.name,
-      gender: profile.gender,
-      year: profile.year,
-      month: profile.month,
-      day: profile.day,
-      hour: profile.hour !== undefined ? profile.hour : -1
-    })
+    body: JSON.stringify({ birth: birthISO, gender: g, calendar: 'solar' })
   })
   .then(function(r){ return r.json(); })
   .then(function(data) {
-    _yongsin = data.yongshin || data.yongsin || null;
+    _yongsin = normalizeYongsin(data.yongshin || data.yongsin);
     _geokguk = data.geokguk || null;
   })
   .catch(function(){});
