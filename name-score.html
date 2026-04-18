@@ -74,8 +74,19 @@ nav {
   text-transform:uppercase; margin-bottom:12px;
 }
 .mode-tabs {
-  display:grid; grid-template-columns:repeat(4,1fr);
-  gap:6px; margin-bottom:14px;
+  display:grid; grid-template-columns:repeat(5,1fr);
+  gap:5px; margin-bottom:14px;
+}
+.mode-tab.premium {
+  background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(123,94,167,0.12));
+  border-color:var(--gold);
+  position:relative;
+}
+.mode-tab.premium::after {
+  content:'PRO'; position:absolute; top:-5px; right:-3px;
+  background:var(--gold); color:#1a1a2e;
+  font-size:8px; font-weight:800; padding:1px 4px;
+  border-radius:3px; letter-spacing:0.05em;
 }
 .mode-tab {
   background: var(--surface2); border:1px solid var(--border);
@@ -363,6 +374,7 @@ nav {
     <div class="mode-tab" id="tabSelect" onclick="setMode('select')">한자 선택</div>
     <div class="mode-tab" id="tabManual" onclick="setMode('manual')">한자 수동</div>
     <div class="mode-tab" id="tabRecommend" onclick="setMode('recommend')">이름 추천</div>
+    <div class="mode-tab premium" id="tabChild" onclick="setMode('child')">아이 작명</div>
   </div>
 
   <div class="input-card" id="inputCardMain">
@@ -442,6 +454,80 @@ nav {
   </div>
 
   <div id="recommendResult" style="display:none; margin-bottom:14px;"></div>
+
+  <div class="input-card" id="childCard" style="display:none;">
+    <div style="padding:12px 14px;background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(123,94,167,0.1));border:1px solid var(--gold);border-radius:12px;margin-bottom:16px;">
+      <div style="font-size:10px;color:var(--gold);letter-spacing:0.15em;font-weight:800;margin-bottom:5px;">💎 PRO · 프리미엄 작명</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.55;">아이 사주 + 부모 궁합 + 형제 조화 + 항렬까지 한번에 고려한 맞춤 작명</div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label class="field-label">성씨</label>
+      <input class="name-input" id="childSur" type="text" maxlength="3" placeholder="김">
+    </div>
+
+    <div style="margin-bottom:14px;padding:12px;background:rgba(123,94,167,0.06);border:1px solid rgba(212,175,55,0.2);border-radius:10px;">
+      <div style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.1em;margin-bottom:10px;">👶 아이 정보 (필수)</div>
+      <label class="field-label">생년월일</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+        <select id="childYear" class="rec-sel"><option value="">년</option></select>
+        <select id="childMonth" class="rec-sel"><option value="">월</option></select>
+        <select id="childDay" class="rec-sel"><option value="">일</option></select>
+      </div>
+      <label class="field-label">태어난 시간 (선택)</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+        <select id="childHour" class="rec-sel"><option value="">시 모름</option></select>
+        <select id="childMin" class="rec-sel"><option value="0">0분</option></select>
+      </div>
+      <label class="field-label">성별</label>
+      <div style="display:flex;gap:6px;">
+        <button type="button" class="mode-tab active" id="childGenderM" onclick="setChildGender('M')" style="flex:1;">남아</button>
+        <button type="button" class="mode-tab" id="childGenderF" onclick="setChildGender('F')" style="flex:1;">여아</button>
+      </div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:6px;line-height:1.5;">※ 한국 표준시로 입력 — 사주 계산 시 <b style="color:var(--gold);">진태양시</b>로 자동 보정</div>
+    </div>
+
+    <div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border:1px solid var(--border);border-radius:10px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:10px;">항렬·돌림자 (선택)</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <button type="button" class="mode-tab active" id="childHangNone" onclick="setChildHang('none')" style="flex:1;">없음</button>
+        <button type="button" class="mode-tab" id="childHangFirst" onclick="setChildHang('first')" style="flex:1;">첫글자 고정</button>
+        <button type="button" class="mode-tab" id="childHangLast" onclick="setChildHang('last')" style="flex:1;">끝글자 고정</button>
+      </div>
+      <input class="name-input" id="childHangChar" type="text" maxlength="1" placeholder="돌림자 한 글자 (예: 준)" style="display:none;">
+    </div>
+
+    <div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border:1px solid var(--border);border-radius:10px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:10px;">형제자매 이름 (선택 · 음오행 조화)</div>
+      <input class="name-input" id="childSibling" type="text" maxlength="4" placeholder="예: 민준">
+    </div>
+
+    <div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border:1px solid var(--border);border-radius:10px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:10px;">부모 사주 (선택 · 궁합 보너스)</div>
+      <details style="margin-bottom:8px;">
+        <summary style="font-size:12px;color:var(--text);cursor:pointer;padding:6px 0;">👨 아빠 생년월일시 입력</summary>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0;">
+          <select id="dadYear" class="rec-sel"><option value="">년</option></select>
+          <select id="dadMonth" class="rec-sel"><option value="">월</option></select>
+          <select id="dadDay" class="rec-sel"><option value="">일</option></select>
+        </div>
+        <select id="dadHour" class="rec-sel" style="width:100%;"><option value="">시 모름</option></select>
+      </details>
+      <details>
+        <summary style="font-size:12px;color:var(--text);cursor:pointer;padding:6px 0;">👩 엄마 생년월일시 입력</summary>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0;">
+          <select id="momYear" class="rec-sel"><option value="">년</option></select>
+          <select id="momMonth" class="rec-sel"><option value="">월</option></select>
+          <select id="momDay" class="rec-sel"><option value="">일</option></select>
+        </div>
+        <select id="momHour" class="rec-sel" style="width:100%;"><option value="">시 모름</option></select>
+      </details>
+    </div>
+
+    <button class="btn-gold" onclick="runChildRecommend()">우리 아이 이름 찾기 · 300 Orb</button>
+    <div class="orb-hint">아이 용신 + 부모 궁합 + 형제·항렬 모두 반영</div>
+    <div id="childResult" style="margin-top:16px;"></div>
+  </div>
 
   <div class="result-area" id="resultArea">
     <div class="section-label">4격 수리 결과</div>
@@ -753,22 +839,27 @@ var hanjaManual   = {};
 
 function setMode(m) {
   currentMode = m;
-  ['auto','select','manual','recommend'].forEach(function(id) {
+  ['auto','select','manual','recommend','child'].forEach(function(id) {
     var el = document.getElementById('tab' + id.charAt(0).toUpperCase() + id.slice(1));
     if (el) el.classList.toggle('active', id === m);
   });
   var isRec = (m === 'recommend');
-  document.getElementById('inputCardMain').style.display = isRec ? 'none' : 'block';
+  var isChild = (m === 'child');
+  var isBasic = !isRec && !isChild;
+  document.getElementById('inputCardMain').style.display = isBasic ? 'block' : 'none';
   document.getElementById('recommendCard').style.display = isRec ? 'block' : 'none';
-  document.getElementById('resultArea').classList.toggle('show', !isRec && lastScores);
+  document.getElementById('childCard').style.display = isChild ? 'block' : 'none';
+  document.getElementById('resultArea').classList.toggle('show', isBasic && lastScores);
   document.getElementById('recommendResult').style.display = isRec ? 'block' : 'none';
-  if (!isRec) {
+  if (isBasic) {
     document.getElementById('hanjaArea').style.display  = (m === 'select') ? 'block' : 'none';
     document.getElementById('strokeArea').style.display = (m === 'manual') ? 'block' : 'none';
     if (m === 'select') renderHanjaSelect();
     if (m === 'manual') renderStrokeArea();
-  } else {
+  } else if (isRec) {
     prefillRecommend();
+  } else if (isChild) {
+    prefillChild();
   }
 }
 
@@ -1177,6 +1268,438 @@ function saveRecommendReport(sur, top, activeYs, blurbs) {
       created_at: new Date().toISOString()
     })
   }).then(function(){ showToast('추천 결과가 저장되었습니다'); }).catch(function(){});
+}
+
+// ══════════ 아이 작명 모드 (Phase 2) ══════════
+var childGender = 'M';
+var childHang = 'none';
+var _childYongsin = null;
+var _dadYongsin = null;
+var _momYongsin = null;
+var _childYongsinKey = null;
+var CHILD_ORB_COST = 300;
+var _childPaid = false;
+
+function _getChildInputKey() {
+  var ids = ['childYear','childMonth','childDay','childHour','childMin','dadYear','dadMonth','dadDay','dadHour','momYear','momMonth','momDay','momHour'];
+  return ids.map(function(id){ var e=document.getElementById(id); return e ? e.value : ''; }).join('|') + '|' + childGender;
+}
+
+function setChildGender(g) {
+  childGender = g;
+  ['M','F'].forEach(function(x){
+    var el = document.getElementById('childGender'+x);
+    if (el) el.classList.toggle('active', x === g);
+  });
+}
+
+function setChildHang(h) {
+  childHang = h;
+  var map = { 'none': 'childHangNone', 'first': 'childHangFirst', 'last': 'childHangLast' };
+  Object.keys(map).forEach(function(k){
+    var el = document.getElementById(map[k]);
+    if (el) el.classList.toggle('active', k === h);
+  });
+  document.getElementById('childHangChar').style.display = (h === 'none') ? 'none' : 'block';
+}
+
+function _populateChildHour(selId) {
+  var el = document.getElementById(selId);
+  if (!el || el.options.length > 1) return;
+  for (var h = 0; h <= 23; h++) {
+    var o = document.createElement('option');
+    o.value = h; o.textContent = h + '시' + (h===0?' (자시)':'');
+    el.appendChild(o);
+  }
+}
+
+function prefillChild() {
+  ['childYear','dadYear','momYear'].forEach(function(id){ _populateRecSelect(id,'year'); });
+  ['childMonth','dadMonth','momMonth'].forEach(function(id){ _populateRecSelect(id,'month'); });
+  ['childDay','dadDay','momDay'].forEach(function(id){ _populateRecSelect(id,'day'); });
+  _populateRecSelect('childMin','min');
+  ['childHour','dadHour','momHour'].forEach(_populateChildHour);
+  var curSur = document.getElementById('inputSur').value.trim();
+  var cSur = document.getElementById('childSur');
+  if (curSur && !cSur.value) cSur.value = curSur;
+}
+
+function fetchChildYongsin(cb) {
+  var y = parseInt(document.getElementById('childYear').value);
+  var m = parseInt(document.getElementById('childMonth').value);
+  var d = parseInt(document.getElementById('childDay').value);
+  var hRaw = document.getElementById('childHour').value;
+  var h = hRaw === '' ? -1 : parseInt(hRaw);
+  var minute = parseInt(document.getElementById('childMin').value) || 0;
+  if (!y || !m || !d) { showToast('아이 생년월일을 입력해주세요', true); return; }
+
+  var dy = parseInt(document.getElementById('dadYear').value);
+  var dm = parseInt(document.getElementById('dadMonth').value);
+  var dd = parseInt(document.getElementById('dadDay').value);
+  var dhRaw = document.getElementById('dadHour').value;
+  var dh = dhRaw === '' ? -1 : parseInt(dhRaw);
+  var my = parseInt(document.getElementById('momYear').value);
+  var mm = parseInt(document.getElementById('momMonth').value);
+  var md = parseInt(document.getElementById('momDay').value);
+  var mhRaw = document.getElementById('momHour').value;
+  var mh = mhRaw === '' ? -1 : parseInt(mhRaw);
+  var hasDad = dy && dm && dd;
+  var hasMom = my && mm && md;
+
+  var API = 'https://fortuna.kkdmb7.workers.dev/saju-report';
+  var headers = {'Content-Type':'application/json'};
+  var calls = [
+    fetch(API, { method:'POST', headers:headers, body: JSON.stringify({ name:'아이', gender:childGender, year:y, month:m, day:d, hour:h, minute:minute }) })
+      .then(function(r){ return r.json(); })
+  ];
+  calls.push(hasDad
+    ? fetch(API, { method:'POST', headers:headers, body: JSON.stringify({ name:'아빠', gender:'M', year:dy, month:dm, day:dd, hour:dh, minute:0 }) }).then(function(r){ return r.json(); })
+    : Promise.resolve(null));
+  calls.push(hasMom
+    ? fetch(API, { method:'POST', headers:headers, body: JSON.stringify({ name:'엄마', gender:'F', year:my, month:mm, day:md, hour:mh, minute:0 }) }).then(function(r){ return r.json(); })
+    : Promise.resolve(null));
+
+  Promise.all(calls).then(function(res) {
+    _childYongsin = res[0] ? (res[0].yongshin || res[0].yongsin) : null;
+    _dadYongsin = res[1] ? (res[1].yongshin || res[1].yongsin) : null;
+    _momYongsin = res[2] ? (res[2].yongshin || res[2].yongsin) : null;
+    if (cb) cb();
+  }).catch(function(){
+    showToast('사주 계산 실패', true);
+  });
+}
+
+function deductOrbChild(userId, amount) {
+  return getOrbBalance(userId).then(function(bal) {
+    if (bal < amount) return Promise.reject(new Error('잔액 부족'));
+    return fetch(SB_URL + '/rest/v1/orb_balance?user_id=eq.' + encodeURIComponent(userId), {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ balance: bal - amount })
+    }).then(function() {
+      return fetch(SB_URL + '/rest/v1/orb_transactions', {
+        method: 'POST',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ user_id: userId, amount: -amount, type: 'use', desc: '아이 작명' })
+      });
+    });
+  });
+}
+
+function runChildRecommend() {
+  var sur = document.getElementById('childSur').value.trim();
+  if (!sur) { showToast('성씨를 입력해주세요', true); return; }
+  var surList = SURNAME_HANJA[sur];
+  if (!surList || !surList.length) { showToast('등록된 성씨가 아닙니다', true); return; }
+
+  var y = parseInt(document.getElementById('childYear').value);
+  var m = parseInt(document.getElementById('childMonth').value);
+  var d = parseInt(document.getElementById('childDay').value);
+  if (!y || !m || !d) { showToast('아이 생년월일을 입력해주세요', true); return; }
+
+  var curKey = _getChildInputKey();
+  if (!_childYongsin || _childYongsinKey !== curKey) {
+    showToast('아이 사주 계산 중...');
+    _childYongsinKey = curKey;
+    fetchChildYongsin(function(){ runChildRecommend(); });
+    return;
+  }
+
+  var hangChar = null;
+  if (childHang !== 'none') {
+    hangChar = document.getElementById('childHangChar').value.trim();
+    if (!hangChar) { showToast('돌림자를 입력해주세요', true); return; }
+    if (!NAME_HANJA[hangChar]) { showToast('"' + hangChar + '"의 한자 정보가 없어요. 다른 글자를 써보세요', true); return; }
+  }
+
+  if (!_childPaid) {
+    var user = null;
+    try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e){}
+    if (!user) { showToast('로그인이 필요합니다', true); return; }
+    getOrbBalance(user.id).then(function(bal) {
+      if (bal < CHILD_ORB_COST) {
+        showToast('Orb가 부족합니다 (현재 ' + bal + ' / 필요 ' + CHILD_ORB_COST + ')', true);
+        return;
+      }
+      if (!confirm('우리 아이 작명을 실행합니다. ' + CHILD_ORB_COST + ' Orb가 차감됩니다.\n현재 잔액: ' + bal + ' Orb')) return;
+      deductOrbChild(user.id, CHILD_ORB_COST).then(function() {
+        _childPaid = true;
+        runChildRecommend();
+      }).catch(function(e) { showToast(e.message || '차감 오류', true); });
+    }).catch(function() { showToast('잔액 조회 오류', true); });
+    return;
+  }
+
+  var surItem = surList[0];
+  var surHanja = surItem[0], surSt = surItem[1], surOh = surItem[2];
+  var KO_OH = {'목':'木','화':'火','토':'土','금':'金','수':'水'};
+  var childYsHan = KO_OH[getYongsinOhaeng(_childYongsin)] || null;
+  var dadYsHan = _dadYongsin ? KO_OH[getYongsinOhaeng(_dadYongsin)] : null;
+  var momYsHan = _momYongsin ? KO_OH[getYongsinOhaeng(_momYongsin)] : null;
+
+  var siblingName = document.getElementById('childSibling').value.trim();
+  var siblingEums = siblingName ? siblingName.split('').map(getEumOhaeng) : [];
+
+  var all = [];
+  Object.keys(NAME_HANJA).forEach(function(sy) {
+    NAME_HANJA[sy].forEach(function(item) {
+      all.push({ syl: sy, hj: item[0], st: item[1], mean: item[2], oh: item[3] });
+    });
+  });
+
+  var firstList = all, secondList = all;
+  if (hangChar) {
+    var hangCands = NAME_HANJA[hangChar].map(function(item){
+      return { syl: hangChar, hj: item[0], st: item[1], mean: item[2], oh: item[3] };
+    });
+    if (childHang === 'first') firstList = hangCands;
+    else if (childHang === 'last') secondList = hangCands;
+  }
+
+  var cands = [];
+  for (var i=0; i<firstList.length; i++) {
+    for (var j=0; j<secondList.length; j++) {
+      var a = firstList[i], b = secondList[j];
+      if (a.syl === b.syl) continue;
+      var A = surSt, B = a.st, C = b.st;
+      var won = normalize81(B + C);
+      var hyun = normalize81(A + B);
+      var yi = normalize81(A + C);
+      var jung = normalize81(A + B + C);
+      var grades = [SURI_TABLE[won], SURI_TABLE[hyun], SURI_TABLE[yi], SURI_TABLE[jung]];
+      var sumScoreRaw = grades.reduce(function(acc,g){ return acc + (GRADE_SCORE[g]||0); }, 0) / 4;
+      if (sumScoreRaw < 95) continue;
+
+      var allChars = sur.split('').concat([a.syl, b.syl]);
+      var eumOhs = allChars.map(function(c){ return getEumOhaeng(c); });
+      var hasGeuk = false;
+      for (var k=0; k<eumOhs.length-1; k++) {
+        if (checkRelation(eumOhs[k], eumOhs[k+1]) === '상극') { hasGeuk = true; break; }
+      }
+      if (hasGeuk) continue;
+
+      var siblingHarmony = 0;
+      if (siblingEums.length) {
+        var myEum = eumOhs[1];
+        var conflict = false, harmony = 0;
+        siblingEums.forEach(function(se){
+          var rel = checkRelation(myEum, se);
+          if (rel === '상극') conflict = true;
+          else if (rel === '상생' || rel === '비화') harmony++;
+        });
+        if (conflict) continue;
+        siblingHarmony = harmony;
+      }
+
+      var sumScore = sumScoreRaw;
+      var ysBonus = 0;
+      if (childYsHan) {
+        if (a.oh === childYsHan) ysBonus += 15;
+        if (b.oh === childYsHan) ysBonus += 15;
+      }
+      if (dadYsHan && (a.oh === dadYsHan || b.oh === dadYsHan)) ysBonus += 5;
+      if (momYsHan && (a.oh === momYsHan || b.oh === momYsHan)) ysBonus += 5;
+      var gBonus = scoreGenderFit(a.mean, childGender) + scoreGenderFit(b.mean, childGender);
+      var sibBonus = siblingHarmony * 3;
+
+      cands.push({
+        name: a.syl + b.syl,
+        hanja: a.hj + b.hj,
+        strokes: [surSt, a.st, b.st],
+        ohs: [surOh, a.oh, b.oh],
+        means: [a.mean, b.mean],
+        gyek: { won: won, hyun: hyun, yi: yi, jung: jung },
+        grades: grades,
+        total: Math.round(sumScore + ysBonus + gBonus + sibBonus),
+        baseTotal: Math.round(sumScore),
+        ysMatch: childYsHan ? (a.oh === childYsHan ? 1 : 0) + (b.oh === childYsHan ? 1 : 0) : 0,
+        dadMatch: dadYsHan ? (a.oh === dadYsHan ? 1 : 0) + (b.oh === dadYsHan ? 1 : 0) : 0,
+        momMatch: momYsHan ? (a.oh === momYsHan ? 1 : 0) + (b.oh === momYsHan ? 1 : 0) : 0,
+        sibHarmony: siblingHarmony
+      });
+    }
+  }
+
+  cands.sort(function(x,y){ return y.total - x.total; });
+  var seen = {}, top = [];
+  for (var n=0; n<cands.length && top.length<5; n++) {
+    var key = cands[n].name;
+    if (seen[key]) continue;
+    seen[key] = 1; top.push(cands[n]);
+  }
+
+  renderChildRecommend(sur, surHanja, top);
+  _childPaid = false;
+}
+
+function renderChildRecommend(sur, surHanja, top) {
+  var el = document.getElementById('childResult');
+  if (!top.length) {
+    el.innerHTML = '<div class="analysis-card" style="text-align:center;color:var(--text-dim);line-height:1.8;">조건을 만족하는 이름을 찾지 못했습니다.<br><span style="font-size:11px;">항렬/형제 조건을 완화하거나 다른 성씨를 시도해보세요.</span></div>';
+    return;
+  }
+  var html = '<div class="section-label">' + sur + '씨 우리 아이 추천 이름 TOP ' + top.length + '</div>';
+  top.forEach(function(c, idx) {
+    var n0 = c.name[0], n1 = c.name[1];
+    var h0 = c.hanja[0], h1 = c.hanja[1];
+    var surO = c.ohs[0], oh0 = c.ohs[1], oh1 = c.ohs[2];
+    var coloredHangul = _colorHanja(sur, surO) + _colorHanja(n0, oh0) + _colorHanja(n1, oh1);
+    var coloredHanja  = _colorHanja(surHanja, surO) + _colorHanja(h0, oh0) + _colorHanja(h1, oh1);
+
+    html += '<div class="analysis-card" style="margin-bottom:12px;">';
+    html += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:10px;">';
+    html += '<div><div style="font-size:11px;color:var(--gold);letter-spacing:0.15em;margin-bottom:4px;">#'+(idx+1)+'</div>';
+    html += '<div style="font-size:22px;font-weight:700;line-height:1.2;font-family:\'Noto Serif KR\',serif;">'+coloredHangul+'</div>';
+    html += '<div style="font-size:15px;margin-top:4px;font-family:\'Noto Serif KR\',serif;">('+coloredHanja+')</div></div>';
+    html += '<div style="text-align:right;flex-shrink:0;"><div style="font-size:10px;color:var(--text-dim);letter-spacing:0.1em;">TOTAL</div><div style="font-size:28px;color:var(--gold);font-weight:700;line-height:1;">'+c.baseTotal+'</div><div style="font-size:10px;color:var(--text-dim);">/100</div></div>';
+    html += '</div>';
+
+    var badges = [];
+    if (c.ysMatch) badges.push('<span style="font-size:10px;background:rgba(76,175,122,0.15);color:#4caf7a;padding:3px 7px;border-radius:6px;"><i class="pi pi-check"></i> 아이 용신 '+c.ysMatch+'자</span>');
+    if (c.dadMatch) badges.push('<span style="font-size:10px;background:rgba(100,150,255,0.15);color:#6496ff;padding:3px 7px;border-radius:6px;">아빠 조화 '+c.dadMatch+'자</span>');
+    if (c.momMatch) badges.push('<span style="font-size:10px;background:rgba(255,138,180,0.15);color:#ff8ab4;padding:3px 7px;border-radius:6px;">엄마 조화 '+c.momMatch+'자</span>');
+    if (c.sibHarmony) badges.push('<span style="font-size:10px;background:rgba(212,175,55,0.15);color:var(--gold);padding:3px 7px;border-radius:6px;">형제 조화</span>');
+    if (badges.length) html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">'+badges.join('')+'</div>';
+
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">';
+    var gyekLabels = [
+      { k:'원격', easy:'청소년·20대', v:c.gyek.won,  g:c.grades[0] },
+      { k:'형격', easy:'30~50대',    v:c.gyek.hyun, g:c.grades[1] },
+      { k:'이격', easy:'인간관계',   v:c.gyek.yi,   g:c.grades[2] },
+      { k:'정격', easy:'인생 전체',  v:c.gyek.jung, g:c.grades[3] }
+    ];
+    gyekLabels.forEach(function(gy) {
+      var col = _GRADE_COL[gy.g]||'#8b8ba8';
+      var bg  = _GRADE_BG[gy.g]||'rgba(255,255,255,0.03)';
+      var bd  = _GRADE_BORDER[gy.g]||'var(--border)';
+      var easy = _SIMPLE_GRADE[gy.g] || gy.g;
+      html += '<div title="'+gy.k+' '+gy.v+' · '+gy.g+'" style="background:'+bg+';border:1px solid '+bd+';border-radius:10px;padding:8px 4px;text-align:center;">';
+      html += '<div style="font-size:10px;color:var(--text-dim);margin-bottom:3px;line-height:1.2;">'+gy.easy+'</div>';
+      html += '<div style="font-size:12px;font-weight:700;color:'+col+';">'+easy+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    html += '<div style="font-size:12px;color:var(--text-dim);line-height:1.9;padding:10px 12px;background:rgba(255,255,255,0.02);border-radius:8px;">';
+    html += '<div style="font-size:10px;color:var(--gold);letter-spacing:0.1em;margin-bottom:4px;">한자 의미</div>';
+    var meanArr = c.means.map(function(m, i){
+      var hjChar = c.hanja[i], ohEl = c.ohs[i+1];
+      return _colorHanja(hjChar, ohEl) + ' ' + m;
+    });
+    html += meanArr.join(' · ');
+    html += '</div>';
+
+    html += '<div id="childBlurb-'+idx+'" style="font-size:12px;color:var(--text);margin-top:10px;padding:9px 11px;background:rgba(212,175,55,0.06);border-left:2px solid var(--gold);border-radius:4px;line-height:1.55;">';
+    html += '<span style="color:var(--text-dim);"><i class="pi pi-sparkle"></i> AI 한줄평 생성 중...</span>';
+    html += '</div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+
+  fetchChildBlurbs(sur, top);
+}
+
+function fetchChildBlurbs(sur, top) {
+  var ysLine = _childYongsin ? '아이 용신: '+_childYongsin+' ('+getYongsinOhaeng(_childYongsin)+'오행)' : '';
+  if (_dadYongsin) ysLine += ' · 아빠 용신: '+_dadYongsin;
+  if (_momYongsin) ysLine += ' · 엄마 용신: '+_momYongsin;
+  var namesList = top.map(function(c, i){
+    var info = [];
+    if (c.ysMatch) info.push('아이용신'+c.ysMatch);
+    if (c.dadMatch) info.push('아빠조화'+c.dadMatch);
+    if (c.momMatch) info.push('엄마조화'+c.momMatch);
+    if (c.sibHarmony) info.push('형제조화');
+    return (i+1)+'. '+sur+c.name+' ('+c.hanja.join('')+') ['+(info.join(',')||'기본')+']';
+  }).join('\n');
+
+  var prompt = '아이 작명 추천 5개에 대해 각각 "왜 이 이름이 우리 아이에게 좋은지" 한 줄(45자 이내)로 평해줘.\n' +
+    ysLine + '\n\n' + namesList + '\n\n' +
+    '반드시 JSON 배열로만 응답. 예: ["한줄평1","한줄평2","한줄평3","한줄평4","한줄평5"]. 다른 설명·마크다운·코드펜스 금지.';
+
+  var fullText = '';
+  fetch('https://fortuna-silk.vercel.app/api/chat', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      messages: [{ role: 'user', content: prompt }],
+      system: '너는 작명·사주 전문가다. 간결하고 JSON 배열만 출력한다.',
+      max_tokens: 700, stream: true
+    })
+  }).then(function(r){
+    if (!r.ok) throw new Error('API');
+    var reader = r.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '';
+    function read() {
+      reader.read().then(function(chunk){
+        if (chunk.done) { finish(); return; }
+        buffer += decoder.decode(chunk.value, {stream:true});
+        var lines = buffer.split('\n'); buffer = lines.pop();
+        lines.forEach(function(line){
+          if (!line.startsWith('data:')) return;
+          var d = line.slice(5).trim();
+          if (d === '[DONE]') return;
+          try {
+            var j = JSON.parse(d);
+            var delta = j.delta && j.delta.text ? j.delta.text
+              : j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content
+              ? j.choices[0].delta.content : '';
+            if (delta) fullText += delta;
+          } catch(e){}
+        });
+        read();
+      }).catch(function(){ finish(); });
+    }
+    read();
+  }).catch(function(){ finish(); });
+
+  function finish() {
+    var blurbs = [];
+    try {
+      var m = fullText.match(/\[[\s\S]*\]/);
+      if (m) blurbs = JSON.parse(m[0]);
+    } catch(e){}
+    top.forEach(function(_, i){
+      var slot = document.getElementById('childBlurb-'+i);
+      if (!slot) return;
+      if (blurbs[i]) slot.innerHTML = '<i class="pi pi-sparkle" style="color:var(--gold);"></i> ' + blurbs[i];
+      else slot.style.display = 'none';
+    });
+    saveChildReport(sur, top, blurbs);
+  }
+}
+
+function saveChildReport(sur, top, blurbs) {
+  var user = null;
+  try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e){}
+  if (!user) return;
+  var lines = top.map(function(c, i){
+    var info = [];
+    if (c.ysMatch) info.push('아이용신 '+c.ysMatch+'자');
+    if (c.dadMatch) info.push('아빠조화 '+c.dadMatch);
+    if (c.momMatch) info.push('엄마조화 '+c.momMatch);
+    if (c.sibHarmony) info.push('형제조화');
+    var base = '#'+(i+1)+' '+sur+c.name+' ('+c.hanja.join('')+') — '+c.baseTotal+'점' + (info.length ? ' · '+info.join(', ') : '');
+    var blurb = blurbs && blurbs[i] ? '\n   → '+blurbs[i] : '';
+    return base + blurb;
+  }).join('\n\n');
+  var ysLine = '아이 용신: ' + (_childYongsin || '없음');
+  if (_dadYongsin) ysLine += ' · 아빠 용신: ' + _dadYongsin;
+  if (_momYongsin) ysLine += ' · 엄마 용신: ' + _momYongsin;
+  var content = [
+    '【아이 작명】 ' + sur + '씨',
+    ysLine,
+    lines,
+    '생성일: ' + new Date().toLocaleString('ko-KR')
+  ];
+  fetch(SB_URL + '/rest/v1/reports', {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+    body: JSON.stringify({
+      user_id: user.id, report_type: 'name_child',
+      content: content, orb_spent: CHILD_ORB_COST,
+      created_at: new Date().toISOString()
+    })
+  }).then(function(){ showToast('아이 작명 결과가 저장되었습니다'); }).catch(function(){});
 }
 
 function applyRecommend(sur, name) {
