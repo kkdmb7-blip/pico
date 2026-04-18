@@ -929,6 +929,7 @@ function setMode(m) {
   if (isBasic) {
     document.getElementById('hanjaArea').style.display  = (m === 'select') ? 'block' : 'none';
     document.getElementById('strokeArea').style.display = (m === 'manual') ? 'block' : 'none';
+    document.getElementById('btnCalc').style.display = (m === 'select') ? 'none' : 'block';
     if (m === 'select') renderHanjaSelect();
     if (m === 'manual') renderStrokeArea();
   } else if (isRec) {
