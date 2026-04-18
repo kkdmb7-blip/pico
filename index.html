@@ -258,7 +258,7 @@
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 6px;
-    color: #d4af37;
+    color: var(--gold);
   }
   .why-card p { font-size: 12px; color: var(--muted); line-height: 1.6; }
   /* 궁합 카드: 풀너비 가로형 */
@@ -393,8 +393,8 @@
   }
   .score-mini-card:hover { border-color: var(--accent); transform: translateY(-2px); }
   .score-mini-card.active { border-color: var(--accent); background: rgba(123,94,167,0.12); }
-  .score-mini-card.highest { border-color: #d4af37; box-shadow: 0 0 12px rgba(212,175,55,0.25); }
-  .score-mini-card.highest .score-mini-num { color: #d4af37 !important; }
+  .score-mini-card.highest { border-color: var(--gold); box-shadow: 0 0 12px rgba(212,175,55,0.25); }
+  .score-mini-card.highest .score-mini-num { color: var(--gold) !important; }
   .score-mini-emoji { display: none; }
   .score-mini-label { font-size: 11px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
   #scoreMiniDesc {
@@ -808,7 +808,7 @@
 .ai-chunk { padding:16px 0; border-bottom:1px solid rgba(255,130,170,0.12); }
 .ai-chunk:last-child { border-bottom:none; }
 #historyDetailContent .ai-chunk p { margin-bottom:8px; }
-#historyDetailContent .ai-chunk strong { color:#d4af37; font-weight:700; }
+#historyDetailContent .ai-chunk strong { color:var(--gold); font-weight:700; }
 #historyDetailContent .ai-chunk em { font-style:italic; color:rgba(240,240,245,0.95); }
 .ai-chunk-spinner { display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.35);font-size:12px;padding:8px 0; }
 .ai-chunk-spinner::before { content:'';display:inline-block;width:16px;height:16px;border:2px solid rgba(255,130,170,0.15);border-top-color:#ff8ab0;border-radius:50%;animation:ghSpin .7s linear infinite; }
@@ -826,10 +826,10 @@
   cursor: pointer;
   margin-bottom: 20px;
 }
-.memox-banner-title { font-size:14px; font-weight:700; color:#d4af37; margin-bottom:4px; }
+.memox-banner-title { font-size:14px; font-weight:700; color:var(--gold); margin-bottom:4px; }
 .memox-banner-desc { font-size:11px; color:var(--muted); }
 .memox-banner-btn {
-  font-size:12px; color:#d4af37; font-weight:600;
+  font-size:12px; color:var(--gold); font-weight:600;
   border: 1px solid rgba(201,168,76,0.35);
   border-radius: 20px;
   padding: 6px 14px;
@@ -987,7 +987,7 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div>
         <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">5대 운세 교차 분석</div>
-        <h2 id="mainScoreTitle" style="font-size:20px;font-weight:700;margin:0;color:var(--text);"><span style="color:#d4af37;">오늘의 운세</span> 점수</h2>
+        <h2 id="mainScoreTitle" style="font-size:20px;font-weight:700;margin:0;color:var(--text);"><span style="color:var(--gold);">오늘의 운세</span> 점수</h2>
       </div>
       <p id="scoreTodayDate" style="font-size:11px;color:var(--muted);margin:0;text-align:right;"></p>
     </div>
@@ -1034,7 +1034,7 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div>
         <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">奇門遁甲 · 일가 기반</div>
-        <h2 style="font-size:20px;font-weight:700;margin:0;color:var(--text);">이번 주 <span style="color:#d4af37;">기문 일운</span></h2>
+        <h2 style="font-size:20px;font-weight:700;margin:0;color:var(--text);">이번 주 <span style="color:var(--gold);">기문 일운</span></h2>
       </div>
       <div style="font-size:10px;color:rgba(107,107,133,0.6);text-align:right;">直使門 기준<br>일간 오행 맞춤</div>
     </div>
@@ -1051,7 +1051,7 @@
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 20px 16px;overflow:hidden;">
     <div style="margin-bottom:14px;">
       <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">이름 수리 무료 체험</div>
-      <h2 style="font-size:20px;font-weight:700;margin:0 0 4px;color:var(--text);">내 이름은 <span style="color:#d4af37;">몇 점</span>일까?</h2>
+      <h2 style="font-size:20px;font-weight:700;margin:0 0 4px;color:var(--text);">내 이름은 <span style="color:var(--gold);">몇 점</span>일까?</h2>
       <p style="font-size:12px;color:var(--muted);margin:0;">이름 획수로 알아보는 81수리 점수</p>
     </div>
 
@@ -1064,7 +1064,7 @@
         style="flex:2;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 8px;color:var(--text);font-size:14px;outline:none;font-family:'Noto Sans KR',sans-serif;text-align:center;transition:border-color 0.2s;"
         onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
       <button onclick="nsCalc()" id="nsBtn"
-        style="flex-shrink:0;background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(123,94,167,0.06));border:1.5px solid rgba(212,175,55,0.5);border-radius:10px;padding:11px 14px;color:#d4af37;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:border-color 0.3s,box-shadow 0.3s;box-shadow:0 0 20px rgba(212,175,55,0.08);"
+        style="flex-shrink:0;background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(123,94,167,0.06));border:1.5px solid rgba(212,175,55,0.5);border-radius:10px;padding:11px 14px;color:var(--gold);font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:border-color 0.3s,box-shadow 0.3s;box-shadow:0 0 20px rgba(212,175,55,0.08);"
         onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(212,175,55,0.8)';this.style.boxShadow='0 0 30px rgba(212,175,55,0.15)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(212,175,55,0.5)';this.style.boxShadow='0 0 20px rgba(212,175,55,0.08)'">
         점수 확인
       </button>
@@ -1077,7 +1077,7 @@
       <div id="nsTotalScore" style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:16px;text-align:center;margin-bottom:12px;"></div>
       <div id="nsHook" style="margin-bottom:12px;"></div>
       <a id="nsCtaBtn" href="/name-score.html" target="_blank"
-        style="display:block;text-align:center;background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(123,94,167,0.06));border:1.5px solid rgba(212,175,55,0.5);border-radius:12px;padding:13px;color:#d4af37;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:border-color 0.3s,box-shadow 0.3s,transform 0.2s;box-shadow:0 0 20px rgba(212,175,55,0.08);"
+        style="display:block;text-align:center;background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(123,94,167,0.06));border:1.5px solid rgba(212,175,55,0.5);border-radius:12px;padding:13px;color:var(--gold);font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.06em;transition:border-color 0.3s,box-shadow 0.3s,transform 0.2s;box-shadow:0 0 20px rgba(212,175,55,0.08);"
         onmouseover="this.style.transform='translateY(-1px)';this.style.borderColor='rgba(212,175,55,0.85)';this.style.boxShadow='0 0 30px rgba(212,175,55,0.18)'"
         onmouseout="this.style.transform='';this.style.borderColor='rgba(212,175,55,0.5)';this.style.boxShadow='0 0 20px rgba(212,175,55,0.08)'">
         자세히 보기 →
@@ -1099,16 +1099,16 @@
         <a href="/name-score.html?mode=recommend" style="text-decoration:none;color:inherit;display:block;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;transition:all 0.2s;"
           onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-target pi-lg" style="color:#d4af37;"></i>이름 추천</span>
-            <span style="font-size:10px;color:#d4af37;font-weight:700;">100 Orb</span>
+            <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-target pi-lg" style="color:var(--gold);"></i>이름 추천</span>
+            <span style="font-size:10px;color:var(--gold);font-weight:700;">100 Orb</span>
           </div>
           <div style="font-size:10.5px;color:var(--muted);line-height:1.5;">용신 매칭 이름 TOP 3 + 최고 점수순</div>
         </a>
         <a href="/name-score.html?mode=auto&ai=1" style="text-decoration:none;color:inherit;display:block;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;transition:all 0.2s;"
           onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-sparkle pi-lg" style="color:#d4af37;"></i>AI 심층</span>
-            <span style="font-size:10px;color:#d4af37;font-weight:700;">300 Orb</span>
+            <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-sparkle pi-lg" style="color:var(--gold);"></i>AI 심층</span>
+            <span style="font-size:10px;color:var(--gold);font-weight:700;">300 Orb</span>
           </div>
           <div style="font-size:10.5px;color:var(--muted);line-height:1.5;">인생단계·사주궁합·돈사람일 3축</div>
         </a>
@@ -1116,8 +1116,8 @@
           onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 0 20px rgba(212,175,55,0.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
           <span style="position:absolute;top:-5px;right:6px;background:#d4af37;color:#1a1a2e;font-size:8px;font-weight:800;padding:2px 5px;border-radius:3px;letter-spacing:0.05em;">PRO</span>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-gem pi-lg" style="color:#d4af37;"></i>아이 작명</span>
-            <span style="font-size:10px;color:#d4af37;font-weight:700;">300 Orb</span>
+            <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-gem pi-lg" style="color:var(--gold);"></i>아이 작명</span>
+            <span style="font-size:10px;color:var(--gold);font-weight:700;">300 Orb</span>
           </div>
           <div style="font-size:10.5px;color:var(--muted);line-height:1.5;">아이 사주 + 부모 궁합 + 항렬 + 형제</div>
         </a>
@@ -1448,7 +1448,7 @@
     var _comment = _total>=90?'매우 좋은 이름입니다. 강한 길운을 가진 이름이에요.':_total>=75?'좋은 이름입니다. 전반적으로 길한 기운이 흐릅니다.':_total>=60?'무난한 이름입니다. 일부 보완이 도움될 수 있어요.':_total>=40?'주의가 필요한 이름입니다. 개명을 고려해볼 수 있어요.':'흉한 기운이 강한 이름입니다. 전문 작명가 상담을 권장합니다.';
     document.getElementById('nsTotalScore').innerHTML =
       '<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:8px;letter-spacing:1px;">이름 종합 점수</div>'+
-      '<div style="font-size:52px;font-weight:700;color:#d4af37;line-height:1;">'+_total+'</div>'+
+      '<div style="font-size:52px;font-weight:700;color:var(--gold);line-height:1;">'+_total+'</div>'+
       '<div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:12px;">/ 100점</div>'+
       '<div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:10px 0;overflow:hidden;"><div id="nsTotalFill" style="height:100%;width:0%;background:linear-gradient(90deg,#d4af37,#f5d87a);border-radius:3px;transition:width 0.8s ease;"></div></div>'+
       '<div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;">'+_comment+'</div>';
@@ -1458,13 +1458,13 @@
     var hookTitle, hookSub;
     if (_total >= 85) {
       hookTitle = '운이 따르는 이름이에요';
-      hookSub = '하지만 이 이름의 <b style="color:#d4af37;">진짜 힘</b>은 언제, 어떻게 쓰이는지가 더 중요해요';
+      hookSub = '하지만 이 이름의 <b style="color:var(--gold);">진짜 힘</b>은 언제, 어떻게 쓰이는지가 더 중요해요';
     } else if (_total >= 65) {
       hookTitle = '빛과 그림자가 섞인 이름';
-      hookSub = '<b style="color:#d4af37;">언제 빛나고 언제 주의</b>해야 하는지, 타이밍이 핵심이에요';
+      hookSub = '<b style="color:var(--gold);">언제 빛나고 언제 주의</b>해야 하는지, 타이밍이 핵심이에요';
     } else {
       hookTitle = '흐름을 되짚어볼 이름';
-      hookSub = '개명하기 전에 <b style="color:#d4af37;">반드시 확인</b>해야 할 것들이 있어요';
+      hookSub = '개명하기 전에 <b style="color:var(--gold);">반드시 확인</b>해야 할 것들이 있어요';
     }
 
     // 맞춤 훅 포인트 3개 — 사주 정보 유무에 따라 다르게
@@ -1520,7 +1520,7 @@
     var hookHtml =
       '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(123,94,167,0.08));border:1px solid rgba(212,175,55,0.35);border-radius:14px;padding:18px 16px;">' +
         '<div style="text-align:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(212,175,55,0.2);">' +
-          '<div style="font-size:10px;letter-spacing:0.2em;color:#d4af37;margin-bottom:6px;font-weight:700;">정밀 분석 예고</div>' +
+          '<div style="font-size:10px;letter-spacing:0.2em;color:var(--gold);margin-bottom:6px;font-weight:700;">정밀 분석 예고</div>' +
           '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;">'+hookTitle+'</div>' +
           '<div style="font-size:12px;color:var(--muted);line-height:1.6;">'+hookSub+'</div>' +
         '</div>' +
@@ -1528,7 +1528,7 @@
     hookPoints.forEach(function(p){
       hookHtml +=
         '<div style="display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(212,175,55,0.18);border-radius:10px;padding:10px 12px;">' +
-          '<span style="color:#d4af37;font-size:16px;flex-shrink:0;line-height:1.4;">'+p.icon+'</span>' +
+          '<span style="color:var(--gold);font-size:16px;flex-shrink:0;line-height:1.4;">'+p.icon+'</span>' +
           '<div style="flex:1;">' +
             '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.4;">'+p.head+'</div>' +
             '<div style="font-size:11px;color:var(--muted);line-height:1.5;">'+p.body+'</div>' +
@@ -1552,12 +1552,12 @@
 <section class="section-why">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 16px 16px;">
     <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;color:var(--muted);text-align:center;margin-bottom:8px;text-transform:uppercase;">PICO Lab의 6중 교차검증 시스템</div>
-    <h2 style="font-family:'Noto Serif KR',serif;font-size:clamp(16px,3.2vw,22px);font-weight:700;text-align:center;margin-bottom:16px;line-height:1.5;">5,000년 인류의 지혜를<br><span style="color:#d4af37;">AI가 동시에 교차 분석합니다</span></h2>
+    <h2 style="font-family:'Noto Serif KR',serif;font-size:clamp(16px,3.2vw,22px);font-weight:700;text-align:center;margin-bottom:16px;line-height:1.5;">5,000년 인류의 지혜를<br><span style="color:var(--gold);">AI가 동시에 교차 분석합니다</span></h2>
     <div class="why-grid">
       <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
         <h3>사주 (四柱)</h3>
         <p>당신의 리더십 DNA</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#d4af37;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:4px 10px;">사주 분석</div>
+        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:var(--gold);background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:4px 10px;">사주 분석</div>
       </div>
       <div class="why-card" onclick="openBirthModal('astro')" style="cursor:pointer;">
         <h3>서양 점성술</h3>
@@ -1604,7 +1604,7 @@
 
   <!-- 헤더 -->
   <div style="padding:20px 4px 16px;">
-    <div style="font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;color:#d4af37;margin-bottom:4px;">나만의 리포트</div>
+    <div style="font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;color:var(--gold);margin-bottom:4px;">나만의 리포트</div>
     <div style="font-size:12px;color:var(--muted);">45종 정밀 계산 데이터 기반 · AI 융합 심층 분석</div>
   </div>
 
@@ -1616,10 +1616,10 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
       <div onclick="window.location.href='report.html?type=character'" style="background:var(--surface2);border:1px solid rgba(212,175,55,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(212,175,55,0.6)'" onmouseout="this.style.borderColor='rgba(212,175,55,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;color:#d4af37;"><i class="pi pi-crystal"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#d4af37;margin-bottom:5px;">타고난 기질 분석</div>
+        <div style="font-size:20px;margin-bottom:6px;color:var(--gold);"><i class="pi pi-crystal"></i></div>
+        <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:5px;">타고난 기질 분석</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">45종 정밀 데이터 기반 — 일간·격국·강약수치로 보는 본질 분석</div>
-        <div style="font-size:11px;font-weight:600;color:#d4af37;background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">500 Orb</div>
+        <div style="font-size:11px;font-weight:600;color:var(--gold);background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=money'" style="background:var(--surface2);border:1px solid rgba(109,213,194,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(109,213,194,0.6)'" onmouseout="this.style.borderColor='rgba(109,213,194,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#6dd5c2;"><i class="pi pi-coin"></i></div>
@@ -1804,7 +1804,7 @@
             <div style="font-size:14px;font-weight:700;color:var(--text);">사주 리포트</div>
             <div style="font-size:11px;color:var(--muted);margin-top:2px;">4기둥·오행·격국·용신·대운 PDF 30~40장</div>
           </div>
-          <div style="font-size:15px;font-weight:800;color:#d4af37;white-space:nowrap;">29,000원</div>
+          <div style="font-size:15px;font-weight:800;color:var(--gold);white-space:nowrap;">29,000원</div>
         </div>
         <a href="https://fortuna-silk.vercel.app" target="_blank" style="display:block;width:100%;padding:10px 0;background:linear-gradient(135deg,#b8952a,#d4af37);color:#1a1020;font-size:13px;font-weight:700;text-align:center;border-radius:10px;text-decoration:none;">신청하기</a>
       </div>
@@ -1814,7 +1814,7 @@
             <div style="font-size:14px;font-weight:700;color:var(--text);">점성 리포트</div>
             <div style="font-size:11px;color:var(--muted);margin-top:2px;">도미넌트·태양·달·상승점 분석 PDF</div>
           </div>
-          <div style="font-size:15px;font-weight:800;color:#d4af37;white-space:nowrap;">9,900원~</div>
+          <div style="font-size:15px;font-weight:800;color:var(--gold);white-space:nowrap;">9,900원~</div>
         </div>
         <a href="https://fortuna-silk.vercel.app" target="_blank" style="display:block;width:100%;padding:10px 0;background:linear-gradient(135deg,#b8952a,#d4af37);color:#1a1020;font-size:13px;font-weight:700;text-align:center;border-radius:10px;text-decoration:none;">신청하기</a>
       </div>
@@ -1825,7 +1825,7 @@
             <div style="font-size:14px;font-weight:700;color:var(--text);">통합 리포트</div>
             <div style="font-size:11px;color:var(--muted);margin-top:2px;">사주+점성 교차 분석 PDF 60~80장</div>
           </div>
-          <div style="font-size:15px;font-weight:800;color:#d4af37;white-space:nowrap;">39,000원</div>
+          <div style="font-size:15px;font-weight:800;color:var(--gold);white-space:nowrap;">39,000원</div>
         </div>
         <a href="https://fortuna-silk.vercel.app" target="_blank" style="display:block;width:100%;padding:10px 0;background:linear-gradient(135deg,#b8952a,#d4af37);color:#1a1020;font-size:13px;font-weight:700;text-align:center;border-radius:10px;text-decoration:none;">신청하기</a>
       </div>
@@ -1837,7 +1837,7 @@
 <!-- TAB: 상담 -->
 <div id="tabConsult" style="display:none;padding:16px 16px 80px;max-width:640px;margin:0 auto;">
   <div style="padding:20px 4px 16px;">
-    <div style="font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;color:#d4af37;margin-bottom:4px;">상담</div>
+    <div style="font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;color:var(--gold);margin-bottom:4px;">상담</div>
     <div style="font-size:12px;color:var(--muted);">AI 또는 전문 상담사와 깊은 운세 상담을 나눠보세요.</div>
   </div>
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;">
@@ -1863,7 +1863,7 @@
 <!-- TAB: 마이페이지 -->
 <div id="tabMypage" style="display:none;padding:16px 16px 80px;max-width:640px;margin:0 auto;">
   <div style="padding:20px 4px 16px;">
-    <div style="font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;color:#d4af37;margin-bottom:4px;">마이페이지</div>
+    <div style="font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;color:var(--gold);margin-bottom:4px;">마이페이지</div>
   </div>
   <!-- 비로그인 -->
   <div id="mypageGuest" style="display:none;">
@@ -3287,8 +3287,8 @@ function _renderHistoryMarkdown(text) {
   if (text == null) return '';
   var t = String(text);
   t = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  t = t.replace(/^#{1,3}\s+(.+)$/gm, '<div style="font-size:14px;font-weight:700;color:#d4af37;margin:12px 0 4px;">$1</div>');
-  t = t.replace(/\*\*(.+?)\*\*/g, '<strong style="color:#d4af37;font-weight:700;">$1</strong>');
+  t = t.replace(/^#{1,3}\s+(.+)$/gm, '<div style="font-size:14px;font-weight:700;color:var(--gold);margin:12px 0 4px;">$1</div>');
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--gold);font-weight:700;">$1</strong>');
   t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
   t = t.replace(/\n{2,}/g, '</p><p>');
   t = t.replace(/\n/g, '<br>');
@@ -4192,7 +4192,7 @@ function updateAuthUI() {
     try { var pp = JSON.parse(localStorage.getItem('pico_profile')); profileName = pp && pp.name; } catch(e) {}
     var _displayName = profileName || currentUser.name;
     if (titleEl && _displayName) {
-      titleEl.innerHTML = _displayName + '님의 <span style="color:#d4af37;">오늘의 운세</span> 점수';
+      titleEl.innerHTML = _displayName + '님의 <span style="color:var(--gold);">오늘의 운세</span> 점수';
     }
     var _ctn = document.getElementById('cosmicTitleName');
     if (_ctn && _displayName) _ctn.textContent = _displayName + '님의';
@@ -4204,7 +4204,7 @@ function updateAuthUI() {
     if (heroEl) heroEl.style.display = '';
     if (heroInputEl) heroInputEl.style.display = '';
     if (p && p.name) {
-      if (titleEl) titleEl.innerHTML = p.name + '님의 <span style="color:#d4af37;">오늘의 운세</span> 점수';
+      if (titleEl) titleEl.innerHTML = p.name + '님의 <span style="color:var(--gold);">오늘의 운세</span> 점수';
       var _ctn2 = document.getElementById('cosmicTitleName');
       if (_ctn2) _ctn2.textContent = p.name + '님의';
     }
