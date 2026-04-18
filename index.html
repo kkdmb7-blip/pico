@@ -1873,7 +1873,7 @@
     </div>
   </div>
   <!-- 로그인 후 -->
-  <div id="mypageUser" style="display:none;display:flex;flex-direction:column;gap:10px;">
+  <div id="mypageUser" style="display:none;flex-direction:column;gap:10px;">
     <div style="display:flex;align-items:center;gap:14px;padding:18px 16px;background:var(--surface);border:1px solid var(--border);border-radius:20px;">
       <img id="mypageAvatar" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;display:none;">
       <div style="flex:1;">
@@ -5032,7 +5032,7 @@ function updateMypageTab() {
   if (!guest || !user) return;
   if (currentUser) {
     guest.style.display = 'none';
-    user.style.display = '';
+    user.style.display = 'flex';
     var nameEl = document.getElementById('mypageName');
     var avEl = document.getElementById('mypageAvatar');
     var profileName = null;
