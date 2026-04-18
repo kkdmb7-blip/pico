@@ -526,6 +526,7 @@ nav {
   <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
+<script src="feedback-widget.js?v=1"></script>
 
 <nav>
   <a onclick="location.href='index.html?tab=report'" class="nav-back">←</a>
@@ -631,6 +632,7 @@ nav {
       <button class="btn-easy" id="easyBtn" onclick="easyExplain()">🤔 어려우셨다면 — 친구처럼 쉽게 풀어드릴게요</button>
       <div id="easyResult" style="display:none;"></div>
     </div>
+    <div id="fwReportMount"></div>
     <div class="consult-banner" id="consultBanner" style="display:none;">
       <div class="consult-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" stroke="url(#cg1)" stroke-width="1.5" opacity="0.4"/><path d="M18 6 L20.5 13.5 L28 14 L22 19.5 L24 27 L18 23 L12 27 L14 19.5 L8 14 L15.5 13.5Z" fill="url(#cg1)"/><defs><linearGradient id="cg1" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#c9a84c"/><stop offset="1" stop-color="#a07fd4"/></linearGradient></defs></svg></div>
       <div class="consult-title" id="consultTitle">리포트 내용이 궁금하신가요?</div>
@@ -4433,6 +4435,26 @@ function showConsultBanner() {
   document.getElementById('consultDesc').innerHTML = t.desc.replace(/\n/g, '<br>');
   document.getElementById('consultBanner').style.display = 'block';
   showEasyExplainBox();
+  mountReportFeedback();
+}
+
+// ── 피드백 위젯 마운트 (로그인 유저 + _type 필수) ──
+function mountReportFeedback() {
+  try {
+    const mount = document.getElementById('fwReportMount');
+    if (!mount) return;
+    if (!_user || !_user.id || !_type) { mount.innerHTML = ''; return; }
+    if (!window.FeedbackWidget) return;
+    window.FeedbackWidget.render({
+      container: mount,
+      user_id: _user.id,
+      client: 'pico',
+      source: 'report',
+      source_type: _type,
+      source_id: null,
+      meta: { profile_key: (typeof getProfileKey==='function' ? getProfileKey() : null), version: REPORT_VERSION },
+    });
+  } catch(e) { /* 위젯 실패는 무시 */ }
 }
 
 // ── 쉽게 풀어주기 박스 표시 (캐시 있으면 자동 펼침) ──
