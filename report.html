@@ -286,6 +286,34 @@ nav {
 .modal-btn-primary { background: linear-gradient(135deg,#7b5ea7,#a07fd4); color: #fff; }
 .modal-btn-cancel { background: var(--surface); color: var(--muted); font-size: 13px; }
 
+/* ── 쉽게 풀어주기 ── */
+.easy-wrap { margin: 20px 0 0; }
+.btn-easy {
+  width: 100%;
+  background: linear-gradient(135deg, #fff8e8, #fef3d7);
+  border: 1.5px solid #e8c98a;
+  color: #6b4a1c;
+  border-radius: 16px;
+  padding: 16px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: all 0.2s;
+}
+.btn-easy:hover:not(:disabled) { background: linear-gradient(135deg, #fef3d7, #ffe8b5); transform: translateY(-1px); }
+.btn-easy:disabled { opacity: 0.6; cursor: wait; }
+.easy-card {
+  background: linear-gradient(135deg, #fffaf0, #fef5e0);
+  border: 1px solid #f0d9a0;
+  border-radius: 18px;
+  padding: 22px 20px;
+  margin-top: 8px;
+}
+.easy-title { font-weight: 700; color: #8b6420; margin-bottom: 12px; font-size: 15px; }
+.easy-body { color: #4a3818; line-height: 1.75; font-size: 14.5px; }
+.easy-body strong { color: #8b6420; font-weight: 700; }
+
 /* ── 상담 배너 ── */
 .consult-banner {
   margin-top: 32px;
@@ -599,6 +627,10 @@ nav {
       <div class="report-meta" id="reportMeta"></div>
     </div>
     <div id="sectionsWrap"></div>
+    <div class="easy-wrap" id="easyWrap" style="display:none;">
+      <button class="btn-easy" id="easyBtn" onclick="easyExplain()">🤔 어려우셨다면 — 친구처럼 쉽게 풀어드릴게요</button>
+      <div id="easyResult" style="display:none;"></div>
+    </div>
     <div class="consult-banner" id="consultBanner" style="display:none;">
       <div class="consult-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" stroke="url(#cg1)" stroke-width="1.5" opacity="0.4"/><path d="M18 6 L20.5 13.5 L28 14 L22 19.5 L24 27 L18 23 L12 27 L14 19.5 L8 14 L15.5 13.5Z" fill="url(#cg1)"/><defs><linearGradient id="cg1" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#c9a84c"/><stop offset="1" stop-color="#a07fd4"/></linearGradient></defs></svg></div>
       <div class="consult-title" id="consultTitle">리포트 내용이 궁금하신가요?</div>
@@ -2757,6 +2789,7 @@ async function regenReport() {
     const sb = getSb();
     await sb.from('reports').delete().eq('user_id', _user.id).eq('report_type', _type);
   } catch(e) {}
+  try { localStorage.removeItem(`easy_${_user.id}_${_type}_v${REPORT_VERSION}`); } catch(e) {}
 
   showState('loading');
   setLoading('Orb 잔액 확인 중...', '');
@@ -4211,6 +4244,94 @@ function showConsultBanner() {
   document.getElementById('consultTitle').textContent = t.title;
   document.getElementById('consultDesc').innerHTML = t.desc.replace(/\n/g, '<br>');
   document.getElementById('consultBanner').style.display = 'block';
+  showEasyExplainBox();
+}
+
+// ── 쉽게 풀어주기 박스 표시 (캐시 있으면 자동 펼침) ──
+function showEasyExplainBox() {
+  const easyWrap = document.getElementById('easyWrap');
+  if (!easyWrap) return;
+  easyWrap.style.display = 'block';
+  const easyBtn = document.getElementById('easyBtn');
+  const easyResult = document.getElementById('easyResult');
+  if (easyResult) { easyResult.style.display = 'none'; easyResult.innerHTML = ''; }
+  if (easyBtn) {
+    easyBtn.style.display = 'flex';
+    easyBtn.disabled = false;
+    easyBtn.textContent = '🤔 어려우셨다면 — 친구처럼 쉽게 풀어드릴게요';
+  }
+  try {
+    if (_user && _user.id && _type) {
+      const cacheKey = `easy_${_user.id}_${_type}_v${REPORT_VERSION}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) showEasyResult(cached);
+    }
+  } catch(e) {}
+}
+
+// ── 쉽게 풀어주기 — AI 호출 ──
+async function easyExplain() {
+  if (!_user || !_user.id) { alert('로그인 후 이용 가능해요.'); return; }
+  const cacheKey = `easy_${_user.id}_${_type}_v${REPORT_VERSION}`;
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) { showEasyResult(cached); return; }
+  } catch(e) {}
+
+  const sections = Array.from(document.querySelectorAll('#sectionsWrap .section-body'))
+    .map(el => el.innerText.trim()).filter(Boolean).join('\n\n');
+  if (!sections) { alert('리포트 본문을 찾을 수 없어요.'); return; }
+
+  const btn = document.getElementById('easyBtn');
+  btn.disabled = true;
+  btn.textContent = '✨ 풀이하는 중...';
+
+  const sys = `당신은 사주를 처음 접한 친구에게 카톡으로 쉽게 풀어주는 따뜻한 친구입니다.
+
+규칙:
+- 명리 용어(격국·용신·십신·대운·세운·천간·지지·식신·정관·편재·비겁·인성 등) 절대 사용 금지
+  → "타고난 성격/필요한 기운/관계 패턴/지금 시기" 같은 일상어로 풀이
+- 한자 병기 절대 금지
+- 일상 비유나 예시 1~2개 반드시 포함 (요리/계절/길찾기/직장 등)
+- 6~10문장, 친한 친구가 카톡으로 설명하듯 다정한 존댓말
+- 원본 리포트 내용만 풀이, 새 정보·추측 절대 추가 금지
+- **볼드** 핵심 단어 3~5개로 강조
+- 마지막 문장은 따뜻한 응원으로 마무리`;
+
+  try {
+    const r = await fetch(CHAT_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: _user.id,
+        skip_orb: true,
+        mode: 'saju',
+        system_prompt: sys,
+        messages: [{ role: 'user', content: `아래 사주 리포트를 친구한테 카톡으로 설명한다 생각하고 쉽게 풀어줘. 명리 용어 쓰지 말고:\n\n${sections}` }],
+        max_tokens: 900
+      })
+    });
+    const d = await r.json();
+    const reply = d.reply || d.error || '풀이를 가져오지 못했어요. 잠시 후 다시 시도해주세요.';
+    if (d.reply) {
+      try { localStorage.setItem(cacheKey, reply); } catch(e) {}
+    }
+    showEasyResult(reply);
+  } catch (e) {
+    alert('풀이 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🤔 어려우셨다면 — 친구처럼 쉽게 풀어드릴게요';
+  }
+}
+
+function showEasyResult(text) {
+  const wrap = document.getElementById('easyResult');
+  if (!wrap) return;
+  wrap.innerHTML = '<div class="easy-card"><div class="easy-title">🌱 쉽게 풀어드렸어요</div><div class="easy-body">' + renderMarkdown(text) + '</div></div>';
+  wrap.style.display = 'block';
+  const btn = document.getElementById('easyBtn');
+  if (btn) btn.style.display = 'none';
 }
 
 // ── 카카오 공유 ──
