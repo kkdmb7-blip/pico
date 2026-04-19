@@ -30,6 +30,9 @@
     --gold: #9a7a26;
     --gold-deep: #7a5e1c;
     --ink: #241a10;
+    --orb: #5f8cb5;
+    --orb-bg: rgba(122,196,255,0.12);
+    --orb-border: rgba(95,140,181,0.30);
     --radius: 14px;
     --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
     --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
@@ -179,8 +182,8 @@
   .logo-text {
     font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
     font-weight: 500;
-    font-size: 12px;
-    letter-spacing: 0.28em;
+    font-size: 14px;
+    letter-spacing: 0.3em;
     color: var(--ink);
     padding-top: 2px;
   }
@@ -949,6 +952,23 @@
 .ai-chunk-spinner::after { content:'분석 중...'; }
 @keyframes ghSpin { to { transform:rotate(360deg); } }
 @keyframes ghFadeIn { from { opacity:0;transform:translateY(6px); } to { opacity:1;transform:translateY(0); } }
+/* ── 통일된 Orb 칩 (리포트 카드·뱃지 전용) ── */
+.orb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--orb);
+  background: var(--orb-bg);
+  border: 1px solid var(--orb-border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+}
+
 .memox-banner {
   background: linear-gradient(135deg, #fcf7ea 0%, #f4ecd8 100%);
   border: 1px solid var(--border-soft);
@@ -996,22 +1016,21 @@
 }
 .memox-banner-btn {
   font-family: 'Gowun Batang', 'Noto Serif KR', serif;
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.02em;
-  color: #fcf7ea;
-  font-weight: 600;
-  border: none;
-  border-radius: 22px;
-  padding: 10px 18px;
+  color: #8a6b20;
+  font-weight: 700;
+  border: 1px solid rgba(154,122,38,0.28);
+  border-radius: 20px;
+  padding: 7px 14px;
   white-space: nowrap;
   flex-shrink: 0;
-  background: linear-gradient(135deg, var(--gold-deep) 0%, #8b5e2a 100%);
-  box-shadow: 0 2px 8px rgba(122,94,28,0.25);
+  background: rgba(212,175,90,0.14);
   transition: all 0.2s;
 }
 .memox-banner:hover .memox-banner-btn {
-  box-shadow: 0 4px 14px rgba(122,94,28,0.38);
-  transform: translateY(-1px);
+  background: rgba(212,175,90,0.28);
+  border-color: rgba(154,122,38,0.5);
 }
 </style>
   <link rel="stylesheet" href="pico-icons.css">
@@ -1277,7 +1296,7 @@
           onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
             <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-target pi-lg" style="color:var(--gold);"></i>이름 추천</span>
-            <span style="font-size:10px;color:var(--gold);font-weight:700;">100 Orb</span>
+            <span style="font-size:10px;color:var(--orb);font-weight:700;">100 Orb</span>
           </div>
           <div style="font-size:10.5px;color:var(--muted);line-height:1.5;">용신 매칭 이름 TOP 3 + 최고 점수순</div>
         </a>
@@ -1285,7 +1304,7 @@
           onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
             <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-sparkle pi-lg" style="color:var(--gold);"></i>AI 심층</span>
-            <span style="font-size:10px;color:var(--gold);font-weight:700;">300 Orb</span>
+            <span style="font-size:10px;color:var(--orb);font-weight:700;">300 Orb</span>
           </div>
           <div style="font-size:10.5px;color:var(--muted);line-height:1.5;">인생단계·사주궁합·돈사람일 3축</div>
         </a>
@@ -1294,7 +1313,7 @@
           <span style="position:absolute;top:-5px;right:6px;background:#d4af37;color:#1a1a2e;font-size:8px;font-weight:800;padding:2px 5px;border-radius:3px;letter-spacing:0.05em;">PRO</span>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
             <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-gem pi-lg" style="color:var(--gold);"></i>아이 작명</span>
-            <span style="font-size:10px;color:var(--gold);font-weight:700;">300 Orb</span>
+            <span style="font-size:10px;color:var(--orb);font-weight:700;">300 Orb</span>
           </div>
           <div style="font-size:10.5px;color:var(--muted);line-height:1.5;">아이 사주 + 부모 궁합 + 항렬 + 형제</div>
         </a>
@@ -1796,25 +1815,25 @@
         <div style="font-size:20px;margin-bottom:6px;color:var(--gold);"><i class="pi pi-crystal"></i></div>
         <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:5px;">타고난 기질 분석</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">45종 정밀 데이터 기반 — 일간·격국·강약수치로 보는 본질 분석</div>
-        <div style="font-size:11px;font-weight:600;color:var(--gold);background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">500 Orb</div>
+        <div class="orb-chip">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=money'" style="background:var(--surface2);border:1px solid rgba(109,213,194,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(109,213,194,0.6)'" onmouseout="this.style.borderColor='rgba(109,213,194,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#2a8577;"><i class="pi pi-coin"></i></div>
         <div style="font-size:13px;font-weight:700;color:#2a8577;margin-bottom:5px;">재물/사업 분석</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">정밀 재물운·대운교차 데이터로 보는 돈의 흐름과 직업 적성</div>
-        <div style="font-size:11px;font-weight:600;color:#2a8577;background:rgba(109,213,194,0.1);border:1px solid rgba(109,213,194,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">700 Orb</div>
+        <div class="orb-chip">700 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=love'" style="background:var(--surface2);border:1px solid rgba(255,138,176,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,138,176,0.6)'" onmouseout="this.style.borderColor='rgba(255,138,176,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#c0306c;"><i class="pi pi-heart"></i></div>
         <div style="font-size:13px;font-weight:700;color:#c0306c;margin-bottom:5px;">연애/결혼 분석</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">궁합·신살·특수패턴 정밀 분석으로 보는 연애와 인연</div>
-        <div style="font-size:11px;font-weight:600;color:#c0306c;background:rgba(255,138,176,0.1);border:1px solid rgba(255,138,176,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">700 Orb</div>
+        <div class="orb-chip">700 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=daeun'" style="background:var(--surface2);border:1px solid rgba(180,143,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(180,143,255,0.6)'" onmouseout="this.style.borderColor='rgba(180,143,255,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#7a4aa8;"><i class="pi pi-asc"></i></div>
         <div style="font-size:13px;font-weight:700;color:#7a4aa8;margin-bottom:5px;">대운 흐름 분석</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">대운분리·세운교차·형충회합 정밀 데이터 기반 인생 흐름</div>
-        <div style="font-size:11px;font-weight:600;color:#7a4aa8;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">800 Orb</div>
+        <div class="orb-chip">800 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=year'" style="background:var(--surface2);border:1px solid rgba(122,196,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(122,196,255,0.6)'" onmouseout="this.style.borderColor='rgba(122,196,255,0.25)'">
         <div style="flex:1;">
@@ -1823,7 +1842,7 @@
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">세운확장·월운절기·운세종합점수 정밀 데이터 기반 올해 전략</div>
         </div>
-        <div style="font-size:11px;font-weight:600;color:#2e6ba8;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
+        <div class="orb-chip" style="flex-shrink:0;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=month'" style="background:var(--surface2);border:1px solid rgba(180,143,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(180,143,255,0.6)'" onmouseout="this.style.borderColor='rgba(180,143,255,0.25)'">
         <div style="flex:1;">
@@ -1832,7 +1851,7 @@
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">월운절기·세운교차·형충회합 정밀 분석으로 보는 이번달</div>
         </div>
-        <div style="font-size:11px;font-weight:600;color:#7a4aa8;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
+        <div class="orb-chip" style="flex-shrink:0;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=yongsin'" style="background:var(--surface2);border:1px solid rgba(255,200,80,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(255,200,80,0.6)'" onmouseout="this.style.borderColor='rgba(255,200,80,0.25)'">
         <div style="flex:1;">
@@ -1841,7 +1860,7 @@
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">용신재검증·조후·적천수·자평진전 정밀 데이터 기반 개운 전략</div>
         </div>
-        <div style="font-size:11px;font-weight:600;color:#a16d1f;background:rgba(255,200,80,0.1);border:1px solid rgba(255,200,80,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
+        <div class="orb-chip" style="flex-shrink:0;">500 Orb</div>
       </div>
     </div>
   </div>
@@ -1857,13 +1876,13 @@
         <div style="font-size:20px;margin-bottom:6px;color:#a16d1f;"><i class="pi pi-sparkle"></i></div>
         <div style="font-size:13px;font-weight:700;color:#a16d1f;margin-bottom:5px;">사주 포인트 요약</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">핵심 3줄 + 올해 포인트 + 즉시 실천법</div>
-        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#a16d1f;background:rgba(255,200,80,0.1);border:1px solid rgba(255,200,80,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">200 Orb</div>
+        <div class="orb-chip" style="margin-top:8px;">200 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=balance'" style="background:var(--surface2);border:1px solid rgba(80,200,200,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(80,200,200,0.6)'" onmouseout="this.style.borderColor='rgba(80,200,200,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#2a8577;"><i class="pi pi-yinyang"></i></div>
         <div style="font-size:13px;font-weight:700;color:#2a8577;margin-bottom:5px;">오행 밸런스</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">오행 균형 진단 + 부족 보완 실천법</div>
-        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#2a8577;background:rgba(42,133,119,0.1);border:1px solid rgba(42,133,119,0.35);border-radius:8px;padding:4px 10px;display:inline-block;">300 Orb</div>
+        <div class="orb-chip" style="margin-top:8px;">300 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=sinsal'" style="background:var(--surface2);border:1px solid rgba(220,160,100,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(220,160,100,0.6)'" onmouseout="this.style.borderColor='rgba(220,160,100,0.25)'">
         <div style="font-size:28px;color:#a16d1f;"><i class="pi pi-scroll"></i></div>
@@ -1871,7 +1890,7 @@
           <div style="font-size:13px;font-weight:700;color:#a16d1f;margin-bottom:3px;">신살 총정리</div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">귀인·삼재·양인살·원진살 — 나의 길신·흉신 한눈에 정리</div>
         </div>
-        <div style="font-size:11px;font-weight:600;color:#a16d1f;background:rgba(220,160,100,0.1);border:1px solid rgba(220,160,100,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">300 Orb</div>
+        <div class="orb-chip" style="flex-shrink:0;">300 Orb</div>
       </div>
     </div>
   </div>
@@ -1887,25 +1906,25 @@
         <div style="font-size:20px;margin-bottom:6px;color:#2d8659;"><i class="pi pi-medical"></i></div>
         <div style="font-size:13px;font-weight:700;color:#2d8659;margin-bottom:5px;">건강·체질 분석</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">오행 건강 지도 + 취약 장기 + 관리법</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#2d8659;">400 Orb</div>
+        <div class="orb-chip" style="margin-top:8px;">400 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=family'" style="background:var(--surface2);border:1px solid rgba(240,160,180,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(240,160,180,0.6)'" onmouseout="this.style.borderColor='rgba(240,160,180,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#c0306c;"><i class="pi pi-people"></i></div>
         <div style="font-size:13px;font-weight:700;color:#c0306c;margin-bottom:5px;">가족·인연 분석</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">부모·배우자·자녀 인연 구조 분석</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#c0306c;">400 Orb</div>
+        <div class="orb-chip" style="margin-top:8px;">400 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=timing'" style="background:var(--surface2);border:1px solid rgba(120,160,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(120,160,255,0.6)'" onmouseout="this.style.borderColor='rgba(120,160,255,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#2e6ba8;"><i class="pi pi-calendar"></i></div>
         <div style="font-size:13px;font-weight:700;color:#2e6ba8;margin-bottom:5px;">인생 타이밍</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">결정·이직·투자 최적 시기 분석</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#2e6ba8;">500 Orb</div>
+        <div class="orb-chip" style="margin-top:8px;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=wealth_timing'" style="background:var(--surface2);border:1px solid rgba(220,180,80,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(220,180,80,0.6)'" onmouseout="this.style.borderColor='rgba(220,180,80,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#a16d1f;"><i class="pi pi-chart"></i></div>
         <div style="font-size:13px;font-weight:700;color:#a16d1f;margin-bottom:5px;">재물 타이밍</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">대운별·월별 재물 흐름 + 투자 적기</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#a16d1f;">500 Orb</div>
+        <div class="orb-chip" style="margin-top:8px;">500 Orb</div>
       </div>
       <div onclick="openGuideModal()" style="background:linear-gradient(135deg,rgba(240,140,180,0.15),rgba(200,100,160,0.15));border:1px solid rgba(240,140,180,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(240,140,180,0.7)'" onmouseout="this.style.borderColor='rgba(240,140,180,0.3)'">
         <div style="font-size:28px;color:#c0306c;"><i class="pi pi-people"></i></div>
@@ -1913,7 +1932,7 @@
           <div style="font-size:13px;font-weight:700;color:#c0306c;margin-bottom:3px;">이 사람 사용설명서 <span style="font-size:10px;background:linear-gradient(90deg,#f08cb4,#ffd864);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">NEW</span></div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">가까운 사람이 이 사주를 어떻게 대하면 좋을지 — 대화법·배려 포인트·지뢰 지점</div>
         </div>
-        <div style="font-size:11px;font-weight:700;color:#c0306c;background:rgba(240,140,180,0.15);border:1px solid rgba(240,140,180,0.4);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
+        <div class="orb-chip" style="flex-shrink:0;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=classic'" style="background:linear-gradient(135deg,rgba(180,140,100,0.15),rgba(140,100,60,0.15));border:1px solid rgba(180,140,100,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(180,140,100,0.7)'" onmouseout="this.style.borderColor='rgba(180,140,100,0.3)'">
         <div style="font-size:28px;color:#8b5a2b;"><i class="pi pi-book"></i></div>
@@ -1921,7 +1940,7 @@
           <div style="font-size:13px;font-weight:700;color:#8b5a2b;margin-bottom:3px;">고전 명리 해석 <span style="font-size:10px;background:linear-gradient(90deg,#8b5a2b,#a16d1f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">CLASSIC</span></div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">적천수 원문·자평진전 격국론·납음·조후 — 고전 명리의 정수</div>
         </div>
-        <div style="font-size:11px;font-weight:700;color:#8b5a2b;background:rgba(139,90,43,0.12);border:1px solid rgba(139,90,43,0.35);border-radius:8px;padding:4px 10px;flex-shrink:0;">600 Orb</div>
+        <div class="orb-chip" style="flex-shrink:0;">600 Orb</div>
       </div>
     </div>
   </div>
@@ -1937,25 +1956,25 @@
         <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-lotus"></i></div>
         <div style="font-size:13px;font-weight:700;color:#6a4aa0;margin-bottom:4px;">베딕 심층 분석</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">사주 정밀 데이터 + 낙샤트라·다샤·라시 교차 분석</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#6a4aa0;">500 Orb</div>
+        <div class="orb-chip" style="margin-top:8px;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=astro_full'" style="background:var(--surface2);border:1px solid rgba(255,220,100,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,220,100,0.6)'" onmouseout="this.style.borderColor='rgba(255,220,100,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-star"></i></div>
         <div style="font-size:13px;font-weight:700;color:#a16d1f;margin-bottom:4px;">서양 점성술</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">사주 정밀 데이터 + 행성 배치·트랜짓 교차 분석</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#a16d1f;">500 Orb</div>
+        <div class="orb-chip" style="margin-top:8px;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=ziwei_full'" style="background:var(--surface2);border:1px solid rgba(100,180,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,180,255,0.6)'" onmouseout="this.style.borderColor='rgba(100,180,255,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-ziwei"></i></div>
         <div style="font-size:13px;font-weight:700;color:#2e6ba8;margin-bottom:4px;">자미두수 심층</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">사주 정밀 데이터 + 명궁·재백·관록궁 교차 분석</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#2e6ba8;">500 Orb</div>
+        <div class="orb-chip" style="margin-top:8px;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=career_deep'" style="background:var(--surface2);border:1px solid rgba(100,220,150,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,220,150,0.6)'" onmouseout="this.style.borderColor='rgba(100,220,150,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-target"></i></div>
         <div style="font-size:13px;font-weight:700;color:#2d8659;margin-bottom:4px;">직업·사업 심층</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">격국·직업적성·십성분포 정밀 데이터 + 3시스템 교차</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#2d8659;">600 Orb</div>
+        <div class="orb-chip" style="margin-top:8px;">600 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=triple'" style="background:linear-gradient(135deg,rgba(100,130,220,0.15),rgba(220,130,100,0.15));border:1px solid rgba(180,160,240,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(180,160,240,0.7)'" onmouseout="this.style.borderColor='rgba(180,160,240,0.3)'">
         <div style="font-size:28px;"><i class="pi pi-eye"></i></div>
@@ -1963,7 +1982,7 @@
           <div style="font-size:13px;font-weight:700;color:#6a4aa0;margin-bottom:3px;">동서양 통합 분석 <span style="font-size:10px;background:linear-gradient(90deg,#c8b4f0,#f0c8b4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">PREMIUM</span></div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">45종 정밀 데이터 + 사주·베딕·서양·자미두수 4시스템 동시 교차 분석</div>
         </div>
-        <div style="font-size:11px;font-weight:700;color:#6a4aa0;background:rgba(180,160,240,0.15);border:1px solid rgba(180,160,240,0.4);border-radius:8px;padding:4px 10px;flex-shrink:0;">800 Orb</div>
+        <div class="orb-chip" style="flex-shrink:0;">800 Orb</div>
       </div>
     </div>
   </div>
@@ -2059,7 +2078,7 @@
         <div id="mypageName" style="font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;margin-bottom:2px;"></div>
         <div style="font-size:11px;color:var(--muted);">PICO Lab 회원</div>
       </div>
-      <div id="mypageOrbBadge" style="font-size:12px;font-weight:700;color:#2e6ba8;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:20px;padding:5px 12px;white-space:nowrap;"><i class="pi pi-sparkle"></i> — Orb</div>
+      <div id="mypageOrbBadge" style="font-size:12px;font-weight:700;color:var(--orb);background:var(--orb-bg);border:1px solid var(--orb-border);border-radius:20px;padding:5px 12px;white-space:nowrap;"><i class="pi pi-sparkle"></i> — Orb</div>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;">
       <button onclick="openProfilesModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
@@ -2279,7 +2298,7 @@
     <!-- 유료: AI 분석 버튼 -->
     <div style="border:1px solid rgba(0,0,0,0.06);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px;">
       <div style="font-size:12px;font-weight:700;color:#a16d1f;margin-bottom:3px;"><i class="pi pi-crystal"></i> AI 정밀 분석 받기</div>
-      <div style="font-size:11px;color:rgba(0,0,0,0.45);margin-bottom:10px;">두 사람의 깊은 인연을 AI가 분석합니다 · <span style="color:#a16d1f;">80 Orb 사용</span></div>
+      <div style="font-size:11px;color:rgba(0,0,0,0.45);margin-bottom:10px;">두 사람의 깊은 인연을 AI가 분석합니다 · <span style="color:var(--orb);">80 Orb 사용</span></div>
       <button id="ghAiBtn" onclick="requestGunghapAI()" style="padding:10px 24px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:10px;color:#a16d1f;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">AI 분석 시작</button>
     </div>
 
