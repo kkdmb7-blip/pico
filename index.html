@@ -5206,6 +5206,13 @@ function switchTab(tab) {
   // 마이페이지: 로그인 상태에 따라 분기
   if (tab === 'mypage') { updateMypageTab(); if (typeof refreshPushBtnLabel === 'function') refreshPushBtnLabel(); }
   _currentTab = tab;
+  // 새로고침 시 같은 탭 유지: URL 쿼리 + localStorage 동시 갱신
+  try {
+    var _u = new URL(window.location.href);
+    if (tab === 'home') _u.searchParams.delete('tab'); else _u.searchParams.set('tab', tab);
+    history.replaceState({}, '', _u.pathname + (_u.search || ''));
+    localStorage.setItem('pico_last_tab', tab);
+  } catch(e) {}
   window.scrollTo(0, 0);
 }
 function updateMypageTab() {
@@ -5237,13 +5244,15 @@ function updateMypageTab() {
     user.style.display = 'none';
   }
 }
-// 초기 탭 활성화 (URL ?tab= 파라미터 지원)
+// 초기 탭 활성화 (URL ?tab= 파라미터 → localStorage 마지막 탭 → 홈 순)
 (function() {
   var params = new URLSearchParams(window.location.search);
   var initTab = params.get('tab');
+  if (!initTab) {
+    try { initTab = localStorage.getItem('pico_last_tab'); } catch(e) {}
+  }
   if (initTab && ['home','report','consult','mypage'].indexOf(initTab) !== -1) {
     switchTab(initTab);
-    history.replaceState({}, '', window.location.pathname);
   } else {
     var btn = document.getElementById('tnHome');
     if (btn) btn.style.color = '#e8b86d';
