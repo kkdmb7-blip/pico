@@ -1734,6 +1734,32 @@ function setLoading(title, desc) {
   document.getElementById('loadingDesc').textContent = desc;
 }
 
+// 공유링크로 들어왔지만 프로필 없는 방문자용 랜딩
+function showGuestLanding(isGuide) {
+  const cfg = _config || {};
+  const title = cfg.title || 'AI 운세 리포트';
+  const emoji = cfg.emoji || '✨';
+  const desc = isGuide
+    ? '친구·가족·동료를 더 깊이 이해하고 싶다면,<br>먼저 그 사람의 사주 정보를 입력해주세요.'
+    : '공유받은 리포트는 본인의 사주에 맞춰 생성됩니다.<br>나만의 AI 분석을 받아보려면 사주를 입력해주세요.';
+  const btnText = isGuide ? '상대방 사주 입력하러 가기' : '내 사주 입력하고 시작하기';
+  const html =
+    '<div style="max-width:520px;margin:0 auto;padding:60px 24px 40px;text-align:center;">' +
+      '<div style="font-size:64px;margin-bottom:20px;">' + emoji + '</div>' +
+      '<div style="font-family:\'Cormorant Garamond\',\'Noto Serif KR\',serif;font-size:clamp(26px,4.5vw,38px);font-weight:500;letter-spacing:-0.01em;color:var(--ink,#1a120a);margin-bottom:14px;">' + title + '</div>' +
+      '<div style="font-family:\'Gowun Batang\',\'Noto Serif KR\',serif;font-size:14px;line-height:1.85;color:var(--muted,#7a6850);margin-bottom:32px;">' + desc + '</div>' +
+      (cfg.preview ? '<div style="background:var(--surface,#fcf7ea);border:1px solid var(--border-soft,rgba(80,55,30,0.10));border-radius:14px;padding:18px 20px;font-size:13px;line-height:1.8;color:var(--text2,#4a3a2a);text-align:left;margin-bottom:28px;font-family:\'Gowun Batang\',\'Noto Serif KR\',serif;">' + cfg.preview + '</div>' : '') +
+      '<button onclick="location.href=\'index.html\'" style="display:inline-block;padding:14px 38px;font-family:\'Cormorant Garamond\',\'Noto Serif KR\',serif;font-size:12px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;background:var(--accent,#7a2418);color:#fcf7ea;border:none;border-radius:28px;cursor:pointer;box-shadow:0 2px 8px rgba(122,36,24,0.18);">' + btnText + '</button>' +
+      '<div style="margin-top:16px;font-size:11px;color:var(--muted,#7a6850);letter-spacing:0.04em;">로그인 필요 · 무료로 시작</div>' +
+    '</div>';
+  const wrap = document.getElementById('stateLoading');
+  if (wrap) {
+    wrap.innerHTML = html;
+    wrap.style.display = 'block';
+    wrap.style.minHeight = '0';
+  }
+}
+
 function showState(state) {
   document.getElementById('stateLoading').style.display     = state === 'loading'     ? 'flex'  : 'none';
   document.getElementById('stateIntro').style.display       = state === 'intro'       ? 'block' : 'none';
@@ -1954,6 +1980,17 @@ async function loadAllData(withZiwei, withAstro) {
 }
 
 // ── 공통 블록 빌더 ──
+const OHENG_KO = { wood:'목', fire:'화', earth:'토', metal:'금', water:'수' };
+function ohengKo(k) { return OHENG_KO[k] || k; }
+function fivePctToKor(pct) {
+  if (!pct) return '미확인';
+  return Object.entries(pct).map(([k,v])=>`${ohengKo(k)}:${v}%`).join(' ');
+}
+function fiveCountToKor(cnt) {
+  if (!cnt) return '미확인';
+  return Object.entries(cnt).map(([k,v])=>`${ohengKo(k)}:${v}개`).join(' ');
+}
+
 function buildSajuBlock() {
   const sd = _sdFull; const rpt = _rptFull;
   const pillars = sd?.summary?.pillars || {};
@@ -1965,7 +2002,7 @@ function buildSajuBlock() {
 용신: ${_yongsin||sd?.yongshin?.primary||'미확인'}
 조후용신: ${Array.isArray(sd?.johu?.needs_kor)?sd.johu.needs_kor.join('/'):(sd?.johu?.needs_kor||'미확인')}
 오행수: 목${sd?.five_count?.wood||0} 화${sd?.five_count?.fire||0} 토${sd?.five_count?.earth||0} 금${sd?.five_count?.metal||0} 수${sd?.five_count?.water||0}
-오행%: ${sd?.five_pct?Object.entries(sd.five_pct).map(([k,v])=>`${k}:${v}%`).join(' '):'미확인'}
+오행%: ${fivePctToKor(sd?.five_pct)}
 패턴: ${sd?.pattern?.type||''} ${sd?.pattern?.subtype||''}
 십신맵: ${sd?.ten_gods_map?JSON.stringify(sd.ten_gods_map):'미확인'}
 공망: ${sd?.gongmang||'미확인'}
@@ -2483,24 +2520,24 @@ function buildAccuracyLayerBlock() {
 
   document.getElementById('navTitle').textContent = _config.title;
 
-  // 로그인 확인
+  // 로그인 확인 — 공유링크로 들어온 미로그인 방문자는 안내 화면 노출
   try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
-  if (!_user || !_user.id) { location.href = 'index.html'; return; }
+  if (!_user || !_user.id) { showGuestLanding(false); return; }
 
   // 프로필 확인 — guide 타입은 sessionStorage의 1회성 프로필 사용 (다른 사람용)
   var _useSession = (_type === 'guide' && new URLSearchParams(location.search).get('src') === 'session');
   if (_useSession) {
     try { _profile = JSON.parse(sessionStorage.getItem('pico_guide_profile')); } catch(e) {}
     if (!_profile || !_profile.year) {
-      setLoading('프로필 필요', '분석할 사람의 정보를 먼저 입력해주세요');
-      setTimeout(() => location.href = 'index.html', 2000);
+      // 공유링크로 들어온 경우: 안내 화면 + 홈 이동 버튼
+      showGuestLanding(true);
       return;
     }
   } else {
     try { _profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
     if (!_profile || !_profile.year) {
-      setLoading('프로필 필요', '사주 정보를 먼저 입력해주세요');
-      setTimeout(() => location.href = 'index.html', 2000);
+      // 공유링크로 들어온 경우: 리포트 소개 화면 + 사주 입력 유도
+      showGuestLanding(false);
       return;
     }
   }
@@ -2816,7 +2853,10 @@ ${prevText}
 - **볼드** 적극 활용 (핵심 키워드 3~5개)
 - 전문 용어 사용 후 쉬운 말로 풀어쓰기
 - 마지막 문장은 희망적으로 마무리
-- 위 사주 원국 및 베딕 데이터를 반드시 분석에 반영할 것`;
+- 위 사주 원국 및 베딕 데이터를 반드시 분석에 반영할 것
+- 오행은 반드시 "목/화/토/금/수" 한글로만 표기. "wood/fire/earth/metal/water" 영어 표기 절대 금지
+- 십신 용어 철자 준수: "비겁"(比劫), "비견"(比肩), "겁재"(劫財). "비겝"·"비견재"·"겹재" 등 오타 금지
+- 그 외 용어도 정확히: "식신" "상관" "편재" "정재" "편관" "정관" "편인" "정인"`;
 
   console.log(`[buildSectionPrompt] 섹션 ${secIdx} systemPrompt:`, systemPrompt);
   const secFocus = (SECTION_FOCUS[_type] || SECTION_FOCUS.character)[secIdx] ?? focus;
@@ -3821,7 +3861,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 섹션 구성:
 1. 출생 차트 핵심 요약 — 태양별자리, 달별자리, 어센던트와 사주 일주 ${_ilju||''}·신강신약 ${_singang||''}이 공통으로 가리키는 기질 핵심 압축.
 2. 주요 행성 배치 분석 — 수성(사고방식), 금성(관계·가치관), 화성(행동 에너지), 목성(성장 방향), 토성(한계·구조) 별자리 배치가 드러내는 성향과 패턴.
-3. 사주·서양 점성 교차 — 사주 오행%(${_sdFull?.five_pct?Object.entries(_sdFull.five_pct).map(([k,v])=>`${k}:${v}%`).join(' '):'미확인'})와 서양 원소(화·수·풍·토) 배치를 교차해 공통으로 강조하는 에너지와 부족한 에너지 분석.
+3. 사주·서양 점성 교차 — 사주 오행%(${fivePctToKor(_sdFull?.five_pct)})와 서양 원소(화·수·풍·토) 배치를 교차해 공통으로 강조하는 에너지와 부족한 에너지 분석.
 
 총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt2A, [0,1,2], '서양 점성술·사주 통합 분석', ysFinal, '', false);
@@ -4036,7 +4076,7 @@ async function generateSummaryReport() {
   const db = buildDaeunBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
-  const fivePctStr = _sdFull?.five_pct ? Object.entries(_sdFull.five_pct).map(([k,v])=>k+':'+v+'%').join(' ') : '미확인';
+  const fivePctStr = fivePctToKor(_sdFull?.five_pct);
   const prompt = profileStr + '\n\n' + sb2 + '\n' + db + '\n올해 세운: ' + (_sewun||'미확인') + '\n' + buildOhangWarningBlock() + buildAccuracyLayerBlock() +
     '\n\n섹션 구성:\n1. 나의 사주 핵심 프로필 — 일간 ' + (_ilju||'') + ', 격국 ' + (_geokguk||'') + ', 신강/신약(' + (_singang||'') + '), 오행 분포(' + fivePctStr + '), 용신(' + ysFinal + ')을 읽기 쉽게 한 문단으로 압축. 이 사주가 어떤 사람인지 핵심 3줄.' +
     '\n2. 올해 운세 핵심 포인트 — 올해 세운 ' + (_sewun||'') + '이 이 사주에 미치는 영향 핵심만. 기회 1가지, 주의 1가지를 명확히.' +
@@ -4056,8 +4096,8 @@ async function generateBalanceReport() {
   const sb2 = buildSajuBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
-  const fivePctStr = _sdFull?.five_pct ? Object.entries(_sdFull.five_pct).map(([k,v])=>`${k}:${v}%`).join(' ') : '미확인';
-  const fiveCountStr = _sdFull?.five_count ? Object.entries(_sdFull.five_count).map(([k,v])=>`${k}:${v}개`).join(' ') : '미확인';
+  const fivePctStr = fivePctToKor(_sdFull?.five_pct);
+  const fiveCountStr = fiveCountToKor(_sdFull?.five_count);
   const prompt = `${profileStr}\n\n${sb2}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 오행 분포 현황 — 오행 개수(${fiveCountStr})와 비율(${fivePctStr}), 신강/신약(${_singang||'미확인'})으로 본 이 사주의 에너지 구조. 가장 강한 오행과 가장 약한 오행이 만드는 체질적 특성.\n2. 부족·과잉 오행의 영향 — 부족한 오행이 성격·건강·재물·관계에 미치는 구체적 영향. 과잉된 오행이 만드는 편향과 약점. 용신(${ysFinal})이 이 불균형을 어떻게 보완하는지.\n3. 오행 보완 실천법 — 부족 오행을 보완하는 색상(옷·소품), 방위(집·사무실), 음식, 계절별 생활습관. 용신 오행 중심으로 지금 당장 실천할 구체적 방법 5가지.\n\n총 500~700자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt, [0,1,2], '오행 밸런스 분석', ysFinal, '', true);
   try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
@@ -4090,7 +4130,7 @@ async function generateHealthReport() {
   const db = buildDaeunBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
-  const fivePctStr = _sdFull?.five_pct ? Object.entries(_sdFull.five_pct).map(([k,v])=>`${k}:${v}%`).join(' ') : '미확인';
+  const fivePctStr = fivePctToKor(_sdFull?.five_pct);
   const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock()}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n오행↔장기 매핑: 목(간·담·눈·근육), 화(심장·소장·혀·혈관), 토(비위·위장·입·살), 금(폐·대장·코·피부), 수(신장·방광·귀·뼈)\n\n섹션 구성:\n1. 체질 구조와 오행 건강 지도 — 오행 분포(${fivePctStr})와 신강/신약(${_singang||'미확인'})으로 본 체질 유형. 강한 오행이 지배하는 장기(과잉 주의)와 약한 오행이 취약한 장기(보강 필요)를 구체적으로 매핑.\n2. 취약 장기와 건강 주의 시기 — 오행 부족/과잉이 만드는 구체적 건강 위험과 증상. 현재 대운 ${_daeun||'미확인'}과 올해 세운이 건강에 미치는 영향. 특히 조심할 계절과 시기.\n3. 체질 맞춤 건강 관리법 — 용신 오행(${ysFinal}) 기반 보강 음식·운동·생활습관. 부족 오행 보완 식단. 계절별 주의사항. 지금 당장 실천할 건강 전략 3가지.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt, [0,1,2], '건강·체질 분석', ysFinal, '', true);
   try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
@@ -4122,7 +4162,7 @@ async function generateGuideReport() {
   const sb2 = buildSajuBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const pillars = _sdFull?.summary?.pillars || {};
-  const fivePctStr = _sdFull?.five_pct ? Object.entries(_sdFull.five_pct).map(([k,v])=>`${k}:${v}%`).join(' ') : '미확인';
+  const fivePctStr = fivePctToKor(_sdFull?.five_pct);
   const tenGodsStr = _sdFull?.ten_gods_map ? Object.entries(_sdFull.ten_gods_map).map(([k,v])=>`${k}:${v}`).join(', ') : '미확인';
   const relTxt = _profile?.relation ? `(독자와의 관계: ${_profile.relation})` : '';
   const subjectStr = `분석 대상: ${_profile?.name||'이 사람'} ${relTxt} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'}`;
@@ -4434,7 +4474,7 @@ function mountReportFeedback() {
   } catch(e) { /* 위젯 실패는 무시 */ }
 }
 
-// ── 쉽게 풀어주기 박스 표시 (캐시 있으면 자동 펼침) ──
+// ── 쉽게 풀어주기 박스 표시 (버튼만 노출, 캐시는 사용자가 버튼 누를 때만 복원) ──
 function showEasyExplainBox() {
   const easyWrap = document.getElementById('easyWrap');
   if (!easyWrap) return;
@@ -4447,13 +4487,6 @@ function showEasyExplainBox() {
     easyBtn.disabled = false;
     easyBtn.textContent = '🤔 어려우셨다면 — 친구처럼 쉽게 풀어드릴게요';
   }
-  try {
-    if (_user && _user.id && _type) {
-      const cacheKey = `easy_${_user.id}_${_type}_v${REPORT_VERSION}`;
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) showEasyResult(cached);
-    }
-  } catch(e) {}
 }
 
 // ── 쉽게 풀어주기 — AI 호출 ──
