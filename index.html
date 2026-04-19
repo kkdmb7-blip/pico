@@ -2172,6 +2172,9 @@
       <button id="btnPushToggle" onclick="togglePushSubscription()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
         <span id="btnPushLabel"><i class="pi pi-bell"></i> 오늘의 명언 알림 켜기</span><span style="color:var(--muted);">›</span>
       </button>
+      <button id="btnAdminDash" onclick="goAdminDashboard()" style="display:none;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--gold-deep);font-size:14px;cursor:pointer;text-align:left;width:100%;font-weight:700;">
+        <span><i class="pi pi-sparkle"></i> 관리자 대시보드</span><span style="color:var(--muted);">›</span>
+      </button>
       <button onclick="logout()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;color:#b91c1c;font-size:14px;cursor:pointer;text-align:left;width:100%;">
         <span>로그아웃</span><span style="color:var(--muted);">›</span>
       </button>
@@ -5321,6 +5324,28 @@ function switchTab(tab) {
   } catch(e) {}
   window.scrollTo(0, 0);
 }
+var ADMIN_UUID = '99f9f77a-2f2a-4055-ab44-421d1c070341';
+async function checkAdminAccess() {
+  try {
+    if (!currentUser || !currentUser.id) return;
+    var kakaoId = currentUser.id.indexOf('kakao_') === 0 ? currentUser.id.slice(6) : currentUser.id;
+    var r = await fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kakao_id: kakaoId, name: currentUser.name || '' })
+    });
+    var data = await r.json();
+    if (data && data.id === ADMIN_UUID) {
+      var btn = document.getElementById('btnAdminDash');
+      if (btn) btn.style.display = 'flex';
+      localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
+    }
+  } catch(e) {}
+}
+function goAdminDashboard() {
+  localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
+  location.href = 'admin.html';
+}
 function updateMypageTab() {
   var guest = document.getElementById('mypageGuest');
   var user = document.getElementById('mypageUser');
@@ -5345,6 +5370,7 @@ function updateMypageTab() {
         });
       } catch(e) {}
     })(currentUser.id);
+    checkAdminAccess();
   } else {
     guest.style.display = '';
     user.style.display = 'none';
