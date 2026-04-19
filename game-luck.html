@@ -7,12 +7,13 @@
 <meta property="og:title" content="오늘의 행운 뽑기 — 포르투나">
 <meta property="og:description" content="3개의 오브 중 하나를 골라 오늘의 행운을 받아보세요">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <link rel="stylesheet" href="pico-icons.css">
 <style>
   :root {
     --bg: #f4ede0;
-    --surface: #fcf7ea;
-    --surface2: #ede4cf;
+    --surface: #f9f1de;
+    --surface2: #e8dcc0;
     --border: #9a8a60;
     --border-soft: rgba(60,40,20,0.22);
     --accent: #7a2418;
@@ -27,7 +28,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -59,7 +60,7 @@
     margin-bottom: 28px;
   }
   .game-eyebrow {
-    font-family: 'Playfair Display', 'Noto Serif KR', serif;
+    font-family: 'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
     font-size: 10px; font-weight: 600;
     letter-spacing: 0.28em; text-transform: uppercase;
     color: var(--accent);
@@ -74,7 +75,7 @@
     line-height: 1.35;
   }
   .game-date {
-    font-family: 'Playfair Display', 'Noto Serif KR', serif;
+    font-family: 'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
     font-size: 13px; color: var(--muted);
     letter-spacing: 0.04em;
   }
@@ -191,14 +192,14 @@
     pointer-events: none;
   }
   .result-score-label {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
     font-size: 11px; font-weight: 600;
     letter-spacing: 0.3em; text-transform: uppercase;
     color: var(--accent); margin-bottom: 10px;
     position: relative;
   }
   .result-score {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
     font-size: 72px; font-weight: 700;
     color: var(--ink);
     line-height: 1; letter-spacing: -0.04em;
@@ -228,7 +229,7 @@
     font-size: 10.5px; color: var(--muted);
     letter-spacing: 0.12em; text-transform: uppercase;
     margin-bottom: 8px;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
     font-weight: 600;
   }
   .result-card-value {
@@ -262,7 +263,7 @@
     font-weight: 700; letter-spacing: 0.2em;
     text-transform: uppercase;
     margin-bottom: 8px;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
   }
   .result-advice-text {
     font-family: 'Noto Serif KR', serif;
@@ -279,7 +280,7 @@
     border-radius: 22px;
     font-size: 13px; font-weight: 700;
     cursor: pointer; border: none;
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
     transition: all 0.2s;
     white-space: nowrap;
   }
@@ -346,7 +347,7 @@
       </div>
       <div class="result-card">
         <div class="result-card-label">Lucky Number</div>
-        <div class="result-card-value" id="luckyNumber" style="font-family:'Playfair Display',serif;font-size:28px;"></div>
+        <div class="result-card-value" id="luckyNumber" style="font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;font-size:28px;"></div>
         <div class="result-card-sub">오늘의 숫자</div>
       </div>
       <div class="result-card">

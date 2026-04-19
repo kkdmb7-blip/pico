@@ -6,12 +6,14 @@
 <meta name="theme-color" content="#f5efe4">
 <title>이름 점수 확인 - 포르투나</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+KR:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <style>
 :root {
   --bg: #f4ede0;
-  --surface: #fcf7ea;
-  --surface2: #ede4cf;
+  --surface: #f9f1de;
+  --surface2: #e8dcc0;
   --border: #9a8a60;
   --border-soft: rgba(60,40,20,0.22);
   --accent: #7a2418;
@@ -26,8 +28,8 @@
   --card: #fcf7ea;
   --void: #f4ede0;
   --ink: #241a10;
-  --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
-  --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
+  --shadow-soft: 0 1px 3px rgba(60,40,20,0.08), 0 6px 20px rgba(60,40,20,0.07);
+  --shadow-lift: 0 3px 8px rgba(60,40,20,0.12), 0 14px 36px rgba(60,40,20,0.14);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -48,8 +50,8 @@ nav {
 .nav-brand {
   display:flex; align-items:center; gap:8px;
   text-decoration:none; color:var(--gold-deep);
-  font-size:14px; letter-spacing:0.2em; font-weight:700;
-  font-family:'Noto Serif KR',serif;
+  font-size:16px; letter-spacing:0.28em; font-weight:600;
+  font-family:'Cinzel','Noto Serif KR',serif;
 }
 .nav-brand img { height:40px; object-fit:contain; flex-shrink:0; }
 .nav-back {
@@ -194,7 +196,7 @@ nav {
   box-shadow: var(--shadow-soft);
 }
 .score-gye { font-size:10px; color:var(--text-dim); letter-spacing:0.15em; margin-bottom:6px; }
-.score-num { font-family:'Playfair Display','Noto Serif KR',serif; font-size:40px; font-weight:600; line-height:1; margin-bottom:8px; }
+.score-num { font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; font-size:40px; font-weight:600; line-height:1; margin-bottom:8px; }
 .score-badge {
   display:inline-block; font-size:11px; font-weight:600;
   padding:3px 10px; border-radius:20px; margin-bottom:6px; letter-spacing:0.06em;
@@ -279,7 +281,7 @@ nav {
   letter-spacing: 1px;
 }
 .total-score-num {
-  font-family:'Playfair Display','Noto Serif KR',serif;
+  font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
   font-size: 56px;
   font-weight: 700;
   color: var(--gold-deep);
@@ -582,7 +584,7 @@ nav {
     <div id="hookCard"></div>
     <div id="aiAnalysisWrap" style="display:none;margin-top:16px;">
       <button class="btn-gold" id="btnAiAnalysis" onclick="onAiAnalysisClick()">AI 심층분석 · 300 Orb</button>
-      <div class="orb-hint">로그인 후 이용 · Orb로 결제</div>
+      <div class="orb-hint" id="aiOrbHint">이름의 수리·음오행·용신을 AI가 깊이 있게 풀어드립니다</div>
     </div>
     <div id="aiAnalysisResult"></div>
   </div>
@@ -1058,21 +1060,24 @@ function fetchTargetYongsin(cb) {
     body: JSON.stringify({ birth: birthISO, gender: g, calendar: 'solar' }),
     signal: ctrl ? ctrl.signal : undefined
   })
-  .then(function(r){ return r.json(); })
+  .then(function(r){
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
   .then(function(data){
     clearTimeout(timer);
     _targetYongsin = normalizeYongsin(data.yongshin || data.yongsin);
-    updateTargetHint();
+    try { updateTargetHint(); } catch(uhe){ console.warn('updateTargetHint:', uhe); }
     if (!_targetYongsin) {
       showToast('용신 정보를 받지 못했어요. 잠시 후 다시 시도해주세요', true);
-      return; // 재귀 차단: cb 호출하지 않음
+      return;
     }
     if (cb) cb();
   })
-  .catch(function(){
+  .catch(function(err){
     clearTimeout(timer);
-    showToast(timedOut ? '응답 지연으로 중단했어요. 다시 시도해주세요' : '사주 계산 실패. 다시 시도해주세요', true);
-    // 재귀 차단: cb 호출하지 않음. 사용자가 버튼을 다시 눌러야 재시도
+    console.error('fetchTargetYongsin error:', err);
+    showToast(timedOut ? '응답 지연으로 중단했어요. 다시 시도해주세요' : ('사주 계산 실패: ' + (err && err.message ? err.message : '네트워크 오류')), true);
   });
 }
 
@@ -2065,7 +2070,8 @@ function loadSajuData() {
   .then(function(r){ return r.json(); })
   .then(function(data) {
     _yongsin = normalizeYongsin(data.yongshin || data.yongsin);
-    _geokguk = data.geokguk || null;
+    var gk = data.geokguk;
+    _geokguk = gk ? (typeof gk === 'string' ? gk : (gk.geok_kor || gk.geok || null)) : null;
   })
   .catch(function(){});
 }

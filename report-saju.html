@@ -5,15 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>나만의 사주 리포트 · FORTUNA</title>
 <meta name="theme-color" content="#f5efe4">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
 :root {
   --bg: #f4ede0;
-  --surface: #fcf7ea;
-  --surface2: #ede4cf;
+  --surface: #f9f1de;
+  --surface2: #e8dcc0;
   --border: #9a8a60;
   --border-soft: rgba(60,40,20,0.22);
   --accent: #7a2418;
@@ -31,8 +32,8 @@
   --muted: #5a4830;
   --green: #3a7a52;
   --red: #a8322a;
-  --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
-  --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
+  --shadow-soft: 0 1px 3px rgba(60,40,20,0.08), 0 6px 20px rgba(60,40,20,0.07);
+  --shadow-lift: 0 3px 8px rgba(60,40,20,0.12), 0 14px 36px rgba(60,40,20,0.14);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -40,7 +41,7 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
   font-weight: 400;
   min-height: 100vh;
   overflow-x: hidden;
@@ -85,7 +86,7 @@ nav {
 .btn-kakao {
   display:flex; align-items:center; gap:8px; padding:8px 16px;
   background:#fee500; color:#3c1e1e; border:none; border-radius:10px;
-  font-size:13px; font-weight:700; font-family:'Noto Sans KR',sans-serif;
+  font-size:13px; font-weight:700; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
   cursor:pointer; white-space:nowrap; transition:all 0.2s;
 }
 .btn-kakao:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(254,229,0,0.35); }
@@ -96,7 +97,7 @@ nav {
 .hamburger-btn { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:7px 10px; cursor:pointer; color:var(--text); display:flex; align-items:center; }
 .hamburger-dropdown { display:none; position:absolute; right:0; top:calc(100% + 8px); background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; white-space:nowrap; min-width:150px; box-shadow:var(--shadow-lift); z-index:200; }
 .hamburger-dropdown.open { display:block; }
-.hamburger-dropdown button { display:block; width:100%; padding:12px 18px; background:none; border:none; color:var(--text); font-size:14px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; text-align:left; }
+.hamburger-dropdown button { display:block; width:100%; padding:12px 18px; background:none; border:none; color:var(--text); font-size:14px; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; cursor:pointer; text-align:left; }
 .hamburger-dropdown button:hover { background:var(--surface2); }
 .menu-divider { height:1px; background:var(--border); }
 
@@ -174,7 +175,7 @@ select {
   width:100%; padding:12px 36px 12px 14px;
   background:var(--surface2); border:1px solid var(--border);
   border-radius:10px; color:var(--text); font-size:13px;
-  font-family:'Noto Sans KR',sans-serif; appearance:none; cursor:pointer;
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; appearance:none; cursor:pointer;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6850' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat; background-position:right 12px center;
 }
@@ -187,7 +188,7 @@ select option { background:var(--surface2); color:var(--text); }
   padding:18px 24px;
   background:linear-gradient(135deg,var(--accent),#5a1810);
   color:#fff; border:none; border-radius:14px; cursor:pointer;
-  font-family:'Noto Sans KR',sans-serif;
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
   font-size:16px; font-weight:700; letter-spacing:-0.2px;
   text-align:center; transition:all 0.2s; line-height:1.5;
 }
@@ -282,7 +283,7 @@ select option { background:var(--surface2); color:var(--text); }
 .action-btn {
   flex:1; min-width:100px; padding:14px 12px;
   border-radius:12px; font-size:13px; font-weight:600;
-  font-family:'Noto Sans KR',sans-serif; cursor:pointer;
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; cursor:pointer;
   display:flex; align-items:center; justify-content:center; gap:6px;
   transition:all 0.2s; border:1px solid transparent;
 }

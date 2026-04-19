@@ -72,11 +72,11 @@
     return name + (date ? ' · ' + date : '');
   }
 
-  // ── Bar Styles ─────────────────────────────────────────
+  // ── Bar Styles (cream theme) ───────────────────────────
   var BAR_STYLE = [
-    'background:rgba(19,19,26,0.97)',
-    'border-bottom:1px solid #2a2a3d',
-    'padding:8px 20px',
+    'background:rgba(249,241,222,0.97)',
+    'border-bottom:1px solid rgba(154,138,96,0.25)',
+    'padding:10px 20px',
     'display:flex',
     'align-items:center',
     'gap:8px',
@@ -89,20 +89,20 @@
   ].join(';');
 
   var BTN_BASE = [
-    'border:1px solid #2a2a3d',
-    'border-radius:8px',
-    'padding:5px 12px',
-    'font-size:12px',
-    'font-weight:600',
+    'border:1px solid rgba(154,138,96,0.35)',
+    'border-radius:10px',
+    'padding:7px 14px',
+    'font-size:12.5px',
+    'font-weight:700',
     'cursor:pointer',
-    'font-family:\'Noto Sans KR\',sans-serif',
+    'font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif',
     'transition:all 0.15s',
     'white-space:nowrap'
   ].join(';');
 
-  var BTN_ACCENT = BTN_BASE + ';background:rgba(123,94,167,0.15);color:#c4a8e8;border-color:rgba(123,94,167,0.35);';
-  var BTN_GHOST  = BTN_BASE + ';background:rgba(255,255,255,0.04);color:#6b6b85;';
-  var BTN_NEW    = BTN_BASE + ';background:rgba(232,184,109,0.1);color:#e8b86d;border-color:rgba(232,184,109,0.3);';
+  var BTN_ACCENT = BTN_BASE + ';background:linear-gradient(135deg,#8a6a15,#6a4f0c);color:#fcf7ea;border-color:#5a4008;box-shadow:0 1px 3px rgba(138,106,21,0.28);';
+  var BTN_GHOST  = BTN_BASE + ';background:#fcf7ea;color:#5a4830;';
+  var BTN_NEW    = BTN_BASE + ';background:linear-gradient(135deg,#7a2418,#5a1810);color:#fcf7ea;border-color:#5a1810;box-shadow:0 1px 3px rgba(122,36,24,0.25);';
 
   // ── Dropdown ───────────────────────────────────────────
   var DD_STYLE = [
@@ -110,22 +110,22 @@
     'top:calc(100% + 4px)',
     'left:0',
     'min-width:220px',
-    'background:#1c1c28',
-    'border:1px solid #2a2a3d',
-    'border-radius:10px',
-    'box-shadow:0 8px 32px rgba(0,0,0,0.5)',
+    'background:#fcf7ea',
+    'border:1px solid rgba(154,138,96,0.35)',
+    'border-radius:12px',
+    'box-shadow:0 8px 24px rgba(60,40,20,0.18)',
     'z-index:300',
     'overflow:hidden',
     'display:none'
   ].join(';');
 
   var DD_ITEM = [
-    'padding:10px 14px',
+    'padding:11px 14px',
     'font-size:13px',
-    'color:#c0c0d8',
+    'color:#4a3a2a',
     'cursor:pointer',
-    'border-bottom:1px solid #2a2a3d',
-    'font-family:\'Noto Sans KR\',sans-serif'
+    'border-bottom:1px solid rgba(154,138,96,0.18)',
+    'font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif'
   ].join(';');
 
   // ── New-input overlay ──────────────────────────────────
@@ -156,8 +156,8 @@
 
     // Label
     var lbl = document.createElement('span');
-    lbl.style.cssText = 'font-size:11px;color:#6b6b85;margin-right:2px;white-space:nowrap;';
-    lbl.textContent = '조회:';
+    lbl.style.cssText = 'font-size:11.5px;color:#7a6850;margin-right:2px;white-space:nowrap;font-weight:600;letter-spacing:0.02em;';
+    lbl.textContent = '조회';
     bar.appendChild(lbl);
 
     // ── "내 정보" button
@@ -184,7 +184,7 @@
 
     if (profiles.length === 0) {
       var noItem = document.createElement('div');
-      noItem.style.cssText = DD_ITEM + ';color:#6b6b85;cursor:default;';
+      noItem.style.cssText = DD_ITEM + ';color:#7a6850;cursor:default;';
       noItem.textContent = '저장된 프로필이 없습니다';
       dd.appendChild(noItem);
     } else {
@@ -192,8 +192,8 @@
         var item = document.createElement('div');
         item.style.cssText = DD_ITEM;
         item.textContent = displayName(p) + ' · ' + (p.gender === 'male' ? '남' : '여');
-        item.addEventListener('mouseenter', function () { item.style.background = 'rgba(123,94,167,0.15)'; item.style.color = '#fff'; });
-        item.addEventListener('mouseleave', function () { item.style.background = ''; item.style.color = '#c0c0d8'; });
+        item.addEventListener('mouseenter', function () { item.style.background = 'rgba(138,106,21,0.10)'; item.style.color = '#3a2a10'; });
+        item.addEventListener('mouseleave', function () { item.style.background = ''; item.style.color = '#4a3a2a'; });
         item.addEventListener('click', function () {
           dd.style.display = 'none';
           window.location.href = buildUrl(profileToParams(p));
@@ -226,7 +226,7 @@
     var urlP = new URLSearchParams(window.location.search);
     if (urlP.get('year')) {
       var infoSpan = document.createElement('span');
-      infoSpan.style.cssText = 'margin-left:auto;font-size:11px;color:#6b6b85;white-space:nowrap;';
+      infoSpan.style.cssText = 'margin-left:auto;font-size:11px;color:#7a6850;white-space:nowrap;';
       infoSpan.textContent = urlP.get('year') + '.' + String(urlP.get('month')).padStart(2,'0') + '.' + String(urlP.get('day')).padStart(2,'0');
       if (urlP.get('hour')) infoSpan.textContent += ' ' + String(urlP.get('hour')).padStart(2,'0') + ':' + String(urlP.get('minute')||0).padStart(2,'0');
       bar.appendChild(infoSpan);
@@ -250,29 +250,29 @@
 
     var modal = document.createElement('div');
     modal.style.cssText = [
-      'background:#13131a',
-      'border:1px solid #2a2a3d',
+      'background:#f9f1de',
+      'border:1px solid rgba(154,138,96,0.35)',
       'border-radius:16px',
       'padding:28px 24px',
       'width:90%',
       'max-width:340px',
       'max-height:90vh',
-      'overflow-y:auto'
+      'overflow-y:auto',
+      'color:#3a2a10',
+      'box-shadow:0 20px 60px rgba(60,40,20,0.25)'
     ].join(';');
 
     modal.innerHTML = [
-      '<h3 style="font-family:\'Noto Serif KR\',serif;font-size:18px;margin-bottom:6px;">새로 입력</h3>',
-      '<p style="font-size:13px;color:#6b6b85;margin-bottom:20px;">직접 생년월일을 입력하여 조회합니다</p>',
+      '<h3 style="font-family:\'Cinzel\',\'Noto Serif KR\',serif;font-size:18px;margin-bottom:6px;letter-spacing:0.15em;color:#3a2a10;">새로 입력</h3>',
+      '<p style="font-size:13px;color:#7a6850;margin-bottom:20px;">직접 생년월일을 입력하여 조회합니다</p>',
 
-      // Name
       '<div style="margin-bottom:14px;">',
-        '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">이름 (선택)</label>',
+        '<label style="font-size:12px;color:#5a4830;display:block;margin-bottom:6px;font-weight:600;">이름 (선택)</label>',
         '<input id="pb-name" type="text" placeholder="홍길동" style="width:100%;box-sizing:border-box;' + selectStyle() + '" />',
       '</div>',
 
-      // Birth date
       '<div style="margin-bottom:14px;">',
-        '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">생년월일</label>',
+        '<label style="font-size:12px;color:#5a4830;display:block;margin-bottom:6px;font-weight:600;">생년월일</label>',
         '<div style="display:flex;gap:6px;">',
           '<select id="pb-year" style="flex:1.2;' + selectStyle() + '"><option value="">년</option></select>',
           '<select id="pb-month" style="flex:0.9;' + selectStyle() + '"><option value="">월</option></select>',
@@ -280,9 +280,8 @@
         '</div>',
       '</div>',
 
-      // Hour + Minute
       '<div style="margin-bottom:14px;">',
-        '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">태어난 시간</label>',
+        '<label style="font-size:12px;color:#5a4830;display:block;margin-bottom:6px;font-weight:600;">태어난 시간</label>',
         '<div style="display:flex;gap:6px;">',
           '<select id="pb-hour" style="flex:1.1;' + selectStyle() + '">',
             '<option value="unknown" selected>시 모름</option>',
@@ -294,18 +293,17 @@
         '</div>',
       '</div>',
 
-      // Gender
       '<div style="margin-bottom:20px;">',
-        '<label style="font-size:12px;color:#a0a0c0;display:block;margin-bottom:6px;">성별</label>',
+        '<label style="font-size:12px;color:#5a4830;display:block;margin-bottom:6px;font-weight:600;">성별</label>',
         '<div style="display:flex;gap:8px;">',
-          '<button id="pb-gM" onclick="window._pbSelectGender(\'male\')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(123,94,167,0.4);background:rgba(123,94,167,0.2);color:#c4a8e8;font-size:13px;cursor:pointer;font-family:\'Noto Sans KR\',sans-serif;">남성 ♂</button>',
-          '<button id="pb-gF" onclick="window._pbSelectGender(\'female\')" style="flex:1;padding:10px;border-radius:8px;border:1px solid #2a2a3d;background:rgba(255,255,255,0.04);color:#6b6b85;font-size:13px;cursor:pointer;font-family:\'Noto Sans KR\',sans-serif;">여성 ♀</button>',
+          '<button id="pb-gM" onclick="window._pbSelectGender(\'male\')" style="flex:1;padding:10px;border-radius:8px;border:1px solid #5a4008;background:linear-gradient(135deg,#8a6a15,#6a4f0c);color:#fcf7ea;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;">남성 ♂</button>',
+          '<button id="pb-gF" onclick="window._pbSelectGender(\'female\')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(154,138,96,0.35);background:#fcf7ea;color:#7a6850;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;">여성 ♀</button>',
         '</div>',
       '</div>',
 
       '<div style="display:flex;gap:8px;">',
-        '<button onclick="window._pbSubmitNew()" style="flex:1;padding:13px;border-radius:10px;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Noto Sans KR\',sans-serif;">조회하기</button>',
-        '<button onclick="window._pbCloseNew()" style="flex:0.5;padding:13px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid #2a2a3d;color:#6b6b85;font-size:13px;cursor:pointer;font-family:\'Noto Sans KR\',sans-serif;">취소</button>',
+        '<button onclick="window._pbSubmitNew()" style="flex:1;padding:13px;border-radius:10px;background:linear-gradient(135deg,#7a2418,#5a1810);color:#fcf7ea;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;box-shadow:0 2px 8px rgba(122,36,24,0.22);">조회하기</button>',
+        '<button onclick="window._pbCloseNew()" style="flex:0.5;padding:13px;border-radius:10px;background:#fcf7ea;border:1px solid rgba(154,138,96,0.35);color:#7a6850;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;">취소</button>',
       '</div>'
     ].join('');
 
@@ -315,7 +313,7 @@
   }
 
   function selectStyle() {
-    return 'background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 10px;color:#e8e0f0;font-size:14px;outline:none;';
+    return 'background:#fcf7ea;border:1px solid rgba(154,138,96,0.35);border-radius:8px;padding:10px 10px;color:#3a2a10;font-size:14px;outline:none;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;';
   }
 
   function openNewInputOverlay() {
@@ -354,12 +352,14 @@
     var mBtn = document.getElementById('pb-gM');
     var fBtn = document.getElementById('pb-gF');
     if (!mBtn || !fBtn) return;
+    var activeBase = 'flex:1;padding:10px;border-radius:8px;border:1px solid #5a4008;background:linear-gradient(135deg,#8a6a15,#6a4f0c);color:#fcf7ea;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;';
+    var ghostBase  = 'flex:1;padding:10px;border-radius:8px;border:1px solid rgba(154,138,96,0.35);background:#fcf7ea;color:#7a6850;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;';
     if (_niGender === 'male') {
-      mBtn.style.cssText = 'flex:1;padding:10px;border-radius:8px;border:1px solid rgba(123,94,167,0.4);background:rgba(123,94,167,0.2);color:#c4a8e8;font-size:13px;cursor:pointer;font-family:\'Noto Sans KR\',sans-serif;';
-      fBtn.style.cssText = 'flex:1;padding:10px;border-radius:8px;border:1px solid #2a2a3d;background:rgba(255,255,255,0.04);color:#6b6b85;font-size:13px;cursor:pointer;font-family:\'Noto Sans KR\',sans-serif;';
+      mBtn.style.cssText = activeBase;
+      fBtn.style.cssText = ghostBase;
     } else {
-      fBtn.style.cssText = 'flex:1;padding:10px;border-radius:8px;border:1px solid rgba(232,184,109,0.4);background:rgba(232,184,109,0.15);color:#e8b86d;font-size:13px;cursor:pointer;font-family:\'Noto Sans KR\',sans-serif;';
-      mBtn.style.cssText = 'flex:1;padding:10px;border-radius:8px;border:1px solid #2a2a3d;background:rgba(255,255,255,0.04);color:#6b6b85;font-size:13px;cursor:pointer;font-family:\'Noto Sans KR\',sans-serif;';
+      fBtn.style.cssText = activeBase.replace('#8a6a15,#6a4f0c', '#7a2418,#5a1810').replace('#5a4008', '#5a1810');
+      mBtn.style.cssText = ghostBase;
     }
   }
 

@@ -6,7 +6,8 @@
   <title>사주 분석 · FORTUNA</title>
   <meta name="theme-color" content="#f5efe4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
@@ -14,8 +15,8 @@
   <style>
     :root {
       --bg: #f4ede0;
-      --surface: #fcf7ea;
-      --surface2: #ede4cf;
+      --surface: #f9f1de;
+      --surface2: #e8dcc0;
       --border: #9a8a60;
       --border-soft: rgba(60,40,20,0.22);
       --accent: #7a2418;
@@ -29,11 +30,11 @@
       --orb: #5f8cb5;
       --orb-bg: rgba(122,196,255,0.12);
       --orb-border: rgba(95,140,181,0.30);
-      --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
-      --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
+      --shadow-soft: 0 1px 3px rgba(60,40,20,0.08), 0 6px 20px rgba(60,40,20,0.07);
+      --shadow-lift: 0 3px 8px rgba(60,40,20,0.12), 0 14px 36px rgba(60,40,20,0.14);
     }
     * { box-sizing: border-box; }
-    body { font-family: 'Noto Sans KR', sans-serif; background: #f4ede0; color: #1a120a; }
+    body { font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; background: #f4ede0; color: #1a120a; }
     .hanja { font-family: 'Noto Serif KR', serif; }
 
     /* glassmorphism (ivory) */
@@ -139,7 +140,7 @@
       color: #1a120a;
       padding: 11px 12px;
       font-size: 14px;
-      font-family: 'Noto Sans KR', sans-serif;
+      font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
       appearance: none;
     }
     .f-select:focus { outline: none; border-color: #7a2418; }
@@ -149,13 +150,13 @@
       flex: 1; padding: 11px; border-radius: 10px; font-size: 14px;
       background: rgba(252,247,234,0.85); border: 1.5px solid rgba(80,55,30,0.18);
       color: #5a4830; cursor: pointer; transition: all 0.2s;
-      font-family: 'Noto Sans KR', sans-serif;
+      font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
     }
     .g-btn.on { background: rgba(122,36,24,0.10); border-color: #7a2418; color: #7a2418; font-weight:700; }
     .main-btn {
       width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700;
       background: linear-gradient(135deg, #7a2418, #5a1810);
-      color: #fcf7ea; border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+      color: #fcf7ea; border: none; cursor: pointer; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
       box-shadow: var(--shadow-soft);
     }
     .main-btn:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -204,7 +205,7 @@
 
 <!-- nav -->
 <nav style="display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(80,55,30,0.08)">
-  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="img/goddess.png" style="height:56px;object-fit:contain" alt="FORTUNA"><span style="font-family:'Noto Serif KR',serif;font-weight:700;font-size:15px;letter-spacing:2px;color:#7a2418;">FORTUNA</span></a>
+  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="img/goddess.png" style="height:56px;object-fit:contain" alt="FORTUNA"><span style="font-family:'Cinzel','Noto Serif KR',serif;font-weight:600;font-size:16px;letter-spacing:4px;color:#7a2418;">FORTUNA</span></a>
   <span style="margin-left:auto;font-size:13px;color:rgba(80,55,30,0.45)">四柱 分析</span>
 </nav>
 
@@ -287,7 +288,7 @@
 
   <!-- 사주 원국 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_pillar')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_pillar')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
       <span>🀄 사주 원국</span><span class="acc-icon open" id="ico_acc_pillar">▾</span>
     </button>
     <div class="acc-body open" id="acc_pillar">
@@ -300,7 +301,7 @@
 
   <!-- 오행 분포 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_five')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_five')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
       <span><i class="pi pi-yinyang"></i> 오행 분포</span><span class="acc-icon open" id="ico_acc_five">▾</span>
     </button>
     <div class="acc-body open" id="acc_five">
@@ -310,7 +311,7 @@
 
   <!-- 격국 · 용신 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_geok')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_geok')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
       <span><i class="pi pi-scale"></i> 격국 · 용신</span><span class="acc-icon open" id="ico_acc_geok">▾</span>
     </button>
     <div class="acc-body open" id="acc_geok">
@@ -320,7 +321,7 @@
 
   <!-- 대운 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_luck')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_luck')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
       <span><i class="pi pi-wave"></i> 대운 흐름 <span style="font-size:11px;font-weight:400;opacity:0.45">10년 단위 운세 주기</span></span><span class="acc-icon open" id="ico_acc_luck">▾</span>
     </button>
     <div class="acc-body open" id="acc_luck">
@@ -333,7 +334,7 @@
 
   <!-- 세운 · 월운 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_yun')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_yun')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
       <span><i class="pi pi-calendar"></i> 세운 · 월운</span><span class="acc-icon open" id="ico_acc_yun">▾</span>
     </button>
     <div class="acc-body open" id="acc_yun">
@@ -346,7 +347,7 @@
 
   <!-- 행운 정보 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_johu')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_johu')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
       <span><i class="pi pi-clover"></i> 행운</span><span class="acc-icon open" id="ico_acc_johu">▾</span>
     </button>
     <div class="acc-body open" id="acc_johu">
@@ -386,25 +387,25 @@
 
 <!-- 리포트 훅 -->
 <div id="sajuReportHook" style="display:none;padding:0 20px 10px;max-width:440px;margin:0 auto;">
-  <a href="report.html?type=character" style="display:block;padding:16px 20px;background:linear-gradient(135deg,rgba(122,36,24,0.12),rgba(154,122,38,0.08));border:1px solid rgba(122,36,24,0.30);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(122,36,24,0.55)';this.style.background='linear-gradient(135deg,rgba(122,36,24,0.22),rgba(154,122,38,0.14))'" onmouseout="this.style.borderColor='rgba(122,36,24,0.30)';this.style.background='linear-gradient(135deg,rgba(122,36,24,0.12),rgba(154,122,38,0.08))'">
-    <div style="font-size:15px;font-weight:700;color:#7a2418;margin-bottom:4px;"><i class="pi pi-crystal"></i> 내 사주에 숨겨진 이야기 →</div>
-    <div style="font-size:11px;color:var(--muted);opacity:0.8;">AI가 풀어내는 나만의 사주 심층 리포트</div>
+  <a href="report.html?type=character" style="display:block;padding:16px 20px;background:linear-gradient(135deg,#7a2418,#5a1810);border:1px solid #5a1810;border-radius:14px;text-decoration:none;text-align:center;box-shadow:0 2px 8px rgba(122,36,24,0.25);transition:all 0.2s;">
+    <div style="font-size:15px;font-weight:700;color:#fcf7ea;margin-bottom:4px;"><i class="pi pi-crystal"></i> 내 사주에 숨겨진 이야기 →</div>
+    <div style="font-size:11px;color:rgba(252,247,234,0.82);">AI가 풀어내는 나만의 사주 심층 리포트</div>
   </a>
 </div>
 
 <!-- 사주 공유 버튼 -->
 <div id="sajuShareBtnWrap" style="display:none;padding:0 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
-  <button id="sajuShareBtn" onclick="shareSajuKakao()" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06));border:1px solid rgba(254,229,0,0.35);border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.borderColor='rgba(254,229,0,0.7)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.22),rgba(254,229,0,0.12))'" onmouseout="this.style.borderColor='rgba(254,229,0,0.35)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06))'">
-    <div style="font-size:15px;font-weight:700;color:#7a5e1c;margin-bottom:4px;"><i class="pi pi-crystal"></i> 카카오톡으로 공유하기 →</div>
-    <div style="font-size:11px;color:var(--muted);opacity:0.8;">내 사주 결과를 친구에게 보내보세요</div>
+  <button id="sajuShareBtn" onclick="shareSajuKakao()" style="display:block;width:100%;padding:16px 20px;background:#fee500;border:1px solid #e4ce00;border-radius:14px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(254,229,0,0.25);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;transition:all 0.2s;">
+    <div style="font-size:15px;font-weight:700;color:#3c1e1e;margin-bottom:4px;"><i class="pi pi-crystal"></i> 카카오톡으로 공유하기 →</div>
+    <div style="font-size:11px;color:#5a3030;">내 사주 결과를 친구에게 보내보세요</div>
   </button>
-  <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06));border:1px solid rgba(232,184,109,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,184,109,0.7)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.22),rgba(201,168,76,0.12))'" onmouseout="this.style.borderColor='rgba(232,184,109,0.35)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06))'">
-    <div style="font-size:15px;font-weight:700;color:#8a6b20;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담하기 →</div>
-    <div style="font-size:11px;color:var(--muted);opacity:0.8;">대화로 풀어보는 나만의 운세 이야기</div>
+  <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,#8a6a15,#6a4f0c);border:1px solid #5a4008;border-radius:14px;text-decoration:none;text-align:center;box-shadow:0 2px 8px rgba(138,106,21,0.25);box-sizing:border-box;transition:all 0.2s;">
+    <div style="font-size:15px;font-weight:700;color:#fcf7ea;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담하기 →</div>
+    <div style="font-size:11px;color:rgba(252,247,234,0.82);">대화로 풀어보는 나만의 운세 이야기</div>
   </a>
-  <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10));border:1px solid rgba(232,168,124,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,168,124,0.7)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.18))'" onmouseout="this.style.borderColor='rgba(232,168,124,0.35)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10))'">
-    <div style="font-size:15px;font-weight:700;color:#a85f2e;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
-    <div style="font-size:11px;color:var(--muted);opacity:0.8;">사주 전문가와 1:1 깊은 상담</div>
+  <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,#a85a2e,#8a3d20);border:1px solid #6a2d18;border-radius:14px;text-decoration:none;text-align:center;box-shadow:0 2px 8px rgba(168,90,46,0.25);box-sizing:border-box;transition:all 0.2s;">
+    <div style="font-size:15px;font-weight:700;color:#fcf7ea;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
+    <div style="font-size:11px;color:rgba(252,247,234,0.82);">사주 전문가와 1:1 깊은 상담</div>
   </a>
 </div>
 
@@ -1716,11 +1717,11 @@ window.addEventListener('load', function() {
 <div id="sajuShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(40,25,10,0.55);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
   <div style="background:#fcf7ea;border-top:1px solid rgba(80,55,30,0.10);border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -8px 32px rgba(60,40,20,0.12);">
     <button onclick="closeSajuShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(74,58,42,0.65);font-size:22px;cursor:pointer;line-height:1;">✕</button>
-    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.65);font-family:'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
+    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.65);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
     <div id="sajuPreviewArea" style="text-align:center;min-height:120px;margin-bottom:16px;"></div>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button onclick="doSajuShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;"><i class="pi pi-crystal"></i> 카카오톡으로 공유하기</button>
-      <button onclick="closeSajuShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(80,55,30,0.10);color:rgba(74,58,42,0.78);border:none;border-radius:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
+      <button onclick="doSajuShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;"><i class="pi pi-crystal"></i> 카카오톡으로 공유하기</button>
+      <button onclick="closeSajuShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(80,55,30,0.10);color:rgba(74,58,42,0.78);border:none;border-radius:14px;font-size:14px;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
     </div>
   </div>
 </div>

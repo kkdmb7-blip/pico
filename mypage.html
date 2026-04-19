@@ -6,13 +6,14 @@
 <title>마이페이지 · FORTUNA</title>
 <meta name="theme-color" content="#f5efe4">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <link rel="stylesheet" href="pico-icons.css">
 <style>
 :root {
   --bg: #f4ede0;
-  --surface: #fcf7ea;
-  --surface2: #ede4cf;
+  --surface: #f9f1de;
+  --surface2: #e8dcc0;
   --border: #9a8a60;
   --border-soft: rgba(60,40,20,0.22);
   --accent: #7a2418;
@@ -26,13 +27,13 @@
   --orb: #5f8cb5;
   --orb-bg: rgba(122,196,255,0.12);
   --orb-border: rgba(95,140,181,0.30);
-  --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
-  --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
+  --shadow-soft: 0 1px 3px rgba(60,40,20,0.08), 0 6px 20px rgba(60,40,20,0.07);
+  --shadow-lift: 0 3px 8px rgba(60,40,20,0.12), 0 14px 36px rgba(60,40,20,0.14);
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
   background:var(--bg); color:var(--text);
-  font-family:'Noto Sans KR',sans-serif;
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
   min-height:100vh;
 }
 nav {
@@ -45,12 +46,12 @@ nav {
 }
 .logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
 .logo img { height:56px; object-fit:contain; }
-.logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--gold-deep); }
+.logo-text { font-family:'Cinzel','Noto Serif KR',serif; font-weight:600; font-size:16px; letter-spacing:4px; color:var(--gold-deep); }
 .back-btn {
   font-size:13px; color:var(--muted); text-decoration:none;
   display:flex; align-items:center; gap:4px;
   background:none; border:none; cursor:pointer;
-  font-family:'Noto Sans KR',sans-serif;
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
 }
 .wrap { max-width:480px; margin:0 auto; padding:24px 20px 60px; }
 
@@ -93,7 +94,7 @@ nav {
 .orb-label { font-size:12px; color:var(--muted); margin-bottom:8px; letter-spacing:0.5px; text-transform:uppercase; }
 .orb-amount {
   font-size:36px; font-weight:800;
-  font-family:'Playfair Display', 'Noto Serif KR', serif;
+  font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
   color:var(--orb); display:flex; align-items:baseline; gap:8px;
   margin-bottom:20px;
 }
@@ -103,7 +104,7 @@ nav {
   background:linear-gradient(135deg,#7a2418,#5a1810);
   border:none; border-radius:12px;
   color:#fcf7ea; font-size:15px; font-weight:700;
-  font-family:'Noto Sans KR',sans-serif;
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
   cursor:pointer; transition:opacity 0.15s, transform 0.15s;
   box-shadow:var(--shadow-lift);
 }
@@ -140,7 +141,7 @@ nav {
   border:1px solid rgba(185,28,28,0.22);
   border-radius:12px;
   color:#b91c1c; font-size:14px; font-weight:600;
-  font-family:'Noto Sans KR',sans-serif;
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
   cursor:pointer; margin-top:8px;
   transition:background 0.15s;
 }
@@ -156,7 +157,7 @@ nav {
   background:#fee500; color:#191919;
   border:none; border-radius:12px;
   padding:14px 28px; font-size:15px; font-weight:700;
-  font-family:'Noto Sans KR',sans-serif;
+  font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
   cursor:pointer;
   box-shadow:var(--shadow-soft);
 }

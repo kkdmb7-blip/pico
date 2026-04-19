@@ -6,13 +6,14 @@
   <title>자미두수 명반 | 피코랩</title>
   <meta name="theme-color" content="#f5efe4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
   <style>
     :root {
       --bg: #f4ede0;
-      --surface: #fcf7ea;
-      --surface2: #ede4cf;
+      --surface: #f9f1de;
+      --surface2: #e8dcc0;
       --border: #9a8a60;
       --border-soft: rgba(60,40,20,0.22);
       --accent: #7a2418;
@@ -24,15 +25,15 @@
       --text2: #4a3a2a;
       --ink: #241a10;
       --muted: #5a4830;
-      --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
-      --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
+      --shadow-soft: 0 1px 3px rgba(60,40,20,0.08), 0 6px 20px rgba(60,40,20,0.07);
+      --shadow-lift: 0 3px 8px rgba(60,40,20,0.12), 0 14px 36px rgba(60,40,20,0.14);
       --radius: 16px;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Noto Sans KR', sans-serif;
+      font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
     }
@@ -75,7 +76,7 @@
     }
     .logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
     .logo img { height:56px; object-fit:contain; }
-    .logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--accent); }
+    .logo-text { font-family:'Cinzel','Noto Serif KR',serif; font-weight:600; font-size:16px; letter-spacing:4px; color:var(--accent); }
     .back-btn {
       background: var(--surface); border: 1px solid var(--border);
       color: var(--text2); padding: 6px 14px; border-radius: 8px;
@@ -198,19 +199,19 @@
       box-shadow: var(--shadow-soft);
     }
     .palace-cell.is-self {
-      border-color: rgba(154,122,38,0.6);
-      background: linear-gradient(145deg, rgba(212,175,90,0.14) 0%, rgba(212,175,90,0.06) 100%);
-      box-shadow: 0 2px 12px rgba(154,122,38,0.12);
+      border: 2px solid #8a6a15;
+      background: linear-gradient(145deg, rgba(212,175,90,0.38) 0%, rgba(212,175,90,0.20) 100%);
+      box-shadow: 0 4px 16px rgba(138,106,21,0.22);
     }
     .palace-cell.is-body {
-      border-color: rgba(138,106,61,0.5);
-      background: linear-gradient(145deg, rgba(138,106,61,0.12) 0%, rgba(138,106,61,0.04) 100%);
-      box-shadow: 0 2px 12px rgba(138,106,61,0.10);
+      border: 2px solid #7a2418;
+      background: linear-gradient(145deg, rgba(122,36,24,0.16) 0%, rgba(122,36,24,0.06) 100%);
+      box-shadow: 0 4px 16px rgba(122,36,24,0.18);
     }
     .palace-cell.is-self.is-body {
-      border-color: rgba(154,122,38,0.65);
-      background: linear-gradient(145deg, rgba(212,175,90,0.14), rgba(138,106,61,0.10));
-      box-shadow: 0 2px 14px rgba(154,122,38,0.14);
+      border: 2px solid #6a4aa0;
+      background: linear-gradient(145deg, rgba(106,74,160,0.18), rgba(212,175,90,0.24));
+      box-shadow: 0 4px 18px rgba(106,74,160,0.22);
     }
     .palace-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
     .palace-name {
@@ -235,14 +236,15 @@
     .palace-stars { display: flex; flex-wrap: wrap; gap: 3px; }
     .star-tag {
       font-size: 10px; padding: 2px 5px; border-radius: 5px;
-      background: rgba(138,106,61,0.10);
-      border: 1px solid rgba(138,106,61,0.22);
-      color: var(--text2);
+      background: rgba(138,106,61,0.18);
+      border: 1px solid rgba(138,106,61,0.40);
+      color: #4a3a1e;
     }
     .star-tag.major {
-      background: rgba(212,175,90,0.18);
-      border: 1px solid rgba(154,122,38,0.35);
-      color: var(--gold-deep); font-weight: 700; font-size: 11px;
+      background: linear-gradient(135deg, #8a6a15, #6a4f0c);
+      border: 1px solid #5a4008;
+      color: #fcf7ea; font-weight: 700; font-size: 11px;
+      box-shadow: 0 1px 3px rgba(138,106,21,0.35);
     }
     .palace-age {
       position: absolute; bottom: 6px; right: 8px;
@@ -380,7 +382,7 @@
     </div>
 
     <div id="ziweiShareBtnWrap" style="display:none;padding:0 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
-      <button id="ziweiKakaoBtn" onclick="shareZiweiKakao()" style="display:block;width:100%;padding:16px 20px;background:#fee500;border:1px solid #e8d44d;border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 14px rgba(254,229,0,0.35)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+      <button id="ziweiKakaoBtn" onclick="shareZiweiKakao()" style="display:block;width:100%;padding:16px 20px;background:#fee500;border:1px solid #e8d44d;border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 14px rgba(254,229,0,0.35)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
         <div style="font-size:15px;font-weight:700;color:#3c1e1e;margin-bottom:4px;"><i class="pi pi-ziwei"></i> 카카오톡으로 공유하기 →</div>
         <div style="font-size:11px;color:#6a3e1e;opacity:0.8;">내 자미두수 결과를 친구에게 보내보세요</div>
       </button>
@@ -778,11 +780,11 @@ function closeZiweiShareModal() {
 <div id="ziweiShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(40,25,15,0.55);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
   <div style="background:#fcf7ea;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -8px 24px rgba(60,40,20,0.18);">
     <button onclick="closeZiweiShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(74,58,42,0.55);font-size:22px;cursor:pointer;line-height:1;">✕</button>
-    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.7);font-family:'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
+    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.7);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
     <div id="ziweiPreviewArea" style="text-align:center;min-height:120px;margin-bottom:16px;"></div>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button onclick="doZiweiShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">⭐ 카카오톡으로 공유하기</button>
-      <button onclick="closeZiweiShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:#ede4cf;color:#4a3a2a;border:1px solid #c9bc9d;border-radius:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
+      <button onclick="doZiweiShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">⭐ 카카오톡으로 공유하기</button>
+      <button onclick="closeZiweiShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:#ede4cf;color:#4a3a2a;border:1px solid #c9bc9d;border-radius:14px;font-size:14px;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
     </div>
   </div>
 </div>

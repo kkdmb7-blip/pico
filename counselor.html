@@ -5,14 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>전문 상담사 · FORTUNA</title>
 <meta name="theme-color" content="#f5efe4">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <link rel="stylesheet" href="pico-icons.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg: #f4ede0;
-    --surface: #fcf7ea;
-    --surface2: #ede4cf;
+    --surface: #f9f1de;
+    --surface2: #e8dcc0;
     --border: #9a8a60;
     --border-soft: rgba(60,40,20,0.22);
     --accent: #7a2418;
@@ -23,8 +24,8 @@
     --gold: #8a6a15;
     --gold-deep: #6a4f0c;
     --ink: #241a10;
-    --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
-    --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
+    --shadow-soft: 0 1px 3px rgba(60,40,20,0.08), 0 6px 20px rgba(60,40,20,0.07);
+    --shadow-lift: 0 3px 8px rgba(60,40,20,0.12), 0 14px 36px rgba(60,40,20,0.14);
     --radius: 16px;
     --warm: #a85a2e;
     --warm2: #c27a4a;
@@ -33,7 +34,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -99,7 +100,7 @@
     width: 100%; padding: 16px;
     background: linear-gradient(135deg, var(--accent), #5a1810);
     color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 700;
-    font-family: 'Noto Sans KR', sans-serif; cursor: pointer; text-decoration: none;
+    font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; cursor: pointer; text-decoration: none;
     letter-spacing: -0.3px; transition: transform 0.2s, box-shadow 0.2s;
   }
   .btn-counselor:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
@@ -121,7 +122,7 @@
     display: none; position: fixed; bottom: 20px; right: 20px; z-index: 100;
     padding: 12px 20px; border-radius: 30px; border: none;
     background: linear-gradient(135deg, var(--accent), #5a1810); color: #fff;
-    font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; font-weight: 700; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
     cursor: pointer; box-shadow: var(--shadow-lift);
   }
   .btn-edit:hover { transform: translateY(-2px); }
@@ -148,7 +149,7 @@
   .edit-group input, .edit-group textarea {
     width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
     background: var(--surface2); color: var(--text); font-size: 14px;
-    font-family: 'Noto Sans KR', sans-serif; outline: none;
+    font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; outline: none;
   }
   .edit-group textarea { min-height: 80px; resize: vertical; }
   .edit-group input:focus, .edit-group textarea:focus { border-color: var(--accent); }
@@ -157,7 +158,7 @@
   }
   .edit-actions button {
     flex: 1; padding: 14px; border-radius: 12px; border: none;
-    font-size: 15px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+    font-size: 15px; font-weight: 700; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; cursor: pointer;
   }
   .btn-save { background: linear-gradient(135deg, var(--accent), #5a1810); color: #fff; }
   .btn-cancel { background: var(--surface2); color: var(--text2); border: 1px solid var(--border) !important; }

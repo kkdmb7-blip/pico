@@ -6,9 +6,10 @@
 <meta name="theme-color" content="#f5efe4">
 <title>사주일기 · PICO Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <style>
 :root {
-  --bg:#f4ede0; --surface:#fcf7ea; --surface2:#ede4cf; --border:#c9bc9d;
+  --bg:#f4ede0; --surface:#f9f1de; --surface2:#e8dcc0; --border:#c9bc9d;
   --border-soft:rgba(80,55,30,0.10);
   --accent:#7a2418; --accent2:#2a1f1a;
   --text:#1a120a; --text2:#4a3a2a; --muted:#7a6850;
@@ -19,14 +20,14 @@
   --radius:16px;
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
-body{ background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; padding-bottom:80px; }
+body{ background:var(--bg); color:var(--text); font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; min-height:100vh; padding-bottom:80px; }
 
 /* NAV */
 nav{ position:sticky; top:0; z-index:100; background:rgba(244,237,224,0.92); backdrop-filter:blur(20px); border-bottom:1px solid var(--border-soft); padding:0 16px; height:56px; display:flex; align-items:center; gap:10px; }
 .nav-back{ background:none; border:none; color:var(--muted); font-size:26px; cursor:pointer; padding:0 6px 0 0; line-height:1; }
 .nav-title{ font-family:'Noto Serif KR',serif; font-weight:700; font-size:16px; color:var(--gold-deep); flex:1; }
 .nav-tabs{ display:flex; gap:4px; }
-.nav-tab{ background:none; border:none; cursor:pointer; font-size:12px; font-weight:600; color:var(--muted); padding:5px 10px; border-radius:20px; transition:all 0.2s; font-family:'Noto Sans KR',sans-serif; }
+.nav-tab{ background:none; border:none; cursor:pointer; font-size:12px; font-weight:600; color:var(--muted); padding:5px 10px; border-radius:20px; transition:all 0.2s; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; }
 .nav-tab.active{ background:rgba(122,36,24,0.10); color:var(--accent); }
 
 /* ILGAN CARD */
@@ -58,12 +59,12 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(244,237,224,0.92); bac
 .event-btn.selected{ background:rgba(122,36,24,0.08); border-color:rgba(122,36,24,0.35); color:var(--accent); }
 
 /* BUTTONS */
-.btn-primary{ width:100%; padding:13px; background:linear-gradient(135deg,#7a2418,#5a1810); color:#fcf7ea; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:10px; font-family:'Noto Sans KR',sans-serif; box-shadow:var(--shadow-lift); }
+.btn-primary{ width:100%; padding:13px; background:linear-gradient(135deg,#7a2418,#5a1810); color:#fcf7ea; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:10px; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; box-shadow:var(--shadow-lift); }
 .btn-primary:active{ transform:scale(0.98); }
-.btn-ghost{ width:100%; padding:11px; background:none; color:var(--muted); border:1px solid var(--border-soft); border-radius:12px; font-size:13px; cursor:pointer; margin-top:8px; font-family:'Noto Sans KR',sans-serif; }
+.btn-ghost{ width:100%; padding:11px; background:none; color:var(--muted); border:1px solid var(--border-soft); border-radius:12px; font-size:13px; cursor:pointer; margin-top:8px; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; }
 
 /* MEMO */
-.memo-area{ width:100%; background:#fdfaf0; border:1px solid var(--border-soft); border-radius:10px; color:var(--text); font-size:14px; line-height:1.6; padding:12px; resize:none; outline:none; font-family:'Noto Sans KR',sans-serif; min-height:80px; }
+.memo-area{ width:100%; background:#fdfaf0; border:1px solid var(--border-soft); border-radius:10px; color:var(--text); font-size:14px; line-height:1.6; padding:12px; resize:none; outline:none; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; min-height:80px; }
 .memo-area:focus{ border-color:var(--gold-deep); }
 
 /* AI FEEDBACK */
@@ -80,7 +81,7 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(244,237,224,0.92); bac
 
 /* CALENDAR */
 .cal-header{ display:flex; align-items:center; justify-content:space-between; margin:14px 16px 10px; }
-.cal-month-title{ font-family:'Playfair Display','Noto Serif KR',serif; font-size:17px; font-weight:700; color:var(--gold-deep); }
+.cal-month-title{ font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; font-size:17px; font-weight:700; color:var(--gold-deep); }
 .cal-nav-btn{ background:var(--surface); border:1px solid var(--border-soft); color:var(--muted); border-radius:8px; padding:5px 12px; cursor:pointer; font-size:14px; }
 .cal-grid{ margin:0 16px; display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
 .cal-day-label{ text-align:center; font-size:10px; color:var(--muted); padding:3px 0; font-weight:600; }
@@ -103,7 +104,7 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(244,237,224,0.92); bac
 .stat-bar-fill{ height:100%; border-radius:4px; background:linear-gradient(90deg,#7a2418,#9a7a26); transition:width 0.6s ease; }
 .stat-count{ font-size:11px; color:var(--muted); min-width:26px; text-align:right; }
 .accuracy-card{ background:rgba(154,122,38,0.06); border:1px solid rgba(154,122,38,0.22); border-radius:12px; padding:16px; margin-top:8px; text-align:center; }
-.accuracy-pct{ font-size:38px; font-weight:800; color:var(--gold-deep); font-family:'Playfair Display','Noto Serif KR',serif; }
+.accuracy-pct{ font-size:38px; font-weight:800; color:var(--gold-deep); font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; }
 
 /* EMPTY */
 .empty-state{ text-align:center; padding:52px 24px; color:var(--muted); }
@@ -245,7 +246,7 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(244,237,224,0.92); bac
 <!-- ═══ MONTHLY STATS VIEW ═══ -->
 <div id="viewMonthly" style="display:none;">
   <div style="margin:14px 16px 0;">
-    <div style="font-family:'Playfair Display','Noto Serif KR',serif;font-size:17px;font-weight:700;color:var(--gold-deep);" id="statsMonthTitle"></div>
+    <div style="font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;font-size:17px;font-weight:700;color:var(--gold-deep);" id="statsMonthTitle"></div>
     <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="statsTotalDays"></div>
   </div>
   <div class="card">
