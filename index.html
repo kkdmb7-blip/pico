@@ -12,22 +12,27 @@
 <meta name="apple-mobile-web-app-title" content="피코랩">
 <link rel="apple-touch-icon" href="/img/goddess.png">
 <link rel="manifest" href="/manifest.json?v=1.0.0">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=Gowun+Batang:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --bg: #f5efe4;
-    --surface: #fffbf3;
-    --surface2: #ece4d3;
-    --border: #d8ccb5;
-    --accent: #8b2a1e;
+    --bg: #f4ede0;
+    --surface: #fcf7ea;
+    --surface2: #ede4cf;
+    --border: #c9bc9d;
+    --border-soft: rgba(80,55,30,0.10);
+    --accent: #7a2418;
     --accent2: #2a1f1a;
     --text: #1a120a;
     --text2: #4a3a2a;
-    --muted: #8a7560;
-    --gold: #a8842a;
-    --radius: 16px;
+    --muted: #7a6850;
+    --gold: #9a7a26;
+    --gold-deep: #7a5e1c;
+    --ink: #241a10;
+    --radius: 14px;
+    --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+    --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
   }
 
   /* ── 대체 테마 (URL ?theme=obsidian|jade|wine|midnight) ── */
@@ -85,10 +90,16 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'Gowun Batang', 'Noto Serif KR', 'Cormorant Garamond', serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.75;
     min-height: 100vh;
     overflow-x: hidden;
     padding-bottom: 60px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   /* UI 요소 Sans 강제 */
   button, input, select, textarea,
@@ -97,6 +108,7 @@
   .saju-back-btn, .btn-kakao, .btn-logout, .btn-profiles,
   .modal-profile-btn, .modal-profile-select {
     font-family: 'Noto Sans KR', sans-serif !important;
+    letter-spacing: 0.02em;
   }
 
   /* BG grain */
@@ -142,9 +154,9 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-soft);
     padding: 0 24px;
     height: 64px;
     display: flex;
@@ -162,28 +174,30 @@
     object-fit: contain;
   }
   .logo-text {
-    font-family: 'Noto Serif KR', serif;
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 2px;
-    color: var(--accent2);
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: 0.35em;
+    color: var(--ink);
   }
 
   .nav-start-btn {
-    padding: 8px 18px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
+    padding: 9px 20px;
+    border-radius: 22px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
     cursor: pointer;
-    background: linear-gradient(135deg, var(--accent), #a07fd4);
-    color: #fff;
+    background: var(--accent);
+    color: #fcf7ea;
     border: none;
-    font-family: 'Noto Serif KR', serif;
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(.2,.7,.2,1);
     white-space: nowrap;
   }
-  .nav-start-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(123,94,167,0.4); }
+  .nav-start-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(122,36,24,0.28); }
 
   /* ── HERO ── */
   .hero {
@@ -210,19 +224,29 @@
     background: radial-gradient(ellipse, rgba(123,94,167,0.28) 0%, transparent 70%);
   }
   .hero h1 {
-    font-family: 'Noto Serif KR', serif;
-    font-size: clamp(40px, 7vw, 72px);
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.5px;
-    margin-bottom: 20px;
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+    font-size: clamp(44px, 8vw, 80px);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 22px;
     position: relative;
+    color: var(--ink);
   }
-  .hero h1 em { font-style: normal; color: var(--accent2); }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+  }
   .hero p {
     color: var(--muted);
-    font-size: 16px;
-    margin-bottom: 40px;
+    font-family: 'Gowun Batang', 'Noto Serif KR', serif;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    line-height: 1.8;
+    margin-bottom: 44px;
     position: relative;
   }
   .hero-btns {
@@ -234,52 +258,63 @@
   }
   .btn-cta-hero {
     display: inline-block;
-    padding: 15px 36px;
-    font-size: 15px;
-    font-weight: 700;
-    font-family: 'Noto Serif KR', serif;
-    background: linear-gradient(135deg, var(--accent), #a07fd4);
-    color: #fff;
-    border-radius: 14px;
+    padding: 14px 38px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+    background: var(--accent);
+    color: #fcf7ea;
+    border-radius: 28px;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(.2,.7,.2,1);
     border: none;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(122,36,24,0.18);
   }
-  .btn-cta-hero:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(123,94,167,0.45); }
+  .btn-cta-hero:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(122,36,24,0.28); }
   .btn-ghost-hero {
     display: inline-block;
-    padding: 15px 36px;
-    font-size: 15px;
-    font-weight: 600;
-    font-family: 'Noto Serif KR', serif;
+    padding: 14px 38px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
     background: transparent;
     color: var(--muted);
-    border-radius: 14px;
+    border-radius: 28px;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(.2,.7,.2,1);
     border: 1px solid var(--border);
   }
-  .btn-ghost-hero:hover { background: var(--surface); color: var(--text); }
+  .btn-ghost-hero:hover { background: var(--surface); color: var(--ink); border-color: var(--ink); }
 
   /* ── SECTION COMMON ── */
   .section-label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 2px;
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.32em;
     text-transform: uppercase;
-    color: var(--accent2);
-    margin-bottom: 14px;
+    color: var(--gold-deep);
+    margin-bottom: 16px;
   }
   .section-title {
-    font-family: 'Noto Serif KR', serif;
-    font-size: clamp(28px, 4vw, 44px);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.5px;
-    margin-bottom: 48px;
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    margin-bottom: 52px;
+    color: var(--ink);
   }
-  .section-title em { font-style: normal; color: var(--accent2); }
+  .section-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
 
   /* ── WHY SECTION ── */
   .section-why {
@@ -304,27 +339,34 @@
     text-align: center;
   }
   .why-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 12px;
-    transition: all 0.3s;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    padding: 16px 14px;
+    transition: all 0.35s cubic-bezier(.2,.7,.2,1);
+    box-shadow: var(--shadow-soft);
   }
   .why-card:hover {
-    border-color: var(--accent);
-    background: var(--surface2);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(123,94,167,0.12);
+    border-color: rgba(122,36,24,0.25);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lift);
   }
   .why-icon { display: none; }
   .why-card h3 {
-    font-family: 'Noto Serif KR', serif;
-    font-size: 14px;
-    font-weight: 700;
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
     margin-bottom: 6px;
-    color: var(--gold);
+    color: var(--gold-deep);
   }
-  .why-card p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .why-card p {
+    font-family: 'Gowun Batang', 'Noto Serif KR', serif;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+  }
   /* 궁합 카드: 풀너비 가로형 */
   .why-card.why-card-full {
     grid-column: 1 / -1;
@@ -355,53 +397,77 @@
   }
   .service-card {
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px;
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
     padding: 36px 28px;
     text-decoration: none;
     color: var(--text);
     text-align: left;
     position: relative;
-    transition: all 0.3s;
+    transition: all 0.35s cubic-bezier(.2,.7,.2,1);
     display: block;
     overflow: hidden;
+    box-shadow: var(--shadow-soft);
   }
   .service-card::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at top left, rgba(123,94,167,0.12) 0%, transparent 60%);
+    background: radial-gradient(ellipse at top left, rgba(122,36,24,0.06) 0%, transparent 60%);
     opacity: 0;
     transition: opacity 0.3s;
   }
-  .service-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.3); }
+  .service-card:hover {
+    border-color: rgba(122,36,24,0.28);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+  }
   .service-card:hover::before { opacity: 1; }
-  .service-icon { font-size: 40px; margin-bottom: 16px; }
+  .service-icon { font-size: 36px; margin-bottom: 16px; color: var(--gold-deep); }
   .service-badge {
     display: inline-block;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    padding: 3px 10px;
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    padding: 3px 12px;
     border-radius: 100px;
-    background: rgba(106,74,160,0.12);
-    border: 1px solid rgba(106,74,160,0.35);
+    background: transparent;
+    border: 1px solid rgba(106,74,160,0.28);
     color: #6a4aa0;
     margin-bottom: 14px;
   }
   .service-badge-premium {
-    background: rgba(232,184,109,0.15);
-    border-color: rgba(232,184,109,0.4);
-    color: var(--accent2);
+    background: transparent;
+    border-color: rgba(154,122,38,0.45);
+    color: var(--gold-deep);
   }
   .service-card h3 {
-    font-family: 'Noto Serif KR', serif;
-    font-size: 22px;
-    font-weight: 800;
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
     margin-bottom: 10px;
+    color: var(--ink);
   }
-  .service-card p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
-  .service-cta { font-size: 14px; font-weight: 700; color: var(--accent2); }
+  .service-card p {
+    font-family: 'Gowun Batang', 'Noto Serif KR', serif;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.75;
+    letter-spacing: 0.01em;
+    margin-bottom: 24px;
+  }
+  .service-cta {
+    font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
 
 
   /* ── DIVIDER ── */
@@ -880,16 +946,26 @@
 @keyframes ghSpin { to { transform:rotate(360deg); } }
 @keyframes ghFadeIn { from { opacity:0;transform:translateY(6px); } to { opacity:1;transform:translateY(0); } }
 .memox-banner {
-  background: linear-gradient(135deg, #faf0d8, #f5e3c8);
-  border: 1px solid rgba(139,42,30,0.28);
-  border-radius: 16px;
-  padding: 16px 20px;
+  background: linear-gradient(135deg, #fcf7ea 0%, #f4ecd8 100%);
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  padding: 18px 22px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(139,42,30,0.06);
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+.memox-banner::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--gold), var(--gold-deep));
+  opacity: 0.6;
 }
 :root[data-theme="obsidian"] .memox-banner,
 :root[data-theme="jade"] .memox-banner,
@@ -899,15 +975,33 @@
   border-color: rgba(201,168,76,0.3);
   box-shadow: none;
 }
-.memox-banner-title { font-size:14px; font-weight:700; color:var(--gold); margin-bottom:4px; }
-.memox-banner-desc { font-size:11px; color:var(--muted); }
+.memox-banner-title {
+  font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--gold-deep);
+  margin-bottom: 4px;
+}
+.memox-banner-desc {
+  font-family: 'Gowun Batang', 'Noto Serif KR', serif;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
 .memox-banner-btn {
-  font-size:12px; color:var(--gold); font-weight:600;
-  border: 1px solid rgba(201,168,76,0.35);
+  font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  font-weight: 500;
+  border: 1px solid rgba(154,122,38,0.35);
   border-radius: 20px;
-  padding: 6px 14px;
+  padding: 7px 16px;
   white-space: nowrap;
   flex-shrink: 0;
+  background: transparent;
 }
 </style>
   <link rel="stylesheet" href="pico-icons.css">
