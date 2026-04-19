@@ -244,6 +244,23 @@ nav {
   <div style="font-size:14px;">결제 처리 중...</div>
 </div>
 
+<!-- 결제 오류 복구 모달 -->
+<div id="chargeErrorModal" style="display:none;position:fixed;inset:0;z-index:9850;background:rgba(30,20,10,0.55);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1.5px solid var(--border-soft);border-radius:18px;padding:24px 22px 20px;max-width:380px;width:100%;box-shadow:var(--shadow-lift);">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:42px;margin-bottom:8px;" id="ceIcon">⚠️</div>
+      <div style="font-family:'Noto Serif KR',serif;font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px;" id="ceTitle">결제 저장에 실패했어요</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.65;" id="ceDesc">결제는 완료됐으나 Orb 지급 중 오류가 발생했어요. 아래 다시 시도해주세요.</div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border-soft);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.6;word-break:break-all;" id="ceDetails"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button id="ceRetryBtn" style="background:linear-gradient(135deg,#7a5e1c,#9a7a26);color:#fcf7ea;border:0;border-radius:12px;padding:13px 0;font-size:14px;font-weight:700;cursor:pointer;">다시 시도</button>
+      <button id="ceCopyBtn" style="background:var(--surface2);color:var(--ink);border:1px solid var(--border-soft);border-radius:12px;padding:13px 0;font-size:13px;font-weight:600;cursor:pointer;">결제번호 복사 후 고객센터 문의</button>
+      <button id="ceCloseBtn" style="background:transparent;color:var(--muted);border:0;padding:8px 0;font-size:12px;cursor:pointer;">나중에</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
 var SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
@@ -433,6 +450,54 @@ function renderPacks() {
   });
 }
 
+var PENDING_KEY = 'pico_pending_charge';
+function savePending(p) { try { localStorage.setItem(PENDING_KEY, JSON.stringify(p)); } catch(e) {} }
+function clearPending() { try { localStorage.removeItem(PENDING_KEY); } catch(e) {} }
+function loadPending() { try { var s = localStorage.getItem(PENDING_KEY); return s ? JSON.parse(s) : null; } catch(e) { return null; } }
+
+function showChargeError(opts) {
+  // opts: { icon, title, desc, paymentId, impUid, packId, retryFn }
+  document.getElementById('ceIcon').textContent = opts.icon || '⚠️';
+  document.getElementById('ceTitle').textContent = opts.title || '결제 저장에 실패했어요';
+  document.getElementById('ceDesc').textContent = opts.desc || '결제는 완료됐으나 Orb 지급 중 오류가 발생했어요. 아래 다시 시도해주세요.';
+  var details = '결제번호: ' + (opts.paymentId || '-') + '\n';
+  if (opts.impUid) details += '거래번호: ' + opts.impUid + '\n';
+  if (opts.packId) details += '팩: ' + opts.packId + '\n';
+  if (opts.userId) details += '사용자ID: ' + opts.userId;
+  document.getElementById('ceDetails').textContent = details;
+
+  var modal = document.getElementById('chargeErrorModal');
+  modal.style.display = 'flex';
+
+  var retryBtn = document.getElementById('ceRetryBtn');
+  var copyBtn = document.getElementById('ceCopyBtn');
+  var closeBtn = document.getElementById('ceCloseBtn');
+
+  retryBtn.style.display = opts.retryFn ? 'block' : 'none';
+  retryBtn.onclick = async function() {
+    if (!opts.retryFn) return;
+    retryBtn.disabled = true;
+    retryBtn.textContent = '재시도 중...';
+    try {
+      await opts.retryFn();
+      modal.style.display = 'none';
+    } catch(e) {
+      retryBtn.disabled = false;
+      retryBtn.textContent = '다시 시도';
+      toast('재시도 실패: ' + (e.message || e));
+    }
+  };
+  copyBtn.onclick = function() {
+    var text = '[Orb 충전 문의] ' + details.replace(/\n/g,' | ');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        toast('결제번호가 복사됐어요. 고객센터(picolab.kr)로 문의해주세요.', 3500);
+      }).catch(function() { prompt('복사해주세요:', text); });
+    } else { prompt('복사해주세요:', text); }
+  };
+  closeBtn.onclick = function() { modal.style.display = 'none'; };
+}
+
 async function doPay(pack) {
   if (typeof PortOne === 'undefined') { toast('결제 모듈 로드 중이에요. 잠시 후 다시 시도해주세요.'); return; }
 
@@ -460,30 +525,84 @@ async function doPay(pack) {
     hideLoading();
     if (rsp && rsp.code) {
       var msg = rsp.message || rsp.code;
-      if (msg.includes('취소') || !msg) {
+      if (String(msg).indexOf('취소') !== -1 || !msg) {
         toast('결제가 취소되었어요.');
+      } else if (String(msg).indexOf('잔액') !== -1 || String(msg).indexOf('한도') !== -1) {
+        showChargeError({ icon:'💳', title:'카드 결제가 거절됐어요', desc:'카드사에서 결제가 거절됐어요. 다른 카드를 이용하시거나 카드사에 문의해주세요.', paymentId: paymentId });
       } else {
-        toast('결제 실패: ' + msg);
+        showChargeError({ icon:'⚠️', title:'결제가 실패했어요', desc: msg, paymentId: paymentId });
       }
       console.warn('[결제 실패]', rsp);
       return;
     }
+
+    // 결제 완료 → 저장 실패에 대비해 pending 기록
+    savePending({ paymentId: paymentId, impUid: rsp.paymentId, packId: pack.id, totalOrb: totalOrb, ts: Date.now() });
+
     showLoading();
-    try {
+    var attempt = 0;
+    async function trySave() {
+      attempt++;
       await chargeOrb(pack, totalOrb, rsp.paymentId, paymentId);
+      clearPending();
+    }
+    try {
+      await trySave();
       hideLoading();
-      toast('<i class="pi pi-check"></i> ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
+      toast('✨ ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
       setTimeout(function() { location.href = 'https://picolab.kr'; }, 2000);
     } catch(e) {
       hideLoading();
       console.error('[charge] chargeOrb 에러:', e);
-      toast('결제는 완료됐으나 저장 중 오류가 발생했어요. 고객센터에 문의해주세요. ('+e.message+')');
+      showChargeError({
+        icon:'⏳',
+        title:'Orb 지급이 지연되고 있어요',
+        desc:'결제는 정상 완료됐으나 Orb 지급이 실패했어요. 다시 시도하거나 결제번호를 복사해 문의해주세요.',
+        paymentId: paymentId,
+        impUid: rsp.paymentId,
+        packId: pack.id,
+        userId: currentUserId,
+        retryFn: async function() {
+          showLoading();
+          try { await chargeOrb(pack, totalOrb, rsp.paymentId, paymentId); clearPending(); hideLoading(); toast('✨ ' + totalOrb.toLocaleString() + ' Orb 지급 완료!', 3000); setTimeout(function(){ location.href='https://picolab.kr'; },1500); }
+          catch(err) { hideLoading(); throw err; }
+        }
+      });
     }
   } catch(e) {
     hideLoading();
-    toast('결제 오류: ' + e.message);
+    showChargeError({ icon:'⚠️', title:'결제 오류', desc: e.message || String(e), paymentId: paymentId });
     console.warn('[결제 오류]', e);
   }
+}
+
+async function recoverPending() {
+  var pending = loadPending();
+  if (!pending) return;
+  if (!currentUserId) return;
+  // 10분 이상 지난 pending은 버림
+  if (Date.now() - (pending.ts || 0) > 10 * 60 * 1000) { clearPending(); return; }
+  var pack = PACKS.find(function(p){ return p.id === pending.packId; });
+  if (!pack) { clearPending(); return; }
+  // orb_transactions에 이미 기록됐는지 확인 (중복 지급 방지)
+  try {
+    var check = await sb.from('orb_transactions').select('id').eq('user_id', currentUserId).ilike('description', '%' + pending.impUid + '%').limit(1);
+    if (check.data && check.data.length > 0) { clearPending(); return; }
+  } catch(e) {}
+  showChargeError({
+    icon:'🔔',
+    title:'지난 결제 Orb 지급이 미완료 상태예요',
+    desc:'직전 결제의 Orb 지급이 완료되지 않았어요. 지금 다시 시도할 수 있어요.',
+    paymentId: pending.paymentId,
+    impUid: pending.impUid,
+    packId: pending.packId,
+    userId: currentUserId,
+    retryFn: async function() {
+      showLoading();
+      try { await chargeOrb(pack, pending.totalOrb, pending.impUid, pending.paymentId); clearPending(); hideLoading(); toast('✨ ' + pending.totalOrb.toLocaleString() + ' Orb 지급 완료!', 3000); setTimeout(function(){ location.href='https://picolab.kr'; },1500); }
+      catch(err) { hideLoading(); throw err; }
+    }
+  });
 }
 
 async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
@@ -594,6 +713,7 @@ async function handleRedirectResult() {
   if (!ok) return;
   await loadBalance();
   await handleRedirectResult();
+  await recoverPending();
 })();
 </script>
 </body>
