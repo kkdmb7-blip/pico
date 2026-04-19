@@ -179,9 +179,10 @@
   .logo-text {
     font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
     font-weight: 500;
-    font-size: 16px;
-    letter-spacing: 0.35em;
+    font-size: 12px;
+    letter-spacing: 0.28em;
     color: var(--ink);
+    padding-top: 2px;
   }
 
   .nav-start-btn {
@@ -979,32 +980,38 @@
   box-shadow: none;
 }
 .memox-banner-title {
-  font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  color: var(--gold-deep);
+  font-family: 'Gowun Batang', 'Noto Serif KR', serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
   margin-bottom: 4px;
 }
 .memox-banner-desc {
   font-family: 'Gowun Batang', 'Noto Serif KR', serif;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
 }
 .memox-banner-btn {
-  font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold-deep);
-  font-weight: 500;
-  border: 1px solid rgba(154,122,38,0.35);
-  border-radius: 20px;
-  padding: 7px 16px;
+  font-family: 'Gowun Batang', 'Noto Serif KR', serif;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: #fcf7ea;
+  font-weight: 600;
+  border: none;
+  border-radius: 22px;
+  padding: 10px 18px;
   white-space: nowrap;
   flex-shrink: 0;
-  background: transparent;
+  background: linear-gradient(135deg, var(--gold-deep) 0%, #8b5e2a 100%);
+  box-shadow: 0 2px 8px rgba(122,94,28,0.25);
+  transition: all 0.2s;
+}
+.memox-banner:hover .memox-banner-btn {
+  box-shadow: 0 4px 14px rgba(122,94,28,0.38);
+  transform: translateY(-1px);
 }
 </style>
   <link rel="stylesheet" href="pico-icons.css">
