@@ -4,27 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Orb 충전 · FORTUNA</title>
-<meta name="theme-color" content="#0a0a0f">
+<meta name="theme-color" content="#f5efe4">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="pico-icons.css">
 <style>
 :root {
-  --bg: #0a0a0f;
-  --surface: #13131a;
-  --surface2: #1c1c28;
-  --border: #2a2a3d;
-  --accent: #7b5ea7;
-  --accent2: #e8b86d;
-  --text: #f0f0f5;
-  --muted: #6b6b85;
-  --orb: #7ac4ff;
-  --gold: #e8b86d;
-  --text2: #9090a8;
-  --text3: #4a4a62;
+  --bg: #f4ede0;
+  --surface: #fcf7ea;
+  --surface2: #ede4cf;
+  --border: #c9bc9d;
+  --border-soft: rgba(80,55,30,0.10);
+  --accent: #7a2418;
+  --accent2: #2a1f1a;
+  --text: #1a120a;
+  --text2: #4a3a2a;
+  --muted: #7a6850;
+  --gold: #9a7a26;
+  --gold-deep: #7a5e1c;
+  --ink: #241a10;
+  --orb: #5f8cb5;
+  --orb-bg: rgba(122,196,255,0.12);
+  --orb-border: rgba(95,140,181,0.30);
+  --text3: #8a7a60;
+  --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+  --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body {
@@ -37,9 +44,9 @@ nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(10,10,15,0.88);
+  background: rgba(244,237,224,0.92);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
   padding: 0 18px;
@@ -48,10 +55,10 @@ nav {
 }
 .nav-logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
 .nav-logo img { height:56px; object-fit:contain; }
-.nav-logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--accent2); }
+.nav-logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--gold-deep); }
 .nav-divider {
   width: 1px; height: 18px;
-  background: var(--border);
+  background: var(--border-soft);
 }
 .nav-page-title {
   font-size: 14px;
@@ -61,8 +68,8 @@ nav {
 .nav-orb {
   margin-left: auto;
   display: flex; align-items: center; gap: 6px;
-  background: rgba(122,196,255,0.1);
-  border: 1px solid rgba(122,196,255,0.25);
+  background: var(--orb-bg);
+  border: 1px solid var(--orb-border);
   border-radius: 20px; padding: 4px 12px;
   font-size: 13px; font-weight: 700; color: var(--orb);
 }
@@ -70,8 +77,8 @@ nav {
 .page-body { padding:20px 16px 80px; max-width:480px; margin:0 auto; }
 
 .hero { text-align:center; padding:28px 0 24px; }
-.hero-icon { font-size:52px; margin-bottom:12px; }
-.hero-title { font-size:22px; font-weight:800; margin-bottom:6px; letter-spacing:-0.3px; }
+.hero-icon { font-size:52px; margin-bottom:12px; color:var(--gold-deep); }
+.hero-title { font-size:22px; font-weight:800; margin-bottom:6px; letter-spacing:-0.3px; color:var(--ink); font-family:'Playfair Display','Noto Serif KR',serif; }
 .hero-sub { font-size:14px; color:var(--text2); line-height:1.7; }
 
 .section-label {
@@ -83,67 +90,74 @@ nav {
 .pack-list { display:flex; flex-direction:column; gap:10px; }
 
 .pack-card {
-  background:var(--surface); border:1.5px solid var(--border);
+  background:var(--surface); border:1.5px solid var(--border-soft);
   border-radius:16px; padding:16px 18px;
   display:flex; align-items:center; gap:14px;
-  cursor:pointer; transition:border-color 0.2s, background 0.2s;
+  cursor:pointer; transition:border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
   position:relative; overflow:hidden;
+  box-shadow:var(--shadow-soft);
 }
-.pack-card:hover { border-color:rgba(122,196,255,0.4); background:var(--surface2); }
+.pack-card:hover { border-color:var(--gold-deep); background:#fdfaf0; box-shadow:var(--shadow-lift); }
 .pack-card.featured {
-  border-color:rgba(232,184,109,0.55);
-  background:linear-gradient(135deg,rgba(232,184,109,0.07),rgba(232,184,109,0.02));
+  border-color:var(--gold-deep);
+  background:linear-gradient(135deg,rgba(154,122,38,0.08),rgba(154,122,38,0.02));
 }
-.pack-card.featured:hover { border-color:rgba(232,184,109,0.8); }
+.pack-card.featured:hover { border-color:var(--gold-deep); background:linear-gradient(135deg,rgba(154,122,38,0.12),rgba(154,122,38,0.04)); }
 
 .pack-badge {
   position:absolute; top:0; right:16px;
-  background:var(--gold); color:#111; font-size:10px; font-weight:800;
+  background:linear-gradient(135deg,#9a7a26,#7a5e1c); color:#fcf7ea; font-size:10px; font-weight:800;
   padding:3px 10px; border-radius:0 0 8px 8px; letter-spacing:0.3px;
 }
 .pack-badge-best {
-  background:linear-gradient(90deg,#7ac4ff,#a78bfa);
-  color:#fff;
+  background:linear-gradient(90deg,#7a2418,#5a1810);
+  color:#fcf7ea;
 }
 
-.pack-icon { font-size:28px; flex-shrink:0; }
+.pack-icon { font-size:28px; flex-shrink:0; color:var(--gold-deep); }
+.pack-orb { font-size:18px; font-weight:800; letter-spacing:-0.3px; color:var(--orb); font-family:'Playfair Display','Noto Serif KR',serif; }
+.pack-orb-bonus { font-size:13px; color:var(--gold-deep); font-weight:700; margin-top:1px; }
+.pack-desc { font-size:12px; color:var(--muted); margin-top:2px; }
+
 .pack-info { flex:1; min-width:0; }
-.pack-orb { font-size:18px; font-weight:800; letter-spacing:-0.3px; color:var(--orb); }
-.pack-orb-bonus { font-size:13px; color:var(--gold); font-weight:700; margin-top:1px; }
-.pack-desc { font-size:12px; color:var(--text3); margin-top:2px; }
 
 .pack-price { text-align:right; flex-shrink:0; }
-.pack-price-main { font-size:17px; font-weight:800; }
-.pack-price-per { font-size:11px; color:var(--text3); margin-top:2px; }
+.pack-price-main { font-size:17px; font-weight:800; color:var(--ink); font-family:'Playfair Display','Noto Serif KR',serif; }
+.pack-price-per { font-size:11px; color:var(--muted); margin-top:2px; }
 
 /* how it works */
 .how-list { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
 .how-item {
-  background:var(--surface); border:1px solid var(--border);
+  background:var(--surface); border:1px solid var(--border-soft);
   border-radius:12px; padding:12px 16px;
   display:flex; align-items:center; gap:12px;
   font-size:13px; color:var(--text2);
+  box-shadow:var(--shadow-soft);
 }
-.how-item strong { color:var(--text); }
+.how-item i { color:var(--gold-deep); }
+.how-item strong { color:var(--ink); }
 
 /* Toast */
 .toast {
   position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
-  background:rgba(28,28,40,0.97); border:1px solid var(--border); border-radius:12px;
+  background:#2a1f1a; color:#fcf7ea; border:1px solid rgba(252,247,234,0.12); border-radius:12px;
   padding:12px 20px; font-size:14px; font-weight:600;
   opacity:0; pointer-events:none; transition:all 0.3s; z-index:9999; white-space:nowrap;
+  box-shadow:var(--shadow-lift);
 }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
 /* Loading overlay */
 .loading-overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.72); z-index:9800;
+  position:fixed; inset:0; background:rgba(40,28,16,0.55); z-index:9800;
   display:none; align-items:center; justify-content:center; flex-direction:column; gap:16px;
+  backdrop-filter:blur(6px);
 }
 .loading-overlay.show { display:flex; }
+.loading-overlay div:last-child { color:#fcf7ea; }
 .loading-spinner {
   width:40px; height:40px; border-radius:50%;
-  border:3px solid rgba(255,255,255,0.1); border-top-color:var(--orb);
+  border:3px solid rgba(252,247,234,0.22); border-top-color:#fcf7ea;
   animation:spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform:rotate(360deg); } }
@@ -169,22 +183,22 @@ nav {
   </div>
 
   <!-- 첫 충전 1+1 배너 (첫 충전자만 표시) -->
-  <div id="firstChargeBanner" style="display:none;background:linear-gradient(135deg,rgba(232,184,109,0.12),rgba(232,184,109,0.04));border:1.5px solid rgba(232,184,109,0.4);border-radius:16px;padding:16px 18px;margin-bottom:16px;text-align:center;">
-    <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-gift pi-xl"></i></div>
-    <div style="font-size:15px;font-weight:800;color:var(--gold);margin-bottom:4px;">첫 충전 한정 1+1 이벤트</div>
+  <div id="firstChargeBanner" style="display:none;background:linear-gradient(135deg,rgba(154,122,38,0.10),rgba(154,122,38,0.03));border:1.5px solid rgba(154,122,38,0.35);border-radius:16px;padding:16px 18px;margin-bottom:16px;text-align:center;box-shadow:var(--shadow-soft);">
+    <div style="font-size:20px;margin-bottom:6px;color:var(--gold-deep);"><i class="pi pi-gift pi-xl"></i></div>
+    <div style="font-size:15px;font-weight:800;color:var(--gold-deep);margin-bottom:4px;">첫 충전 한정 1+1 이벤트</div>
     <div style="font-size:13px;color:var(--text2);line-height:1.6;">500 Orb 충전 시 1,000 Orb를 드려요<br>첫 충전에만 적용되는 특별 혜택이에요</div>
   </div>
 
   <!-- 친구 초대 배너 -->
-  <div id="inviteBanner" onclick="handleInviteCharge()" style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,rgba(122,196,255,0.12),rgba(122,196,255,0.04));border:1.5px solid rgba(122,196,255,0.35);border-radius:16px;padding:16px 18px;margin-bottom:16px;cursor:pointer;">
+  <div id="inviteBanner" onclick="handleInviteCharge()" style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--orb-bg);border:1.5px solid var(--orb-border);border-radius:16px;padding:16px 18px;margin-bottom:16px;cursor:pointer;box-shadow:var(--shadow-soft);">
     <div style="display:flex;align-items:center;gap:12px;">
-      <div style="font-size:28px;"><i class="pi pi-people pi-xl"></i></div>
+      <div style="font-size:28px;color:var(--orb);"><i class="pi pi-people pi-xl"></i></div>
       <div>
         <div style="font-size:15px;font-weight:800;color:var(--orb);margin-bottom:2px;">친구 초대하고 Orb 받기</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.5;">카카오톡으로 공유하면 친구가 가입할 때 Orb를 드려요</div>
       </div>
     </div>
-    <div style="font-size:18px;color:var(--text3);flex-shrink:0;">→</div>
+    <div style="font-size:18px;color:var(--muted);flex-shrink:0;">→</div>
   </div>
 
   <div class="section-label">충전 팩 선택</div>
@@ -202,7 +216,7 @@ nav {
 <div class="toast" id="toast"></div>
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
-  <div style="font-size:14px;color:var(--text2);">결제 처리 중...</div>
+  <div style="font-size:14px;">결제 처리 중...</div>
 </div>
 
 <script>
