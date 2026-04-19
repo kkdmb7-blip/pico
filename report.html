@@ -2581,14 +2581,6 @@ function buildAccuracyLayerBlock() {
 
   renderIntro();
   showState('intro');
-
-  // 새로고침 대응: 캐시된 리포트가 있으면 자동 렌더 (사용자 상태 유지)
-  try {
-    const _cached = await fetchExistingReport();
-    if (_cached && _cached.content) {
-      renderReport(_cached.content, _cached.created_at);
-    }
-  } catch(e) { /* 네트워크 오류는 무시하고 intro 유지 */ }
 })();
 
 function renderIntro() {
@@ -2720,22 +2712,6 @@ function renderIntro() {
 async function startGeneration() {
   showState('loading');
 
-  // 캐시 선조회 (적중 시 Worker 호출 전부 스킵 — 속도·비용 절감)
-  setLoading('기존 리포트 확인 중...', '');
-  let existing;
-  try {
-    existing = await fetchExistingReport();
-  } catch(e) {
-    alert('일시적인 네트워크 문제로 기존 리포트를 확인할 수 없어요.\n잠시 후 다시 시도해주세요.');
-    location.href = 'index.html?tab=report';
-    return;
-  }
-  if (existing) {
-    renderReport(existing.content, existing.created_at);
-    return;
-  }
-
-  // 캐시 미스 시에만 사주/ziwei/astro 로드
   setLoading('사주 정보 불러오는 중...', '');
   const withZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
   const withAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
@@ -2765,44 +2741,6 @@ function getProfileKey() {
   const p = _profile;
   if (!p) return '';
   return `${p.year}-${p.month}-${p.day}-${p.hour || 0}-${p.gender}-v${REPORT_VERSION}`;
-}
-
-async function fetchExistingReport() {
-  const sb = getSb();
-  // 네트워크 장애·일시 오류는 1회 재시도. 2회 모두 실패 시 throw해서 재생성+Orb차감 방지
-  let lastErr = null;
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
-      const { data, error } = await sb.from('reports')
-        .select('*')
-        .eq('user_id', _user.id)
-        .eq('report_type', _type)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      if (!data) return null;
-      // month 타입은 이번 달 생성분만 유효
-      if (_type === 'month') {
-        const reportDate = data.created_at ? new Date(data.created_at) : null;
-        if (reportDate) {
-          const now2 = new Date();
-          if (reportDate.getFullYear() !== now2.getFullYear() || reportDate.getMonth() !== now2.getMonth()) return null;
-        }
-      }
-      // 프로필 키 불일치 시 무효 처리 (다른 프로필로 생성된 캐시 방지)
-      const sectionCount = (TYPE_SECTIONS[_type] || TYPE_SECTIONS.character).length;
-      const storedKey = Array.isArray(data.content) ? data.content[sectionCount] : null;
-      if (!storedKey || storedKey !== getProfileKey()) return null;
-      return data;
-    } catch(e) {
-      lastErr = e;
-      if (attempt === 0) await new Promise(r => setTimeout(r, 500));
-    }
-  }
-  const err = new Error('CACHE_LOOKUP_FAILED');
-  err.cause = lastErr;
-  throw err;
 }
 
 // ── Orb 잔액 조회 ──
@@ -3005,17 +2943,6 @@ function selectPersonality(btn) {
 // ── character 생성 시작 (Orb 확인 후 generateCharacterReport) ──
 async function startCharacterGeneration() {
   showState('loading');
-
-  setLoading('기존 리포트 확인 중...', '');
-  let existing;
-  try {
-    existing = await fetchExistingReport();
-  } catch(e) {
-    alert('일시적인 네트워크 문제로 기존 리포트를 확인할 수 없어요.\n잠시 후 다시 시도해주세요.');
-    location.href = 'index.html?tab=report';
-    return;
-  }
-  if (existing) { renderReport(existing.content, existing.created_at); return; }
 
   setLoading('사주 정보 불러오는 중...', '');
   if (!_sdFull && !_rptFull) await loadAllData(false, false);
