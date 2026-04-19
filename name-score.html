@@ -3,23 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f5efe4">
 <title>이름 점수 확인 - 포르투나</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+KR:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0d0d14;
-  --surface: #13131a;
-  --surface2: #1c1c28;
-  --border: #2a2a3d;
-  --text: #e8e0f0;
-  --muted: #6b6b85;
-  --gold: #d4af37;
-  --gold-dim: rgba(212,175,55,0.12);
-  --gold-border: rgba(212,175,55,0.3);
-  --text-dim: #6b6b85;
-  --card: #13131a;
-  --void: #0d0d14;
+  --bg: #f4ede0;
+  --surface: #fcf7ea;
+  --surface2: #ede4cf;
+  --border: #c9bc9d;
+  --border-soft: rgba(80,55,30,0.10);
+  --accent: #7a2418;
+  --accent2: #2a1f1a;
+  --text: #1a120a;
+  --muted: #7a6850;
+  --gold: #9a7a26;
+  --gold-deep: #7a5e1c;
+  --gold-dim: rgba(154,122,38,0.12);
+  --gold-border: rgba(154,122,38,0.45);
+  --text-dim: #7a6850;
+  --card: #fcf7ea;
+  --void: #f4ede0;
+  --ink: #241a10;
+  --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+  --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -31,15 +39,15 @@ body {
 }
 nav {
   position: sticky; top:0; left:0; right:0; z-index:100;
-  background: rgba(13,13,20,0.95);
+  background: rgba(252,247,234,0.92);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-soft);
   padding: 0 20px; height:56px;
   display: flex; align-items:center; justify-content:space-between;
 }
 .nav-brand {
   display:flex; align-items:center; gap:8px;
-  text-decoration:none; color:var(--gold);
+  text-decoration:none; color:var(--gold-deep);
   font-size:14px; letter-spacing:0.2em; font-weight:700;
   font-family:'Noto Serif KR',serif;
 }
@@ -49,7 +57,7 @@ nav {
   transition:color 0.2s; cursor:pointer;
   background:none; border:none; font-family:inherit;
 }
-.nav-back:hover { color:var(--gold); }
+.nav-back:hover { color:var(--gold-deep); }
 .wrap {
   position:relative; z-index:1;
   max-width: 480px; margin:0 auto;
@@ -78,264 +86,274 @@ nav {
   gap:5px; margin-bottom:14px;
 }
 .mode-tab.premium {
-  background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(123,94,167,0.12));
+  background:linear-gradient(135deg,rgba(154,122,38,0.12),rgba(122,36,24,0.08));
   border-color:var(--gold);
   position:relative;
 }
 .mode-tab.premium::after {
   content:'PRO'; position:absolute; top:-5px; right:-3px;
-  background:var(--gold); color:#1a1a2e;
+  background:var(--gold-deep); color:#fff;
   font-size:8px; font-weight:800; padding:1px 4px;
   border-radius:3px; letter-spacing:0.05em;
 }
 .mode-tab {
-  background: var(--surface2); border:1px solid var(--border);
+  background: var(--surface2); border:1px solid var(--border-soft);
   border-radius:10px; padding:10px 4px;
   text-align:center; cursor:pointer;
   font-family:'Noto Serif KR',serif; font-size:12px;
   color:var(--muted); transition:all 0.22s;
 }
-.mode-tab:hover { border-color:var(--gold-border); color:var(--text); }
-.mode-tab.active { background:var(--gold-dim); border-color:var(--gold); color:var(--gold); }
+.mode-tab:hover { border-color:var(--gold-border); color:var(--ink); }
+.mode-tab.active { background:var(--gold-dim); border-color:var(--gold); color:var(--gold-deep); }
 .input-card {
-  background: var(--surface); border:1px solid var(--border);
+  background: var(--surface); border:1px solid var(--border-soft);
   border-radius:20px; padding:20px; margin-bottom:14px;
+  box-shadow: var(--shadow-soft);
 }
 .name-row { display:grid; grid-template-columns:1fr 2fr; gap:12px; margin-bottom:18px; }
 .field-label { font-size:11px; color:var(--text-dim); margin-bottom:8px; letter-spacing:0.08em; display:block; }
 .name-input {
-  width:100%; background:rgba(255,255,255,0.04);
+  width:100%; background:#fff;
   border:1px solid var(--gold-border); border-radius:10px;
-  padding:12px 14px; color:var(--text);
+  padding:12px 14px; color:var(--ink);
   font-family:'Noto Serif KR',serif; font-size:16px;
   outline:none; transition:border-color 0.25s; -webkit-appearance:none;
+  box-shadow: var(--shadow-soft);
 }
-.name-input:focus { border-color:var(--gold); background:rgba(212,175,55,0.04); }
+.name-input:focus { border-color:var(--gold-deep); background:#fffaf0; }
 .rec-sel {
-  width:100%; background:#1c1c28;
+  width:100%; background:#fffaf0;
   border:1px solid var(--gold-border); border-radius:10px;
-  padding:11px 10px; color:#e8e0f0 !important;
+  padding:11px 10px; color:var(--ink) !important;
   font-family:'Noto Serif KR',serif; font-size:13px;
   outline:none; -webkit-appearance:none; appearance:none;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23d4af37' d='M0 0l5 6 5-6z'/></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%237a5e1c' d='M0 0l5 6 5-6z'/></svg>");
   background-repeat:no-repeat; background-position:right 10px center;
   padding-right:26px;
 }
-.rec-sel:focus { border-color:var(--gold); }
-.rec-sel option { background:#1c1c28; color:#e8e0f0; }
+.rec-sel:focus { border-color:var(--gold-deep); }
+.rec-sel option { background:#fffaf0; color:var(--ink); }
 .hanja-section { margin-bottom:16px; }
 .hanja-section-label { font-size:11px; color:var(--text-dim); letter-spacing:0.08em; margin-bottom:8px; display:block; }
 .hanja-btns { display:flex; flex-wrap:wrap; gap:7px; }
 .hanja-btn {
-  background:rgba(255,255,255,0.04); border:1px solid var(--gold-border);
+  background:#fffaf0; border:1px solid var(--gold-border);
   border-radius:10px; padding:8px 12px; cursor:pointer;
   font-family:'Noto Serif KR',serif; text-align:center;
-  transition:all 0.2s; min-width:60px;
+  transition:all 0.2s; min-width:60px; color: var(--ink);
 }
-.hanja-btn:hover { border-color:var(--gold); background:var(--gold-dim); }
-.hanja-btn.selected { background:linear-gradient(135deg, rgba(212,175,55,0.18), rgba(123,94,167,0.12)); border-color:var(--gold); color:var(--gold); box-shadow:0 0 20px rgba(212,175,55,0.2); }
+.hanja-btn:hover { border-color:var(--gold-deep); background:var(--gold-dim); }
+.hanja-btn.selected { background:linear-gradient(135deg, rgba(154,122,38,0.16), rgba(122,36,24,0.06)); border-color:var(--gold-deep); color:var(--gold-deep); box-shadow:0 0 14px rgba(154,122,38,0.22); }
 .hanja-btn .hb-char { font-size:22px; display:block; line-height:1.2; }
 .hanja-btn .hb-info { font-size:10px; color:var(--text-dim); margin-top:3px; }
-.hanja-btn.selected .hb-info { color:rgba(212,175,55,0.7); }
+.hanja-btn.selected .hb-info { color:var(--gold-deep); }
 .hanja-manual-row { display:flex; align-items:center; gap:10px; margin-top:8px; }
 .hanja-manual-label { font-size:11px; color:var(--text-dim); flex:1; }
 .stroke-grid { display:grid; gap:10px; }
 .stroke-row { display:flex; align-items:center; gap:10px; }
-.stroke-char { font-size:20px; color:var(--gold); min-width:28px; text-align:center; }
+.stroke-char { font-size:20px; color:var(--gold-deep); min-width:28px; text-align:center; }
 .stroke-label { font-size:11px; color:var(--text-dim); flex:1; }
 .stroke-spin { display:flex; align-items:center; gap:6px; }
 .spin-btn {
   width:30px; height:30px; border-radius:8px;
   background:var(--gold-dim); border:1px solid var(--gold-border);
-  color:var(--gold); font-size:16px; cursor:pointer;
+  color:var(--gold-deep); font-size:16px; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   transition:background 0.2s;
 }
-.spin-btn:hover { background:rgba(212,175,55,0.25); }
+.spin-btn:hover { background:rgba(154,122,38,0.25); }
 .spin-val {
   width:36px; text-align:center; font-size:15px;
-  background:rgba(255,255,255,0.04); border:1px solid var(--border);
-  border-radius:8px; padding:4px 0; color:var(--text);
+  background:#fff; border:1px solid var(--border-soft);
+  border-radius:8px; padding:4px 0; color:var(--ink);
   font-family:'Noto Serif KR',serif;
 }
 .btn-gold {
   display:block; width:100%; padding:14px;
-  background:linear-gradient(135deg, rgba(212,175,55,0.08), rgba(123,94,167,0.06));
-  color:var(--gold);
-  border:1.5px solid rgba(212,175,55,0.5);
+  background:linear-gradient(135deg, #7a2418, #5a1810);
+  color:#fff;
+  border:1.5px solid #5a1810;
   border-radius:12px;
   font-family:'Noto Serif KR',serif;
   font-size:15px; font-weight:700; letter-spacing:0.08em;
   cursor:pointer; text-align:center;
   transition:border-color 0.3s, box-shadow 0.3s, transform 0.2s;
-  box-shadow:0 0 20px rgba(212,175,55,0.08);
+  box-shadow: var(--shadow-soft);
   position:relative; overflow:hidden;
 }
-.btn-gold:hover { transform:translateY(-1px); border-color:rgba(212,175,55,0.85); box-shadow:0 0 30px rgba(212,175,55,0.18); }
+.btn-gold:hover { transform:translateY(-1px); box-shadow: var(--shadow-lift); }
 .btn-gold:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
-.orb-hint { font-size:11px; color:rgba(255,255,255,0.4); margin-top:6px; text-align:center; }
-#aiAnalysisResult { margin-top:16px; padding:16px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid var(--border); font-size:14px; line-height:1.8; white-space:pre-wrap; display:none; }
+.orb-hint { font-size:11px; color:var(--muted); margin-top:6px; text-align:center; }
+#aiAnalysisResult { margin-top:16px; padding:16px; border-radius:12px; background:var(--surface); border:1px solid var(--border-soft); color: var(--text); font-size:14px; line-height:1.8; white-space:pre-wrap; display:none; box-shadow: var(--shadow-soft); }
 .result-area { display:none; margin-top:24px; }
 .result-area.show { display:block; animation:fadeUp 0.5s ease; }
 .score-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
 .score-card {
   background:var(--card); border-radius:16px; padding:18px 14px;
-  text-align:center; border:1px solid var(--border); backdrop-filter:blur(10px);
+  text-align:center; border:1px solid var(--border-soft);
+  box-shadow: var(--shadow-soft);
 }
 .score-gye { font-size:10px; color:var(--text-dim); letter-spacing:0.15em; margin-bottom:6px; }
-.score-num { font-size:40px; font-weight:300; line-height:1; margin-bottom:8px; }
+.score-num { font-family:'Playfair Display','Noto Serif KR',serif; font-size:40px; font-weight:600; line-height:1; margin-bottom:8px; }
 .score-badge {
   display:inline-block; font-size:11px; font-weight:600;
   padding:3px 10px; border-radius:20px; margin-bottom:6px; letter-spacing:0.06em;
 }
 .score-name { font-size:11px; color:var(--text-dim); }
-.grade-대길 { color:#d4af37; border:1px solid rgba(212,175,55,0.5); background:rgba(212,175,55,0.12); }
-.score-card.grade-대길 .score-num { color:#d4af37; }
-.grade-길 { color:#4caf7a; border:1px solid rgba(76,175,122,0.5); background:rgba(76,175,122,0.12); }
-.score-card.grade-길 .score-num { color:#4caf7a; }
-.grade-반길 { color:#ff9800; border:1px solid rgba(255,152,0,0.5); background:rgba(255,152,0,0.12); }
-.score-card.grade-반길 .score-num { color:#ff9800; }
-.grade-흉 { color:#f44336; border:1px solid rgba(244,67,54,0.4); background:rgba(244,67,54,0.1); }
-.score-card.grade-흉 .score-num { color:#f44336; }
-.grade-대흉 { color:#e91e63; border:1px solid rgba(233,30,99,0.4); background:rgba(233,30,99,0.1); }
-.score-card.grade-대흉 .score-num { color:#e91e63; }
+.grade-대길 { color:#7a5e1c; border:1px solid rgba(154,122,38,0.5); background:rgba(154,122,38,0.12); }
+.score-card.grade-대길 .score-num { color:#7a5e1c; }
+.grade-길 { color:#2f7a55; border:1px solid rgba(47,122,85,0.5); background:rgba(47,122,85,0.10); }
+.score-card.grade-길 .score-num { color:#2f7a55; }
+.grade-반길 { color:#b06a10; border:1px solid rgba(176,106,16,0.45); background:rgba(176,106,16,0.10); }
+.score-card.grade-반길 .score-num { color:#b06a10; }
+.grade-흉 { color:#a33838; border:1px solid rgba(163,56,56,0.4); background:rgba(163,56,56,0.08); }
+.score-card.grade-흉 .score-num { color:#a33838; }
+.grade-대흉 { color:#8a1c3c; border:1px solid rgba(138,28,60,0.4); background:rgba(138,28,60,0.08); }
+.score-card.grade-대흉 .score-num { color:#8a1c3c; }
 .analysis-card {
-  background:var(--card); border:1px solid var(--border);
+  background:var(--card); border:1px solid var(--border-soft);
   border-radius:16px; padding:20px; margin-bottom:16px;
+  box-shadow: var(--shadow-soft);
 }
 .analysis-title {
-  font-size:10px; letter-spacing:0.3em; color:var(--gold);
-  margin-bottom:16px; opacity:0.7; text-transform:uppercase;
+  font-size:10px; letter-spacing:0.3em; color:var(--gold-deep);
+  margin-bottom:16px; opacity:0.85; text-transform:uppercase;
 }
 .ohaeng-flow {
   display:flex; align-items:center; justify-content:center;
   gap:8px; margin-bottom:14px; flex-wrap:wrap;
 }
 .oh-node { text-align:center; }
-.oh-char { font-size:18px; color:var(--text); display:block; margin-bottom:4px; }
+.oh-char { font-size:18px; color:var(--ink); display:block; margin-bottom:4px; }
 .oh-badge {
   display:inline-block; font-size:11px; font-weight:600;
   padding:3px 10px; border-radius:20px; letter-spacing:0.06em;
 }
-.oh-badge.木 { color:#4caf7a; border:1px solid rgba(76,175,122,0.5); background:rgba(76,175,122,0.12); }
-.oh-badge.火 { color:#f44336; border:1px solid rgba(244,67,54,0.4); background:rgba(244,67,54,0.1); }
-.oh-badge.土 { color:#ff9800; border:1px solid rgba(255,152,0,0.5); background:rgba(255,152,0,0.12); }
-.oh-badge.金 { color:#d4af37; border:1px solid rgba(212,175,55,0.5); background:rgba(212,175,55,0.12); }
-.oh-badge.水 { color:#2196f3; border:1px solid rgba(33,150,243,0.5); background:rgba(33,150,243,0.12); }
+.oh-badge.木 { color:#2f7a55; border:1px solid rgba(47,122,85,0.5); background:rgba(47,122,85,0.10); }
+.oh-badge.火 { color:#a33838; border:1px solid rgba(163,56,56,0.4); background:rgba(163,56,56,0.08); }
+.oh-badge.土 { color:#b06a10; border:1px solid rgba(176,106,16,0.45); background:rgba(176,106,16,0.10); }
+.oh-badge.金 { color:#7a5e1c; border:1px solid rgba(154,122,38,0.5); background:rgba(154,122,38,0.12); }
+.oh-badge.水 { color:#355f9a; border:1px solid rgba(53,95,154,0.5); background:rgba(53,95,154,0.10); }
 .oh-arrow { font-size:16px; color:var(--text-dim); line-height:1; margin-top:8px; }
-.oh-arrow.상생 { color:#4caf7a; }
-.oh-arrow.상극 { color:#f44336; }
+.oh-arrow.상생 { color:#2f7a55; }
+.oh-arrow.상극 { color:#a33838; }
 .oh-result {
   text-align:center; font-size:12px; padding:8px 14px;
   border-radius:10px; letter-spacing:0.04em; line-height:1.6;
 }
-.oh-result.all-good { background:rgba(76,175,122,0.1); color:#4caf7a; border:1px solid rgba(76,175,122,0.3); }
-.oh-result.has-bad { background:rgba(244,67,54,0.08); color:#f44336; border:1px solid rgba(244,67,54,0.25); }
-.oh-result.mixed { background:rgba(255,152,0,0.08); color:#ff9800; border:1px solid rgba(255,152,0,0.25); }
+.oh-result.all-good { background:rgba(47,122,85,0.10); color:#2f7a55; border:1px solid rgba(47,122,85,0.3); }
+.oh-result.has-bad { background:rgba(163,56,56,0.08); color:#a33838; border:1px solid rgba(163,56,56,0.25); }
+.oh-result.mixed { background:rgba(176,106,16,0.08); color:#b06a10; border:1px solid rgba(176,106,16,0.25); }
 .eumyang-row { display:flex; gap:8px; justify-content:center; margin-bottom:14px; }
 .ey-node { text-align:center; flex:1; }
-.ey-char { font-size:16px; color:var(--text); display:block; margin-bottom:4px; }
+.ey-char { font-size:16px; color:var(--ink); display:block; margin-bottom:4px; }
 .ey-badge {
   display:inline-block; font-size:11px; font-weight:600;
   padding:4px 6px; border-radius:20px; letter-spacing:0.04em; width:100%;
 }
-.ey-badge.양 { color:#f44336; border:1px solid rgba(244,67,54,0.4); background:rgba(244,67,54,0.08); }
-.ey-badge.음 { color:#2196f3; border:1px solid rgba(33,150,243,0.5); background:rgba(33,150,243,0.1); }
+.ey-badge.양 { color:#a33838; border:1px solid rgba(163,56,56,0.4); background:rgba(163,56,56,0.08); }
+.ey-badge.음 { color:#355f9a; border:1px solid rgba(53,95,154,0.5); background:rgba(53,95,154,0.10); }
 .jawon-row { display:flex; gap:8px; justify-content:center; margin-bottom:8px; }
 .jw-node { text-align:center; flex:1; }
-.jw-hanja { font-size:24px; color:var(--gold); display:block; margin-bottom:6px; }
-.jawon-notice { font-size:11px; color:var(--text-dim); line-height:1.7; margin-bottom:12px; padding:8px 10px; background:rgba(255,255,255,0.03); border-radius:8px; border-left:2px solid rgba(212,175,55,0.3); }
+.jw-hanja { font-size:24px; color:var(--gold-deep); display:block; margin-bottom:6px; }
+.jawon-notice { font-size:11px; color:var(--text-dim); line-height:1.7; margin-bottom:12px; padding:8px 10px; background:var(--surface2); border-radius:8px; border-left:2px solid var(--gold-border); }
 .summary-card {
   background:var(--gold-dim); border:1px solid var(--gold-border);
   border-radius:14px; padding:18px 16px; margin-bottom:20px;
   font-size:13px; line-height:1.9; color:var(--text);
+  box-shadow: var(--shadow-soft);
 }
 .total-score-card {
-  background: rgba(212,175,55,0.08);
-  border: 1px solid rgba(212,175,55,0.3);
+  background: rgba(154,122,38,0.10);
+  border: 1px solid rgba(154,122,38,0.32);
   border-radius: 16px;
   padding: 20px;
   text-align: center;
   margin-bottom: 16px;
+  box-shadow: var(--shadow-soft);
 }
 .total-score-label {
   font-size: 12px;
-  color: rgba(255,255,255,0.6);
+  color: var(--muted);
   margin-bottom: 8px;
   letter-spacing: 1px;
 }
 .total-score-num {
+  font-family:'Playfair Display','Noto Serif KR',serif;
   font-size: 56px;
   font-weight: 700;
-  color: #d4af37;
+  color: var(--gold-deep);
   line-height: 1;
 }
 .total-score-max {
   font-size: 14px;
-  color: rgba(255,255,255,0.4);
+  color: var(--muted);
   margin-bottom: 12px;
 }
 .total-score-bar {
   height: 6px;
-  background: rgba(255,255,255,0.1);
+  background: var(--surface2);
   border-radius: 3px;
   margin: 12px 0;
   overflow: hidden;
 }
 .total-score-fill {
   height: 100%;
-  background: linear-gradient(90deg, #d4af37, #f5d87a);
+  background: linear-gradient(90deg, #7a5e1c, #c9a84c);
   border-radius: 3px;
   transition: width 0.8s ease;
 }
 .total-score-comment {
   font-size: 13px;
-  color: rgba(255,255,255,0.7);
+  color: var(--text2, #4a3a2a);
   line-height: 1.5;
 }
 .interpret-card {
-  background:var(--card); border:1px solid var(--border);
+  background:var(--card); border:1px solid var(--border-soft);
   border-radius:16px; padding:22px 18px; margin-bottom:16px;
   font-size:13px; line-height:2; color:var(--text);
+  box-shadow: var(--shadow-soft);
 }
 .interpret-section { margin-bottom:14px; }
 .interpret-section:last-child { margin-bottom:0; }
 .interpret-label {
-  font-size:10px; letter-spacing:0.25em; color:var(--gold);
-  margin-bottom:6px; display:block; opacity:0.8;
+  font-size:10px; letter-spacing:0.25em; color:var(--gold-deep);
+  margin-bottom:6px; display:block; opacity:0.9;
 }
 .toast {
   position:fixed; top:20px; left:50%;
   transform:translateX(-50%) translateY(-80px);
-  background:rgba(212,175,55,0.12); border:1px solid var(--gold);
+  background:rgba(252,247,234,0.96); border:1px solid var(--gold);
   border-radius:50px; padding:11px 24px;
-  color:var(--gold); font-size:12px; z-index:9999;
+  color:var(--gold-deep); font-size:12px; z-index:9999;
   transition:transform 0.3s; backdrop-filter:blur(10px);
   white-space:nowrap; letter-spacing:0.06em;
+  box-shadow: var(--shadow-lift);
 }
 .toast.show { transform:translateX(-50%) translateY(0); }
-.toast.error { border-color:#f44336; color:#f44336; background:rgba(244,67,54,0.1); }
+.toast.error { border-color:#a33838; color:#a33838; background:rgba(163,56,56,0.10); }
 .score-desc {
   font-size: 11px;
-  color: rgba(255,255,255,0.55);
+  color: var(--muted);
   line-height: 1.4;
   margin-top: 4px;
   text-align: center;
 }
 @keyframes fadeUp { from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)} }
 .yongsin-match-box {
-  border:1px solid var(--gold); background:rgba(212,175,55,0.08);
+  border:1px solid var(--gold); background:rgba(154,122,38,0.08);
   border-radius:16px; padding:20px; margin-top:16px;
   font-size:13px; line-height:1.9; color:var(--text);
+  box-shadow: var(--shadow-soft);
 }
 .yongsin-match-title {
-  font-size:10px; letter-spacing:0.3em; color:var(--gold);
-  margin-bottom:16px; opacity:0.7; text-transform:uppercase;
+  font-size:10px; letter-spacing:0.3em; color:var(--gold-deep);
+  margin-bottom:16px; opacity:0.85; text-transform:uppercase;
 }
 .yongsin-match-item { margin-bottom:6px; }
-.yongsin-ok  { color:#4caf7a; }
-.yongsin-warn { color:#ff9800; }
-.yongsin-bad  { color:#f44336; }
+.yongsin-ok  { color:#2f7a55; }
+.yongsin-warn { color:#b06a10; }
+.yongsin-bad  { color:#a33838; }
 .yongsin-login-banner {
   text-align:center; padding:10px 0 4px;
   color:var(--text-dim); font-size:13px; line-height:1.9;
@@ -343,7 +361,7 @@ nav {
 .btn-login-small {
   display:inline-block; margin-top:10px; padding:10px 24px;
   background:var(--gold-dim); border:1px solid var(--gold-border);
-  border-radius:10px; color:var(--gold); font-size:12px;
+  border-radius:10px; color:var(--gold-deep); font-size:12px;
   font-family:'Noto Serif KR',serif; cursor:pointer;
   letter-spacing:0.08em; text-decoration:none;
 }
@@ -403,7 +421,7 @@ nav {
       <input class="name-input" id="recSur" type="text" maxlength="3" placeholder="김">
     </div>
 
-    <div style="margin-bottom:14px;padding:12px;background:rgba(123,94,167,0.06);border:1px solid rgba(212,175,55,0.2);border-radius:10px;">
+    <div style="margin-bottom:14px;padding:12px;background:rgba(154,122,38,0.06);border:1px solid rgba(154,122,38,0.22);border-radius:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.1em;margin-bottom:10px;">누구의 이름인가요?</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
         <button type="button" class="mode-tab active" id="recTargetSelf" onclick="setRecTarget('self')">내 프로필 기준</button>
@@ -446,7 +464,7 @@ nav {
         <button type="button" class="mode-tab" id="recGenderF" onclick="setRecGender('F')" style="flex:1;">여자</button>
       </div>
     </div>
-    <div id="recYongsinHint" style="font-size:11px; color:var(--text-dim); margin-bottom:14px; padding:10px; background:rgba(255,255,255,0.03); border-radius:8px; border-left:2px solid rgba(212,175,55,0.3); line-height:1.6;">
+    <div id="recYongsinHint" style="font-size:11px; color:var(--text-dim); margin-bottom:14px; padding:10px; background:var(--surface2); border-radius:8px; border-left:2px solid rgba(154,122,38,0.40); line-height:1.6;">
       로그인 후 프로필을 등록하시면 내 사주 용신과 매칭되는 이름을 우선 추천해드립니다.
     </div>
     <button class="btn-gold" id="btnRecommend" onclick="runRecommend()">이름 추천받기</button>
@@ -456,7 +474,7 @@ nav {
   <div id="recommendResult" style="display:none; margin-bottom:14px;"></div>
 
   <div class="input-card" id="childCard" style="display:none;">
-    <div style="padding:12px 14px;background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(123,94,167,0.1));border:1px solid var(--gold);border-radius:12px;margin-bottom:16px;">
+    <div style="padding:12px 14px;background:linear-gradient(135deg,rgba(154,122,38,0.14),rgba(122,36,24,0.08));border:1px solid var(--gold);border-radius:12px;margin-bottom:16px;">
       <div style="font-size:10px;color:var(--gold);letter-spacing:0.15em;font-weight:800;margin-bottom:5px;display:flex;align-items:center;gap:5px;"><i class="pi pi-gem"></i>PRO · 프리미엄 작명</div>
       <div style="font-size:13px;color:var(--text);line-height:1.55;">아이 사주 + 부모 궁합 + 형제 조화 + 항렬까지 한번에 고려한 맞춤 작명</div>
     </div>
@@ -466,7 +484,7 @@ nav {
       <input class="name-input" id="childSur" type="text" maxlength="3" placeholder="김">
     </div>
 
-    <div style="margin-bottom:14px;padding:12px;background:rgba(123,94,167,0.06);border:1px solid rgba(212,175,55,0.2);border-radius:10px;">
+    <div style="margin-bottom:14px;padding:12px;background:rgba(154,122,38,0.06);border:1px solid rgba(154,122,38,0.22);border-radius:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.1em;margin-bottom:10px;">👶 아이 정보 (필수)</div>
       <label class="field-label">생년월일</label>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
@@ -487,7 +505,7 @@ nav {
       <div style="font-size:10px;color:var(--text-dim);margin-top:6px;line-height:1.5;">※ 한국 표준시로 입력 — 사주 계산 시 <b style="color:var(--gold);">진태양시</b>로 자동 보정</div>
     </div>
 
-    <div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border:1px solid var(--border);border-radius:10px;">
+    <div style="margin-bottom:14px;padding:12px;background:var(--surface2);border:1px solid var(--border-soft);border-radius:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:10px;">항렬·돌림자 (선택)</div>
       <div style="display:flex;gap:6px;margin-bottom:8px;">
         <button type="button" class="mode-tab active" id="childHangNone" onclick="setChildHang('none')" style="flex:1;">없음</button>
@@ -497,12 +515,12 @@ nav {
       <input class="name-input" id="childHangChar" type="text" maxlength="1" placeholder="돌림자 한 글자 (예: 준)" style="display:none;">
     </div>
 
-    <div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border:1px solid var(--border);border-radius:10px;">
+    <div style="margin-bottom:14px;padding:12px;background:var(--surface2);border:1px solid var(--border-soft);border-radius:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:10px;">형제자매 이름 (선택 · 음오행 조화)</div>
       <input class="name-input" id="childSibling" type="text" maxlength="4" placeholder="예: 민준">
     </div>
 
-    <div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.15);border:1px solid var(--border);border-radius:10px;">
+    <div style="margin-bottom:14px;padding:12px;background:var(--surface2);border:1px solid var(--border-soft);border-radius:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:10px;">부모 사주 (선택 · 궁합 보너스)</div>
       <details style="margin-bottom:8px;">
         <summary style="font-size:12px;color:var(--text);cursor:pointer;padding:6px 0;">👨 아빠 생년월일시 입력</summary>
@@ -1243,8 +1261,8 @@ function renderRecommend(sur, surHanja, top) {
       { k:'정격', easy:'인생 전체',  v:c.gyek.jung, g:c.grades[3] }
     ];
     gyekLabels.forEach(function(gy) {
-      var col = _GRADE_COL[gy.g]||'#8b8ba8';
-      var bg  = _GRADE_BG[gy.g]||'rgba(255,255,255,0.03)';
+      var col = _GRADE_COL[gy.g]||'#7a6850';
+      var bg  = _GRADE_BG[gy.g]||'rgba(80,55,30,0.05)';
       var bd  = _GRADE_BORDER[gy.g]||'var(--border)';
       var easy = _SIMPLE_GRADE[gy.g] || gy.g;
       html += '<div title="'+gy.k+' '+gy.v+' · '+gy.g+'" style="background:'+bg+';border:1px solid '+bd+';border-radius:10px;padding:8px 4px;text-align:center;">';
@@ -1255,18 +1273,18 @@ function renderRecommend(sur, surHanja, top) {
     html += '</div>';
 
     // 한자 의미 (색상 적용)
-    html += '<div style="font-size:12px; color:var(--text-dim); line-height:1.9; padding:10px 12px; background:rgba(255,255,255,0.02); border-radius:8px;">';
+    html += '<div style="font-size:12px; color:var(--text-dim); line-height:1.9; padding:10px 12px; background:var(--surface2); border-radius:8px;">';
     html += '<div style="font-size:10px; color:var(--gold); letter-spacing:0.1em; margin-bottom:4px;">한자 의미</div>';
     var meanArr = c.means.map(function(m, i){
       var hjChar = c.hanja[i], ohEl = c.ohs[i+1];
       return _colorHanja(hjChar, ohEl) + ' ' + m;
     });
     html += meanArr.join(' · ');
-    if (c.ysMatch > 0) html += '<br><span style="color:#4caf7a;margin-top:4px;display:inline-block;"><i class="pi pi-check"></i> 용신 오행 ' + c.ysMatch + '자 일치</span>';
+    if (c.ysMatch > 0) html += '<br><span style="color:#2f7a55;margin-top:4px;display:inline-block;"><i class="pi pi-check"></i> 용신 오행 ' + c.ysMatch + '자 일치</span>';
     html += '</div>';
 
     // AI 한줄평 슬롯
-    html += '<div id="nameBlurb-'+idx+'" style="font-size:12px;color:var(--text);margin-top:10px;padding:9px 11px;background:rgba(212,175,55,0.06);border-left:2px solid var(--gold);border-radius:4px;line-height:1.55;">';
+    html += '<div id="nameBlurb-'+idx+'" style="font-size:12px;color:var(--text);margin-top:10px;padding:9px 11px;background:rgba(154,122,38,0.08);border-left:2px solid var(--gold);border-radius:4px;line-height:1.55;">';
     html += '<span style="color:var(--text-dim);"><i class="pi pi-sparkle"></i> AI 한줄평 생성 중...</span>';
     html += '</div>';
 
@@ -1678,10 +1696,10 @@ function renderChildRecommend(sur, surHanja, top) {
     html += '</div>';
 
     var badges = [];
-    if (c.ysMatch) badges.push('<span style="font-size:10px;background:rgba(76,175,122,0.15);color:#4caf7a;padding:3px 7px;border-radius:6px;"><i class="pi pi-check"></i> 아이 용신 '+c.ysMatch+'자</span>');
-    if (c.dadMatch) badges.push('<span style="font-size:10px;background:rgba(100,150,255,0.15);color:#6496ff;padding:3px 7px;border-radius:6px;">아빠 조화 '+c.dadMatch+'자</span>');
-    if (c.momMatch) badges.push('<span style="font-size:10px;background:rgba(255,138,180,0.15);color:#ff8ab4;padding:3px 7px;border-radius:6px;">엄마 조화 '+c.momMatch+'자</span>');
-    if (c.sibHarmony) badges.push('<span style="font-size:10px;background:rgba(212,175,55,0.15);color:var(--gold);padding:3px 7px;border-radius:6px;">형제 조화</span>');
+    if (c.ysMatch) badges.push('<span style="font-size:10px;background:rgba(47,122,85,0.14);color:#2f7a55;padding:3px 7px;border-radius:6px;"><i class="pi pi-check"></i> 아이 용신 '+c.ysMatch+'자</span>');
+    if (c.dadMatch) badges.push('<span style="font-size:10px;background:rgba(53,95,154,0.14);color:#355f9a;padding:3px 7px;border-radius:6px;">아빠 조화 '+c.dadMatch+'자</span>');
+    if (c.momMatch) badges.push('<span style="font-size:10px;background:rgba(163,56,104,0.12);color:#a33868;padding:3px 7px;border-radius:6px;">엄마 조화 '+c.momMatch+'자</span>');
+    if (c.sibHarmony) badges.push('<span style="font-size:10px;background:rgba(154,122,38,0.15);color:var(--gold-deep);padding:3px 7px;border-radius:6px;">형제 조화</span>');
     if (badges.length) html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">'+badges.join('')+'</div>';
 
     html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">';
@@ -1692,8 +1710,8 @@ function renderChildRecommend(sur, surHanja, top) {
       { k:'정격', easy:'인생 전체',  v:c.gyek.jung, g:c.grades[3] }
     ];
     gyekLabels.forEach(function(gy) {
-      var col = _GRADE_COL[gy.g]||'#8b8ba8';
-      var bg  = _GRADE_BG[gy.g]||'rgba(255,255,255,0.03)';
+      var col = _GRADE_COL[gy.g]||'#7a6850';
+      var bg  = _GRADE_BG[gy.g]||'rgba(80,55,30,0.05)';
       var bd  = _GRADE_BORDER[gy.g]||'var(--border)';
       var easy = _SIMPLE_GRADE[gy.g] || gy.g;
       html += '<div title="'+gy.k+' '+gy.v+' · '+gy.g+'" style="background:'+bg+';border:1px solid '+bd+';border-radius:10px;padding:8px 4px;text-align:center;">';
@@ -1703,7 +1721,7 @@ function renderChildRecommend(sur, surHanja, top) {
     });
     html += '</div>';
 
-    html += '<div style="font-size:12px;color:var(--text-dim);line-height:1.9;padding:10px 12px;background:rgba(255,255,255,0.02);border-radius:8px;">';
+    html += '<div style="font-size:12px;color:var(--text-dim);line-height:1.9;padding:10px 12px;background:var(--surface2);border-radius:8px;">';
     html += '<div style="font-size:10px;color:var(--gold);letter-spacing:0.1em;margin-bottom:4px;">한자 의미</div>';
     var meanArr = c.means.map(function(m, i){
       var hjChar = c.hanja[i], ohEl = c.ohs[i+1];
@@ -1712,7 +1730,7 @@ function renderChildRecommend(sur, surHanja, top) {
     html += meanArr.join(' · ');
     html += '</div>';
 
-    html += '<div id="childBlurb-'+idx+'" style="font-size:12px;color:var(--text);margin-top:10px;padding:9px 11px;background:rgba(212,175,55,0.06);border-left:2px solid var(--gold);border-radius:4px;line-height:1.55;">';
+    html += '<div id="childBlurb-'+idx+'" style="font-size:12px;color:var(--text);margin-top:10px;padding:9px 11px;background:rgba(154,122,38,0.08);border-left:2px solid var(--gold);border-radius:4px;line-height:1.55;">';
     html += '<span style="color:var(--text-dim);"><i class="pi pi-sparkle"></i> AI 한줄평 생성 중...</span>';
     html += '</div>';
     html += '</div>';
@@ -2084,7 +2102,7 @@ function renderYongsinMatch(allChars, allJawon, allEumOh) {
   });
   var charDesc = allChars.map(function(ch, i) {
     var oh = ohaengList[i];
-    var col = oh ? _OHENG_COLOR[oh] : '#d4af37';
+    var col = oh ? _OHENG_COLOR[oh] : '#7a5e1c';
     return '<span style="color:'+col+';font-weight:700;">'+ch+'</span>='+_colorize(oh)+'오행';
   }).join(', ');
   var matchCount = matchChars.length;
@@ -2115,7 +2133,7 @@ function renderYongsinMatch(allChars, allJawon, allEumOh) {
     html += '<div class="yongsin-match-item yongsin-ok"><i class="pi pi-check"></i> 용신 일치: ' + matchChars.map(function(o){return _colorHanja(o.ch, o.oh);}).join(', ') + '</div>';
   if (kijinChars.length > 0)
     html += '<div class="yongsin-match-item yongsin-warn"><i class="pi pi-warning"></i>️ 기신 주의: ' + kijinChars.map(function(o){return _colorHanja(o.ch, o.oh);}).join(', ') + '</div>';
-  html += '<div class="yongsin-match-item" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(212,175,55,0.2);">' + overall + '</div>';
+  html += '<div class="yongsin-match-item" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(154,122,38,0.28);">' + overall + '</div>';
   if (recText)
     html += '<div class="yongsin-match-item" style="margin-top:8px;font-size:12px;color:var(--text-dim);">용신(' + _colorize(yongsinHan) + ') 추천 한자: ' + recText + '</div>';
   html += '</div>';
@@ -2146,8 +2164,8 @@ function calcScore() {
 }
 
 // ── 공용 상수 (사용자 친화 redesign) ──
-var _OHENG_COLOR = { '木':'#00C853', '火':'#FF1744', '土':'#FFD600', '金':'#E0E0E0', '水':'#1565C0' };
-var _OHENG_BG    = { '木':'rgba(0,200,83,0.18)', '火':'rgba(255,23,68,0.18)', '土':'rgba(255,214,0,0.18)', '金':'rgba(224,224,224,0.18)', '水':'rgba(21,101,192,0.25)' };
+var _OHENG_COLOR = { '木':'#2f7a55', '火':'#a33838', '土':'#b06a10', '金':'#7a5e1c', '水':'#355f9a' };
+var _OHENG_BG    = { '木':'rgba(47,122,85,0.14)', '火':'rgba(163,56,56,0.12)', '土':'rgba(176,106,16,0.14)', '金':'rgba(154,122,38,0.14)', '水':'rgba(53,95,154,0.14)' };
 var _SIMPLE_LABEL = {
   '원격': { title: '청소년·20대',   sub: '재능 · 초년 흐름' },
   '형격': { title: '30~50대',       sub: '사회 · 커리어 기운' },
@@ -2156,17 +2174,17 @@ var _SIMPLE_LABEL = {
 };
 var _SIMPLE_GRADE = { '대길':'최상', '길':'좋음', '반길':'보통', '흉':'주의', '대흉':'위험' };
 var _REL_SIMPLE = {
-  '상생': { simple:'받침',   color:'#4caf7a' },
-  '상극': { simple:'부딪힘', color:'#f44336' },
-  '비화': { simple:'같음',   color:'#8b8ba8' },
-  '중화': { simple:'무난',   color:'#8ba0c0' }
+  '상생': { simple:'받침',   color:'#2f7a55' },
+  '상극': { simple:'부딪힘', color:'#a33838' },
+  '비화': { simple:'같음',   color:'#7a6850' },
+  '중화': { simple:'무난',   color:'#355f9a' }
 };
-var _GRADE_COL    = { '대길':'#d4af37','길':'#4caf7a','반길':'#ff9800','흉':'#f44336','대흉':'#e91e63' };
-var _GRADE_BG     = { '대길':'rgba(212,175,55,0.1)','길':'rgba(76,175,122,0.1)','반길':'rgba(255,152,0,0.1)','흉':'rgba(244,67,54,0.08)','대흉':'rgba(233,30,99,0.08)' };
-var _GRADE_BORDER = { '대길':'rgba(212,175,55,0.35)','길':'rgba(76,175,122,0.35)','반길':'rgba(255,152,0,0.35)','흉':'rgba(244,67,54,0.3)','대흉':'rgba(233,30,99,0.3)' };
+var _GRADE_COL    = { '대길':'#7a5e1c','길':'#2f7a55','반길':'#b06a10','흉':'#a33838','대흉':'#8a1c3c' };
+var _GRADE_BG     = { '대길':'rgba(154,122,38,0.12)','길':'rgba(47,122,85,0.10)','반길':'rgba(176,106,16,0.10)','흉':'rgba(163,56,56,0.08)','대흉':'rgba(138,28,60,0.08)' };
+var _GRADE_BORDER = { '대길':'rgba(154,122,38,0.40)','길':'rgba(47,122,85,0.40)','반길':'rgba(176,106,16,0.40)','흉':'rgba(163,56,56,0.35)','대흉':'rgba(138,28,60,0.35)' };
 function _colorize(el) { return el ? '<span style="color:'+_OHENG_COLOR[el]+';font-weight:800;">'+el+'</span>' : ''; }
 function _colorHanja(hj, el) {
-  var col = _OHENG_COLOR[el] || '#d4af37';
+  var col = _OHENG_COLOR[el] || '#7a5e1c';
   return '<span style="color:'+col+';font-weight:700;">'+hj+'</span>';
 }
 
@@ -2183,7 +2201,7 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
   cards.forEach(function(c) {
     var g = SURI_TABLE[c.val]||'흉';
     var sn = SURI_NAME[c.val]||'';
-    var col = _GRADE_COL[g]||'#8b8ba8';
+    var col = _GRADE_COL[g]||'#7a6850';
     var lbl = _SIMPLE_LABEL[c.label];
     var easy = _SIMPLE_GRADE[g] || g;
     var tip = c.label + ' (' + c.val + ') · ' + sn + ' — ' + (SURI_DESC[c.val]||'');
@@ -2224,8 +2242,8 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
   flowEl.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;';
   allChars.forEach(function(ch, i) {
     var oh = allEumOh[i];
-    var col = oh ? _OHENG_COLOR[oh] : '#555';
-    var bg  = oh ? _OHENG_BG[oh] : 'rgba(255,255,255,0.05)';
+    var col = oh ? _OHENG_COLOR[oh] : '#7a6850';
+    var bg  = oh ? _OHENG_BG[oh] : 'rgba(80,55,30,0.06)';
     var node = document.createElement('div');
     node.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
     node.innerHTML =
@@ -2234,7 +2252,7 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
     flowEl.appendChild(node);
     if (i < allChars.length - 1) {
       var rel = checkRelation(allEumOh[i], allEumOh[i+1]);
-      var r = _REL_SIMPLE[rel] || {simple:rel, color:'#8b8ba8'};
+      var r = _REL_SIMPLE[rel] || {simple:rel, color:'#7a6850'};
       var arr = document.createElement('div');
       arr.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;padding-top:4px;';
       arr.title = rel;
@@ -2290,7 +2308,7 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
   jwRow.innerHTML = '';
   allChars.forEach(function(ch, i) {
     var hj = allHanja[i]||ch, oh = allJawon[i]||null;
-    var col = oh ? _OHENG_COLOR[oh] : '#d4af37';
+    var col = oh ? _OHENG_COLOR[oh] : '#7a5e1c';
     var node = document.createElement('div');
     node.className = 'jw-node';
     node.innerHTML =
@@ -2316,13 +2334,13 @@ function renderHook(totalScore, allEumOh, allJawon) {
   var hookTitle, hookSub;
   if (totalScore >= 85) {
     hookTitle = '운이 따르는 이름이에요';
-    hookSub = '하지만 이 이름의 <b style="color:#d4af37;">진짜 힘</b>은 언제, 어떻게 쓰이는지가 더 중요해요';
+    hookSub = '하지만 이 이름의 <b style="color:#7a5e1c;">진짜 힘</b>은 언제, 어떻게 쓰이는지가 더 중요해요';
   } else if (totalScore >= 65) {
     hookTitle = '빛과 그림자가 섞인 이름';
-    hookSub = '<b style="color:#d4af37;">언제 빛나고 언제 주의</b>해야 하는지, 타이밍이 핵심이에요';
+    hookSub = '<b style="color:#7a5e1c;">언제 빛나고 언제 주의</b>해야 하는지, 타이밍이 핵심이에요';
   } else {
     hookTitle = '흐름을 되짚어볼 이름';
-    hookSub = '개명하기 전에 <b style="color:#d4af37;">반드시 확인</b>해야 할 것들이 있어요';
+    hookSub = '개명하기 전에 <b style="color:#7a5e1c;">반드시 확인</b>해야 할 것들이 있어요';
   }
 
   var hookPoints = [{
@@ -2354,17 +2372,17 @@ function renderHook(totalScore, allEumOh, allJawon) {
   hookPoints.push({ icon:'<i class="pi pi-target"></i>', head:'돈 · 사람 · 일 — 3가지 방향 분석', body:'이 이름이 끌어당기는 <b>재물운 · 관계운 · 직업운</b>의 실제 영향' });
 
   var html =
-    '<div style="background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(123,94,167,0.08));border:1px solid rgba(212,175,55,0.35);border-radius:14px;padding:18px 16px;margin-top:16px;">' +
-      '<div style="text-align:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(212,175,55,0.2);">' +
-        '<div style="font-size:10px;letter-spacing:0.2em;color:#d4af37;margin-bottom:6px;font-weight:700;">정밀 분석 예고</div>' +
-        '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;">'+hookTitle+'</div>' +
+    '<div style="background:linear-gradient(135deg,rgba(154,122,38,0.12),rgba(122,36,24,0.06));border:1px solid rgba(154,122,38,0.40);border-radius:14px;padding:18px 16px;margin-top:16px;box-shadow:var(--shadow-soft);">' +
+      '<div style="text-align:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(154,122,38,0.22);">' +
+        '<div style="font-size:10px;letter-spacing:0.2em;color:#7a5e1c;margin-bottom:6px;font-weight:700;">정밀 분석 예고</div>' +
+        '<div style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:4px;line-height:1.3;">'+hookTitle+'</div>' +
         '<div style="font-size:12px;color:var(--text-dim);line-height:1.6;">'+hookSub+'</div>' +
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:8px;">';
   hookPoints.forEach(function(p){
     html +=
-      '<div style="display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(212,175,55,0.18);border-radius:10px;padding:10px 12px;">' +
-        '<span style="color:#d4af37;font-size:16px;flex-shrink:0;line-height:1.4;">'+p.icon+'</span>' +
+      '<div style="display:flex;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid rgba(154,122,38,0.20);border-radius:10px;padding:10px 12px;">' +
+        '<span style="color:#7a5e1c;font-size:16px;flex-shrink:0;line-height:1.4;">'+p.icon+'</span>' +
         '<div style="flex:1;">' +
           '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.4;">'+p.head+'</div>' +
           '<div style="font-size:11px;color:var(--text-dim);line-height:1.5;">'+p.body+'</div>' +

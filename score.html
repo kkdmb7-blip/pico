@@ -3,25 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f5efe4">
 <title>오늘의 운세 점수 · PICO Lab</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <style>
 :root {
-  --bg: #0a0a0f;
-  --surface: #13131a;
-  --surface2: #1c1c28;
-  --border: #2a2a3d;
-  --accent: #7b5ea7;
-  --accent2: #e8b86d;
-  --text: #f0f0f5;
-  --muted: #6b6b85;
+  --bg: #f4ede0;
+  --surface: #fcf7ea;
+  --surface2: #ede4cf;
+  --border: #c9bc9d;
+  --border-soft: rgba(80,55,30,0.10);
+  --accent: #7a2418;
+  --accent2: #2a1f1a;
+  --text: #1a120a;
+  --text2: #4a3a2a;
+  --muted: #7a6850;
   --radius: 16px;
-  --gold: #e8b86d;
-  --green: #4caf82;
-  --blue: #5b8dee;
-  --red: #e05c6a;
+  --gold: #9a7a26;
+  --gold-deep: #7a5e1c;
+  --ink: #241a10;
+  --green: #2f7a55;
+  --blue: #355f9a;
+  --red: #a33838;
+  --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+  --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -33,30 +40,30 @@ body {
 body::before {
   content:'';
   position:fixed; inset:0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none; z-index:0; opacity:0.4;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:0; opacity:0.35;
 }
 
 /* NAV */
 nav {
   position:sticky; top:0; z-index:100;
-  background: rgba(10,10,15,0.88);
+  background: rgba(252,247,234,0.92);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-soft);
   padding: 0 24px; height: 64px;
   display:flex; align-items:center; justify-content:space-between;
 }
 .logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
 .logo img { height:56px; object-fit:contain; }
-.logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--accent2); }
+.logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--gold-deep); }
 .nav-back {
   display:flex; align-items:center; gap:6px;
   color:var(--muted); font-size:13px; text-decoration:none;
-  background:none; border:1px solid var(--border); border-radius:8px;
+  background:none; border:1px solid var(--border-soft); border-radius:8px;
   padding:6px 12px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;
   transition:all 0.2s;
 }
-.nav-back:hover { color:var(--text); border-color:var(--muted); }
+.nav-back:hover { color:var(--ink); border-color:var(--border); }
 
 /* MAIN */
 .main-wrap {
@@ -71,11 +78,11 @@ nav {
 }
 .score-date {
   font-size:12px; font-weight:700; letter-spacing:2px;
-  text-transform:uppercase; color:var(--accent2); margin-bottom:10px;
+  text-transform:uppercase; color:var(--gold-deep); margin-bottom:10px;
 }
 .score-title {
-  font-family:'Noto Serif KR',serif; font-size:clamp(22px,5vw,34px);
-  font-weight:700; margin-bottom:6px;
+  font-family:'Playfair Display','Noto Serif KR',serif; font-size:clamp(22px,5vw,34px);
+  font-weight:700; margin-bottom:6px; color:var(--ink);
 }
 .score-subtitle { font-size:13px; color:var(--muted); }
 
@@ -99,11 +106,12 @@ nav {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
 }
 .overall-num {
-  font-family:'Noto Serif KR',serif; font-size:40px; font-weight:700; line-height:1;
+  font-family:'Playfair Display','Noto Serif KR',serif; font-size:44px; font-weight:700; line-height:1;
+  color:var(--gold-deep);
 }
 .overall-label { font-size:11px; color:var(--muted); margin-top:3px; letter-spacing:0.5px; }
 .overall-summary {
-  font-size:14px; color:var(--muted); text-align:center;
+  font-size:14px; color:var(--text2); text-align:center;
   line-height:1.65; max-width:480px;
 }
 
@@ -114,23 +122,24 @@ nav {
 }
 .domain-card {
   background:var(--surface);
-  border:1px solid var(--border);
+  border:1px solid var(--border-soft);
   border-radius:18px; padding:22px 24px;
   display:flex; align-items:center; gap:20px;
   transition: border-color 0.3s, box-shadow 0.3s;
   position:relative; overflow:hidden;
+  box-shadow: var(--shadow-soft);
 }
 .domain-card::before {
   content:''; position:absolute; inset:0;
-  background:radial-gradient(ellipse at left, rgba(123,94,167,0.08) 0%, transparent 60%);
+  background:radial-gradient(ellipse at left, rgba(154,122,38,0.08) 0%, transparent 60%);
   opacity:0; transition:opacity 0.3s;
 }
-.domain-card:hover { border-color:var(--accent); box-shadow:0 6px 24px rgba(0,0,0,0.25); }
+.domain-card:hover { border-color:var(--gold); box-shadow: var(--shadow-lift); }
 .domain-card:hover::before { opacity:1; }
 
-.domain-emoji { font-size:32px; flex-shrink:0; }
+.domain-emoji { font-size:32px; flex-shrink:0; color: var(--gold-deep); }
 .domain-info  { flex:1; min-width:0; }
-.domain-name  { font-size:14px; font-weight:600; margin-bottom:8px; }
+.domain-name  { font-size:14px; font-weight:600; margin-bottom:8px; color: var(--ink); }
 .domain-gauge-wrap {
   position:relative; height:8px;
   background:var(--surface2); border-radius:100px;
@@ -145,29 +154,30 @@ nav {
   display:flex; flex-direction:column; align-items:flex-end; gap:4px;
 }
 .domain-score-num {
-  font-family:'Noto Serif KR',serif;
+  font-family:'Playfair Display','Noto Serif KR',serif;
   font-size:30px; font-weight:700; line-height:1;
 }
 .domain-score-tag {
   font-size:10px; font-weight:700; letter-spacing:0.5px;
   padding:2px 8px; border-radius:100px;
-  background:rgba(255,255,255,0.06);
+  background:rgba(80,55,30,0.06);
 }
 
 /* BREAKDOWN */
 .breakdown-section { margin-bottom:32px; }
 .breakdown-title {
   font-size:12px; font-weight:700; letter-spacing:1.5px;
-  text-transform:uppercase; color:var(--accent2);
+  text-transform:uppercase; color:var(--gold-deep);
   margin-bottom:16px;
 }
 .breakdown-grid {
   display:grid; grid-template-columns:repeat(5,1fr); gap:10px;
 }
 .breakdown-card {
-  background:var(--surface); border:1px solid var(--border);
+  background:var(--surface); border:1px solid var(--border-soft);
   border-radius:12px; padding:14px 10px 12px;
   text-align:center; min-width:0;
+  box-shadow: var(--shadow-soft);
 }
 .breakdown-src  { font-size:10px; color:var(--muted); margin-bottom:8px; font-weight:600; letter-spacing:0.3px; }
 .breakdown-mini-bars { display:flex; flex-direction:column; gap:4px; width:100%; }
@@ -202,16 +212,17 @@ nav {
   text-align:center; padding:60px 20px;
 }
 .no-profile-icon { font-size:56px; margin-bottom:20px; }
-.no-profile h2 { font-family:'Noto Serif KR',serif; font-size:22px; margin-bottom:10px; }
+.no-profile h2 { font-family:'Noto Serif KR',serif; font-size:22px; margin-bottom:10px; color: var(--ink); }
 .no-profile p  { font-size:14px; color:var(--muted); margin-bottom:28px; line-height:1.7; }
 .btn-go {
   display:inline-block; padding:13px 32px;
-  background:linear-gradient(135deg,var(--accent),#a07fd4);
+  background:linear-gradient(135deg,#7a2418,#5a1810);
   color:#fff; border-radius:12px; text-decoration:none;
   font-size:14px; font-weight:700; font-family:'Noto Sans KR',sans-serif;
   transition:all 0.2s;
+  box-shadow: var(--shadow-soft);
 }
-.btn-go:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(123,94,167,0.4); }
+.btn-go:hover { transform:translateY(-2px); box-shadow: var(--shadow-lift); }
 
 /* WEIGHT INFO */
 .weight-row {
@@ -219,16 +230,17 @@ nav {
   margin-bottom:32px;
 }
 .weight-chip {
-  background:var(--surface); border:1px solid var(--border);
+  background:var(--surface); border:1px solid var(--border-soft);
   border-radius:100px; padding:5px 12px; font-size:11px; color:var(--muted);
 }
-.weight-chip strong { color:var(--text); }
+.weight-chip strong { color:var(--ink); }
 
 /* FEEDBACK */
 .feedback-box {
   text-align:center; padding:20px 24px;
-  background:var(--surface); border:1px solid var(--border);
+  background:var(--surface); border:1px solid var(--border-soft);
   border-radius:16px; margin-top:8px;
+  box-shadow: var(--shadow-soft);
 }
 .feedback-q { font-size:13px; color:var(--muted); margin-bottom:14px; }
 .fb-btns { display:flex; gap:10px; justify-content:center; }
@@ -236,20 +248,20 @@ nav {
   padding:10px 22px; border-radius:10px; font-size:14px; font-weight:700;
   cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all 0.2s; border:1px solid;
 }
-.btn-fb-yes { background:rgba(76,175,130,0.1); color:#4caf82; border-color:#4caf82; }
-.btn-fb-no  { background:rgba(224,92,106,0.1); color:var(--red); border-color:var(--red); }
-.btn-fb-yes:hover { background:rgba(76,175,130,0.2); }
-.btn-fb-no:hover  { background:rgba(224,92,106,0.2); }
+.btn-fb-yes { background:rgba(47,122,85,0.10); color:var(--green); border-color:rgba(47,122,85,0.45); }
+.btn-fb-no  { background:rgba(163,56,56,0.10); color:var(--red); border-color:rgba(163,56,56,0.45); }
+.btn-fb-yes:hover { background:rgba(47,122,85,0.18); }
+.btn-fb-no:hover  { background:rgba(163,56,56,0.18); }
 .login-nudge {
   display:none; text-align:center; padding:16px 24px;
-  background:rgba(123,94,167,0.08); border:1px solid rgba(123,94,167,0.22);
+  background:rgba(122,36,24,0.06); border:1px solid rgba(122,36,24,0.18);
   border-radius:12px; margin-top:10px;
 }
-.login-nudge p { font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:10px; }
+.login-nudge p { font-size:13px; color:var(--muted); margin-bottom:10px; }
 .toast {
   position:fixed; bottom:24px; left:50%;
   transform:translateX(-50%) translateY(16px);
-  background:#1e1e2a; border:1px solid var(--accent);
+  background:var(--ink); color:#fff; border:1px solid var(--gold-deep);
   border-radius:12px; padding:11px 22px;
   font-size:14px; font-weight:600; opacity:0;
   transition:all 0.3s; z-index:9999; white-space:nowrap; pointer-events:none;
@@ -263,35 +275,35 @@ nav {
 .btn-share-card {
   display:inline-flex; align-items:center; gap:8px;
   padding:13px 32px; border-radius:100px;
-  background:linear-gradient(135deg,var(--accent),#a07fd4);
+  background:linear-gradient(135deg,#7a2418,#5a1810);
   color:#fff; font-size:14px; font-weight:700;
   font-family:'Noto Sans KR',sans-serif;
   border:none; cursor:pointer; transition:all 0.2s;
-  box-shadow:0 4px 16px rgba(123,94,167,0.35);
+  box-shadow: var(--shadow-soft);
 }
-.btn-share-card:hover { transform:translateY(-2px); box-shadow:0 6px 22px rgba(123,94,167,0.5); }
+.btn-share-card:hover { transform:translateY(-2px); box-shadow: var(--shadow-lift); }
 
 /* 공유 카드 모달 */
 #scoreShareModal {
   display:none; position:fixed; inset:0; z-index:9999;
-  background:rgba(0,0,0,0.85); backdrop-filter:blur(6px);
+  background:rgba(36,26,16,0.55); backdrop-filter:blur(6px);
   align-items:center; justify-content:center; flex-direction:column;
   padding:20px; box-sizing:border-box;
 }
 #scoreShareModal.open { display:flex; }
 #scoreShareModal .ssm-close {
   position:absolute; top:16px; right:16px;
-  background:rgba(255,255,255,0.1); border:none; color:#fff;
+  background:rgba(252,247,234,0.92); border:1px solid var(--border); color:var(--ink);
   width:36px; height:36px; border-radius:50%; font-size:18px;
   cursor:pointer;
 }
 #scoreShareModal .ssm-preview {
   width:min(270px,72vw); aspect-ratio:9/16;
-  border-radius:16px; overflow:hidden; box-shadow:0 8px 40px rgba(0,0,0,0.7);
-  background:#0a0a0f;
+  border-radius:16px; overflow:hidden; box-shadow:0 8px 40px rgba(36,26,16,0.45);
+  background:#fcf7ea;
 }
 #scoreShareModal .ssm-preview img { width:100%; height:100%; object-fit:cover; display:block; }
-#scoreShareModal .ssm-loading { color:var(--accent2); font-size:13px; margin-top:14px; }
+#scoreShareModal .ssm-loading { color:var(--gold-deep); font-size:13px; margin-top:14px; }
 #scoreShareModal .ssm-actions {
   display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; justify-content:center;
 }
@@ -300,9 +312,9 @@ nav {
   cursor:pointer; border:none; transition:all 0.2s;
 }
 #scoreShareModal .ssm-kakao { background:#fee500; color:#3c1e1e; }
-#scoreShareModal .ssm-dl { background:linear-gradient(135deg,var(--accent2),#f0d080); color:#1a1a2e; }
-#scoreShareModal .ssm-link { background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.2); }
-#scoreShareModal .ssm-x { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.45); font-size:12px; }
+#scoreShareModal .ssm-dl { background:linear-gradient(135deg,#7a2418,#5a1810); color:#fff; }
+#scoreShareModal .ssm-link { background:rgba(252,247,234,0.95); color:var(--ink); border:1px solid var(--border); }
+#scoreShareModal .ssm-x { background:rgba(252,247,234,0.6); color:var(--muted); border:1px solid var(--border-soft); font-size:12px; }
 
 /* RESPONSIVE */
 @media (max-width:600px) {
@@ -365,8 +377,8 @@ nav {
     </div>
 
     <p style="margin:0 auto 18px;text-align:center;max-width:340px;">
-      <span style="display:block;font-size:13px;font-weight:600;color:rgba(200,180,255,0.85);line-height:1.6;">⏱ 기문둔갑 · 베딕점성술은 실시간 반영됩니다</span>
-      <span style="display:block;font-size:12px;font-weight:400;color:rgba(180,160,240,0.6);line-height:1.7;margin-top:4px;">기문은 2시간마다 시(時)가 바뀌고, 베딕은 행성 위치에 따라 점수가 달라질 수 있습니다.</span>
+      <span style="display:block;font-size:13px;font-weight:600;color:var(--gold-deep);line-height:1.6;">⏱ 기문둔갑 · 베딕점성술은 실시간 반영됩니다</span>
+      <span style="display:block;font-size:12px;font-weight:400;color:var(--muted);line-height:1.7;margin-top:4px;">기문은 2시간마다 시(時)가 바뀌고, 베딕은 행성 위치에 따라 점수가 달라질 수 있습니다.</span>
     </p>
 
     <!-- 가중치 칩 -->
@@ -404,7 +416,7 @@ nav {
     <!-- 로그인 넛지 -->
     <div class="login-nudge" id="loginNudge">
       <p><i class="pi pi-save"></i> 이 결과를 저장하고 매일 받아보려면?</p>
-      <a href="/" style="display:inline-block;padding:8px 20px;background:linear-gradient(135deg,var(--accent),#a07fd4);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;font-family:'Noto Sans KR',sans-serif">카카오로 저장하기</a>
+      <a href="/" style="display:inline-block;padding:8px 20px;background:linear-gradient(135deg,#7a2418,#5a1810);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;font-family:'Noto Sans KR',sans-serif">카카오로 저장하기</a>
     </div>
 
   </div><!-- /resultWrap -->
@@ -580,7 +592,7 @@ function _todayKST() {
 function initFeedback(today) {
   if (localStorage.getItem('score_feedback_' + today)) {
     document.getElementById('feedbackBtns').innerHTML =
-      '<div style="font-size:15px;color:var(--accent2)">소중한 피드백 감사해요 <i class="pi pi-star"></i></div>';
+      '<div style="font-size:15px;color:var(--gold-deep)">소중한 피드백 감사해요 <i class="pi pi-star"></i></div>';
   }
 }
 
@@ -596,7 +608,7 @@ async function sendFeedback(fb) {
   if (localStorage.getItem(key)) return;
   localStorage.setItem(key, fb);
   document.getElementById('feedbackBtns').innerHTML =
-    '<div style="font-size:15px;color:var(--accent2)">소중한 피드백 감사해요 <i class="pi pi-star"></i></div>';
+    '<div style="font-size:15px;color:var(--gold-deep)">소중한 피드백 감사해요 <i class="pi pi-star"></i></div>';
   showToast('소중한 피드백 감사해요 <i class="pi pi-star"></i>');
   const user = (() => { try { return JSON.parse(localStorage.getItem('pico_user')); } catch(e) { return null; } })();
   const uid = (user && user.id) ? user.id : ('anon_' + Math.random().toString(36).slice(2,10));
@@ -652,29 +664,29 @@ function openScoreShareCard() {
   card.style.cssText = [
     'position:fixed','left:-9999px','top:-9999px',
     'width:540px','height:960px',
-    'background:linear-gradient(160deg,#0a0a0f 0%,#1a1a2e 60%,#0f1f3d 100%)',
+    'background:linear-gradient(160deg,#fcf7ea 0%,#f4ede0 55%,#ede4cf 100%)',
     'display:flex','flex-direction:column','align-items:center',
     'padding:80px 56px 60px','box-sizing:border-box',
     'font-family:\'Noto Sans KR\',sans-serif','overflow:hidden'
   ].join(';');
 
-  // 정적 별
+  // 은은한 장식 점
   var stars = '';
   [[8,12],[20,35],[38,8],[55,22],[72,10],[85,28],[6,52],[18,68],[32,80],[50,60],[66,78],[82,48],[90,65],[14,90],[44,45],[78,35],[60,90],[25,15],[92,82],[48,30]].forEach(function(p) {
     var sz = (Math.abs(p[0]*3+p[1])%3)+1;
-    var op = 0.3+(Math.abs(p[0]+p[1])%5)*0.12;
-    stars += '<div style="position:absolute;left:'+p[0]+'%;top:'+p[1]+'%;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:#fff;opacity:'+op+';"></div>';
+    var op = 0.18+(Math.abs(p[0]+p[1])%5)*0.06;
+    stars += '<div style="position:absolute;left:'+p[0]+'%;top:'+p[1]+'%;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:#7a5e1c;opacity:'+op+';"></div>';
   });
 
-  var overallColor = overall>=80?'#e8b86d':overall>=60?'#4caf82':overall>=40?'#5b8dee':'#e05c6a';
+  var overallColor = overall>=80?'#7a5e1c':overall>=60?'#2f7a55':overall>=40?'#355f9a':'#a33838';
 
   var barsHtml = domains.map(function(d) {
     var info = DOMAIN_INFO[d]; var v = final[d]||50;
-    var c = v>=80?'#e8b86d':v>=60?'#4caf82':v>=40?'#5b8dee':'#e05c6a';
+    var c = v>=80?'#7a5e1c':v>=60?'#2f7a55':v>=40?'#355f9a':'#a33838';
     return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">' +
-      '<span style="font-size:16px;width:22px;text-align:center;">'+info.emoji+'</span>' +
-      '<span style="font-size:12px;color:rgba(255,255,255,0.65);width:32px;">'+info.label+'</span>' +
-      '<div style="flex:1;background:rgba(255,255,255,0.07);border-radius:100px;height:8px;overflow:hidden;">' +
+      '<span style="font-size:16px;width:22px;text-align:center;color:#7a5e1c;">'+info.emoji+'</span>' +
+      '<span style="font-size:12px;color:#4a3a2a;width:32px;">'+info.label+'</span>' +
+      '<div style="flex:1;background:rgba(80,55,30,0.10);border-radius:100px;height:8px;overflow:hidden;">' +
         '<div style="width:'+v+'%;height:8px;border-radius:100px;background:'+c+';"></div>' +
       '</div>' +
       '<span style="font-size:13px;font-weight:700;color:'+c+';width:28px;text-align:right;">'+v+'</span>' +
@@ -683,19 +695,19 @@ function openScoreShareCard() {
 
   card.innerHTML = stars +
     '<div style="position:relative;z-index:1;text-align:center;margin-bottom:28px;">' +
-      '<div style="font-size:12px;letter-spacing:0.35em;color:#c9a84c;font-weight:700;margin-bottom:8px;">● FORTUNA</div>' +
-      '<div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:0 auto;"></div>' +
+      '<div style="font-size:12px;letter-spacing:0.35em;color:#7a5e1c;font-weight:700;margin-bottom:8px;">● FORTUNA</div>' +
+      '<div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,#9a7a26,transparent);margin:0 auto;"></div>' +
     '</div>' +
     '<div style="position:relative;z-index:1;text-align:center;margin-bottom:36px;">' +
-      (name ? '<div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:6px;">'+name+'</div>' : '') +
-      '<div style="font-size:11px;letter-spacing:0.2em;color:rgba(201,168,76,0.7);margin-bottom:14px;">'+today+' 운세 점수</div>' +
-      '<div style="font-size:80px;font-weight:700;color:'+overallColor+';line-height:1;">'+overall+'</div>' +
-      '<div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px;">/ 100점</div>' +
+      (name ? '<div style="font-size:13px;color:#7a6850;margin-bottom:6px;">'+name+'</div>' : '') +
+      '<div style="font-size:11px;letter-spacing:0.2em;color:#9a7a26;margin-bottom:14px;">'+today+' 운세 점수</div>' +
+      '<div style="font-family:\'Playfair Display\',\'Noto Serif KR\',serif;font-size:88px;font-weight:700;color:'+overallColor+';line-height:1;">'+overall+'</div>' +
+      '<div style="font-size:13px;color:#7a6850;margin-top:6px;">/ 100점</div>' +
     '</div>' +
     '<div style="position:relative;z-index:1;width:100%;padding:0 8px;box-sizing:border-box;flex:1;">' + barsHtml + '</div>' +
     '<div style="position:relative;z-index:1;text-align:center;margin-top:24px;">' +
-      '<div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:0 auto 14px;"></div>' +
-      '<div style="font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.08em;">picolab.kr에서 무료로 확인하세요</div>' +
+      '<div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,#9a7a26,transparent);margin:0 auto 14px;"></div>' +
+      '<div style="font-size:11px;color:#7a6850;letter-spacing:0.08em;">picolab.kr에서 무료로 확인하세요</div>' +
     '</div>';
 
   document.body.appendChild(card);

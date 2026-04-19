@@ -3,19 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#f5efe4">
 <title>타로 카드 · FORTUNA</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0d14;
-    --surface: #13131a;
-    --surface2: #1c1c28;
-    --border: #2a2a3d;
-    --text: #e8e0f0;
-    --text2: #c0b8d8;
-    --text3: #6b6b85;
-    --accent: #c9a84c;
-    --accent2: #8b5cf6;
+    --bg: #f4ede0;
+    --surface: #fcf7ea;
+    --surface2: #ede4cf;
+    --border: #c9bc9d;
+    --border-soft: rgba(80,55,30,0.10);
+    --accent: #7a2418;
+    --accent2: #2a1f1a;
+    --text: #1a120a;
+    --text2: #4a3a2a;
+    --text3: #7a6850;
+    --muted: #7a6850;
+    --gold: #9a7a26;
+    --gold-deep: #7a5e1c;
+    --ink: #241a10;
+    --orb: #5f8cb5;
+    --orb-bg: rgba(122,196,255,0.12);
+    --orb-border: rgba(95,140,181,0.30);
+    --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+    --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -28,9 +39,9 @@
   /* NAV */
   nav {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(13,13,20,0.95);
+    background: rgba(252,247,234,0.92);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-soft);
     padding: 0 20px;
     height: 56px;
     display: flex; align-items: center; justify-content: space-between;
@@ -42,7 +53,7 @@
   }
   .nav-title {
     font-family: 'Noto Serif KR', serif;
-    font-size: 16px; font-weight: 700; color: var(--accent);
+    font-size: 16px; font-weight: 700; color: var(--gold-deep);
   }
 
   /* MAIN */
@@ -57,35 +68,37 @@
     font-family: 'Noto Serif KR', serif;
     font-size: 22px; font-weight: 700;
     text-align: center; margin-bottom: 8px;
-    color: var(--accent);
+    color: var(--gold-deep);
   }
   .step-sub {
-    font-size: 13px; color: var(--text3);
+    font-size: 13px; color: var(--muted);
     text-align: center; margin-bottom: 24px; line-height: 1.6;
   }
   .question-input {
-    width: 100%; background: var(--surface2);
+    width: 100%; background: #fff;
     border: 1px solid var(--border); border-radius: 12px;
     padding: 14px 16px; color: var(--text); font-size: 15px;
     resize: none; margin-bottom: 16px;
     font-family: 'Noto Sans KR', sans-serif;
     outline: none; line-height: 1.6;
+    box-shadow: var(--shadow-soft);
   }
-  .question-input:focus { border-color: var(--accent2); }
+  .question-input:focus { border-color: var(--gold-deep); }
   .draw-btn {
     width: 100%; padding: 15px;
-    background: linear-gradient(135deg, #6a0dad, #c9a84c);
+    background: linear-gradient(135deg, #7a2418, #5a1810);
     border: none; border-radius: 12px;
     color: #fff; font-size: 16px; font-weight: 700;
     cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
     transition: opacity 0.2s, transform 0.15s;
+    box-shadow: var(--shadow-soft);
   }
   .draw-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .draw-btn:not(:disabled):hover { opacity: 0.9; transform: translateY(-1px); }
 
   /* STEP 2 — select grid */
   .select-hint {
-    font-size: 12px; color: var(--accent);
+    font-size: 12px; color: var(--gold-deep);
     text-align: center; margin-bottom: 14px;
   }
   .select-grid {
@@ -97,28 +110,30 @@
   }
   .sel-card {
     aspect-ratio: 2/3; border-radius: 6px;
-    background: linear-gradient(135deg, #1a0a2e, #3a1a5a);
-    border: 1px solid #3a2a5a;
+    background: linear-gradient(135deg, #fcf7ea, #ede4cf);
+    border: 1px solid var(--border);
     cursor: pointer; display: flex; align-items: center; justify-content: center;
-    font-size: 20px; transition: all 0.2s; position: relative;
+    font-size: 20px; color: var(--gold-deep);
+    transition: all 0.2s; position: relative;
+    box-shadow: var(--shadow-soft);
   }
-  .sel-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(201,168,76,0.3); }
-  .sel-card.selected { border-color: var(--accent); background: linear-gradient(135deg,#2d1460,#4a2a6a); box-shadow: 0 0 16px rgba(201,168,76,0.4); }
+  .sel-card:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(154,122,38,0.25); }
+  .sel-card.selected { border-color: var(--gold-deep); background: linear-gradient(135deg,#f7eccb,#efdfb5); box-shadow: 0 0 14px rgba(154,122,38,0.28); }
   .sel-card.selected::after {
     content: attr(data-order);
     position: absolute; top: -6px; right: -6px;
     width: 18px; height: 18px;
-    background: var(--accent); color: #000;
+    background: var(--gold-deep); color: #fff;
     border-radius: 50%; font-size: 11px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
   }
-  .sel-card.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
-  .select-count { font-size: 12px; color: var(--text3); text-align: center; }
+  .sel-card.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+  .select-count { font-size: 12px; color: var(--muted); text-align: center; }
 
   /* STEP 3 — result */
   .cards-area { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
   .card-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .card-label { font-size: 11px; color: var(--text3); text-align: center; }
+  .card-label { font-size: 11px; color: var(--muted); text-align: center; }
   .card-name { font-size: 12px; color: var(--text2); text-align: center; }
   .tarot-card { width: 80px; height: 140px; perspective: 600px; cursor: pointer; }
   .tarot-card-inner {
@@ -128,44 +143,52 @@
   .tarot-card.flipped .tarot-card-inner { transform: rotateY(180deg); }
   .tarot-card-front, .tarot-card-back {
     position: absolute; inset: 0; backface-visibility: hidden;
-    border-radius: 8px; overflow: hidden; border: 1px solid #3a2a5a;
+    border-radius: 8px; overflow: hidden; border: 1px solid var(--border);
   }
-  .tarot-card-back { background: linear-gradient(135deg,#1a0a2e,#3a1a5a); display: flex; align-items: center; justify-content: center; font-size: 28px; }
-  .tarot-card-front { transform: rotateY(180deg); background: #1a0a2e; }
+  .tarot-card-back {
+    background:
+      radial-gradient(circle at 50% 30%, rgba(154,122,38,0.18) 0%, transparent 55%),
+      linear-gradient(135deg, #fcf7ea, #ede4cf);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--gold-deep);
+    box-shadow: inset 0 0 0 2px rgba(154,122,38,0.22);
+  }
+  .tarot-card-front { transform: rotateY(180deg); background: #fcf7ea; }
   .tarot-card-front img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .reversed-badge { font-size: 9px; color: #e07070; background: rgba(200,50,50,0.15); border: 1px solid rgba(200,50,50,0.3); border-radius: 4px; padding: 1px 5px; }
+  .reversed-badge { font-size: 9px; color: #a33; background: rgba(180,60,60,0.10); border: 1px solid rgba(180,60,60,0.28); border-radius: 4px; padding: 1px 5px; }
 
   /* fallback card */
   .fb { display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:6px;text-align:center; }
-  .fb-sym { font-size:26px;margin-bottom:4px; }
-  .fb-num { font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:2px; }
-  .fb-name { font-size:9px;color:rgba(255,255,255,0.4);line-height:1.2; }
+  .fb-sym { font-size:26px;margin-bottom:4px; color: var(--gold-deep); }
+  .fb-num { font-size:11px;color:var(--muted);margin-bottom:2px; }
+  .fb-name { font-size:9px;color:var(--muted);line-height:1.2; }
 
   /* AI Result */
   .result-box {
-    background: var(--surface2); border: 1px solid var(--border);
+    background: var(--surface); border: 1px solid var(--border-soft);
     border-radius: 12px; padding: 16px;
     font-size: 15px; color: var(--text); line-height: 1.8;
     min-height: 60px;
+    box-shadow: var(--shadow-soft);
   }
-  .result-box.loading { color: var(--text3); font-style: italic; }
+  .result-box.loading { color: var(--muted); font-style: italic; }
 
   /* Retry btn */
   .retry-btn {
     margin-top: 20px; width: 100%; padding: 13px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text3);
+    background: rgba(212,175,90,0.14); border: 1px solid rgba(154,122,38,0.28);
+    border-radius: 10px; color: #8a6b20;
     font-size: 14px; cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif; transition: all 0.15s;
   }
-  .retry-btn:hover { color: var(--text); border-color: var(--text3); }
+  .retry-btn:hover { color: var(--gold-deep); border-color: var(--gold); }
 
   /* Login prompt */
   .login-notice {
     margin-top: 16px;
-    background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25);
+    background: rgba(122,36,24,0.06); border: 1px solid rgba(122,36,24,0.18);
     border-radius: 10px; padding: 12px 14px;
-    font-size: 13px; color: var(--text3); text-align: center; line-height: 1.6;
+    font-size: 13px; color: var(--text2); text-align: center; line-height: 1.6;
   }
 </style>
   <link rel="stylesheet" href="pico-icons.css">
@@ -173,7 +196,7 @@
 <body>
 
 <nav>
-  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="img/goddess.png" style="height:56px;object-fit:contain" alt="FORTUNA"><span style="font-family:'Noto Serif KR',serif;font-weight:700;font-size:15px;letter-spacing:2px;color:#e8b86d;">FORTUNA</span></a>
+  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="img/goddess.png" style="height:56px;object-fit:contain" alt="FORTUNA"><span style="font-family:'Noto Serif KR',serif;font-weight:700;font-size:15px;letter-spacing:2px;color:#7a5e1c;">FORTUNA</span></a>
   <span class="nav-title">🃏 타로 카드</span>
   <div style="width:60px"></div>
 </nav>
@@ -202,7 +225,7 @@
     <div class="result-box loading" id="resultBox" style="display:none;"></div>
     <div class="login-notice" id="loginNotice" style="display:none;">
       <i class="pi pi-key"></i> 카카오 로그인 후 AI 타로 해석을 받을 수 있어요<br>
-      <a href="../" style="color:var(--accent2);text-decoration:none;">picolab.kr에서 로그인하기 →</a>
+      <a href="../" style="color:var(--accent);text-decoration:none;">picolab.kr에서 로그인하기 →</a>
     </div>
     <button class="retry-btn" onclick="restart()"><i class="pi pi-refresh"></i> 다시 뽑기</button>
   </div>
@@ -381,7 +404,7 @@ function renderMarkdown(str) {
   if (!str) return '';
   var s = String(str);
   s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#e2d0ff;">$1</strong>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#7a2418;">$1</strong>');
   s = s.replace(/(^|\n)- ([^\n]+)/g, '$1<span style="display:inline-block;margin-left:4px;">• $2</span>');
   s = s.replace(/\n/g, '<br>');
   return s;
@@ -435,7 +458,7 @@ async function interpretWithAI() {
       var errData = await res.json().catch(function(){ return {}; });
       if (errData.error === 'limit_exceeded') {
         resultBox.className = 'result-box';
-        resultBox.innerHTML = '오늘 사용량을 모두 소진했어요. 내일 다시 시도해주세요.<br><a href="https://kkdmb7-blip.github.io/memox/" style="color:var(--accent2);">memox에서 충전하기 →</a>';
+        resultBox.innerHTML = '오늘 사용량을 모두 소진했어요. 내일 다시 시도해주세요.<br><a href="https://kkdmb7-blip.github.io/memox/" style="color:var(--accent);">memox에서 충전하기 →</a>';
         return;
       }
       throw new Error('API ' + res.status);
