@@ -342,7 +342,7 @@
       <div class="result-card">
         <div class="result-card-label">Lucky Color</div>
         <div class="result-card-value" id="luckyColor"><span class="color-dot" id="luckyColorDot"></span><span id="luckyColorName"></span></div>
-        <div class="result-card-sub" id="luckyColorHex"></div>
+        <div class="result-card-sub">오늘의 색상</div>
       </div>
       <div class="result-card">
         <div class="result-card-label">Lucky Number</div>
@@ -517,7 +517,6 @@ function showResult(r, fromCache) {
 
   document.getElementById('luckyColorName').textContent = r.colorName + ' · ' + r.elementKo;
   document.getElementById('luckyColorDot').style.background = r.color;
-  document.getElementById('luckyColorHex').textContent = r.color.toUpperCase();
   document.getElementById('luckyNumber').textContent = r.number;
   document.getElementById('luckyTime').textContent = r.time;
   document.getElementById('luckyDir').textContent = r.dir + '쪽';
