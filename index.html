@@ -2304,6 +2304,9 @@
       <button id="btnPushToggle" onclick="togglePushSubscription()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
         <span id="btnPushLabel"><i class="pi pi-bell"></i> 오늘의 명언 알림 켜기</span><span style="color:var(--muted);">›</span>
       </button>
+      <button onclick="openHelpModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
+        <span><i class="pi pi-question"></i> 도움말 · FAQ</span><span style="color:var(--muted);">›</span>
+      </button>
       <button id="btnAdminDash" onclick="goAdminDashboard()" style="display:none;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--gold-deep);font-size:14px;cursor:pointer;text-align:left;width:100%;font-weight:700;">
         <span><i class="pi pi-sparkle"></i> 관리자 대시보드</span><span style="color:var(--muted);">›</span>
       </button>
@@ -6244,6 +6247,64 @@ window.togglePushSubscription = async function() {
       if (badge) badge.style.display = '';
     }
   } catch(e) {}
+})();
+</script>
+
+<!-- HELP / FAQ MODAL -->
+<div id="helpOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(26,18,10,0.55);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;max-width:480px;width:100%;max-height:86vh;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);">
+      <div style="font-size:16px;font-weight:700;color:var(--text);"><i class="pi pi-question"></i> 도움말 · 자주 묻는 질문</div>
+      <button onclick="closeHelpModal()" aria-label="닫기" style="background:transparent;border:0;font-size:20px;line-height:1;color:var(--muted);cursor:pointer;padding:4px 6px;">×</button>
+    </div>
+    <div style="padding:8px 18px 18px;overflow-y:auto;" id="helpBody"></div>
+  </div>
+</div>
+<script>
+(function(){
+  var FAQ = [
+    {q:'FORTUNA는 어떤 서비스인가요?', a:'동서양 5대 운세 엔진(사주·베딕·서양점성·자미두수·기문)을 교차 분석해 AI 리포트와 실시간 상담을 제공하는 운세 플랫폼입니다. 홈의 "오늘의 운세 점수"는 이 5개 엔진을 합산한 결과입니다.'},
+    {q:'AI 리포트는 어떻게 받나요?', a:'홈 하단 "리포트" 탭에서 원하는 분석 종류를 선택합니다. 리포트는 Orb로 생성되며, 한 번 생성된 리포트는 언제든 다시 볼 수 있습니다.'},
+    {q:'Orb는 무엇인가요? 어떻게 충전하나요?', a:'Orb는 AI 분석을 생성할 때 사용하는 포인트입니다. AI 채팅 1회에 20 Orb가 사용됩니다. 마이페이지 또는 채팅 화면 상단의 Orb 아이콘을 눌러 충전 페이지로 이동할 수 있어요.'},
+    {q:'첫 충전 혜택이 있나요?', a:'첫 충전 시 1+1 이벤트(500 Orb 충전 → 1,000 Orb 지급)가 자동 적용됩니다. 충전 페이지 상단에서 해당 팩을 선택하세요.'},
+    {q:'생년월일을 모를 경우(시간만)는?', a:'시간이 정확하지 않아도 분석이 가능합니다. 사주 입력에서 "시간 모름"을 선택하면 시주를 제외한 3주 기준으로 분석을 제공합니다. 정확도는 다소 낮아질 수 있어요.'},
+    {q:'궁합 분석은 어떻게 하나요?', a:'홈 또는 리포트 탭에서 궁합 메뉴를 선택한 뒤, 상대방 생년월일과 성별을 입력하면 즉시 결과가 계산됩니다. 저장된 프로필(가족·연인)을 불러올 수도 있어요.'},
+    {q:'카카오 로그인 후 기기가 바뀌면 데이터가 유지되나요?', a:'카카오 계정으로 로그인한 상태에서 생성한 리포트와 Orb는 서버에 저장되므로, 같은 카카오 계정으로 다른 기기에서도 그대로 사용할 수 있습니다.'},
+    {q:'결제가 완료됐는데 Orb가 지급되지 않았어요', a:'충전 페이지를 새로고침하면 자동 복구 모달이 나타나 재시도할 수 있어요. 해결되지 않으면 결제번호를 복사해 고객센터(picolab.kr)로 문의해주세요.'},
+    {q:'알림은 어떻게 설정하나요?', a:'마이페이지 → "오늘의 명언 알림 켜기"에서 웹 푸시를 활성화할 수 있습니다. 매일 아침 오늘의 운세 알림을 받을 수 있어요.'},
+    {q:'AI 채팅(memox)은 어떻게 이용하나요?', a:'홈 하단 "상담" 탭 또는 추천 경로의 "AI 상담사에게 질문"을 통해 memox로 이동합니다. 같은 카카오 계정으로 로그인되며, 내 사주 정보를 바탕으로 1:1 상담을 제공합니다.'},
+    {q:'문의/제안은 어디로 하나요?', a:'picolab.kr 또는 memox 앱 내 문의하기를 이용해주세요. 결제·환불·기능 제안 모두 24시간 내 답변을 목표로 하고 있어요.'}
+  ];
+  window.openHelpModal = function() {
+    var body = document.getElementById('helpBody');
+    if (body && !body._rendered) {
+      var html = '';
+      FAQ.forEach(function(it, i){
+        html += '<details style="border:1px solid var(--border);border-radius:12px;margin:10px 0;padding:0 14px;background:var(--surface2);overflow:hidden;">'
+          + '<summary style="padding:12px 0;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;">'
+            + '<span>' + (i+1) + '. ' + it.q + '</span><span style="color:var(--muted);font-size:12px;">▾</span>'
+          + '</summary>'
+          + '<div style="padding:0 0 14px;font-size:13px;color:var(--text2);line-height:1.7;">' + it.a + '</div>'
+          + '</details>';
+      });
+      html += '<div style="margin-top:14px;padding:12px 14px;background:rgba(123,94,167,0.06);border:1px solid rgba(123,94,167,0.2);border-radius:12px;font-size:12px;color:var(--text2);line-height:1.6;">'
+        + '원하시는 답을 찾지 못하셨나요?<br>'
+        + '<a href="https://kkdmb7-blip.github.io/memox/" target="_blank" rel="noopener" style="color:#7b5ea7;font-weight:700;text-decoration:none;">AI 상담사에게 물어보기 →</a>'
+        + '</div>';
+      body.innerHTML = html;
+      body._rendered = true;
+    }
+    var ov = document.getElementById('helpOverlay');
+    if (ov) { ov.style.display = 'flex'; document.body.style.overflow='hidden'; }
+  };
+  window.closeHelpModal = function() {
+    var ov = document.getElementById('helpOverlay');
+    if (ov) { ov.style.display = 'none'; document.body.style.overflow = ''; }
+  };
+  document.addEventListener('click', function(e){
+    var ov = document.getElementById('helpOverlay');
+    if (ov && ov.style.display === 'flex' && e.target === ov) closeHelpModal();
+  });
 })();
 </script>
 </body>
