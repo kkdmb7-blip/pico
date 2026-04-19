@@ -250,7 +250,39 @@ nav {
 .section-body {
   padding: 12px 18px 18px;
   font-size: 14px; line-height: 1.85; color: var(--text);
+  position: relative;
 }
+.sec-density-toggle {
+  display: flex; gap: 0; align-items: center;
+  background: var(--surface); border: 1px solid var(--border-soft);
+  border-radius: 999px; padding: 3px; margin: 0 0 14px; width: fit-content;
+}
+.sec-density-toggle button {
+  background: transparent; border: 0; padding: 6px 14px;
+  font-size: 12px; font-weight: 700; color: var(--muted);
+  border-radius: 999px; cursor: pointer; transition: all .18s;
+}
+.sec-density-toggle button.active {
+  background: linear-gradient(135deg, rgba(154,122,38,0.18), rgba(122,36,24,0.12));
+  color: var(--gold-deep);
+}
+.sections-summary .section-card .section-body {
+  max-height: 4.8em; overflow: hidden;
+}
+.sections-summary .section-card .section-body::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+  height: 2.2em; background: linear-gradient(transparent, var(--surface));
+  pointer-events: none;
+}
+.sections-summary .section-card.expanded .section-body { max-height: none; }
+.sections-summary .section-card.expanded .section-body::after { display: none; }
+.sections-summary .section-card { cursor: pointer; }
+.sec-expand-hint {
+  font-size: 11px; color: var(--muted); text-align: right;
+  padding: 0 18px 12px; margin-top: -4px; display: none;
+}
+.sections-summary .section-card .sec-expand-hint { display: block; }
+.sections-summary .section-card.expanded .sec-expand-hint { display: none; }
 .section-body h1,.section-body h2,.section-body h3 {
   font-family: 'Noto Serif KR', serif; margin: 12px 0 6px; color: var(--ink);
 }
@@ -650,6 +682,10 @@ nav {
       <div class="report-badge" id="reportBadge">AI REPORT</div>
       <div class="report-title" id="reportTitle"></div>
       <div class="report-meta" id="reportMeta"></div>
+    </div>
+    <div class="sec-density-toggle" id="secDensityToggle" style="display:none;">
+      <button type="button" data-mode="summary" onclick="setReportDensity('summary')">요약</button>
+      <button type="button" data-mode="detail" class="active" onclick="setReportDensity('detail')">상세</button>
     </div>
     <div id="sectionsWrap"></div>
     <div class="easy-wrap" id="easyWrap" style="display:none;">
@@ -2881,13 +2917,45 @@ function renderReport(sections, createdAt) {
         <div class="section-num">${i+1}</div>
         <div class="section-name">${(TYPE_SECTIONS[_type] || TYPE_SECTIONS.character)[i]?.name || ''}</div>
       </div>
-      <div class="section-body">${renderMarkdown(text)}</div>`;
+      <div class="section-body">${renderMarkdown(text)}</div>
+      <div class="sec-expand-hint">탭하여 전체 보기 ↓</div>`;
     wrap.appendChild(card);
   });
+  { const _t = document.getElementById('secDensityToggle'); if (_t) _t.style.display = 'flex'; }
 
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
+
+function setReportDensity(mode){
+  const wrap = document.getElementById('sectionsWrap');
+  if (!wrap) return;
+  if (mode === 'summary') wrap.classList.add('sections-summary');
+  else wrap.classList.remove('sections-summary');
+  wrap.querySelectorAll('.section-card.expanded').forEach(function(c){ c.classList.remove('expanded'); });
+  wrap.querySelectorAll('.section-card').forEach(function(c){
+    if (!c.querySelector('.sec-expand-hint')) {
+      const h = document.createElement('div');
+      h.className = 'sec-expand-hint';
+      h.textContent = '탭하여 전체 보기 ↓';
+      c.appendChild(h);
+    }
+  });
+  const toggle = document.getElementById('secDensityToggle');
+  if (toggle) toggle.querySelectorAll('button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+  });
+  try { localStorage.setItem('pico_report_density', mode); } catch(e) {}
+}
+// 이벤트 위임: summary 모드에서 카드 탭하면 개별 펼침
+document.addEventListener('click', function(ev){
+  const wrap = document.getElementById('sectionsWrap');
+  if (!wrap || !wrap.classList.contains('sections-summary')) return;
+  const card = ev.target && ev.target.closest ? ev.target.closest('.section-card') : null;
+  if (!card || !wrap.contains(card)) return;
+  if (ev.target.closest('a,button')) return;
+  card.classList.toggle('expanded');
+});
 
 // ── 다시 생성 ──
 async function regenReport() {
@@ -4412,6 +4480,16 @@ function showConsultBanner() {
   document.getElementById('consultBanner').style.display = 'block';
   showEasyExplainBox();
   mountReportFeedback();
+  // 섹션 밀도 토글 노출 + 저장된 선호도 복원
+  try {
+    const _dt = document.getElementById('secDensityToggle');
+    const _sw = document.getElementById('sectionsWrap');
+    if (_dt && _sw && _sw.children && _sw.children.length > 0) {
+      _dt.style.display = 'flex';
+      const saved = localStorage.getItem('pico_report_density');
+      if (saved === 'summary' && typeof setReportDensity === 'function') setReportDensity('summary');
+    }
+  } catch(e) {}
 }
 
 // ── 피드백 위젯 마운트 (로그인 유저 + _type 필수) ──
