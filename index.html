@@ -3809,20 +3809,45 @@ function _drawGunghapCard(cb) {
       ctx.closePath();
     }
 
-    // ── 배경
-    ctx.fillStyle = '#fcf7ea';
+    // ── 배경 (아이보리 그라데이션 + 소프트 글로우)
+    var bgGrad = ctx.createLinearGradient(0, 0, 0, totalH);
+    bgGrad.addColorStop(0, '#fcf7ea');
+    bgGrad.addColorStop(0.5, '#f6efdd');
+    bgGrad.addColorStop(1, '#ede4cf');
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, totalH);
+    // 상단 로즈 글로우
+    var topGlow = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, W*0.7);
+    topGlow.addColorStop(0, 'rgba(139,36,71,0.10)');
+    topGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = topGlow;
+    ctx.fillRect(0, 0, W, totalH);
+    // 장식 별
+    [[12,30,1.2],[48,18,1],[82,42,1.4],[24,90,1],[78,120,1.2],[14,160,0.9],[90,180,1.1]].forEach(function(s){
+      ctx.beginPath(); ctx.arc(s[0]/100*W, s[1], s[2], 0, Math.PI*2);
+      ctx.fillStyle='rgba(154,122,38,0.28)'; ctx.fill();
+    });
 
     var y = PAD;
 
-    // ── 헤더: FORTUNA
+    // ── 헤더: FORTUNA (프리미엄 로고라인)
+    // 좌우 장식 선
+    var hgrad = ctx.createLinearGradient(PAD, 0, W-PAD, 0);
+    hgrad.addColorStop(0, 'transparent');
+    hgrad.addColorStop(0.25, 'rgba(154,122,38,0.35)');
+    hgrad.addColorStop(0.75, 'rgba(154,122,38,0.35)');
+    hgrad.addColorStop(1, 'transparent');
+    ctx.strokeStyle = hgrad; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(PAD, y+7); ctx.lineTo(W-PAD, y+7); ctx.stroke();
+
     ctx.fillStyle = '#7a5e1c';
-    ctx.font = 'bold 12px "Noto Serif KR"';
+    ctx.font = 'bold 13px "Noto Serif KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('● F O R T U N A', W/2, y+14);
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
-    ctx.lineWidth = 0.5;
-    ctx.beginPath(); ctx.moveTo(PAD, y+28); ctx.lineTo(W-PAD, y+28); ctx.stroke();
+    ctx.fillText('✦  F O R T U N A  ✦', W/2, y+18);
+
+    ctx.fillStyle = 'rgba(80,55,30,0.4)';
+    ctx.font = '9px "Noto Serif KR"';
+    ctx.fillText('운명의 조화를 읽다', W/2, y+32);
     y += H_HEADER + GAP;
 
     // ── 이름 행: "나 <i class="pi pi-heart"></i> 상대방"
@@ -3832,14 +3857,37 @@ function _drawGunghapCard(cb) {
     ctx.fillText(myName + '  ❤  ' + pName, W/2, y + H_NAMES/2);
     y += H_NAMES + GAP;
 
-    // ── 점수 (48px, 실제화면과 동일)
+    // ── 점수 (백그라운드 원형 글로우 + 고득점 배지)
+    var scoreCX = W/2, scoreCY = y + 28;
+    var scoreGlow = ctx.createRadialGradient(scoreCX, scoreCY, 0, scoreCX, scoreCY, 70);
+    scoreGlow.addColorStop(0, 'rgba(139,36,71,0.14)');
+    scoreGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = scoreGlow;
+    ctx.beginPath(); ctx.arc(scoreCX, scoreCY, 70, 0, Math.PI*2); ctx.fill();
+
     ctx.fillStyle = '#8b2447';
-    ctx.font = '900 48px "Noto Serif KR"';
+    ctx.font = '900 52px "Noto Serif KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(String(score.total), W/2, y + 28);
+    ctx.fillText(String(score.total), scoreCX, scoreCY);
     ctx.fillStyle = 'rgba(0,0,0,0.45)';
     ctx.font = '11px "Noto Serif KR"';
-    ctx.fillText('/ 100점', W/2, y + 54);
+    ctx.fillText('/ 100점', scoreCX, y + 56);
+
+    // 고득점 배지 (85점 이상)
+    if (score.total >= 85) {
+      ctx.save();
+      ctx.translate(W - PAD - 38, y + 6);
+      ctx.rotate(Math.PI * 0.08);
+      var bGrad = ctx.createLinearGradient(0, 0, 0, 28);
+      bGrad.addColorStop(0, '#c49a3a'); bGrad.addColorStop(1, '#7a5e1c');
+      ctx.fillStyle = bGrad;
+      rr(0, 0, 60, 22, 11); ctx.fill();
+      ctx.fillStyle = '#fff7e0';
+      ctx.font = 'bold 10px "Noto Serif KR"';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('★ 천생연분', 30, 11);
+      ctx.restore();
+    }
     y += H_SCORE;
 
     // ── 게이지 바 (height:8px, 실제와 동일)
@@ -3957,11 +4005,17 @@ function _drawGunghapCard(cb) {
     });
     y += DETAIL_H + GAP;
 
-    // ── 푸터
-    ctx.fillStyle = 'rgba(0,0,0,0.22)';
-    ctx.font = '10px "Noto Serif KR"';
+    // ── 푸터: CTA 버튼 스타일
+    var ctaW = 180, ctaH = 28;
+    var ctaX = (W - ctaW) / 2, ctaY = y + 2;
+    var ctaGrad = ctx.createLinearGradient(ctaX, ctaY, ctaX, ctaY + ctaH);
+    ctaGrad.addColorStop(0, '#8b2447'); ctaGrad.addColorStop(1, '#6a1a33');
+    ctx.fillStyle = ctaGrad;
+    rr(ctaX, ctaY, ctaW, ctaH, 14); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 11px "Noto Serif KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('picolab.kr에서 무료로 확인하세요', W/2, y+14);
+    ctx.fillText('내 궁합 확인 → picolab.kr', W/2, ctaY + ctaH/2);
 
     _ghCanvas = cv;
     if (cb) cb(cv);
