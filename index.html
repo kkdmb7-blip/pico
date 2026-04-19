@@ -873,15 +873,15 @@
 .ai-chunk:last-child { border-bottom:none; }
 #historyDetailContent .ai-chunk p { margin-bottom:8px; }
 #historyDetailContent .ai-chunk strong { color:var(--gold); font-weight:700; }
-#historyDetailContent .ai-chunk em { font-style:italic; color:rgba(240,240,245,0.95); }
+#historyDetailContent .ai-chunk em { font-style:italic; color:var(--text); }
 .ai-chunk-spinner { display:flex;align-items:center;gap:8px;color:rgba(0,0,0,0.45);font-size:12px;padding:8px 0; }
 .ai-chunk-spinner::before { content:'';display:inline-block;width:16px;height:16px;border:2px solid rgba(255,130,170,0.15);border-top-color:#c0306c;border-radius:50%;animation:ghSpin .7s linear infinite; }
 .ai-chunk-spinner::after { content:'분석 중...'; }
 @keyframes ghSpin { to { transform:rotate(360deg); } }
 @keyframes ghFadeIn { from { opacity:0;transform:translateY(6px); } to { opacity:1;transform:translateY(0); } }
 .memox-banner {
-  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(138,100,255,0.08));
-  border: 1px solid rgba(201,168,76,0.3);
+  background: linear-gradient(135deg, #faf0d8, #f5e3c8);
+  border: 1px solid rgba(139,42,30,0.28);
   border-radius: 16px;
   padding: 16px 20px;
   display: flex;
@@ -889,6 +889,15 @@
   align-items: center;
   cursor: pointer;
   margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(139,42,30,0.06);
+}
+:root[data-theme="obsidian"] .memox-banner,
+:root[data-theme="jade"] .memox-banner,
+:root[data-theme="wine"] .memox-banner,
+:root[data-theme="midnight"] .memox-banner {
+  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(138,100,255,0.08));
+  border-color: rgba(201,168,76,0.3);
+  box-shadow: none;
 }
 .memox-banner-title { font-size:14px; font-weight:700; color:var(--gold); margin-bottom:4px; }
 .memox-banner-desc { font-size:11px; color:var(--muted); }
@@ -1033,7 +1042,7 @@
 
 <!-- TODAY COSMIC ENERGY -->
 <section id="todayCosmicWrap" style="padding:16px 16px;max-width:960px;margin:0 auto;position:relative;z-index:1;display:none;">
-  <div style="text-align:center;margin-bottom:24px;font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:#f5c842;letter-spacing:1px;">
+  <div style="text-align:center;margin-bottom:24px;font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:#8b2a1e;letter-spacing:1px;">
     <i class="pi pi-sparkle"></i> <span id="cosmicTitleName">당신의</span> 우주 에너지
   </div>
   <div id="cosmicGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;"></div>
@@ -2264,7 +2273,7 @@
   <div class="saju-modal" style="padding:20px 16px 24px;max-height:92vh;overflow-y:auto;">
     <button class="saju-modal-close" onclick="closeHistoryDetail()">✕</button>
     <h3 id="historyDetailTitle" style="color:#c0306c;font-size:18px;margin-bottom:12px;"></h3>
-    <div id="historyDetailContent" style="font-size:14px;line-height:1.85;color:rgba(240,240,245,0.88);"></div>
+    <div id="historyDetailContent" style="font-size:14px;line-height:1.85;color:var(--text2);"></div>
   </div>
 </div>
 
@@ -4926,7 +4935,7 @@ initHeroSelects();
       ? '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 10px;border-radius:12px;margin-bottom:6px;background:' + badgeClr.bg + ';border:1px solid ' + badgeClr.border + ';color:' + badgeClr.text + ';">' + badgeText + '</span><br>'
       : '';
     var interpHTML = interp
-      ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.05);font-size:12px;color:rgba(240,240,245,0.85);line-height:1.9;text-align:left;font-family:\'Noto Serif KR\',serif;font-weight:300;">' + interp + '</div>'
+      ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,0.05);font-size:12px;color:var(--text2);line-height:1.9;text-align:left;font-family:\'Noto Serif KR\',serif;font-weight:300;">' + interp + '</div>'
       : '';
     return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;">' +
       '<div style="font-size:22px;line-height:1;">' + icon + '</div>' +
@@ -5202,7 +5211,7 @@ function updateMypageTab() {
   var EL_HAN = {목:'木',화:'Fire',토:'土',금:'金',수:'水'};
   var STEM_EL = {'甲':'목','乙':'목','丙':'화','丁':'화','戊':'토','己':'토','庚':'금','辛':'금','壬':'수','癸':'수'};
   var STEM_EL_KOR = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
-  var GRADE_COLOR = {'대길':'#4ade80','길':'#38d1ff','평':'#9b8fb0','흉':'#f59e42','대흉':'#e05c6a'};
+  var GRADE_COLOR = {'대길':'#2e7d32','길':'#0369a1','평':'#5a4a7a','흉':'#b45309','대흉':'#b91c1c'};
   var doorNameMap = {'生':'생','開':'개','休':'휴','景':'경','傷':'상','杜':'두','驚':'경','死':'사'};
   var DAYS = ['일','월','화','수','목','금','토'];
   var PERSONAL_KW = {
@@ -5281,27 +5290,27 @@ function updateMypageTab() {
       var dt=dates[idx];
       card.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.3s;';
       if(!item){
-        var dayColor0=dt.day==='토'?'#fbbf24':dt.day==='일'?'#e05c6a':'var(--muted)';
+        var dayColor0=dt.day==='토'?'#b45309':dt.day==='일'?'#b91c1c':'var(--muted)';
         card.innerHTML='<div style="font-size:13px;font-weight:600;color:'+dayColor0+';">'+dt.day+'</div><div style="font-size:12px;margin-top:4px;">'+dt.m+'/'+dt.d+'</div><div style="font-size:11px;color:var(--muted);margin-top:6px;">—</div>';
       } else {
         var gc=GRADE_COLOR[item.grade]||'#9b8fb0';
-        var dayColor=dt.day==='토'?'#fbbf24':dt.day==='일'?'#e05c6a':'var(--muted)';
+        var dayColor=dt.day==='토'?'#b45309':dt.day==='일'?'#b91c1c':'var(--muted)';
         card.innerHTML='<div style="font-size:13px;letter-spacing:0.05em;color:'+dayColor+';font-weight:600;">'+dt.day+'</div>'+
-          '<div style="font-size:12px;margin-top:3px;color:rgba(240,240,245,0.6);">'+dt.m+'/'+dt.d+'</div>'+
+          '<div style="font-size:12px;margin-top:3px;color:var(--text2);">'+dt.m+'/'+dt.d+'</div>'+
           '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+gc+';letter-spacing:0.03em;">'+item.grade+'</div>'+
-          '<div style="margin-top:3px;font-size:9px;color:rgba(155,143,176,0.6);letter-spacing:0.08em;">'+doorNameMap[item.door]+'門</div>';
+          '<div style="margin-top:3px;font-size:9px;color:var(--muted);letter-spacing:0.08em;">'+doorNameMap[item.door]+'門</div>';
         card.onclick=(function(it,cardEl){return function(){
           // 선택 스타일: 모든 카드 초기화 후 현재만 활성화
           Array.from(grid.children).forEach(function(c){c.style.borderColor='var(--border)';c.style.boxShadow='';});
           cardEl.style.borderColor='var(--accent)';cardEl.style.boxShadow='0 0 12px rgba(123,94,167,0.3)';
           detail.style.display='block';
           detail.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
-            '<div><div style="font-size:10px;color:rgba(167,139,250,0.5);letter-spacing:0.12em;font-weight:600;margin-bottom:3px;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
-            '<div style="font-size:10px;color:rgba(155,143,176,0.6);letter-spacing:0.03em;">'+doorNameMap[it.door]+'門 · 일가 포국</div></div>'+
-            '<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;color:'+(GRADE_COLOR[it.grade]||'#9b8fb0')+';background:rgba(0,0,0,0.25);border:1px solid '+(GRADE_COLOR[it.grade]||'#9b8fb0')+'25;letter-spacing:0.05em;">'+it.grade+'</div>'+
+            '<div><div style="font-size:10px;color:#5a4a7a;letter-spacing:0.12em;font-weight:600;margin-bottom:3px;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
+            '<div style="font-size:10px;color:var(--muted);letter-spacing:0.03em;">'+doorNameMap[it.door]+'門 · 일가 포국</div></div>'+
+            '<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;color:'+(GRADE_COLOR[it.grade]||'#9b8fb0')+';background:rgba(0,0,0,0.05);border:1px solid'+(GRADE_COLOR[it.grade]||'#9b8fb0')+'25;letter-spacing:0.05em;">'+it.grade+'</div>'+
           '</div>'+
           '<div style="font-size:14px;font-weight:300;color:#1a120a;line-height:1.7;letter-spacing:-0.01em;">'+it.kw+'</div>'+
-          '<div style="margin-top:12px;text-align:right;"><a href="#" onclick="event.preventDefault();goQimenDetail()" style="font-size:10px;color:rgba(167,139,250,0.6);text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
+          '<div style="margin-top:12px;text-align:right;"><a href="#" onclick="event.preventDefault();goQimenDetail()" style="font-size:10px;color:#5a4a7a;text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
         };})(item,card);
       }
       card.addEventListener('mouseenter',function(){this.style.transform='translateY(-3px)';});
@@ -5633,14 +5642,14 @@ window.togglePushSubscription = async function() {
 
     wrap.style.display = 'block';
     wrap.innerHTML =
-      '<div style="background:linear-gradient(160deg,var(--surface) 0%,rgba(45,27,78,0.6) 100%);border:1px solid rgba(212,175,55,0.2);border-radius:18px;padding:16px 18px;">' +
+      '<div style="background:linear-gradient(160deg,#fffbf0 0%,#f2e7ce 100%);border:1px solid rgba(139,42,30,0.22);border-radius:18px;padding:16px 18px;box-shadow:0 1px 3px rgba(139,42,30,0.05);">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
-          '<span style="font-size:10px;color:rgba(212,175,55,0.55);letter-spacing:0.12em;font-weight:600;"><i class="pi pi-sparkle"></i> 오늘의 우주 메시지</span>' +
-          '<button id="btnDismissQuote" style="background:none;border:none;color:rgba(0,0,0,0.3);font-size:16px;cursor:pointer;line-height:1;padding:0 2px;">✕</button>' +
+          '<span style="font-size:10px;color:#8b2a1e;letter-spacing:0.12em;font-weight:700;"><i class="pi pi-sparkle"></i> 오늘의 우주 메시지</span>' +
+          '<button id="btnDismissQuote" style="background:none;border:none;color:rgba(0,0,0,0.5);font-size:16px;cursor:pointer;line-height:1;padding:0 2px;">✕</button>' +
         '</div>' +
         '<p style="font-size:14px;font-style:italic;color:var(--text);line-height:1.75;margin:0 0 6px;font-family:\'Noto Serif KR\',serif;">&ldquo;' + esc(data.quote) + '&rdquo;</p>' +
-        '<p style="font-size:11px;color:rgba(212,175,55,0.6);margin:0 0 10px;letter-spacing:0.04em;">— ' + esc(data.source) + '</p>' +
-        '<p style="font-size:12px;color:var(--muted);line-height:1.65;margin:0;background:rgba(212,175,55,0.05);border-radius:10px;padding:10px 12px;">' + esc(data.message) + '</p>' +
+        '<p style="font-size:11px;color:#8b2a1e;margin:0 0 10px;letter-spacing:0.04em;font-weight:600;">— ' + esc(data.source) + '</p>' +
+        '<p style="font-size:12px;color:var(--text2);line-height:1.65;margin:0;background:rgba(168,132,42,0.1);border-radius:10px;padding:10px 12px;">' + esc(data.message) + '</p>' +
       '</div>';
 
     document.getElementById('btnDismissQuote').addEventListener('click', function() {
