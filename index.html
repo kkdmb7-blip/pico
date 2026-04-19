@@ -4974,26 +4974,31 @@ function useProfileForGunghap(id) {
   var p = getProfiles().find(function(x) { return x.id === id; });
   if (!p) return;
   closeProfilesModal();
-  if (typeof openGunghapModal === 'function') {
-    openGunghapModal();
-    setTimeout(function() {
-      var nameEl = document.getElementById('gh-name'), yEl = document.getElementById('gh-year'), mEl = document.getElementById('gh-month'), dEl = document.getElementById('gh-day');
-      if (nameEl) nameEl.value = p.name || '';
-      var parts = (p.birth_date || '').split('-');
-      if (parts.length === 3 && yEl && mEl && dEl) {
-        yEl.value = parseInt(parts[0]); mEl.value = parseInt(parts[1]);
-        if (mEl.dispatchEvent) mEl.dispatchEvent(new Event('change'));
-        setTimeout(function() { dEl.value = parseInt(parts[2]); }, 30);
-      }
-      var hEl = document.getElementById('gh-hour'), minEl = document.getElementById('gh-minute');
-      if (p.birth_time && p.birth_time !== 'unknown') {
-        var tp = p.birth_time.split(':');
-        if (hEl) hEl.value = String(parseInt(tp[0]));
-        if (minEl) minEl.value = String(parseInt(tp[1] || 0));
-      }
-      if (typeof selectGhGender === 'function') selectGhGender(p.gender === 'male' ? 'male' : 'female');
-    }, 120);
-  }
+  if (typeof openGunghapModal !== 'function') return;
+  openGunghapModal();
+  setTimeout(function() {
+    var nameEl = document.getElementById('ghPartnerName');
+    if (nameEl) nameEl.value = p.name || '';
+    var parts = (p.birth_date || '').split('-');
+    if (parts.length === 3) {
+      var yEl = document.getElementById('ghPartnerYear');
+      var mEl = document.getElementById('ghPartnerMonth');
+      var dEl = document.getElementById('ghPartnerDay');
+      if (yEl) yEl.value = parseInt(parts[0]);
+      if (mEl) { mEl.value = parseInt(parts[1]); if (mEl.dispatchEvent) mEl.dispatchEvent(new Event('change')); }
+      setTimeout(function() { if (dEl) dEl.value = parseInt(parts[2]); }, 40);
+    }
+    if (p.birth_time && p.birth_time !== 'unknown') {
+      var tp = p.birth_time.split(':');
+      var hEl = document.getElementById('ghPartnerHour');
+      var minEl = document.getElementById('ghPartnerMin');
+      if (hEl) hEl.value = String(parseInt(tp[0]));
+      if (minEl) minEl.value = String(parseInt(tp[1] || 0));
+    }
+    if (typeof selectGhPartnerGender === 'function') {
+      selectGhPartnerGender(p.gender === 'male' ? 'M' : 'F');
+    }
+  }, 120);
 }
 
 function toggleAddProfileForm() {
