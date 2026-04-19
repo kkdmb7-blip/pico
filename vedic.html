@@ -4,44 +4,51 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>베딕 점성술 · FORTUNA</title>
+<meta name="theme-color" content="#f5efe4">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <style>
   :root {
-    --bg:#0a0a0f; --surface:#13131a; --surface2:#1c1c28;
-    --border:#2a2a3d; --accent:#7b5ea7; --accent2:#e8b86d;
-    --text:#f0f0f5; --muted:#6b6b85; --radius:16px;
+    --bg:#f4ede0; --surface:#fcf7ea; --surface2:#ede4cf;
+    --border:#c9bc9d; --border-soft:rgba(80,55,30,0.10);
+    --accent:#7a2418; --accent2:#2a1f1a;
+    --text:#1a120a; --text2:#4a3a2a; --muted:#7a6850;
+    --gold:#9a7a26; --gold-deep:#7a5e1c; --ink:#241a10;
+    --orb:#5f8cb5; --orb-bg:rgba(122,196,255,0.12); --orb-border:rgba(95,140,181,0.30);
+    --radius:16px;
+    --shadow-soft:0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+    --shadow-lift:0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;overflow-x:hidden;}
-  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.25;}
   #starCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
-  .star{position:absolute;background:#fff;border-radius:50%;opacity:0;animation:twinkle var(--dur,3s) ease-in-out infinite;animation-delay:var(--delay,0s);}
+  .star{position:absolute;background:var(--gold);border-radius:50%;opacity:0;animation:twinkle var(--dur,3s) ease-in-out infinite;animation-delay:var(--delay,0s);}
   @keyframes twinkle{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:var(--max-op,.7);transform:scale(1)}}
 
   /* NAV */
-  nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+  nav{position:sticky;top:0;z-index:100;background:rgba(252,247,234,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;}
   .logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
   .logo img{height:56px;object-fit:contain;}
-  .logo-text{font-family:'Noto Serif KR',serif;font-weight:700;font-size:15px;letter-spacing:2px;color:var(--accent2);}
-  .nav-btn{padding:8px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,var(--accent),#a07fd4);color:#fff;border:none;font-family:'Noto Sans KR',sans-serif;text-decoration:none;transition:all .2s;white-space:nowrap;}
-  .nav-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(123,94,167,.4);}
+  .logo-text{font-family:'Noto Serif KR',serif;font-weight:700;font-size:15px;letter-spacing:2px;color:var(--accent);}
+  .nav-btn{padding:8px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,var(--accent),#5a1810);color:#fcf7ea;border:none;font-family:'Noto Sans KR',sans-serif;text-decoration:none;transition:all .2s;white-space:nowrap;}
+  .nav-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift);}
 
   /* MAIN */
   .main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:40px 20px 80px;}
   .page-title{font-family:'Noto Serif KR',serif;font-size:clamp(26px,5vw,40px);font-weight:700;text-align:center;margin-bottom:6px;letter-spacing:-.5px;}
-  .page-title em{font-style:normal;color:var(--accent2);}
+  .page-title em{font-style:normal;color:var(--accent);}
   .page-sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:32px;}
 
   /* STATUS */
   .status-msg{text-align:center;padding:48px 24px;color:var(--muted);font-size:15px;display:none;}
   .status-msg.visible{display:block;}
-  .status-msg.err{color:#FF1744;}
+  .status-msg.err{color:#b02a1a;}
   .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
   @keyframes spin{to{transform:rotate(360deg)}}
 
   /* SECTION CARD */
-  .section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;display:none;}
+  .section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;display:none;box-shadow:var(--shadow-soft);}
   .section-card.visible{display:block;}
   .section-label{font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:16px;}
 
@@ -57,22 +64,22 @@
   /* PLANET TABLE */
   .planet-table{width:100%;border-collapse:collapse;}
   .planet-table th{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);}
-  .planet-table td{padding:9px 10px;font-size:13px;border-bottom:1px solid rgba(42,42,61,.5);vertical-align:middle;}
+  .planet-table td{padding:9px 10px;font-size:13px;border-bottom:1px solid rgba(80,55,30,0.10);vertical-align:middle;}
   .planet-table tr:last-child td{border-bottom:none;}
   .planet-name{font-weight:600;}
   .sign-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;font-size:12px;font-weight:700;border:1px solid;}
   .bindu-bar{display:inline-flex;gap:2px;align-items:center;}
   .bindu{width:7px;height:7px;border-radius:50%;}
-  .bindu.on{background:var(--accent2);}
-  .bindu.off{background:rgba(255,255,255,.1);}
+  .bindu.on{background:var(--gold);}
+  .bindu.off{background:rgba(80,55,30,.15);}
 
   /* DASHA TIMELINE */
   .dasha-wrap{display:flex;flex-direction:column;gap:12px;}
   .dasha-row{padding:14px 18px;border-radius:12px;background:var(--surface2);}
   .dasha-tag{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-  .dasha-planet{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--accent2);margin-bottom:4px;}
+  .dasha-planet{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--gold-deep);margin-bottom:4px;}
   .dasha-date{font-size:12px;color:var(--muted);}
-  .dasha-remain{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(123,94,167,.15);color:var(--accent);border:1px solid rgba(123,94,167,.3);}
+  .dasha-remain{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(122,36,24,.10);color:var(--accent);border:1px solid rgba(122,36,24,.28);}
   .dasha-next{font-size:12px;color:var(--muted);padding:10px 14px;border-radius:8px;border:1px dashed var(--border);margin-top:4px;}
 
   /* YOGA LIST */
@@ -82,14 +89,14 @@
   .yoga-길{background:rgba(0,200,83,.12);color:#00C853;border:1px solid rgba(0,200,83,.25);}
   .yoga-흉{background:rgba(255,23,68,.12);color:#FF1744;border:1px solid rgba(255,23,68,.25);}
   .yoga-혼합{background:rgba(255,109,0,.12);color:#FF6D00;border:1px solid rgba(255,109,0,.25);}
-  .yoga-강화{background:rgba(123,94,167,.15);color:var(--accent);border:1px solid rgba(123,94,167,.3);}
+  .yoga-강화{background:rgba(122,36,24,.10);color:var(--accent);border:1px solid rgba(122,36,24,.28);}
   .yoga-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
   .yoga-desc{font-size:12px;color:var(--muted);}
 
   /* INTERP TABS */
   .interp-tabs{display:flex;gap:0;margin-bottom:16px;background:var(--surface2);border-radius:10px;padding:4px;border:1px solid var(--border);width:fit-content;flex-wrap:wrap;}
   .interp-tab{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:600;background:transparent;color:var(--muted);transition:all .2s;white-space:nowrap;}
-  .interp-tab.active{background:linear-gradient(135deg,var(--accent),#a07fd4);color:#fff;box-shadow:0 2px 8px rgba(123,94,167,.4);}
+  .interp-tab.active{background:linear-gradient(135deg,var(--accent),#5a1810);color:#fcf7ea;box-shadow:0 2px 8px rgba(122,36,24,.28);}
   .interp-tab:hover:not(.active){color:var(--text);}
   .interp-panel{display:none;}
   .interp-panel.active{display:block;}
@@ -98,8 +105,8 @@
   .interp-name{font-family:'Noto Serif KR',serif;font-size:19px;font-weight:700;margin-bottom:2px;}
   .interp-role{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
   .interp-text{font-size:14px;color:var(--text);line-height:1.85;}
-  .dasha-interp{padding:16px;border-radius:12px;background:var(--surface2);border-left:3px solid var(--accent2);}
-  .dasha-interp-title{font-size:16px;font-weight:700;color:var(--accent2);margin-bottom:8px;}
+  .dasha-interp{padding:16px;border-radius:12px;background:var(--surface2);border-left:3px solid var(--gold);}
+  .dasha-interp-title{font-size:16px;font-weight:700;color:var(--gold-deep);margin-bottom:8px;}
   .dasha-interp-text{font-size:14px;color:var(--text);line-height:1.8;}
 
   /* PAID / ACTION */
@@ -108,8 +115,8 @@
   .paid-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;}
   .paid-desc{font-size:12px;color:var(--muted);}
   .btn-paid{display:inline-flex;flex-direction:column;align-items:center;padding:10px 20px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;}
-  .btn-memox{display:inline-flex;align-items:center;gap:8px;padding:13px 32px;border-radius:14px;background:linear-gradient(135deg,var(--accent2),#c9914a);color:#000;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;text-decoration:none;transition:all .2s;}
-  .btn-memox:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(232,184,109,.35);}
+  .btn-memox{display:inline-flex;align-items:center;gap:8px;padding:13px 32px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:#fcf7ea;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;text-decoration:none;transition:all .2s;}
+  .btn-memox:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(154,122,38,.28);}
   .action-row{display:none;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:8px;}
   .action-row.visible{display:flex;}
 
@@ -205,18 +212,18 @@
   <!-- 리포트 훅 -->
   <div id="vedicReportHook" style="display:none;padding:0 20px 10px;max-width:440px;margin:0 auto;">
     <a href="report.html?type=vedic_full" style="display:block;padding:16px 20px;background:linear-gradient(135deg,rgba(255,170,80,0.12),rgba(255,200,120,0.08));border:1px solid rgba(255,170,80,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(255,170,80,0.7)';this.style.background='linear-gradient(135deg,rgba(255,170,80,0.22),rgba(255,200,120,0.15))'" onmouseout="this.style.borderColor='rgba(255,170,80,0.35)';this.style.background='linear-gradient(135deg,rgba(255,170,80,0.12),rgba(255,200,120,0.08))'">
-      <div style="font-size:15px;font-weight:700;color:#ffaa50;margin-bottom:4px;"><i class="pi pi-lotus"></i> 베딕이 읽어낸 내 카르마 →</div>
+      <div style="font-size:15px;font-weight:700;color:#b56420;margin-bottom:4px;"><i class="pi pi-lotus"></i> 베딕이 읽어낸 내 카르마 →</div>
       <div style="font-size:11px;color:var(--muted);opacity:0.8;">AI가 풀어내는 베딕 운명 심층 리포트</div>
     </a>
   </div>
 
   <div id="vedicShareBtnWrap" style="display:none;padding:0 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
     <button id="vedicKakaoBtn" onclick="shareVedicKakao()" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06));border:1px solid rgba(254,229,0,0.35);border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.borderColor='rgba(254,229,0,0.7)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.22),rgba(254,229,0,0.12))'" onmouseout="this.style.borderColor='rgba(254,229,0,0.35)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06))'">
-      <div style="font-size:15px;font-weight:700;color:#e8d44d;margin-bottom:4px;"><i class="pi pi-lotus"></i> 카카오톡으로 공유하기 →</div>
+      <div style="font-size:15px;font-weight:700;color:#7a5e1c;margin-bottom:4px;"><i class="pi pi-lotus"></i> 카카오톡으로 공유하기 →</div>
       <div style="font-size:11px;color:var(--muted);opacity:0.8;">내 베딕 결과를 친구에게 보내보세요</div>
     </button>
     <a href="https://kkdmb7-blip.github.io/memox/?mode=vedic" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06));border:1px solid rgba(232,184,109,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,184,109,0.7)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.22),rgba(201,168,76,0.12))'" onmouseout="this.style.borderColor='rgba(232,184,109,0.35)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06))'">
-      <div style="font-size:15px;font-weight:700;color:#e8b86d;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 베딕 상담하기 →</div>
+      <div style="font-size:15px;font-weight:700;color:#8a6b20;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 베딕 상담하기 →</div>
       <div style="font-size:11px;color:var(--muted);opacity:0.8;">대화로 풀어보는 나만의 카르마 이야기</div>
     </a>
     <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10));border:1px solid rgba(232,168,124,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,168,124,0.7)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.18))'" onmouseout="this.style.borderColor='rgba(232,168,124,0.35)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10))'">
@@ -705,7 +712,7 @@ function _drawVedicCard(cb) {
 
   function fRR(x,y,w,h,r){ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);}ctx.fill();}
   function sRR(x,y,w,h,r){ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);}ctx.stroke();}
-  function drawLine(cy,w2,al){var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0);lg.addColorStop(0,'transparent');lg.addColorStop(0.5,'rgba(168,213,162,'+al+')');lg.addColorStop(1,'transparent');ctx.strokeStyle=lg;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(W/2-w2,cy);ctx.lineTo(W/2+w2,cy);ctx.stroke();}
+  function drawLine(cy,w2,al){var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0);lg.addColorStop(0,'transparent');lg.addColorStop(0.5,'rgba(154,122,38,'+al+')');lg.addColorStop(1,'transparent');ctx.strokeStyle=lg;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(W/2-w2,cy);ctx.lineTo(W/2+w2,cy);ctx.stroke();}
   function fillWrapped(text,cx,startY,maxW,lineH){
     var words=text.split(' ');var line='';var fy=startY;
     words.forEach(function(w){var t=line?line+' '+w:w;if(ctx.measureText(t).width>maxW&&line){ctx.fillText(line,cx,fy);fy+=lineH;line=w;}else{line=t;}});
@@ -714,64 +721,64 @@ function _drawVedicCard(cb) {
   }
 
   var bg=ctx.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0,'#0d0a1a');bg.addColorStop(0.5,'#1a0a2a');bg.addColorStop(1,'#0a1020');
+  bg.addColorStop(0,'#fcf7ea');bg.addColorStop(0.5,'#f4ede0');bg.addColorStop(1,'#ede4cf');
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 
   [[8,12],[20,35],[38,8],[55,22],[72,10],[85,28],[6,52],[18,68],[32,80],[50,60],[66,78],[82,48],[90,65],[14,90],[44,45],[78,35],[60,90],[25,15],[92,82],[48,30],[35,55],[15,42],[70,25]].forEach(function(s){
     ctx.beginPath();ctx.arc(s[0]/100*W,s[1]/100*H,((s[0]*3+s[1])%3)+1.5,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,'+(0.25+((s[0]+s[1])%5)*0.1)+')';ctx.fill();
+    ctx.fillStyle='rgba(154,122,38,'+(0.18+((s[0]+s[1])%5)*0.08)+')';ctx.fill();
   });
 
   ctx.textAlign='center';
   var y=100;
 
   // 헤더
-  ctx.font='700 44px "Noto Sans KR",sans-serif';ctx.fillStyle='#A8D5A2';ctx.fillText('FORTUNA',W/2,y);y+=40;
-  ctx.font='400 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(168,213,162,0.65)';ctx.fillText('베딕 점성술 차트',W/2,y);y+=34;
-  ctx.font='400 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.35)';ctx.fillText(dateStr,W/2,y);y+=26;
+  ctx.font='700 44px "Noto Sans KR",sans-serif';ctx.fillStyle='#7a2418';ctx.fillText('FORTUNA',W/2,y);y+=40;
+  ctx.font='400 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.78)';ctx.fillText('베딕 점성술 차트',W/2,y);y+=34;
+  ctx.font='400 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.6)';ctx.fillText(dateStr,W/2,y);y+=26;
   drawLine(y,200,0.5);y+=42;
 
   // ── 달 라시 / 낙샤트라 / 상승궁 — 동일 크기 3카드
   var nakText=NAK_INTERP[d.nakshatra]||'';
   var cH=260;
   var cards3=[
-    {icon:'<i class="pi pi-moon"></i>',role:'달 라시 · Moon Sign',sign:d.moonSign,sub:(RASHI_SYM2[d.moonSign]||'')+' · '+(RASHI_EL2[d.moonSign]||''),color:EL_C2[RASHI_EL2[d.moonSign]]||'#A8D5A2',border:'55'},
-    {icon:'⭐',role:'낙샤트라'+(d.nakshatraPada?' · 파다 '+d.nakshatraPada:''),sign:d.nakshatra||'–',sub:'',color:'#e8b86d',border:'66'},
-    {icon:'↑',role:'상승궁 · Ascendant',sign:d.ascendant||'–',sub:(RASHI_SYM2[d.ascendant]||'')+' · '+(RASHI_EL2[d.ascendant]||''),color:EL_C2[RASHI_EL2[d.ascendant]]||'#74B9FF',border:'44'},
+    {icon:'<i class="pi pi-moon"></i>',role:'달 라시 · Moon Sign',sign:d.moonSign,sub:(RASHI_SYM2[d.moonSign]||'')+' · '+(RASHI_EL2[d.moonSign]||''),color:EL_C2[RASHI_EL2[d.moonSign]]||'#7a5e1c',border:'55'},
+    {icon:'⭐',role:'낙샤트라'+(d.nakshatraPada?' · 파다 '+d.nakshatraPada:''),sign:d.nakshatra||'–',sub:'',color:'#7a5e1c',border:'66'},
+    {icon:'↑',role:'상승궁 · Ascendant',sign:d.ascendant||'–',sub:(RASHI_SYM2[d.ascendant]||'')+' · '+(RASHI_EL2[d.ascendant]||''),color:EL_C2[RASHI_EL2[d.ascendant]]||'#7a2418',border:'44'},
   ];
   cards3.forEach(function(c){
-    ctx.fillStyle='rgba(255,255,255,0.04)';fRR(PAD,y,W-PAD*2,cH,20);
-    ctx.strokeStyle=(c.color||'#A8D5A2')+c.border;ctx.lineWidth=2;sRR(PAD,y,W-PAD*2,cH,20);
-    ctx.font='56px serif';ctx.fillStyle='rgba(255,255,255,0.9)';ctx.fillText(c.icon,W/2,y+68);
-    ctx.font='600 21px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText(c.role,W/2,y+106);
-    ctx.font='700 52px "Noto Sans KR",sans-serif';ctx.fillStyle=(c.color||'#A8D5A2');ctx.fillText(c.sign,W/2,y+174);
-    if(c.sub){ctx.font='400 24px serif';ctx.fillStyle='rgba(255,255,255,0.28)';ctx.fillText(c.sub,W/2,y+216);}
+    ctx.fillStyle='rgba(252,247,234,0.85)';fRR(PAD,y,W-PAD*2,cH,20);
+    ctx.strokeStyle='rgba(80,55,30,0.20)';ctx.lineWidth=2;sRR(PAD,y,W-PAD*2,cH,20);
+    ctx.font='56px serif';ctx.fillStyle='rgba(26,18,10,0.78)';ctx.fillText(c.icon,W/2,y+68);
+    ctx.font='600 21px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.75)';ctx.fillText(c.role,W/2,y+106);
+    ctx.font='700 52px "Noto Sans KR",sans-serif';ctx.fillStyle=(c.color||'#7a2418');ctx.fillText(c.sign,W/2,y+174);
+    if(c.sub){ctx.font='400 24px serif';ctx.fillStyle='rgba(74,58,42,0.6)';ctx.fillText(c.sub,W/2,y+216);}
     y+=cH+24;
   });
 
   // ── 낙샤트라 해석 카드
   if(nakText){
     var nakInterpH=nakText?300:0;
-    ctx.fillStyle='rgba(232,184,109,0.06)';fRR(PAD,y,W-PAD*2,nakInterpH,20);
-    ctx.strokeStyle='rgba(232,184,109,0.3)';ctx.lineWidth=1.5;sRR(PAD,y,W-PAD*2,nakInterpH,20);
-    ctx.font='600 21px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(232,184,109,0.7)';
+    ctx.fillStyle='rgba(154,122,38,0.08)';fRR(PAD,y,W-PAD*2,nakInterpH,20);
+    ctx.strokeStyle='rgba(154,122,38,0.35)';ctx.lineWidth=1.5;sRR(PAD,y,W-PAD*2,nakInterpH,20);
+    ctx.font='600 21px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(122,94,28,0.9)';
     ctx.fillText('✨ '+(d.nakshatra||'')+' 낙샤트라 해석',W/2,y+46);
-    ctx.font='400 25px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';
+    ctx.font='400 25px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(26,18,10,0.78)';
     fillWrapped(nakText,W/2,y+88,W-PAD*2-80,38);
     y+=nakInterpH+28;
   }
 
   // ── 다샤
   drawLine(y,180,0.3);y+=44;
-  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillText('🔮 현재 다샤 (행성 대운)',W/2,y);y+=48;
+  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.8)';ctx.fillText('🔮 현재 다샤 (행성 대운)',W/2,y);y+=48;
   if(d.dasha){
     var dashaItems=[];
     if(d.dasha.mahadasha)dashaItems.push({label:'마하다샤',val:d.dasha.mahadasha});
     if(d.dasha.antardasha)dashaItems.push({label:'안타르다샤',val:d.dasha.antardasha});
     dashaItems.forEach(function(item){
-      ctx.fillStyle='rgba(255,255,255,0.05)';fRR(PAD,y-4,W-PAD*2,50,12);
-      ctx.textAlign='left';ctx.font='400 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fillText(item.label,PAD+30,y+26);
-      ctx.textAlign='right';ctx.font='700 26px "Noto Sans KR",sans-serif';ctx.fillStyle='#A8D5A2';ctx.fillText(item.val,W-PAD-30,y+26);
+      ctx.fillStyle='rgba(252,247,234,0.85)';fRR(PAD,y-4,W-PAD*2,50,12);
+      ctx.textAlign='left';ctx.font='400 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.75)';ctx.fillText(item.label,PAD+30,y+26);
+      ctx.textAlign='right';ctx.font='700 26px "Noto Sans KR",sans-serif';ctx.fillStyle='#7a5e1c';ctx.fillText(item.val,W-PAD-30,y+26);
       ctx.textAlign='center';y+=58;
     });
   }
@@ -779,7 +786,7 @@ function _drawVedicCard(cb) {
 
   // ── 행성 배치 (2열, PLANET_KO_MAP2 사용)
   drawLine(y,180,0.3);y+=44;
-  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillText('🌟 주요 행성 배치',W/2,y);y+=42;
+  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.8)';ctx.fillText('🌟 주요 행성 배치',W/2,y);y+=42;
   var planets=(d.planets||[]).slice(0,9);
   var colW2=(W-PAD*2-20)/2;
   planets.forEach(function(p,i){
@@ -787,17 +794,17 @@ function _drawVedicCard(cb) {
     var px2=PAD+col*(colW2+20),py=y+row*52;
     var koName=PLANET_KO_MAP2[p.name]||p.name||'';
     var sym=PLANET_SYM2[koName]||'';
-    var pElC=EL_C2[RASHI_EL2[p.sign]]||'#ffffff';
-    ctx.fillStyle='rgba(255,255,255,0.05)';fRR(px2,py-2,colW2,44,10);
-    ctx.textAlign='left';ctx.font='400 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fillText(sym+' '+koName,px2+14,py+26);
-    ctx.textAlign='right';ctx.font='600 22px "Noto Sans KR",sans-serif';ctx.fillStyle=(pElC||'#ffffff');
+    var pElC=EL_C2[RASHI_EL2[p.sign]]||'#4a3a2a';
+    ctx.fillStyle='rgba(252,247,234,0.85)';fRR(px2,py-2,colW2,44,10);
+    ctx.textAlign='left';ctx.font='400 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.75)';ctx.fillText(sym+' '+koName,px2+14,py+26);
+    ctx.textAlign='right';ctx.font='600 22px "Noto Sans KR",sans-serif';ctx.fillStyle=(pElC||'#4a3a2a');
     ctx.fillText((RASHI_SYM2[p.sign]||'')+' '+(p.sign||''),px2+colW2-14,py+26);
     ctx.textAlign='center';
   });
 
   // 푸터
   var footerY=H-80;drawLine(footerY,150,0.4);
-  ctx.font='400 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.25)';ctx.fillText('picolab.kr',W/2,footerY+42);
+  ctx.font='400 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(80,55,30,0.45)';ctx.fillText('picolab.kr',W/2,footerY+42);
 
   cb(canvas);
 }
@@ -807,11 +814,11 @@ function shareVedicKakao() {
   if(btn){ btn.disabled=true; btn.textContent='⏳ 생성 중...'; }
   var modal = document.getElementById('vedicShareModal');
   var preview = document.getElementById('vedicPreviewArea');
-  preview.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
+  preview.innerHTML = '<div style="color:rgba(74,58,42,0.7);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
   modal.style.display = 'flex';
   _drawVedicCard(function(canvas){
     if(btn){ btn.disabled=false; btn.innerHTML='<i class="pi pi-om"></i>️ 카카오톡 공유'; }
-    if(!canvas){ preview.innerHTML='<div style="color:#ff6b6b;padding:20px;">카드 생성 실패 <i class="pi pi-sad"></i></div>'; return; }
+    if(!canvas){ preview.innerHTML='<div style="color:#b02a1a;padding:20px;">카드 생성 실패 <i class="pi pi-sad"></i></div>'; return; }
     window._vedicCanvas = canvas;
     var img = new Image(); img.src = canvas.toDataURL('image/png');
     img.style.cssText = 'width:100%;border-radius:12px;display:block;';
@@ -849,14 +856,14 @@ function closeVedicShareModal() {
 </script>
 
 <!-- 공유 카드 프리뷰 모달 -->
-<div id="vedicShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
-  <div style="background:#13131a;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:92vh;overflow-y:auto;position:relative;">
-    <button onclick="closeVedicShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:22px;cursor:pointer;line-height:1;">✕</button>
-    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(255,255,255,0.4);font-family:'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
+<div id="vedicShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(40,28,16,0.55);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
+  <div style="background:#fcf7ea;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -10px 40px rgba(60,40,20,0.18);">
+    <button onclick="closeVedicShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(74,58,42,0.6);font-size:22px;cursor:pointer;line-height:1;">✕</button>
+    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.7);font-family:'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
     <div id="vedicPreviewArea" style="text-align:center;min-height:120px;margin-bottom:16px;"></div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <button onclick="doVedicShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;"><i class="pi pi-om"></i>️ 카카오톡으로 공유하기</button>
-      <button onclick="closeVedicShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);border:none;border-radius:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
+      <button onclick="closeVedicShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(80,55,30,0.08);color:rgba(74,58,42,0.8);border:none;border-radius:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
     </div>
   </div>
 </div>

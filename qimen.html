@@ -4,19 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>기문둔갑 포국반 · FORTUNA</title>
+<meta name="theme-color" content="#f5efe4">
 <meta name="description" content="기문둔갑 시가·일가 포국반. 날짜와 시각을 입력하면 9궁 포국 결과를 즉시 확인할 수 있습니다.">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <style>
   :root {
-    --bg: #09090f;
-    --surface: #111118;
-    --surface2: #18181f;
-    --border: rgba(167,139,250,0.1);
-    --accent: #9b7fd4;
-    --accent2: #e8b86d;
-    --text: #ede8f5;
-    --muted: #6e6a82;
+    --bg: #f4ede0;
+    --surface: #fcf7ea;
+    --surface2: #ede4cf;
+    --border: #c9bc9d;
+    --border-soft: rgba(80,55,30,0.10);
+    --accent: #7a2418;
+    --accent2: #9a7a26;
+    --gold: #9a7a26;
+    --gold-deep: #7a5e1c;
+    --text: #1a120a;
+    --text2: #4a3a2a;
+    --ink: #241a10;
+    --muted: #7a6850;
+    --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+    --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
     --radius: 18px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,7 +47,7 @@
   #starCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
   .star {
     position: absolute;
-    background: #fff;
+    background: rgba(122,36,24,0.35);
     border-radius: 50%;
     opacity: 0;
     animation: twinkle var(--dur, 3s) ease-in-out infinite;
@@ -53,7 +61,7 @@
   /* ── NAV ── */
   nav {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(10,10,15,0.85);
+    background: rgba(244,237,224,0.88);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
     padding: 0 24px; height: 64px;
@@ -61,16 +69,16 @@
   }
   .logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
   .logo img { height:56px; object-fit:contain; }
-  .logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--accent2); }
+  .logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--accent); }
   .nav-btn {
     padding: 8px 18px; border-radius: 10px;
     font-size: 14px; font-weight: 600; cursor: pointer;
-    background: linear-gradient(135deg, var(--accent), #a07fd4);
+    background: linear-gradient(135deg, var(--accent), #5a1810);
     color: #fff; border: none;
     font-family: 'Noto Sans KR', sans-serif;
     text-decoration: none; transition: all 0.2s; white-space: nowrap;
   }
-  .nav-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(123,94,167,0.4); }
+  .nav-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(122,36,24,0.28); }
 
   /* ── MAIN ── */
   .main {
@@ -85,7 +93,7 @@
     margin-bottom: 8px; letter-spacing: 0.02em;
     color: var(--text);
   }
-  .page-title em { font-style: normal; font-weight: 700; color: var(--accent2); }
+  .page-title em { font-style: normal; font-weight: 700; color: var(--accent); }
   .page-sub {
     text-align: center; color: var(--muted);
     font-size: 13px; margin-bottom: 36px;
@@ -97,6 +105,7 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 24px;
     margin-bottom: 20px;
+    box-shadow: var(--shadow-soft);
   }
   .form-row {
     display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
@@ -118,14 +127,14 @@
   .form-group input::-webkit-inner-spin-button { -webkit-appearance: none; }
   .btn-fetch {
     padding: 10px 24px; border-radius: 10px;
-    background: linear-gradient(135deg, var(--accent), #a07fd4);
+    background: linear-gradient(135deg, var(--accent), #5a1810);
     color: #fff; border: none; cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 14px; font-weight: 700;
     transition: all 0.2s; white-space: nowrap;
     align-self: flex-end; height: 40px;
   }
-  .btn-fetch:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(123,94,167,0.4); }
+  .btn-fetch:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(122,36,24,0.28); }
   .btn-fetch:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
   .type-toggle {
@@ -145,9 +154,9 @@
     white-space: nowrap; letter-spacing: 0.02em;
   }
   .type-btn.active {
-    background: linear-gradient(135deg, #7b5ea7, #b08de0);
+    background: linear-gradient(135deg, var(--accent), #5a1810);
     color: #fff;
-    box-shadow: 0 2px 12px rgba(155,127,212,0.35);
+    box-shadow: 0 2px 12px rgba(122,36,24,0.22);
   }
   .type-btn:hover:not(.active) { color: var(--text); }
 
@@ -157,6 +166,7 @@
     border-radius: var(--radius); padding: 16px 24px;
     display: none; gap: 8px 24px; flex-wrap: wrap;
     align-items: center; margin-bottom: 16px;
+    box-shadow: var(--shadow-soft);
   }
   .meta-bar.visible { display: flex; }
   .meta-item { display: flex; flex-direction: column; gap: 3px; }
@@ -165,8 +175,8 @@
     font-size: 16px; font-weight: 700; color: var(--text);
     font-family: 'Noto Serif KR', serif;
   }
-  .meta-value.yang { color: #FF1744; }
-  .meta-value.eum  { color: #64b5f6; }
+  .meta-value.yang { color: #b02a1a; }
+  .meta-value.eum  { color: #3e6da0; }
   .meta-divider { width: 1px; height: 36px; background: var(--border); }
 
   /* ── 9궁 GRID ── */
@@ -175,6 +185,7 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); overflow: hidden;
     margin-bottom: 16px;
+    box-shadow: var(--shadow-soft);
   }
   .grid-wrap.visible { display: block; }
   .grid-title {
@@ -186,6 +197,7 @@
     display: grid; grid-template-columns: repeat(3, 1fr);
     border-left: 1px solid var(--border);
     border-top: 1px solid var(--border);
+    background: var(--surface);
   }
   .palace {
     border-right: 1px solid var(--border);
@@ -195,9 +207,10 @@
     align-items: center; gap: 5px;
     min-height: 140px; position: relative;
     transition: background 0.2s;
+    background: var(--surface);
   }
   .palace.zhifu {
-    background: rgba(123,94,167,0.07);
+    background: rgba(122,36,24,0.07);
   }
   .palace-num {
     position: absolute; top: 8px; left: 10px;
@@ -206,7 +219,7 @@
   }
   .zhifu-badge {
     position: absolute; top: 20px; right: 8px;
-    font-size: 10px; color: var(--accent2);
+    font-size: 10px; color: var(--accent);
     font-weight: 700; letter-spacing: 0;
   }
   .palace-dir {
@@ -230,12 +243,12 @@
     border: 1.5px solid currentColor;
     margin: 2px 0;
   }
-  .stem-목 { color: #00C853; background: rgba(0,200,83,0.08); }
-  .stem-화 { color: #FF1744; background: rgba(255,23,68,0.08); }
-  .stem-토 { color: #FFD600; background: rgba(255,214,0,0.08); }
-  .stem-금 { color: #e8e8e8; background: rgba(232,232,232,0.06); }
-  .stem-수 { color: #64b5f6; background: rgba(100,181,246,0.08); }
-  .stem-unknown { color: var(--muted); background: rgba(107,107,133,0.08); }
+  .stem-목 { color: #2a7a3e; background: rgba(42,122,62,0.10); }
+  .stem-화 { color: #b02a1a; background: rgba(176,42,26,0.08); }
+  .stem-토 { color: #8a6b20; background: rgba(138,107,32,0.10); }
+  .stem-금 { color: #6a5a48; background: rgba(106,90,72,0.08); }
+  .stem-수 { color: #3e6da0; background: rgba(62,109,160,0.10); }
+  .stem-unknown { color: var(--muted); background: rgba(122,104,80,0.08); }
   .palace-door {
     display: flex; gap: 2px; justify-content: center;
     text-align: center;
@@ -247,13 +260,14 @@
     border-radius: var(--radius); padding: 14px 24px;
     display: none; gap: 24px; flex-wrap: wrap; align-items: center;
     margin-bottom: 24px;
+    box-shadow: var(--shadow-soft);
   }
   .zhifu-bar.visible { display: flex; }
   .zhifu-item { display: flex; gap: 8px; align-items: center; }
   .zhifu-label { font-size: 12px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
   .zhifu-val {
     font-size: 15px; font-weight: 700;
-    color: var(--accent2); font-family: 'Noto Serif KR', serif;
+    color: var(--accent); font-family: 'Noto Serif KR', serif;
   }
 
   /* ── 해석 카드 ── */
@@ -270,6 +284,7 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 20px 24px;
     margin-bottom: 12px;
+    box-shadow: var(--shadow-soft);
   }
   .interp-rows { display: flex; flex-direction: column; gap: 14px; }
   .interp-row { display: flex; gap: 12px; align-items: flex-start; }
@@ -282,9 +297,9 @@
   .interp-summary {
     margin-top: 16px; padding-top: 16px;
     border-top: 1px solid var(--border);
-    font-size: 15px; color: rgba(237,232,245,0.85);
+    font-size: 15px; color: var(--text2);
     font-family: 'Noto Serif KR', serif;
-    font-weight: 300; line-height: 1.9;
+    font-weight: 400; line-height: 1.9;
     letter-spacing: 0.01em;
   }
   .interp-geok-badge {
@@ -292,16 +307,17 @@
     padding: 2px 8px; border-radius: 5px; margin-right: 6px;
     vertical-align: middle;
   }
-  .badge-대길 { background: rgba(253,224,71,0.1);  color: #fde047; border: 1px solid rgba(253,224,71,0.2); }
-  .badge-길   { background: rgba(134,239,172,0.1); color: #86efac; border: 1px solid rgba(134,239,172,0.2); }
-  .badge-흉   { background: rgba(251,146,60,0.1);  color: #fb923c; border: 1px solid rgba(251,146,60,0.2); }
-  .badge-대흉 { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+  .badge-대길 { background: rgba(212,175,90,0.20); color: #7a5e1c; border: 1px solid rgba(154,122,38,0.35); }
+  .badge-길   { background: rgba(42,122,62,0.12);  color: #2a7a3e; border: 1px solid rgba(42,122,62,0.30); }
+  .badge-흉   { background: rgba(200,100,40,0.12); color: #a85a2e; border: 1px solid rgba(200,100,40,0.30); }
+  .badge-대흉 { background: rgba(176,42,26,0.12);  color: #a8322a; border: 1px solid rgba(176,42,26,0.30); }
   .interp-paid {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 20px 24px;
     display: flex; align-items: center; justify-content: space-between;
     gap: 16px; flex-wrap: wrap;
-    opacity: 0.7;
+    opacity: 0.8;
+    box-shadow: var(--shadow-soft);
   }
   .interp-paid-left { display: flex; flex-direction: column; gap: 4px; }
   .interp-paid-title {
@@ -329,13 +345,13 @@
   .btn-ai {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 13px 32px; border-radius: 14px;
-    background: linear-gradient(135deg, var(--accent2), #c9914a);
-    color: #000; border: none; cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), #5a1810);
+    color: #fff; border: none; cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 14px; font-weight: 700;
     transition: all 0.2s; text-decoration: none;
   }
-  .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(232,184,109,0.35); }
+  .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(122,36,24,0.28); }
 
   /* ── STATUS ── */
   .status-msg {
@@ -344,7 +360,7 @@
     display: none;
   }
   .status-msg.visible { display: block; }
-  .status-msg.err { color: #FF1744; }
+  .status-msg.err { color: #a8322a; }
   .spinner {
     display: inline-block; width: 20px; height: 20px;
     border: 2px solid var(--border);
@@ -360,6 +376,7 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 14px 20px;
     display: none; margin-bottom: 16px;
+    box-shadow: var(--shadow-soft);
   }
   .bestdir-box.visible { display: block; }
   .bestdir-title {
@@ -369,16 +386,16 @@
   .bestdir-rows { display: flex; flex-wrap: wrap; gap: 8px; }
   .bestdir-chip {
     display: inline-flex; align-items: center; gap: 6px;
-    background: var(--surface2); border: 1px solid rgba(155,127,212,0.12);
+    background: var(--surface2); border: 1px solid var(--border);
     border-radius: 10px; padding: 7px 14px;
     transition: border-color 0.2s;
   }
-  .bestdir-chip.travel { border-left: 2px solid rgba(155,127,212,0.5); }
+  .bestdir-chip.travel { border-left: 2px solid var(--accent); }
   .bestdir-dir {
     font-size: 14px; font-weight: 500;
     font-family: 'Noto Serif KR', serif;
   }
-  .bestdir-chip:not(.travel) .bestdir-dir { color: #fde047; }
+  .bestdir-chip:not(.travel) .bestdir-dir { color: var(--gold-deep); }
   .bestdir-chip.travel .bestdir-dir { color: var(--accent); }
   .bestdir-info { font-size: 11px; color: var(--muted); }
 
@@ -387,6 +404,7 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 16px 24px;
     display: none; margin-bottom: 16px;
+    box-shadow: var(--shadow-soft);
   }
   .saju-bar.visible { display: block; }
   .saju-bar-title {
@@ -434,13 +452,13 @@
     transition: all 0.2s;
   }
   .yun-row.current-shi {
-    border: 1px solid rgba(155,127,212,0.5);
-    background: rgba(155,127,212,0.08);
+    border: 1px solid var(--accent);
+    background: rgba(122,36,24,0.07);
   }
-  .yun-row.past-shi { opacity: 0.35; }
+  .yun-row.past-shi { opacity: 0.45; }
   .yun-shi {
     font-family: 'Noto Serif KR', serif;
-    font-size: 14px; font-weight: 700; min-width: 34px;
+    font-size: 14px; font-weight: 700; min-width: 34px; color: var(--ink);
   }
   .yun-range { font-size: 10px; color: var(--muted); min-width: 78px; }
   .yun-grade {
@@ -449,11 +467,11 @@
     padding: 3px 7px; border-radius: 20px;
     letter-spacing: 0.5px;
   }
-  .yun-grade-대길 { color: #1a1200; background: #fde047; }
-  .yun-grade-길   { color: #0a2a14; background: #86efac; }
-  .yun-grade-평   { color: #c8c8e0; background: rgba(200,200,224,0.13); border: 1px solid rgba(200,200,224,0.2); }
-  .yun-grade-흉   { color: #fff7f0; background: rgba(251,146,60,0.25); border: 1px solid rgba(251,146,60,0.35); }
-  .yun-grade-대흉 { color: #fff0f0; background: rgba(248,113,113,0.22); border: 1px solid rgba(248,113,113,0.35); }
+  .yun-grade-대길 { color: #3c2a04; background: #f2d64d; border: 1px solid #d4b837; }
+  .yun-grade-길   { color: #0a2a14; background: #9fd9ac; border: 1px solid #6eb57f; }
+  .yun-grade-평   { color: #4a3a2a; background: rgba(122,104,80,0.14); border: 1px solid rgba(122,104,80,0.30); }
+  .yun-grade-흉   { color: #6a3a0e; background: rgba(200,100,40,0.18); border: 1px solid rgba(200,100,40,0.40); }
+  .yun-grade-대흉 { color: #6a1a14; background: rgba(176,42,26,0.16); border: 1px solid rgba(176,42,26,0.40); }
   .yun-keyword { font-size: 13px; color: var(--text); flex: 1; }
   .yun-now-dot {
     display: inline-block; width: 6px; height: 6px;
@@ -476,12 +494,12 @@
   }
   .qm-summary-card.visible { display: flex; }
   .qm-headline {
-    background: linear-gradient(160deg, #14101f, #1a1428);
-    border: 1px solid rgba(155,127,212,0.18);
+    background: linear-gradient(160deg, #fcf7ea 0%, #f4ecd8 100%);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 28px 24px;
     text-align: center;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.3);
+    box-shadow: var(--shadow-lift);
   }
   .qm-headline-badge {
     display: inline-block;
@@ -492,17 +510,17 @@
     margin-bottom: 14px;
     letter-spacing: 0.08em;
   }
-  .qm-headline-badge.badge-길   { background: rgba(134,239,172,0.12); color: #86efac; border: 1px solid rgba(134,239,172,0.2); }
-  .qm-headline-badge.badge-대길 { background: rgba(253,224,71,0.12);  color: #fde047; border: 1px solid rgba(253,224,71,0.2); }
-  .qm-headline-badge.badge-흉   { background: rgba(251,146,60,0.12);  color: #fb923c; border: 1px solid rgba(251,146,60,0.2); }
-  .qm-headline-badge.badge-대흉 { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
-  .qm-headline-badge.badge-보통 { background: rgba(148,163,184,0.1);  color: #94a3b8; border: 1px solid rgba(148,163,184,0.15); }
+  .qm-headline-badge.badge-길   { background: rgba(42,122,62,0.12);  color: #2a7a3e; border: 1px solid rgba(42,122,62,0.28); }
+  .qm-headline-badge.badge-대길 { background: rgba(212,175,90,0.20); color: #7a5e1c; border: 1px solid rgba(154,122,38,0.35); }
+  .qm-headline-badge.badge-흉   { background: rgba(200,100,40,0.12); color: #a85a2e; border: 1px solid rgba(200,100,40,0.28); }
+  .qm-headline-badge.badge-대흉 { background: rgba(176,42,26,0.12);  color: #a8322a; border: 1px solid rgba(176,42,26,0.30); }
+  .qm-headline-badge.badge-보통 { background: rgba(122,104,80,0.10); color: #7a6850; border: 1px solid rgba(122,104,80,0.22); }
   .qm-headline-text {
     font-family: 'Noto Serif KR', serif;
     font-size: 17px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.8;
-    color: #e8e0f5;
+    color: var(--ink);
     letter-spacing: 0.01em;
   }
   .qm-headline-geok {
@@ -520,19 +538,19 @@
     .qm-rec-grid { grid-template-columns: 1fr; }
   }
   .qm-rec-item {
-    background: linear-gradient(160deg, #13111c, #1a1728);
-    border: 1px solid rgba(155,127,212,0.13);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 20px 16px;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-soft);
   }
-  .qm-rec-icon { font-size: 20px; line-height: 1; }
+  .qm-rec-icon { font-size: 20px; line-height: 1; color: var(--accent); }
   .qm-rec-label {
     font-size: 10px;
-    color: rgba(155,127,212,0.6);
+    color: var(--gold-deep);
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -541,7 +559,7 @@
   .qm-rec-value {
     font-size: 14px;
     font-weight: 500;
-    color: #e8e0f5;
+    color: var(--ink);
     line-height: 1.6;
     font-family: 'Noto Serif KR', serif;
   }
@@ -552,8 +570,8 @@
     letter-spacing: 0.02em;
   }
   .qm-warn-box {
-    background: rgba(251,146,60,0.05);
-    border: 1px solid rgba(251,146,60,0.15);
+    background: rgba(200,100,40,0.08);
+    border: 1px solid rgba(200,100,40,0.25);
     border-radius: var(--radius);
     padding: 16px 20px;
     display: none;
@@ -561,24 +579,24 @@
   .qm-warn-box.visible { display: block; }
   .qm-warn-title {
     font-size: 12px;
-    font-weight: 600;
-    color: #fb923c;
+    font-weight: 700;
+    color: #a85a2e;
     margin-bottom: 6px;
     letter-spacing: 0.05em;
   }
   .qm-warn-text {
     font-size: 13px;
-    color: rgba(237,232,245,0.8);
+    color: var(--text2);
     line-height: 1.7;
   }
   .qm-detail-toggle {
     background: var(--surface);
-    border: 1px solid rgba(155,127,212,0.12);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 13px 20px;
     font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
+    font-weight: 600;
+    color: var(--text2);
     cursor: pointer;
     text-align: center;
     transition: all 0.2s;
@@ -586,7 +604,7 @@
     width: 100%;
     letter-spacing: 0.04em;
   }
-  .qm-detail-toggle:hover { border-color: rgba(155,127,212,0.35); color: #b08de0; }
+  .qm-detail-toggle:hover { border-color: var(--accent); color: var(--accent); }
   .qm-detail-wrap {
     display: none;
     flex-direction: column;
@@ -613,7 +631,7 @@
     display: flex; align-items: flex-start; gap: 10px;
   }
   .doorshen-dir {
-    font-size: 12px; font-weight: 700; color: var(--accent2);
+    font-size: 12px; font-weight: 700; color: var(--accent);
     min-width: 20px; padding-top: 1px;
   }
   .doorshen-main {
@@ -626,11 +644,11 @@
     font-size: 10px; font-weight: 700; padding: 2px 7px;
     border-radius: 10px; margin-left: 6px; vertical-align: middle;
   }
-  .doorshen-badge.gil    { background:rgba(0,200,83,0.15); color:#00C853; }
-  .doorshen-badge.daegil { background:rgba(255,215,0,0.15); color:#FFD700; }
-  .doorshen-badge.hyung  { background:rgba(255,109,0,0.15); color:#FF6D00; }
-  .doorshen-badge.daehyung { background:rgba(255,23,68,0.15); color:#FF1744; }
-  .doorshen-badge.jung   { background:rgba(107,107,133,0.15); color:var(--muted); }
+  .doorshen-badge.gil    { background:rgba(42,122,62,0.14); color:#2a7a3e; }
+  .doorshen-badge.daegil { background:rgba(212,175,90,0.22); color:#7a5e1c; }
+  .doorshen-badge.hyung  { background:rgba(200,100,40,0.14); color:#a85a2e; }
+  .doorshen-badge.daehyung { background:rgba(176,42,26,0.14); color:#a8322a; }
+  .doorshen-badge.jung   { background:rgba(122,104,80,0.14); color:var(--muted); }
 
   /* ── 택일 카드 ── */
   .taegil-wrap {
@@ -653,8 +671,8 @@
   .taegil-note { font-size: 11px; color: var(--muted); margin-left: 4px; }
 
   /* 흉방 칩 */
-  .bestdir-chip.bad .bestdir-dir { color: #FF1744; }
-  .bestdir-chip.bad { border-left: 2px solid #FF1744; }
+  .bestdir-chip.bad .bestdir-dir { color: #a8322a; }
+  .bestdir-chip.bad { border-left: 2px solid #a8322a; }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
@@ -718,8 +736,8 @@
 
   <div class="status-msg" id="status"></div>
 
-  <div id="wonmyong-notice" style="display:none;background:rgba(123,94,167,0.1);border:1px solid rgba(123,94,167,0.3);border-radius:12px;padding:12px 20px;margin-bottom:16px;">
-    <div id="wonmyong-date-label" style="font-size:13px;font-weight:700;color:var(--accent2);"><i class="pi pi-calendar"></i> 원명국</div>
+  <div id="wonmyong-notice" style="display:none;background:rgba(122,36,24,0.08);border:1px solid rgba(122,36,24,0.28);border-radius:12px;padding:12px 20px;margin-bottom:16px;">
+    <div id="wonmyong-date-label" style="font-size:13px;font-weight:700;color:var(--accent);"><i class="pi pi-calendar"></i> 원명국</div>
     <div style="font-size:12px;color:var(--muted);margin-top:4px;">이 판은 태어난 순간의 고정된 기운입니다.</div>
   </div>
 
@@ -828,17 +846,17 @@
 
   <!-- 버튼 그룹 -->
   <div id="qimenShareBtnWrap" style="display:none;padding:0 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
-    <button onclick="shareQimenKakao()" id="qimenKakaoBtn" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06));border:1px solid rgba(254,229,0,0.35);border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.borderColor='rgba(254,229,0,0.7)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.22),rgba(254,229,0,0.12))'" onmouseout="this.style.borderColor='rgba(254,229,0,0.35)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06))'">
-      <div style="font-size:15px;font-weight:700;color:#e8d44d;margin-bottom:4px;"><i class="pi pi-compass"></i> 카카오톡으로 공유하기 →</div>
-      <div style="font-size:11px;color:var(--muted);opacity:0.8;">내 기문둔갑 결과를 친구에게 보내보세요</div>
+    <button onclick="shareQimenKakao()" id="qimenKakaoBtn" style="display:block;width:100%;padding:16px 20px;background:#fee500;border:1px solid #e8d44d;border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 14px rgba(254,229,0,0.35)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+      <div style="font-size:15px;font-weight:700;color:#3c1e1e;margin-bottom:4px;"><i class="pi pi-compass"></i> 카카오톡으로 공유하기 →</div>
+      <div style="font-size:11px;color:#6a3e1e;opacity:0.8;">내 기문둔갑 결과를 친구에게 보내보세요</div>
     </button>
-    <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06));border:1px solid rgba(232,184,109,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,184,109,0.7)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.22),rgba(201,168,76,0.12))'" onmouseout="this.style.borderColor='rgba(232,184,109,0.35)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06))'">
-      <div style="font-size:15px;font-weight:700;color:#e8b86d;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담하기 →</div>
-      <div style="font-size:11px;color:var(--muted);opacity:0.8;">대화로 풀어보는 나만의 기문 이야기</div>
+    <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:block;width:100%;padding:16px 20px;background:rgba(212,175,90,0.14);border:1px solid rgba(154,122,38,0.28);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='#9a7a26';this.style.background='rgba(212,175,90,0.22)'" onmouseout="this.style.borderColor='rgba(154,122,38,0.28)';this.style.background='rgba(212,175,90,0.14)'">
+      <div style="font-size:15px;font-weight:700;color:#8a6b20;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담하기 →</div>
+      <div style="font-size:11px;color:#7a6850;opacity:0.85;">대화로 풀어보는 나만의 기문 이야기</div>
     </a>
-    <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10));border:1px solid rgba(232,168,124,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,168,124,0.7)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.18))'" onmouseout="this.style.borderColor='rgba(232,168,124,0.35)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10))'">
-      <div style="font-size:15px;font-weight:700;color:#e8a87c;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
-      <div style="font-size:11px;color:var(--muted);opacity:0.8;">기문둔갑 전문가와 1:1 깊은 상담</div>
+    <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,#7a2418,#5a1810);border:1px solid #5a1810;border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(122,36,24,0.25)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.82);">기문둔갑 전문가와 1:1 깊은 상담</div>
     </a>
   </div>
 
@@ -892,10 +910,10 @@ const DOOR_DESC = {
 };
 // 팔문 → 길흉 색상
 const DOOR_COLOR = {
-  '生':'#FFD700', '開':'#FFD700',
-  '休':'#00C853', '景':'#00C853',
-  '傷':'#FF6D00', '杜':'#FF6D00', '驚':'#FF6D00',
-  '死':'#FF1744'
+  '生':'#7a5e1c', '開':'#7a5e1c',
+  '休':'#3a7a3a', '景':'#3a7a3a',
+  '傷':'#a05a28', '杜':'#a05a28', '驚':'#a05a28',
+  '死':'#a94a3a'
 };
 
 // 오행별 글자 색상·배경
@@ -1669,7 +1687,7 @@ function renderTaegil(data) {
 
   CATS.forEach(function(cat) {
     var stars = '★'.repeat(cat.score) + '☆'.repeat(5 - cat.score);
-    var starColor = cat.score >= 4 ? '#FFD700' : cat.score >= 3 ? '#a07fd4' : cat.score >= 2 ? 'var(--muted)' : '#FF6D00';
+    var starColor = cat.score >= 4 ? '#7a5e1c' : cat.score >= 3 ? '#6a4ea0' : cat.score >= 2 ? 'var(--muted)' : '#a05a28';
     var note = cat.score >= 4 ? '적합' : cat.score >= 3 ? '무난' : cat.score >= 2 ? '주의' : '비추';
     var row = document.createElement('div');
     row.className = 'taegil-row';
@@ -1924,7 +1942,7 @@ function _qimenShowToast(msg) {
   if (!t) {
     t = document.createElement('div');
     t.id = '_qimenToast';
-    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#e8e0f0;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#2a1f1a;color:#fcf7ea;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;box-shadow:0 4px 16px rgba(60,40,20,0.18);';
     document.body.appendChild(t);
   }
   t.innerHTML = msg; t.style.opacity = '1';
@@ -1949,17 +1967,17 @@ function _drawQimenCard(cb) {
   ['生','開'].forEach(function(door) {
     Object.entries(palaces).forEach(function(e) {
       var p = e[1];
-      if (p && p.팔문 === door) bestDirs.push({ dir: GONG_DIR_LOCAL[parseInt(e[0])], door: door+'門', color: '#FFD700' });
+      if (p && p.팔문 === door) bestDirs.push({ dir: GONG_DIR_LOCAL[parseInt(e[0])], door: door+'門', color: '#7a5e1c' });
     });
   });
   Object.entries(palaces).forEach(function(e) {
     var p = e[1];
-    if (p && p.팔신 === '六合') bestDirs.push({ dir: GONG_DIR_LOCAL[parseInt(e[0])], door: '역마·六合', color: '#a07fd4' });
+    if (p && p.팔신 === '六合') bestDirs.push({ dir: GONG_DIR_LOCAL[parseInt(e[0])], door: '역마·六合', color: '#7a2418' });
   });
 
-  // 오행 색상
-  var EL_C = { 목:'#00C853', 화:'#FF5252', 토:'#FFD740', 금:'#d4d4d4', 수:'#64b5f6' };
-  var EL_B = { 목:'rgba(0,200,83,0.18)', 화:'rgba(255,82,82,0.18)', 토:'rgba(255,215,0,0.18)', 금:'rgba(212,212,212,0.12)', 수:'rgba(100,181,246,0.18)' };
+  // 오행 색상 (아이보리 테마용 — 톤다운 & 콘트라스트 조정)
+  var EL_C = { 목:'#3a7a3a', 화:'#a94a3a', 토:'#8a6b20', 금:'#6b6053', 수:'#3a6f8a' };
+  var EL_B = { 목:'rgba(58,122,58,0.10)', 화:'rgba(169,74,58,0.10)', 토:'rgba(154,122,38,0.12)', 금:'rgba(107,96,83,0.10)', 수:'rgba(58,111,138,0.10)' };
   var STAR_EL2 = {'天蓬':'수','天芮':'토','天衝':'목','天冲':'목','天輔':'목','天禽':'토','天心':'금','天柱':'금','天任':'토','天英':'화'};
   var SHEN_EL2 = {'直符':'토','値符':'토','騰蛇':'화','太陰':'금','六合':'목','白虎':'금','玄武':'수','九地':'토','九天':'금'};
   var DOOR_EL2 = {'生':'목','傷':'목','杜':'목','景':'화','死':'토','開':'금','驚':'금','休':'수'};
@@ -1971,17 +1989,17 @@ function _drawQimenCard(cb) {
   var ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = true;
 
-  // 배경
+  // 배경 (아이보리)
   var bg = ctx.createLinearGradient(0, 0, W*0.3, H);
-  bg.addColorStop(0, '#0a0a0f'); bg.addColorStop(0.55, '#12122a'); bg.addColorStop(1, '#0f1f3d');
+  bg.addColorStop(0, '#fcf7ea'); bg.addColorStop(0.55, '#f4ede0'); bg.addColorStop(1, '#ede4cf');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-  // 별
+  // 은은한 장식 도트 (별 대신)
   [[8,12],[20,35],[38,8],[55,22],[72,10],[85,28],[6,52],[18,68],[32,80],[50,60],[66,78],[82,48],[90,65],[14,90],[44,45],[78,35],[60,90],[25,15],[92,82],[48,30],[35,55],[15,42],[70,25],[5,75],[65,15],[30,68]].forEach(function(s) {
-    var sz = ((s[0]*3+s[1])%3)+1.5;
-    var op = 0.25+((s[0]+s[1])%5)*0.1;
+    var sz = ((s[0]*3+s[1])%3)+1.2;
+    var op = 0.05+((s[0]+s[1])%5)*0.015;
     ctx.beginPath(); ctx.arc(s[0]/100*W, s[1]/100*H, sz, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,'+op+')'; ctx.fill();
+    ctx.fillStyle = 'rgba(80,55,30,'+op+')'; ctx.fill();
   });
 
   ctx.textAlign = 'center';
@@ -1989,29 +2007,29 @@ function _drawQimenCard(cb) {
   // ─── 헤더 ───
   var y = 110;
   ctx.font = '700 40px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = '#c9a84c';
+  ctx.fillStyle = '#7a5e1c';
   ctx.fillText('FORTUNA', W/2, y);
 
   y += 28;
   ctx.font = '400 26px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(201,168,76,0.65)';
+  ctx.fillStyle = 'rgba(122,94,28,0.70)';
   ctx.fillText('기문둔갑 포국반', W/2, y);
 
   y += 36;
   ctx.font = '400 28px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillStyle = 'rgba(26,18,10,0.70)';
   ctx.fillText(dateStr, W/2, y);
 
   y += 34;
   ctx.font = '400 24px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.fillStyle = 'rgba(122,104,80,0.75)';
   ctx.fillText(jieqiStr + ' · ' + dunStr, W/2, y);
 
   // 구분선
   y += 28;
   var drawLine = function(cy, w2, alpha) {
     var lg = ctx.createLinearGradient(W/2-w2, 0, W/2+w2, 0);
-    lg.addColorStop(0,'transparent'); lg.addColorStop(0.5,'rgba(201,168,76,'+alpha+')'); lg.addColorStop(1,'transparent');
+    lg.addColorStop(0,'transparent'); lg.addColorStop(0.5,'rgba(122,94,28,'+alpha+')'); lg.addColorStop(1,'transparent');
     ctx.strokeStyle=lg; ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.moveTo(W/2-w2, cy); ctx.lineTo(W/2+w2, cy); ctx.stroke();
   };
@@ -2021,7 +2039,7 @@ function _drawQimenCard(cb) {
   y += 28;
   var gridTitle = '9궁 포국  ·  낙서 배치';
   ctx.font = '400 22px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillStyle = 'rgba(74,58,42,0.65)';
   ctx.fillText(gridTitle, W/2, y);
 
   y += 20;
@@ -2033,8 +2051,8 @@ function _drawQimenCard(cb) {
   var gridX = pad;
   var gridY = y;
 
-  // 그리드 배경 + 테두리
-  ctx.fillStyle = '#13131a';
+  // 그리드 배경 + 테두리 (surface tone)
+  ctx.fillStyle = '#fcf7ea';
   ctx.beginPath();
   ctx.roundRect(gridX, gridY, gridW, cellH*3, 16);
   ctx.fill();
@@ -2048,12 +2066,12 @@ function _drawQimenCard(cb) {
 
       // 직부궁 배경
       if (isZhifu) {
-        ctx.fillStyle = 'rgba(123,94,167,0.12)';
+        ctx.fillStyle = 'rgba(154,122,38,0.10)';
         ctx.fillRect(cx, cy, cellW, cellH);
       }
 
       // 셀 테두리
-      ctx.strokeStyle = '#2a2a3d'; ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(80,55,30,0.20)'; ctx.lineWidth = 1;
       ctx.strokeRect(cx, cy, cellW, cellH);
 
       var midX = cx + cellW/2;
@@ -2061,20 +2079,20 @@ function _drawQimenCard(cb) {
       // 궁번호 (좌상단)
       ctx.textAlign = 'left';
       ctx.font = '400 20px "Noto Sans KR", sans-serif';
-      ctx.fillStyle = '#6b6b85';
+      ctx.fillStyle = '#7a6850';
       ctx.fillText(n+'궁', cx+14, cy+28);
 
       // 방위 (우상단)
       ctx.textAlign = 'right';
       ctx.font = '600 19px "Noto Sans KR", sans-serif';
-      ctx.fillStyle = isZhifu ? '#c9a84c' : '#6b6b85';
+      ctx.fillStyle = isZhifu ? '#7a5e1c' : '#7a6850';
       ctx.fillText(GONG_DIR_LOCAL[n]||'', cx+cellW-12, cy+28);
 
       // 직부 표시
       if (isZhifu) {
         ctx.textAlign = 'right';
         ctx.font = '700 18px "Noto Sans KR", sans-serif';
-        ctx.fillStyle = '#c9a84c';
+        ctx.fillStyle = '#7a5e1c';
         ctx.fillText('★直', cx+cellW-12, cy+52);
       }
 
@@ -2083,7 +2101,7 @@ function _drawQimenCard(cb) {
       // 구성(九星) — 박스형
       if (p.구성) {
         var el = STAR_EL2[p.구성] || '토';
-        var sc = EL_C[el]||'#aaa', sb = EL_B[el]||'rgba(255,255,255,0.08)';
+        var sc = EL_C[el]||'#7a6850', sb = EL_B[el]||'rgba(80,55,30,0.08)';
         var starW = p.구성.length * 22 + 12;
         var starX = midX - starW/2, starY = cy + 46;
         ctx.fillStyle = sb;
@@ -2098,7 +2116,7 @@ function _drawQimenCard(cb) {
       // 팔신 — 박스형
       if (p.팔신) {
         var el2 = SHEN_EL2[p.팔신]||'토';
-        var sc2 = EL_C[el2]||'#aaa', sb2 = EL_B[el2]||'rgba(255,255,255,0.08)';
+        var sc2 = EL_C[el2]||'#7a6850', sb2 = EL_B[el2]||'rgba(80,55,30,0.08)';
         var shenW = p.팔신.length * 22 + 12;
         var shenX = midX - shenW/2, shenY = cy + 83;
         ctx.fillStyle = sb2;
@@ -2114,7 +2132,7 @@ function _drawQimenCard(cb) {
       if (p.지반) {
         var stem1 = p.지반[0] || '';
         var stemEl2 = STEM_OHAENG[stem1] || '토';
-        var stemC = EL_C[stemEl2]||'#aaa', stemB = EL_B[stemEl2]||'rgba(255,255,255,0.08)';
+        var stemC = EL_C[stemEl2]||'#7a6850', stemB = EL_B[stemEl2]||'rgba(80,55,30,0.08)';
         var stemW = 54, stemH2 = 54;
         var stemX = midX - stemW/2, stemY = cy + 118;
         ctx.fillStyle = stemB;
@@ -2129,10 +2147,10 @@ function _drawQimenCard(cb) {
       // 팔문 — 우하단 작게
       if (p.팔문) {
         var del2 = DOOR_EL2[p.팔문]||'토';
-        var dc = EL_C[del2]||'#aaa';
+        var dc = EL_C[del2]||'#7a6850';
         var isGood = DOOR_GOOD[p.팔문];
         ctx.font = (isGood ? '700' : '400') + ' 21px "Noto Serif KR", serif';
-        ctx.fillStyle = isGood ? '#FFD700' : 'rgba(255,255,255,0.4)';
+        ctx.fillStyle = isGood ? '#7a5e1c' : 'rgba(80,55,30,0.45)';
         ctx.textAlign = 'right';
         ctx.fillText(p.팔문+'門', cx+cellW-12, cy+cellH-14);
       }
@@ -2142,7 +2160,7 @@ function _drawQimenCard(cb) {
   });
 
   // 그리드 외곽 테두리
-  ctx.strokeStyle = '#2a2a3d'; ctx.lineWidth = 1.5;
+  ctx.strokeStyle = '#c9bc9d'; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.roundRect(gridX, gridY, gridW, cellH*3, 16); ctx.stroke();
 
   // ─── 최길 방향 ───
@@ -2151,7 +2169,7 @@ function _drawQimenCard(cb) {
 
   y += 38;
   ctx.font = '700 30px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.fillStyle = 'rgba(36,26,16,0.85)';
   ctx.fillText('🧭 오늘의 최길 방향', W/2, y);
 
   y += 44;
@@ -2161,15 +2179,15 @@ function _drawQimenCard(cb) {
 
   if (bestDirs.length === 0) {
     ctx.font = '400 26px "Noto Sans KR", sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillStyle = 'rgba(80,55,30,0.45)';
     ctx.fillText('–', W/2, y+36);
   } else {
     bestDirs.forEach(function(bd, i) {
       var cx2 = chipStartX + i*(chipW+chipGap);
       // 칩 배경
-      ctx.fillStyle = 'rgba(255,255,255,0.05)';
+      ctx.fillStyle = 'rgba(252,247,234,0.80)';
       ctx.beginPath(); ctx.roundRect(cx2, y, chipW, chipH, 12); ctx.fill();
-      ctx.strokeStyle = bd.color === '#FFD700' ? 'rgba(255,215,0,0.35)' : 'rgba(160,127,212,0.4)';
+      ctx.strokeStyle = bd.color === '#7a5e1c' ? 'rgba(122,94,28,0.45)' : 'rgba(122,36,24,0.40)';
       ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.roundRect(cx2, y, chipW, chipH, 12); ctx.stroke();
       // 방위 텍스트
@@ -2179,7 +2197,7 @@ function _drawQimenCard(cb) {
       ctx.fillText(bd.dir, cx2+chipW/2, y+34);
       // 문 레이블
       ctx.font = '400 20px "Noto Sans KR", sans-serif';
-      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.fillStyle = 'rgba(74,58,42,0.75)';
       ctx.fillText(bd.door, cx2+chipW/2, y+58);
     });
   }
@@ -2189,7 +2207,7 @@ function _drawQimenCard(cb) {
   drawLine(y, 150, 0.4);
   y += 42;
   ctx.font = '400 24px "Noto Sans KR", sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.fillStyle = 'rgba(122,104,80,0.60)';
   ctx.fillText('picolab.kr', W/2, y);
 
   cb(canvas);

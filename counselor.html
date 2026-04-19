@@ -4,22 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>전문 상담사 · FORTUNA</title>
+<meta name="theme-color" content="#f5efe4">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="pico-icons.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --surface2: #1c1c28;
-    --border: #2a2a3d;
-    --accent: #7b5ea7;
-    --accent2: #e8b86d;
-    --text: #f0f0f5;
-    --muted: #6b6b85;
+    --bg: #f4ede0;
+    --surface: #fcf7ea;
+    --surface2: #ede4cf;
+    --border: #c9bc9d;
+    --border-soft: rgba(80,55,30,0.10);
+    --accent: #7a2418;
+    --accent2: #2a1f1a;
+    --text: #1a120a;
+    --text2: #4a3a2a;
+    --muted: #7a6850;
+    --gold: #9a7a26;
+    --gold-deep: #7a5e1c;
+    --ink: #241a10;
+    --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+    --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
     --radius: 16px;
-    --warm: #c2784e;
-    --warm2: #e8a87c;
+    --warm: #a85a2e;
+    --warm2: #c27a4a;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -56,44 +64,45 @@
     border-radius: var(--radius); overflow: hidden;
   }
   .profile-header {
-    background: linear-gradient(160deg, #1a1a2e, #16213e);
+    background: linear-gradient(160deg, #fcf7ea 0%, #f4ecd8 100%);
     padding: 32px 24px; text-align: center; border-bottom: 1px solid var(--border);
   }
   .profile-avatar {
     width: 88px; height: 88px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--warm), var(--warm2));
+    background: linear-gradient(135deg, var(--accent), #5a1810);
     display: flex; align-items: center; justify-content: center;
+    color: #fcf7ea;
     font-size: 36px; margin: 0 auto 16px;
-    box-shadow: 0 4px 20px rgba(194,120,78,0.3);
+    box-shadow: 0 4px 18px rgba(122,36,24,0.25);
   }
-  .profile-name { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
-  .profile-title { font-size: 13px; color: var(--warm2); font-weight: 600; }
+  .profile-name { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
+  .profile-title { font-size: 13px; color: var(--accent); font-weight: 600; }
   .profile-body { padding: 24px; }
   .info-section { margin-bottom: 24px; }
   .info-section:last-child { margin-bottom: 0; }
-  .info-label { font-size: 11px; font-weight: 700; color: var(--warm2); letter-spacing: 1px; margin-bottom: 10px; }
-  .info-text { font-size: 14px; color: rgba(240,240,245,0.85); line-height: 1.8; }
+  .info-label { font-size: 11px; font-weight: 700; color: var(--gold-deep); letter-spacing: 1px; margin-bottom: 10px; }
+  .info-text { font-size: 14px; color: var(--text2); line-height: 1.8; }
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .tag {
     padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
-    background: rgba(194,120,78,0.12); border: 1px solid rgba(194,120,78,0.25); color: var(--warm2);
+    background: rgba(212,175,90,0.14); border: 1px solid rgba(154,122,38,0.28); color: #8a6b20;
   }
   .price-row {
     display: flex; align-items: center; justify-content: space-between;
     background: var(--surface2); border-radius: 12px; padding: 14px 16px;
   }
   .price-label { font-size: 13px; color: var(--muted); }
-  .price-value { font-size: 15px; font-weight: 700; color: var(--warm2); }
+  .price-value { font-size: 15px; font-weight: 700; color: var(--accent); }
   .cta-section { padding: 24px; border-top: 1px solid var(--border); }
   .btn-counselor {
     display: flex; align-items: center; justify-content: center; gap: 8px;
     width: 100%; padding: 16px;
-    background: linear-gradient(135deg, var(--warm), var(--warm2));
+    background: linear-gradient(135deg, var(--accent), #5a1810);
     color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 700;
     font-family: 'Noto Sans KR', sans-serif; cursor: pointer; text-decoration: none;
     letter-spacing: -0.3px; transition: transform 0.2s, box-shadow 0.2s;
   }
-  .btn-counselor:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(194,120,78,0.35); }
+  .btn-counselor:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
   .notice { margin-top: 16px; text-align: center; font-size: 12px; color: var(--muted); line-height: 1.6; }
   .method-row {
     display: flex; align-items: center; gap: 10px;
@@ -101,37 +110,39 @@
   }
   .method-icon {
     width: 36px; height: 36px; border-radius: 10px; background: #fee500;
+    color: #3c1e1e;
     display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
   }
-  .method-text { font-size: 14px; font-weight: 600; }
+  .method-text { font-size: 14px; font-weight: 600; color: var(--text); }
   .method-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
   /* 수정 버튼 */
   .btn-edit {
     display: none; position: fixed; bottom: 20px; right: 20px; z-index: 100;
     padding: 12px 20px; border-radius: 30px; border: none;
-    background: linear-gradient(135deg, var(--accent), #a07fd4); color: #fff;
+    background: linear-gradient(135deg, var(--accent), #5a1810); color: #fff;
     font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif;
-    cursor: pointer; box-shadow: 0 4px 16px rgba(123,94,167,0.4);
+    cursor: pointer; box-shadow: var(--shadow-lift);
   }
   .btn-edit:hover { transform: translateY(-2px); }
 
   /* 수정 모드 overlay */
   .edit-overlay {
     display: none; position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,0.7); overflow-y: auto;
+    background: rgba(40,25,15,0.55); overflow-y: auto;
   }
   .edit-panel {
     max-width: 480px; margin: 40px auto; padding: 24px;
     background: var(--surface); border-radius: var(--radius);
     border: 1px solid var(--border);
+    box-shadow: var(--shadow-lift);
   }
   .edit-panel h2 {
-    font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--warm2);
+    font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--accent);
   }
   .edit-group { margin-bottom: 16px; }
   .edit-group label {
-    display: block; font-size: 12px; font-weight: 700; color: var(--warm2);
+    display: block; font-size: 12px; font-weight: 700; color: var(--gold-deep);
     margin-bottom: 6px; letter-spacing: 0.5px;
   }
   .edit-group input, .edit-group textarea {
@@ -140,7 +151,7 @@
     font-family: 'Noto Sans KR', sans-serif; outline: none;
   }
   .edit-group textarea { min-height: 80px; resize: vertical; }
-  .edit-group input:focus, .edit-group textarea:focus { border-color: var(--warm); }
+  .edit-group input:focus, .edit-group textarea:focus { border-color: var(--accent); }
   .edit-actions {
     display: flex; gap: 10px; margin-top: 20px;
   }
@@ -148,8 +159,8 @@
     flex: 1; padding: 14px; border-radius: 12px; border: none;
     font-size: 15px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
   }
-  .btn-save { background: linear-gradient(135deg, var(--warm), var(--warm2)); color: #fff; }
-  .btn-cancel { background: var(--surface2); color: var(--muted); border: 1px solid var(--border) !important; }
+  .btn-save { background: linear-gradient(135deg, var(--accent), #5a1810); color: #fff; }
+  .btn-cancel { background: var(--surface2); color: var(--text2); border: 1px solid var(--border) !important; }
 </style>
 </head>
 <body>
@@ -452,7 +463,7 @@ function showToast(msg) {
   if (!t) {
     t = document.createElement('div');
     t.id = '_toast';
-    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#e8e0f0;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(36,26,16,0.92);color:#fcf7ea;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;';
     document.body.appendChild(t);
   }
   t.textContent = msg; t.style.opacity = '1';

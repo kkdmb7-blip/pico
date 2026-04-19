@@ -4,21 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>자미두수 명반 | 피코랩</title>
+  <meta name="theme-color" content="#f5efe4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
   <style>
     :root {
-      --bg: #05050f;
-      --surface: #0e0e1c;
-      --surface2: #161628;
-      --border: #252540;
-      --accent: #9b6fe0;
-      --accent2: #f0c060;
-      --gold: #f0c060;
-      --purple: #c084fc;
-      --text: #f0f0f8;
-      --muted: #7070a0;
+      --bg: #f4ede0;
+      --surface: #fcf7ea;
+      --surface2: #ede4cf;
+      --border: #c9bc9d;
+      --border-soft: rgba(80,55,30,0.10);
+      --accent: #7a2418;
+      --accent2: #9a7a26;
+      --gold: #9a7a26;
+      --gold-deep: #7a5e1c;
+      --purple: #8a6a3d;
+      --text: #1a120a;
+      --text2: #4a3a2a;
+      --ink: #241a10;
+      --muted: #7a6850;
+      --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+      --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
       --radius: 16px;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,24 +36,25 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
-    /* 은하 배경 그라디언트 */
+    /* 크림 배경 그라디언트 */
     body::before {
       content: '';
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background:
-        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(120,60,200,0.18) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 70%, rgba(80,40,160,0.14) 0%, transparent 55%),
-        radial-gradient(ellipse 40% 30% at 50% 90%, rgba(200,130,50,0.08) 0%, transparent 50%);
+        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(122,36,24,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 70%, rgba(154,122,38,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 30% at 50% 90%, rgba(200,130,50,0.05) 0%, transparent 50%);
     }
     /* 노이즈 텍스처 */
     body::after {
       content: '';
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-      opacity: 0.6;
+      opacity: 0.4;
     }
     .star {
       position: fixed; border-radius: 50%; opacity: 0;
+      background: rgba(122,36,24,0.6);
       animation: twinkle var(--dur, 3s) ease-in-out infinite;
       animation-delay: var(--delay, 0s);
       z-index: 0; pointer-events: none;
@@ -59,21 +67,21 @@
     /* NAV */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(5,5,15,0.88);
+      background: rgba(244,237,224,0.88);
       backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(155,111,224,0.2);
+      border-bottom: 1px solid var(--border);
       padding: 0 24px; height: 64px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
     .logo img { height:56px; object-fit:contain; }
-    .logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--accent2); }
+    .logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--accent); }
     .back-btn {
-      background: rgba(155,111,224,0.08); border: 1px solid rgba(155,111,224,0.25);
-      color: var(--muted); padding: 6px 14px; border-radius: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text2); padding: 6px 14px; border-radius: 8px;
       font-size: 13px; cursor: pointer; text-decoration: none; transition: all .2s;
     }
-    .back-btn:hover { color: var(--text); border-color: rgba(155,111,224,0.5); }
+    .back-btn:hover { color: var(--accent); border-color: var(--accent); }
 
     /* MAIN */
     main { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 32px 16px 80px; }
@@ -82,9 +90,9 @@
     #loading { text-align: center; padding: 80px 20px; color: var(--muted); }
     .loader {
       width: 52px; height: 52px; border-radius: 50%;
-      border: 3px solid rgba(155,111,224,0.15);
-      border-top-color: var(--accent2);
-      box-shadow: 0 0 20px rgba(240,192,96,0.3);
+      border: 3px solid rgba(154,122,38,0.18);
+      border-top-color: var(--accent);
+      box-shadow: var(--shadow-soft);
       animation: spin 1s linear infinite; margin: 0 auto 20px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -100,52 +108,50 @@
     /* 헤더 히어로 */
     .hero {
       position: relative; overflow: hidden;
-      background: linear-gradient(135deg,
-        rgba(155,111,224,0.18) 0%,
-        rgba(100,60,180,0.12) 40%,
-        rgba(240,192,96,0.10) 100%);
-      border: 1px solid rgba(155,111,224,0.35);
+      background: linear-gradient(135deg, #fcf7ea 0%, #f4ecd8 100%);
+      border: 1px solid var(--border);
       border-radius: 20px;
       padding: 36px 24px 32px;
       margin-bottom: 28px;
       text-align: center;
+      box-shadow: var(--shadow-soft);
     }
     .hero::before {
       content: '';
       position: absolute; top: -60px; right: -60px;
       width: 200px; height: 200px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(240,192,96,0.12) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(154,122,38,0.08) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero::after {
       content: '';
       position: absolute; bottom: -40px; left: -40px;
       width: 160px; height: 160px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(155,111,224,0.12) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(122,36,24,0.06) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero-eyebrow {
-      font-size: 11px; letter-spacing: 0.3em; color: var(--accent2);
-      font-weight: 700; margin-bottom: 6px; opacity: 0.8;
+      font-size: 11px; letter-spacing: 0.3em; color: var(--accent);
+      font-weight: 700; margin-bottom: 6px; opacity: 0.85;
       text-transform: uppercase;
     }
     .hero-title {
       font-family: 'Noto Serif KR', serif;
       font-size: clamp(22px, 4vw, 30px); font-weight: 700;
-      color: var(--text); margin-bottom: 24px; line-height: 1.3;
+      color: var(--ink); margin-bottom: 24px; line-height: 1.3;
     }
-    .hero-title em { font-style: normal; color: var(--accent2); }
+    .hero-title em { font-style: normal; color: var(--accent); }
     .hero-badges {
       display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
     }
     .hero-badge {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(155,111,224,0.3);
+      background: rgba(252,247,234,0.7);
+      border: 1px solid var(--border);
       border-radius: 14px; padding: 14px 20px;
       min-width: 110px; position: relative;
       transition: border-color .2s, transform .2s;
     }
-    .hero-badge:hover { border-color: rgba(240,192,96,0.5); transform: translateY(-2px); }
+    .hero-badge:hover { border-color: var(--accent); transform: translateY(-2px); }
     .hero-badge-label {
       font-size: 10px; color: var(--muted); margin-bottom: 8px;
       letter-spacing: 0.1em; text-transform: uppercase;
@@ -153,23 +159,21 @@
     .hero-badge-value {
       font-family: 'Noto Serif KR', serif;
       font-size: 22px; font-weight: 700;
-      background: linear-gradient(135deg, var(--accent2), #f8a04a);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--accent);
     }
 
     /* 섹션 타이틀 */
     .section-title {
       font-family: 'Noto Serif KR', serif;
       font-size: 15px; font-weight: 700;
-      color: var(--accent2); letter-spacing: 0.08em;
+      color: var(--accent); letter-spacing: 0.08em;
       margin-bottom: 16px;
       display: flex; align-items: center; gap: 10px;
     }
     .section-title::after {
       content: ''; flex: 1;
       height: 1px;
-      background: linear-gradient(90deg, rgba(155,111,224,0.4), transparent);
+      background: linear-gradient(90deg, rgba(122,36,24,0.35), transparent);
     }
 
     /* 12궁 그리드 */
@@ -182,67 +186,67 @@
     @media (max-width: 400px) { .palace-grid { grid-template-columns: repeat(2, 1fr); } }
 
     .palace-cell {
-      background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(155,111,224,0.04) 100%);
-      border: 1px solid rgba(155,111,224,0.18);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 12px; padding: 10px 8px;
       min-height: 124px; position: relative;
       transition: all .25s;
     }
     .palace-cell:hover {
-      border-color: rgba(155,111,224,0.45);
+      border-color: var(--accent);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(155,111,224,0.15);
+      box-shadow: var(--shadow-soft);
     }
     .palace-cell.is-self {
-      border-color: rgba(240,192,96,0.55);
-      background: linear-gradient(145deg, rgba(240,192,96,0.07) 0%, rgba(200,100,20,0.05) 100%);
-      box-shadow: 0 0 16px rgba(240,192,96,0.12);
+      border-color: rgba(154,122,38,0.6);
+      background: linear-gradient(145deg, rgba(212,175,90,0.14) 0%, rgba(212,175,90,0.06) 100%);
+      box-shadow: 0 2px 12px rgba(154,122,38,0.12);
     }
     .palace-cell.is-body {
-      border-color: rgba(192,132,252,0.55);
-      background: linear-gradient(145deg, rgba(192,132,252,0.07) 0%, rgba(120,60,200,0.05) 100%);
-      box-shadow: 0 0 16px rgba(192,132,252,0.12);
+      border-color: rgba(138,106,61,0.5);
+      background: linear-gradient(145deg, rgba(138,106,61,0.12) 0%, rgba(138,106,61,0.04) 100%);
+      box-shadow: 0 2px 12px rgba(138,106,61,0.10);
     }
     .palace-cell.is-self.is-body {
-      border-color: rgba(240,192,96,0.6);
-      background: linear-gradient(145deg, rgba(240,192,96,0.07), rgba(192,132,252,0.07));
-      box-shadow: 0 0 20px rgba(240,192,96,0.15), 0 0 20px rgba(192,132,252,0.1);
+      border-color: rgba(154,122,38,0.65);
+      background: linear-gradient(145deg, rgba(212,175,90,0.14), rgba(138,106,61,0.10));
+      box-shadow: 0 2px 14px rgba(154,122,38,0.14);
     }
     .palace-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
     .palace-name {
       font-family: 'Noto Serif KR', serif;
-      font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85);
+      font-size: 12px; font-weight: 700; color: var(--ink);
     }
     .palace-badges { display: flex; gap: 3px; }
     .badge-self {
-      font-size: 10px; color: var(--accent2);
-      background: rgba(240,192,96,0.18); border: 1px solid rgba(240,192,96,0.3);
+      font-size: 10px; color: var(--gold-deep);
+      background: rgba(212,175,90,0.2); border: 1px solid rgba(154,122,38,0.3);
       border-radius: 4px; padding: 1px 5px; font-weight: 700;
     }
     .badge-body {
-      font-size: 10px; color: #c084fc;
-      background: rgba(192,132,252,0.18); border: 1px solid rgba(192,132,252,0.3);
+      font-size: 10px; color: #6a4a1e;
+      background: rgba(138,106,61,0.2); border: 1px solid rgba(138,106,61,0.3);
       border-radius: 4px; padding: 1px 5px; font-weight: 700;
     }
     .palace-stem-branch {
       font-family: 'Noto Serif KR', serif;
-      font-size: 11px; color: rgba(155,111,224,0.7); margin-bottom: 6px;
+      font-size: 11px; color: var(--muted); margin-bottom: 6px;
     }
     .palace-stars { display: flex; flex-wrap: wrap; gap: 3px; }
     .star-tag {
       font-size: 10px; padding: 2px 5px; border-radius: 5px;
-      background: rgba(155,111,224,0.15);
-      border: 1px solid rgba(155,111,224,0.25);
-      color: #c4b5fd;
+      background: rgba(138,106,61,0.10);
+      border: 1px solid rgba(138,106,61,0.22);
+      color: var(--text2);
     }
     .star-tag.major {
-      background: rgba(240,192,96,0.14);
-      border: 1px solid rgba(240,192,96,0.3);
-      color: var(--accent2); font-weight: 700; font-size: 11px;
+      background: rgba(212,175,90,0.18);
+      border: 1px solid rgba(154,122,38,0.35);
+      color: var(--gold-deep); font-weight: 700; font-size: 11px;
     }
     .palace-age {
       position: absolute; bottom: 6px; right: 8px;
-      font-size: 9px; color: rgba(155,111,224,0.5);
+      font-size: 9px; color: var(--muted);
     }
 
     /* 현재 운세 */
@@ -250,16 +254,17 @@
     @media (max-width: 480px) { .fortune-row { grid-template-columns: 1fr; } }
 
     .fortune-card {
-      background: linear-gradient(135deg, rgba(155,111,224,0.1) 0%, rgba(255,255,255,0.03) 100%);
-      border: 1px solid rgba(155,111,224,0.3);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: var(--radius); padding: 20px;
       position: relative; overflow: hidden;
       transition: border-color .2s, transform .2s;
+      box-shadow: var(--shadow-soft);
     }
-    .fortune-card:hover { border-color: rgba(240,192,96,0.4); transform: translateY(-2px); }
+    .fortune-card:hover { border-color: var(--accent); transform: translateY(-2px); }
     .fortune-card::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      background: linear-gradient(90deg, var(--accent), var(--gold));
     }
     .fortune-card-label {
       font-size: 11px; color: var(--muted); letter-spacing: 0.1em;
@@ -268,9 +273,8 @@
     .fortune-card-value {
       font-family: 'Noto Serif KR', serif;
       font-size: 20px; font-weight: 700;
-      background: linear-gradient(135deg, var(--text), rgba(240,192,96,0.9));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text; margin-bottom: 4px;
+      color: var(--accent);
+      margin-bottom: 4px;
     }
     .fortune-card-sub { font-size: 12px; color: var(--muted); }
     .fortune-card-stars { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px; }
@@ -278,18 +282,18 @@
     /* 해석 카드 */
     .interp-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 28px; }
     .interp-card {
-      background: linear-gradient(135deg, rgba(155,111,224,0.08) 0%, rgba(255,255,255,0.02) 100%);
-      border: 1px solid rgba(155,111,224,0.2);
-      border-left: 3px solid;
-      border-image: linear-gradient(180deg, var(--accent), var(--accent2)) 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
       border-radius: 12px; padding: 16px 18px;
       display: flex; gap: 14px; align-items: flex-start;
       transition: border-color .2s, transform .2s;
+      box-shadow: var(--shadow-soft);
     }
     .interp-card:hover { transform: translateX(3px); }
-    .interp-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-    .interp-label { font-size: 11px; color: var(--accent2); margin-bottom: 5px; font-weight: 600; letter-spacing: 0.05em; }
-    .interp-text { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.7; }
+    .interp-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; color: var(--accent); }
+    .interp-label { font-size: 11px; color: var(--accent); margin-bottom: 5px; font-weight: 600; letter-spacing: 0.05em; }
+    .interp-text { font-size: 14px; color: var(--text2); line-height: 1.7; }
 
     /* 하단 버튼 */
     .action-row { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -367,26 +371,26 @@
     <div class="interp-grid" id="interpGrid"></div>
 
     <!-- 하단 버튼 -->
-    <!-- 리포��� 훅 -->
+    <!-- 리포트 훅 -->
     <div id="ziweiReportHook" style="display:none;padding:0 20px 10px;max-width:440px;margin:0 auto;">
-      <a href="report.html?type=ziwei_full" style="display:block;padding:16px 20px;background:linear-gradient(135deg,rgba(180,143,255,0.12),rgba(140,100,220,0.08));border:1px solid rgba(180,143,255,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(180,143,255,0.7)';this.style.background='linear-gradient(135deg,rgba(180,143,255,0.22),rgba(140,100,220,0.15))'" onmouseout="this.style.borderColor='rgba(180,143,255,0.35)';this.style.background='linear-gradient(135deg,rgba(180,143,255,0.12),rgba(140,100,220,0.08))'">
-        <div style="font-size:15px;font-weight:700;color:#b48fff;margin-bottom:4px;"><i class="pi pi-ziwei"></i> 명반 속 숨은 운명의 열쇠 →</div>
-        <div style="font-size:11px;color:var(--muted);opacity:0.8;">AI가 풀어내는 자미두수 심층 리포트</div>
+      <a href="report.html?type=ziwei_full" style="display:block;padding:16px 20px;background:#fcf7ea;border:1px solid rgba(122,36,24,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-shadow:0 1px 2px rgba(60,40,20,0.05),0 4px 16px rgba(60,40,20,0.04);" onmouseover="this.style.borderColor='#7a2418';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='rgba(122,36,24,0.35)';this.style.transform='translateY(0)'">
+        <div style="font-size:15px;font-weight:700;color:#7a2418;margin-bottom:4px;"><i class="pi pi-ziwei"></i> 명반 속 숨은 운명의 열쇠 →</div>
+        <div style="font-size:11px;color:var(--muted);opacity:0.85;">AI가 풀어내는 자미두수 심층 리포트</div>
       </a>
     </div>
 
     <div id="ziweiShareBtnWrap" style="display:none;padding:0 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
-      <button id="ziweiKakaoBtn" onclick="shareZiweiKakao()" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06));border:1px solid rgba(254,229,0,0.35);border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.borderColor='rgba(254,229,0,0.7)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.22),rgba(254,229,0,0.12))'" onmouseout="this.style.borderColor='rgba(254,229,0,0.35)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06))'">
-        <div style="font-size:15px;font-weight:700;color:#e8d44d;margin-bottom:4px;"><i class="pi pi-ziwei"></i> 카카오톡으로 공유하기 →</div>
-        <div style="font-size:11px;color:var(--muted);opacity:0.8;">내 자미두수 결과를 친구에게 보내보세요</div>
+      <button id="ziweiKakaoBtn" onclick="shareZiweiKakao()" style="display:block;width:100%;padding:16px 20px;background:#fee500;border:1px solid #e8d44d;border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 14px rgba(254,229,0,0.35)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+        <div style="font-size:15px;font-weight:700;color:#3c1e1e;margin-bottom:4px;"><i class="pi pi-ziwei"></i> 카카오톡으로 공유하기 →</div>
+        <div style="font-size:11px;color:#6a3e1e;opacity:0.8;">내 자미두수 결과를 친구에게 보내보세요</div>
       </button>
-      <a id="consultBtn" href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06));border:1px solid rgba(232,184,109,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,184,109,0.7)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.22),rgba(201,168,76,0.12))'" onmouseout="this.style.borderColor='rgba(232,184,109,0.35)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06))'">
-        <div style="font-size:15px;font-weight:700;color:#e8b86d;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담하기 →</div>
-        <div style="font-size:11px;color:var(--muted);opacity:0.8;">대화로 풀어보는 나만의 명반 이야기</div>
+      <a id="consultBtn" href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:block;width:100%;padding:16px 20px;background:rgba(212,175,90,0.14);border:1px solid rgba(154,122,38,0.28);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='#9a7a26';this.style.background='rgba(212,175,90,0.22)'" onmouseout="this.style.borderColor='rgba(154,122,38,0.28)';this.style.background='rgba(212,175,90,0.14)'">
+        <div style="font-size:15px;font-weight:700;color:#8a6b20;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담하기 →</div>
+        <div style="font-size:11px;color:#7a6850;opacity:0.85;">대화로 풀어보는 나만의 명반 이야기</div>
       </a>
-      <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10));border:1px solid rgba(232,168,124,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,168,124,0.7)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.18))'" onmouseout="this.style.borderColor='rgba(232,168,124,0.35)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10))'">
-        <div style="font-size:15px;font-weight:700;color:#e8a87c;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
-        <div style="font-size:11px;color:var(--muted);opacity:0.8;">자미두수 전문가와 1:1 깊은 상담</div>
+      <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,#7a2418,#5a1810);border:1px solid #5a1810;border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(122,36,24,0.25)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.82);">자미두수 전문가와 1:1 깊은 상담</div>
       </a>
     </div>
 
@@ -614,7 +618,7 @@ function _ziweiShowToast(msg) {
   var t = document.getElementById('_ziweiToast');
   if (!t) {
     t = document.createElement('div'); t.id = '_ziweiToast';
-    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#e8e0f0;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(36,26,16,0.92);color:#fcf7ea;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;';
     document.body.appendChild(t);
   }
   t.textContent = msg; t.style.opacity = '1';
@@ -633,7 +637,7 @@ function _drawZiweiCard(cb) {
 
   function fRR(x,y,w,h,r){ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);}ctx.fill();}
   function sRR(x,y,w,h,r){ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);}ctx.stroke();}
-  function drawLine(cy,w2,al){var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0);lg.addColorStop(0,'transparent');lg.addColorStop(0.5,'rgba(201,168,76,'+al+')');lg.addColorStop(1,'transparent');ctx.strokeStyle=lg;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(W/2-w2,cy);ctx.lineTo(W/2+w2,cy);ctx.stroke();}
+  function drawLine(cy,w2,al){var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0);lg.addColorStop(0,'transparent');lg.addColorStop(0.5,'rgba(154,122,38,'+al+')');lg.addColorStop(1,'transparent');ctx.strokeStyle=lg;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(W/2-w2,cy);ctx.lineTo(W/2+w2,cy);ctx.stroke();}
   function fillWrapped(text,cx,startY,maxW,lineH){
     var words=text.split(' ');var line='';var fy=startY;
     words.forEach(function(w){var t=line?line+' '+w:w;if(ctx.measureText(t).width>maxW&&line){ctx.fillText(line,cx,fy);fy+=lineH;line=w;}else{line=t;}});
@@ -641,24 +645,24 @@ function _drawZiweiCard(cb) {
     return fy;
   }
 
-  // 배경
+  // 배경 (ivory)
   var bg=ctx.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0,'#050510');bg.addColorStop(0.4,'#100820');bg.addColorStop(1,'#080f1e');
+  bg.addColorStop(0,'#fcf7ea');bg.addColorStop(0.4,'#f4ede0');bg.addColorStop(1,'#ede4cf');
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-  [{cx:0.2,cy:0.15,r:0.4,c:'150,80,220,0.07'},{cx:0.8,cy:0.6,r:0.5,c:'80,60,180,0.06'},{cx:0.5,cy:0.85,r:0.35,c:'200,120,50,0.05'}].forEach(function(n){
+  [{cx:0.2,cy:0.15,r:0.4,c:'122,36,24,0.05'},{cx:0.8,cy:0.6,r:0.5,c:'154,122,38,0.06'},{cx:0.5,cy:0.85,r:0.35,c:'200,130,50,0.04'}].forEach(function(n){
     var g=ctx.createRadialGradient(n.cx*W,n.cy*H,0,n.cx*W,n.cy*H,n.r*W);g.addColorStop(0,'rgba('+n.c+')');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   });
   [[8,12,2],[20,35,1.5],[38,8,2],[55,22,1],[72,10,2.5],[85,28,1.5],[6,52,1],[18,68,2],[32,80,1.5],[50,60,1],[66,78,2],[82,48,1],[90,65,1.5],[14,90,2],[44,45,1],[78,35,1.5],[60,90,1],[25,15,2],[92,82,1.5],[48,30,1],[35,55,1.5],[15,42,2],[70,25,1],[42,72,1.5],[88,40,1]].forEach(function(s){
-    ctx.beginPath();ctx.arc(s[0]/100*W,s[1]/100*H,s[2],0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+(0.2+((s[0]+s[1])%5)*0.1)+')';ctx.fill();
+    ctx.beginPath();ctx.arc(s[0]/100*W,s[1]/100*H,s[2],0,Math.PI*2);ctx.fillStyle='rgba(154,122,38,'+(0.10+((s[0]+s[1])%5)*0.05)+')';ctx.fill();
   });
 
   ctx.textAlign='center';
   var y=110;
 
   // 헤더
-  ctx.font='bold 48px sans-serif';ctx.fillStyle='#e8b86d';ctx.fillText('FORTUNA',W/2,y);y+=40;
-  ctx.font='400 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(232,184,109,0.7)';ctx.fillText('자미두수 명반',W/2,y);y+=34;
-  ctx.font='400 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText(dateStr,W/2,y);y+=26;
+  ctx.font='bold 48px sans-serif';ctx.fillStyle='#7a2418';ctx.fillText('FORTUNA',W/2,y);y+=40;
+  ctx.font='400 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(122,36,24,0.7)';ctx.fillText('자미두수 명반',W/2,y);y+=34;
+  ctx.font='400 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.55)';ctx.fillText(dateStr,W/2,y);y+=26;
   drawLine(y,220,0.5);y+=44;
 
   // ── 명주성 히어로 카드 (SOUL_INTERP 포함)
@@ -666,13 +670,13 @@ function _drawZiweiCard(cb) {
   var soulText=SOUL_INTERP[destStar]||'';
   var destCardH=soulText?320:180;
   var goldGrad=ctx.createLinearGradient(PAD,y,PAD,y+destCardH);
-  goldGrad.addColorStop(0,'rgba(232,184,109,0.14)');goldGrad.addColorStop(1,'rgba(232,184,109,0.03)');
+  goldGrad.addColorStop(0,'rgba(212,175,90,0.18)');goldGrad.addColorStop(1,'rgba(212,175,90,0.05)');
   ctx.fillStyle=goldGrad;fRR(PAD,y,W-PAD*2,destCardH,20);
-  ctx.strokeStyle='rgba(232,184,109,0.5)';ctx.lineWidth=2;sRR(PAD,y,W-PAD*2,destCardH,20);
-  ctx.font='600 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText('★ 명주성 (命主星)',W/2,y+46);
-  ctx.font='700 64px "Noto Serif KR",serif';ctx.fillStyle='#e8b86d';ctx.fillText(destStar,W/2,y+126);
+  ctx.strokeStyle='rgba(154,122,38,0.5)';ctx.lineWidth=2;sRR(PAD,y,W-PAD*2,destCardH,20);
+  ctx.font='600 22px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.65)';ctx.fillText('★ 명주성 (命主星)',W/2,y+46);
+  ctx.font='700 64px "Noto Serif KR",serif';ctx.fillStyle='#7a2418';ctx.fillText(destStar,W/2,y+126);
   if(soulText){
-    ctx.font='400 26px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';
+    ctx.font='400 26px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(36,26,16,0.75)';
     fillWrapped(soulText,W/2,y+168,W-PAD*2-80,40);
   }
   y+=destCardH+32;
@@ -681,27 +685,27 @@ function _drawZiweiCard(cb) {
   var rowH=160,colW=(W-PAD*2-20)/2;
   [{label:'◎ 신주성 (身主星)',val:d.bodyMaster||'—'},{label:'오행국 (五行局)',val:d.element||'—'}].forEach(function(b,i){
     var bx=PAD+i*(colW+20);
-    ctx.fillStyle='rgba(255,255,255,0.05)';fRR(bx,y,colW,rowH,16);
-    ctx.strokeStyle='rgba(232,184,109,0.3)';ctx.lineWidth=1.5;sRR(bx,y,colW,rowH,16);
-    ctx.font='400 20px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText(b.label,bx+colW/2,y+40);
-    ctx.font='700 40px "Noto Serif KR",serif';ctx.fillStyle='#e8b86d';ctx.fillText(b.val,bx+colW/2,y+110);
+    ctx.fillStyle='rgba(252,247,234,0.7)';fRR(bx,y,colW,rowH,16);
+    ctx.strokeStyle='rgba(154,122,38,0.35)';ctx.lineWidth=1.5;sRR(bx,y,colW,rowH,16);
+    ctx.font='400 20px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.6)';ctx.fillText(b.label,bx+colW/2,y+40);
+    ctx.font='700 40px "Noto Serif KR",serif';ctx.fillStyle='#7a2418';ctx.fillText(b.val,bx+colW/2,y+110);
   });
   y+=rowH+36;
 
   // ── 현재 대한
   drawLine(y,220,0.4);y+=42;
-  ctx.font='600 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.55)';ctx.fillText('🌊 현재 대한 大限',W/2,y);y+=40;
+  ctx.font='600 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(36,26,16,0.7)';ctx.fillText('🌊 현재 대한 大限',W/2,y);y+=40;
   var dec=d.currentDecade;
   if(dec){
-    ctx.font='bold 52px "Noto Serif KR",serif';ctx.fillStyle='#e8b86d';ctx.fillText(dec.name||'—',W/2,y);y+=44;
-    ctx.font='400 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText(dec.ageRange||'',W/2,y);y+=44;
+    ctx.font='bold 52px "Noto Serif KR",serif';ctx.fillStyle='#7a2418';ctx.fillText(dec.name||'—',W/2,y);y+=44;
+    ctx.font='400 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.6)';ctx.fillText(dec.ageRange||'',W/2,y);y+=44;
     var dStars=(dec.stars||[]).slice(0,5);
     if(dStars.length){
       var sW=140,sH=52,sGap=10,sx=W/2-((sW+sGap)*dStars.length-sGap)/2;
       dStars.forEach(function(s){
-        ctx.fillStyle='rgba(232,184,109,0.12)';fRR(sx,y,sW,sH,10);
-        ctx.strokeStyle='rgba(232,184,109,0.35)';ctx.lineWidth=1;sRR(sx,y,sW,sH,10);
-        ctx.font='600 22px "Noto Serif KR",serif';ctx.fillStyle='#e8b86d';ctx.fillText(s,sx+sW/2,y+34);
+        ctx.fillStyle='rgba(212,175,90,0.18)';fRR(sx,y,sW,sH,10);
+        ctx.strokeStyle='rgba(154,122,38,0.4)';ctx.lineWidth=1;sRR(sx,y,sW,sH,10);
+        ctx.font='600 22px "Noto Serif KR",serif';ctx.fillStyle='#7a5e1c';ctx.fillText(s,sx+sW/2,y+34);
         sx+=sW+sGap;
       });
       y+=sH+16;
@@ -712,14 +716,14 @@ function _drawZiweiCard(cb) {
   var yr=d.currentYear;
   if(yr){
     drawLine(y,180,0.3);y+=36;
-    ctx.font='600 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.45)';ctx.fillText('✨ 유년 流年',W/2,y);y+=34;
-    ctx.font='700 32px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(232,184,109,0.85)';
+    ctx.font='600 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(36,26,16,0.65)';ctx.fillText('✨ 유년 流年',W/2,y);y+=34;
+    ctx.font='700 32px "Noto Sans KR",sans-serif';ctx.fillStyle='#7a2418';
     ctx.fillText((yr.heavenlyStem||'')+(yr.earthlyBranch||'')+' '+(yr.year||'')+'년 · '+(yr.palace||''),W/2,y);
   }
 
   // 푸터
   var footerY=H-80;drawLine(footerY,150,0.4);
-  ctx.font='400 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(255,255,255,0.22)';ctx.fillText('picolab.kr',W/2,footerY+42);
+  ctx.font='400 24px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.45)';ctx.fillText('picolab.kr',W/2,footerY+42);
 
   cb(canvas);
 }
@@ -729,11 +733,11 @@ function shareZiweiKakao() {
   if(btn){ btn.disabled=true; btn.textContent='⏳ 생성 중...'; }
   var modal = document.getElementById('ziweiShareModal');
   var preview = document.getElementById('ziweiPreviewArea');
-  preview.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
+  preview.innerHTML = '<div style="color:rgba(74,58,42,0.7);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
   modal.style.display = 'flex';
   _drawZiweiCard(function(canvas){
     if(btn){ btn.disabled=false; btn.textContent='⭐ 카카오톡 공유'; }
-    if(!canvas){ preview.innerHTML='<div style="color:#ff6b6b;padding:20px;">카드 생성 실패 <i class="pi pi-sad"></i></div>'; return; }
+    if(!canvas){ preview.innerHTML='<div style="color:#c0392b;padding:20px;">카드 생성 실패 <i class="pi pi-sad"></i></div>'; return; }
     window._ziweiCanvas = canvas;
     var img = new Image(); img.src = canvas.toDataURL('image/png');
     img.style.cssText = 'width:100%;border-radius:12px;display:block;';
@@ -771,14 +775,14 @@ function closeZiweiShareModal() {
 </script>
 
 <!-- 공유 카드 프리뷰 모달 -->
-<div id="ziweiShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
-  <div style="background:#13131a;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:92vh;overflow-y:auto;position:relative;">
-    <button onclick="closeZiweiShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:22px;cursor:pointer;line-height:1;">✕</button>
-    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(255,255,255,0.4);font-family:'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
+<div id="ziweiShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(40,25,15,0.55);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
+  <div style="background:#fcf7ea;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -8px 24px rgba(60,40,20,0.18);">
+    <button onclick="closeZiweiShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(74,58,42,0.55);font-size:22px;cursor:pointer;line-height:1;">✕</button>
+    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.7);font-family:'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
     <div id="ziweiPreviewArea" style="text-align:center;min-height:120px;margin-bottom:16px;"></div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <button onclick="doZiweiShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">⭐ 카카오톡으로 공유하기</button>
-      <button onclick="closeZiweiShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);border:none;border-radius:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
+      <button onclick="closeZiweiShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:#ede4cf;color:#4a3a2a;border:1px solid #c9bc9d;border-radius:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
     </div>
   </div>
 </div>

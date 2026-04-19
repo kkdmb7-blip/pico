@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>사주 분석 · FORTUNA</title>
+  <meta name="theme-color" content="#f5efe4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,20 +12,41 @@
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="pico-icons.css">
   <style>
+    :root {
+      --bg: #f4ede0;
+      --surface: #fcf7ea;
+      --surface2: #ede4cf;
+      --border: #c9bc9d;
+      --border-soft: rgba(80,55,30,0.10);
+      --accent: #7a2418;
+      --accent2: #2a1f1a;
+      --text: #1a120a;
+      --text2: #4a3a2a;
+      --muted: #7a6850;
+      --gold: #9a7a26;
+      --gold-deep: #7a5e1c;
+      --ink: #241a10;
+      --orb: #5f8cb5;
+      --orb-bg: rgba(122,196,255,0.12);
+      --orb-border: rgba(95,140,181,0.30);
+      --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+      --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
+    }
     * { box-sizing: border-box; }
-    body { font-family: 'Noto Sans KR', sans-serif; background: #0d0d14; color: #e8e8f0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #f4ede0; color: #1a120a; }
     .hanja { font-family: 'Noto Serif KR', serif; }
 
-    /* glassmorphism */
+    /* glassmorphism (ivory) */
     .glass {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(252,247,234,0.78);
+      border: 1px solid rgba(80,55,30,0.12);
       border-radius: 16px;
       backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-soft);
     }
     .glass-sm {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(252,247,234,0.82);
+      border: 1px solid rgba(80,55,30,0.10);
       border-radius: 10px;
     }
 
@@ -44,14 +66,14 @@
 
     /* pillar */
     .pillar-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(252,247,234,0.85);
+      border: 1px solid rgba(80,55,30,0.10);
       border-radius: 12px;
       padding: 8px 4px;
       text-align: center;
       min-width: 0;
     }
-    .pillar-card.is-day { border-color: rgba(123,94,167,0.5); background: rgba(123,94,167,0.06); }
+    .pillar-card.is-day { border-color: rgba(122,36,24,0.45); background: rgba(122,36,24,0.06); }
     .hanja-box {
       font-family: 'Noto Serif KR', serif;
       font-size: 1.6rem;
@@ -77,7 +99,8 @@
     .badge {
       display: inline-flex; align-items: center;
       padding: 3px 9px; border-radius: 20px; font-size: 12px; line-height: 1.5;
-      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(80,55,30,0.08); border: 1px solid rgba(80,55,30,0.18);
+      color: #4a3a2a;
     }
     .badge-ham   { background: rgba(0,200,83,0.12);  border: 1px solid rgba(0,200,83,0.3);  color: #69F0AE; }
     .badge-chung { background: rgba(255,23,68,0.12);  border: 1px solid rgba(255,23,68,0.3); color: #FF5252; }
@@ -93,82 +116,84 @@
     .luck-card {
       scroll-snap-align: center; flex-shrink: 0; width: 58px;
       border-radius: 10px; padding: 8px 4px; text-align: center;
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(252,247,234,0.85); border: 1px solid rgba(80,55,30,0.12);
       cursor: pointer; transition: border-color 0.2s, background 0.2s;
     }
     .luck-card:active { opacity: 0.8; }
-    .luck-card.active { border-color: #7b5ea7; background: rgba(123,94,167,0.18); }
-    .luck-card.selected { border-color: #e8b86d; background: rgba(232,184,109,0.12); }
+    .luck-card.active { border-color: #7a2418; background: rgba(122,36,24,0.10); }
+    .luck-card.selected { border-color: #9a7a26; background: rgba(154,122,38,0.14); }
 
     /* yun grid */
     .yun-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-    .yun-cell { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 8px 4px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+    .yun-cell { background: rgba(252,247,234,0.85); border: 1px solid rgba(80,55,30,0.12); border-radius: 8px; padding: 8px 4px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
     .yun-cell:active { opacity: 0.8; }
-    .yun-cell.now { border-color: #7b5ea7; background: rgba(123,94,167,0.15); }
-    .yun-cell.selected { border-color: #e8b86d; background: rgba(232,184,109,0.12); }
+    .yun-cell.now { border-color: #7a2418; background: rgba(122,36,24,0.10); }
+    .yun-cell.selected { border-color: #9a7a26; background: rgba(154,122,38,0.14); }
 
     /* form */
     .f-select {
       width: 100%;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.13);
+      background: rgba(252,247,234,0.85);
+      border: 1px solid rgba(80,55,30,0.18);
       border-radius: 10px;
-      color: #e8e8f0;
+      color: #1a120a;
       padding: 11px 12px;
       font-size: 14px;
       font-family: 'Noto Sans KR', sans-serif;
       appearance: none;
     }
-    .f-select:focus { outline: none; border-color: #7b5ea7; }
-    .f-select option { background: #1c1c28; }
-    .f-label { display: block; font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 6px; letter-spacing: 0.05em; }
+    .f-select:focus { outline: none; border-color: #7a2418; }
+    .f-select option { background: #fcf7ea; color: #1a120a; }
+    .f-label { display: block; font-size: 11px; color: #7a6850; margin-bottom: 6px; letter-spacing: 0.05em; }
     .g-btn {
       flex: 1; padding: 11px; border-radius: 10px; font-size: 14px;
-      background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.13);
-      color: rgba(255,255,255,0.45); cursor: pointer; transition: all 0.2s;
+      background: rgba(252,247,234,0.85); border: 1.5px solid rgba(80,55,30,0.18);
+      color: #7a6850; cursor: pointer; transition: all 0.2s;
       font-family: 'Noto Sans KR', sans-serif;
     }
-    .g-btn.on { background: rgba(123,94,167,0.28); border-color: #7b5ea7; color: #fff; }
+    .g-btn.on { background: rgba(122,36,24,0.10); border-color: #7a2418; color: #7a2418; font-weight:700; }
     .main-btn {
       width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700;
-      background: linear-gradient(135deg, #7b5ea7, #5e3d8a);
-      color: #fff; border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #7a2418, #5a1810);
+      color: #fcf7ea; border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+      box-shadow: var(--shadow-soft);
     }
     .main-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
     /* spinner */
     @keyframes spin { to { transform: rotate(360deg); } }
-    .spin { width: 38px; height: 38px; border: 3px solid rgba(255,255,255,0.08); border-top-color: #7b5ea7; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .spin { width: 38px; height: 38px; border: 3px solid rgba(80,55,30,0.15); border-top-color: #7a2418; border-radius: 50%; animation: spin 0.8s linear infinite; }
 
     /* five bar */
-    .five-bar-bg { height: 7px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+    .five-bar-bg { height: 7px; background: rgba(80,55,30,0.10); border-radius: 10px; overflow: hidden; }
     .five-bar-fill { height: 100%; border-radius: 10px; transition: width 0.7s ease; }
 
 
     /* 달력 모달 */
     .cal-overlay {
       display: none; position: fixed; inset: 0; z-index: 500;
-      background: rgba(0,0,0,0.75); align-items: flex-end; justify-content: center;
+      background: rgba(40,28,16,0.55); align-items: flex-end; justify-content: center;
     }
     .cal-overlay.open { display: flex; }
     .cal-modal {
       width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
-      background: #13131f; border-radius: 20px 20px 0 0;
-      border: 1px solid rgba(255,255,255,0.08);
+      background: #fcf7ea; border-radius: 20px 20px 0 0;
+      border: 1px solid rgba(80,55,30,0.15);
       padding: 0 14px 32px; animation: slideUp 0.25s ease;
+      box-shadow: 0 -10px 40px rgba(60,40,20,0.18);
     }
     @keyframes slideUp { from { transform: translateY(40px); opacity:0; } to { transform: translateY(0); opacity:1; } }
-    .cal-header { position: sticky; top:0; background:#13131f; padding: 16px 0 10px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); margin-bottom:10px; }
+    .cal-header { position: sticky; top:0; background:#fcf7ea; padding: 16px 0 10px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(80,55,30,0.10); margin-bottom:10px; }
     .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
-    .cal-dow { text-align:center; font-size:10px; color:rgba(255,255,255,0.3); padding: 4px 0; }
+    .cal-dow { text-align:center; font-size:10px; color:#7a6850; padding: 4px 0; }
     .cal-day {
       border-radius: 8px; padding: 5px 2px; text-align:center;
-      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+      background: rgba(252,247,234,0.85); border: 1px solid rgba(80,55,30,0.10);
       min-height: 56px;
     }
-    .cal-day.today { border-color: #7b5ea7; background: rgba(123,94,167,0.12); }
+    .cal-day.today { border-color: #7a2418; background: rgba(122,36,24,0.10); }
     .cal-day.empty { background: none; border-color: transparent; }
-    .cal-day-num { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+    .cal-day-num { font-size: 11px; color: #4a3a2a; margin-bottom: 3px; }
     .cal-day-num.sun { color: #FF5252; }
     .cal-day-num.sat { color: #64B5F6; }
     .cal-hanja { font-family:'Noto Serif KR',serif; font-size:13px; font-weight:700; line-height:1.2; }
@@ -178,9 +203,9 @@
 <body class="min-h-screen pb-24">
 
 <!-- nav -->
-<nav style="display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.05)">
-  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="img/goddess.png" style="height:56px;object-fit:contain" alt="FORTUNA"><span style="font-family:'Noto Serif KR',serif;font-weight:700;font-size:15px;letter-spacing:2px;color:#e8b86d;">FORTUNA</span></a>
-  <span style="margin-left:auto;font-size:13px;color:rgba(255,255,255,0.25)">四柱 分析</span>
+<nav style="display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(80,55,30,0.08)">
+  <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="img/goddess.png" style="height:56px;object-fit:contain" alt="FORTUNA"><span style="font-family:'Noto Serif KR',serif;font-weight:700;font-size:15px;letter-spacing:2px;color:#7a2418;">FORTUNA</span></a>
+  <span style="margin-left:auto;font-size:13px;color:rgba(80,55,30,0.45)">四柱 分析</span>
 </nav>
 
 <div id="profile-bar-root"></div>
@@ -189,7 +214,7 @@
 <!-- ═══ 폼 ═══ -->
 <div id="S_form" style="display:none;max-width:440px;margin:0 auto;padding:28px 18px 40px">
   <h1 class="hanja" style="font-size:26px;font-weight:700;text-align:center;margin-bottom:6px">四柱 分析</h1>
-  <p style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:28px">생년월일시를 입력하면 사주 8자를 바로 분석합니다</p>
+  <p style="text-align:center;font-size:13px;color:rgba(74,58,42,0.65);margin-bottom:28px">생년월일시를 입력하면 사주 8자를 바로 분석합니다</p>
 
   <div style="margin-bottom:16px">
     <label class="f-label">이름 (선택)</label>
@@ -251,7 +276,7 @@
 <!-- ═══ 로딩 ═══ -->
 <div id="S_load" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh">
   <div class="spin" style="margin-bottom:20px"></div>
-  <p style="font-size:13px;color:rgba(255,255,255,0.35)">사주를 분석하는 중...</p>
+  <p style="font-size:13px;color:rgba(74,58,42,0.6)">사주를 분석하는 중...</p>
 </div>
 
 <!-- ═══ 결과 ═══ -->
@@ -262,7 +287,7 @@
 
   <!-- 사주 원국 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_pillar')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_pillar')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
       <span>🀄 사주 원국</span><span class="acc-icon open" id="ico_acc_pillar">▾</span>
     </button>
     <div class="acc-body open" id="acc_pillar">
@@ -275,7 +300,7 @@
 
   <!-- 오행 분포 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_five')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_five')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
       <span><i class="pi pi-yinyang"></i> 오행 분포</span><span class="acc-icon open" id="ico_acc_five">▾</span>
     </button>
     <div class="acc-body open" id="acc_five">
@@ -285,7 +310,7 @@
 
   <!-- 격국 · 용신 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_geok')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_geok')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
       <span><i class="pi pi-scale"></i> 격국 · 용신</span><span class="acc-icon open" id="ico_acc_geok">▾</span>
     </button>
     <div class="acc-body open" id="acc_geok">
@@ -295,7 +320,7 @@
 
   <!-- 대운 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_luck')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_luck')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
       <span><i class="pi pi-wave"></i> 대운 흐름 <span style="font-size:11px;font-weight:400;opacity:0.45">10년 단위 운세 주기</span></span><span class="acc-icon open" id="ico_acc_luck">▾</span>
     </button>
     <div class="acc-body open" id="acc_luck">
@@ -308,7 +333,7 @@
 
   <!-- 세운 · 월운 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_yun')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_yun')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
       <span><i class="pi pi-calendar"></i> 세운 · 월운</span><span class="acc-icon open" id="ico_acc_yun">▾</span>
     </button>
     <div class="acc-body open" id="acc_yun">
@@ -321,7 +346,7 @@
 
   <!-- 행운 정보 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
-    <button onclick="togAcc('acc_johu')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#e8e8f0;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
+    <button onclick="togAcc('acc_johu')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Noto Sans KR',sans-serif">
       <span><i class="pi pi-clover"></i> 행운</span><span class="acc-icon open" id="ico_acc_johu">▾</span>
     </button>
     <div class="acc-body open" id="acc_johu">
@@ -336,7 +361,7 @@
   <div class="cal-modal">
     <div class="cal-header">
       <span id="calTitle" style="font-size:16px;font-weight:700"></span>
-      <button onclick="closeCalModal()" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:20px;cursor:pointer;padding:0 4px">✕</button>
+      <button onclick="closeCalModal()" style="background:none;border:none;color:rgba(74,58,42,0.65);font-size:20px;cursor:pointer;padding:0 4px">✕</button>
     </div>
     <div class="cal-grid" style="margin-bottom:6px">
       <div class="cal-dow" style="color:#FF5252">일</div>
@@ -352,7 +377,7 @@
 <!-- 사주 핵심 티저 -->
 <div id="sajuTeaserWrap" style="display:none;padding:4px 20px 8px;max-width:440px;margin:0 auto;">
   <div class="glass" style="padding:20px 18px;">
-    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.35);margin-bottom:16px;"><i class="pi pi-sparkle"></i> 나의 사주 핵심</div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(74,58,42,0.6);margin-bottom:16px;"><i class="pi pi-sparkle"></i> 나의 사주 핵심</div>
     <div id="sajuTeaserText"></div>
   </div>
 </div>
@@ -361,8 +386,8 @@
 
 <!-- 리포트 훅 -->
 <div id="sajuReportHook" style="display:none;padding:0 20px 10px;max-width:440px;margin:0 auto;">
-  <a href="report.html?type=character" style="display:block;padding:16px 20px;background:linear-gradient(135deg,rgba(123,94,167,0.15),rgba(160,127,212,0.10));border:1px solid rgba(180,143,255,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(180,143,255,0.7)';this.style.background='linear-gradient(135deg,rgba(123,94,167,0.25),rgba(160,127,212,0.18))'" onmouseout="this.style.borderColor='rgba(180,143,255,0.35)';this.style.background='linear-gradient(135deg,rgba(123,94,167,0.15),rgba(160,127,212,0.10))'">
-    <div style="font-size:15px;font-weight:700;color:#d4b8ff;margin-bottom:4px;"><i class="pi pi-crystal"></i> 내 사주에 숨겨진 이야기 →</div>
+  <a href="report.html?type=character" style="display:block;padding:16px 20px;background:linear-gradient(135deg,rgba(122,36,24,0.12),rgba(154,122,38,0.08));border:1px solid rgba(122,36,24,0.30);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(122,36,24,0.55)';this.style.background='linear-gradient(135deg,rgba(122,36,24,0.22),rgba(154,122,38,0.14))'" onmouseout="this.style.borderColor='rgba(122,36,24,0.30)';this.style.background='linear-gradient(135deg,rgba(122,36,24,0.12),rgba(154,122,38,0.08))'">
+    <div style="font-size:15px;font-weight:700;color:#7a2418;margin-bottom:4px;"><i class="pi pi-crystal"></i> 내 사주에 숨겨진 이야기 →</div>
     <div style="font-size:11px;color:var(--muted);opacity:0.8;">AI가 풀어내는 나만의 사주 심층 리포트</div>
   </a>
 </div>
@@ -370,15 +395,15 @@
 <!-- 사주 공유 버튼 -->
 <div id="sajuShareBtnWrap" style="display:none;padding:0 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
   <button id="sajuShareBtn" onclick="shareSajuKakao()" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06));border:1px solid rgba(254,229,0,0.35);border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.borderColor='rgba(254,229,0,0.7)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.22),rgba(254,229,0,0.12))'" onmouseout="this.style.borderColor='rgba(254,229,0,0.35)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06))'">
-    <div style="font-size:15px;font-weight:700;color:#e8d44d;margin-bottom:4px;"><i class="pi pi-crystal"></i> 카카오톡으로 공유하기 →</div>
+    <div style="font-size:15px;font-weight:700;color:#7a5e1c;margin-bottom:4px;"><i class="pi pi-crystal"></i> 카카오톡으로 공유하기 →</div>
     <div style="font-size:11px;color:var(--muted);opacity:0.8;">내 사주 결과를 친구에게 보내보세요</div>
   </button>
   <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06));border:1px solid rgba(232,184,109,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,184,109,0.7)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.22),rgba(201,168,76,0.12))'" onmouseout="this.style.borderColor='rgba(232,184,109,0.35)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06))'">
-    <div style="font-size:15px;font-weight:700;color:#e8b86d;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담하기 →</div>
+    <div style="font-size:15px;font-weight:700;color:#8a6b20;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담하기 →</div>
     <div style="font-size:11px;color:var(--muted);opacity:0.8;">대화로 풀어보는 나만의 운세 이야기</div>
   </a>
   <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10));border:1px solid rgba(232,168,124,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,168,124,0.7)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.18))'" onmouseout="this.style.borderColor='rgba(232,168,124,0.35)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10))'">
-    <div style="font-size:15px;font-weight:700;color:#e8a87c;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
+    <div style="font-size:15px;font-weight:700;color:#a85f2e;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
     <div style="font-size:11px;color:var(--muted);opacity:0.8;">사주 전문가와 1:1 깊은 상담</div>
   </a>
 </div>
@@ -643,17 +668,17 @@ function renderProfile(data) {
 
   const namePart = pName
     ? `<span style="font-size:20px;font-weight:700">${pName}</span>`
-    : `<span style="font-size:13px;color:rgba(255,255,255,0.3)">이름 미입력</span>`;
+    : `<span style="font-size:13px;color:rgba(80,55,30,0.55)">이름 미입력</span>`;
 
   document.getElementById('R_profile').innerHTML=`
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
       <div>
         ${namePart}
-        <div style="margin-top:4px;font-size:12px;color:rgba(255,255,255,0.4)">양력 ${pBirth} · ${hTxt} · ${gTxt}성</div>
+        <div style="margin-top:4px;font-size:12px;color:rgba(74,58,42,0.65)">양력 ${pBirth} · ${hTxt} · ${gTxt}성</div>
       </div>
       <div style="text-align:right">
-        <div style="font-size:24px;font-weight:700;line-height:1">${ageKor}<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.4)">세</span></div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.3)">만 ${ageMan}세</div>
+        <div style="font-size:24px;font-weight:700;line-height:1">${ageKor}<span style="font-size:12px;font-weight:400;color:rgba(74,58,42,0.65)">세</span></div>
+        <div style="font-size:11px;color:rgba(80,55,30,0.55)">만 ${ageMan}세</div>
       </div>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
@@ -662,7 +687,7 @@ function renderProfile(data) {
       <span class="badge">${data.summary.zodiac}띠</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:6px">
-      <span class="badge" style="background:rgba(123,94,167,0.2);border-color:rgba(123,94,167,0.4);color:#CE93D8">${data.summary.strength}</span>
+      <span class="badge" style="background:rgba(122,36,24,0.18);border-color:rgba(122,36,24,0.35);color:#7a2418">${data.summary.strength}</span>
       <span class="badge">${data.geokguk.geok_kor}</span>
       ${(data.johu.needs_kor||[]).map((n,i)=>`<span class="badge" style="color:#FFAB40;border-color:rgba(255,171,64,0.35);background:rgba(255,171,64,0.08)">${i===0?'조후용신':'조후희신'} ${n}</span>`).join('')}
     </div>
@@ -679,7 +704,7 @@ function renderPillars(data, pls, dayP) {
 
     // 천간 십성 (상단)
     const stemSip = isDay
-      ? '<span style="color:#CE93D8">일간</span>'
+      ? '<span style="color:#7a2418">일간</span>'
       : `<span title="${SIP_DESC[sipseong(dayP.si, pl.si)]||''}">${sipseong(dayP.si, pl.si) || '&nbsp;'}</span>`;
 
     // 지지 안전 처리
@@ -692,8 +717,8 @@ function renderPillars(data, pls, dayP) {
       const name = STEMS[ji] || '';
       const sip  = sipseong(dayP.si, ji);
       return `<div style="display:flex;flex-direction:column;align-items:center;gap:1px">
-        <span style="font-size:11px;color:rgba(255,255,255,0.6)">${name}</span>
-        <span style="font-size:9px;color:rgba(255,255,255,0.35);white-space:nowrap" title="${SIP_DESC[sip]||''}">${sip||'—'}</span>
+        <span style="font-size:11px;color:rgba(74,58,42,0.88)">${name}</span>
+        <span style="font-size:9px;color:rgba(74,58,42,0.6);white-space:nowrap" title="${SIP_DESC[sip]||''}">${sip||'—'}</span>
       </div>`;
     }).join('');
 
@@ -713,14 +738,14 @@ function renderPillars(data, pls, dayP) {
 
     html += `
     <div class="pillar-card${isDay?' is-day':''}">
-      <div style="font-size:10px;color:rgba(255,255,255,0.28);margin-bottom:4px">${LABELS[i]}</div>
-      <div style="font-size:11px;min-height:16px;margin-bottom:4px;color:rgba(255,255,255,0.6)">${stemSip}</div>
+      <div style="font-size:10px;color:rgba(80,55,30,0.50);margin-bottom:4px">${LABELS[i]}</div>
+      <div style="font-size:11px;min-height:16px;margin-bottom:4px;color:rgba(74,58,42,0.88)">${stemSip}</div>
       <div class="hanja-box ${EL_BG_CSS[pl.sStemEl]||''}">${STEM_H[pl.si]||'?'}</div>
       <div class="hanja-box ${EL_BG_CSS[bEl]||''}">${BRANCH_H[bIdx]||'?'}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px" title="${SIP_DESC[sipseong(dayP.si, BRANCH_MAIN_STEM[bIdx])]||''}">${sipseong(dayP.si, BRANCH_MAIN_STEM[bIdx]) || '&nbsp;'}</div>
+      <div style="font-size:11px;color:rgba(74,58,42,0.82);margin-top:3px" title="${SIP_DESC[sipseong(dayP.si, BRANCH_MAIN_STEM[bIdx])]||''}">${sipseong(dayP.si, BRANCH_MAIN_STEM[bIdx]) || '&nbsp;'}</div>
       <div style="margin-top:6px;display:flex;justify-content:center;gap:4px;flex-wrap:wrap">${jjgHTML}</div>
-      <div style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.5);font-weight:600">${woon}</div>
-      <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;line-height:1.3">${nap}</div>
+      <div style="margin-top:6px;font-size:10px;color:rgba(74,58,42,0.78);font-weight:600">${woon}</div>
+      <div style="font-size:9px;color:rgba(80,55,30,0.55);margin-top:2px;line-height:1.3">${nap}</div>
       <div style="margin-top:5px;min-height:14px;line-height:1.4">${myRels}</div>
     </div>`;
   });
@@ -739,11 +764,11 @@ function renderRelations(data) {
     ...(rel.breaks      ||[]).map(s=>`<span class="badge badge-pa">${s}</span>`),
   ];
   document.getElementById('R_relations').innerHTML = all.length
-    ? `<div style="border-top:1px solid rgba(255,255,255,0.05);padding-top:10px">
-         <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:6px">형충회합해파</div>
+    ? `<div style="border-top:1px solid rgba(80,55,30,0.08);padding-top:10px">
+         <div style="font-size:11px;color:rgba(80,55,30,0.55);margin-bottom:6px">형충회합해파</div>
          <div style="display:flex;flex-wrap:wrap;gap:5px">${all.join('')}</div>
        </div>`
-    : `<div style="font-size:12px;color:rgba(255,255,255,0.25);padding-top:8px">형충회합 없음</div>`;
+    : `<div style="font-size:12px;color:rgba(80,55,30,0.45);padding-top:8px">형충회합 없음</div>`;
 }
 
 // ─── 오행 분포도 ──────────────────────────────────
@@ -767,13 +792,13 @@ function renderFive(data) {
       const a = -Math.PI/2 + i * 2*Math.PI/5;
       return (cx + r*Math.cos(a)).toFixed(1)+','+(cy + r*Math.sin(a)).toFixed(1);
     }).join(' ');
-    radarGrid += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>`;
+    radarGrid += `<polygon points="${pts}" fill="none" stroke="rgba(80,55,30,0.12)" stroke-width="1"/>`;
   }
   // 5축선
   let radarAxes = '';
   for (let i=0; i<5; i++) {
     const a = -Math.PI/2 + i * 2*Math.PI/5;
-    radarAxes += `<line x1="${cx}" y1="${cy}" x2="${(cx+R*Math.cos(a)).toFixed(1)}" y2="${(cy+R*Math.sin(a)).toFixed(1)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    radarAxes += `<line x1="${cx}" y1="${cy}" x2="${(cx+R*Math.cos(a)).toFixed(1)}" y2="${(cy+R*Math.sin(a)).toFixed(1)}" stroke="rgba(80,55,30,0.10)" stroke-width="1"/>`;
   }
   const dataPts = radarVals.map((v,i) => {
     const r = R * (v/maxV);
@@ -788,16 +813,16 @@ function renderFive(data) {
     const lx = cx + (R+18)*Math.cos(a);
     const ly = cy + (R+18)*Math.sin(a);
     radarLabels += `<text x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}" fill="${EL_HEX[items[i].el]}" font-size="14" font-weight="700" text-anchor="middle">${items[i].kor}</text>`;
-    radarLabels += `<text x="${lx.toFixed(1)}" y="${(ly+18).toFixed(1)}" fill="rgba(255,255,255,0.45)" font-size="10" text-anchor="middle">${radarVals[i]}%</text>`;
+    radarLabels += `<text x="${lx.toFixed(1)}" y="${(ly+18).toFixed(1)}" fill="rgba(74,58,42,0.72)" font-size="10" text-anchor="middle">${radarVals[i]}%</text>`;
   }
   let html = `<div style="text-align:center;margin-bottom:6px">
     <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto">
       ${radarGrid}${radarAxes}
-      <polygon points="${dataPts}" fill="rgba(206,147,216,0.22)" stroke="#CE93D8" stroke-width="2"/>
+      <polygon points="${dataPts}" fill="rgba(122,36,24,0.22)" stroke="#7a2418" stroke-width="2"/>
       ${radarDots}${radarLabels}
     </svg>
   </div>
-  <div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;margin:-4px 0 12px">오행 균형 레이더 · 모서리 멀수록 강함</div>`;
+  <div style="font-size:10px;color:rgba(80,55,30,0.55);text-align:center;margin:-4px 0 12px">오행 균형 레이더 · 모서리 멀수록 강함</div>`;
   items.forEach(it=>{
     html+=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
@@ -805,7 +830,7 @@ function renderFive(data) {
       <div class="five-bar-bg" style="flex:1">
         <div class="five-bar-fill" style="width:${it.pct}%;background:${EL_HEX[it.el]}"></div>
       </div>
-      <span style="font-size:13px;color:rgba(255,255,255,0.55);width:38px;text-align:right;flex-shrink:0">${it.pct}%</span>
+      <span style="font-size:13px;color:rgba(74,58,42,0.82);width:38px;text-align:right;flex-shrink:0">${it.pct}%</span>
     </div>`;
   });
   document.getElementById('R_five').innerHTML=html;
@@ -840,47 +865,47 @@ function renderGeok(data) {
   document.getElementById('R_geok').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">격국</div>
+        <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:4px">격국</div>
         <div style="font-weight:700;color:#FFD740">${g.geok_kor}</div>
         <div style="font-size:9px;opacity:0.5;margin-top:3px">사주 구조 유형</div>
       </div>
       <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">신강/신약</div>
-        <div style="font-weight:700;color:#CE93D8">${data.summary.strength}</div>
+        <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:4px">신강/신약</div>
+        <div style="font-weight:700;color:#7a2418">${data.summary.strength}</div>
         <div style="font-size:9px;opacity:0.5;margin-top:3px">일간 에너지의 강약</div>
       </div>
     </div>
-    <div style="background:rgba(255,171,64,0.06);border:1px solid rgba(255,171,64,0.2);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px;color:rgba(255,255,255,0.55);line-height:1.7">
+    <div style="background:rgba(255,171,64,0.06);border:1px solid rgba(255,171,64,0.2);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px;color:rgba(74,58,42,0.82);line-height:1.7">
       <i class="pi pi-calendar"></i> <b style="color:#FFAB40">${season}생</b> → <b style="color:#FFAB40">${weight}</b> 우선 적용
-      &nbsp;·&nbsp; <span style="color:rgba(255,255,255,0.4)">"조후 = 귀(貴) · 억부 = 부(富)"</span>
+      &nbsp;·&nbsp; <span style="color:rgba(74,58,42,0.65)">"조후 = 귀(貴) · 억부 = 부(富)"</span>
     </div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px">☀️ 조후용신 (기후·환경)</div>
+    <div style="font-size:11px;color:rgba(74,58,42,0.6);margin-bottom:6px">☀️ 조후용신 (기후·환경)</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <div class="glass-sm" style="padding:12px;text-align:center;border-color:rgba(255,171,64,0.25)">
         <div style="font-size:10px;color:rgba(255,171,64,0.6);margin-bottom:4px">조후용신<span style="display:block;font-size:9px;opacity:0.55;font-weight:400;letter-spacing:0">기후 불균형 보완 기운</span></div>
         <div class="hanja ${EL_TC_CSS[johuEl1]}" style="font-weight:700;font-size:17px">${EL_NAME[johuEl1]}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.5)">${johuKor1}</div>
+        <div style="font-size:11px;color:rgba(74,58,42,0.78)">${johuKor1}</div>
       </div>
       <div class="glass-sm" style="padding:12px;text-align:center;border-color:rgba(255,171,64,0.15)">
         <div style="font-size:10px;color:rgba(255,171,64,0.4);margin-bottom:4px">조후희신<span style="display:block;font-size:9px;opacity:0.55;font-weight:400;letter-spacing:0">조후용신을 보조</span></div>
         <div class="hanja ${EL_TC_CSS[johuEl2]}" style="font-weight:700;font-size:17px">${johuKor2?EL_NAME[johuEl2]:'—'}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.5)">${johuKor2}</div>
+        <div style="font-size:11px;color:rgba(74,58,42,0.78)">${johuKor2}</div>
       </div>
     </div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px"><i class="pi pi-scale"></i>️ 억부용신 (강약·균형)</div>
+    <div style="font-size:11px;color:rgba(74,58,42,0.6);margin-bottom:6px"><i class="pi pi-scale"></i>️ 억부용신 (강약·균형)</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">억부용신<span style="display:block;font-size:9px;opacity:0.55;font-weight:400;letter-spacing:0">일간 강약 균형 기운</span></div>
+        <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:4px">억부용신<span style="display:block;font-size:9px;opacity:0.55;font-weight:400;letter-spacing:0">일간 강약 균형 기운</span></div>
         <div class="hanja ${EL_TC_CSS[priEl]}" style="font-weight:700;font-size:17px">${EL_NAME[priEl]}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.5)">${y.primary_kor}</div>
+        <div style="font-size:11px;color:rgba(74,58,42,0.78)">${y.primary_kor}</div>
       </div>
       <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">억부희신<span style="display:block;font-size:9px;opacity:0.55;font-weight:400;letter-spacing:0">용신을 보조하는 기운</span></div>
+        <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:4px">억부희신<span style="display:block;font-size:9px;opacity:0.55;font-weight:400;letter-spacing:0">용신을 보조하는 기운</span></div>
         <div class="hanja ${EL_TC_CSS[secEl]}" style="font-weight:700;font-size:17px">${EL_NAME[secEl]}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.5)">${y.secondary_kor}</div>
+        <div style="font-size:11px;color:rgba(74,58,42,0.78)">${y.secondary_kor}</div>
       </div>
     </div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px"><i class="pi pi-pin"></i> 통근 천간</div>
+    <div style="font-size:11px;color:rgba(74,58,42,0.6);margin-bottom:6px"><i class="pi pi-pin"></i> 통근 천간</div>
     <div class="glass-sm" style="padding:10px;text-align:center">
       <div class="hanja" style="font-weight:700;font-size:16px;color:#FFD740;letter-spacing:6px">${(t.stems_with_root||[]).join(' ')||'—'}</div>
     </div>
@@ -934,28 +959,28 @@ function renderLuckTrend(data, cy) {
   const areaPath = linePath + ` L${points[points.length-1].x.toFixed(1)} ${(padT+innerH).toFixed(1)} L${points[0].x.toFixed(1)} ${(padT+innerH).toFixed(1)} Z`;
 
   const dots = points.map(p =>
-    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.isNow?5:3.5}" fill="${p.isNow?'#CE93D8':'#ff8ab0'}" stroke="${p.isNow?'#fff':'none'}" stroke-width="${p.isNow?2:0}"/>` +
-    (p.isNow ? `<text x="${p.x.toFixed(1)}" y="${(p.y-10).toFixed(1)}" fill="#CE93D8" font-size="10" font-weight="700" text-anchor="middle">현재 ${p.sc}</text>` : '')
+    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.isNow?5:3.5}" fill="${p.isNow?'#7a2418':'#c87040'}" stroke="${p.isNow?'#fff':'none'}" stroke-width="${p.isNow?2:0}"/>` +
+    (p.isNow ? `<text x="${p.x.toFixed(1)}" y="${(p.y-10).toFixed(1)}" fill="#7a2418" font-size="10" font-weight="700" text-anchor="middle">현재 ${p.sc}</text>` : '')
   ).join('');
 
   const labels = points.map(p =>
-    `<text x="${p.x.toFixed(1)}" y="${(padT+innerH+15).toFixed(1)}" fill="rgba(255,255,255,0.4)" font-size="9" text-anchor="middle">${p.year}</text>`
+    `<text x="${p.x.toFixed(1)}" y="${(padT+innerH+15).toFixed(1)}" fill="rgba(74,58,42,0.65)" font-size="9" text-anchor="middle">${p.year}</text>`
   ).join('');
 
   const midY = padT + innerH/2;
 
-  el.innerHTML = `<div style="margin-bottom:14px;padding:10px 6px 8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px">
-    <div style="font-size:11px;color:rgba(255,255,255,0.45);margin:0 8px 4px"><i class="pi pi-chart-line"></i> 대운 용신 적합도 흐름</div>
+  el.innerHTML = `<div style="margin-bottom:14px;padding:10px 6px 8px;background:rgba(80,55,30,0.04);border:1px solid rgba(80,55,30,0.10);border-radius:10px">
+    <div style="font-size:11px;color:rgba(74,58,42,0.72);margin:0 8px 4px"><i class="pi pi-chart-line"></i> 대운 용신 적합도 흐름</div>
     <svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block">
-      <line x1="${padL}" y1="${midY}" x2="${W-padR}" y2="${midY}" stroke="rgba(255,255,255,0.1)" stroke-dasharray="3 3"/>
-      <text x="${padL-4}" y="${(midY+3).toFixed(1)}" fill="rgba(255,255,255,0.3)" font-size="9" text-anchor="end">50</text>
-      <text x="${padL-4}" y="${(padT+5).toFixed(1)}" fill="rgba(255,255,255,0.3)" font-size="9" text-anchor="end">100</text>
-      <text x="${padL-4}" y="${(padT+innerH+3).toFixed(1)}" fill="rgba(255,255,255,0.3)" font-size="9" text-anchor="end">0</text>
-      <path d="${areaPath}" fill="rgba(206,147,216,0.15)"/>
-      <path d="${linePath}" fill="none" stroke="#CE93D8" stroke-width="2" stroke-linejoin="round"/>
+      <line x1="${padL}" y1="${midY}" x2="${W-padR}" y2="${midY}" stroke="rgba(80,55,30,0.18)" stroke-dasharray="3 3"/>
+      <text x="${padL-4}" y="${(midY+3).toFixed(1)}" fill="rgba(80,55,30,0.55)" font-size="9" text-anchor="end">50</text>
+      <text x="${padL-4}" y="${(padT+5).toFixed(1)}" fill="rgba(80,55,30,0.55)" font-size="9" text-anchor="end">100</text>
+      <text x="${padL-4}" y="${(padT+innerH+3).toFixed(1)}" fill="rgba(80,55,30,0.55)" font-size="9" text-anchor="end">0</text>
+      <path d="${areaPath}" fill="rgba(122,36,24,0.15)"/>
+      <path d="${linePath}" fill="none" stroke="#7a2418" stroke-width="2" stroke-linejoin="round"/>
       ${dots}${labels}
     </svg>
-    <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-top:2px">용신(${ys.primary_kor||'—'}) · 희신(${ys.secondary_kor||'—'}) 기준 천간+지지 평균</div>
+    <div style="font-size:9px;color:rgba(74,58,42,0.6);text-align:center;margin-top:2px">용신(${ys.primary_kor||'—'}) · 희신(${ys.secondary_kor||'—'}) 기준 천간+지지 평균</div>
   </div>`;
 }
 
@@ -984,11 +1009,11 @@ function renderLuck(data) {
 
     html+=`
     <div class="luck-card${isNow?' active':''}" onclick="selectDaeun(${idx})">
-      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:2px">${lk.age_range}</div>
+      <div style="font-size:9px;color:rgba(74,58,42,0.6);margin-bottom:2px">${lk.age_range}</div>
       <div class="hanja-box ${EL_BG_CSS[lk.element]||''}" style="width:34px;height:34px;font-size:1.1rem;margin:2px auto">${stemH}</div>
       <div class="hanja-box ${EL_BG_CSS[bEl]||''}"       style="width:34px;height:34px;font-size:1.1rem;margin:2px auto">${branH}</div>
-      <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:3px">${ys}~</div>
-      ${isNow?'<div style="font-size:9px;color:#CE93D8;font-weight:600;margin-top:2px">현재</div>':''}
+      <div style="font-size:9px;color:rgba(80,55,30,0.45);margin-top:3px">${ys}~</div>
+      ${isNow?'<div style="font-size:9px;color:#7a2418;font-weight:600;margin-top:2px">현재</div>':''}
     </div>`;
   });
 
@@ -1035,7 +1060,7 @@ function renderSeun(ys, ye) {
   const cy = new Date().getFullYear();
   const byear = parseInt(pBirth.split('-')[0]);
   let html = `<div style="margin-bottom:14px">
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">세운 (${ys}~${ye}) <span style="font-size:9px;opacity:0.5">1년 단위 흐름</span></div>
+    <div style="font-size:11px;color:rgba(74,58,42,0.6);margin-bottom:8px">세운 (${ys}~${ye}) <span style="font-size:9px;opacity:0.5">1년 단위 흐름</span></div>
     <div class="yun-grid">`;
   for (let y=ys; y<=ye; y++) {
     const yp = yearPillar(y);
@@ -1043,10 +1068,10 @@ function renderSeun(ys, ye) {
     const age = y-byear+1;
     const stemH = STEM_H[yp.si], branH = BRANCH_H[yp.bi];
     html+=`<div class="yun-cell${isCur?' now':''}" onclick="selectSeun(${y})">
-      <div style="font-size:9px;color:rgba(255,255,255,0.3)">${y}</div>
+      <div style="font-size:9px;color:rgba(80,55,30,0.55)">${y}</div>
       <div class="hanja-box ${EL_BG_CSS[STEM_EL[yp.si]]||''}" style="width:30px;height:30px;font-size:1rem;margin:2px auto">${stemH}</div>
       <div class="hanja-box ${EL_BG_CSS[BRANCH_EL[yp.bi]]||''}" style="width:30px;height:30px;font-size:1rem;margin:2px auto">${branH}</div>
-      <div style="font-size:9px;color:rgba(255,255,255,0.25)">${age}세</div>
+      <div style="font-size:9px;color:rgba(80,55,30,0.45)">${age}세</div>
     </div>`;
   }
   html += '</div></div>';
@@ -1070,13 +1095,13 @@ function renderWolun(y) {
   const cy = new Date().getFullYear();
   const cyp = yearPillar(y);
   let html = `<div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px">월운 (${y}년) · 월 클릭 시 달력</div>
+    <div style="font-size:11px;color:rgba(74,58,42,0.6);margin-bottom:8px">월운 (${y}년) · 월 클릭 시 달력</div>
     <div class="yun-grid">`;
   for (let mo=1; mo<=12; mo++) {
     const mp = monthPillar(cyp.si, mo);
     const isCur = mo===cm && y===cy;
     html+=`<div class="yun-cell${isCur?' now':''}" onclick="openCalModal(${y},${mo})">
-      <div style="font-size:9px;color:rgba(255,255,255,0.3)">${mo}월</div>
+      <div style="font-size:9px;color:rgba(80,55,30,0.55)">${mo}월</div>
       <div class="hanja-box ${EL_BG_CSS[STEM_EL[mp.si]]||''}" style="width:30px;height:30px;font-size:1rem;margin:2px auto">${STEM_H[mp.si]}</div>
       <div class="hanja-box ${EL_BG_CSS[BRANCH_EL[mp.bi]]||''}" style="width:30px;height:30px;font-size:1rem;margin:2px auto">${BRANCH_H[mp.bi]}</div>
     </div>`;
@@ -1150,21 +1175,21 @@ function renderJohu(data) {
   document.getElementById('R_johu').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px">
       <div class="glass-sm" style="padding:10px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3)">행운 숫자</div>
+        <div style="font-size:10px;color:rgba(80,55,30,0.55)">행운 숫자</div>
         <div style="font-weight:700;font-size:20px;color:#69F0AE">${l.good_num}</div>
       </div>
       <div class="glass-sm" style="padding:10px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3)">길한 방향</div>
+        <div style="font-size:10px;color:rgba(80,55,30,0.55)">길한 방향</div>
         <div style="font-weight:700;color:#82B1FF">${l.good_dir}</div>
       </div>
       <div class="glass-sm" style="padding:10px;text-align:center">
-        <div style="font-size:10px;color:rgba(255,255,255,0.3)">흉한 방향</div>
-        <div style="font-weight:700;color:rgba(255,255,255,0.3)">${l.bad_dir}</div>
+        <div style="font-size:10px;color:rgba(80,55,30,0.55)">흉한 방향</div>
+        <div style="font-weight:700;color:rgba(80,55,30,0.55)">${l.bad_dir}</div>
       </div>
     </div>
     ${topZ.length?`
     <div class="glass-sm" style="padding:12px">
-      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:6px">잘 맞는 띠</div>
+      <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:6px">잘 맞는 띠</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         ${topZ.map(z=>`<span class="badge" style="color:#69F0AE;border-color:rgba(105,240,174,0.3);background:rgba(105,240,174,0.08)">${z.animal}띠 · ${z.grade}</span>`).join('')}
       </div>
@@ -1288,28 +1313,28 @@ function renderSajuTeaser(data) {
   // ① 일주 기질 — hanja-box 가로 + 설명 아래
   html += `
   <div style="margin-bottom:16px">
-    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:8px">${namePart}의 일주 기질</div>
+    <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:8px">${namePart}의 일주 기질</div>
     <div style="display:flex;gap:5px;margin-bottom:10px">
       <div class="hanja-box ${stemBgCss}" style="width:40px;height:40px;font-size:1.35rem;margin:0">${STEM_H[si]||'?'}</div>
       <div class="hanja-box ${branBgCss}" style="width:40px;height:40px;font-size:1.35rem;margin:0">${BRANCH_H[bi]||'?'}</div>
     </div>
     <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
-      ${keywords.map(k=>`<span class="badge" style="color:#CE93D8;border-color:rgba(206,147,216,0.3);background:rgba(206,147,216,0.08)">${k}</span>`).join('')}
+      ${keywords.map(k=>`<span class="badge" style="color:#7a2418;border-color:rgba(122,36,24,0.30);background:rgba(122,36,24,0.08)">${k}</span>`).join('')}
     </div>
-    <p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.8);margin:0 0 5px">${desc1}${branchHint ? ' ' + branchHint : ''}</p>
-    ${desc2 ? `<p style="font-size:13px;line-height:1.75;color:rgba(255,255,255,0.45);margin:0">${desc2}</p>` : ''}
+    <p style="font-size:13px;line-height:1.8;color:rgba(26,18,10,0.82);margin:0 0 5px">${desc1}${branchHint ? ' ' + branchHint : ''}</p>
+    ${desc2 ? `<p style="font-size:13px;line-height:1.75;color:rgba(74,58,42,0.72);margin:0">${desc2}</p>` : ''}
   </div>
-  <div style="border-top:1px solid rgba(255,255,255,0.06);margin-bottom:14px"></div>`;
+  <div style="border-top:1px solid rgba(80,55,30,0.10);margin-bottom:14px"></div>`;
 
   // ② 신강/신약
   const dotColor = isGang ? '#FF8A65' : '#82B1FF';
   html += `
   <div class="glass-sm" style="padding:12px 14px;margin-bottom:12px">
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-      <span class="badge" style="color:#CE93D8;border-color:rgba(206,147,216,0.3);background:rgba(206,147,216,0.1)">${strength}</span>
-      <span style="font-size:11px;color:rgba(255,255,255,0.3)">${isGang?'에너지가 강한 사주':'에너지가 섬세한 사주'}</span>
+      <span class="badge" style="color:#7a2418;border-color:rgba(122,36,24,0.30);background:rgba(122,36,24,0.10)">${strength}</span>
+      <span style="font-size:11px;color:rgba(80,55,30,0.55)">${isGang?'에너지가 강한 사주':'에너지가 섬세한 사주'}</span>
     </div>
-    ${patterns.map(p=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6"><span style="color:${dotColor};margin-top:3px;flex-shrink:0;font-size:8px">●</span>${p}</div>`).join('')}
+    ${patterns.map(p=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;font-size:13px;color:rgba(26,18,10,0.72);line-height:1.6"><span style="color:${dotColor};margin-top:3px;flex-shrink:0;font-size:8px">●</span>${p}</div>`).join('')}
   </div>`;
 
   // ③ 조후용신/희신 — hanja-box
@@ -1319,20 +1344,20 @@ function renderSajuTeaser(data) {
     const secBgCss = EL_BG_CSS[secEl] || '';
     html += `
   <div class="glass-sm" style="padding:12px 14px;margin-bottom:12px">
-    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">나에게 필요한 기운</div>
+    <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:10px">나에게 필요한 기운</div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
       <div style="text-align:center">
         <div class="hanja-box ${priBgCss}" style="width:40px;height:40px;font-size:1.35rem;margin-bottom:4px">${EL_NAME[priEl]||'?'}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.35)">조후용신</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:1px">${priKor}</div>
+        <div style="font-size:10px;color:rgba(74,58,42,0.6)">조후용신</div>
+        <div style="font-size:11px;color:rgba(26,18,10,0.78);margin-top:1px">${priKor}</div>
       </div>
       ${secKor ? `<div style="text-align:center">
         <div class="hanja-box ${secBgCss}" style="width:40px;height:40px;font-size:1.35rem;margin-bottom:4px">${EL_NAME[secEl]||'?'}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.35)">조후희신</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:1px">${secKor}</div>
+        <div style="font-size:10px;color:rgba(74,58,42,0.6)">조후희신</div>
+        <div style="font-size:11px;color:rgba(26,18,10,0.78);margin-top:1px">${secKor}</div>
       </div>` : ''}
     </div>
-    ${advice ? `<div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.7;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)">${advice}</div>` : ''}
+    ${advice ? `<div style="font-size:12px;color:rgba(74,58,42,0.72);line-height:1.7;padding-top:8px;border-top:1px solid rgba(80,55,30,0.10)">${advice}</div>` : ''}
   </div>`;
   }
 
@@ -1349,13 +1374,13 @@ function renderSajuTeaser(data) {
     const lkTcCss  = EL_TC_CSS[lkElKor] || '';
     html += `
   <div class="glass-sm" style="padding:12px 14px;margin-bottom:12px">
-    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">현재 대운 · ${nowLuck.age_range} (${nowLuck.year_range})</div>
+    <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:10px">현재 대운 · ${nowLuck.age_range} (${nowLuck.year_range})</div>
     <div style="display:flex;gap:10px;align-items:center">
       <div style="display:flex;gap:5px;flex-shrink:0">
         <div class="hanja-box ${lkStemBg}" style="width:40px;height:40px;font-size:1.35rem">${lkStemH}</div>
         <div class="hanja-box ${lkBranBg}" style="width:40px;height:40px;font-size:1.35rem">${lkBranH}</div>
       </div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.65">${lkElKor ? `<span class="${lkTcCss}" style="font-weight:700">${lkElKor}</span> 기운이 흐르는 대운입니다` : '현재 대운이 흐르는 시기입니다'}</div>
+      <div style="font-size:13px;color:rgba(26,18,10,0.72);line-height:1.65">${lkElKor ? `<span class="${lkTcCss}" style="font-weight:700">${lkElKor}</span> 기운이 흐르는 대운입니다` : '현재 대운이 흐르는 시기입니다'}</div>
     </div>
   </div>`;
   }
@@ -1364,7 +1389,7 @@ function renderSajuTeaser(data) {
   if (hasClash || hasPunish) {
     html += `
   <div class="glass-sm" style="padding:12px 14px;margin-bottom:12px;border-color:rgba(255,82,82,0.2)">
-    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:6px">관계 & 변화 주의</div>
+    <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:6px">관계 & 변화 주의</div>
     <div style="font-size:13px;color:rgba(255,200,200,0.75);line-height:1.75">
       ${hasClash ? `사주 내 <strong class="tc-fire">충(沖)</strong>이 있어 급격한 변화와 충돌이 잦을 수 있습니다. ` : ''}${hasPunish ? `<strong class="tc-earth">형(刑)</strong> 관계로 예기치 않은 마찰이 생기기 쉬운 구조입니다.` : ''}
     </div>
@@ -1455,18 +1480,18 @@ function openSajuShareCard(cb) {
     }
 
     // ── 배경 ──
-    ctx.fillStyle = '#0d0d14';
+    ctx.fillStyle = '#f4ede0';
     ctx.fillRect(0, 0, W, totalH);
 
     var y = PAD;
 
     // ── 헤더: FORTUNA ──
-    ctx.fillStyle = '#c9a84c';
+    ctx.fillStyle = '#7a2418';
     ctx.font = 'bold 12px "Noto Sans KR"';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('● F O R T U N A', W/2, y+18);
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.strokeStyle = 'rgba(80,55,30,0.14)';
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(PAD,y+36); ctx.lineTo(W-PAD,y+36); ctx.stroke();
     y += H_HEADER + SECTION_GAP;
@@ -1483,7 +1508,7 @@ function openSajuShareCard(cb) {
     ctx.textAlign = 'right';
     ctx.fillText((new Date().getFullYear()-byear+1)+'세', W-PAD, y+12);
 
-    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillStyle = 'rgba(74,58,42,0.72)';
     ctx.font = '11px "Noto Sans KR"';
     ctx.textAlign = 'left';
     ctx.fillText('양력 '+(pBirth||'')+'  ·  '+pHour+'시 '+(pMinute||0)+'분  ·  '+(pGender==='male'?'남성':'여성'), PAD, y+32);
@@ -1494,11 +1519,11 @@ function openSajuShareCard(cb) {
     ctx.font = '10px "Noto Sans KR"';
     badges.forEach(function(txt){
       var tw = ctx.measureText(txt).width + 14;
-      ctx.fillStyle = 'rgba(255,255,255,0.07)';
-      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.fillStyle = 'rgba(80,55,30,0.12)';
+      ctx.strokeStyle = 'rgba(80,55,30,0.18)';
       ctx.lineWidth = 0.5;
       rr(bx, y+48, tw, 20, 10); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.65)';
+      ctx.fillStyle = 'rgba(26,18,10,0.72)';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(txt, bx+tw/2, y+58);
       bx += tw+6;
@@ -1509,8 +1534,8 @@ function openSajuShareCard(cb) {
     pls.forEach(function(pl, i){
       var cx = PAD + i*(colW+COL_GAP);
       var isDay = (i===1);
-      ctx.fillStyle = isDay ? 'rgba(123,94,167,0.06)' : 'rgba(255,255,255,0.03)';
-      ctx.strokeStyle = isDay ? 'rgba(123,94,167,0.5)' : 'rgba(255,255,255,0.06)';
+      ctx.fillStyle = isDay ? 'rgba(122,36,24,0.06)' : 'rgba(80,55,30,0.05)';
+      ctx.strokeStyle = isDay ? 'rgba(122,36,24,0.45)' : 'rgba(80,55,30,0.10)';
       ctx.lineWidth = isDay ? 1 : 0.5;
       rr(cx, y, colW, PILLAR_H, 10); ctx.fill(); ctx.stroke();
 
@@ -1518,7 +1543,7 @@ function openSajuShareCard(cb) {
       var iy = y + 8;
 
       // 레이블
-      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.fillStyle = 'rgba(80,55,30,0.50)';
       ctx.font = '9px "Noto Sans KR"';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(LABELS[i], mx, iy+7);
@@ -1547,7 +1572,7 @@ function openSajuShareCard(cb) {
     // ── 형충회합해파 태그 ──
     if(allTags.length > 0){
       y += SECTION_GAP;
-      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.fillStyle = 'rgba(80,55,30,0.50)';
       ctx.font = '10px "Noto Sans KR"';
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       ctx.fillText('형충회합해파', PAD, y+9);
@@ -1572,7 +1597,7 @@ function openSajuShareCard(cb) {
 
     // ── 푸터 ──
     y += SECTION_GAP;
-    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.fillStyle = 'rgba(80,55,30,0.40)';
     ctx.font = '10px "Noto Sans KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('picolab.kr에서 무료로 확인하세요', W/2, y+16);
@@ -1605,7 +1630,7 @@ function shareSajuKakao() {
   if (btn) { btn.textContent = '⏳ 생성 중...'; btn.disabled = true; }
   var modal = document.getElementById('sajuShareModal');
   var preview = document.getElementById('sajuPreviewArea');
-  preview.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
+  preview.innerHTML = '<div style="color:rgba(74,58,42,0.65);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
   modal.style.display = 'flex';
 
   function resetBtn() { if (btn) { btn.innerHTML = '<i class="pi pi-crystal"></i> 카카오톡 공유'; btn.disabled = false; } }
@@ -1686,14 +1711,14 @@ window.addEventListener('load', function() {
 // ── 성향 질문 선택 ──
 </script>
 <!-- 공유 카드 프리뷰 모달 -->
-<div id="sajuShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
-  <div style="background:#13131a;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:92vh;overflow-y:auto;position:relative;">
-    <button onclick="closeSajuShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:22px;cursor:pointer;line-height:1;">✕</button>
-    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(255,255,255,0.4);font-family:'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
+<div id="sajuShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(40,25,10,0.55);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
+  <div style="background:#fcf7ea;border-top:1px solid rgba(80,55,30,0.10);border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -8px 32px rgba(60,40,20,0.12);">
+    <button onclick="closeSajuShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(74,58,42,0.65);font-size:22px;cursor:pointer;line-height:1;">✕</button>
+    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.65);font-family:'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
     <div id="sajuPreviewArea" style="text-align:center;min-height:120px;margin-bottom:16px;"></div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <button onclick="doSajuShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;"><i class="pi pi-crystal"></i> 카카오톡으로 공유하기</button>
-      <button onclick="closeSajuShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);border:none;border-radius:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
+      <button onclick="closeSajuShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(80,55,30,0.10);color:rgba(74,58,42,0.78);border:none;border-radius:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
     </div>
   </div>
 </div>
