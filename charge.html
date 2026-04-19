@@ -165,6 +165,31 @@ nav {
 </head>
 <body>
 
+<!-- TWA(안드로이드 앱) 환경 차단 오버레이 -->
+<div id="twaBlocker" style="display:none;position:fixed;inset:0;z-index:9999;background:#f5efe4;color:#241a10;padding:40px 24px;text-align:center;font-family:'Noto Sans KR',sans-serif;">
+  <div style="max-width:360px;margin:40px auto 0;">
+    <div style="font-size:56px;margin-bottom:16px;">💎</div>
+    <div style="font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;margin-bottom:12px;color:#241a10;">앱에서는 충전할 수 없어요</div>
+    <div style="font-size:14px;color:#4a3a2a;line-height:1.75;margin-bottom:22px;">
+      Orb 충전은 웹 브라우저에서만 가능합니다.<br>
+      Chrome 등 브라우저에서 <strong style="color:#7a5e1c;">picolab.kr</strong>에<br>접속하시면 같은 계정으로 자동 로그인돼요.
+    </div>
+    <a href="index.html" style="display:inline-block;background:linear-gradient(135deg,#7a5e1c,#9a7a26);color:#fcf7ea;font-size:14px;font-weight:700;padding:12px 26px;border-radius:12px;text-decoration:none;">돌아가기</a>
+  </div>
+</div>
+<script>
+(function() {
+  var isTWA = document.referrer.indexOf('android-app://') === 0
+    || /\bTWA\b/.test(navigator.userAgent)
+    || sessionStorage.getItem('pico_is_twa') === '1';
+  if (isTWA) {
+    try { sessionStorage.setItem('pico_is_twa', '1'); } catch(e) {}
+    document.getElementById('twaBlocker').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+})();
+</script>
+
 <!-- PICOLAB 스타일 네비게이션 -->
 <nav>
   <a class="nav-logo" href="/">
