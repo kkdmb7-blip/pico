@@ -1036,6 +1036,71 @@
   background: rgba(212,175,90,0.28);
   border-color: rgba(154,122,38,0.5);
 }
+
+.luck-banner {
+  background: linear-gradient(135deg, #fdf4f1 0%, #f9e8e0 100%);
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+.luck-banner::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #d89b7a, #c47a58);
+  opacity: 0.7;
+}
+:root[data-theme="obsidian"] .luck-banner,
+:root[data-theme="jade"] .luck-banner,
+:root[data-theme="wine"] .luck-banner,
+:root[data-theme="midnight"] .luck-banner {
+  background: linear-gradient(135deg, rgba(216,155,122,0.14), rgba(196,122,88,0.08));
+  border-color: rgba(216,155,122,0.3);
+  box-shadow: none;
+}
+.luck-banner-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 3px;
+  white-space: nowrap;
+}
+.luck-banner-desc {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+.luck-banner-btn {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0;
+  color: #8c4a30;
+  font-weight: 700;
+  border: 1px solid rgba(140,74,48,0.28);
+  border-radius: 18px;
+  padding: 6px 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: rgba(216,155,122,0.16);
+  transition: all 0.2s;
+}
+.luck-banner:hover .luck-banner-btn {
+  background: rgba(216,155,122,0.30);
+  border-color: rgba(140,74,48,0.5);
+}
 </style>
   <link rel="stylesheet" href="pico-icons.css">
 </head>
@@ -1081,6 +1146,16 @@
       <div class="memox-banner-desc">사주+베딕+기문+자미두수 융합 실시간 채팅</div>
     </div>
     <div class="memox-banner-btn">상담 시작 →</div>
+  </div>
+</div>
+<!-- 오늘의 행운 뽑기 -->
+<div style="padding:16px 16px 0;">
+  <div class="luck-banner" onclick="window.location.href='game-luck.html'">
+    <div class="luck-banner-left">
+      <div class="luck-banner-title"><i class="pi pi-sparkle"></i> 오늘의 행운 뽑기</div>
+      <div class="luck-banner-desc">오행 구슬을 골라 오늘의 운을 확인하세요</div>
+    </div>
+    <div class="luck-banner-btn">뽑기 →</div>
   </div>
 </div>
 <!-- 오늘의 명언 카드 -->

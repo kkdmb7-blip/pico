@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 행운 뽑기 · 포르투나</title>
+<meta property="og:title" content="오늘의 행운 뽑기 — 포르투나">
+<meta property="og:description" content="3개의 오브 중 하나를 골라 오늘의 행운을 받아보세요">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pico-icons.css">
+<style>
+  :root {
+    --bg: #f4ede0;
+    --surface: #fcf7ea;
+    --surface2: #ede4cf;
+    --border: #c9bc9d;
+    --border-soft: rgba(80,55,30,0.10);
+    --accent: #7a2418;
+    --text: #1a120a;
+    --muted: #7a6850;
+    --gold: #9a7a26;
+    --gold-deep: #7a5e1c;
+    --ink: #241a10;
+    --orb: #5f8cb5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .game-nav {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border-soft);
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .game-nav a {
+    color: var(--muted); font-size: 20px; text-decoration: none;
+    line-height: 1; cursor: pointer;
+  }
+  .game-nav-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 14px; font-weight: 700; color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .game-wrap {
+    max-width: 520px; margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+
+  .game-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .game-eyebrow {
+    font-family: 'Playfair Display', 'Noto Serif KR', serif;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .game-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: clamp(22px, 5.5vw, 30px);
+    font-weight: 700; letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+  .game-date {
+    font-family: 'Playfair Display', 'Noto Serif KR', serif;
+    font-size: 13px; color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .game-subtitle {
+    font-size: 12.5px; color: var(--muted);
+    line-height: 1.7; margin-top: 10px;
+  }
+
+  /* ── 오브 선택 화면 ── */
+  .orb-stage {
+    position: relative;
+    height: 340px;
+    margin: 32px 0 28px;
+    display: flex; justify-content: center; align-items: center;
+    gap: 16px;
+  }
+  .orb {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.5s cubic-bezier(.2,.7,.2,1), opacity 0.4s;
+    animation: float 4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  .orb:nth-child(1) { animation-delay: 0s; }
+  .orb:nth-child(2) { animation-delay: 1.2s; }
+  .orb:nth-child(3) { animation-delay: 2.4s; }
+
+  .orb::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffffff 0%, var(--c) 45%, var(--cd) 100%);
+    box-shadow:
+      0 0 0 1px rgba(80,55,30,0.08),
+      0 8px 24px rgba(80,55,30,0.18),
+      inset 0 -16px 32px rgba(80,55,30,0.15);
+  }
+  .orb::after {
+    content: '';
+    position: absolute;
+    top: 12px; left: 18px;
+    width: 28px; height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    filter: blur(3px);
+  }
+  .orb-wood { --c: #a8c99a; --cd: #5e8a4c; }
+  .orb-fire { --c: #e8a594; --cd: #b85d42; }
+  .orb-earth { --c: #d9c29a; --cd: #9a7a4a; }
+  .orb-metal { --c: #c9bfb0; --cd: #7a7060; }
+  .orb-water { --c: #9ab8d4; --cd: #4a6e94; }
+
+  .orb:hover {
+    transform: translateY(-8px) scale(1.06);
+  }
+  .orb.picked {
+    animation: pickSpin 0.8s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  .orb.faded {
+    opacity: 0.15;
+    transform: scale(0.7);
+    pointer-events: none;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+  @keyframes pickSpin {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4) rotate(180deg); box-shadow: 0 0 60px 20px rgba(212,175,90,0.55); }
+    100% { transform: scale(0) rotate(360deg); opacity: 0; }
+  }
+
+  .orb-hint {
+    position: absolute; bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    font-size: 12.5px; color: var(--muted);
+    letter-spacing: 0.02em;
+    animation: hintPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* ── 결과 화면 ── */
+  .result-wrap {
+    display: none;
+    animation: resultFade 0.8s ease-out;
+  }
+  .result-wrap.show { display: block; }
+  @keyframes resultFade {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-score-box {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
+    margin-bottom: 16px;
+    position: relative; overflow: hidden;
+  }
+  .result-score-box::before {
+    content: '';
+    position: absolute;
+    top: -40%; left: -20%; right: -20%; height: 180%;
+    background: radial-gradient(ellipse, rgba(212,175,90,0.14), transparent 65%);
+    pointer-events: none;
+  }
+  .result-score-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px;
+    position: relative;
+  }
+  .result-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px; font-weight: 700;
+    color: var(--ink);
+    line-height: 1; letter-spacing: -0.04em;
+    position: relative;
+    font-variant-numeric: lining-nums;
+  }
+  .result-score-sub {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 14px; font-weight: 500;
+    color: var(--gold-deep);
+    margin-top: 8px;
+    position: relative;
+  }
+
+  .result-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    padding: 16px 14px;
+    text-align: center;
+  }
+  .result-card-label {
+    font-size: 10.5px; color: var(--muted);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 8px;
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+  }
+  .result-card-value {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--ink); letter-spacing: -0.02em;
+  }
+  .result-card-sub {
+    font-size: 11px; color: var(--muted); margin-top: 4px;
+  }
+  .color-dot {
+    display: inline-block;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: 6px;
+    box-shadow: 0 1px 3px rgba(60,40,20,0.2);
+    border: 1px solid rgba(255,255,255,0.6);
+  }
+
+  .result-advice {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .result-advice-label {
+    font-size: 10.5px; color: var(--accent);
+    font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-family: 'Playfair Display', serif;
+  }
+  .result-advice-text {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 14.5px; color: var(--ink);
+    line-height: 1.75; font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .btn-row {
+    display: flex; gap: 10px; margin-bottom: 10px;
+  }
+  .btn {
+    flex: 1; padding: 13px 14px;
+    border-radius: 22px;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; border: none;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--accent); color: #fcf7ea;
+    box-shadow: 0 2px 8px rgba(122,36,24,0.22);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(122,36,24,0.35); }
+  .btn-secondary {
+    background: rgba(212,175,90,0.14); color: #8a6b20;
+    border: 1px solid rgba(154,122,38,0.28);
+  }
+  .btn-secondary:hover { background: rgba(212,175,90,0.24); }
+
+  .tomorrow-note {
+    text-align: center;
+    font-size: 11.5px; color: var(--muted);
+    margin-top: 14px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 380px) {
+    .orb { width: 84px; height: 84px; }
+    .orb-stage { gap: 10px; }
+    .result-score { font-size: 58px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="game-nav">
+  <a onclick="location.href='index.html'">←</a>
+  <div class="game-nav-title">오늘의 행운 뽑기</div>
+</nav>
+
+<div class="game-wrap">
+  <div class="game-header">
+    <div class="game-eyebrow">Daily Fortune</div>
+    <div class="game-title" id="gameTitle">오늘의 기운을 담은<br>3개의 오브</div>
+    <div class="game-date" id="gameDate"></div>
+    <div class="game-subtitle" id="gameSubtitle">마음이 끌리는 오브 하나를 골라주세요</div>
+  </div>
+
+  <!-- 오브 선택 -->
+  <div id="orbStage" class="orb-stage">
+    <div class="orb orb-fire" data-idx="0" onclick="pickOrb(0, this)"></div>
+    <div class="orb orb-water" data-idx="1" onclick="pickOrb(1, this)"></div>
+    <div class="orb orb-wood" data-idx="2" onclick="pickOrb(2, this)"></div>
+  </div>
+
+  <!-- 결과 -->
+  <div id="resultWrap" class="result-wrap">
+    <div class="result-score-box">
+      <div class="result-score-label">Today's Luck</div>
+      <div class="result-score" id="resultScore">0</div>
+      <div class="result-score-sub" id="resultScoreSub"></div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="result-card-label">Lucky Color</div>
+        <div class="result-card-value" id="luckyColor"><span class="color-dot" id="luckyColorDot"></span><span id="luckyColorName"></span></div>
+        <div class="result-card-sub" id="luckyColorHex"></div>
+      </div>
+      <div class="result-card">
+        <div class="result-card-label">Lucky Number</div>
+        <div class="result-card-value" id="luckyNumber" style="font-family:'Playfair Display',serif;font-size:28px;"></div>
+        <div class="result-card-sub">오늘의 숫자</div>
+      </div>
+      <div class="result-card">
+        <div class="result-card-label">Lucky Time</div>
+        <div class="result-card-value" id="luckyTime" style="font-size:16px;"></div>
+        <div class="result-card-sub">최적의 시간대</div>
+      </div>
+      <div class="result-card">
+        <div class="result-card-label">Direction</div>
+        <div class="result-card-value" id="luckyDir"></div>
+        <div class="result-card-sub">행운의 방위</div>
+      </div>
+    </div>
+
+    <div class="result-advice">
+      <div class="result-advice-label">오늘의 한 마디</div>
+      <div class="result-advice-text" id="luckyAdvice"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="shareLuck()"><i class="pi pi-share"></i> 친구에게 공유</button>
+      <button class="btn btn-secondary" onclick="location.href='index.html'">홈으로</button>
+    </div>
+    <div class="tomorrow-note" id="tomorrowNote"></div>
+  </div>
+</div>
+
+<script>
+const TODAY_KEY = 'pico_luck_' + new Date().toISOString().slice(0,10);
+
+// 오브별 오행 매핑 (클릭한 오브가 힌트만 될 뿐 결과는 date+user seed로 고정)
+const ORB_ELEMENTS = ['fire','water','wood']; // data-idx 순서
+
+// 오행별 색·숫자·방위 데이터
+const ELEMENT_DATA = {
+  wood:  { ko:'목(木)', color:'#5e8a4c', colorName:'청록', numbers:[3,8], dirs:['동','동남'], times:['오전 3시~7시'], advices:[
+    '새로운 시작에 힘을 쓰세요. 씨앗을 심기 좋은 날입니다.',
+    '책상 위를 정리하세요. 생각이 뻗어나갈 공간이 생깁니다.',
+    '오늘은 먼저 말을 건네보세요. 관계가 한 뼘 자랄 날입니다.'
+  ]},
+  fire:  { ko:'화(火)', color:'#b85d42', colorName:'진홍', numbers:[2,7], dirs:['남','남서'], times:['오전 9시~오후 1시'], advices:[
+    '감정이 움직이는 날. 솔직함이 가장 큰 무기가 됩니다.',
+    '사람을 만나세요. 한 번의 웃음이 오늘의 문을 엽니다.',
+    '망설이던 한 발을 내디뎌볼 타이밍. 불은 지금 가장 밝습니다.'
+  ]},
+  earth: { ko:'토(土)', color:'#9a7a4a', colorName:'황금', numbers:[5,10], dirs:['중앙','서남'], times:['오후 1시~5시'], advices:[
+    '서두르지 말고 단단히. 기반을 다지기 좋은 하루입니다.',
+    '약속을 지키세요. 오늘의 신뢰가 내일의 기회로 돌아옵니다.',
+    '현재 가진 것에 감사하세요. 땅은 조용히 자라고 있습니다.'
+  ]},
+  metal: { ko:'금(金)', color:'#7a7060', colorName:'은백', numbers:[4,9], dirs:['서','서북'], times:['오후 3시~7시'], advices:[
+    '결단의 날. 잘라낼 것과 지킬 것을 분명히 하세요.',
+    '깔끔한 옷차림이 오늘의 흐름을 바꿉니다.',
+    '말을 아끼세요. 무게 있는 한 마디가 공간을 정리합니다.'
+  ]},
+  water: { ko:'수(水)', color:'#4a6e94', colorName:'심청', numbers:[1,6], dirs:['북','동북'], times:['저녁 7시~11시'], advices:[
+    '흐름을 따라가는 날. 억지로 밀지 마세요.',
+    '듣는 게 말하는 것보다 귀한 하루입니다.',
+    '한 발 뒤로 물러서면 전체가 보입니다. 여유가 답입니다.'
+  ]}
+};
+
+// 간단한 날짜 시드 기반 pseudo-random (같은 날 같은 유저면 같은 결과)
+function seedRand(seed) {
+  let x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+function dateSeed() {
+  const d = new Date();
+  let user = '';
+  try { const u = JSON.parse(localStorage.getItem('pico_user')); if (u && u.id) user = u.id; } catch(e) {}
+  const key = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
+  let h = key;
+  for (let i=0;i<user.length;i++) h = (h*31 + user.charCodeAt(i)) % 2147483647;
+  return h;
+}
+function pickFrom(arr, seed) {
+  return arr[Math.floor(seedRand(seed) * arr.length)];
+}
+
+function formatDateKo() {
+  const d = new Date();
+  const days = ['일','월','화','수','목','금','토'];
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+}
+
+document.getElementById('gameDate').textContent = formatDateKo();
+
+// 이미 오늘 뽑았는지 확인
+(function checkExisting() {
+  try {
+    const saved = localStorage.getItem(TODAY_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      showResult(data, true);
+    }
+  } catch(e) {}
+})();
+
+function pickOrb(idx, el) {
+  // 애니메이션
+  const allOrbs = document.querySelectorAll('.orb');
+  allOrbs.forEach((o,i) => {
+    if (i === idx) o.classList.add('picked');
+    else o.classList.add('faded');
+  });
+
+  // 결과 계산 (date+user 시드 + 사용자 선택 인덱스 영향)
+  setTimeout(() => {
+    const result = calculateLuck(idx);
+    localStorage.setItem(TODAY_KEY, JSON.stringify(result));
+    showResult(result, false);
+  }, 800);
+}
+
+function calculateLuck(pickedIdx) {
+  const seed = dateSeed() + pickedIdx * 7919;
+  // 점수 55-98
+  const score = 55 + Math.floor(seedRand(seed) * 44);
+  // 오행: 선택한 오브 기반 + 약간의 변동
+  const elements = ['wood','fire','earth','metal','water'];
+  const elShift = Math.floor(seedRand(seed + 1) * 5);
+  const element = pickedIdx === 0 ? elements[(1+elShift)%5] : (pickedIdx === 1 ? elements[(4+elShift)%5] : elements[(0+elShift)%5]);
+  const data = ELEMENT_DATA[element];
+
+  const number = data.numbers[Math.floor(seedRand(seed+2) * data.numbers.length)];
+  const dir = data.dirs[Math.floor(seedRand(seed+3) * data.dirs.length)];
+  const time = data.times[0];
+  const advice = data.advices[Math.floor(seedRand(seed+4) * data.advices.length)];
+
+  let scoreSub;
+  if (score >= 90) scoreSub = '최상의 흐름 — 오늘은 당신의 날입니다';
+  else if (score >= 80) scoreSub = '매우 좋은 기운 — 원하던 것을 말해보세요';
+  else if (score >= 70) scoreSub = '안정적인 흐름 — 꾸준함이 빛나는 날';
+  else if (score >= 60) scoreSub = '평탄한 하루 — 내면의 균형을 지키세요';
+  else scoreSub = '조용한 하루 — 무리하지 말고 충전하세요';
+
+  return { score, scoreSub, element, elementKo: data.ko, color: data.color, colorName: data.colorName, number, dir, time, advice };
+}
+
+function animateScore(from, to, duration) {
+  const el = document.getElementById('resultScore');
+  const start = performance.now();
+  function step(t) {
+    const p = Math.min((t-start)/duration, 1);
+    const eased = 1 - Math.pow(1-p, 3);
+    el.textContent = Math.floor(from + (to-from)*eased);
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = to;
+  }
+  requestAnimationFrame(step);
+}
+
+function showResult(r, fromCache) {
+  document.getElementById('orbStage').style.display = 'none';
+  const wrap = document.getElementById('resultWrap');
+  wrap.classList.add('show');
+
+  document.getElementById('gameTitle').innerHTML = fromCache ? '오늘의 행운<br>이미 확인하셨네요' : '오늘 당신의 기운은';
+  document.getElementById('gameSubtitle').textContent = fromCache ? '내일 0시 이후 다시 뽑을 수 있어요' : '오브가 건넨 오늘의 메시지입니다';
+
+  if (fromCache) {
+    document.getElementById('resultScore').textContent = r.score;
+  } else {
+    animateScore(0, r.score, 1400);
+  }
+  document.getElementById('resultScoreSub').textContent = r.scoreSub;
+
+  document.getElementById('luckyColorName').textContent = r.colorName + ' · ' + r.elementKo;
+  document.getElementById('luckyColorDot').style.background = r.color;
+  document.getElementById('luckyColorHex').textContent = r.color.toUpperCase();
+  document.getElementById('luckyNumber').textContent = r.number;
+  document.getElementById('luckyTime').textContent = r.time;
+  document.getElementById('luckyDir').textContent = r.dir + '쪽';
+  document.getElementById('luckyAdvice').textContent = r.advice;
+
+  document.getElementById('tomorrowNote').textContent = '🎲 하루 한 번 · 내일 0시에 다시 열려요';
+}
+
+function shareLuck() {
+  const r = JSON.parse(localStorage.getItem(TODAY_KEY) || '{}');
+  if (!r.score) return;
+  const title = '포르투나 · 오늘의 행운 뽑기';
+  const body = `오늘의 운세 점수: ${r.score}점\n행운의 색: ${r.colorName} (${r.elementKo})\n행운의 숫자: ${r.number}\n행운의 방위: ${r.dir}쪽\n\n"${r.advice}"`;
+  const link = 'https://picolab.kr/game-luck.html';
+  const text = title + '\n\n' + body;
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile && navigator.share) {
+    navigator.share({ title, text, url: link }).catch(()=>{});
+  } else if (window.Kakao && window.Kakao.Share) {
+    if (!Kakao.isInitialized()) Kakao.init('2543c896dead8185e2edfa0976396f25');
+    Kakao.Share.sendDefault({
+      objectType: 'text',
+      text: text,
+      link: { mobileWebUrl: link, webUrl: link },
+      buttons: [{ title: '행운 뽑으러 가기', link: { mobileWebUrl: link, webUrl: link } }]
+    });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text + '\n' + link).then(() => {
+      alert('결과가 복사되었어요! 친구에게 붙여넣기 해보세요.');
+    });
+  } else {
+    alert(text + '\n' + link);
+  }
+}
+</script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
+</body>
+</html>
