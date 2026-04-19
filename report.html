@@ -702,6 +702,11 @@ nav {
       <div id="easyResult" style="display:none;"></div>
     </div>
     <div id="fwReportMount"></div>
+    <div id="relatedReportsWrap" style="display:none;margin-top:22px;padding:18px 16px 16px;background:linear-gradient(135deg,rgba(123,94,167,0.05),rgba(212,175,55,0.04));border:1px solid rgba(123,94,167,0.22);border-radius:16px;">
+      <div style="font-size:10px;letter-spacing:0.18em;color:rgba(123,94,167,0.85);font-weight:700;margin-bottom:4px;">RECOMMENDED FOR YOU</div>
+      <div style="font-size:15px;font-weight:700;color:#241a10;margin-bottom:12px;">이 리포트와 함께 보면 좋은 분석</div>
+      <div id="relatedReportsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
     <div class="consult-banner" id="consultBanner" style="display:none;">
       <div class="consult-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" stroke="url(#cg1)" stroke-width="1.5" opacity="0.5"/><path d="M18 6 L20.5 13.5 L28 14 L22 19.5 L24 27 L18 23 L12 27 L14 19.5 L8 14 L15.5 13.5Z" fill="url(#cg1)"/><defs><linearGradient id="cg1" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#9a7a26"/><stop offset="1" stop-color="#7a2418"/></linearGradient></defs></svg></div>
       <div class="consult-title" id="consultTitle">리포트 내용이 궁금하신가요?</div>
@@ -4532,6 +4537,7 @@ function showConsultBanner() {
   document.getElementById('consultTitle').textContent = t.title;
   document.getElementById('consultDesc').innerHTML = t.desc.replace(/\n/g, '<br>');
   document.getElementById('consultBanner').style.display = 'block';
+  showRelatedReports();
   showEasyExplainBox();
   mountReportFeedback();
   // 섹션 밀도 토글 노출 + 저장된 선호도 복원
@@ -4544,6 +4550,79 @@ function showConsultBanner() {
       if (saved === 'summary' && typeof setReportDensity === 'function') setReportDensity('summary');
     }
   } catch(e) {}
+}
+
+// ── 관련 리포트 추천 ──
+function showRelatedReports() {
+  const RELATED = {
+    character:    [{t:'love',icon:'💞',title:'연애운 리포트',desc:'나의 기질이 관계에서 어떻게 드러나는지'},
+                   {t:'career_deep',icon:'💼',title:'직업·사업 적성',desc:'타고난 기질에 맞는 일의 방향'},
+                   {t:'balance',icon:'☯️',title:'오행 균형 처방',desc:'부족한 오행을 일상에서 보충하는 법'}],
+    money:        [{t:'daeun',icon:'🌊',title:'대운 흐름',desc:'재물의 시기적 파고를 읽는다'},
+                   {t:'wealth_timing',icon:'⏰',title:'재물 타이밍',desc:'투자·계약 시점 판단'},
+                   {t:'career_deep',icon:'💼',title:'직업·사업 적성',desc:'재물을 만드는 일의 방향'}],
+    love:         [{t:'guide',icon:'💬',title:'관계 코칭',desc:'상대와의 대화·갈등 매뉴얼'},
+                   {t:'family',icon:'👨‍👩‍👧',title:'가족 관계',desc:'인연의 기반이 되는 가족 역학'},
+                   {t:'year',icon:'📅',title:'올해의 운세',desc:'올해 인연의 흐름'}],
+    daeun:        [{t:'money',icon:'💰',title:'재물운 리포트',desc:'대운 안에서 재물의 위치'},
+                   {t:'timing',icon:'⏱️',title:'중요 시기 판단',desc:'대운 속 결정적 타이밍'},
+                   {t:'year',icon:'📅',title:'올해의 운세',desc:'대운의 현재 단면'}],
+    year:         [{t:'month',icon:'📆',title:'이달의 운세',desc:'올해를 월 단위로 쪼개서 보기'},
+                   {t:'daeun',icon:'🌊',title:'대운 흐름',desc:'올해를 대운 맥락에서 이해'},
+                   {t:'timing',icon:'⏱️',title:'타이밍 판단',desc:'올해 내 주요 결정 시점'}],
+    month:        [{t:'year',icon:'📅',title:'올해의 운세',desc:'이달이 속한 큰 흐름'},
+                   {t:'timing',icon:'⏱️',title:'타이밍 판단',desc:'이달의 중요 선택'}],
+    yongsin:      [{t:'balance',icon:'☯️',title:'오행 균형',desc:'용신을 일상에 적용하는 법'},
+                   {t:'health',icon:'🌿',title:'건강·체질',desc:'용신 기준 체질 관리'}],
+    guide:        [{t:'love',icon:'💞',title:'연애운',desc:'관계의 근본 궁합'},
+                   {t:'family',icon:'👨‍👩‍👧',title:'가족 관계',desc:'관계 역학의 뿌리'}],
+    vedic_full:   [{t:'astro_full',icon:'🔮',title:'서양 점성',desc:'또 다른 관점으로 같은 사람'},
+                   {t:'triple',icon:'🌐',title:'3계보 교차',desc:'사주·베딕·점성 통합'}],
+    astro_full:   [{t:'vedic_full',icon:'🕉️',title:'베딕 점성',desc:'낙샤트라·다샤 관점'},
+                   {t:'triple',icon:'🌐',title:'3계보 교차',desc:'사주·베딕·점성 통합'}],
+    ziwei_full:   [{t:'character',icon:'🌟',title:'기질 분석',desc:'자미 + 사주 기질 대조'},
+                   {t:'triple',icon:'🌐',title:'3계보 교차',desc:'사주·베딕·점성 통합'}],
+    triple:       [{t:'character',icon:'🌟',title:'기질 분석',desc:'3계보 공통 기질 확인'},
+                   {t:'daeun',icon:'🌊',title:'대운 흐름',desc:'큰 흐름 맥락'}],
+    career_deep:  [{t:'money',icon:'💰',title:'재물운',desc:'일의 성과로 이어지는 재물'},
+                   {t:'timing',icon:'⏱️',title:'타이밍',desc:'이직·창업 시점'}],
+    summary:      [{t:'character',icon:'🌟',title:'기질 분석',desc:'요약 뒤의 세부 구조'},
+                   {t:'daeun',icon:'🌊',title:'대운 흐름',desc:'삶의 큰 궤적'}],
+    balance:      [{t:'yongsin',icon:'🧭',title:'용신 활용',desc:'균형을 만드는 핵심 오행'},
+                   {t:'health',icon:'🌿',title:'건강·체질',desc:'균형의 신체적 기반'}],
+    sinsal:       [{t:'daeun',icon:'🌊',title:'대운 흐름',desc:'신살이 활성화되는 시기'}],
+    health:       [{t:'balance',icon:'☯️',title:'오행 균형',desc:'체질 관리의 뿌리'},
+                   {t:'family',icon:'👨‍👩‍👧',title:'가족 관계',desc:'유전·환경 맥락'}],
+    family:       [{t:'love',icon:'💞',title:'연애운',desc:'가족에서 파생되는 관계 패턴'},
+                   {t:'guide',icon:'💬',title:'관계 코칭',desc:'가족 관계 실전 매뉴얼'}],
+    timing:       [{t:'year',icon:'📅',title:'올해의 운세',desc:'타이밍의 전체 맥락'},
+                   {t:'daeun',icon:'🌊',title:'대운 흐름',desc:'타이밍이 놓인 큰 흐름'}],
+    wealth_timing:[{t:'money',icon:'💰',title:'재물운',desc:'재물 타이밍의 구조적 배경'},
+                   {t:'daeun',icon:'🌊',title:'대운 흐름',desc:'재물 타이밍의 큰 흐름'}],
+    classic:      [{t:'character',icon:'🌟',title:'기질 분석',desc:'고전 개념을 현대 기질로'},
+                   {t:'yongsin',icon:'🧭',title:'용신 활용',desc:'고전 용신을 일상에'}]
+  };
+  try {
+    const wrap = document.getElementById('relatedReportsWrap');
+    const list = document.getElementById('relatedReportsList');
+    if (!wrap || !list) return;
+    const items = RELATED[_type] || [];
+    if (items.length === 0) { wrap.style.display = 'none'; return; }
+    let html = '';
+    items.forEach(function(it) {
+      const url = 'report.html?type=' + encodeURIComponent(it.t);
+      html += '<a href="'+url+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,55,30,0.12);border-radius:12px;padding:11px 13px;text-decoration:none;color:#241a10;transition:background 0.15s;">'
+        + '<div style="font-size:24px;flex-shrink:0;">'+it.icon+'</div>'
+        + '<div style="flex:1;min-width:0;">'
+          + '<div style="font-size:13px;font-weight:700;line-height:1.35;">'+it.title+'</div>'
+          + '<div style="font-size:11px;color:#7a6850;line-height:1.4;margin-top:1px;">'+it.desc+'</div>'
+        + '</div>'
+        + '<div style="flex-shrink:0;color:#7a6850;font-size:14px;">›</div>'
+        + '</a>';
+    });
+    list.innerHTML = html;
+    wrap.style.display = 'block';
+  } catch(e) { /* ignore */ }
 }
 
 // ── 피드백 위젯 마운트 (로그인 유저 + _type 필수) ──
