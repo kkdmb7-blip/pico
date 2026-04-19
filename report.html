@@ -1784,6 +1784,37 @@ function getSb() {
   return _sb;
 }
 
+// ── 오프라인 감지 토스트 ──
+window.addEventListener('offline', function(){ try { showToast('<i class="pi pi-bolt"></i> 인터넷 연결이 끊어졌어요.'); } catch(e){} });
+window.addEventListener('online',  function(){ try { showToast('<i class="pi pi-sparkle"></i> 연결이 복구되었어요.'); } catch(e){} });
+
+// ── 재시도 fetch 유틸 (비스트림 API 전용) ──
+// 네트워크/5xx 실패 시 지수 백오프로 재시도, 최종 실패 시 토스트 노출
+async function picoRetryFetch(url, opts, maxRetries) {
+  var tries = (typeof maxRetries === 'number') ? maxRetries : 2;
+  var lastErr = null;
+  for (var i = 0; i <= tries; i++) {
+    try {
+      var res = await fetch(url, opts);
+      if (res.ok) return res;
+      if (res.status >= 500 && i < tries) {
+        await new Promise(function(r){ setTimeout(r, 400 * Math.pow(2, i)); });
+        continue;
+      }
+      return res;
+    } catch (e) {
+      lastErr = e;
+      if (i < tries) {
+        await new Promise(function(r){ setTimeout(r, 400 * Math.pow(2, i)); });
+        continue;
+      }
+    }
+  }
+  try { showToast('<i class="pi pi-bolt"></i> 네트워크가 불안정합니다. 잠시 후 다시 시도해 주세요.'); } catch(e) {}
+  if (lastErr) throw lastErr;
+  throw new Error('fetch failed');
+}
+
 function showToast(msg) {
   var t = document.getElementById('_reportToast');
   if (!t) {
@@ -1866,7 +1897,7 @@ async function loadSajuData() {
     const minute = p.minute || 0;
     const now = new Date();
     const url = `${WORKER_BASE}/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&current_year=${now.getFullYear()}&current_month=${now.getMonth()+1}&current_day=${now.getDate()}`;
-    const res = await fetch(url);
+    const res = await picoRetryFetch(url);
     if (!res.ok) return;
     const data = await res.json();
     console.log('[loadSajuData] API 응답:', data);
@@ -1900,7 +1931,7 @@ async function loadVedicData() {
     const p = _profile;
     const hour = (p.hour != null && p.hour !== 'unknown') ? p.hour : 12;
     const url = `${WORKER_BASE}/vedic?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&tz=9`;
-    const res = await fetch(url);
+    const res = await picoRetryFetch(url);
     if (!res.ok) return;
     const data = await res.json();
     _vedicData = {
