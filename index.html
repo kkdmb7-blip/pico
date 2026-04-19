@@ -5328,17 +5328,26 @@ var ADMIN_UUID = '99f9f77a-2f2a-4055-ab44-421d1c070341';
 async function checkAdminAccess() {
   try {
     if (!currentUser || !currentUser.id) return;
-    var kakaoId = currentUser.id.indexOf('kakao_') === 0 ? currentUser.id.slice(6) : currentUser.id;
-    var r = await fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kakao_id: kakaoId, name: currentUser.name || '' })
-    });
-    var data = await r.json();
-    if (data && data.id === ADMIN_UUID) {
-      var btn = document.getElementById('btnAdminDash');
+    var btn = document.getElementById('btnAdminDash');
+    // index.html의 currentUser.id는 resolve-user가 돌려준 UUID가 저장됨
+    if (currentUser.id === ADMIN_UUID) {
       if (btn) btn.style.display = 'flex';
       localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
+      return;
+    }
+    // fallback: 구버전 pico_user (kakao_ 접두어) 인 경우만 resolve-user 호출
+    if (currentUser.id.indexOf('kakao_') === 0) {
+      var kakaoId = currentUser.id.slice(6);
+      var r = await fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kakao_id: kakaoId, name: currentUser.name || '' })
+      });
+      var data = await r.json();
+      if (data && data.id === ADMIN_UUID) {
+        if (btn) btn.style.display = 'flex';
+        localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
+      }
     }
   } catch(e) {}
 }
