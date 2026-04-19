@@ -3936,7 +3936,7 @@ function shareGunghapKakao() {
 function _showToast(msg) {
   var t = document.createElement('div');
   t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#1a120a;padding:12px 20px;border-radius:12px;font-size:13px;font-family:"Noto Serif KR",sans-serif;z-index:9999;text-align:center;white-space:pre-line;box-shadow:0 4px 20px rgba(0,0,0,0.4);pointer-events:none;';
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.95);color:#fcf7ea;padding:12px 20px;border-radius:12px;font-size:13px;font-family:"Noto Serif KR",sans-serif;z-index:9999;text-align:center;white-space:pre-line;box-shadow:0 4px 20px rgba(0,0,0,0.4);pointer-events:none;';
   document.body.appendChild(t);
   setTimeout(function() { t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(function(){t.remove();},400); }, 2500);
 }
