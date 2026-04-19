@@ -1261,7 +1261,7 @@ function renderRecommend(sur, surHanja, top) {
       { k:'정격', easy:'인생 전체',  v:c.gyek.jung, g:c.grades[3] }
     ];
     gyekLabels.forEach(function(gy) {
-      var col = _GRADE_COL[gy.g]||'#7a6850';
+      var col = _GRADE_COL[gy.g]||'#5a4830';
       var bg  = _GRADE_BG[gy.g]||'rgba(80,55,30,0.05)';
       var bd  = _GRADE_BORDER[gy.g]||'var(--border)';
       var easy = _SIMPLE_GRADE[gy.g] || gy.g;
@@ -1710,7 +1710,7 @@ function renderChildRecommend(sur, surHanja, top) {
       { k:'정격', easy:'인생 전체',  v:c.gyek.jung, g:c.grades[3] }
     ];
     gyekLabels.forEach(function(gy) {
-      var col = _GRADE_COL[gy.g]||'#7a6850';
+      var col = _GRADE_COL[gy.g]||'#5a4830';
       var bg  = _GRADE_BG[gy.g]||'rgba(80,55,30,0.05)';
       var bd  = _GRADE_BORDER[gy.g]||'var(--border)';
       var easy = _SIMPLE_GRADE[gy.g] || gy.g;
@@ -2176,7 +2176,7 @@ var _SIMPLE_GRADE = { '대길':'최상', '길':'좋음', '반길':'보통', '흉
 var _REL_SIMPLE = {
   '상생': { simple:'받침',   color:'#2f7a55' },
   '상극': { simple:'부딪힘', color:'#a33838' },
-  '비화': { simple:'같음',   color:'#7a6850' },
+  '비화': { simple:'같음',   color:'#5a4830' },
   '중화': { simple:'무난',   color:'#355f9a' }
 };
 var _GRADE_COL    = { '대길':'#7a5e1c','길':'#2f7a55','반길':'#b06a10','흉':'#a33838','대흉':'#8a1c3c' };
@@ -2201,7 +2201,7 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
   cards.forEach(function(c) {
     var g = SURI_TABLE[c.val]||'흉';
     var sn = SURI_NAME[c.val]||'';
-    var col = _GRADE_COL[g]||'#7a6850';
+    var col = _GRADE_COL[g]||'#5a4830';
     var lbl = _SIMPLE_LABEL[c.label];
     var easy = _SIMPLE_GRADE[g] || g;
     var tip = c.label + ' (' + c.val + ') · ' + sn + ' — ' + (SURI_DESC[c.val]||'');
@@ -2242,7 +2242,7 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
   flowEl.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;';
   allChars.forEach(function(ch, i) {
     var oh = allEumOh[i];
-    var col = oh ? _OHENG_COLOR[oh] : '#7a6850';
+    var col = oh ? _OHENG_COLOR[oh] : '#5a4830';
     var bg  = oh ? _OHENG_BG[oh] : 'rgba(80,55,30,0.06)';
     var node = document.createElement('div');
     node.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
@@ -2252,7 +2252,7 @@ function renderResult(gyek, allChars, allStrokes, allJawon, allHanja) {
     flowEl.appendChild(node);
     if (i < allChars.length - 1) {
       var rel = checkRelation(allEumOh[i], allEumOh[i+1]);
-      var r = _REL_SIMPLE[rel] || {simple:rel, color:'#7a6850'};
+      var r = _REL_SIMPLE[rel] || {simple:rel, color:'#5a4830'};
       var arr = document.createElement('div');
       arr.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;padding-top:4px;';
       arr.title = rel;

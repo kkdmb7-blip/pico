@@ -1672,7 +1672,7 @@
   function _ohengRel(a, b) {
     if (!a || !b) return { label: '-', grade: '중', color: '#5a4830' };
     if (a === b) return { label: '비화(比和)', grade: '평', color: '#5a4830' };
-    if (_SANGSAENG[a] === b) return { label: '상생(相生)', grade: '길', color: '#3a8f4d' };
+    if (_SANGSAENG[a] === b) return { label: '상생(相生)', grade: '길', color: '#2d8659' };
     if (_SANGSAENG[b] === a) return { label: '역생(逆生)', grade: '평', color: '#2e6ba8' };
     if (_SANGKUK[a] === b)   return { label: '상극(相剋)', grade: '흉', color: '#b91c1c' };
     return { label: '극복(剋伏)', grade: '평', color: '#a16d1f' };
@@ -1698,7 +1698,7 @@
       '정격': { val: _n81(A+B+(isSingleName?0:C)), desc: '말년·전체운' },
     };
 
-    var gradeColor = { '대길':'#a16d1f','길':'#3a8f4d','반길':'#c2410c','흉':'#b91c1c','대흉':'#881337' };
+    var gradeColor = { '대길':'#a16d1f','길':'#2d8659','반길':'#c2410c','흉':'#b91c1c','대흉':'#881337' };
     var gradeBg    = { '대길':'rgba(212,175,55,0.1)','길':'rgba(76,175,122,0.1)','반길':'rgba(255,152,0,0.1)','흉':'rgba(244,67,54,0.08)','대흉':'rgba(233,30,99,0.08)' };
     var gradeBorder= { '대길':'rgba(212,175,55,0.35)','길':'rgba(76,175,122,0.35)','반길':'rgba(255,152,0,0.35)','흉':'rgba(244,67,54,0.3)','대흉':'rgba(233,30,99,0.3)' };
 
@@ -1753,7 +1753,7 @@
 
     // 관계 라벨 → 쉬운 말
     var _RELMAP = {
-      '상생(相生)': { simple: '받침', color: '#3a8f4d' },
+      '상생(相生)': { simple: '받침', color: '#2d8659' },
       '역생(逆生)': { simple: '순환', color: '#2e6ba8' },
       '상극(相剋)': { simple: '부딪힘', color: '#b91c1c' },
       '극복(剋伏)': { simple: '버팀', color: '#a16d1f' },

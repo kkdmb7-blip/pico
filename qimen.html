@@ -2079,13 +2079,13 @@ function _drawQimenCard(cb) {
       // 궁번호 (좌상단)
       ctx.textAlign = 'left';
       ctx.font = '400 20px "Noto Sans KR", sans-serif';
-      ctx.fillStyle = '#7a6850';
+      ctx.fillStyle = '#5a4830';
       ctx.fillText(n+'궁', cx+14, cy+28);
 
       // 방위 (우상단)
       ctx.textAlign = 'right';
       ctx.font = '600 19px "Noto Sans KR", sans-serif';
-      ctx.fillStyle = isZhifu ? '#7a5e1c' : '#7a6850';
+      ctx.fillStyle = isZhifu ? '#7a5e1c' : '#5a4830';
       ctx.fillText(GONG_DIR_LOCAL[n]||'', cx+cellW-12, cy+28);
 
       // 직부 표시
@@ -2101,7 +2101,7 @@ function _drawQimenCard(cb) {
       // 구성(九星) — 박스형
       if (p.구성) {
         var el = STAR_EL2[p.구성] || '토';
-        var sc = EL_C[el]||'#7a6850', sb = EL_B[el]||'rgba(80,55,30,0.08)';
+        var sc = EL_C[el]||'#5a4830', sb = EL_B[el]||'rgba(80,55,30,0.08)';
         var starW = p.구성.length * 22 + 12;
         var starX = midX - starW/2, starY = cy + 46;
         ctx.fillStyle = sb;
@@ -2116,7 +2116,7 @@ function _drawQimenCard(cb) {
       // 팔신 — 박스형
       if (p.팔신) {
         var el2 = SHEN_EL2[p.팔신]||'토';
-        var sc2 = EL_C[el2]||'#7a6850', sb2 = EL_B[el2]||'rgba(80,55,30,0.08)';
+        var sc2 = EL_C[el2]||'#5a4830', sb2 = EL_B[el2]||'rgba(80,55,30,0.08)';
         var shenW = p.팔신.length * 22 + 12;
         var shenX = midX - shenW/2, shenY = cy + 83;
         ctx.fillStyle = sb2;
@@ -2132,7 +2132,7 @@ function _drawQimenCard(cb) {
       if (p.지반) {
         var stem1 = p.지반[0] || '';
         var stemEl2 = STEM_OHAENG[stem1] || '토';
-        var stemC = EL_C[stemEl2]||'#7a6850', stemB = EL_B[stemEl2]||'rgba(80,55,30,0.08)';
+        var stemC = EL_C[stemEl2]||'#5a4830', stemB = EL_B[stemEl2]||'rgba(80,55,30,0.08)';
         var stemW = 54, stemH2 = 54;
         var stemX = midX - stemW/2, stemY = cy + 118;
         ctx.fillStyle = stemB;
@@ -2147,7 +2147,7 @@ function _drawQimenCard(cb) {
       // 팔문 — 우하단 작게
       if (p.팔문) {
         var del2 = DOOR_EL2[p.팔문]||'토';
-        var dc = EL_C[del2]||'#7a6850';
+        var dc = EL_C[del2]||'#5a4830';
         var isGood = DOOR_GOOD[p.팔문];
         ctx.font = (isGood ? '700' : '400') + ' 21px "Noto Serif KR", serif';
         ctx.fillStyle = isGood ? '#7a5e1c' : 'rgba(80,55,30,0.45)';
