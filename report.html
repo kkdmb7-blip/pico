@@ -4554,23 +4554,55 @@ function showEasyResult(text) {
   if (btn) btn.style.display = 'none';
 }
 
+// ── 공유용 요약 추출 (본문 섹션에서 핵심 문장/키워드 뽑기) ──
+function buildShareSummary() {
+  // 1순위: 쉬운말 해석 캐시가 있으면 그걸로 (이미 요약된 버전)
+  try {
+    if (_user && _user.id && _type) {
+      const cacheKey = `easy_${_user.id}_${_type}_v${REPORT_VERSION}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached && cached.length > 30) {
+        const clean = cached.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\s+/g, ' ').trim();
+        return clean.length > 260 ? clean.slice(0, 260) + '…' : clean;
+      }
+    }
+  } catch(e) {}
+
+  // 2순위: 본문 섹션에서 첫 문장씩 뽑아 불릿 요약
+  const bodies = Array.from(document.querySelectorAll('#sectionsWrap .section-body'))
+    .map(el => (el.innerText || '').trim()).filter(t => t.length > 10);
+  if (!bodies.length) return '';
+
+  const parts = [];
+  for (let i = 0; i < Math.min(bodies.length, 3); i++) {
+    const text = bodies[i].replace(/\s+/g, ' ');
+    // 섹션 번호/헤더 제거 (앞에 "1." "2." 같은 것)
+    const stripped = text.replace(/^\d+[.)]\s*/, '');
+    // 첫 문장 추출 (. ! ? 。 기준)
+    const m = stripped.match(/^[^.!?。]+[.!?。]/);
+    const firstSent = (m ? m[0] : stripped).trim();
+    if (firstSent.length < 8) continue;
+    parts.push('• ' + (firstSent.length > 90 ? firstSent.slice(0, 88) + '…' : firstSent));
+  }
+  return parts.join('\n');
+}
+
 // ── 공유 (모바일: navigator.share / 데스크탑: Kakao SDK / 폴백: 클립보드) ──
 function shareKakao() {
   const url = location.href;
-  const title = '✨ ' + (_config?.title || 'AI 운세 리포트');
-  let desc = 'FORTUNA에서 AI가 분석한 나만의 운세 리포트를 확인해보세요!';
-  try {
-    const simpleCache = window._simpleCache;
-    if (simpleCache) {
-      const firstSimple = Object.values(simpleCache).find(v => v && v.length > 0);
-      if (firstSimple) desc = firstSimple.slice(0, 180);
-    }
-  } catch(e) {}
+  const reportTitle = _config?.title || 'AI 운세 리포트';
+  const userName = _profile?.name ? ` · ${_profile.name}님` : '';
+  const title = '✨ ' + reportTitle + userName;
+
+  const summary = buildShareSummary();
+  const body = summary
+    ? summary + '\n\n📜 전체 리포트 보기 ↓'
+    : 'FORTUNA가 AI로 분석한 나만의 운세 리포트예요.\n전체 내용은 링크에서 확인하세요.';
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   if (isMobile && navigator.share) {
-    navigator.share({ title, text: desc, url }).catch(function(){});
+    navigator.share({ title, text: title + '\n\n' + body, url }).catch(function(){});
     return;
   }
 
@@ -4578,16 +4610,16 @@ function shareKakao() {
     if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
     Kakao.Share.sendDefault({
       objectType: 'text',
-      text: title + '\n\n' + desc,
+      text: title + '\n\n' + body,
       link: { mobileWebUrl: url, webUrl: url },
-      buttons: [{ title: '리포트 보기', link: { mobileWebUrl: url, webUrl: url } }]
+      buttons: [{ title: '전체 리포트 보기', link: { mobileWebUrl: url, webUrl: url } }]
     });
     return;
   }
 
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(desc + '\n' + url)
-      .then(() => alert('📋 클립보드에 복사됐어요! 카카오톡에 붙여넣어 주세요'));
+    navigator.clipboard.writeText(title + '\n\n' + body + '\n' + url)
+      .then(() => alert('📋 요약이 클립보드에 복사됐어요! 카카오톡에 붙여넣어 주세요'));
   }
 }
 </script>
