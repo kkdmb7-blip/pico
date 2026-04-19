@@ -4784,12 +4784,20 @@ function renderProfilesModal() {
   } else {
     list.forEach(function(p) {
       var div = document.createElement('div');
-      div.style.cssText = 'background:rgba(0,0,0,0.02);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;';
+      div.style.cssText = 'background:rgba(0,0,0,0.02);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;';
       var bdate = p.birth_date ? p.birth_date.replace(/-/g, '.') : '';
       var gender = p.gender === 'male' ? '남' : '여';
+      var timeLabel = (p.birth_time && p.birth_time !== 'unknown') ? ' · ' + p.birth_time : ' · 시간모름';
       div.innerHTML =
-        '<span style="font-size:14px;color:var(--text);">' + (p.name || '이름없음') + ' · ' + bdate + ' · ' + gender + '</span>' +
-        '<button onclick="deleteProfile(\'' + p.id + '\')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:0 4px;">×</button>';
+        '<div style="min-width:0;flex:1;">'
+          + '<div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (p.name || '이름없음') + '</div>'
+          + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + bdate + ' · ' + gender + timeLabel + '</div>'
+        + '</div>'
+        + '<div style="display:flex;gap:4px;flex-shrink:0;">'
+          + '<button onclick="useProfileForGunghap(\'' + p.id + '\')" title="궁합 보기" style="background:rgba(122,36,24,0.08);border:1px solid rgba(122,36,24,0.18);color:var(--accent);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">궁합</button>'
+          + '<button onclick="editProfile(\'' + p.id + '\')" title="편집" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 8px;font-size:11px;cursor:pointer;">편집</button>'
+          + '<button onclick="deleteProfile(\'' + p.id + '\')" title="삭제" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 8px;font-size:14px;line-height:1;cursor:pointer;">×</button>'
+        + '</div>';
       listEl.appendChild(div);
     });
   }
@@ -4800,9 +4808,74 @@ function renderProfilesModal() {
 }
 
 function deleteProfile(id) {
+  var target = getProfiles().find(function(p) { return p.id === id; });
+  var label = target ? (target.name || '이름없음') : '이 프로필';
+  if (!confirm(label + ' 프로필을 삭제할까요?\n삭제하면 궁합·가족운 분석에서 더 이상 사용할 수 없어요.')) return;
   var list = getProfiles().filter(function(p) { return p.id !== id; });
   saveProfiles(list);
   renderProfilesModal();
+}
+
+function editProfile(id) {
+  var target = getProfiles().find(function(p) { return p.id === id; });
+  if (!target) return;
+  toggleAddProfileForm();
+  var form = document.getElementById('pm-add-form');
+  if (form.style.display === 'none') toggleAddProfileForm();
+  setTimeout(function() {
+    document.getElementById('pm-name').value = target.name || '';
+    var parts = (target.birth_date || '').split('-');
+    if (parts.length === 3) {
+      document.getElementById('pm-year').value = parseInt(parts[0]);
+      document.getElementById('pm-month').value = parseInt(parts[1]);
+      var dEl = document.getElementById('pm-day');
+      var yv = parseInt(parts[0]), mv = parseInt(parts[1]);
+      var maxD = new Date(yv, mv, 0).getDate();
+      dEl.innerHTML = '<option value="">일</option>';
+      for (var dd = 1; dd <= maxD; dd++) {
+        var o = document.createElement('option'); o.value = dd; o.textContent = dd + '일';
+        if (dd === parseInt(parts[2])) o.selected = true;
+        dEl.appendChild(o);
+      }
+    }
+    if (target.birth_time && target.birth_time !== 'unknown') {
+      var tParts = target.birth_time.split(':');
+      document.getElementById('pm-hour').value = String(parseInt(tParts[0]));
+      document.getElementById('pm-minute').value = String(parseInt(tParts[1] || 0));
+    } else {
+      document.getElementById('pm-hour').value = 'unknown';
+    }
+    selectPmGender(target.gender || 'female');
+    window._pmEditingId = id;
+    var btn = document.querySelector('#pm-add-form button[onclick="saveNewProfile()"]');
+    if (btn) btn.textContent = '수정 저장';
+  }, 50);
+}
+
+function useProfileForGunghap(id) {
+  var p = getProfiles().find(function(x) { return x.id === id; });
+  if (!p) return;
+  closeProfilesModal();
+  if (typeof openGunghapModal === 'function') {
+    openGunghapModal();
+    setTimeout(function() {
+      var nameEl = document.getElementById('gh-name'), yEl = document.getElementById('gh-year'), mEl = document.getElementById('gh-month'), dEl = document.getElementById('gh-day');
+      if (nameEl) nameEl.value = p.name || '';
+      var parts = (p.birth_date || '').split('-');
+      if (parts.length === 3 && yEl && mEl && dEl) {
+        yEl.value = parseInt(parts[0]); mEl.value = parseInt(parts[1]);
+        if (mEl.dispatchEvent) mEl.dispatchEvent(new Event('change'));
+        setTimeout(function() { dEl.value = parseInt(parts[2]); }, 30);
+      }
+      var hEl = document.getElementById('gh-hour'), minEl = document.getElementById('gh-minute');
+      if (p.birth_time && p.birth_time !== 'unknown') {
+        var tp = p.birth_time.split(':');
+        if (hEl) hEl.value = String(parseInt(tp[0]));
+        if (minEl) minEl.value = String(parseInt(tp[1] || 0));
+      }
+      if (typeof selectGhGender === 'function') selectGhGender(p.gender === 'male' ? 'male' : 'female');
+    }, 120);
+  }
 }
 
 function toggleAddProfileForm() {
@@ -4856,17 +4929,26 @@ function saveNewProfile() {
   var hour   = document.getElementById('pm-hour').value;
   var minute = document.getElementById('pm-minute').value;
   var list = getProfiles();
-  var others = list.filter(function(p) { return !p.isMe; });
-  if (others.length >= 10) { alert('최대 10명까지 저장할 수 있습니다.'); return; }
-  var newP = {
-    id: genId(),
+  var editingId = window._pmEditingId;
+  var others = list.filter(function(p) { return !p.isMe && p.id !== editingId; });
+  if (!editingId && others.length >= 10) { alert('최대 10명까지 저장할 수 있습니다.'); return; }
+  var entry = {
+    id: editingId || genId(),
     name: name || '이름없음',
     birth_date: year + '-' + String(parseInt(month)).padStart(2,'0') + '-' + String(parseInt(day)).padStart(2,'0'),
     birth_time: hour === 'unknown' ? 'unknown' : String(parseInt(hour)).padStart(2,'0') + ':' + String(parseInt(minute) || 0).padStart(2,'0'),
     gender: _pmGender,
     isMe: false
   };
-  list.push(newP);
+  if (editingId) {
+    var idx = list.findIndex(function(p) { return p.id === editingId; });
+    if (idx >= 0) list[idx] = entry; else list.push(entry);
+    window._pmEditingId = null;
+    var btn = document.querySelector('#pm-add-form button[onclick="saveNewProfile()"]');
+    if (btn) btn.textContent = '저장';
+  } else {
+    list.push(entry);
+  }
   saveProfiles(list);
   document.getElementById('pm-add-form').style.display = 'none';
   document.getElementById('pm-name').value = '';
