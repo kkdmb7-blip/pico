@@ -4,19 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>피드백 관리 · FORTUNA</title>
-<meta name="theme-color" content="#0a0a0f">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#f5efe4">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0a0f;
-  --surface: #13131a;
-  --surface2: #1c1c28;
-  --border: #2a2a3d;
-  --text: #f0f0f5;
-  --muted: #7a7a95;
-  --gold: #d4af37;
-  --good: #7fd37f;
-  --bad: #f08a80;
+  --bg: #f4ede0;
+  --surface: #fcf7ea;
+  --surface2: #ede4cf;
+  --border: #c9bc9d;
+  --border-soft: rgba(80,55,30,0.10);
+  --text: #1a120a;
+  --text2: #4a3a2a;
+  --muted: #7a6850;
+  --gold: #9a7a26;
+  --gold-deep: #7a5e1c;
+  --ink: #241a10;
+  --shadow-soft: 0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+  --good: #4a7a3a;
+  --bad: #a94a3a;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -24,148 +29,210 @@ body {
   font-family:'Noto Sans KR',sans-serif;
   min-height:100vh;
   padding-bottom:40px;
+  -webkit-text-size-adjust:100%;
 }
 nav {
   display:flex; align-items:center; justify-content:space-between;
-  padding:14px 20px;
-  border-bottom:1px solid var(--border);
+  padding:12px 20px; height:52px;
+  border-bottom:1px solid var(--border-soft);
   position:sticky; top:0; z-index:100;
-  background:rgba(10,10,15,0.95);
+  background:rgba(244,237,224,0.92);
   backdrop-filter:blur(12px);
 }
-.logo-text { font-family:'Noto Serif KR',serif; font-weight:700; font-size:15px; letter-spacing:2px; color:var(--gold); }
-.back-btn {
-  font-size:13px; color:var(--muted); text-decoration:none;
-  background:none; border:none; cursor:pointer;
+.logo-text {
+  font-family:'Playfair Display','Noto Serif KR',serif;
+  font-weight:700; font-size:14px; letter-spacing:0.28em;
+  color:var(--gold-deep);
 }
-.wrap { max-width:980px; margin:0 auto; padding:24px 20px 60px; }
+.back-btn {
+  font-size:12px; color:var(--muted); text-decoration:none;
+  background:none; border:none; cursor:pointer;
+  padding:6px 10px; border-radius:8px;
+}
+.back-btn:hover { background:var(--surface2); color:var(--text); }
+
+.wrap { max-width:980px; margin:0 auto; padding:22px 16px 60px; }
 h2 {
   font-family:'Noto Serif KR',serif;
-  font-size:18px; font-weight:700; color:var(--gold);
-  margin:28px 0 14px; letter-spacing:1px;
+  font-size:15px; font-weight:700; color:var(--gold-deep);
+  margin:24px 0 12px; letter-spacing:-0.01em;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  flex-wrap:wrap;
 }
 h2:first-child { margin-top:0; }
 
 /* 관리자 인증 */
 .gate {
   max-width:420px; margin:60px auto; padding:28px 24px;
-  background:var(--surface); border:1px solid var(--border); border-radius:16px;
+  background:var(--surface); border:1px solid var(--border-soft); border-radius:16px;
+  box-shadow:var(--shadow-soft);
   text-align:center;
 }
 .gate h1 {
-  font-family:'Noto Serif KR',serif; color:var(--gold);
-  font-size:20px; margin-bottom:14px;
+  font-family:'Noto Serif KR',serif; color:var(--gold-deep);
+  font-size:17px; margin-bottom:14px;
 }
 .gate input {
   width:100%; padding:12px; border-radius:10px;
-  background:#000; border:1px solid var(--border);
-  color:var(--text); font-size:14px; margin-bottom:10px;
+  background:#fff; border:1px solid var(--border-soft);
+  color:var(--text); font-size:13px; margin-bottom:10px;
   font-family:monospace;
 }
 .gate button {
   width:100%; padding:12px; border-radius:10px;
-  background:linear-gradient(135deg,#d4af37,#c9a84c); color:#1a1a2e;
-  border:none; cursor:pointer; font-weight:700; font-size:14px;
+  background:var(--gold-deep); color:#fcf7ea;
+  border:none; cursor:pointer; font-weight:700; font-size:13px;
+  letter-spacing:0.02em;
 }
-.gate .hint { font-size:12px; color:var(--muted); margin-top:12px; }
+.gate .hint { font-size:11px; color:var(--muted); margin-top:12px; }
 
 /* 카드 */
 .card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:18px; margin-bottom:14px;
+  background:var(--surface); border:1px solid var(--border-soft);
+  border-radius:14px; padding:16px; margin-bottom:12px;
+  box-shadow:var(--shadow-soft);
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
 }
+.card > .loading, .card > .empty {
+  padding:26px; text-align:center; color:var(--muted); font-size:12px;
+}
+
+/* 요약 통계 */
 .summary-grid {
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  display:grid; grid-template-columns:repeat(2, 1fr);
   gap:10px; margin-bottom:16px;
 }
+@media(min-width:560px) { .summary-grid { grid-template-columns:repeat(4, 1fr); } }
 .stat {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:12px; padding:14px;
+  background:var(--surface); border:1px solid var(--border-soft);
+  border-radius:12px; padding:12px 14px;
+  box-shadow:var(--shadow-soft);
+  min-width:0;
 }
-.stat .label { font-size:11px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; }
-.stat .value { font-size:24px; font-weight:700; color:var(--gold); font-family:'Noto Serif KR',serif; }
-.stat .sub { font-size:11px; color:var(--muted); margin-top:4px; }
+.stat .label {
+  font-size:10px; color:var(--muted); margin-bottom:6px;
+  text-transform:uppercase; letter-spacing:0.1em;
+  font-family:'Playfair Display',serif;
+}
+.stat .value {
+  font-size:22px; font-weight:700; color:var(--gold-deep);
+  font-family:'Playfair Display','Noto Serif KR',serif;
+  font-variant-numeric:lining-nums;
+  line-height:1.1;
+}
+.stat .sub { font-size:10.5px; color:var(--muted); margin-top:4px; }
 
 /* 테이블 */
 table {
   width:100%; border-collapse:collapse;
-  background:var(--surface); border-radius:12px; overflow:hidden;
-  font-size:12px;
+  font-size:11.5px;
+  min-width:520px;
 }
 th, td {
-  padding:10px 12px; text-align:left;
-  border-bottom:1px solid var(--border);
+  padding:9px 10px; text-align:left;
+  border-bottom:1px solid var(--border-soft);
   vertical-align:top;
 }
 th {
-  background:var(--surface2); color:var(--gold);
-  font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:1px;
+  background:var(--surface2); color:var(--gold-deep);
+  font-weight:700; font-size:10px;
+  text-transform:uppercase; letter-spacing:0.08em;
+  font-family:'Playfair Display',serif;
+  white-space:nowrap;
 }
-tbody tr:hover { background:rgba(212,175,55,0.04); }
-td.rating-up { color:var(--good); font-weight:600; }
-td.rating-down { color:var(--bad); font-weight:600; }
+tbody tr:hover { background:rgba(154,122,38,0.05); }
+td.rating-up { color:var(--good); font-weight:700; }
+td.rating-down { color:var(--bad); font-weight:700; }
+
 .pill {
   display:inline-block; padding:3px 9px; border-radius:999px;
-  font-size:10px; background:rgba(212,175,55,0.15); color:var(--gold);
-  border:1px solid rgba(212,175,55,0.3);
+  font-size:10px; background:rgba(154,122,38,0.12); color:var(--gold-deep);
+  border:1px solid rgba(154,122,38,0.28);
+  white-space:nowrap;
 }
-.pill-chat { background:rgba(125,94,167,0.15); color:#a07fd4; border-color:rgba(160,127,212,0.3); }
-.pill-daily { background:rgba(76,175,80,0.12); color:var(--good); border-color:rgba(127,211,127,0.3); }
+.pill-chat { background:rgba(125,94,167,0.14); color:#6a4ea0; border-color:rgba(125,94,167,0.32); }
+.pill-daily { background:rgba(74,122,58,0.14); color:var(--good); border-color:rgba(74,122,58,0.32); }
 
 /* 필터 */
 .filter {
-  display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center;
+  display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center;
 }
 .filter select, .filter button {
-  padding:8px 12px; border-radius:8px;
-  background:var(--surface2); border:1px solid var(--border);
-  color:var(--text); font-size:13px; cursor:pointer;
+  padding:8px 12px; border-radius:10px;
+  background:var(--surface); border:1px solid var(--border-soft);
+  color:var(--text); font-size:12px; cursor:pointer;
   font-family:inherit;
 }
 .filter button.primary {
-  background:linear-gradient(135deg,#d4af37,#c9a84c); color:#1a1a2e;
-  border:none; font-weight:700;
+  background:var(--gold-deep); color:#fcf7ea;
+  border-color:var(--gold-deep); font-weight:700;
+  letter-spacing:0.02em;
 }
-.filter button:hover { opacity:0.85; }
-
-/* 로딩 / 비어있음 */
-.loading, .empty {
-  padding:30px; text-align:center; color:var(--muted); font-size:13px;
-}
+.filter button:hover { opacity:0.88; }
 
 /* 추이 막대 */
-.daily-row { display:flex; align-items:center; gap:10px; font-size:12px; padding:4px 0; }
-.daily-row .day-label { width:88px; color:var(--muted); font-family:monospace; }
+.daily-row {
+  display:flex; align-items:center; gap:10px;
+  font-size:11.5px; padding:4px 0;
+}
+.daily-row .day-label {
+  width:78px; color:var(--muted); font-family:'Playfair Display',monospace;
+  flex-shrink:0;
+  font-variant-numeric:lining-nums;
+}
 .daily-row .bar {
-  flex:1; height:18px; background:var(--surface2); border-radius:4px; overflow:hidden;
-  display:flex;
+  flex:1; height:16px; background:var(--surface2); border-radius:4px; overflow:hidden;
+  display:flex; min-width:80px;
 }
 .daily-row .bar-up { background:var(--good); height:100%; }
 .daily-row .bar-down { background:var(--bad); height:100%; }
-.daily-row .count { width:110px; text-align:right; color:var(--muted); font-size:11px; }
+.daily-row .count {
+  width:96px; text-align:right; color:var(--muted); font-size:10.5px;
+  flex-shrink:0;
+  font-variant-numeric:lining-nums;
+}
 
 /* 코멘트 셀 */
 td.comment {
-  max-width:280px; white-space:normal; word-break:break-word;
-  color:rgba(240,240,245,0.82); line-height:1.5;
+  max-width:240px; min-width:140px; white-space:normal; word-break:break-word;
+  color:var(--text2); line-height:1.5; font-size:11.5px;
 }
 td.reasons span {
   display:inline-block; padding:2px 7px; margin:1px;
-  background:rgba(212,175,55,0.1); color:var(--gold);
+  background:rgba(154,122,38,0.1); color:var(--gold-deep);
   border-radius:999px; font-size:10px;
 }
+
 .csv-btn {
   padding:6px 12px; border-radius:8px;
-  background:var(--surface2); border:1px solid var(--border);
-  color:var(--gold); font-size:12px; cursor:pointer; font-family:inherit;
+  background:var(--surface); border:1px solid var(--border-soft);
+  color:var(--gold-deep); font-size:11.5px; cursor:pointer;
+  font-family:inherit; font-weight:700;
 }
+.csv-btn:hover { background:var(--surface2); }
+
+.del-btn {
+  padding:4px 8px; border-radius:6px;
+  background:rgba(169,74,58,0.1);
+  border:1px solid rgba(169,74,58,0.35);
+  color:var(--bad); font-size:10.5px; cursor:pointer;
+  font-family:inherit; font-weight:600;
+  white-space:nowrap;
+}
+.del-btn:hover { background:rgba(169,74,58,0.2); }
+
+.time-cell { color:var(--muted); white-space:nowrap; font-size:10.5px; font-variant-numeric:lining-nums; }
+.user-cell { color:var(--muted); font-family:monospace; font-size:10px; white-space:nowrap; }
+
+.err-text { color:var(--bad); }
 </style>
 </head>
 <body>
 
 <nav>
   <span class="logo-text">FORTUNA · ADMIN</span>
-  <a href="mypage.html" class="back-btn">← 마이페이지</a>
+  <a href="index.html?tab=mypage" class="back-btn">← 마이페이지</a>
 </nav>
 
 <div id="gateView" class="gate" style="display:none;">
@@ -173,7 +240,7 @@ td.reasons span {
   <input id="adminUuid" type="text" placeholder="관리자 UUID 입력" autocomplete="off">
   <button id="gateSubmit">접속</button>
   <div class="hint">권한이 없는 접근은 Worker에서 차단됩니다</div>
-  <div id="gateError" style="color:var(--bad); font-size:12px; margin-top:10px;"></div>
+  <div id="gateError" class="err-text" style="font-size:11.5px; margin-top:10px;"></div>
 </div>
 
 <div id="mainView" class="wrap" style="display:none;">
@@ -188,8 +255,8 @@ td.reasons span {
   <div id="dailyTable" class="card"><div class="loading">불러오는 중...</div></div>
 
   <h2>
-    최근 피드백
-    <button class="csv-btn" id="csvBtn" style="float:right;">CSV 내보내기</button>
+    <span>최근 피드백</span>
+    <button class="csv-btn" id="csvBtn">CSV 내보내기</button>
   </h2>
   <div class="filter">
     <select id="fltSource">
@@ -200,8 +267,8 @@ td.reasons span {
     </select>
     <select id="fltRating">
       <option value="">전체 평가</option>
-      <option value="1">👍 긍정</option>
-      <option value="-1">👎 부정</option>
+      <option value="1">긍정</option>
+      <option value="-1">부정</option>
     </select>
     <select id="fltLimit">
       <option value="50">50건</option>
@@ -254,12 +321,12 @@ async function loadStats() {
     const total = totalUp + totalDown;
     const score = total ? Math.round((totalUp / total) * 100) : 0;
     qs('summaryGrid').innerHTML = `
-      <div class="stat"><div class="label">총 피드백</div><div class="value">${total.toLocaleString()}</div><div class="sub">소스 ${sources.size}종</div></div>
-      <div class="stat"><div class="label">👍 긍정</div><div class="value" style="color:var(--good);">${totalUp.toLocaleString()}</div></div>
-      <div class="stat"><div class="label">👎 부정</div><div class="value" style="color:var(--bad);">${totalDown.toLocaleString()}</div></div>
+      <div class="stat"><div class="label">Total</div><div class="value">${total.toLocaleString()}</div><div class="sub">소스 ${sources.size}종</div></div>
+      <div class="stat"><div class="label">긍정</div><div class="value" style="color:var(--good);">${totalUp.toLocaleString()}</div></div>
+      <div class="stat"><div class="label">부정</div><div class="value" style="color:var(--bad);">${totalDown.toLocaleString()}</div></div>
       <div class="stat"><div class="label">긍정률</div><div class="value">${score}%</div></div>
     `;
-    const headers = ['소스','타입','👍','👎','긍정률','최근'];
+    const headers = ['소스','타입','긍정','부정','긍정률','최근'];
     const trs = rows.map(r => {
       const rate = r.positive_rate_pct != null ? Math.round(r.positive_rate_pct) : 0;
       return `<tr>
@@ -268,12 +335,12 @@ async function loadStats() {
         <td class="rating-up">${r.positive||0}</td>
         <td class="rating-down">${r.negative||0}</td>
         <td>${rate}%</td>
-        <td style="color:var(--muted); font-size:11px;">${fmtDate(r.last_at)}</td>
+        <td class="time-cell">${fmtDate(r.last_at)}</td>
       </tr>`;
     }).join('');
     qs('statsTable').innerHTML = `<table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table>`;
   } catch(e) {
-    qs('statsTable').innerHTML = `<div class="empty" style="color:var(--bad);">오류: ${e.message}</div>`;
+    qs('statsTable').innerHTML = `<div class="empty err-text">오류: ${e.message}</div>`;
   }
 }
 
@@ -284,7 +351,6 @@ async function loadDaily() {
       qs('dailyTable').innerHTML = '<div class="empty">추이 데이터 없음</div>';
       return;
     }
-    // 날짜별로 묶기 (소스 합산)
     const byDay = {};
     rows.forEach(r => {
       const d = String(r.day).slice(0, 10);
@@ -304,12 +370,12 @@ async function loadDaily() {
           <div class="bar-up" style="width:${upPct}%;"></div>
           <div class="bar-down" style="width:${dnPct}%;"></div>
         </div>
-        <div class="count">👍 ${o.up} · 👎 ${o.down}</div>
+        <div class="count">↑${o.up} · ↓${o.down}</div>
       </div>`;
     }).join('');
     qs('dailyTable').innerHTML = html;
   } catch(e) {
-    qs('dailyTable').innerHTML = `<div class="empty" style="color:var(--bad);">오류: ${e.message}</div>`;
+    qs('dailyTable').innerHTML = `<div class="empty err-text">오류: ${e.message}</div>`;
   }
 }
 
@@ -332,14 +398,14 @@ async function loadRecent() {
       const rs = Array.isArray(r.reasons) ? r.reasons : [];
       const reasonsHtml = rs.map(x => `<span>${escapeHtml(x)}</span>`).join('');
       return `<tr data-id="${escapeHtml(r.id)}">
-        <td style="color:var(--muted); white-space:nowrap;">${fmtDate(r.created_at)}</td>
+        <td class="time-cell">${fmtDate(r.created_at)}</td>
         <td><span class="${pillClass(r.source)}">${r.source}</span></td>
         <td>${r.source_type || '-'}</td>
-        <td class="${r.rating === 1 ? 'rating-up' : 'rating-down'}">${r.rating === 1 ? '👍' : '👎'}</td>
+        <td class="${r.rating === 1 ? 'rating-up' : 'rating-down'}">${r.rating === 1 ? '↑' : '↓'}</td>
         <td class="reasons">${reasonsHtml || '<span style="color:var(--muted); background:none; border:none; padding:0;">-</span>'}</td>
         <td class="comment">${escapeHtml(r.comment || '') || '<span style="color:var(--muted);">-</span>'}</td>
-        <td style="color:var(--muted); font-family:monospace; font-size:10px;">${(r.user_id||'').slice(0,16)}</td>
-        <td><button class="del-btn" data-id="${escapeHtml(r.id)}" style="padding:4px 8px; border-radius:6px; background:rgba(244,67,54,0.15); border:1px solid rgba(244,67,54,0.4); color:#f08a80; font-size:11px; cursor:pointer; font-family:inherit;">삭제</button></td>
+        <td class="user-cell">${(r.user_id||'').slice(0,16)}</td>
+        <td><button class="del-btn" data-id="${escapeHtml(r.id)}">삭제</button></td>
       </tr>`;
     }).join('');
     qs('recentTable').innerHTML = `<table><thead><tr>
@@ -363,7 +429,7 @@ async function loadRecent() {
       });
     });
   } catch(e) {
-    qs('recentTable').innerHTML = `<div class="empty" style="color:var(--bad);">오류: ${e.message}</div>`;
+    qs('recentTable').innerHTML = `<div class="empty err-text">오류: ${e.message}</div>`;
   }
 }
 
@@ -398,7 +464,6 @@ async function boot() {
     qs('gateView').style.display = 'block';
     return;
   }
-  // 권한 확인 겸 초기 로드
   try {
     await fetchJson('/feedback-stats');
   } catch(e) {
