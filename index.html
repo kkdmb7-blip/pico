@@ -335,9 +335,9 @@
   }
   .why-card.why-card-full:hover { border-color: rgba(255,130,170,0.6); }
   .why-card.why-card-full .why-card-body { flex: 1; }
-  .why-card.why-card-full h3 { margin-bottom: 4px; font-size: 14px; color: #ff8ab0; }
+  .why-card.why-card-full h3 { margin-bottom: 4px; font-size: 14px; color: #c0306c; }
   .why-card.why-card-full p { margin: 0; }
-  .why-card.why-card-full .why-card-link { flex-shrink: 0; font-size: 12px; font-weight: 700; color: #ff8ab0; }
+  .why-card.why-card-full .why-card-link { flex-shrink: 0; font-size: 12px; font-weight: 700; color: #c0306c; }
 
   /* ── SERVICES SECTION ── */
   .section-services {
@@ -384,9 +384,9 @@
     letter-spacing: 0.5px;
     padding: 3px 10px;
     border-radius: 100px;
-    background: rgba(123,94,167,0.2);
-    border: 1px solid rgba(123,94,167,0.4);
-    color: #c4a8e8;
+    background: rgba(106,74,160,0.12);
+    border: 1px solid rgba(106,74,160,0.35);
+    color: #6a4aa0;
     margin-bottom: 14px;
   }
   .service-badge-premium {
@@ -578,7 +578,7 @@
     font-size: 16px;
     display: flex; align-items: center; justify-content: center;
   }
-  .saju-modal-close:hover { color: #f0f0f5; }
+  .saju-modal-close:hover { color: #1a120a; }
   .saju-modal h3 {
     font-family: 'Noto Serif KR', serif;
     font-size: 22px;
@@ -607,7 +607,7 @@
     background: var(--surface2);
     border: 1px solid #2a2a3d;
     border-radius: 10px;
-    color: #f0f0f5;
+    color: #1a120a;
     font-size: 14px;
     font-family: 'Noto Serif KR', serif;
     outline: none;
@@ -632,7 +632,7 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  .saju-gender-btn.active { background: rgba(123,94,167,0.2); border-color: #7b5ea7; color: #f0f0f5; }
+  .saju-gender-btn.active { background: rgba(123,94,167,0.2); border-color: #7b5ea7; color: #1a120a; }
   .saju-submit-btn {
     width: 100%;
     padding: 14px;
@@ -739,7 +739,7 @@
     align-items: center;
     gap: 4px;
   }
-  .saju-back-btn:hover { color: #f0f0f5; }
+  .saju-back-btn:hover { color: #1a120a; }
 
   /* ── AUTH ── */
   .btn-kakao {
@@ -839,7 +839,7 @@
   content: '✨';
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  font-size: 28px; color: #8e7dff88;
+  font-size: 28px; color: rgba(106,74,160,0.55);
 }
 .tarot-shuffle .tc:nth-child(1) { animation-delay: 0s;   --rx: -28deg; --tx: -44px; }
 .tarot-shuffle .tc:nth-child(2) { animation-delay: 0.1s; --rx: 0deg;   --tx: -36px; z-index:1; }
@@ -852,14 +852,14 @@
 .tarot-intro-text {
   font-family: 'Noto Serif KR', serif;
   font-size: clamp(15px, 4vw, 20px);
-  color: #e8e0f8;
+  color: var(--text);
   text-align: center;
   line-height: 1.7;
   letter-spacing: 0.3px;
   animation: fadeInUp 0.6s 0.4s both;
 }
 .tarot-intro-sub {
-  font-size: 12px; color: #8e7dff99;
+  font-size: 12px; color: var(--muted);
   animation: fadeInUp 0.6s 0.8s both;
 }
 @keyframes fadeInUp {
@@ -1164,8 +1164,8 @@
         <a href="/name-score.html?mode=auto" style="text-decoration:none;color:inherit;display:block;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;transition:all 0.2s;"
           onmouseover="this.style.borderColor='var(--accent)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-compass pi-lg" style="color:#4caf7a;"></i>진단</span>
-            <span style="font-size:10px;color:#4caf7a;font-weight:700;">무료</span>
+            <span style="font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px;"><i class="pi pi-compass pi-lg" style="color:#3a8f4d;"></i>진단</span>
+            <span style="font-size:10px;color:#3a8f4d;font-weight:700;">무료</span>
           </div>
           <div style="font-size:10.5px;color:var(--muted);line-height:1.5;">81수리 4격 점수·음오행</div>
         </a>
@@ -1321,12 +1321,12 @@
     return _OHENG_CHO[cho] || null;
   }
   function _ohengRel(a, b) {
-    if (!a || !b) return { label: '-', grade: '중', color: '#8b8ba8' };
-    if (a === b) return { label: '비화(比和)', grade: '평', color: '#8b8ba8' };
-    if (_SANGSAENG[a] === b) return { label: '상생(相生)', grade: '길', color: '#4caf7a' };
-    if (_SANGSAENG[b] === a) return { label: '역생(逆生)', grade: '평', color: '#8ba0c0' };
-    if (_SANGKUK[a] === b)   return { label: '상극(相剋)', grade: '흉', color: '#f44336' };
-    return { label: '극복(剋伏)', grade: '평', color: '#ff9800' };
+    if (!a || !b) return { label: '-', grade: '중', color: '#6b6b85' };
+    if (a === b) return { label: '비화(比和)', grade: '평', color: '#6b6b85' };
+    if (_SANGSAENG[a] === b) return { label: '상생(相生)', grade: '길', color: '#3a8f4d' };
+    if (_SANGSAENG[b] === a) return { label: '역생(逆生)', grade: '평', color: '#2e6ba8' };
+    if (_SANGKUK[a] === b)   return { label: '상극(相剋)', grade: '흉', color: '#b91c1c' };
+    return { label: '극복(剋伏)', grade: '평', color: '#a16d1f' };
   }
 
   window.nsCalc = function() {
@@ -1349,7 +1349,7 @@
       '정격': { val: _n81(A+B+(isSingleName?0:C)), desc: '말년·전체운' },
     };
 
-    var gradeColor = { '대길':'#d4af37','길':'#4caf7a','반길':'#ff9800','흉':'#f44336','대흉':'#e91e63' };
+    var gradeColor = { '대길':'#a16d1f','길':'#3a8f4d','반길':'#c2410c','흉':'#b91c1c','대흉':'#881337' };
     var gradeBg    = { '대길':'rgba(212,175,55,0.1)','길':'rgba(76,175,122,0.1)','반길':'rgba(255,152,0,0.1)','흉':'rgba(244,67,54,0.08)','대흉':'rgba(233,30,99,0.08)' };
     var gradeBorder= { '대길':'rgba(212,175,55,0.35)','길':'rgba(76,175,122,0.35)','반길':'rgba(255,152,0,0.35)','흉':'rgba(244,67,54,0.3)','대흉':'rgba(233,30,99,0.3)' };
 
@@ -1404,11 +1404,11 @@
 
     // 관계 라벨 → 쉬운 말
     var _RELMAP = {
-      '상생(相生)': { simple: '받침', color: '#4caf7a' },
-      '역생(逆生)': { simple: '순환', color: '#8ba0c0' },
-      '상극(相剋)': { simple: '부딪힘', color: '#f44336' },
-      '극복(剋伏)': { simple: '버팀', color: '#ff9800' },
-      '비화(比和)': { simple: '같음', color: '#8b8ba8' }
+      '상생(相生)': { simple: '받침', color: '#3a8f4d' },
+      '역생(逆生)': { simple: '순환', color: '#2e6ba8' },
+      '상극(相剋)': { simple: '부딪힘', color: '#b91c1c' },
+      '극복(剋伏)': { simple: '버팀', color: '#a16d1f' },
+      '비화(比和)': { simple: '같음', color: '#6b6b85' }
     };
 
     var ohengHtml =
@@ -1655,7 +1655,7 @@
       <div class="why-card" onclick="openTarotIntro()" style="cursor:pointer;">
         <h3>타로카드</h3>
         <p>당신의 직관 신호</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#9b8dff;background:rgba(155,141,255,0.1);border:1px solid rgba(155,141,255,0.3);border-radius:8px;padding:4px 10px;">카드 뽑기</div>
+        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#6a4aa0;background:rgba(106,74,160,0.1);border:1px solid rgba(106,74,160,0.35);border-radius:8px;padding:4px 10px;">카드 뽑기</div>
       </div>
       <div class="why-card why-card-full" onclick="openGunghapModal()" style="cursor:pointer;">
         <div class="why-card-body">
@@ -1733,11 +1733,11 @@
       <div onclick="window.location.href='report.html?type=yongsin'" style="background:var(--surface2);border:1px solid rgba(255,200,80,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(255,200,80,0.6)'" onmouseout="this.style.borderColor='rgba(255,200,80,0.25)'">
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <div style="font-size:13px;font-weight:700;color:#ffc850;"><i class="pi pi-bolt"></i> 용신 생활 가이드</div>
+            <div style="font-size:13px;font-weight:700;color:#a16d1f;"><i class="pi pi-bolt"></i> 용신 생활 가이드</div>
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">용신재검증·조후·적천수·자평진전 정밀 데이터 기반 개운 전략</div>
         </div>
-        <div style="font-size:11px;font-weight:600;color:#ffc850;background:rgba(255,200,80,0.1);border:1px solid rgba(255,200,80,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
+        <div style="font-size:11px;font-weight:600;color:#a16d1f;background:rgba(255,200,80,0.1);border:1px solid rgba(255,200,80,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
       </div>
     </div>
   </div>
@@ -1750,24 +1750,24 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
       <div onclick="window.location.href='report.html?type=summary'" style="background:var(--surface2);border:1px solid rgba(255,200,80,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,200,80,0.6)'" onmouseout="this.style.borderColor='rgba(255,200,80,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;color:#ffc850;"><i class="pi pi-sparkle"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#ffc850;margin-bottom:5px;">사주 포인트 요약</div>
+        <div style="font-size:20px;margin-bottom:6px;color:#a16d1f;"><i class="pi pi-sparkle"></i></div>
+        <div style="font-size:13px;font-weight:700;color:#a16d1f;margin-bottom:5px;">사주 포인트 요약</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">핵심 3줄 + 올해 포인트 + 즉시 실천법</div>
-        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#ffc850;background:rgba(255,200,80,0.1);border:1px solid rgba(255,200,80,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">200 Orb</div>
+        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#a16d1f;background:rgba(255,200,80,0.1);border:1px solid rgba(255,200,80,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">200 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=balance'" style="background:var(--surface2);border:1px solid rgba(80,200,200,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(80,200,200,0.6)'" onmouseout="this.style.borderColor='rgba(80,200,200,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;color:#50c8c8;"><i class="pi pi-yinyang"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#50c8c8;margin-bottom:5px;">오행 밸런스</div>
+        <div style="font-size:20px;margin-bottom:6px;color:#2a8577;"><i class="pi pi-yinyang"></i></div>
+        <div style="font-size:13px;font-weight:700;color:#2a8577;margin-bottom:5px;">오행 밸런스</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">오행 균형 진단 + 부족 보완 실천법</div>
-        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#50c8c8;background:rgba(80,200,200,0.1);border:1px solid rgba(80,200,200,0.3);border-radius:8px;padding:4px 10px;display:inline-block;">300 Orb</div>
+        <div style="margin-top:8px;font-size:11px;font-weight:600;color:#2a8577;background:rgba(42,133,119,0.1);border:1px solid rgba(42,133,119,0.35);border-radius:8px;padding:4px 10px;display:inline-block;">300 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=sinsal'" style="background:var(--surface2);border:1px solid rgba(220,160,100,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(220,160,100,0.6)'" onmouseout="this.style.borderColor='rgba(220,160,100,0.25)'">
-        <div style="font-size:28px;color:#dca064;"><i class="pi pi-scroll"></i></div>
+        <div style="font-size:28px;color:#a16d1f;"><i class="pi pi-scroll"></i></div>
         <div style="flex:1;">
-          <div style="font-size:13px;font-weight:700;color:#dca064;margin-bottom:3px;">신살 총정리</div>
+          <div style="font-size:13px;font-weight:700;color:#a16d1f;margin-bottom:3px;">신살 총정리</div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">귀인·삼재·양인살·원진살 — 나의 길신·흉신 한눈에 정리</div>
         </div>
-        <div style="font-size:11px;font-weight:600;color:#dca064;background:rgba(220,160,100,0.1);border:1px solid rgba(220,160,100,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">300 Orb</div>
+        <div style="font-size:11px;font-weight:600;color:#a16d1f;background:rgba(220,160,100,0.1);border:1px solid rgba(220,160,100,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">300 Orb</div>
       </div>
     </div>
   </div>
@@ -1780,44 +1780,44 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
       <div onclick="window.location.href='report.html?type=health'" style="background:var(--surface2);border:1px solid rgba(100,200,140,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,200,140,0.6)'" onmouseout="this.style.borderColor='rgba(100,200,140,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;color:#64c88c;"><i class="pi pi-medical"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#64c88c;margin-bottom:5px;">건강·체질 분석</div>
+        <div style="font-size:20px;margin-bottom:6px;color:#2d8659;"><i class="pi pi-medical"></i></div>
+        <div style="font-size:13px;font-weight:700;color:#2d8659;margin-bottom:5px;">건강·체질 분석</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">오행 건강 지도 + 취약 장기 + 관리법</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#64c88c;">400 Orb</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#2d8659;">400 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=family'" style="background:var(--surface2);border:1px solid rgba(240,160,180,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(240,160,180,0.6)'" onmouseout="this.style.borderColor='rgba(240,160,180,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;color:#f0a0b4;"><i class="pi pi-people"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#f0a0b4;margin-bottom:5px;">가족·인연 분석</div>
+        <div style="font-size:20px;margin-bottom:6px;color:#c0306c;"><i class="pi pi-people"></i></div>
+        <div style="font-size:13px;font-weight:700;color:#c0306c;margin-bottom:5px;">가족·인연 분석</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">부모·배우자·자녀 인연 구조 분석</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#f0a0b4;">400 Orb</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#c0306c;">400 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=timing'" style="background:var(--surface2);border:1px solid rgba(120,160,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(120,160,255,0.6)'" onmouseout="this.style.borderColor='rgba(120,160,255,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;color:#78a0ff;"><i class="pi pi-calendar"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#78a0ff;margin-bottom:5px;">인생 타이밍</div>
+        <div style="font-size:20px;margin-bottom:6px;color:#2e6ba8;"><i class="pi pi-calendar"></i></div>
+        <div style="font-size:13px;font-weight:700;color:#2e6ba8;margin-bottom:5px;">인생 타이밍</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">결정·이직·투자 최적 시기 분석</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#78a0ff;">500 Orb</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#2e6ba8;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=wealth_timing'" style="background:var(--surface2);border:1px solid rgba(220,180,80,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(220,180,80,0.6)'" onmouseout="this.style.borderColor='rgba(220,180,80,0.25)'">
-        <div style="font-size:20px;margin-bottom:6px;color:#dcb450;"><i class="pi pi-chart"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#dcb450;margin-bottom:5px;">재물 타이밍</div>
+        <div style="font-size:20px;margin-bottom:6px;color:#a16d1f;"><i class="pi pi-chart"></i></div>
+        <div style="font-size:13px;font-weight:700;color:#a16d1f;margin-bottom:5px;">재물 타이밍</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">대운별·월별 재물 흐름 + 투자 적기</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#dcb450;">500 Orb</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#a16d1f;">500 Orb</div>
       </div>
       <div onclick="openGuideModal()" style="background:linear-gradient(135deg,rgba(240,140,180,0.15),rgba(200,100,160,0.15));border:1px solid rgba(240,140,180,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(240,140,180,0.7)'" onmouseout="this.style.borderColor='rgba(240,140,180,0.3)'">
-        <div style="font-size:28px;color:#f08cb4;"><i class="pi pi-people"></i></div>
+        <div style="font-size:28px;color:#c0306c;"><i class="pi pi-people"></i></div>
         <div style="flex:1;">
-          <div style="font-size:13px;font-weight:700;color:#f08cb4;margin-bottom:3px;">이 사람 사용설명서 <span style="font-size:10px;background:linear-gradient(90deg,#f08cb4,#ffd864);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">NEW</span></div>
+          <div style="font-size:13px;font-weight:700;color:#c0306c;margin-bottom:3px;">이 사람 사용설명서 <span style="font-size:10px;background:linear-gradient(90deg,#f08cb4,#ffd864);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">NEW</span></div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">가까운 사람이 이 사주를 어떻게 대하면 좋을지 — 대화법·배려 포인트·지뢰 지점</div>
         </div>
-        <div style="font-size:11px;font-weight:700;color:#f08cb4;background:rgba(240,140,180,0.15);border:1px solid rgba(240,140,180,0.4);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
+        <div style="font-size:11px;font-weight:700;color:#c0306c;background:rgba(240,140,180,0.15);border:1px solid rgba(240,140,180,0.4);border-radius:8px;padding:4px 10px;flex-shrink:0;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=classic'" style="background:linear-gradient(135deg,rgba(180,140,100,0.15),rgba(140,100,60,0.15));border:1px solid rgba(180,140,100,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(180,140,100,0.7)'" onmouseout="this.style.borderColor='rgba(180,140,100,0.3)'">
-        <div style="font-size:28px;color:#b48c64;"><i class="pi pi-book"></i></div>
+        <div style="font-size:28px;color:#8b5a2b;"><i class="pi pi-book"></i></div>
         <div style="flex:1;">
-          <div style="font-size:13px;font-weight:700;color:#b48c64;margin-bottom:3px;">고전 명리 해석 <span style="font-size:10px;background:linear-gradient(90deg,#b48c64,#d4af37);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">CLASSIC</span></div>
+          <div style="font-size:13px;font-weight:700;color:#8b5a2b;margin-bottom:3px;">고전 명리 해석 <span style="font-size:10px;background:linear-gradient(90deg,#8b5a2b,#a16d1f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">CLASSIC</span></div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">적천수 원문·자평진전 격국론·납음·조후 — 고전 명리의 정수</div>
         </div>
-        <div style="font-size:11px;font-weight:700;color:#b48c64;background:rgba(180,140,100,0.15);border:1px solid rgba(180,140,100,0.4);border-radius:8px;padding:4px 10px;flex-shrink:0;">600 Orb</div>
+        <div style="font-size:11px;font-weight:700;color:#8b5a2b;background:rgba(139,90,43,0.12);border:1px solid rgba(139,90,43,0.35);border-radius:8px;padding:4px 10px;flex-shrink:0;">600 Orb</div>
       </div>
     </div>
   </div>
@@ -1831,35 +1831,35 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <div onclick="window.location.href='report.html?type=vedic_full'" style="background:var(--surface2);border:1px solid rgba(148,130,220,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(148,130,220,0.6)'" onmouseout="this.style.borderColor='rgba(148,130,220,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-lotus"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#9482dc;margin-bottom:4px;">베딕 심층 분석</div>
+        <div style="font-size:13px;font-weight:700;color:#6a4aa0;margin-bottom:4px;">베딕 심층 분석</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">사주 정밀 데이터 + 낙샤트라·다샤·라시 교차 분석</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#9482dc;">500 Orb</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#6a4aa0;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=astro_full'" style="background:var(--surface2);border:1px solid rgba(255,220,100,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,220,100,0.6)'" onmouseout="this.style.borderColor='rgba(255,220,100,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-star"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#ffd864;margin-bottom:4px;">서양 점성술</div>
+        <div style="font-size:13px;font-weight:700;color:#a16d1f;margin-bottom:4px;">서양 점성술</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">사주 정밀 데이터 + 행성 배치·트랜짓 교차 분석</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#ffd864;">500 Orb</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#a16d1f;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=ziwei_full'" style="background:var(--surface2);border:1px solid rgba(100,180,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,180,255,0.6)'" onmouseout="this.style.borderColor='rgba(100,180,255,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-ziwei"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#64b4ff;margin-bottom:4px;">자미두수 심층</div>
+        <div style="font-size:13px;font-weight:700;color:#2e6ba8;margin-bottom:4px;">자미두수 심층</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">사주 정밀 데이터 + 명궁·재백·관록궁 교차 분석</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#64b4ff;">500 Orb</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#2e6ba8;">500 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=career_deep'" style="background:var(--surface2);border:1px solid rgba(100,220,150,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(100,220,150,0.6)'" onmouseout="this.style.borderColor='rgba(100,220,150,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;"><i class="pi pi-target"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#64dc96;margin-bottom:4px;">직업·사업 심층</div>
+        <div style="font-size:13px;font-weight:700;color:#2d8659;margin-bottom:4px;">직업·사업 심층</div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">격국·직업적성·십성분포 정밀 데이터 + 3시스템 교차</div>
-        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#64dc96;">600 Orb</div>
+        <div style="margin-top:8px;font-size:10px;font-weight:600;color:#2d8659;">600 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=triple'" style="background:linear-gradient(135deg,rgba(100,130,220,0.15),rgba(220,130,100,0.15));border:1px solid rgba(180,160,240,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;grid-column:1/-1;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(180,160,240,0.7)'" onmouseout="this.style.borderColor='rgba(180,160,240,0.3)'">
         <div style="font-size:28px;"><i class="pi pi-eye"></i></div>
         <div style="flex:1;">
-          <div style="font-size:13px;font-weight:700;color:#c8b4f0;margin-bottom:3px;">동서양 통합 분석 <span style="font-size:10px;background:linear-gradient(90deg,#c8b4f0,#f0c8b4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">PREMIUM</span></div>
+          <div style="font-size:13px;font-weight:700;color:#6a4aa0;margin-bottom:3px;">동서양 통합 분석 <span style="font-size:10px;background:linear-gradient(90deg,#c8b4f0,#f0c8b4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;">PREMIUM</span></div>
           <div style="font-size:11px;color:var(--muted);line-height:1.5;">45종 정밀 데이터 + 사주·베딕·서양·자미두수 4시스템 동시 교차 분석</div>
         </div>
-        <div style="font-size:11px;font-weight:700;color:#c8b4f0;background:rgba(180,160,240,0.15);border:1px solid rgba(180,160,240,0.4);border-radius:8px;padding:4px 10px;flex-shrink:0;">800 Orb</div>
+        <div style="font-size:11px;font-weight:700;color:#6a4aa0;background:rgba(180,160,240,0.15);border:1px solid rgba(180,160,240,0.4);border-radius:8px;padding:4px 10px;flex-shrink:0;">800 Orb</div>
       </div>
     </div>
   </div>
@@ -1928,7 +1928,7 @@
         <div style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;margin-bottom:3px;">전문 상담사 연결</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.5;">사주·타로 전문가에게 1:1 직접 상담</div>
       </div>
-      <div style="font-size:11px;font-weight:600;color:#e8a46d;background:rgba(232,164,109,0.1);border:1px solid rgba(232,164,109,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">1:1 상담</div>
+      <div style="font-size:11px;font-weight:600;color:#a16d1f;background:rgba(161,109,31,0.1);border:1px solid rgba(161,109,31,0.35);border-radius:8px;padding:4px 10px;flex-shrink:0;">1:1 상담</div>
     </a>
   </div>
 </div>
@@ -1970,7 +1970,7 @@
       <button id="btnPushToggle" onclick="togglePushSubscription()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
         <span id="btnPushLabel"><i class="pi pi-bell"></i> 오늘의 명언 알림 켜기</span><span style="color:var(--muted);">›</span>
       </button>
-      <button onclick="logout()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;color:#f87171;font-size:14px;cursor:pointer;text-align:left;width:100%;">
+      <button onclick="logout()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;color:#b91c1c;font-size:14px;cursor:pointer;text-align:left;width:100%;">
         <span>로그아웃</span><span style="color:var(--muted);">›</span>
       </button>
     </div>
@@ -1991,7 +1991,7 @@
         <select class="modal-profile-select" id="sajuProfileSelect" onchange="fillSajuFromSaved(this.value)">
           <option value="">저장된 프로필</option>
         </select>
-        <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#a16d1f;" onclick="clearSajuForm()">새로 입력</button>
+        <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:#a16d1f;color:#a16d1f;" onclick="clearSajuForm()">새로 입력</button>
       </div>
       <div class="saju-form-group">
         <label>이름 (선택)</label>
@@ -2023,7 +2023,7 @@
         </div>
       </div>
       <div id="sajuYajasiRow" style="display:none;margin-bottom:16px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#c0b8d8">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text2)">
           <input type="checkbox" id="sajuYajasi" style="width:15px;height:15px;flex-shrink:0;accent-color:#7b5ea7;cursor:pointer;appearance:auto;-webkit-appearance:checkbox">
           야자시 (夜子時) 적용
         </label>
@@ -2052,7 +2052,7 @@
       <select class="modal-profile-select" id="qimenProfileSelect" onchange="fillQimenFromSaved(this.value)">
         <option value="">저장된 프로필</option>
       </select>
-      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#a16d1f;" onclick="clearQimenForm()">새로 입력</button>
+      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:#a16d1f;color:#a16d1f;" onclick="clearQimenForm()">새로 입력</button>
     </div>
     <div class="saju-form-group">
       <label>날짜</label>
@@ -2143,7 +2143,7 @@
       <div style="display:flex;gap:8px;">
         <button id="ghPgMale" onclick="selectGhPartnerGender('M')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);background:rgba(0,0,0,0.03);color:rgba(0,0,0,0.6);font-size:13px;cursor:pointer;">남성</button>
         <button id="ghPgFemale" onclick="selectGhPartnerGender('F')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);background:rgba(0,0,0,0.03);color:rgba(0,0,0,0.6);font-size:13px;cursor:pointer;">여성</button>
-        <button id="ghPgNone" onclick="selectGhPartnerGender('')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(201,168,76,0.4);background:rgba(201,168,76,0.08);color:#c9a84c;font-size:13px;cursor:pointer;">미지정</button>
+        <button id="ghPgNone" onclick="selectGhPartnerGender('')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(161,109,31,0.35);background:rgba(161,109,31,0.08);color:#a16d1f;font-size:13px;cursor:pointer;">미지정</button>
       </div>
     </div>
 
@@ -2165,7 +2165,7 @@
       <div style="background:rgba(0,0,0,0.05);border-radius:999px;height:8px;margin:0 4px 8px;">
         <div id="ghResBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,#c2185b,#ff8ab0);width:0%;transition:width .6s ease;"></div>
       </div>
-      <div id="ghResComment" style="font-size:14px;font-weight:700;color:#f5e0ec;"></div>
+      <div id="ghResComment" style="font-size:14px;font-weight:700;color:#c0306c;"></div>
     </div>
 
     <!-- 무료: 사주 카드 + 세부 점수 -->
@@ -2175,7 +2175,7 @@
     <!-- 유료: AI 분석 버튼 -->
     <div style="border:1px solid rgba(0,0,0,0.06);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px;">
       <div style="font-size:12px;font-weight:700;color:#a16d1f;margin-bottom:3px;"><i class="pi pi-crystal"></i> AI 정밀 분석 받기</div>
-      <div style="font-size:11px;color:rgba(0,0,0,0.45);margin-bottom:10px;">두 사람의 깊은 인연을 AI가 분석합니다 · <span style="color:rgba(255,200,100,0.6);">80 Orb 사용</span></div>
+      <div style="font-size:11px;color:rgba(0,0,0,0.45);margin-bottom:10px;">두 사람의 깊은 인연을 AI가 분석합니다 · <span style="color:#a16d1f;">80 Orb 사용</span></div>
       <button id="ghAiBtn" onclick="requestGunghapAI()" style="padding:10px 24px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(232,184,109,0.15));border:1px solid rgba(201,168,76,0.5);border-radius:10px;color:#a16d1f;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Serif KR',sans-serif;">AI 분석 시작</button>
     </div>
 
@@ -2197,7 +2197,7 @@
 <div class="saju-overlay" id="guideOverlay" onclick="if(event.target===this)closeGuideModal()" style="display:none;">
   <div class="saju-modal">
     <button class="saju-modal-close" onclick="closeGuideModal()">✕</button>
-    <h3 style="color:#f08cb4;"><i class="pi pi-people"></i> 이 사람 사용설명서</h3>
+    <h3 style="color:#c0306c;"><i class="pi pi-people"></i> 이 사람 사용설명서</h3>
     <p class="saju-modal-sub">분석할 사람의 생년월일을 입력하세요 (가족·연인·친구·동료 등)</p>
 
     <div class="saju-form-group">
@@ -2288,7 +2288,7 @@
       <select class="modal-profile-select" id="birthProfileSelect" onchange="fillBirthFromSaved(this.value)">
         <option value="">저장된 프로필</option>
       </select>
-      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:rgba(232,184,109,0.3);color:#a16d1f;" onclick="clearBirthForm()">새로 입력</button>
+      <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:#a16d1f;color:#a16d1f;" onclick="clearBirthForm()">새로 입력</button>
     </div>
     <div class="saju-form-group">
       <label>이름 (선택)</label>
@@ -2485,12 +2485,12 @@
   height:60px;z-index:200;
   padding-bottom:env(safe-area-inset-bottom);
 ">
-  <button onclick="switchTab('home')" id="tnHome" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#b0afc8;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+  <button onclick="switchTab('home')" id="tnHome" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#6b6b85;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
     </svg>홈
   </button>
-  <button onclick="switchTab('report')" id="tnReport" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#b0afc8;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+  <button onclick="switchTab('report')" id="tnReport" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#6b6b85;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
       <polyline points="14 2 14 8 20 8"/>
@@ -2498,14 +2498,14 @@
       <line x1="9" y1="17" x2="13" y2="17"/>
     </svg>리포트
   </button>
-  <button onclick="switchTab('consult')" id="tnConsult" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#b0afc8;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+  <button onclick="switchTab('consult')" id="tnConsult" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#6b6b85;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="11" r="5"/>
       <path d="M12 16v2M10 20h4"/>
       <path d="M8.5 8.5L7 7M15.5 8.5L17 7M12 6V4"/>
     </svg>상담
   </button>
-  <button onclick="switchTab('mypage')" id="tnMypage" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#b0afc8;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+  <button onclick="switchTab('mypage')" id="tnMypage" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#6b6b85;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
       <circle cx="12" cy="7" r="4"/>
@@ -2650,7 +2650,7 @@ function openGunghapModal() {
       infoEl.innerHTML = '<span style="color:#1a120a;font-weight:600;">' + (_ghMyProfile.name || '나') + '</span>'
         + '&nbsp;&nbsp;<span style="color:rgba(0,0,0,0.5);">' + _ghMyProfile.year + '년 ' + _ghMyProfile.month + '월 ' + _ghMyProfile.day + '일 · ' + gTxt + '</span>';
     } else {
-      infoEl.innerHTML = '<span style="color:#f87171;">프로필을 먼저 설정해주세요 (사주 분석 메뉴에서 입력)</span>';
+      infoEl.innerHTML = '<span style="color:#b91c1c;">프로필을 먼저 설정해주세요 (사주 분석 메뉴에서 입력)</span>';
     }
   }
   document.getElementById('gunghapOverlay').style.display = 'flex';
@@ -5293,7 +5293,7 @@ function updateMypageTab() {
         var dayColor0=dt.day==='토'?'#b45309':dt.day==='일'?'#b91c1c':'var(--muted)';
         card.innerHTML='<div style="font-size:13px;font-weight:600;color:'+dayColor0+';">'+dt.day+'</div><div style="font-size:12px;margin-top:4px;">'+dt.m+'/'+dt.d+'</div><div style="font-size:11px;color:var(--muted);margin-top:6px;">—</div>';
       } else {
-        var gc=GRADE_COLOR[item.grade]||'#9b8fb0';
+        var gc=GRADE_COLOR[item.grade]||'#5a4a7a';
         var dayColor=dt.day==='토'?'#b45309':dt.day==='일'?'#b91c1c':'var(--muted)';
         card.innerHTML='<div style="font-size:13px;letter-spacing:0.05em;color:'+dayColor+';font-weight:600;">'+dt.day+'</div>'+
           '<div style="font-size:12px;margin-top:3px;color:var(--text2);">'+dt.m+'/'+dt.d+'</div>'+
@@ -5307,7 +5307,7 @@ function updateMypageTab() {
           detail.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
             '<div><div style="font-size:10px;color:#5a4a7a;letter-spacing:0.12em;font-weight:600;margin-bottom:3px;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
             '<div style="font-size:10px;color:var(--muted);letter-spacing:0.03em;">'+doorNameMap[it.door]+'門 · 일가 포국</div></div>'+
-            '<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;color:'+(GRADE_COLOR[it.grade]||'#9b8fb0')+';background:rgba(0,0,0,0.05);border:1px solid'+(GRADE_COLOR[it.grade]||'#9b8fb0')+'25;letter-spacing:0.05em;">'+it.grade+'</div>'+
+            '<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;color:'+(GRADE_COLOR[it.grade]||'#5a4a7a')+';background:rgba(0,0,0,0.05);border:1px solid'+(GRADE_COLOR[it.grade]||'#5a4a7a')+'25;letter-spacing:0.05em;">'+it.grade+'</div>'+
           '</div>'+
           '<div style="font-size:14px;font-weight:300;color:#1a120a;line-height:1.7;letter-spacing:-0.01em;">'+it.kw+'</div>'+
           '<div style="margin-top:12px;text-align:right;"><a href="#" onclick="event.preventDefault();goQimenDetail()" style="font-size:10px;color:#5a4a7a;text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
@@ -5377,15 +5377,15 @@ function picoShowInstallBanner() {
   var banner = document.createElement('div');
   banner.id = 'picoInstallBanner';
   banner.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:9999;' +
-    'background:linear-gradient(135deg,#1a0533,#0a0a2e);' +
-    'border:1px solid rgba(200,162,245,0.4);border-radius:16px;' +
+    'background:linear-gradient(135deg,#fffbf3,#f5efe4);' +
+    'border:1px solid rgba(139,42,30,0.28);border-radius:16px;' +
     'padding:16px;display:flex;align-items:center;gap:12px;' +
-    'box-shadow:0 8px 32px rgba(124,92,252,0.3);';
+    'box-shadow:0 8px 32px rgba(139,42,30,0.12);';
   banner.innerHTML =
     '<div style="font-size:28px;flex-shrink:0;">🔮</div>' +
     '<div style="flex:1;">' +
-      '<div style="font-size:13px;font-weight:700;color:#f0f0f0;margin-bottom:2px;">홈화면에 추가하기</div>' +
-      '<div style="font-size:11px;color:#aaa;">앱처럼 바로 실행할 수 있어요</div>' +
+      '<div style="font-size:13px;font-weight:700;color:#1a120a;margin-bottom:2px;">홈화면에 추가하기</div>' +
+      '<div style="font-size:11px;color:#6b6b85;">앱처럼 바로 실행할 수 있어요</div>' +
     '</div>' +
     '<button onclick="picoInstallApp()" style="' +
       'background:linear-gradient(135deg,#7b5ea7,#a07fd4);' +
@@ -5427,19 +5427,19 @@ function picoShowChromeBanner() {
   var banner = document.createElement('div');
   banner.id = 'picoChromeBanner';
   banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;' +
-    'background:linear-gradient(135deg,#1a0533,#0a0a2e);' +
-    'border-bottom:1px solid rgba(200,162,245,0.4);' +
+    'background:linear-gradient(135deg,#fffbf3,#f5efe4);' +
+    'border-bottom:1px solid rgba(139,42,30,0.28);' +
     'padding:14px 16px;display:flex;align-items:center;gap:10px;' +
-    'box-shadow:0 4px 20px rgba(0,0,0,0.4);';
+    'box-shadow:0 4px 20px rgba(139,42,30,0.12);';
   if (isAndroid) {
     var fullUrl = 'https://picolab.kr' + window.location.pathname + window.location.search;
     var path = 'picolab.kr' + window.location.pathname + window.location.search;
     var intentUrl = 'intent://' + path + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(fullUrl) + ';end';
     banner.innerHTML =
       '<div style="font-size:20px;">🌐</div>' +
-      '<div style="flex:1;font-size:12px;color:#f0f0f0;line-height:1.4;">' +
+      '<div style="flex:1;font-size:12px;color:#1a120a;line-height:1.4;">' +
         '<div style="font-weight:700;margin-bottom:2px;">크롬에서 열어주세요</div>' +
-        '<div style="font-size:10px;color:#aaa;">카카오 브라우저는 설치·알림 기능이 제한돼요</div>' +
+        '<div style="font-size:10px;color:#6b6b85;">카카오 브라우저는 설치·알림 기능이 제한돼요</div>' +
       '</div>' +
       '<button onclick="location.href=\'' + intentUrl + '\'" style="' +
         'background:linear-gradient(135deg,#7b5ea7,#a07fd4);border:none;border-radius:8px;' +
@@ -5450,9 +5450,9 @@ function picoShowChromeBanner() {
   } else if (isIOS) {
     banner.innerHTML =
       '<div style="font-size:20px;">🌐</div>' +
-      '<div style="flex:1;font-size:12px;color:#f0f0f0;line-height:1.4;">' +
+      '<div style="flex:1;font-size:12px;color:#1a120a;line-height:1.4;">' +
         '<div style="font-weight:700;margin-bottom:2px;">사파리에서 열어주세요</div>' +
-        '<div style="font-size:10px;color:#aaa;">우측 상단 ⋯ → "다른 브라우저로 열기"</div>' +
+        '<div style="font-size:10px;color:#6b6b85;">우측 상단 ⋯ → "다른 브라우저로 열기"</div>' +
       '</div>' +
       '<button onclick="navigator.clipboard&&navigator.clipboard.writeText(\'https://picolab.kr\'+location.pathname+location.search);this.textContent=\'복사됨\';" style="' +
         'background:linear-gradient(135deg,#7b5ea7,#a07fd4);border:none;border-radius:8px;' +
@@ -5488,14 +5488,14 @@ if (picoIsInAppBrowser()) {
       var b = document.createElement('div');
       b.id = 'picoIosInstallBanner';
       b.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:9999;' +
-        'background:linear-gradient(135deg,#1a0533,#0a0a2e);' +
-        'border:1px solid rgba(200,162,245,0.4);border-radius:16px;padding:16px;' +
-        'display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(124,92,252,0.3);';
+        'background:linear-gradient(135deg,#fffbf3,#f5efe4);' +
+        'border:1px solid rgba(139,42,30,0.28);border-radius:16px;padding:16px;' +
+        'display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(139,42,30,0.12);';
       b.innerHTML =
         '<div style="font-size:28px;">🔮</div>' +
-        '<div style="flex:1;font-size:12px;color:#f0f0f0;line-height:1.5;">' +
+        '<div style="flex:1;font-size:12px;color:#1a120a;line-height:1.5;">' +
           '<div style="font-weight:700;margin-bottom:4px;">홈화면에 추가하기</div>' +
-          '<div style="font-size:11px;color:#aaa;">공유 <b>⬆</b> → "홈 화면에 추가"</div>' +
+          '<div style="font-size:11px;color:#6b6b85;">공유 <b>⬆</b> → "홈 화면에 추가"</div>' +
         '</div>' +
         '<button onclick="localStorage.setItem(\'pico_ios_install_dismissed\',\'1\');document.getElementById(\'picoIosInstallBanner\').remove();" style="' +
           'background:none;border:none;color:#666;font-size:18px;cursor:pointer;padding:4px;">✕</button>';
