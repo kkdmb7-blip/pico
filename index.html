@@ -1372,6 +1372,67 @@
   </div>
 </section>
 
+<!-- RECOMMENDED JOURNEY (프로필 있는 사용자용 추천 경로) -->
+<section id="picoJourneyWrap" style="display:none;padding:4px 16px 12px;max-width:640px;margin:0 auto;position:relative;z-index:1;">
+  <div style="background:linear-gradient(135deg,rgba(123,94,167,0.06),rgba(212,175,55,0.04));border:1px solid rgba(123,94,167,0.22);border-radius:16px;padding:16px 16px 14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <div style="font-size:10px;letter-spacing:0.18em;color:rgba(123,94,167,0.85);font-weight:700;margin-bottom:3px;">RECOMMENDED PATH</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);">오늘 이렇게 활용해보세요</div>
+      </div>
+      <button id="picoJourneyDismiss" aria-label="숨기기" style="background:transparent;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:4px 6px;line-height:1;">×</button>
+    </div>
+    <div id="picoJourneySteps" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</section>
+<script>
+(function(){
+  function getJourneyState(){
+    return {
+      step1: !!localStorage.getItem('pico_saju_viewed'),
+      step2: !!localStorage.getItem('pico_report_viewed'),
+      step3: !!localStorage.getItem('pico_consult_viewed')
+    };
+  }
+  function renderJourney(){
+    var wrap = document.getElementById('picoJourneyWrap');
+    if(!wrap) return;
+    var hasProfile = !!localStorage.getItem('pico_profile');
+    var dismissed = localStorage.getItem('pico_journey_dismissed') === '1';
+    if(!hasProfile || dismissed){ wrap.style.display='none'; return; }
+    var s = getJourneyState();
+    if(s.step1 && s.step2 && s.step3){ wrap.style.display='none'; return; }
+    var steps = [
+      {k:'step1', title:'내 사주 상세 분석', desc:'일주·격국·용신까지 내 타고난 구조 보기', href:'saju.html', flag:'pico_saju_viewed'},
+      {k:'step2', title:'AI 맞춤 리포트 생성', desc:'재물·연애·대운 등 깊이 있는 해석', href:'report.html', flag:'pico_report_viewed'},
+      {k:'step3', title:'AI 상담사에게 질문', desc:'내 사주 기반 1:1 실시간 조언', href:'https://kkdmb7-blip.github.io/memox/', flag:'pico_consult_viewed', external:true}
+    ];
+    var html = '';
+    steps.forEach(function(st, i){
+      var done = s[st.k];
+      var num = i+1;
+      html += '<a href="'+st.href+'"'+(st.external?' target="_blank" rel="noopener"':'')+' onclick="try{localStorage.setItem(\''+st.flag+'\',\'1\');}catch(e){}"'
+        +' style="display:flex;align-items:center;gap:10px;background:'+(done?'rgba(123,94,167,0.06)':'rgba(255,255,255,0.55)')+';border:1px solid '+(done?'rgba(123,94,167,0.25)':'var(--border)')+';border-radius:12px;padding:10px 12px;text-decoration:none;color:var(--text);">'
+        +'<div style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:'+(done?'linear-gradient(135deg,#7b5ea7,#a07fd4)':'var(--surface2)')+';color:'+(done?'#fff':'var(--muted)')+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">'+(done?'✓':num)+'</div>'
+        +'<div style="flex:1;min-width:0;">'
+          +'<div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.35;'+(done?'text-decoration:line-through;opacity:0.65;':'')+'">'+st.title+'</div>'
+          +'<div style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:1px;">'+st.desc+'</div>'
+        +'</div>'
+        +'<div style="flex-shrink:0;color:var(--muted);font-size:14px;">›</div>'
+        +'</a>';
+    });
+    document.getElementById('picoJourneySteps').innerHTML = html;
+    wrap.style.display = 'block';
+  }
+  window._picoRenderJourney = renderJourney;
+  document.addEventListener('DOMContentLoaded', function(){
+    renderJourney();
+    var d = document.getElementById('picoJourneyDismiss');
+    if(d) d.addEventListener('click', function(){ try{localStorage.setItem('pico_journey_dismissed','1');}catch(e){} var w=document.getElementById('picoJourneyWrap'); if(w)w.style.display='none'; });
+  });
+})();
+</script>
+
 <div class="section-divider"></div>
 
 <!-- QIMEN WEEKLY -->
@@ -5542,6 +5603,11 @@ function switchTab(tab) {
   // 마이페이지: 로그인 상태에 따라 분기
   if (tab === 'mypage') { updateMypageTab(); if (typeof refreshPushBtnLabel === 'function') refreshPushBtnLabel(); }
   _currentTab = tab;
+  // 추천 경로 진행상태 기록
+  try {
+    if (tab === 'consult') localStorage.setItem('pico_consult_viewed','1');
+    if (typeof window._picoRenderJourney === 'function') window._picoRenderJourney();
+  } catch(e) {}
   // 새로고침 시 같은 탭 유지: URL 쿼리 + localStorage 동시 갱신
   try {
     var _u = new URL(window.location.href);

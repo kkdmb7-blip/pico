@@ -526,6 +526,8 @@ function selCal(c) {
   document.getElementById('cal_lunar').className='g-btn'+(c==='lunar'?' on':'');
 }
 
+try { localStorage.setItem('pico_saju_viewed', '1'); } catch(e) {}
+
 // 날짜 드롭다운 초기화
 (function initDateSelects(){
   const yE=document.getElementById('f_y');

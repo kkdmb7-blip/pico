@@ -2613,6 +2613,7 @@ function buildAccuracyLayerBlock() {
 
 // ── 초기화 ──
 (async function init() {
+  try { localStorage.setItem('pico_report_viewed', '1'); } catch(e) {}
   const params = new URLSearchParams(location.search);
   _type = params.get('type');
   _config = TYPE_CONFIG[_type];
