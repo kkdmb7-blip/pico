@@ -446,7 +446,7 @@ function renderRasiChart(d) {
   const moonColor = EL_COLOR[moonEl].text;
   const nakText = (d.nakshatra || '').replace(/[가-힣]{3,}파다/,'').trim();
 
-  const centerCircle = `<circle cx="${cx}" cy="${cy}" r="${R_inner - 2}" fill="#0e0c1a" stroke="rgba(155,127,212,0.2)" stroke-width="1"/>`;
+  const centerCircle = `<circle cx="${cx}" cy="${cy}" r="${R_inner - 2}" fill="#fcf7ea" stroke="rgba(155,127,212,0.25)" stroke-width="1"/>`;
   const centerContent =
     `<text x="${cx}" y="${cy - 16}" text-anchor="middle" dominant-baseline="middle" font-size="22" fill="${moonColor}">${RASHI_SYM[moonSign]||'☽'}</text>` +
     `<text x="${cx}" y="${cy + 4}" text-anchor="middle" dominant-baseline="middle" font-size="9.5" fill="${moonColor}" font-family="'Noto Sans KR',sans-serif">${RASHI_NAME_SHORT[moonSign]||moonSign}</text>` +
