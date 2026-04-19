@@ -3562,7 +3562,15 @@ async function openHistoryModal() {
   if (!user) { alert('로그인 후 이용 가능합니다.'); return; }
   document.getElementById('historyOverlay').style.display = 'flex';
   var list = document.getElementById('historyList');
-  list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">불러오는 중...</div>';
+  list.innerHTML = [0,1,2].map(function(){
+    return '<div class="pico-skel" style="height:58px;border-radius:12px;background:linear-gradient(90deg,var(--surface2) 0%,rgba(255,255,255,0.4) 50%,var(--surface2) 100%);background-size:200% 100%;animation:picoSkelShimmer 1.1s linear infinite;border:1px solid var(--border);"></div>';
+  }).join('');
+  if (!document.getElementById('picoSkelStyle')) {
+    var st = document.createElement('style');
+    st.id = 'picoSkelStyle';
+    st.textContent = '@keyframes picoSkelShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}';
+    document.head.appendChild(st);
+  }
 
   var allItems = [];
   var TYPE_ICON = { character:'<i class="pi pi-crystal"></i>', money:'<i class="pi pi-coin"></i>', love:'<i class="pi pi-heart"></i>', daeun:'<i class="pi pi-asc"></i>', year:'<i class="pi pi-sparkle"></i>', month:'<i class="pi pi-moon"></i>', yongsin:'<i class="pi pi-bolt"></i>', vedic_full:'<i class="pi pi-lotus"></i>', astro_full:'<i class="pi pi-star"></i>', ziwei_full:'<i class="pi pi-ziwei"></i>', triple:'<i class="pi pi-eye"></i>', career_deep:'<i class="pi pi-target"></i>', gunghap:'<i class="pi pi-heart"></i>', saju:'<i class="pi pi-temple"></i>', name_ai:'<i class="pi pi-sparkle"></i>', name_rec:'<i class="pi pi-crystal"></i>', name_child:'<i class="pi pi-sparkle"></i>' };
@@ -3596,7 +3604,12 @@ async function openHistoryModal() {
   allItems.sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); });
 
   if (allItems.length === 0) {
-    list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">저장된 분석이 없어요</div>';
+    list.innerHTML = '<div style="text-align:center;padding:32px 20px;">'
+      + '<div style="font-size:36px;margin-bottom:10px;opacity:0.55;"><i class="pi pi-crystal"></i></div>'
+      + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">아직 저장된 분석이 없어요</div>'
+      + '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;">사주·점성·리포트를 생성하면<br>여기에 자동으로 쌓입니다</div>'
+      + '<button onclick="closeHistoryModal();if(typeof switchTab===\'function\')switchTab(\'report\');" style="background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;">리포트 둘러보기 →</button>'
+      + '</div>';
     return;
   }
   list.innerHTML = '';
@@ -4749,7 +4762,11 @@ function renderProfilesModal() {
   var listEl = document.getElementById('pm-list');
   listEl.innerHTML = '';
   if (list.length === 0) {
-    listEl.innerHTML = '<div style="font-size:13px;color:var(--muted);text-align:center;padding:12px;">저장된 추가 프로필이 없습니다</div>';
+    listEl.innerHTML = '<div style="text-align:center;padding:18px 10px;border:1px dashed var(--border);border-radius:12px;">'
+      + '<div style="font-size:28px;margin-bottom:6px;opacity:0.45;"><i class="pi pi-user"></i></div>'
+      + '<div style="font-size:13px;color:var(--text);font-weight:700;margin-bottom:3px;">가족·연인 프로필을 추가해 보세요</div>'
+      + '<div style="font-size:11px;color:var(--muted);line-height:1.5;">궁합·가족운 분석에 활용됩니다</div>'
+      + '</div>';
   } else {
     list.forEach(function(p) {
       var div = document.createElement('div');
