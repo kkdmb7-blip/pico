@@ -158,7 +158,7 @@
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border-soft);
     padding: 0 24px;
-    height: 64px;
+    height: 52px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -167,11 +167,13 @@
   .logo {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
   .logo img {
-    height: 56px;
+    height: 36px;
     object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(60,40,20,0.18)) contrast(1.08) saturate(1.05);
+    image-rendering: -webkit-optimize-contrast;
   }
   .logo-text {
     font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;

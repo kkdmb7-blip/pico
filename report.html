@@ -2557,6 +2557,14 @@ function buildAccuracyLayerBlock() {
 
   renderIntro();
   showState('intro');
+
+  // 새로고침 대응: 캐시된 리포트가 있으면 자동 렌더 (사용자 상태 유지)
+  try {
+    const _cached = await fetchExistingReport();
+    if (_cached && _cached.content) {
+      renderReport(_cached.content, _cached.created_at);
+    }
+  } catch(e) { /* 네트워크 오류는 무시하고 intro 유지 */ }
 })();
 
 function renderIntro() {
