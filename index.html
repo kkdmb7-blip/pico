@@ -49,6 +49,20 @@
     --shadow-lift: 0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
   }
 
+  /* ── 모바일 접근성 보강 (좁은 화면에서 최소 가독성/터치 타겟) ── */
+  @media (max-width: 480px) {
+    /* 터치 타겟 최소 44px (WCAG / iOS HIG) */
+    nav button, .saju-submit-btn, .btn-intro-gen, .btn-intro-back,
+    .memox-banner, .luck-banner, .btn-memox, .btn-share, .btn-consult {
+      min-height: 44px;
+    }
+    /* iOS 자동 텍스트 확대 방지 (가로 방향 시 폰트 튐) */
+    body { -webkit-text-size-adjust: 100%; }
+    /* 긴 한글 단어 줄바꿈 (오른쪽 짤림 방지) */
+    .intro-section-desc, .intro-section-detail, .consult-desc,
+    .score-summary-text, p { word-break: keep-all; overflow-wrap: break-word; }
+  }
+
   /* ── 대체 테마 (URL ?theme=obsidian|jade|wine|midnight) ── */
   :root[data-theme="obsidian"] {
     --bg: #0a0a0f;

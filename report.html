@@ -39,6 +39,15 @@
 body {
   background: linear-gradient(180deg, #f7f0e2 0%, #f4ede0 40%, #f4ede0 100%);
   color: var(--text); font-family: var(--fn); min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+}
+@media (max-width: 480px) {
+  .btn-intro-gen, .btn-intro-back, .btn-consult, .btn-action,
+  .btn-easy, .sec-density-toggle button { min-height: 44px; }
+  .section-body, .consult-desc, .intro-section-detail, p {
+    word-break: keep-all; overflow-wrap: break-word;
+  }
+  .section-body { line-height: 1.78; }
 }
 
 nav {
