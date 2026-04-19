@@ -6,12 +6,12 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0a0a1a",
-  "theme_color": "#0a0a1a",
+  "background_color": "#f5efe4",
+  "theme_color": "#f5efe4",
   "categories": ["lifestyle", "entertainment"],
   "icons": [
     {
-      "src": "/img/goddess.png",
+      "src": "/img/goddess-app.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
