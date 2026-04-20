@@ -148,11 +148,16 @@
       'line-height:1.55',
       'opacity:0',
       'transition:opacity 0.3s',
-      'pointer-events:none',
+      'pointer-events:auto',
+      'cursor:pointer',
       'z-index:10000',
       'font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif',
       'box-shadow:0 4px 16px rgba(0,0,0,0.3)',
     ].join(';');
+    bubble.addEventListener('click', function() {
+      clearTimeout(bubbleTimer);
+      bubble.style.opacity = '0';
+    });
     document.body.appendChild(bubble);
 
     // 펫 버튼
@@ -352,8 +357,8 @@
         showBubble('오늘도 용신 기운을 잘 활용해요! 🌟', 4000);
         return;
       }
-      var text = (data.keyword ? '✦ ' + data.keyword + '\n' : '') + data.advice;
-      showBubble(text, 6000);
+      var text = (data.keyword ? '✦ ' + data.keyword + '\n' : '') + data.advice + (data.lucky ? '\n🍀 ' + data.lucky : '');
+      showBubble(text, 0);
     });
   }
 
