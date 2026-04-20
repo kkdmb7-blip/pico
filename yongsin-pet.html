@@ -509,7 +509,7 @@ nav {
 }
 .status-label {
   font-size: 11px; font-weight: 700; color: var(--muted);
-  width: 28px; flex-shrink: 0;
+  width: 42px; flex-shrink: 0; white-space: nowrap;
 }
 .bar-bg {
   flex: 1; height: 8px; background: var(--surface2);
@@ -748,18 +748,18 @@ nav {
     <div class="status-bars">
       <div class="status-row">
         <div class="status-label">배고픔</div>
-        <div class="bar-bg"><div class="bar-fill hunger" id="barHunger" style="width:80%"></div></div>
-        <div class="status-val" id="valHunger">80</div>
+        <div class="bar-bg"><div class="bar-fill hunger" id="barHunger" style="width:20%"></div></div>
+        <div class="status-val" id="valHunger">20</div>
       </div>
       <div class="status-row">
         <div class="status-label">행복</div>
-        <div class="bar-bg"><div class="bar-fill happy" id="barHappy" style="width:70%"></div></div>
-        <div class="status-val" id="valHappy">70</div>
+        <div class="bar-bg"><div class="bar-fill happy" id="barHappy" style="width:20%"></div></div>
+        <div class="status-val" id="valHappy">20</div>
       </div>
       <div class="status-row">
         <div class="status-label">기운</div>
-        <div class="bar-bg"><div class="bar-fill energy" id="barEnergy" style="width:90%"></div></div>
-        <div class="status-val" id="valEnergy">90</div>
+        <div class="bar-bg"><div class="bar-fill energy" id="barEnergy" style="width:30%"></div></div>
+        <div class="status-val" id="valEnergy">30</div>
       </div>
     </div>
 
@@ -853,17 +853,55 @@ var MESSAGES = {
   orb:   ['Orb의 에너지를 받았어요! ⭐','강해지는 게 느껴져요! 고마워요 🌟','Orb가 용신 기운을 증폭시켜요 ✦'],
 };
 
+var SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
+var SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
+
 var state = {
   element: null,
-  hunger: 80, happy: 70, energy: 90,
+  hunger: 20, happy: 20, energy: 30,
   exp: 0, level: 1,
   feedCount: 0,
   sleeping: false,
   birthDate: null,
-  cooldowns: {},       // {feed: timestamp, orb: timestamp}
-  dailyMission: {},    // {date:'2025-01-01', feedCount:0, playCount:0, bonusDone:false}
-  luckyBonusDone: '',  // 날짜 문자열 (오늘 길일 보너스 받았으면)
+  cooldowns: {},
+  dailyMission: {},
+  luckyBonusDone: '',
 };
+
+function getCurrentUserId() {
+  try { var u = JSON.parse(localStorage.getItem('pico_user')); return u && u.id ? u.id : null; } catch(e) { return null; }
+}
+
+// Supabase 저장 (로그인 시)
+function syncToServer() {
+  var uid = getCurrentUserId();
+  if (!uid) return;
+  var body = JSON.stringify({ state: state, updated_at: new Date().toISOString() });
+  // reports 테이블에 pet_state 타입으로 upsert
+  fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state', {
+    method: 'DELETE',
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+  }).then(function() {
+    fetch(SB_URL + '/rest/v1/reports', {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ user_id: uid, report_type: 'pet_state', content: [body], orb_spent: 0 })
+    });
+  }).catch(function() {});
+}
+
+// Supabase 로드
+function loadFromServer(cb) {
+  var uid = getCurrentUserId();
+  if (!uid) { cb(null); return; }
+  fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state&select=content,created_at&order=created_at.desc&limit=1', {
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+  }).then(function(r) { return r.json(); }).then(function(rows) {
+    if (rows && rows[0] && rows[0].content && rows[0].content[0]) {
+      try { cb(JSON.parse(rows[0].content[0])); } catch(e) { cb(null); }
+    } else { cb(null); }
+  }).catch(function() { cb(null); });
+}
 
 // localStorage에서 불러오기
 function loadState() {
@@ -871,7 +909,6 @@ function loadState() {
     var s = JSON.parse(localStorage.getItem('yongsin_pet'));
     if (s) {
       Object.assign(state, s);
-      // decay 계산 (마지막 접속 후 시간)
       if (s.lastVisit) {
         var hours = (Date.now() - s.lastVisit) / 3600000;
         state.hunger = Math.max(0, state.hunger - hours * 5);
@@ -881,7 +918,6 @@ function loadState() {
     }
   } catch(e) {}
 
-  // pico localStorage에서 용신 자동 감지
   try {
     var ys = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached');
     if (!state.element && ys) {
@@ -891,9 +927,13 @@ function loadState() {
   } catch(e) {}
 }
 
+var _syncTimer;
 function saveState() {
   state.lastVisit = Date.now();
   try { localStorage.setItem('yongsin_pet', JSON.stringify(state)); } catch(e) {}
+  // 서버 동기화 (디바운스 3초)
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(syncToServer, 3000);
 }
 
 function selectElement(el) {
@@ -1172,17 +1212,39 @@ setInterval(function() {
   saveState();
 }, 30000); // 30초마다
 
-// 초기화
+// 초기화: localStorage 먼저, 서버 데이터 있으면 덮어씀
 loadState();
 render();
 renderMission();
+
+// 서버에서 더 최신 데이터 로드
+loadFromServer(function(serverData) {
+  if (!serverData || !serverData.state) return;
+  var srv = serverData.state;
+  // 서버 데이터가 더 최신이거나 로컬에 데이터 없으면 적용
+  var localTs = state.lastVisit || 0;
+  var serverTs = srv.lastVisit || 0;
+  if (serverTs > localTs) {
+    Object.assign(state, srv);
+    // decay 재계산
+    if (srv.lastVisit) {
+      var hours = (Date.now() - srv.lastVisit) / 3600000;
+      state.hunger = Math.max(0, state.hunger - hours * 5);
+      state.happy  = Math.max(0, state.happy  - hours * 3);
+      state.energy = Math.min(100, state.energy + (state.sleeping ? hours * 10 : 0));
+    }
+    try { localStorage.setItem('yongsin_pet', JSON.stringify(state)); } catch(e) {}
+    render();
+    renderMission();
+  }
+});
+
 checkLuckyBonus();
 if (state.element) {
   document.querySelectorAll('.elem-btn').forEach(function(b) {
     b.classList.toggle('active', b.classList.contains(state.element));
   });
 }
-// 쿨타임 표시 갱신 (1분마다)
 setInterval(renderMission, 60000);
 </script>
 </body>
