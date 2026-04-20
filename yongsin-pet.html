@@ -877,18 +877,15 @@ var MESSAGES = {
 var SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
 var SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 
-var state = {
-  element: null,
-  hunger: 20, happy: 20, energy: 30,
-  exp: 0, level: 1,
-  feedCount: 0,
-  sleeping: false,
-  sleepStart: null,
-  birthDate: null,
-  cooldowns: {},
-  dailyMission: {},
-  luckyBonusDone: '',
-};
+// 오행별 독립 상태 저장소
+var allStates = {};
+
+function getDefaultState() {
+  return { hunger: 20, happy: 20, energy: 30, exp: 0, level: 1, feedCount: 0,
+    sleeping: false, sleepStart: null, birthDate: null, cooldowns: {}, dailyMission: {}, luckyBonusDone: '' };
+}
+
+var state = Object.assign({ element: null }, getDefaultState());
 
 function getCurrentUserId() {
   try { var u = JSON.parse(localStorage.getItem('pico_user')); return u && u.id ? u.id : null; } catch(e) { return null; }
@@ -898,8 +895,7 @@ function getCurrentUserId() {
 function syncToServer() {
   var uid = getCurrentUserId();
   if (!uid) return;
-  var body = JSON.stringify({ state: state, updated_at: new Date().toISOString() });
-  // reports 테이블에 pet_state 타입으로 upsert
+  var body = JSON.stringify({ all: allStates, element: state.element, updated_at: new Date().toISOString() });
   fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state', {
     method: 'DELETE',
     headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
@@ -925,17 +921,35 @@ function loadFromServer(cb) {
   }).catch(function() { cb(null); });
 }
 
+function _applyOfflineTime(s) {
+  if (s.lastVisit) {
+    var hours = (Date.now() - s.lastVisit) / 3600000;
+    s.hunger = Math.max(0, s.hunger - hours * 5);
+    s.happy  = Math.max(0, s.happy  - hours * 3);
+    s.energy = Math.min(100, s.energy + (s.sleeping ? hours * 10 : 0));
+  }
+  return s;
+}
+
 // localStorage에서 불러오기
 function loadState() {
   try {
-    var s = JSON.parse(localStorage.getItem('yongsin_pet'));
-    if (s) {
-      Object.assign(state, s);
-      if (s.lastVisit) {
-        var hours = (Date.now() - s.lastVisit) / 3600000;
-        state.hunger = Math.max(0, state.hunger - hours * 5);
-        state.happy  = Math.max(0, state.happy  - hours * 3);
-        state.energy = Math.min(100, state.energy + (state.sleeping ? hours * 10 : 0));
+    var saved = JSON.parse(localStorage.getItem('yongsin_pet'));
+    if (saved) {
+      if (saved.all) {
+        // 신형 포맷: 오행별 독립 상태
+        allStates = saved.all || {};
+        state.element = saved.element || null;
+        if (state.element && allStates[state.element]) {
+          Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[state.element])));
+        }
+      } else if (saved.element) {
+        // 구형 포맷 → 마이그레이션
+        var elState = Object.assign({}, saved);
+        state.element = saved.element;
+        delete elState.element;
+        allStates[state.element] = elState;
+        Object.assign(state, _applyOfflineTime(Object.assign({}, elState)));
       }
     }
   } catch(e) {}
@@ -952,15 +966,30 @@ function loadState() {
 var _syncTimer;
 function saveState() {
   state.lastVisit = Date.now();
-  try { localStorage.setItem('yongsin_pet', JSON.stringify(state)); } catch(e) {}
-  // 서버 동기화 (디바운스 3초)
+  // 현재 오행 상태를 allStates에 저장
+  if (state.element) {
+    var elState = Object.assign({}, state);
+    delete elState.element;
+    allStates[state.element] = elState;
+  }
+  try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: state.element })); } catch(e) {}
   clearTimeout(_syncTimer);
   _syncTimer = setTimeout(syncToServer, 3000);
 }
 
 function selectElement(el) {
-  state.element = el;
-  if (!state.birthDate) state.birthDate = new Date().toLocaleDateString('ko-KR');
+  // 현재 오행 상태 저장
+  if (state.element) {
+    state.lastVisit = Date.now();
+    var curState = Object.assign({}, state);
+    delete curState.element;
+    allStates[state.element] = curState;
+  }
+  // 새 오행 상태 로드 (없으면 새로 시작)
+  var fresh = getDefaultState();
+  fresh.birthDate = new Date().toLocaleDateString('ko-KR');
+  var newElState = allStates[el] ? _applyOfflineTime(Object.assign({}, allStates[el])) : fresh;
+  Object.assign(state, getDefaultState(), newElState, { element: el });
   saveState();
   render();
 }
@@ -1123,12 +1152,16 @@ function checkLuckyBonus() {
 // ── 사주/리포트 EXP 연동 (외부에서 호출) ──
 window.petGainExpExternal = function(amount, msg) {
   try {
-    var s = JSON.parse(localStorage.getItem('yongsin_pet') || '{}');
-    if (!s.element) return;
+    var saved = JSON.parse(localStorage.getItem('yongsin_pet') || '{}');
+    var el = saved.element || null;
+    if (!el) return;
+    var s = (saved.all && saved.all[el]) ? Object.assign({}, saved.all[el]) : {};
     s.exp = (s.exp || 0) + amount;
     var needed = (s.level || 1) * (s.level || 1) * 100;
     if (s.exp >= needed) { s.exp -= needed; s.level = (s.level || 1) + 1; }
-    localStorage.setItem('yongsin_pet', JSON.stringify(s));
+    if (!saved.all) saved.all = {};
+    saved.all[el] = s;
+    localStorage.setItem('yongsin_pet', JSON.stringify(saved));
     if (window._refreshPetCard) window._refreshPetCard();
   } catch(e) {}
 };
@@ -1328,27 +1361,35 @@ loadState();
 render();
 renderMission();
 
-// 서버에서 더 최신 데이터 로드 (레벨 높은 쪽 우선)
+// 서버에서 더 최신 데이터 로드 (현재 오행 레벨 기준 높은 쪽 우선)
 loadFromServer(function(serverData) {
-  if (!serverData || !serverData.state) return;
-  var srv = serverData.state;
-  var localLv = state.level || 1;
-  var srvLv   = srv.level  || 1;
-  // 서버 레벨이 같거나 높으면 서버 데이터 사용
-  if (srvLv >= localLv) {
-    Object.assign(state, srv);
-    if (srv.lastVisit) {
-      var hours = (Date.now() - srv.lastVisit) / 3600000;
-      state.hunger = Math.max(0, state.hunger - hours * 5);
-      state.happy  = Math.max(0, state.happy  - hours * 3);
-      state.energy = Math.min(100, state.energy + (state.sleeping ? hours * 10 : 0));
-    }
-    try { localStorage.setItem('yongsin_pet', JSON.stringify(state)); } catch(e) {}
-    render();
-    renderMission();
-  } else {
-    // 로컬 레벨이 더 높으면 서버에 즉시 업로드
-    syncToServer();
+  if (!serverData) return;
+  // 신형 포맷 (all 포함)
+  var srvAll = serverData.all || null;
+  var srvEl  = serverData.element || state.element;
+  if (srvAll) {
+    var srvElState = srvAll[state.element || srvEl];
+    var localLv = state.level || 1;
+    var srvLv   = srvElState ? (srvElState.level || 1) : 0;
+    if (srvLv >= localLv) {
+      allStates = Object.assign({}, srvAll);
+      if (state.element && allStates[state.element]) {
+        Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[state.element])));
+      }
+      try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: state.element })); } catch(e) {}
+      render(); renderMission();
+    } else { syncToServer(); }
+  } else if (serverData.state) {
+    // 구형 포맷
+    var srv = serverData.state;
+    var localLv = state.level || 1;
+    var srvLv   = srv.level  || 1;
+    if (srvLv >= localLv) {
+      Object.assign(state, _applyOfflineTime(Object.assign({}, srv)));
+      if (state.element) { var es = Object.assign({}, state); delete es.element; allStates[state.element] = es; }
+      try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: state.element })); } catch(e) {}
+      render(); renderMission();
+    } else { syncToServer(); }
   }
 });
 
