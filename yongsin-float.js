@@ -139,8 +139,8 @@
       'color:#fcf7ea',
       'padding:10px 14px',
       'border-radius:14px',
-      'font-size:14px',
-      'font-weight:600',
+      'font-size:13px',
+      'font-weight:500',
       'white-space:normal',
       'max-width:200px',
       'width:max-content',
@@ -245,13 +245,54 @@
     bubble.style.top  = top + 'px';
   }
 
-  function showBubble(text, duration) {
-    bubble.textContent = text;
+  function showBubble(html, duration) {
+    // 첫 줄 볼드 처리
+    var lines = html.split('\n');
+    bubble.innerHTML = lines.map(function(l, i) {
+      var esc = l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return i === 0 ? '<b>' + esc + '</b>' : esc;
+    }).join('<br>');
     positionBubble();
     bubble.style.opacity = '1';
     clearTimeout(bubbleTimer);
     if (duration > 0) {
       bubbleTimer = setTimeout(function() { bubble.style.opacity = '0'; }, duration);
+    }
+  }
+
+  var PARTICLE_MAP = {
+    wood:  ['🌿','🍃','🌱','🍀','✨'],
+    fire:  ['🔥','💥','✨','🌟','⚡'],
+    earth: ['🪨','⭐','🌰','✨','💛'],
+    metal: ['💎','✨','⭐','💫','🌟'],
+    water: ['💧','🌊','❄️','✨','💙'],
+  };
+
+  function spawnParticles() {
+    var elem = getElement() || 'water';
+    var emojis = PARTICLE_MAP[elem] || PARTICLE_MAP.water;
+    var rect = pet.getBoundingClientRect();
+    var cx = rect.left + rect.width / 2;
+    var cy = rect.top + rect.height / 2;
+    for (var i = 0; i < 8; i++) {
+      (function(idx) {
+        setTimeout(function() {
+          var p = document.createElement('div');
+          p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          var angle = (Math.random() * 360) * Math.PI / 180;
+          var dist = 28 + Math.random() * 36;
+          var tx = Math.cos(angle) * dist;
+          var ty = -Math.abs(Math.sin(angle) * dist) - 10;
+          var size = 13 + Math.random() * 10;
+          p.style.cssText = 'position:fixed;left:' + cx + 'px;top:' + cy + 'px;font-size:' + size + 'px;pointer-events:none;z-index:10001;transform:translate(-50%,-50%);transition:transform 0.85s ease-out,opacity 0.85s ease-out;opacity:1;';
+          document.body.appendChild(p);
+          requestAnimationFrame(function() { requestAnimationFrame(function() {
+            p.style.transform = 'translate(calc(-50% + ' + tx + 'px),calc(-50% + ' + ty + 'px))';
+            p.style.opacity = '0';
+          }); });
+          setTimeout(function() { if (p.parentNode) p.parentNode.removeChild(p); }, 950);
+        }, idx * 65);
+      })(i);
     }
   }
 
@@ -302,7 +343,9 @@
     var today = getTodayStr();
     try {
       var cached = JSON.parse(localStorage.getItem(ADVICE_KEY) || '{}');
-      if (cached.date === today && cached.advice) { cb(cached); return; }
+      var adv = cached.advice || '';
+      var isClean = adv && !adv.includes('{') && !adv.includes('`') && !adv.includes('"advice"');
+      if (cached.date === today && isClean) { cb(cached); return; }
     } catch(e) {}
 
     var ps = getPetState();
@@ -403,6 +446,7 @@
     pet.style.animation = 'none';
     pet.style.animation = 'pet-found 0.6s ease';
     setTimeout(function() { pet.style.animation = 'pet-idle 2.5s ease-in-out infinite'; }, 700);
+    spawnParticles();
 
     // EXP 지급 (오늘 처음)
     if (found !== today) {
