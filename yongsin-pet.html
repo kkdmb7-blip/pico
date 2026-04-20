@@ -784,8 +784,8 @@ nav {
       <span class="btn-desc" id="playBtnDesc">하루 1회 · AI 맞춤조언</span>
     </button>
     <button class="action-btn btn-sleep" onclick="doAction('sleep')">
-      <span class="btn-icon">🌙</span>재우기
-      <span class="btn-desc">기운 회복</span>
+      <span class="btn-icon" id="sleepIcon">🌙</span><span id="sleepLabel">재우기</span>
+      <span class="btn-desc" id="sleepDesc">수련 중 EXP 자동 적립</span>
     </button>
     <button class="action-btn btn-orb"   onclick="doAction('orb')">
       <span class="btn-icon">✦</span>Orb 주기
@@ -876,6 +876,7 @@ var state = {
   exp: 0, level: 1,
   feedCount: 0,
   sleeping: false,
+  sleepStart: null,
   birthDate: null,
   cooldowns: {},
   dailyMission: {},
@@ -1006,12 +1007,21 @@ function render() {
   // 메시지
   var msg;
   if (state.sleeping) {
-    msg = MESSAGES.sleep[Math.floor(Math.random()*MESSAGES.sleep.length)];
+    var sleptMin = state.sleepStart ? Math.floor((Date.now() - state.sleepStart) / 60000) : 0;
+    var pendingExp = Math.floor(Math.min(sleptMin / 60, 8) * 5);
+    msg = 'Zzz... 수련 중 (' + sleptMin + '분 경과, EXP +' + pendingExp + ' 적립 중)';
     document.getElementById('zzzContainer').style.display = 'block';
+    // 재우기 버튼 → 깨우기로
+    var si = document.getElementById('sleepIcon'); if(si) si.textContent = '☀️';
+    var sl = document.getElementById('sleepLabel'); if(sl) sl.textContent = '깨우기';
+    var sd = document.getElementById('sleepDesc'); if(sd) sd.textContent = '깨우면 EXP 지급';
   } else {
     document.getElementById('zzzContainer').style.display = 'none';
     if (state.hunger < 30) msg = MESSAGES.hungry[Math.floor(Math.random()*MESSAGES.hungry.length)];
     else msg = MESSAGES[state.element][Math.floor(Math.random()*MESSAGES[state.element].length)];
+    var si = document.getElementById('sleepIcon'); if(si) si.textContent = '🌙';
+    var sl = document.getElementById('sleepLabel'); if(sl) sl.textContent = '재우기';
+    var sd = document.getElementById('sleepDesc'); if(sd) sd.textContent = '수련 중 EXP 자동 적립';
   }
   document.getElementById('petMessage').textContent = msg;
 
@@ -1155,13 +1165,26 @@ function doAction(type) {
     bounce('pet-' + state.element);
     fetchAdvice();
   } else if (type === 'sleep') {
-    state.sleeping = !state.sleeping;
-    if (state.sleeping) {
-      state.energy = Math.min(100, state.energy + 30);
-      showToast('잘 자요~ 🌙');
+    if (!state.sleeping) {
+      // 재우기: 수련 시작
+      state.sleeping = true;
+      state.sleepStart = Date.now();
+      showToast('수련 시작! 자는 동안 EXP가 쌓여요 🌙');
     } else {
-      showToast('잘 잤어요! 기운이 넘쳐요 ☀️');
-      gainExp(3);
+      // 깨우기: 잠든 시간만큼 EXP 지급 (시간당 5, 최대 8시간)
+      var sleptMs = Date.now() - (state.sleepStart || Date.now());
+      var sleptHours = Math.min(sleptMs / 3600000, 8);
+      var earnedExp = Math.floor(sleptHours * 5);
+      state.sleeping = false;
+      state.sleepStart = null;
+      state.energy = Math.min(100, state.energy + Math.round(sleptHours * 8));
+      if (earnedExp > 0) {
+        gainExp(earnedExp);
+        if (!document.querySelector('#toast').textContent.includes('크리티컬'))
+          showToast('☀️ ' + Math.round(sleptHours * 60) + '분 수련! EXP +' + earnedExp);
+      } else {
+        showToast('잠깐 쉬었어요 ☀️');
+      }
     }
   } else if (type === 'orb') {
     state.happy  = Math.min(100, state.happy  + 30);
