@@ -1447,11 +1447,11 @@ function openSajuShareCard(cb) {
 
   var rel = d.branch_relations_kor || {};
   var allTags = [
-    ...(rel.harmonies   ||[]).map(function(s){return{t:s,c:'#69F0AE',bg:'rgba(0,200,83,0.15)',bd:'rgba(0,200,83,0.4)'};}),
-    ...(rel.clashes     ||[]).map(function(s){return{t:s,c:'#FF5252',bg:'rgba(255,23,68,0.15)',bd:'rgba(255,23,68,0.4)'};}),
-    ...(rel.punishments ||[]).map(function(s){return{t:s,c:'#FFD740',bg:'rgba(255,214,0,0.15)',bd:'rgba(255,214,0,0.4)'};}),
-    ...(rel.harms       ||[]).map(function(s){return{t:s,c:'#82B1FF',bg:'rgba(100,181,246,0.15)',bd:'rgba(100,181,246,0.4)'};}),
-    ...(rel.breaks      ||[]).map(function(s){return{t:s,c:'#9E9E9E',bg:'rgba(200,200,200,0.1)',bd:'rgba(200,200,200,0.2)'};})
+    ...(rel.harmonies   ||[]).map(function(s){return{t:s,c:'#fff',bg:'rgba(0,160,70,0.82)',bd:'rgba(0,130,55,0.9)'};}),
+    ...(rel.clashes     ||[]).map(function(s){return{t:s,c:'#fff',bg:'rgba(210,40,40,0.82)',bd:'rgba(170,20,20,0.9)'};}),
+    ...(rel.punishments ||[]).map(function(s){return{t:s,c:'#fff',bg:'rgba(185,120,0,0.82)',bd:'rgba(150,95,0,0.9)'};}),
+    ...(rel.harms       ||[]).map(function(s){return{t:s,c:'#fff',bg:'rgba(30,110,190,0.82)',bd:'rgba(20,85,155,0.9)'};}),
+    ...(rel.breaks      ||[]).map(function(s){return{t:s,c:'#fff',bg:'rgba(90,85,80,0.75)',bd:'rgba(70,65,60,0.9)'};})
   ];
 
   document.fonts.ready.then(function() {
