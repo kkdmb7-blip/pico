@@ -250,7 +250,9 @@
     var lines = html.split('\n');
     bubble.innerHTML = lines.map(function(l, i) {
       var esc = l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      return i === 0 ? '<b>' + esc + '</b>' : esc;
+      var boldColors = { wood:'#7dff8a', fire:'#ffaa44', earth:'#ffd700', metal:'#c8e6ff', water:'#66d4ff' };
+      var bc = boldColors[getElement()] || '#ffd700';
+      return i === 0 ? '<b style="color:' + bc + '">' + esc + '</b>' : esc;
     }).join('<br>');
     positionBubble();
     bubble.style.opacity = '1';
@@ -261,11 +263,11 @@
   }
 
   var PARTICLE_MAP = {
-    wood:  ['🌿','🍃','🌱','🍀','✨'],
-    fire:  ['🔥','💥','✨','🌟','⚡'],
-    earth: ['🪨','⭐','🌰','✨','💛'],
-    metal: ['💎','✨','⭐','💫','🌟'],
-    water: ['💧','🌊','❄️','✨','💙'],
+    wood:  ['🌿','🍃','🌱','🍀','✨','🌿'],
+    fire:  ['🔥','💥','✨','🌟','⚡','🔥'],
+    earth: ['⛰️','⭐','🌰','✨','💛','🌍'],
+    metal: ['💎','✨','⭐','💫','🌟','💎'],
+    water: ['💧','🌊','❄️','✨','💙','💧'],
   };
 
   function spawnParticles() {
@@ -274,24 +276,25 @@
     var rect = pet.getBoundingClientRect();
     var cx = rect.left + rect.width / 2;
     var cy = rect.top + rect.height / 2;
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < 12; i++) {
       (function(idx) {
         setTimeout(function() {
           var p = document.createElement('div');
           p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
           var angle = (Math.random() * 360) * Math.PI / 180;
-          var dist = 28 + Math.random() * 36;
+          var dist = 70 + Math.random() * 80;
           var tx = Math.cos(angle) * dist;
-          var ty = -Math.abs(Math.sin(angle) * dist) - 10;
-          var size = 13 + Math.random() * 10;
-          p.style.cssText = 'position:fixed;left:' + cx + 'px;top:' + cy + 'px;font-size:' + size + 'px;pointer-events:none;z-index:10001;transform:translate(-50%,-50%);transition:transform 0.85s ease-out,opacity 0.85s ease-out;opacity:1;';
+          var ty = -Math.abs(Math.sin(angle) * dist) - 30;
+          var size = 14 + Math.random() * 12;
+          var dur = (1.1 + Math.random() * 0.4).toFixed(2);
+          p.style.cssText = 'position:fixed;left:' + cx + 'px;top:' + cy + 'px;font-size:' + size + 'px;pointer-events:none;z-index:10001;transform:translate(-50%,-50%);transition:transform ' + dur + 's cubic-bezier(0.2,0.8,0.4,1),opacity ' + dur + 's ease-out;opacity:1;';
           document.body.appendChild(p);
           requestAnimationFrame(function() { requestAnimationFrame(function() {
-            p.style.transform = 'translate(calc(-50% + ' + tx + 'px),calc(-50% + ' + ty + 'px))';
+            p.style.transform = 'translate(calc(-50% + ' + tx + 'px),calc(-50% + ' + ty + 'px)) scale(0.6)';
             p.style.opacity = '0';
           }); });
-          setTimeout(function() { if (p.parentNode) p.parentNode.removeChild(p); }, 950);
-        }, idx * 65);
+          setTimeout(function() { if (p.parentNode) p.parentNode.removeChild(p); }, 1600);
+        }, idx * 55);
       })(i);
     }
   }
