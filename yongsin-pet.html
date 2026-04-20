@@ -777,11 +777,11 @@ nav {
   <div class="action-grid">
     <button class="action-btn btn-feed"  onclick="doAction('feed')">
       <span class="btn-icon">🍚</span>밥 주기
-      <span class="btn-desc">배고픔↑ EXP+15</span>
+      <span class="btn-desc">배고픔↑ EXP+5</span>
     </button>
     <button class="action-btn btn-play"  onclick="doAction('play')">
       <span class="btn-icon">⚡</span>운세 보기
-      <span class="btn-desc">행복↑ EXP+25</span>
+      <span class="btn-desc">행복↑ EXP+8</span>
     </button>
     <button class="action-btn btn-sleep" onclick="doAction('sleep')">
       <span class="btn-icon">🌙</span>재우기
@@ -789,7 +789,7 @@ nav {
     </button>
     <button class="action-btn btn-orb"   onclick="doAction('orb')">
       <span class="btn-icon">✦</span>Orb 주기
-      <span class="btn-desc">전체↑ EXP+40</span>
+      <span class="btn-desc">전체↑ EXP+15</span>
     </button>
   </div>
 
@@ -814,7 +814,7 @@ var ELEMENTS = {
   water: { name:'수령(水靈)',  nameShort:'수(水)', color:'#1565c0', color2:'#42a5f5', glow:'rgba(21,101,192,0.12)', badge:'rgba(21,101,192,0.12)', borderBadge:'rgba(21,101,192,0.4)', bgStyle:'linear-gradient(135deg,rgba(21,101,192,0.06),rgba(66,165,245,0.04))' },
 };
 var STAGES = ['새싹','성장','각성','정화','신화'];
-var MAX_LEVEL = 15;
+function expNeeded(lv) { return lv * lv * 100; } // 레벨²×100 (Lv1=100, Lv3=900, Lv5=2500...)
 var MESSAGES = {
   wood:  ['나무처럼 천천히, 하지만 깊게 뿌리내릴게요 🌱','목기운이 강해졌어요! 창의력이 넘치는 날이에요 🌿','오늘 청록색을 가까이 하면 좋아요 🍃'],
   fire:  ['오늘 활활 타오르고 싶어요! 🔥','화기운으로 열정적인 하루가 될 거예요 ✨','빨간색 소품이 행운을 불러요 🌹'],
@@ -916,14 +916,9 @@ function render() {
   setBar('Energy', state.energy);
 
   // EXP
-  if (state.level >= MAX_LEVEL) {
-    document.getElementById('expFill').style.width = '100%';
-    document.getElementById('expText').textContent = 'MAX ✨';
-  } else {
-    var expNeeded = state.level * 100;
-    document.getElementById('expFill').style.width = (state.exp / expNeeded * 100) + '%';
-    document.getElementById('expText').textContent = state.exp + ' / ' + expNeeded;
-  }
+  var needed = expNeeded(state.level);
+  document.getElementById('expFill').style.width = (state.exp / needed * 100) + '%';
+  document.getElementById('expText').textContent = state.exp + ' / ' + needed;
 
   // 메시지
   var msg;
@@ -951,18 +946,12 @@ function setBar(name, val) {
 }
 
 function gainExp(amount) {
-  if (state.level >= MAX_LEVEL) { showToast('✨ 이미 최고 레벨이에요!'); return; }
   state.exp += amount;
-  var needed = state.level * 100;
+  var needed = expNeeded(state.level);
   if (state.exp >= needed) {
     state.exp -= needed;
     state.level++;
-    if (state.level >= MAX_LEVEL) {
-      state.exp = 0;
-      showToast('🌟 Lv.' + MAX_LEVEL + ' 신화 완성! 최고 레벨에 도달했어요!');
-    } else {
-      showToast('🎉 레벨 업! Lv.' + state.level + '이 되었어요!');
-    }
+    showToast('🎉 레벨 업! Lv.' + state.level + '이 되었어요!');
   }
 }
 
@@ -974,13 +963,13 @@ function doAction(type) {
     state.hunger = Math.min(100, state.hunger + 25);
     state.happy  = Math.min(100, state.happy  + 5);
     state.feedCount++;
-    gainExp(15);
+    gainExp(5);
     showToast('냠냠! 맛있어요 🍚');
     bounce('pet-' + state.element);
   } else if (type === 'play') {
     state.happy  = Math.min(100, state.happy  + 20);
     state.energy = Math.max(0,   state.energy - 10);
-    gainExp(25);
+    gainExp(8);
     showToast('운세를 확인했어요! 에너지가 오릅니다 ⚡');
     bounce('pet-' + state.element);
   } else if (type === 'sleep') {
@@ -990,13 +979,13 @@ function doAction(type) {
       showToast('잘 자요~ 🌙');
     } else {
       showToast('잘 잤어요! 기운이 넘쳐요 ☀️');
-      gainExp(10);
+      gainExp(3);
     }
   } else if (type === 'orb') {
     state.happy  = Math.min(100, state.happy  + 30);
     state.hunger = Math.min(100, state.hunger + 10);
     state.energy = Math.min(100, state.energy + 20);
-    gainExp(40);
+    gainExp(15);
     showToast('✦ Orb 에너지가 용신을 강하게 해요!');
     bounce('pet-' + state.element);
   }

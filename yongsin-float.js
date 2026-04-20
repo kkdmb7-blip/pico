@@ -285,7 +285,7 @@
       var state = getPetState();
       state.hunger = Math.min(100, (state.hunger || 70) + 15);
       state.happy  = Math.min(100, (state.happy  || 70) + 20);
-      state.exp    = (state.exp || 0) + 30;
+      state.exp    = (state.exp || 0) + 10;
       // 레벨업 체크
       var needed = (state.level || 1) * 100;
       if (state.exp >= needed) { state.exp -= needed; state.level = (state.level || 1) + 1; }
@@ -386,15 +386,8 @@
     document.addEventListener('pointercancel', endDrag);
   }
 
-  // 닫기 (오른쪽 클릭)
   function setupContextMenu() {
-    pet.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-      wrapper.style.opacity = '0';
-      wrapper.style.pointerEvents = 'none';
-      try { localStorage.setItem(HIDE_KEY, getTodayStr()); } catch(e2) {}
-      setTimeout(function() { wrapper.remove(); }, 400);
-    });
+    pet.addEventListener('contextmenu', function(e) { e.preventDefault(); });
   }
 
   // 현재 페이지가 yongsin-pet.html이면 띄우지 않음
