@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>용신 키우기 · FORTUNA</title>
+<meta name="theme-color" content="#f4ede0">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif+KR:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="pico-icons.css">
+<style>
+:root {
+  --bg: #f4ede0;
+  --surface: #f9f1de;
+  --surface2: #e8dcc0;
+  --border: #c8b890;
+  --ink: #1a120a;
+  --text: #2a1e10;
+  --text2: #4a3a2a;
+  --muted: #5a4830;
+  --gold: #8a6a15;
+  --gold-deep: #6a4f0c;
+  --accent: #7a2418;
+  --fn: 'Pretendard Variable', Pretendard, -apple-system, 'Noto Sans KR', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  font-family: var(--fn);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(244,237,224,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(154,138,96,0.2);
+  padding: 0 20px; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-brand {
+  font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600;
+  letter-spacing: 0.28em; color: var(--gold-deep); text-decoration: none;
+}
+.nav-back {
+  font-size: 13px; color: var(--muted); text-decoration: none;
+  background: none; border: none; cursor: pointer; font-family: var(--fn);
+}
+
+.wrap { max-width: 480px; margin: 0 auto; padding: 24px 20px; }
+
+/* HEADER */
+.page-header {
+  text-align: center; margin-bottom: 28px;
+}
+.page-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--ink); margin-bottom: 6px;
+}
+.page-sub { font-size: 13px; color: var(--muted); }
+
+/* ELEMENT SELECTOR */
+.element-tabs {
+  display: flex; gap: 6px; justify-content: center;
+  margin-bottom: 24px; flex-wrap: wrap;
+}
+.elem-btn {
+  padding: 8px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 700;
+  border: 1.5px solid; cursor: pointer;
+  transition: all 0.2s; font-family: var(--fn);
+  background: var(--surface);
+}
+.elem-btn.wood  { color: #1a6630; border-color: #1a6630; }
+.elem-btn.fire  { color: #8a1a1a; border-color: #8a1a1a; }
+.elem-btn.earth { color: #6a4a10; border-color: #6a4a10; }
+.elem-btn.metal { color: #3a3a3a; border-color: #3a3a3a; }
+.elem-btn.water { color: #0d3a7a; border-color: #0d3a7a; }
+.elem-btn.active.wood  { background: #1a6630; color: #fff; }
+.elem-btn.active.fire  { background: #8a1a1a; color: #fff; }
+.elem-btn.active.earth { background: #6a4a10; color: #fff; }
+.elem-btn.active.metal { background: #3a3a3a; color: #fff; }
+.elem-btn.active.water { background: #0d3a7a; color: #fff; }
+
+/* PET CARD */
+.pet-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  padding: 28px 20px 20px;
+  box-shadow: 0 4px 20px rgba(60,40,20,0.10);
+  margin-bottom: 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.pet-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--pet-glow, rgba(138,106,21,0.08)) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* PET STAGE */
+.pet-stage {
+  width: 180px; height: 180px;
+  margin: 0 auto 16px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── 목(木) 나무정령 ── */
+.pet-wood {
+  width: 130px; height: 130px;
+  position: relative;
+  animation: wood-sway 3s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+@keyframes wood-sway {
+  0%,100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+.pet-wood .body {
+  width: 80px; height: 90px;
+  background: linear-gradient(160deg, #2a8a40 0%, #1a6630 60%, #145228 100%);
+  border-radius: 50% 50% 40% 40% / 55% 55% 45% 45%;
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+  box-shadow: 0 4px 12px rgba(26,102,48,0.3);
+}
+.pet-wood .body::after {
+  content: '';
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 50px; height: 30px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+}
+.pet-wood .face {
+  position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%);
+  width: 52px; z-index: 2;
+}
+.pet-wood .eye {
+  width: 11px; height: 11px;
+  background: #fff;
+  border-radius: 50%;
+  display: inline-block; margin: 0 5px;
+  position: relative;
+}
+.pet-wood .eye::after {
+  content: '';
+  position: absolute; top: 2px; left: 2px;
+  width: 7px; height: 7px;
+  background: #1a3a10;
+  border-radius: 50%;
+}
+.pet-wood .mouth {
+  width: 20px; height: 8px;
+  border-bottom: 2.5px solid rgba(255,255,255,0.7);
+  border-radius: 0 0 10px 10px;
+  margin: 4px auto 0;
+}
+.pet-wood .trunk {
+  width: 18px; height: 24px;
+  background: linear-gradient(180deg, #6a3a10 0%, #4a2808 100%);
+  border-radius: 4px;
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+}
+.pet-wood .leaf1, .pet-wood .leaf2, .pet-wood .leaf3 {
+  position: absolute;
+  width: 28px; height: 20px;
+  background: linear-gradient(135deg, #3aaa50 0%, #1a7835 100%);
+  border-radius: 50% 10% 50% 10%;
+  box-shadow: 0 2px 6px rgba(26,102,48,0.2);
+}
+.pet-wood .leaf1 { top: 0; left: 20px; transform: rotate(-20deg); }
+.pet-wood .leaf2 { top: 10px; right: 12px; transform: rotate(30deg); }
+.pet-wood .leaf3 { top: -8px; left: 50%; transform: translateX(-50%) rotate(10deg); width: 32px; height: 22px; }
+.pet-wood .sparkle { position: absolute; }
+.pet-wood .sparkle::before, .pet-wood .sparkle::after {
+  content: '✦'; font-size: 10px; color: #7aff88; opacity: 0;
+  position: absolute;
+  animation: sparkle-pop 2.5s ease-in-out infinite;
+}
+.pet-wood .sparkle::before { top: -10px; left: 5px; animation-delay: 0.3s; }
+.pet-wood .sparkle::after  { top: 5px; right: -8px; animation-delay: 1.1s; }
+
+/* ── 화(火) 불꽃령 ── */
+.pet-fire {
+  width: 110px; height: 140px;
+  position: relative;
+  animation: fire-pulse 1.8s ease-in-out infinite;
+}
+@keyframes fire-pulse {
+  0%,100% { transform: scaleX(1) scaleY(1); }
+  50% { transform: scaleX(1.04) scaleY(0.97); }
+}
+.pet-fire .flame-body {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 80px; height: 110px;
+}
+.pet-fire .flame-main {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 72px; height: 90px;
+  background: linear-gradient(180deg, #ff9a00 0%, #e53935 50%, #b71c1c 100%);
+  border-radius: 50% 50% 30% 30% / 60% 60% 40% 40%;
+  box-shadow: 0 0 20px rgba(229,57,53,0.5), 0 0 40px rgba(255,154,0,0.3);
+}
+.pet-fire .flame-inner {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  width: 44px; height: 60px;
+  background: linear-gradient(180deg, #fff176 0%, #ffcc02 50%, #ff8f00 100%);
+  border-radius: 50% 50% 30% 30% / 60% 60% 40% 40%;
+  opacity: 0.9;
+}
+.pet-fire .flame-tip {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 24px; height: 40px;
+  background: linear-gradient(180deg, #fff 0%, #fff59d 100%);
+  border-radius: 50% 50% 30% 30% / 70% 70% 30% 30%;
+  opacity: 0.85;
+  animation: flame-tip 1s ease-in-out infinite alternate;
+}
+@keyframes flame-tip {
+  from { transform: translateX(-50%) rotate(-5deg); }
+  to   { transform: translateX(-50%) rotate(5deg); }
+}
+.pet-fire .face {
+  position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+  width: 50px; z-index: 3;
+}
+.pet-fire .eye {
+  width: 10px; height: 10px;
+  background: #fff;
+  border-radius: 50%;
+  display: inline-block; margin: 0 5px;
+  position: relative;
+}
+.pet-fire .eye::after {
+  content: '';
+  position: absolute; top: 2px; left: 2px;
+  width: 6px; height: 6px;
+  background: #3a0a00;
+  border-radius: 50%;
+}
+.pet-fire .mouth {
+  width: 22px; height: 10px;
+  border-bottom: 2.5px solid rgba(255,255,255,0.8);
+  border-radius: 0 0 12px 12px;
+  margin: 4px auto 0;
+}
+.pet-fire .ember {
+  position: absolute; border-radius: 50%;
+  animation: ember-float 2s ease-in-out infinite;
+  opacity: 0;
+}
+.pet-fire .ember:nth-child(1) { width:5px;height:5px;background:#ffcc02;top:10px;left:15px;animation-delay:0s; }
+.pet-fire .ember:nth-child(2) { width:4px;height:4px;background:#ff8f00;top:0;left:60%;animation-delay:0.6s; }
+.pet-fire .ember:nth-child(3) { width:3px;height:3px;background:#ff5722;top:15px;right:10px;animation-delay:1.2s; }
+@keyframes ember-float {
+  0% { opacity:0; transform:translateY(0); }
+  30% { opacity:1; }
+  100% { opacity:0; transform:translateY(-30px) rotate(30deg); }
+}
+
+/* ── 토(土) 대지정령 ── */
+.pet-earth {
+  width: 120px; height: 110px;
+  position: relative;
+  animation: earth-bounce 2.4s ease-in-out infinite;
+}
+@keyframes earth-bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.pet-earth .body {
+  width: 110px; height: 95px;
+  background: linear-gradient(160deg, #a0724a 0%, #7a5230 60%, #5a3a1a 100%);
+  border-radius: 55% 55% 50% 50% / 58% 58% 42% 42%;
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  box-shadow: 0 6px 18px rgba(90,58,26,0.35);
+}
+.pet-earth .body::before {
+  content: '';
+  position: absolute; top: 10px; left: 15px;
+  width: 80px; height: 30px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+.pet-earth .tummy {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  width: 62px; height: 42px;
+  background: linear-gradient(160deg, #c89a6a 0%, #a07040 100%);
+  border-radius: 50%;
+}
+.pet-earth .face {
+  position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+  width: 56px; z-index: 2;
+}
+.pet-earth .eye {
+  width: 13px; height: 13px;
+  background: #fff;
+  border-radius: 50%;
+  display: inline-block; margin: 0 4px;
+  position: relative;
+}
+.pet-earth .eye::after {
+  content: '';
+  position: absolute; top: 3px; left: 3px;
+  width: 7px; height: 7px;
+  background: #2a1a08;
+  border-radius: 50%;
+}
+.pet-earth .blush {
+  position: absolute; top: 3px;
+  width: 10px; height: 6px;
+  background: rgba(200,100,80,0.4);
+  border-radius: 50%;
+}
+.pet-earth .blush.left { left: -6px; }
+.pet-earth .blush.right { right: -6px; }
+.pet-earth .mouth {
+  width: 20px; height: 9px;
+  border-bottom: 2.5px solid rgba(255,255,255,0.6);
+  border-radius: 0 0 10px 10px;
+  margin: 5px auto 0;
+}
+.pet-earth .pebble {
+  position: absolute;
+  width: 8px; height: 6px;
+  background: rgba(160,120,60,0.5);
+  border-radius: 50%;
+  animation: pebble-orbit 4s linear infinite;
+}
+.pet-earth .pebble:nth-child(1) { animation-delay: 0s; }
+.pet-earth .pebble:nth-child(2) { animation-delay: 1.3s; width:5px;height:4px; }
+.pet-earth .pebble:nth-child(3) { animation-delay: 2.7s; width:6px;height:5px; }
+@keyframes pebble-orbit {
+  0%   { transform: rotate(0deg) translateX(58px) rotate(0deg); opacity:0.8; }
+  100% { transform: rotate(360deg) translateX(58px) rotate(-360deg); opacity:0.8; }
+}
+
+/* ── 금(金) 금빛령 ── */
+.pet-metal {
+  width: 120px; height: 130px;
+  position: relative;
+  animation: metal-float 2.8s ease-in-out infinite;
+}
+@keyframes metal-float {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+.pet-metal .crystal {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  width: 80px; height: 90px;
+}
+.pet-metal .crystal-body {
+  width: 80px; height: 80px;
+  background: linear-gradient(135deg, #e8e0d0 0%, #c8b890 30%, #a89060 60%, #888060 100%);
+  clip-path: polygon(50% 0%, 95% 30%, 95% 70%, 50% 100%, 5% 70%, 5% 30%);
+  position: absolute; bottom: 0;
+  box-shadow: 0 0 20px rgba(200,184,144,0.5), inset 0 0 20px rgba(255,255,255,0.2);
+  animation: crystal-shimmer 2s ease-in-out infinite alternate;
+}
+@keyframes crystal-shimmer {
+  from { filter: brightness(1); }
+  to   { filter: brightness(1.15); }
+}
+.pet-metal .crystal-shine {
+  position: absolute; top: 8px; left: 22px;
+  width: 22px; height: 35px;
+  background: linear-gradient(160deg, rgba(255,255,255,0.7) 0%, transparent 80%);
+  clip-path: polygon(50% 0%, 100% 40%, 50% 100%, 0% 40%);
+}
+.pet-metal .face {
+  position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+  width: 50px; z-index: 3;
+}
+.pet-metal .eye {
+  width: 10px; height: 10px;
+  background: #fff;
+  border-radius: 50%;
+  display: inline-block; margin: 0 5px;
+  position: relative;
+  box-shadow: 0 0 4px rgba(200,184,144,0.6);
+}
+.pet-metal .eye::after {
+  content: '';
+  position: absolute; top: 2px; left: 2px;
+  width: 6px; height: 6px;
+  background: #1a1a2a;
+  border-radius: 50%;
+}
+.pet-metal .mouth {
+  width: 18px; height: 8px;
+  border-bottom: 2px solid rgba(255,255,255,0.7);
+  border-radius: 0 0 9px 9px;
+  margin: 4px auto 0;
+}
+.pet-metal .sparkle {
+  position: absolute;
+  color: #e8d890;
+  animation: star-spin 1.5s ease-in-out infinite;
+  opacity: 0;
+  font-size: 14px;
+}
+.pet-metal .sparkle:nth-child(1) { top: -5px; left: 10px; animation-delay: 0s; }
+.pet-metal .sparkle:nth-child(2) { top: 15px; right: 5px; animation-delay: 0.5s; }
+.pet-metal .sparkle:nth-child(3) { bottom: 25px; left: 0; animation-delay: 1s; }
+@keyframes star-spin {
+  0%,100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+/* ── 수(水) 물방울령 ── */
+.pet-water {
+  width: 110px; height: 130px;
+  position: relative;
+  animation: water-wobble 2s ease-in-out infinite;
+}
+@keyframes water-wobble {
+  0%,100% { transform: scaleX(1) scaleY(1); }
+  25% { transform: scaleX(0.95) scaleY(1.04); }
+  75% { transform: scaleX(1.04) scaleY(0.96); }
+}
+.pet-water .drop-body {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 88px; height: 110px;
+  background: linear-gradient(160deg, #5ba8e0 0%, #1565c0 55%, #0d47a1 100%);
+  border-radius: 50% 50% 40% 40% / 45% 45% 55% 55%;
+  clip-path: polygon(50% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+  box-shadow: 0 6px 20px rgba(21,101,192,0.4), inset 0 -4px 12px rgba(0,0,0,0.15);
+}
+.pet-water .drop-shine {
+  position: absolute; top: 12px; left: 24px;
+  width: 20px; height: 30px;
+  background: linear-gradient(160deg, rgba(255,255,255,0.6) 0%, transparent 80%);
+  border-radius: 50%;
+}
+.pet-water .drop-body2 {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 88px; height: 110px;
+  background: linear-gradient(160deg, rgba(100,200,255,0.2) 0%, transparent 50%);
+  border-radius: 50% 50% 40% 40% / 45% 45% 55% 55%;
+  clip-path: polygon(50% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+}
+.pet-water .face {
+  position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+  width: 52px; z-index: 3;
+}
+.pet-water .eye {
+  width: 11px; height: 11px;
+  background: #fff;
+  border-radius: 50%;
+  display: inline-block; margin: 0 5px;
+  position: relative;
+}
+.pet-water .eye::after {
+  content: '';
+  position: absolute; top: 2px; left: 2px;
+  width: 7px; height: 7px;
+  background: #0d1a3a;
+  border-radius: 50%;
+}
+.pet-water .mouth {
+  width: 20px; height: 9px;
+  border-bottom: 2.5px solid rgba(255,255,255,0.75);
+  border-radius: 0 0 10px 10px;
+  margin: 4px auto 0;
+}
+.pet-water .ripple {
+  position: absolute; border: 1.5px solid rgba(100,180,255,0.5);
+  border-radius: 50%; bottom: -8px; left: 50%; transform: translateX(-50%);
+  animation: ripple-out 2s ease-out infinite;
+  opacity: 0;
+}
+.pet-water .ripple:nth-child(1) { width:30px;height:10px; animation-delay:0s; }
+.pet-water .ripple:nth-child(2) { width:50px;height:15px; animation-delay:0.5s; }
+.pet-water .ripple:nth-child(3) { width:70px;height:20px; animation-delay:1s; }
+@keyframes ripple-out {
+  0% { opacity:0.7; transform:translateX(-50%) scale(0.8); }
+  100% { opacity:0; transform:translateX(-50%) scale(1.3); }
+}
+
+/* sparkle keyframe (shared) */
+@keyframes sparkle-pop {
+  0%,100% { opacity:0; transform:scale(0.5); }
+  50% { opacity:1; transform:scale(1.2); }
+}
+
+/* PET NAME & LEVEL */
+.pet-name {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--ink); margin-bottom: 2px;
+}
+.pet-level {
+  font-size: 12px; color: var(--muted);
+  margin-bottom: 14px;
+}
+
+/* STATUS BARS */
+.status-bars { margin-bottom: 16px; }
+.status-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.status-label {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  width: 28px; flex-shrink: 0;
+}
+.bar-bg {
+  flex: 1; height: 8px; background: var(--surface2);
+  border-radius: 4px; overflow: hidden;
+}
+.bar-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+.bar-fill.hunger { background: linear-gradient(90deg, #e55a2b, #ff8a50); }
+.bar-fill.happy  { background: linear-gradient(90deg, #1a8a40, #4caf50); }
+.bar-fill.energy { background: linear-gradient(90deg, #1565c0, #42a5f5); }
+.status-val {
+  font-size: 11px; color: var(--muted); width: 28px; text-align: right;
+}
+
+/* MESSAGE BUBBLE */
+.pet-message {
+  background: rgba(138,106,21,0.08);
+  border: 1px solid rgba(138,106,21,0.22);
+  border-radius: 14px; padding: 10px 16px;
+  font-size: 13px; color: var(--text2);
+  line-height: 1.6; margin-bottom: 6px;
+  min-height: 44px;
+  transition: all 0.3s;
+}
+
+/* ACTION BUTTONS */
+.action-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 20px;
+}
+.action-btn {
+  padding: 14px 10px;
+  border-radius: 14px;
+  border: 1.5px solid;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: var(--fn);
+  transition: all 0.18s;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+}
+.action-btn .btn-icon { font-size: 22px; }
+.action-btn:active { transform: scale(0.95); }
+.btn-feed  { background: linear-gradient(135deg,#7a2418,#5a1810); color:#fcf7ea; border-color:#5a1810; box-shadow:0 2px 8px rgba(122,36,24,0.22); }
+.btn-play  { background: linear-gradient(135deg,#1a6630,#145228); color:#fcf7ea; border-color:#145228; box-shadow:0 2px 8px rgba(26,102,48,0.22); }
+.btn-sleep { background: linear-gradient(135deg,#1565c0,#0d47a1); color:#fcf7ea; border-color:#0d47a1; box-shadow:0 2px 8px rgba(21,101,192,0.22); }
+.btn-orb   { background: linear-gradient(135deg,#8a6a15,#6a4f0c); color:#fcf7ea; border-color:#5a4008; box-shadow:0 2px 8px rgba(138,106,21,0.22); }
+
+/* INFO CARD */
+.info-card {
+  background: var(--surface);
+  border: 1px solid rgba(154,138,96,0.3);
+  border-radius: 16px; padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.info-title {
+  font-size: 12px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.08em; margin-bottom: 10px;
+}
+.info-row {
+  display: flex; justify-content: space-between;
+  font-size: 13px; color: var(--text2);
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(154,138,96,0.12);
+}
+.info-row:last-child { border-bottom: none; }
+.info-val { font-weight: 700; color: var(--ink); }
+
+/* SLEEPING overlay */
+.zzz-container {
+  position: absolute; top: 0; right: 10px;
+  pointer-events: none; display: none;
+}
+.zzz {
+  font-size: 14px; color: #7090c0;
+  animation: zzz-float 2s ease-in-out infinite;
+  display: block; font-weight: 700;
+}
+.zzz:nth-child(2) { animation-delay: 0.6s; font-size: 18px; margin-left: 8px; }
+.zzz:nth-child(3) { animation-delay: 1.2s; font-size: 22px; margin-left: 16px; }
+@keyframes zzz-float {
+  0% { opacity:0; transform:translateY(0); }
+  40% { opacity:1; }
+  100% { opacity:0; transform:translateY(-40px); }
+}
+
+/* EXP BAR */
+.exp-wrap { margin-top: 10px; }
+.exp-label {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--muted); margin-bottom: 4px;
+}
+.exp-bg {
+  height: 6px; background: var(--surface2);
+  border-radius: 3px; overflow: hidden;
+}
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pet-color, #8a6a15), var(--pet-color2, #c9a84c));
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* TOAST */
+.toast-pet {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  background: rgba(26,18,10,0.88); color: #fcf7ea;
+  padding: 10px 20px; border-radius: 20px;
+  font-size: 13px; font-weight: 600;
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none; white-space: nowrap;
+  z-index: 999;
+}
+.toast-pet.show { opacity: 1; }
+
+/* YONGSIN BADGE */
+.yongsin-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+  margin-bottom: 12px;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">FORTUNA</a>
+  <button class="nav-back" onclick="history.back()">← 돌아가기</button>
+</nav>
+
+<div class="wrap">
+  <div class="page-header">
+    <div class="page-title">용신 키우기</div>
+    <div class="page-sub">내 사주의 용신을 키워 행운을 불러오세요</div>
+  </div>
+
+  <!-- 원소 선택 탭 -->
+  <div class="element-tabs" id="elemTabs">
+    <button class="elem-btn wood"  onclick="selectElement('wood')" >목(木)</button>
+    <button class="elem-btn fire"  onclick="selectElement('fire')" >화(火)</button>
+    <button class="elem-btn earth" onclick="selectElement('earth')">토(土)</button>
+    <button class="elem-btn metal" onclick="selectElement('metal')">금(金)</button>
+    <button class="elem-btn water" onclick="selectElement('water')">수(水)</button>
+  </div>
+
+  <!-- 펫 카드 -->
+  <div class="pet-card" id="petCard">
+    <div class="zzz-container" id="zzzContainer">
+      <span class="zzz">z</span>
+      <span class="zzz">Z</span>
+      <span class="zzz">Z</span>
+    </div>
+
+    <!-- 펫 스테이지 -->
+    <div class="pet-stage" id="petStage">
+      <!-- 각 원소별 캐릭터 -->
+      <div class="pet-wood" id="pet-wood" style="display:none;">
+        <div class="leaf1"></div><div class="leaf2"></div><div class="leaf3"></div>
+        <div class="body">
+          <div class="face">
+            <span class="eye"></span><span class="eye"></span>
+            <div class="mouth"></div>
+          </div>
+        </div>
+        <div class="trunk"></div>
+        <div class="sparkle"></div>
+      </div>
+
+      <div class="pet-fire" id="pet-fire" style="display:none;">
+        <div class="ember"></div><div class="ember"></div><div class="ember"></div>
+        <div class="flame-body">
+          <div class="flame-main">
+            <div class="flame-inner">
+              <div class="flame-tip"></div>
+            </div>
+          </div>
+        </div>
+        <div class="face">
+          <span class="eye"></span><span class="eye"></span>
+          <div class="mouth"></div>
+        </div>
+      </div>
+
+      <div class="pet-earth" id="pet-earth" style="display:none;">
+        <div class="pebble"></div><div class="pebble"></div><div class="pebble"></div>
+        <div class="body">
+          <div class="tummy"></div>
+          <div class="face">
+            <span class="eye"></span><span class="eye"></span>
+            <div class="blush left"></div><div class="blush right"></div>
+            <div class="mouth"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pet-metal" id="pet-metal" style="display:none;">
+        <span class="sparkle">✦</span>
+        <span class="sparkle">✦</span>
+        <span class="sparkle">✦</span>
+        <div class="crystal">
+          <div class="crystal-body">
+            <div class="crystal-shine"></div>
+          </div>
+        </div>
+        <div class="face">
+          <span class="eye"></span><span class="eye"></span>
+          <div class="mouth"></div>
+        </div>
+      </div>
+
+      <div class="pet-water" id="pet-water" style="display:none;">
+        <div class="ripple"></div><div class="ripple"></div><div class="ripple"></div>
+        <div class="drop-body">
+          <div class="drop-shine"></div>
+        </div>
+        <div class="drop-body2"></div>
+        <div class="face">
+          <span class="eye"></span><span class="eye"></span>
+          <div class="mouth"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 이름 & 레벨 -->
+    <div id="yongsinBadge" class="yongsin-badge"></div>
+    <div class="pet-name" id="petName">—</div>
+    <div class="pet-level" id="petLevel">Lv.1 · 새싹 단계</div>
+
+    <!-- 메시지 -->
+    <div class="pet-message" id="petMessage">용신을 선택하세요...</div>
+
+    <!-- 상태 바 -->
+    <div class="status-bars">
+      <div class="status-row">
+        <div class="status-label">배고픔</div>
+        <div class="bar-bg"><div class="bar-fill hunger" id="barHunger" style="width:80%"></div></div>
+        <div class="status-val" id="valHunger">80</div>
+      </div>
+      <div class="status-row">
+        <div class="status-label">행복</div>
+        <div class="bar-bg"><div class="bar-fill happy" id="barHappy" style="width:70%"></div></div>
+        <div class="status-val" id="valHappy">70</div>
+      </div>
+      <div class="status-row">
+        <div class="status-label">기운</div>
+        <div class="bar-bg"><div class="bar-fill energy" id="barEnergy" style="width:90%"></div></div>
+        <div class="status-val" id="valEnergy">90</div>
+      </div>
+    </div>
+
+    <!-- EXP -->
+    <div class="exp-wrap">
+      <div class="exp-label">
+        <span>경험치</span>
+        <span id="expText">0 / 100</span>
+      </div>
+      <div class="exp-bg"><div class="exp-fill" id="expFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- 행동 버튼 -->
+  <div class="action-grid">
+    <button class="action-btn btn-feed"  onclick="doAction('feed')">
+      <span class="btn-icon">🍚</span>밥 주기
+    </button>
+    <button class="action-btn btn-play"  onclick="doAction('play')">
+      <span class="btn-icon">⚡</span>운세 보기
+    </button>
+    <button class="action-btn btn-sleep" onclick="doAction('sleep')">
+      <span class="btn-icon">🌙</span>재우기
+    </button>
+    <button class="action-btn btn-orb"   onclick="doAction('orb')">
+      <span class="btn-icon">✦</span>Orb 주기
+    </button>
+  </div>
+
+  <!-- 정보 카드 -->
+  <div class="info-card">
+    <div class="info-title">용신 정보</div>
+    <div class="info-row"><span>원소</span><span class="info-val" id="infoElem">—</span></div>
+    <div class="info-row"><span>단계</span><span class="info-val" id="infoStage">—</span></div>
+    <div class="info-row"><span>총 먹이 횟수</span><span class="info-val" id="infoFeedCount">0회</span></div>
+    <div class="info-row"><span>탄생일</span><span class="info-val" id="infoBirth">—</span></div>
+  </div>
+</div>
+
+<div class="toast-pet" id="toast"></div>
+
+<script>
+var ELEMENTS = {
+  wood:  { name:'목령(木靈)',  nameShort:'목(木)', color:'#1a6630', color2:'#4caf50', glow:'rgba(26,102,48,0.12)',  badge:'rgba(26,102,48,0.12)',  borderBadge:'rgba(26,102,48,0.4)',  bgStyle:'linear-gradient(135deg,rgba(26,102,48,0.06),rgba(58,170,80,0.04))' },
+  fire:  { name:'화령(火靈)',  nameShort:'화(火)', color:'#c62828', color2:'#ff7043', glow:'rgba(198,40,40,0.12)',  badge:'rgba(198,40,40,0.12)',  borderBadge:'rgba(198,40,40,0.4)',  bgStyle:'linear-gradient(135deg,rgba(198,40,40,0.06),rgba(255,112,67,0.04))' },
+  earth: { name:'토령(土靈)',  nameShort:'토(土)', color:'#6a4a10', color2:'#bc8a4a', glow:'rgba(106,74,16,0.12)', badge:'rgba(106,74,16,0.12)', borderBadge:'rgba(106,74,16,0.4)', bgStyle:'linear-gradient(135deg,rgba(106,74,16,0.06),rgba(160,112,64,0.04))' },
+  metal: { name:'금령(金靈)',  nameShort:'금(金)', color:'#5a5a4a', color2:'#c8b870', glow:'rgba(90,90,74,0.12)',  badge:'rgba(90,90,74,0.12)',  borderBadge:'rgba(90,90,74,0.4)',  bgStyle:'linear-gradient(135deg,rgba(90,90,74,0.06),rgba(200,184,112,0.04))' },
+  water: { name:'수령(水靈)',  nameShort:'수(水)', color:'#1565c0', color2:'#42a5f5', glow:'rgba(21,101,192,0.12)', badge:'rgba(21,101,192,0.12)', borderBadge:'rgba(21,101,192,0.4)', bgStyle:'linear-gradient(135deg,rgba(21,101,192,0.06),rgba(66,165,245,0.04))' },
+};
+var STAGES = ['새싹','성장','각성','정화','신화'];
+var MESSAGES = {
+  wood:  ['나무처럼 천천히, 하지만 깊게 뿌리내릴게요 🌱','목기운이 강해졌어요! 창의력이 넘치는 날이에요 🌿','오늘 청록색을 가까이 하면 좋아요 🍃'],
+  fire:  ['오늘 활활 타오르고 싶어요! 🔥','화기운으로 열정적인 하루가 될 거예요 ✨','빨간색 소품이 행운을 불러요 🌹'],
+  earth: ['든든하게 옆에 있을게요 🪨','토기운으로 안정적인 하루예요. 천천히 해도 돼요 🌾','노란색·갈색 음식이 좋아요 🌽'],
+  metal: ['번뜩이는 아이디어가 떠오를 거예요 💎','금기운으로 집중력이 최고예요 ⚡','흰색·은색이 오늘의 행운색이에요 🤍'],
+  water: ['흐르는 물처럼 유연하게 💧','수기운으로 직관이 예리해졌어요 🌊','검정색·파란색이 오늘 도움돼요 🫧'],
+  hungry:['배고파요... 밥 주세요 😢','꼬르륵... 밥이 필요해요 🙏','조금만 먹여주시면 안 될까요...'],
+  happy: ['너무 행복해요! 고마워요 🥰','행복지수 최고! 오늘 운이 좋아요 💕','함께라서 좋아요 ✨'],
+  sleep: ['Zzz... 잘 자고 있어요 😴','꿈에서 용신의 기운을 채우고 있어요 🌙','푹 자고 나면 더 강해질 거예요 💤'],
+  orb:   ['Orb의 에너지를 받았어요! ⭐','강해지는 게 느껴져요! 고마워요 🌟','Orb가 용신 기운을 증폭시켜요 ✦'],
+};
+
+var state = {
+  element: null,
+  hunger: 80, happy: 70, energy: 90,
+  exp: 0, level: 1,
+  feedCount: 0,
+  sleeping: false,
+  birthDate: null,
+};
+
+// localStorage에서 불러오기
+function loadState() {
+  try {
+    var s = JSON.parse(localStorage.getItem('yongsin_pet'));
+    if (s) {
+      Object.assign(state, s);
+      // decay 계산 (마지막 접속 후 시간)
+      if (s.lastVisit) {
+        var hours = (Date.now() - s.lastVisit) / 3600000;
+        state.hunger = Math.max(0, state.hunger - hours * 5);
+        state.happy  = Math.max(0, state.happy  - hours * 3);
+        state.energy = Math.min(100, state.energy + (state.sleeping ? hours * 10 : 0));
+      }
+    }
+  } catch(e) {}
+
+  // pico localStorage에서 용신 자동 감지
+  try {
+    var ys = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached');
+    if (!state.element && ys) {
+      var map = { '목': 'wood', '화': 'fire', '토': 'earth', '금': 'metal', '수': 'water' };
+      for (var k in map) if (ys.includes(k)) { state.element = map[k]; break; }
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  state.lastVisit = Date.now();
+  try { localStorage.setItem('yongsin_pet', JSON.stringify(state)); } catch(e) {}
+}
+
+function selectElement(el) {
+  state.element = el;
+  if (!state.birthDate) state.birthDate = new Date().toLocaleDateString('ko-KR');
+  saveState();
+  render();
+}
+
+function render() {
+  if (!state.element) {
+    document.getElementById('petMessage').textContent = '오행을 선택해서 용신을 소환하세요!';
+    return;
+  }
+  var el = ELEMENTS[state.element];
+
+  // 탭 강조
+  document.querySelectorAll('.elem-btn').forEach(function(b) {
+    b.classList.toggle('active', b.classList.contains(state.element));
+  });
+
+  // 캐릭터 표시
+  ['wood','fire','earth','metal','water'].forEach(function(e) {
+    document.getElementById('pet-' + e).style.display = (e === state.element) ? '' : 'none';
+  });
+
+  // 카드 배경
+  document.getElementById('petCard').style.setProperty('--pet-glow', el.glow);
+
+  // 배지
+  var badge = document.getElementById('yongsinBadge');
+  badge.textContent = '✦ 용신 ' + el.nameShort;
+  badge.style.background = el.badge;
+  badge.style.border = '1px solid ' + el.borderBadge;
+  badge.style.color = el.color;
+
+  // 이름·레벨
+  var stageIdx = Math.min(Math.floor(state.level / 3), STAGES.length - 1);
+  document.getElementById('petName').textContent = el.name;
+  document.getElementById('petLevel').textContent = 'Lv.' + state.level + ' · ' + STAGES[stageIdx] + ' 단계';
+
+  // EXP 바 색상
+  document.getElementById('expFill').style.setProperty('--pet-color', el.color);
+  document.getElementById('expFill').style.background = 'linear-gradient(90deg,' + el.color + ',' + el.color2 + ')';
+
+  // 상태 바
+  setBar('Hunger', state.hunger);
+  setBar('Happy', state.happy);
+  setBar('Energy', state.energy);
+
+  // EXP
+  var expNeeded = state.level * 100;
+  document.getElementById('expFill').style.width = (state.exp / expNeeded * 100) + '%';
+  document.getElementById('expText').textContent = state.exp + ' / ' + expNeeded;
+
+  // 메시지
+  var msg;
+  if (state.sleeping) {
+    msg = MESSAGES.sleep[Math.floor(Math.random()*MESSAGES.sleep.length)];
+    document.getElementById('zzzContainer').style.display = 'block';
+  } else {
+    document.getElementById('zzzContainer').style.display = 'none';
+    if (state.hunger < 30) msg = MESSAGES.hungry[Math.floor(Math.random()*MESSAGES.hungry.length)];
+    else msg = MESSAGES[state.element][Math.floor(Math.random()*MESSAGES[state.element].length)];
+  }
+  document.getElementById('petMessage').textContent = msg;
+
+  // 정보 카드
+  document.getElementById('infoElem').textContent = el.name;
+  document.getElementById('infoStage').textContent = STAGES[stageIdx];
+  document.getElementById('infoFeedCount').textContent = state.feedCount + '회';
+  document.getElementById('infoBirth').textContent = state.birthDate || '—';
+}
+
+function setBar(name, val) {
+  val = Math.round(Math.max(0, Math.min(100, val)));
+  document.getElementById('bar' + name).style.width = val + '%';
+  document.getElementById('val' + name).textContent = val;
+}
+
+function gainExp(amount) {
+  state.exp += amount;
+  var needed = state.level * 100;
+  if (state.exp >= needed) {
+    state.exp -= needed;
+    state.level++;
+    showToast('🎉 레벨 업! Lv.' + state.level + '이 되었어요!');
+  }
+}
+
+function doAction(type) {
+  if (!state.element) { showToast('먼저 용신을 선택해주세요!'); return; }
+  if (state.sleeping && type !== 'sleep') { showToast('자고 있어요... 먼저 깨워주세요 🌙'); return; }
+
+  if (type === 'feed') {
+    state.hunger = Math.min(100, state.hunger + 25);
+    state.happy  = Math.min(100, state.happy  + 5);
+    state.feedCount++;
+    gainExp(15);
+    showToast('냠냠! 맛있어요 🍚');
+    bounce('pet-' + state.element);
+  } else if (type === 'play') {
+    state.happy  = Math.min(100, state.happy  + 20);
+    state.energy = Math.max(0,   state.energy - 10);
+    gainExp(25);
+    showToast('운세를 확인했어요! 에너지가 오릅니다 ⚡');
+    bounce('pet-' + state.element);
+  } else if (type === 'sleep') {
+    state.sleeping = !state.sleeping;
+    if (state.sleeping) {
+      state.energy = Math.min(100, state.energy + 30);
+      showToast('잘 자요~ 🌙');
+    } else {
+      showToast('잘 잤어요! 기운이 넘쳐요 ☀️');
+      gainExp(10);
+    }
+  } else if (type === 'orb') {
+    state.happy  = Math.min(100, state.happy  + 30);
+    state.hunger = Math.min(100, state.hunger + 10);
+    state.energy = Math.min(100, state.energy + 20);
+    gainExp(40);
+    showToast('✦ Orb 에너지가 용신을 강하게 해요!');
+    bounce('pet-' + state.element);
+  }
+
+  saveState();
+  render();
+}
+
+function bounce(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.transition = 'transform 0.15s';
+  el.style.transform = 'scale(1.18)';
+  setTimeout(function() { el.style.transform = ''; }, 150);
+}
+
+var _toastTimer;
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2200);
+}
+
+// 시간 경과 decay (앱 열려있는 동안)
+setInterval(function() {
+  if (!state.element || state.sleeping) return;
+  state.hunger = Math.max(0, state.hunger - 0.5);
+  state.happy  = Math.max(0, state.happy  - 0.3);
+  render();
+  saveState();
+}, 30000); // 30초마다
+
+// 초기화
+loadState();
+render();
+if (state.element) {
+  document.querySelectorAll('.elem-btn').forEach(function(b) {
+    b.classList.toggle('active', b.classList.contains(state.element));
+  });
+}
+</script>
+</body>
+</html>
