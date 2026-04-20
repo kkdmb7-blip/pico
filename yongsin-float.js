@@ -329,16 +329,21 @@
     var dragOffX = 0, dragOffY = 0;
     var didDrag = false;
     var startX = 0, startY = 0;
+    var activePointerId = null;
 
     pet.addEventListener('pointerdown', function(e) {
       if (e.button && e.button !== 0) return;
       startX = e.clientX; startY = e.clientY;
       didDrag = false;
+      activePointerId = e.pointerId;
       longPressTimer = setTimeout(function() {
         longPressTimer = null;
         dragging = true;
+        // 포인터 캡처: 손가락이 빠르게 움직여도 이벤트 유지
+        try { pet.setPointerCapture(activePointerId); } catch(ev2) {}
         clearTimeout(moveTimer);
         wrapper.style.transition = 'none';
+        wrapper.style.willChange = 'left, top';
         var sg = ELEM_STYLE[getElement()] || ELEM_STYLE.water;
         pet.style.transform = 'scale(1.25)';
         pet.style.boxShadow = '0 0 28px ' + sg.glow + ', 0 8px 24px rgba(0,0,0,0.3)';
@@ -350,7 +355,8 @@
       }, 500);
     });
 
-    document.addEventListener('pointermove', function(e) {
+    // 캡처된 포인터는 pet에서 직접 받음
+    pet.addEventListener('pointermove', function(e) {
       if (longPressTimer) {
         if (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8) {
           clearTimeout(longPressTimer); longPressTimer = null;
@@ -367,11 +373,13 @@
       wrapper.style.top  = y + 'px';
     }, { passive: false });
 
-    function endDrag() {
+    function endDrag(e) {
       if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
       if (!dragging) return;
       dragging = false;
+      try { pet.releasePointerCapture(activePointerId); } catch(ev2) {}
       wrapper.style.transition = MOVE_TRANSITION;
+      wrapper.style.willChange = '';
       var sg = ELEM_STYLE[getElement()] || ELEM_STYLE.water;
       pet.style.transform = '';
       pet.style.boxShadow = '0 0 12px ' + sg.glow + ', 0 3px 10px rgba(0,0,0,0.15)';
@@ -382,8 +390,8 @@
         pet.addEventListener('click', stopClick, true);
       }
     }
-    document.addEventListener('pointerup', endDrag);
-    document.addEventListener('pointercancel', endDrag);
+    pet.addEventListener('pointerup', endDrag);
+    pet.addEventListener('pointercancel', endDrag);
   }
 
   function setupContextMenu() {
