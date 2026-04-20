@@ -312,8 +312,7 @@
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ birth: birth, gender: 'M', calendar: 'solar' })
     }).then(function(r){ return r.json(); }).then(function(sd) {
-      var dp = (sd.summary && sd.summary.pillars && sd.summary.pillars.day)
-        ? sd.summary.pillars.day.stem + sd.summary.pillars.day.branch : '';
+      var dp = (sd.summary && sd.summary.pillars && sd.summary.pillars.day) || '';
       return fetch('https://fortuna-silk.vercel.app/api/pet-advice', {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ yongsin: yongsin, element: ps.element, day_pillar: dp, profile: profile })
