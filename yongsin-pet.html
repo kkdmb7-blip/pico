@@ -1313,6 +1313,9 @@ setInterval(function() {
   saveState();
 }, 30000); // 30초마다
 
+// 펫 페이지 방문 시 플로팅 펫 숨김 상태 초기화 (다시 돌아다니게)
+try { localStorage.removeItem('yongsin_float_hidden'); localStorage.removeItem('yongsin_found_today'); } catch(e) {}
+
 // 초기화: localStorage 먼저, 서버 데이터 있으면 덮어씀
 loadState();
 render();
