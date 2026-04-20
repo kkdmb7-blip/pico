@@ -1373,8 +1373,10 @@ loadFromServer(function(serverData) {
     var srvLv   = srvElState ? (srvElState.level || 1) : 0;
     if (srvLv >= localLv) {
       allStates = Object.assign({}, srvAll);
+      state.element = srvEl;
       if (state.element && allStates[state.element]) {
         Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[state.element])));
+        state.element = srvEl;
       }
       try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: state.element })); } catch(e) {}
       render(); renderMission();
