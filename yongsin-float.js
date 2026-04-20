@@ -135,21 +135,24 @@
     bubble = document.createElement('div');
     bubble.style.cssText = [
       'position:absolute',
-      'bottom:58px', 'left:50%',
+      'bottom:62px', 'left:50%',
       'transform:translateX(-50%)',
-      'background:rgba(26,18,10,0.88)',
+      'background:rgba(26,18,10,0.92)',
       'color:#fcf7ea',
-      'padding:6px 12px',
-      'border-radius:12px',
+      'padding:10px 14px',
+      'border-radius:14px',
       'font-size:12px',
-      'font-weight:700',
-      'white-space:nowrap',
+      'font-weight:600',
+      'white-space:normal',
+      'width:180px',
+      'text-align:center',
+      'line-height:1.55',
       'opacity:0',
       'transition:opacity 0.3s',
       'pointer-events:none',
       'font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif',
+      'box-shadow:0 4px 16px rgba(0,0,0,0.3)',
     ].join(';');
-    bubble.style.setProperty('--arrow','');
     wrapper.appendChild(bubble);
 
     // 펫 버튼
@@ -229,9 +232,9 @@
     bubble.textContent = text;
     bubble.style.opacity = '1';
     clearTimeout(bubbleTimer);
-    bubbleTimer = setTimeout(function() {
-      bubble.style.opacity = '0';
-    }, duration || 2000);
+    if (duration > 0) {
+      bubbleTimer = setTimeout(function() { bubble.style.opacity = '0'; }, duration);
+    }
   }
 
   function moveTo(pos) {
@@ -275,6 +278,40 @@
     }, delay);
   }
 
+  var ADVICE_KEY = 'yongsin_float_advice';
+
+  function fetchTodayAdvice(cb) {
+    var today = getTodayStr();
+    try {
+      var cached = JSON.parse(localStorage.getItem(ADVICE_KEY) || '{}');
+      if (cached.date === today && cached.advice) { cb(cached); return; }
+    } catch(e) {}
+
+    var ps = getPetState();
+    var profile = {};
+    try { profile = JSON.parse(localStorage.getItem('pico_profile') || '{}'); } catch(e) {}
+    var yongsin = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached') || '';
+
+    // 오늘 일진 조회 후 AI 호출
+    var now = new Date();
+    var birth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' 12:00';
+    fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ birth: birth, gender: 'M', calendar: 'solar' })
+    }).then(function(r){ return r.json(); }).then(function(sd) {
+      var dp = (sd.summary && sd.summary.pillars && sd.summary.pillars.day)
+        ? sd.summary.pillars.day.stem + sd.summary.pillars.day.branch : '';
+      return fetch('https://fortuna-silk.vercel.app/api/pet-advice', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ yongsin: yongsin, element: ps.element, day_pillar: dp, profile: profile })
+      });
+    }).then(function(r){ return r.json(); }).then(function(data) {
+      var result = { date: today, advice: data.advice || '', keyword: data.keyword || '', lucky: data.lucky || '' };
+      try { localStorage.setItem(ADVICE_KEY, JSON.stringify(result)); } catch(e) {}
+      cb(result);
+    }).catch(function() { cb(null); });
+  }
+
   function onPetClick() {
     var today = getTodayStr();
     var found = localStorage.getItem(FOUND_KEY);
@@ -283,31 +320,29 @@
     pet.style.animation = 'pet-found 0.6s ease';
     setTimeout(function() { pet.style.animation = 'pet-idle 2.5s ease-in-out infinite'; }, 700);
 
+    // EXP 지급 (오늘 처음)
     if (found !== today) {
-      // 오늘 처음 발견
       localStorage.setItem(FOUND_KEY, today);
       var state = getPetState();
-      state.hunger = Math.min(100, (state.hunger || 70) + 15);
-      state.happy  = Math.min(100, (state.happy  || 70) + 20);
+      state.hunger = Math.min(100, (state.hunger || 20) + 15);
+      state.happy  = Math.min(100, (state.happy  || 20) + 20);
       state.exp    = (state.exp || 0) + 10;
-      // 레벨업 체크
-      var needed = (state.level || 1) * 100;
+      var needed = Math.pow(state.level || 1, 2) * 100;
       if (state.exp >= needed) { state.exp -= needed; state.level = (state.level || 1) + 1; }
       state.lastVisit = Date.now();
       try { localStorage.setItem(PET_KEY, JSON.stringify(state)); } catch(e) {}
-
-      showBubble('찾았다! +30 EXP 🎉', 2500);
-      // 이동
-      setTimeout(function() {
-        var pos = pickNextPos();
-        moveTo(pos);
-      }, 1000);
-    } else {
-      var msgs = ['또 찾았어요! 😊', '여기 있었어요 ✨', '안녕하세요~ 🌟', '오늘 운이 좋아요 💫'];
-      showBubble(msgs[Math.floor(Math.random() * msgs.length)], 1800);
     }
 
-    // 펫 페이지 열기 (길게 탭 or 더블클릭은 페이지 이동)
+    // 오늘의 운세 말풍선
+    showBubble('운세 읽는 중... ✨', 0);
+    fetchTodayAdvice(function(data) {
+      if (!data || !data.advice) {
+        showBubble('오늘도 용신 기운을 잘 활용해요! 🌟', 4000);
+        return;
+      }
+      var text = (data.keyword ? '✦ ' + data.keyword + '\n' : '') + data.advice;
+      showBubble(text, 6000);
+    });
   }
 
   // 더블클릭 → 펫 페이지
