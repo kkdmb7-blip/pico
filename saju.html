@@ -622,6 +622,19 @@ async function fetchSaju() {
     renderAll(data);
     document.getElementById('sajuShareBtnWrap').style.display = 'flex';
     document.getElementById('sajuReportHook').style.display = 'block';
+    // 용신 펫 EXP 연동 (사주 분석 완료 시 +50, 하루 1번)
+    try {
+      var _petS = JSON.parse(localStorage.getItem('yongsin_pet') || '{}');
+      var _petD = new Date().toISOString().slice(0,10);
+      if (_petS.element && _petS._sajuExpDate !== _petD) {
+        _petS._sajuExpDate = _petD;
+        _petS.exp = (_petS.exp || 0) + 50;
+        var _petN = (_petS.level||1)*(_petS.level||1)*100;
+        if (_petS.exp >= _petN) { _petS.exp -= _petN; _petS.level = (_petS.level||1)+1; }
+        localStorage.setItem('yongsin_pet', JSON.stringify(_petS));
+        if (window._refreshPetCard) window._refreshPetCard();
+      }
+    } catch(e2) {}
   } catch(e) {
     document.getElementById('S_load').style.display='none';
     const fe=document.getElementById('f_err');

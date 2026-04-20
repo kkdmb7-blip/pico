@@ -5345,6 +5345,9 @@ async function loadMiniScore() {
   var summaryEl = document.getElementById('scoreSummaryText');
   if (summaryEl) summaryEl.innerHTML = result.summary;
 
+  // 용신 펫 길일 보너스용: 오늘 운세 점수 저장
+  try { localStorage.setItem('pico_today_score', String(result.overall)); } catch(e) {}
+
   // 자세히 보기 링크에 프로필 파라미터 추가
   var detailLink = document.getElementById('scoreDetailLink');
   if (detailLink && profile) {

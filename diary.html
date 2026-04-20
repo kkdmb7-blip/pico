@@ -521,6 +521,18 @@ async function submitDiary(skipMemo) {
   // localStorage 캐시 (홈 CTA용)
   try { localStorage.setItem('pico_diary_'+ds, _currentMood); } catch(e) {}
 
+  // 용신 펫 EXP 연동 (일기 저장 시 +20)
+  try {
+    var _ps = JSON.parse(localStorage.getItem('yongsin_pet') || '{}');
+    if (_ps.element) {
+      _ps.exp = (_ps.exp || 0) + 20;
+      var _pn = (_ps.level || 1) * (_ps.level || 1) * 100;
+      if (_ps.exp >= _pn) { _ps.exp -= _pn; _ps.level = (_ps.level || 1) + 1; }
+      localStorage.setItem('yongsin_pet', JSON.stringify(_ps));
+      if (window._refreshPetCard) window._refreshPetCard();
+    }
+  } catch(e) {}
+
   // 캘린더/통계 즉시 갱신 (AI 피드백 기다리지 않고 저장 직후 반영)
   _calDiaries[ds] = { date: ds, mood: _currentMood };
   renderCalendar();

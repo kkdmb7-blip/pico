@@ -4511,6 +4511,20 @@ if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
 
 // ── 상담 배너 표시 ──
 function showConsultBanner() {
+  // 용신 펫 EXP 연동 (리포트 생성 완료 시 +100, 리포트 타입당 하루 1번)
+  try {
+    var _rps = JSON.parse(localStorage.getItem('yongsin_pet') || '{}');
+    var _rpd = new Date().toISOString().slice(0,10);
+    var _rpk = '_reportExpDate_' + (_type || 'x');
+    if (_rps.element && _rps[_rpk] !== _rpd) {
+      _rps[_rpk] = _rpd;
+      _rps.exp = (_rps.exp || 0) + 100;
+      var _rpn = (_rps.level||1)*(_rps.level||1)*100;
+      if (_rps.exp >= _rpn) { _rps.exp -= _rpn; _rps.level = (_rps.level||1)+1; }
+      localStorage.setItem('yongsin_pet', JSON.stringify(_rps));
+      if (window._refreshPetCard) window._refreshPetCard();
+    }
+  } catch(e) {}
   const bannerTexts = {
     character: { title: '나의 기질, 더 깊이 알고 싶다면', desc: '타고난 성향과 잠재력을 <em>전문 상담사</em>가\n1:1로 풀어드립니다.' },
     money:     { title: '재물운을 현실에 적용하고 싶다면', desc: '투자 시기, 사업 방향까지 <em>전문 상담사</em>가\n구체적으로 안내해 드립니다.' },

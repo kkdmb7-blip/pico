@@ -793,6 +793,32 @@ nav {
     </button>
   </div>
 
+  <!-- 운세 활동 EXP 카드 -->
+  <div class="info-card">
+    <div class="info-title">⭐ 활동으로 EXP 얻기</div>
+    <a href="diary.html" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(154,138,96,0.15);text-decoration:none;color:var(--text);">
+      <span style="font-size:13px;">📔 일기 쓰기</span>
+      <span style="font-size:11px;color:var(--muted);">저장 시 EXP +20</span>
+    </a>
+    <a href="saju.html" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(154,138,96,0.15);text-decoration:none;color:var(--text);">
+      <span style="font-size:13px;">🔮 사주 분석하기</span>
+      <span style="font-size:11px;color:var(--muted);">완료 시 EXP +50</span>
+    </a>
+    <a href="report.html" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;text-decoration:none;color:var(--text);">
+      <span style="font-size:13px;">📜 AI 리포트 생성</span>
+      <span style="font-size:11px;color:var(--muted);">완료 시 EXP +100</span>
+    </a>
+    <div style="font-size:10px;color:var(--muted);margin-top:8px;">오늘 운세 점수 80점 이상이면 방문 시 길일 보너스 EXP +50</div>
+  </div>
+
+  <!-- 일일 미션 카드 -->
+  <div class="info-card" id="missionCard">
+    <div class="info-title">📋 오늘의 미션 <span id="missionBonus" style="color:#c8a830;font-size:11px;"></span></div>
+    <div class="info-row"><span>🍚 밥 3번 주기</span><span class="info-val" id="mFeed">0/3</span></div>
+    <div class="info-row"><span>⚡ 운세 2번 보기</span><span class="info-val" id="mPlay">0/2</span></div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px;">완료 시 EXP +80 보너스</div>
+  </div>
+
   <!-- 정보 카드 -->
   <div class="info-card">
     <div class="info-title">용신 정보</div>
@@ -834,6 +860,9 @@ var state = {
   feedCount: 0,
   sleeping: false,
   birthDate: null,
+  cooldowns: {},       // {feed: timestamp, orb: timestamp}
+  dailyMission: {},    // {date:'2025-01-01', feedCount:0, playCount:0, bonusDone:false}
+  luckyBonusDone: '',  // 날짜 문자열 (오늘 길일 보너스 받았으면)
 };
 
 // localStorage에서 불러오기
@@ -945,32 +974,125 @@ function setBar(name, val) {
   document.getElementById('val' + name).textContent = val;
 }
 
-function gainExp(amount) {
+// ── 유틸 ──
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+function conditionMultiplier() {
+  var avg = (state.hunger + state.happy + state.energy) / 3;
+  if (state.hunger < 30) return 0.5;   // 배고프면 절반
+  if (avg >= 80) return 1.5;           // 전체 컨디션 좋으면 1.5배
+  return 1;
+}
+
+function gainExp(base) {
+  // 컨디션 보정
+  var mult = conditionMultiplier();
+  // 크리티컬 10%
+  var critical = Math.random() < 0.1;
+  if (critical) mult *= 3;
+  var amount = Math.round(base * mult);
   state.exp += amount;
   var needed = expNeeded(state.level);
+  var msg = critical ? '💥 크리티컬! EXP +' + amount + '!' : null;
   if (state.exp >= needed) {
     state.exp -= needed;
     state.level++;
     showToast('🎉 레벨 업! Lv.' + state.level + '이 되었어요!');
+  } else if (msg) {
+    showToast(msg);
   }
 }
+
+// ── 쿨타임 ──
+var COOLDOWNS = { feed: 4 * 3600 * 1000, orb: 8 * 3600 * 1000 };
+function getCooldownLeft(type) {
+  var cd = COOLDOWNS[type];
+  if (!cd) return 0;
+  var last = (state.cooldowns || {})[type] || 0;
+  var left = cd - (Date.now() - last);
+  return Math.max(0, left);
+}
+function fmtCooldown(ms) {
+  var h = Math.floor(ms / 3600000);
+  var m = Math.floor((ms % 3600000) / 60000);
+  return h > 0 ? h + '시간 ' + m + '분' : m + '분';
+}
+
+// ── 일일 미션 ──
+function getMission() {
+  var today = todayStr();
+  if (!state.dailyMission || state.dailyMission.date !== today) {
+    state.dailyMission = { date: today, feedCount: 0, playCount: 0, bonusDone: false };
+  }
+  return state.dailyMission;
+}
+function checkMission() {
+  var m = getMission();
+  if (!m.bonusDone && m.feedCount >= 3 && m.playCount >= 2) {
+    m.bonusDone = true;
+    state.exp += 80;
+    showToast('🏆 일일 미션 완료! EXP +80');
+  }
+}
+
+// ── 길일 보너스 (오늘 운세 점수 연동) ──
+function checkLuckyBonus() {
+  var today = todayStr();
+  if (state.luckyBonusDone === today) return;
+  try {
+    var score = parseInt(localStorage.getItem('pico_today_score') || '0', 10);
+    if (score >= 80) {
+      state.luckyBonusDone = today;
+      state.exp += 50;
+      showToast('🌟 길일 보너스! 오늘 운세 ' + score + '점 — EXP +50');
+    }
+  } catch(e) {}
+}
+
+// ── 사주/리포트 EXP 연동 (외부에서 호출) ──
+window.petGainExpExternal = function(amount, msg) {
+  try {
+    var s = JSON.parse(localStorage.getItem('yongsin_pet') || '{}');
+    if (!s.element) return;
+    s.exp = (s.exp || 0) + amount;
+    var needed = (s.level || 1) * (s.level || 1) * 100;
+    if (s.exp >= needed) { s.exp -= needed; s.level = (s.level || 1) + 1; }
+    localStorage.setItem('yongsin_pet', JSON.stringify(s));
+    if (window._refreshPetCard) window._refreshPetCard();
+  } catch(e) {}
+};
 
 function doAction(type) {
   if (!state.element) { showToast('먼저 용신을 선택해주세요!'); return; }
   if (state.sleeping && type !== 'sleep') { showToast('자고 있어요... 먼저 깨워주세요 🌙'); return; }
 
+  // 쿨타임 체크
+  var cdLeft = getCooldownLeft(type);
+  if (cdLeft > 0) {
+    showToast('⏳ ' + fmtCooldown(cdLeft) + ' 후에 가능해요');
+    return;
+  }
+
+  var m = getMission();
+
   if (type === 'feed') {
     state.hunger = Math.min(100, state.hunger + 25);
     state.happy  = Math.min(100, state.happy  + 5);
     state.feedCount++;
+    m.feedCount++;
+    if (!state.cooldowns) state.cooldowns = {};
+    state.cooldowns.feed = Date.now();
     gainExp(5);
-    showToast('냠냠! 맛있어요 🍚');
+    if (!document.querySelector('#toast').textContent.includes('크리티컬'))
+      showToast('냠냠! 맛있어요 🍚');
     bounce('pet-' + state.element);
   } else if (type === 'play') {
     state.happy  = Math.min(100, state.happy  + 20);
     state.energy = Math.max(0,   state.energy - 10);
+    m.playCount++;
     gainExp(8);
-    showToast('운세를 확인했어요! 에너지가 오릅니다 ⚡');
+    if (!document.querySelector('#toast').textContent.includes('크리티컬'))
+      showToast('운세를 확인했어요! ⚡');
     bounce('pet-' + state.element);
   } else if (type === 'sleep') {
     state.sleeping = !state.sleeping;
@@ -985,13 +1107,43 @@ function doAction(type) {
     state.happy  = Math.min(100, state.happy  + 30);
     state.hunger = Math.min(100, state.hunger + 10);
     state.energy = Math.min(100, state.energy + 20);
+    if (!state.cooldowns) state.cooldowns = {};
+    state.cooldowns.orb = Date.now();
     gainExp(15);
-    showToast('✦ Orb 에너지가 용신을 강하게 해요!');
+    if (!document.querySelector('#toast').textContent.includes('크리티컬'))
+      showToast('✦ Orb 에너지가 용신을 강하게 해요!');
     bounce('pet-' + state.element);
   }
 
+  checkMission();
   saveState();
   render();
+  renderMission();
+}
+
+function renderMission() {
+  var m = getMission();
+  var fEl = document.getElementById('mFeed');
+  var pEl = document.getElementById('mPlay');
+  var bEl = document.getElementById('missionBonus');
+  if (fEl) fEl.textContent = Math.min(m.feedCount, 3) + '/3';
+  if (pEl) pEl.textContent = Math.min(m.playCount, 2) + '/2';
+  if (bEl) bEl.textContent = m.bonusDone ? '✅ 완료!' : '';
+  // 쿨타임 버튼 비활성화 표시
+  ['feed','orb'].forEach(function(type) {
+    var btn = document.querySelector('.btn-' + (type === 'feed' ? 'feed' : 'orb'));
+    if (!btn) return;
+    var left = getCooldownLeft(type);
+    var desc = btn.querySelector('.btn-desc');
+    if (!desc) return;
+    if (left > 0) {
+      desc.textContent = '⏳ ' + fmtCooldown(left) + ' 후';
+      btn.style.opacity = '0.55';
+    } else {
+      desc.textContent = type === 'feed' ? '배고픔↑ EXP+5' : '전체↑ EXP+15';
+      btn.style.opacity = '';
+    }
+  });
 }
 
 function bounce(id) {
@@ -1023,11 +1175,15 @@ setInterval(function() {
 // 초기화
 loadState();
 render();
+renderMission();
+checkLuckyBonus();
 if (state.element) {
   document.querySelectorAll('.elem-btn').forEach(function(b) {
     b.classList.toggle('active', b.classList.contains(state.element));
   });
 }
+// 쿨타임 표시 갱신 (1분마다)
+setInterval(renderMission, 60000);
 </script>
 </body>
 </html>
