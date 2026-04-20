@@ -1,6 +1,6 @@
 {
-  "name": "피코랩",
-  "short_name": "피코랩",
+  "name": "FORTUNA",
+  "short_name": "FORTUNA",
   "description": "사주·점성·베딕·자미두수·기문둔갑 운세 분석",
   "start_url": "/",
   "scope": "/",
@@ -11,13 +11,13 @@
   "categories": ["lifestyle", "entertainment"],
   "icons": [
     {
-      "src": "/img/goddess-app.png?v=3",
+      "src": "/img/logo.png?v=4",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/goddess-maskable.png?v=3",
+      "src": "/img/logo.png?v=4",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
