@@ -1495,12 +1495,12 @@
           +'<span style="font-size:11px;color:var(--muted);">Lv.'+( st.level||1)+' '+getStage(st.level||1)+' 단계</span>'
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;">'
-          +'<span style="font-size:9px;color:var(--muted);width:18px;flex-shrink:0;">밥</span>'+bar(st.hunger||0,'#e8a87c')
-          +'<span style="font-size:9px;color:var(--muted);width:18px;flex-shrink:0;margin-left:4px;">행복</span>'+bar(st.happy||0,'#e87ca0')
-          +'<span style="font-size:9px;color:var(--muted);width:18px;flex-shrink:0;margin-left:4px;">기운</span>'+bar(st.energy||0,'#7ca0e8')
+          +'<span style="font-size:10px;color:var(--muted);width:20px;flex-shrink:0;">밥</span>'+bar(st.hunger||0,'#e8a87c')
+          +'<span style="font-size:10px;color:var(--muted);width:22px;flex-shrink:0;margin-left:4px;">행복</span>'+bar(st.happy||0,'#e87ca0')
+          +'<span style="font-size:10px;color:var(--muted);width:22px;flex-shrink:0;margin-left:4px;">기운</span>'+bar(st.energy||0,'#7ca0e8')
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:4px;">'
-          +'<span style="font-size:9px;color:var(--muted);">EXP</span>'
+          +'<span style="font-size:10px;color:var(--muted);">EXP</span>'
           +'<div style="flex:1;height:4px;background:rgba(0,0,0,0.1);border-radius:2px;overflow:hidden;">'
             +'<div style="height:100%;width:'+expPct+'%;background:linear-gradient(90deg,'+el.color+',rgba(212,175,55,0.8));border-radius:2px;"></div>'
           +'</div>'
@@ -3223,7 +3223,7 @@ function _sajuMiniCard(saju, label, name, gender) {
   var order=['hour','day','month','year'], labs=['시','일','월','년'];
   var cols=order.map(function(k,i){
     return '<div style="text-align:center;">'
-      +'<div style="font-size:8px;color:rgba(0,0,0,0.4);margin-bottom:2px;">'+labs[i]+'</div>'
+      +'<div style="font-size:10px;color:rgba(0,0,0,0.7);margin-bottom:2px;font-weight:600;">'+labs[i]+'</div>'
       +box(saju.stemH[k],EL_BG[saju.stemEl[k]]||'#333',EL_TC[saju.stemEl[k]]||'#fff')
       +box(saju.branchH[k],EL_BG[saju.branchEl[k]]||'#333',EL_TC[saju.branchEl[k]]||'#fff')
       +'</div>';
@@ -3231,11 +3231,11 @@ function _sajuMiniCard(saju, label, name, gender) {
   var gText=gender==='F'?'여성':gender==='M'?'남성':'';
   var fp=saju.fivePct;
   return '<div style="background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);border-radius:10px;padding:10px 8px;">'
-    +'<div style="font-size:10px;color:rgba(0,0,0,0.4);margin-bottom:3px;">'+label+'</div>'
+    +'<div style="font-size:11px;color:rgba(0,0,0,0.7);font-weight:600;margin-bottom:3px;">'+label+'</div>'
     +'<div style="font-size:12px;font-weight:700;color:#1a120a;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(name||label)
-    +(gText?' <span style="font-size:9px;color:rgba(0,0,0,0.45);">'+gText+'</span>':'')+' <span style="font-size:9px;color:rgba(0,0,0,0.45);">'+saju.zodiac+'띠</span></div>'
+    +(gText?' <span style="font-size:10px;color:rgba(0,0,0,0.7);">'+gText+'</span>':'')+' <span style="font-size:10px;color:rgba(0,0,0,0.7);">'+saju.zodiac+'띠</span></div>'
     +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;">'+cols+'</div>'
-    +'<div style="margin-top:6px;font-size:9px;color:rgba(0,0,0,0.5);line-height:1.5;">'+saju.dayEl+' · '+saju.strength+'<br>목'+fp.목+'·화'+fp.화+'·토'+fp.토+'·금'+fp.금+'·수'+fp.수+'</div>'
+    +'<div style="margin-top:6px;font-size:10px;color:rgba(0,0,0,0.72);line-height:1.5;">'+saju.dayEl+' · '+saju.strength+'<br>목'+fp.목+'·화'+fp.화+'·토'+fp.토+'·금'+fp.금+'·수'+fp.수+'</div>'
     +'</div>';
 }
 

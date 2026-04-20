@@ -187,13 +187,13 @@
 
   <!-- DASHA TIMELINE -->
   <div class="section-card" id="card-dasha">
-    <div class="section-label">다샤 타임라인 (Vimshottari) <span style="font-size:9px;opacity:0.6;text-transform:none;font-weight:400;letter-spacing:0">· 어느 행성의 주기를 살고 있는지 보여줍니다</span></div>
+    <div class="section-label">다샤 타임라인 (Vimshottari) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 어느 행성의 주기를 살고 있는지 보여줍니다</span></div>
     <div class="dasha-wrap" id="dasha-wrap"></div>
   </div>
 
   <!-- YOGAS -->
   <div class="section-card" id="card-yoga">
-    <div class="section-label">요가 (Yogas) <span style="font-size:9px;opacity:0.6;text-transform:none;font-weight:400;letter-spacing:0">· 특수 행성 배치가 만들어내는 길흉 패턴</span></div>
+    <div class="section-label">요가 (Yogas) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 특수 행성 배치가 만들어내는 길흉 패턴</span></div>
     <div class="yoga-list" id="yoga-list"></div>
   </div>
 
@@ -524,7 +524,7 @@ function renderDasha(d) {
     mahaDiv.className = 'dasha-row';
     const next = nextDasha(maha.planet);
     mahaDiv.innerHTML =
-      '<div class="dasha-tag">마하다샤 (Mahadasha) <span style="font-size:9px;opacity:0.6;text-transform:none;font-weight:400">· 현재 운세 대주기</span></div>' +
+      '<div class="dasha-tag">마하다샤 (Mahadasha) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400">· 현재 운세 대주기</span></div>' +
       '<div class="dasha-planet">' + maha.planet + ' 다샤</div>' +
       '<div class="dasha-date">~ ' + maha.endDate + ' 종료</div>' +
       '<div class="dasha-remain">' + remainText(maha.endDate) + '</div>' +

@@ -322,7 +322,7 @@
   <!-- 대운 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
     <button onclick="togAcc('acc_luck')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
-      <span><i class="pi pi-wave"></i> 대운 흐름 <span style="font-size:11px;font-weight:400;opacity:0.45">10년 단위 운세 주기</span></span><span class="acc-icon open" id="ico_acc_luck">▾</span>
+      <span><i class="pi pi-wave"></i> 대운 흐름 <span style="font-size:11px;font-weight:400;opacity:0.75">10년 단위 운세 주기</span></span><span class="acc-icon open" id="ico_acc_luck">▾</span>
     </button>
     <div class="acc-body open" id="acc_luck">
       <div style="padding:0 12px 14px">
@@ -734,7 +734,7 @@ function renderPillars(data, pls, dayP) {
       const sip  = sipseong(dayP.si, ji);
       return `<div style="display:flex;flex-direction:column;align-items:center;gap:1px">
         <span style="font-size:11px;color:rgba(74,58,42,0.88)">${name}</span>
-        <span style="font-size:9px;color:rgba(74,58,42,0.6);white-space:nowrap" title="${SIP_DESC[sip]||''}">${sip||'—'}</span>
+        <span style="font-size:10px;color:rgba(74,58,42,0.82);white-space:nowrap" title="${SIP_DESC[sip]||''}">${sip||'—'}</span>
       </div>`;
     }).join('');
 
@@ -881,12 +881,12 @@ function renderGeok(data) {
   document.getElementById('R_geok').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:4px">격국</div>
+        <div style="font-size:11px;color:rgba(74,58,42,0.9);font-weight:600;margin-bottom:4px">격국</div>
         <div style="font-weight:700;color:#8a6a15">${g.geok_kor}</div>
-        <div style="font-size:9px;opacity:0.5;margin-top:3px">사주 구조 유형</div>
+        <div style="font-size:10px;opacity:0.75;margin-top:3px">사주 구조 유형</div>
       </div>
       <div class="glass-sm" style="padding:12px;text-align:center">
-        <div style="font-size:10px;color:rgba(80,55,30,0.55);margin-bottom:4px">신강/신약</div>
+        <div style="font-size:11px;color:rgba(74,58,42,0.9);font-weight:600;margin-bottom:4px">신강/신약</div>
         <div style="font-weight:700;color:#7a2418">${data.summary.strength}</div>
         <div style="font-size:10px;opacity:0.75;margin-top:3px">일간 에너지의 강약</div>
       </div>
@@ -996,7 +996,7 @@ function renderLuckTrend(data, cy) {
       <path d="${linePath}" fill="none" stroke="#7a2418" stroke-width="2" stroke-linejoin="round"/>
       ${dots}${labels}
     </svg>
-    <div style="font-size:9px;color:rgba(74,58,42,0.6);text-align:center;margin-top:2px">용신(${ys.primary_kor||'—'}) · 희신(${ys.secondary_kor||'—'}) 기준 천간+지지 평균</div>
+    <div style="font-size:10px;color:rgba(74,58,42,0.8);text-align:center;margin-top:2px">용신(${ys.primary_kor||'—'}) · 희신(${ys.secondary_kor||'—'}) 기준 천간+지지 평균</div>
   </div>`;
 }
 
@@ -1025,10 +1025,10 @@ function renderLuck(data) {
 
     html+=`
     <div class="luck-card${isNow?' active':''}" onclick="selectDaeun(${idx})">
-      <div style="font-size:9px;color:rgba(74,58,42,0.6);margin-bottom:2px">${lk.age_range}</div>
+      <div style="font-size:10px;color:rgba(74,58,42,0.82);margin-bottom:2px">${lk.age_range}</div>
       <div class="hanja-box ${EL_BG_CSS[lk.element]||''}" style="width:34px;height:34px;font-size:1.1rem;margin:2px auto">${stemH}</div>
       <div class="hanja-box ${EL_BG_CSS[bEl]||''}"       style="width:34px;height:34px;font-size:1.1rem;margin:2px auto">${branH}</div>
-      <div style="font-size:9px;color:rgba(80,55,30,0.45);margin-top:3px">${ys}~</div>
+      <div style="font-size:10px;color:rgba(80,55,30,0.75);margin-top:3px">${ys}~</div>
       ${isNow?'<div style="font-size:9px;color:#7a2418;font-weight:600;margin-top:2px">현재</div>':''}
     </div>`;
   });
@@ -1076,7 +1076,7 @@ function renderSeun(ys, ye) {
   const cy = new Date().getFullYear();
   const byear = parseInt(pBirth.split('-')[0]);
   let html = `<div style="margin-bottom:14px">
-    <div style="font-size:11px;color:rgba(74,58,42,0.6);margin-bottom:8px">세운 (${ys}~${ye}) <span style="font-size:9px;opacity:0.5">1년 단위 흐름</span></div>
+    <div style="font-size:11px;color:rgba(74,58,42,0.88);font-weight:600;margin-bottom:8px">세운 (${ys}~${ye}) <span style="font-size:10px;opacity:0.75;font-weight:400">1년 단위 흐름</span></div>
     <div class="yun-grid">`;
   for (let y=ys; y<=ye; y++) {
     const yp = yearPillar(y);
@@ -1084,10 +1084,10 @@ function renderSeun(ys, ye) {
     const age = y-byear+1;
     const stemH = STEM_H[yp.si], branH = BRANCH_H[yp.bi];
     html+=`<div class="yun-cell${isCur?' now':''}" onclick="selectSeun(${y})">
-      <div style="font-size:9px;color:rgba(80,55,30,0.55)">${y}</div>
+      <div style="font-size:10px;color:rgba(74,58,42,0.85)">${y}</div>
       <div class="hanja-box ${EL_BG_CSS[STEM_EL[yp.si]]||''}" style="width:30px;height:30px;font-size:1rem;margin:2px auto">${stemH}</div>
       <div class="hanja-box ${EL_BG_CSS[BRANCH_EL[yp.bi]]||''}" style="width:30px;height:30px;font-size:1rem;margin:2px auto">${branH}</div>
-      <div style="font-size:9px;color:rgba(80,55,30,0.45)">${age}세</div>
+      <div style="font-size:10px;color:rgba(74,58,42,0.75)">${age}세</div>
     </div>`;
   }
   html += '</div></div>';
