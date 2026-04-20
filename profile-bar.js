@@ -100,9 +100,9 @@
     'white-space:nowrap'
   ].join(';');
 
-  var BTN_ACCENT = BTN_BASE + ';background:#1a120a;color:#fcf7ea;border-color:#1a120a;box-shadow:0 1px 4px rgba(0,0,0,0.18);';
+  var BTN_ACCENT = BTN_BASE + ';background:#fcf7ea;color:#1a120a;border:1.5px solid rgba(26,18,10,0.4);';
   var BTN_GHOST  = BTN_BASE + ';background:#fcf7ea;color:#5a4830;';
-  var BTN_NEW    = BTN_BASE + ';background:rgba(26,18,10,0.06);color:#3a2a10;border:1.5px solid rgba(26,18,10,0.22);';
+  var BTN_NEW    = BTN_BASE + ';background:#fcf7ea;color:#5a4830;border:1px solid rgba(154,138,96,0.35);';
 
   // ── Dropdown ───────────────────────────────────────────
   var DD_STYLE = [
