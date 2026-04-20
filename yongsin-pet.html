@@ -42,8 +42,15 @@ nav {
   display: flex; align-items: center; justify-content: space-between;
 }
 .nav-brand {
-  font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600;
-  letter-spacing: 0.28em; color: var(--gold-deep); text-decoration: none;
+  display: flex; align-items: center; gap: 8px; text-decoration: none;
+}
+.nav-brand img {
+  height: 48px; object-fit: contain;
+  filter: drop-shadow(0 1px 4px rgba(60,30,10,0.32)) contrast(1.15);
+}
+.nav-brand span {
+  font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700;
+  letter-spacing: 0.28em; color: var(--gold-deep);
 }
 .nav-back {
   font-size: 13px; color: var(--muted); text-decoration: none;
@@ -639,7 +646,7 @@ nav {
 <body>
 
 <nav>
-  <a href="/" class="nav-brand">FORTUNA</a>
+  <a href="/" class="nav-brand"><img src="img/goddess.png" alt="FORTUNA"><span>FORTUNA</span></a>
   <button class="nav-back" onclick="history.back()">← 돌아가기</button>
 </nav>
 
