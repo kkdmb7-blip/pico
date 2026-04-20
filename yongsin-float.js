@@ -139,7 +139,7 @@
       'color:#fcf7ea',
       'padding:10px 14px',
       'border-radius:14px',
-      'font-size:12px',
+      'font-size:14px',
       'font-weight:600',
       'white-space:normal',
       'max-width:200px',
