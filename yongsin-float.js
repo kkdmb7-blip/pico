@@ -123,7 +123,7 @@
     wrapper = document.createElement('div');
     wrapper.id = 'yongsin-float-wrapper';
     wrapper.style.cssText = [
-      'position:fixed',
+      'position:absolute',
       'z-index:9999',
       'pointer-events:none',
       'transition:left 1.8s cubic-bezier(0.34,1.2,0.64,1), top 1.8s cubic-bezier(0.34,1.2,0.64,1)',
@@ -232,10 +232,10 @@
   function moveTo(pos) {
     var vw = window.innerWidth;
     var vh = window.innerHeight;
-    var x = Math.round(vw * pos.x / 100);
-    var y = Math.round(vh * pos.y / 100);
-    x = Math.max(-20, Math.min(vw - 30, x));
-    y = Math.max(-20, Math.min(vh - 30, y));
+    var x = Math.round(vw * pos.x / 100) + window.scrollX;
+    var y = Math.round(vh * pos.y / 100) + window.scrollY;
+    x = Math.max(-20, Math.min(vw - 30 + window.scrollX, x));
+    y = Math.max(-20, Math.min(document.body.scrollHeight - 30, y));
     wrapper.style.left = x + 'px';
     wrapper.style.top  = y + 'px';
     isHiding = !!pos.hide;
