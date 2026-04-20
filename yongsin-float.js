@@ -131,12 +131,10 @@
       'left:10px', 'top:20%',
     ].join(';');
 
-    // 말풍선
+    // 말풍선 (fixed로 뷰포트 기준 배치 → 가로 스크롤 없음)
     bubble = document.createElement('div');
     bubble.style.cssText = [
-      'position:absolute',
-      'bottom:62px', 'left:50%',
-      'transform:translateX(-50%)',
+      'position:fixed',
       'background:rgba(26,18,10,0.92)',
       'color:#fcf7ea',
       'padding:10px 14px',
@@ -144,16 +142,18 @@
       'font-size:12px',
       'font-weight:600',
       'white-space:normal',
-      'width:180px',
+      'max-width:200px',
+      'width:max-content',
       'text-align:center',
       'line-height:1.55',
       'opacity:0',
       'transition:opacity 0.3s',
       'pointer-events:none',
+      'z-index:10000',
       'font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif',
       'box-shadow:0 4px 16px rgba(0,0,0,0.3)',
     ].join(';');
-    wrapper.appendChild(bubble);
+    document.body.appendChild(bubble);
 
     // 펫 버튼
     pet = document.createElement('button');
@@ -228,8 +228,21 @@
     document.body.appendChild(wrapper);
   }
 
+  function positionBubble() {
+    var rect = pet.getBoundingClientRect();
+    var bw = bubble.offsetWidth || 200;
+    var left = rect.left + rect.width / 2 - bw / 2;
+    // 뷰포트 안에 클램프
+    left = Math.max(8, Math.min(window.innerWidth - bw - 8, left));
+    var top = rect.top - bubble.offsetHeight - 10;
+    if (top < 8) top = rect.bottom + 10; // 위에 공간 없으면 아래로
+    bubble.style.left = left + 'px';
+    bubble.style.top  = top + 'px';
+  }
+
   function showBubble(text, duration) {
     bubble.textContent = text;
+    positionBubble();
     bubble.style.opacity = '1';
     clearTimeout(bubbleTimer);
     if (duration > 0) {
