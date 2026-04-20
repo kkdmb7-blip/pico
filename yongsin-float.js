@@ -16,7 +16,7 @@
 
   function getElement() {
     var s = getPetState();
-    return s.element || 'water'; // 기본값 수(水)
+    return s.element || null;
   }
 
   var ELEM_STYLE = {
@@ -392,6 +392,8 @@
 
   // 현재 페이지가 yongsin-pet.html이면 띄우지 않음
   if (window.location.pathname.indexOf('yongsin-pet') !== -1) return;
+  // 펫 원소 미설정이면 띄우지 않음
+  if (!getElement()) return;
   // 오늘 숨겼으면 모든 페이지에서 띄우지 않음 (하루 지나면 다시 등장)
   try { if (localStorage.getItem(HIDE_KEY) === getTodayStr()) return; } catch(e) {}
 
