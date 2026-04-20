@@ -5928,8 +5928,8 @@ function updateMypageTab() {
           '<div style="margin-top:3px;font-size:9px;color:var(--muted);letter-spacing:0.08em;">'+doorNameMap[item.door]+'門</div>';
         card.onclick=(function(it,cardEl){return function(){
           // 선택 스타일: 모든 카드 초기화 후 현재만 활성화
-          Array.from(grid.children).forEach(function(c){c.style.borderColor='var(--border)';c.style.boxShadow='';});
-          cardEl.style.borderColor='var(--accent)';cardEl.style.boxShadow='0 0 12px rgba(123,94,167,0.3)';
+          Array.from(grid.children).forEach(function(c){c.style.borderColor='var(--border)';c.style.boxShadow='';c.style.background='var(--surface)';});
+          cardEl.style.borderColor='var(--accent)';cardEl.style.boxShadow='0 0 14px rgba(123,94,167,0.35)';cardEl.style.background='rgba(123,94,167,0.12)';
           detail.style.display='block';
           detail.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
             '<div><div style="font-size:10px;color:#5a4a7a;letter-spacing:0.12em;font-weight:600;margin-bottom:3px;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
