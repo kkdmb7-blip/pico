@@ -76,11 +76,11 @@
   var BAR_STYLE = [
     'background:rgba(249,241,222,0.97)',
     'border-bottom:1px solid rgba(154,138,96,0.25)',
-    'padding:10px 20px',
+    'padding:8px 16px',
     'display:flex',
     'align-items:center',
-    'gap:8px',
-    'flex-wrap:wrap',
+    'gap:6px',
+    'flex-wrap:nowrap',
     'position:sticky',
     'top:64px',
     'z-index:99',
@@ -91,8 +91,8 @@
   var BTN_BASE = [
     'border:1px solid rgba(154,138,96,0.35)',
     'border-radius:10px',
-    'padding:7px 14px',
-    'font-size:12.5px',
+    'padding:6px 11px',
+    'font-size:12px',
     'font-weight:700',
     'cursor:pointer',
     'font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif',
@@ -162,7 +162,7 @@
 
     // ── "내 정보" button
     var meBtn = document.createElement('button');
-    meBtn.style.cssText = hasMe ? BTN_ACCENT : BTN_GHOST;
+    meBtn.style.cssText = (hasMe ? BTN_ACCENT : BTN_GHOST) + ';max-width:120px;overflow:hidden;text-overflow:ellipsis;';
     meBtn.textContent = hasMe ? ('👤 ' + (me.name || '내 정보')) : '👤 내 정보 (미설정)';
     meBtn.title = hasMe ? displayName(me) : '로그인 후 프로필 설정 필요';
     meBtn.addEventListener('click', function () {
