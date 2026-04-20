@@ -137,7 +137,7 @@
       'position:fixed',
       'background:rgba(26,18,10,0.92)',
       'color:#fcf7ea',
-      'padding:10px 14px',
+      'padding:10px 30px 10px 14px',
       'border-radius:14px',
       'font-size:13px',
       'font-weight:500',
@@ -149,15 +149,25 @@
       'opacity:0',
       'transition:opacity 0.3s',
       'pointer-events:auto',
-      'cursor:pointer',
       'z-index:10000',
       'font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif',
       'box-shadow:0 4px 16px rgba(0,0,0,0.3)',
     ].join(';');
-    bubble.addEventListener('click', function() {
+
+    // 텍스트 영역 (innerHTML 갱신 대상)
+    var bubbleText = document.createElement('div');
+    bubble.appendChild(bubbleText);
+
+    // X 닫기 버튼 (bubble에 고정, innerHTML에 영향 없음)
+    var bubbleClose = document.createElement('button');
+    bubbleClose.textContent = '✕';
+    bubbleClose.style.cssText = 'position:absolute;top:5px;right:7px;background:none;border:none;color:rgba(252,247,234,0.7);font-size:14px;cursor:pointer;padding:4px;line-height:1;min-width:22px;min-height:22px;';
+    bubbleClose.addEventListener('pointerdown', function(e) {
+      e.stopPropagation();
       clearTimeout(bubbleTimer);
       bubble.style.opacity = '0';
     });
+    bubble.appendChild(bubbleClose);
     document.body.appendChild(bubble);
 
     // 펫 버튼
@@ -246,12 +256,13 @@
   }
 
   function showBubble(html, duration) {
-    // 첫 줄 볼드 처리
     var lines = html.split('\n');
-    bubble.innerHTML = lines.map(function(l, i) {
+    var boldColors = { wood:'#7dff8a', fire:'#ffaa44', earth:'#ffd700', metal:'#c8e6ff', water:'#66d4ff' };
+    var bc = boldColors[getElement()] || '#ffd700';
+    // 첫 번째 자식(텍스트 div)에만 innerHTML 갱신
+    var textDiv = bubble.firstChild;
+    textDiv.innerHTML = lines.map(function(l, i) {
       var esc = l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      var boldColors = { wood:'#7dff8a', fire:'#ffaa44', earth:'#ffd700', metal:'#c8e6ff', water:'#66d4ff' };
-      var bc = boldColors[getElement()] || '#ffd700';
       return i === 0 ? '<b style="color:' + bc + '">' + esc + '</b>' : esc;
     }).join('<br>');
     positionBubble();
