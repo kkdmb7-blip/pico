@@ -781,7 +781,7 @@ nav {
     </button>
     <button class="action-btn btn-play"  onclick="doAction('play')">
       <span class="btn-icon">⚡</span>운세 보기
-      <span class="btn-desc">행복↑ EXP+8</span>
+      <span class="btn-desc" id="playBtnDesc">하루 1회 · AI 맞춤조언</span>
     </button>
     <button class="action-btn btn-sleep" onclick="doAction('sleep')">
       <span class="btn-icon">🌙</span>재우기
@@ -826,6 +826,20 @@ nav {
     <div class="info-row"><span>단계</span><span class="info-val" id="infoStage">—</span></div>
     <div class="info-row"><span>총 먹이 횟수</span><span class="info-val" id="infoFeedCount">0회</span></div>
     <div class="info-row"><span>탄생일</span><span class="info-val" id="infoBirth">—</span></div>
+  </div>
+</div>
+
+<!-- 운세 조언 팝업 -->
+<div id="adviceModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#f9f1de;border-radius:20px;padding:24px 20px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="font-size:11px;letter-spacing:0.15em;color:var(--muted);text-align:center;margin-bottom:4px;" id="adviceDate"></div>
+    <div style="font-size:16px;font-weight:700;text-align:center;color:var(--gold);margin-bottom:16px;" id="advicePillar">오늘의 일진</div>
+    <div id="adviceKeywordWrap" style="text-align:center;margin-bottom:14px;">
+      <span id="adviceKeyword" style="display:inline-block;background:rgba(138,106,21,0.12);border:1px solid rgba(138,106,21,0.3);border-radius:20px;padding:4px 14px;font-size:13px;font-weight:700;color:#8a6a15;"></span>
+    </div>
+    <div id="adviceText" style="font-size:14px;line-height:1.8;color:#3a2a1a;margin-bottom:14px;text-align:center;min-height:60px;"></div>
+    <div id="adviceLucky" style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:18px;"></div>
+    <button onclick="document.getElementById('adviceModal').style.display='none'" style="width:100%;padding:12px;background:linear-gradient(135deg,#8a6a15,#6a4f0c);color:#fcf7ea;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">확인</button>
   </div>
 </div>
 
@@ -1127,13 +1141,19 @@ function doAction(type) {
       showToast('냠냠! 맛있어요 🍚');
     bounce('pet-' + state.element);
   } else if (type === 'play') {
+    // 하루 1회 제한
+    var today = todayStr();
+    if ((state.dailyMission || {}).playDate === today) {
+      showToast('오늘 운세는 이미 확인했어요 ✨');
+      return;
+    }
     state.happy  = Math.min(100, state.happy  + 20);
     state.energy = Math.max(0,   state.energy - 10);
     m.playCount++;
+    m.playDate = today;
     gainExp(8);
-    if (!document.querySelector('#toast').textContent.includes('크리티컬'))
-      showToast('운세를 확인했어요! ⚡');
     bounce('pet-' + state.element);
+    fetchAdvice();
   } else if (type === 'sleep') {
     state.sleeping = !state.sleeping;
     if (state.sleeping) {
@@ -1161,6 +1181,56 @@ function doAction(type) {
   renderMission();
 }
 
+async function fetchAdvice() {
+  var modal = document.getElementById('adviceModal');
+  var textEl = document.getElementById('adviceText');
+  var keyEl  = document.getElementById('adviceKeyword');
+  var luckyEl = document.getElementById('adviceLucky');
+  var pillarEl = document.getElementById('advicePillar');
+  var dateEl  = document.getElementById('adviceDate');
+
+  textEl.textContent = '용신의 기운을 읽는 중...';
+  keyEl.textContent = '';
+  luckyEl.textContent = '';
+  modal.style.display = 'flex';
+
+  try {
+    var profile = {};
+    try { profile = JSON.parse(localStorage.getItem('pico_profile') || '{}'); } catch(e) {}
+    var yongsin = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached') || '';
+
+    // 오늘 일진 조회
+    var today = new Date();
+    var birth = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0') + ' 12:00';
+    var sajuRes = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ birth: birth, gender: 'M', calendar: 'solar' })
+    });
+    var sajuData = await sajuRes.json();
+    var dayPillar = (sajuData.summary && sajuData.summary.pillars && sajuData.summary.pillars.day)
+      ? sajuData.summary.pillars.day.stem + sajuData.summary.pillars.day.branch
+      : '';
+
+    dateEl.textContent = today.toLocaleDateString('ko-KR', {month:'long', day:'numeric', weekday:'short'});
+    pillarEl.textContent = dayPillar ? '일진 ' + dayPillar + '일' : '오늘의 운세';
+
+    // AI 조언
+    var aiRes = await fetch('https://fortuna-silk.vercel.app/api/pet-advice', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ yongsin: yongsin, element: state.element, day_pillar: dayPillar, profile: profile })
+    });
+    var advice = await aiRes.json();
+
+    textEl.textContent = advice.advice || '오늘도 용신 기운을 잘 활용해보세요!';
+    keyEl.textContent  = advice.keyword ? '✦ ' + advice.keyword : '';
+    luckyEl.textContent = advice.lucky ? '🍀 ' + advice.lucky : '';
+  } catch(e) {
+    textEl.textContent = '오늘 용신 기운을 충전했어요. 긍정적인 하루 보내세요! 🌟';
+  }
+}
+
 function renderMission() {
   var m = getMission();
   var fEl = document.getElementById('mFeed');
@@ -1169,6 +1239,14 @@ function renderMission() {
   if (fEl) fEl.textContent = Math.min(m.feedCount, 3) + '/3';
   if (pEl) pEl.textContent = Math.min(m.playCount, 2) + '/2';
   if (bEl) bEl.textContent = m.bonusDone ? '✅ 완료!' : '';
+  // 운세보기 오늘 사용 여부
+  var playBtn = document.querySelector('.btn-play');
+  var playDesc = document.getElementById('playBtnDesc');
+  if (playBtn && playDesc) {
+    var usedToday = (getMission().playDate === todayStr());
+    playBtn.style.opacity = usedToday ? '0.55' : '';
+    playDesc.textContent = usedToday ? '오늘 완료 ✓' : '하루 1회 · AI 맞춤조언';
+  }
   // 쿨타임 버튼 비활성화 표시
   ['feed','orb'].forEach(function(type) {
     var btn = document.querySelector('.btn-' + (type === 'feed' ? 'feed' : 'orb'));
