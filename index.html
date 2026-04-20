@@ -3746,7 +3746,7 @@ async function openHistoryModal() {
   // reports 테이블 조회
   try {
     var sb = getSb();
-    var rptRes = await sb.from('reports').select('id,report_type,content,created_at').eq('user_id', user.id).order('created_at', { ascending: false });
+    var rptRes = await sb.from('reports').select('id,report_type,content,created_at').eq('user_id', user.id).neq('report_type', 'pet_state').order('created_at', { ascending: false });
     if (rptRes.data) {
       rptRes.data.forEach(function(r) {
         allItems.push({
@@ -5986,7 +5986,7 @@ function _urlBase64ToUint8Array(b64) {
 }
 
 // SW 등록 (페이지 로드 시)
-var APP_VERSION = '1.0.0';
+var APP_VERSION = '1.0.1';
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js?v=' + APP_VERSION, { scope: '/' }).catch(function(e) {
     console.warn('[pico sw]', e);
