@@ -329,6 +329,73 @@
     }).catch(function() { cb(null); });
   }
 
+  var TAP_MODES = ['fortune', 'pet_status', 'yongsin_tip', 'lucky_draw'];
+  var tapModeIdx = 0;
+
+  var ELEM_TIPS = {
+    wood:  ['초록색 옷이 오늘 행운을 불러요 🌿', '동쪽 방향이 유리해요 🧭', '나무 소재 물건이 좋아요 🪵', '채소 먹으면 기운 올라요 🥗', '오전에 중요한 일 처리해요 ☀️'],
+    fire:  ['빨간색 아이템 챙겨봐요 🔴', '남쪽이 오늘의 방향이에요 🌞', '따뜻한 음료가 좋아요 ☕', '밝은 조명 아래서 일해요 💡', '오후 2~4시가 집중력 피크예요 ⚡'],
+    earth: ['노란색이 오늘 행운색이에요 🟡', '실내·중앙이 안정적이에요 🏠', '뿌리채소가 좋아요 🥕', '묵직한 가방이 행운이에요 👜', '규칙적인 식사가 중요해요 🍱'],
+    metal: ['흰색 또는 금색이 좋아요 ⚪', '서쪽 방향을 주목하세요 🧭', '견과류가 에너지를 줘요 🥜', '금속 소품이 행운이에요 💍', '오전 일정이 잘 풀려요 📋'],
+    water: ['검정·파란색이 행운이에요 💙', '북쪽이 유리한 방향이에요 🧭', '물을 많이 마셔요 💧', '해산물이 기운을 북돋아요 🐟', '밤 시간 집중력이 올라요 🌙'],
+  };
+
+  var LUCK_TABLE = [
+    { label: '대길 🎉', msg: '오늘은 뭘 해도 잘 풀려요!', w: 8 },
+    { label: '길 ✨', msg: '순조로운 하루가 될 거예요', w: 22 },
+    { label: '소길 🌟', msg: '작은 행운들이 찾아올 거예요', w: 30 },
+    { label: '평 😌', msg: '무난하게 흘러가는 하루예요', w: 22 },
+    { label: '소흉 😅', msg: '서두르지 말고 신중하게 가요', w: 12 },
+    { label: '흉 😬', msg: '오늘은 조용히 내실을 다져요', w: 6 },
+  ];
+
+  function weightedRandom(table) {
+    var total = table.reduce(function(s, t) { return s + t.w; }, 0);
+    var r = Math.random() * total;
+    for (var i = 0; i < table.length; i++) {
+      r -= table[i].w;
+      if (r <= 0) return table[i];
+    }
+    return table[0];
+  }
+
+  function showPetStatus() {
+    var state = getPetState();
+    var lv = state.level || 1;
+    var hunger = state.hunger || 0;
+    var happy = state.happy || 0;
+    var energy = state.energy || 0;
+
+    var lines = ['Lv.' + lv + ' 상태 보고 📊'];
+    lines.push('🍖 ' + (hunger < 30 ? '배고파요 😢' : hunger > 75 ? '배불러요 😊' : '보통이에요') );
+    lines.push('😊 ' + (happy < 30 ? '심심해요 🥺' : happy > 75 ? '너무 행복해요 🥰' : '괜찮아요') );
+    lines.push('⚡ ' + (energy < 30 ? '피곤해요 😴' : energy > 75 ? '에너지 넘쳐요 💪' : '적당해요') );
+    showBubble(lines.join('\n'), 0);
+  }
+
+  function showYongsinTip() {
+    var elem = getElement() || 'water';
+    var tips = ELEM_TIPS[elem] || ELEM_TIPS.water;
+    var tip = tips[Math.floor(Math.random() * tips.length)];
+    showBubble('오늘의 용신 팁 💫\n' + tip, 0);
+  }
+
+  function showLuckyDraw() {
+    var frames = ['🎲 뽑는 중...', '🎰 두근두근...', '✨ 거의 다 됐어요...'];
+    var fi = 0;
+    showBubble(frames[fi], 0);
+    var interval = setInterval(function() {
+      fi++;
+      if (fi < frames.length) {
+        showBubble(frames[fi], 0);
+      } else {
+        clearInterval(interval);
+        var result = weightedRandom(LUCK_TABLE);
+        showBubble('오늘의 운 뽑기!\n' + result.label + '\n' + result.msg, 0);
+      }
+    }, 600);
+  }
+
   function onPetClick() {
     var today = getTodayStr();
     var found = localStorage.getItem(FOUND_KEY);
@@ -350,16 +417,27 @@
       try { localStorage.setItem(PET_KEY, JSON.stringify(state)); } catch(e) {}
     }
 
-    // 오늘의 운세 말풍선
-    showBubble('운세 읽는 중... ✨', 0);
-    fetchTodayAdvice(function(data) {
-      if (!data || !data.advice) {
-        showBubble('오늘도 용신 기운을 잘 활용해요! 🌟', 4000);
-        return;
-      }
-      var text = (data.keyword ? '✦ ' + data.keyword + '\n' : '') + data.advice + (data.lucky ? '\n🍀 ' + data.lucky : '');
-      showBubble(text, 0);
-    });
+    // 탭할 때마다 다른 콘텐츠 순환
+    var mode = TAP_MODES[tapModeIdx % TAP_MODES.length];
+    tapModeIdx++;
+
+    if (mode === 'fortune') {
+      showBubble('운세 읽는 중... ✨', 0);
+      fetchTodayAdvice(function(data) {
+        if (!data || !data.advice) {
+          showBubble('오늘도 용신 기운을 잘 활용해요! 🌟', 0);
+          return;
+        }
+        var text = (data.keyword ? '✦ ' + data.keyword + '\n' : '') + data.advice + (data.lucky ? '\n🍀 ' + data.lucky : '');
+        showBubble(text, 0);
+      });
+    } else if (mode === 'pet_status') {
+      showPetStatus();
+    } else if (mode === 'yongsin_tip') {
+      showYongsinTip();
+    } else if (mode === 'lucky_draw') {
+      showLuckyDraw();
+    }
   }
 
   // 더블클릭 → 펫 페이지
