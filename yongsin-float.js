@@ -47,6 +47,7 @@
   var currentPos = 0;
   var moveTimer, hideTimer, bubbleTimer;
   var isHiding = false;
+  var MOVE_TRANSITION = 'left 1.8s cubic-bezier(0.34,1.2,0.64,1), top 1.8s cubic-bezier(0.34,1.2,0.64,1)';
 
   // ── 캐릭터 SVG (원소별 미니 버전) ──
   function buildPetSVG(elem) {
@@ -321,6 +322,70 @@
     });
   }
 
+  // 길게 누르면 드래그
+  function setupDrag() {
+    var longPressTimer = null;
+    var dragging = false;
+    var dragOffX = 0, dragOffY = 0;
+    var didDrag = false;
+    var startX = 0, startY = 0;
+
+    pet.addEventListener('pointerdown', function(e) {
+      if (e.button && e.button !== 0) return;
+      startX = e.clientX; startY = e.clientY;
+      didDrag = false;
+      longPressTimer = setTimeout(function() {
+        longPressTimer = null;
+        dragging = true;
+        clearTimeout(moveTimer);
+        wrapper.style.transition = 'none';
+        var sg = ELEM_STYLE[getElement()] || ELEM_STYLE.water;
+        pet.style.transform = 'scale(1.25)';
+        pet.style.boxShadow = '0 0 28px ' + sg.glow + ', 0 8px 24px rgba(0,0,0,0.3)';
+        var rect = wrapper.getBoundingClientRect();
+        dragOffX = e.clientX - rect.left;
+        dragOffY = e.clientY - rect.top;
+        showBubble('잡았다! 🫴', 1200);
+        try { navigator.vibrate && navigator.vibrate(50); } catch(ev) {}
+      }, 500);
+    });
+
+    document.addEventListener('pointermove', function(e) {
+      if (longPressTimer) {
+        if (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8) {
+          clearTimeout(longPressTimer); longPressTimer = null;
+        }
+      }
+      if (!dragging) return;
+      e.preventDefault();
+      didDrag = true;
+      var x = e.clientX + window.scrollX - dragOffX;
+      var y = e.clientY + window.scrollY - dragOffY;
+      x = Math.max(0, Math.min(document.documentElement.scrollWidth - 60, x));
+      y = Math.max(0, Math.min(document.body.scrollHeight - 60, y));
+      wrapper.style.left = x + 'px';
+      wrapper.style.top  = y + 'px';
+    }, { passive: false });
+
+    function endDrag() {
+      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+      if (!dragging) return;
+      dragging = false;
+      wrapper.style.transition = MOVE_TRANSITION;
+      var sg = ELEM_STYLE[getElement()] || ELEM_STYLE.water;
+      pet.style.transform = '';
+      pet.style.boxShadow = '0 0 12px ' + sg.glow + ', 0 3px 10px rgba(0,0,0,0.15)';
+      showBubble('여기 놔둘게요 😊', 1500);
+      scheduleMove();
+      if (didDrag) {
+        var stopClick = function(ev) { ev.stopImmediatePropagation(); pet.removeEventListener('click', stopClick, true); };
+        pet.addEventListener('click', stopClick, true);
+      }
+    }
+    document.addEventListener('pointerup', endDrag);
+    document.addEventListener('pointercancel', endDrag);
+  }
+
   // 닫기 (오른쪽 클릭)
   function setupContextMenu() {
     pet.addEventListener('contextmenu', function(e) {
@@ -341,6 +406,7 @@
   function init() {
     buildPet();
     setupDoubleClick();
+    setupDrag();
     setupContextMenu();
 
     // 첫 등장: 랜덤 위치
