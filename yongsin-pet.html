@@ -1318,16 +1318,15 @@ loadState();
 render();
 renderMission();
 
-// 서버에서 더 최신 데이터 로드
+// 서버에서 더 최신 데이터 로드 (레벨 높은 쪽 우선)
 loadFromServer(function(serverData) {
   if (!serverData || !serverData.state) return;
   var srv = serverData.state;
-  // 서버 데이터가 더 최신이거나 로컬에 데이터 없으면 적용
-  var localTs = state.lastVisit || 0;
-  var serverTs = srv.lastVisit || 0;
-  if (serverTs > localTs) {
+  var localLv = state.level || 1;
+  var srvLv   = srv.level  || 1;
+  // 서버 레벨이 같거나 높으면 서버 데이터 사용
+  if (srvLv >= localLv) {
     Object.assign(state, srv);
-    // decay 재계산
     if (srv.lastVisit) {
       var hours = (Date.now() - srv.lastVisit) / 3600000;
       state.hunger = Math.max(0, state.hunger - hours * 5);
@@ -1337,6 +1336,9 @@ loadFromServer(function(serverData) {
     try { localStorage.setItem('yongsin_pet', JSON.stringify(state)); } catch(e) {}
     render();
     renderMission();
+  } else {
+    // 로컬 레벨이 더 높으면 서버에 즉시 업로드
+    syncToServer();
   }
 });
 
