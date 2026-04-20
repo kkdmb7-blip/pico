@@ -381,18 +381,21 @@
       </a>
     </div>
 
-    <div id="ziweiShareBtnWrap" style="display:none;padding:0 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
-      <button id="ziweiKakaoBtn" onclick="shareZiweiKakao()" style="display:block;width:100%;padding:16px 20px;background:#fee500;border:1px solid #e8d44d;border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 14px rgba(254,229,0,0.35)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
-        <div style="font-size:15px;font-weight:700;color:#3c1e1e;margin-bottom:4px;"><i class="pi pi-ziwei"></i> 카카오톡으로 공유하기 →</div>
-        <div style="font-size:11px;color:#6a3e1e;opacity:0.8;">내 자미두수 결과를 친구에게 보내보세요</div>
+    <div id="ziweiShareBtnWrap" style="display:none;padding:0 20px 36px;flex-direction:column;gap:10px;max-width:440px;margin:0 auto;">
+      <button id="ziweiKakaoBtn" onclick="shareZiweiKakao()" style="display:flex;align-items:center;gap:14px;width:100%;padding:15px 18px;background:#fff;border:1.5px solid rgba(80,55,30,0.15);border-radius:16px;text-align:left;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.07);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;transition:all 0.2s;box-sizing:border-box;">
+        <div style="width:38px;height:38px;border-radius:10px;background:#fee500;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">💬</div>
+        <div><div style="font-size:14px;font-weight:700;color:#1a120a;margin-bottom:2px;">카카오톡 공유</div><div style="font-size:11px;color:rgba(26,18,10,0.5);">내 자미두수 결과를 친구에게 보내기</div></div>
+        <div style="margin-left:auto;font-size:16px;color:rgba(26,18,10,0.25);">›</div>
       </button>
-      <a id="consultBtn" href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:block;width:100%;padding:16px 20px;background:rgba(212,175,90,0.14);border:1px solid rgba(154,122,38,0.28);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='#6a4f0c';this.style.background='rgba(212,175,90,0.22)'" onmouseout="this.style.borderColor='rgba(154,122,38,0.28)';this.style.background='rgba(212,175,90,0.14)'">
-        <div style="font-size:15px;font-weight:700;color:#8a6b20;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담하기 →</div>
-        <div style="font-size:11px;color:#5a4830;opacity:0.85;">대화로 풀어보는 나만의 명반 이야기</div>
+      <a id="consultBtn" href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:flex;align-items:center;gap:14px;width:100%;padding:15px 18px;background:#fff;border:1.5px solid rgba(80,55,30,0.15);border-radius:16px;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,0.07);box-sizing:border-box;transition:all 0.2s;">
+        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">🔮</div>
+        <div><div style="font-size:14px;font-weight:700;color:#1a120a;margin-bottom:2px;">AI 운세 상담</div><div style="font-size:11px;color:rgba(26,18,10,0.5);">대화로 풀어보는 나만의 명반 이야기</div></div>
+        <div style="margin-left:auto;font-size:16px;color:rgba(26,18,10,0.25);">›</div>
       </a>
-      <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,#7a2418,#5a1810);border:1px solid #5a1810;border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(122,36,24,0.25)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
-        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.82);">자미두수 전문가와 1:1 깊은 상담</div>
+      <a href="counselor.html" style="display:flex;align-items:center;gap:14px;width:100%;padding:15px 18px;background:#fff;border:1.5px solid rgba(80,55,30,0.15);border-radius:16px;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,0.07);box-sizing:border-box;transition:all 0.2s;">
+        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">👤</div>
+        <div><div style="font-size:14px;font-weight:700;color:#1a120a;margin-bottom:2px;">전문 상담사 연결</div><div style="font-size:11px;color:rgba(26,18,10,0.5);">자미두수 전문가와 1:1 깊은 상담</div></div>
+        <div style="margin-left:auto;font-size:16px;color:rgba(26,18,10,0.25);">›</div>
       </a>
     </div>
 

@@ -100,9 +100,9 @@
     'white-space:nowrap'
   ].join(';');
 
-  var BTN_ACCENT = BTN_BASE + ';background:linear-gradient(135deg,#8a6a15,#6a4f0c);color:#fcf7ea;border-color:#5a4008;box-shadow:0 1px 3px rgba(138,106,21,0.28);';
+  var BTN_ACCENT = BTN_BASE + ';background:#1a120a;color:#fcf7ea;border-color:#1a120a;box-shadow:0 1px 4px rgba(0,0,0,0.18);';
   var BTN_GHOST  = BTN_BASE + ';background:#fcf7ea;color:#5a4830;';
-  var BTN_NEW    = BTN_BASE + ';background:linear-gradient(135deg,#7a2418,#5a1810);color:#fcf7ea;border-color:#5a1810;box-shadow:0 1px 3px rgba(122,36,24,0.25);';
+  var BTN_NEW    = BTN_BASE + ';background:rgba(26,18,10,0.06);color:#3a2a10;border:1.5px solid rgba(26,18,10,0.22);';
 
   // ── Dropdown ───────────────────────────────────────────
   var DD_STYLE = [
@@ -296,14 +296,14 @@
       '<div style="margin-bottom:20px;">',
         '<label style="font-size:12px;color:#5a4830;display:block;margin-bottom:6px;font-weight:600;">성별</label>',
         '<div style="display:flex;gap:8px;">',
-          '<button id="pb-gM" onclick="window._pbSelectGender(\'male\')" style="flex:1;padding:10px;border-radius:8px;border:1px solid #5a4008;background:linear-gradient(135deg,#8a6a15,#6a4f0c);color:#fcf7ea;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;">남성 ♂</button>',
-          '<button id="pb-gF" onclick="window._pbSelectGender(\'female\')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(154,138,96,0.35);background:#fcf7ea;color:#7a6850;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;">여성 ♀</button>',
+          '<button id="pb-gM" onclick="window._pbSelectGender(\'male\')" style="flex:1;padding:10px;border-radius:8px;border:1.5px solid #1a120a;background:#1a120a;color:#fcf7ea;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;">남성 ♂</button>',
+          '<button id="pb-gF" onclick="window._pbSelectGender(\'female\')" style="flex:1;padding:10px;border-radius:8px;border:1.5px solid rgba(26,18,10,0.2);background:#fcf7ea;color:#7a6850;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;">여성 ♀</button>',
         '</div>',
       '</div>',
 
       '<div style="display:flex;gap:8px;">',
-        '<button onclick="window._pbSubmitNew()" style="flex:1;padding:13px;border-radius:10px;background:linear-gradient(135deg,#7a2418,#5a1810);color:#fcf7ea;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;box-shadow:0 2px 8px rgba(122,36,24,0.22);">조회하기</button>',
-        '<button onclick="window._pbCloseNew()" style="flex:0.5;padding:13px;border-radius:10px;background:#fcf7ea;border:1px solid rgba(154,138,96,0.35);color:#7a6850;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;">취소</button>',
+        '<button onclick="window._pbSubmitNew()" style="flex:1;padding:13px;border-radius:10px;background:#1a120a;color:#fcf7ea;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;box-shadow:0 2px 10px rgba(0,0,0,0.18);">조회하기</button>',
+        '<button onclick="window._pbCloseNew()" style="flex:0.5;padding:13px;border-radius:10px;background:#fcf7ea;border:1.5px solid rgba(26,18,10,0.15);color:#7a6850;font-size:13px;font-weight:700;cursor:pointer;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;">취소</button>',
       '</div>'
     ].join('');
 
@@ -352,13 +352,13 @@
     var mBtn = document.getElementById('pb-gM');
     var fBtn = document.getElementById('pb-gF');
     if (!mBtn || !fBtn) return;
-    var activeBase = 'flex:1;padding:10px;border-radius:8px;border:1px solid #5a4008;background:linear-gradient(135deg,#8a6a15,#6a4f0c);color:#fcf7ea;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;';
-    var ghostBase  = 'flex:1;padding:10px;border-radius:8px;border:1px solid rgba(154,138,96,0.35);background:#fcf7ea;color:#7a6850;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;';
+    var activeBase = 'flex:1;padding:10px;border-radius:8px;border:1.5px solid #1a120a;background:#1a120a;color:#fcf7ea;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;';
+    var ghostBase  = 'flex:1;padding:10px;border-radius:8px;border:1.5px solid rgba(26,18,10,0.2);background:#fcf7ea;color:#7a6850;font-size:13px;cursor:pointer;font-weight:700;font-family:\'Pretendard Variable\',Pretendard,\'Noto Sans KR\',sans-serif;';
     if (_niGender === 'male') {
       mBtn.style.cssText = activeBase;
       fBtn.style.cssText = ghostBase;
     } else {
-      fBtn.style.cssText = activeBase.replace('#8a6a15,#6a4f0c', '#7a2418,#5a1810').replace('#5a4008', '#5a1810');
+      fBtn.style.cssText = activeBase;
       mBtn.style.cssText = ghostBase;
     }
   }

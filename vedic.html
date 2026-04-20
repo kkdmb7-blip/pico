@@ -218,18 +218,21 @@
     </a>
   </div>
 
-  <div id="vedicShareBtnWrap" style="display:none;padding:0 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
-    <button id="vedicKakaoBtn" onclick="shareVedicKakao()" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06));border:1px solid rgba(254,229,0,0.35);border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;" onmouseover="this.style.borderColor='rgba(254,229,0,0.7)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.22),rgba(254,229,0,0.12))'" onmouseout="this.style.borderColor='rgba(254,229,0,0.35)';this.style.background='linear-gradient(135deg,rgba(254,229,0,0.12),rgba(254,229,0,0.06))'">
-      <div style="font-size:15px;font-weight:700;color:#7a5e1c;margin-bottom:4px;"><i class="pi pi-lotus"></i> 카카오톡으로 공유하기 →</div>
-      <div style="font-size:11px;color:var(--muted);opacity:0.8;">내 베딕 결과를 친구에게 보내보세요</div>
+  <div id="vedicShareBtnWrap" style="display:none;padding:0 20px 36px;flex-direction:column;gap:10px;max-width:440px;margin:0 auto;">
+    <button id="vedicKakaoBtn" onclick="shareVedicKakao()" style="display:flex;align-items:center;gap:14px;width:100%;padding:15px 18px;background:#fff;border:1.5px solid rgba(80,55,30,0.15);border-radius:16px;text-align:left;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.07);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;transition:all 0.2s;box-sizing:border-box;">
+      <div style="width:38px;height:38px;border-radius:10px;background:#fee500;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">💬</div>
+      <div><div style="font-size:14px;font-weight:700;color:#1a120a;margin-bottom:2px;">카카오톡 공유</div><div style="font-size:11px;color:rgba(26,18,10,0.5);">내 베딕 결과를 친구에게 보내기</div></div>
+      <div style="margin-left:auto;font-size:16px;color:rgba(26,18,10,0.25);">›</div>
     </button>
-    <a href="https://kkdmb7-blip.github.io/memox/?mode=vedic" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06));border:1px solid rgba(232,184,109,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,184,109,0.7)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.22),rgba(201,168,76,0.12))'" onmouseout="this.style.borderColor='rgba(232,184,109,0.35)';this.style.background='linear-gradient(135deg,rgba(232,184,109,0.12),rgba(201,168,76,0.06))'">
-      <div style="font-size:15px;font-weight:700;color:#8a6b20;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 베딕 상담하기 →</div>
-      <div style="font-size:11px;color:var(--muted);opacity:0.8;">대화로 풀어보는 나만의 카르마 이야기</div>
+    <a href="https://kkdmb7-blip.github.io/memox/?mode=vedic" target="_blank" style="display:flex;align-items:center;gap:14px;width:100%;padding:15px 18px;background:#fff;border:1.5px solid rgba(80,55,30,0.15);border-radius:16px;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,0.07);box-sizing:border-box;transition:all 0.2s;">
+      <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">🔮</div>
+      <div><div style="font-size:14px;font-weight:700;color:#1a120a;margin-bottom:2px;">AI 베딕 상담</div><div style="font-size:11px;color:rgba(26,18,10,0.5);">대화로 풀어보는 나만의 카르마 이야기</div></div>
+      <div style="margin-left:auto;font-size:16px;color:rgba(26,18,10,0.25);">›</div>
     </a>
-    <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10));border:1px solid rgba(232,168,124,0.35);border-radius:14px;text-decoration:none;text-align:center;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(232,168,124,0.7)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.18))'" onmouseout="this.style.borderColor='rgba(232,168,124,0.35)';this.style.background='linear-gradient(135deg,rgba(194,120,78,0.15),rgba(232,168,124,0.10))'">
-      <div style="font-size:15px;font-weight:700;color:#a85a2e;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
-      <div style="font-size:11px;color:var(--muted);opacity:0.8;">베딕 전문가와 1:1 깊은 상담</div>
+    <a href="counselor.html" style="display:flex;align-items:center;gap:14px;width:100%;padding:15px 18px;background:#fff;border:1.5px solid rgba(80,55,30,0.15);border-radius:16px;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,0.07);box-sizing:border-box;transition:all 0.2s;">
+      <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">👤</div>
+      <div><div style="font-size:14px;font-weight:700;color:#1a120a;margin-bottom:2px;">전문 상담사 연결</div><div style="font-size:11px;color:rgba(26,18,10,0.5);">베딕 전문가와 1:1 깊은 상담</div></div>
+      <div style="margin-left:auto;font-size:16px;color:rgba(26,18,10,0.25);">›</div>
     </a>
   </div>
   <div class="action-row" id="action-row"></div>

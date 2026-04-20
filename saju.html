@@ -155,9 +155,9 @@
     .g-btn.on { background: rgba(122,36,24,0.10); border-color: #7a2418; color: #7a2418; font-weight:700; }
     .main-btn {
       width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700;
-      background: linear-gradient(135deg, #7a2418, #5a1810);
+      background: #1a120a;
       color: #fcf7ea; border: none; cursor: pointer; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;
-      box-shadow: var(--shadow-soft);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
     }
     .main-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
@@ -387,25 +387,41 @@
 
 <!-- 리포트 훅 -->
 <div id="sajuReportHook" style="display:none;padding:0 20px 10px;max-width:440px;margin:0 auto;">
-  <a href="report.html?type=character" style="display:block;padding:16px 20px;background:linear-gradient(135deg,#7a2418,#5a1810);border:1px solid #5a1810;border-radius:14px;text-decoration:none;text-align:center;box-shadow:0 2px 8px rgba(122,36,24,0.25);transition:all 0.2s;">
-    <div style="font-size:15px;font-weight:700;color:#fcf7ea;margin-bottom:4px;"><i class="pi pi-crystal"></i> 내 사주에 숨겨진 이야기 →</div>
-    <div style="font-size:11px;color:rgba(252,247,234,0.82);">AI가 풀어내는 나만의 사주 심층 리포트</div>
+  <a href="report.html?type=character" style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:linear-gradient(135deg,rgba(26,18,10,0.88),rgba(50,30,10,0.92));border:1px solid rgba(212,175,55,0.3);border-radius:16px;text-decoration:none;box-shadow:0 4px 20px rgba(0,0,0,0.18);transition:all 0.2s;backdrop-filter:blur(4px);">
+    <div style="font-size:26px;flex-shrink:0;">✨</div>
+    <div style="text-align:left;">
+      <div style="font-size:15px;font-weight:700;color:#fcf7ea;margin-bottom:3px;">내 사주 심층 리포트</div>
+      <div style="font-size:11px;color:rgba(212,175,55,0.85);">AI가 분석하는 나만의 기질·운세 이야기</div>
+    </div>
+    <div style="margin-left:auto;font-size:16px;color:rgba(212,175,55,0.7);">›</div>
   </a>
 </div>
 
 <!-- 사주 공유 버튼 -->
-<div id="sajuShareBtnWrap" style="display:none;padding:0 20px 32px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
-  <button id="sajuShareBtn" onclick="shareSajuKakao()" style="display:block;width:100%;padding:16px 20px;background:#fee500;border:1px solid #e4ce00;border-radius:14px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(254,229,0,0.25);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;transition:all 0.2s;">
-    <div style="font-size:15px;font-weight:700;color:#3c1e1e;margin-bottom:4px;"><i class="pi pi-crystal"></i> 카카오톡으로 공유하기 →</div>
-    <div style="font-size:11px;color:#5a3030;">내 사주 결과를 친구에게 보내보세요</div>
+<div id="sajuShareBtnWrap" style="display:none;padding:0 20px 36px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
+  <button id="sajuShareBtn" onclick="shareSajuKakao()" style="display:flex;align-items:center;gap:14px;width:100%;padding:15px 18px;background:#fff;border:1.5px solid rgba(80,55,30,0.15);border-radius:16px;text-align:left;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.07);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;transition:all 0.2s;box-sizing:border-box;">
+    <div style="width:38px;height:38px;border-radius:10px;background:#fee500;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">💬</div>
+    <div>
+      <div style="font-size:14px;font-weight:700;color:#1a120a;margin-bottom:2px;">카카오톡 공유</div>
+      <div style="font-size:11px;color:rgba(26,18,10,0.5);">친구에게 내 사주 결과 보내기</div>
+    </div>
+    <div style="margin-left:auto;font-size:16px;color:rgba(26,18,10,0.25);">›</div>
   </button>
-  <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,#8a6a15,#6a4f0c);border:1px solid #5a4008;border-radius:14px;text-decoration:none;text-align:center;box-shadow:0 2px 8px rgba(138,106,21,0.25);box-sizing:border-box;transition:all 0.2s;">
-    <div style="font-size:15px;font-weight:700;color:#fcf7ea;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담하기 →</div>
-    <div style="font-size:11px;color:rgba(252,247,234,0.82);">대화로 풀어보는 나만의 운세 이야기</div>
+  <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:flex;align-items:center;gap:14px;width:100%;padding:15px 18px;background:#fff;border:1.5px solid rgba(80,55,30,0.15);border-radius:16px;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,0.07);box-sizing:border-box;transition:all 0.2s;">
+    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">🔮</div>
+    <div>
+      <div style="font-size:14px;font-weight:700;color:#1a120a;margin-bottom:2px;">AI 운세 상담</div>
+      <div style="font-size:11px;color:rgba(26,18,10,0.5);">대화로 풀어보는 나만의 운세</div>
+    </div>
+    <div style="margin-left:auto;font-size:16px;color:rgba(26,18,10,0.25);">›</div>
   </a>
-  <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,#a85a2e,#8a3d20);border:1px solid #6a2d18;border-radius:14px;text-decoration:none;text-align:center;box-shadow:0 2px 8px rgba(168,90,46,0.25);box-sizing:border-box;transition:all 0.2s;">
-    <div style="font-size:15px;font-weight:700;color:#fcf7ea;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
-    <div style="font-size:11px;color:rgba(252,247,234,0.82);">사주 전문가와 1:1 깊은 상담</div>
+  <a href="counselor.html" style="display:flex;align-items:center;gap:14px;width:100%;padding:15px 18px;background:#fff;border:1.5px solid rgba(80,55,30,0.15);border-radius:16px;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,0.07);box-sizing:border-box;transition:all 0.2s;">
+    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">👤</div>
+    <div>
+      <div style="font-size:14px;font-weight:700;color:#1a120a;margin-bottom:2px;">전문 상담사 연결</div>
+      <div style="font-size:11px;color:rgba(26,18,10,0.5);">사주 전문가와 1:1 깊은 상담</div>
+    </div>
+    <div style="margin-left:auto;font-size:16px;color:rgba(26,18,10,0.25);">›</div>
   </a>
 </div>
 
