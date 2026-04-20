@@ -162,8 +162,8 @@
 
     // ── "내 정보" button
     var meBtn = document.createElement('button');
-    meBtn.style.cssText = (hasMe ? BTN_ACCENT : BTN_GHOST) + ';max-width:120px;overflow:hidden;text-overflow:ellipsis;';
-    meBtn.textContent = hasMe ? ('👤 ' + (me.name || '내 정보')) : '👤 내 정보 (미설정)';
+    meBtn.style.cssText = (hasMe ? BTN_ACCENT : BTN_GHOST) + ';max-width:130px;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;';
+    meBtn.textContent = hasMe ? (me.name || '내 정보') : '내 정보 (미설정)';
     meBtn.title = hasMe ? displayName(me) : '로그인 후 프로필 설정 필요';
     meBtn.addEventListener('click', function () {
       if (!hasMe) { alert('index.html에서 프로필을 먼저 설정해주세요.'); return; }
@@ -177,7 +177,7 @@
 
     var othersBtn = document.createElement('button');
     othersBtn.style.cssText = profiles.length > 0 ? BTN_GHOST : BTN_GHOST + ';opacity:0.5;';
-    othersBtn.textContent = '👥 저장된 프로필 ' + (profiles.length > 0 ? '▾' : '(없음)');
+    othersBtn.textContent = '저장된 프로필 ' + (profiles.length > 0 ? '▾' : '(없음)');
 
     var dd = document.createElement('div');
     dd.style.cssText = DD_STYLE;
