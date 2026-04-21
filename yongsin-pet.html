@@ -1269,11 +1269,11 @@ function fmtCooldown(ms) {
 
 // ── 일일 미션 ──
 var DAILY_MISSIONS = [
-  { id: 'feed',   icon: '🍚', label: '밥 3번 주기',    sub: '배고픔 회복',      action: 'scroll:btn-feed' },
-  { id: 'orb',    icon: '✦',  label: '특훈하기',        sub: 'EXP +15',          action: 'scroll:btn-orb' },
-  { id: 'saju',   icon: '🔮', label: '사주 분석하기',   sub: '오행 에너지 확인', action: '/saju.html' },
-  { id: 'report', icon: '📊', label: '리포트 보기',     sub: 'AI 운세 리포트',   action: '/report.html' },
-  { id: 'share',  icon: '📤', label: '공유하기',        sub: '친구에게 알리기',  action: 'share' },
+  { id: 'feed',   icon: '🍚', label: '밥 3번 주기',    sub: '1회·2회·3회 채워주기', action: 'scroll:btn-feed' },
+  { id: 'orb',    icon: '✦',  label: '특훈하기',        sub: '용신 기운 집중 수련',  action: 'scroll:btn-orb' },
+  { id: 'saju',   icon: '🔮', label: '사주 확인하기',   sub: '오늘 오행 에너지 보기', action: '/saju.html' },
+  { id: 'diary',  icon: '📔', label: '일기 쓰기',       sub: '하루 기록 + EXP +20',  action: '/diary.html' },
+  { id: 'share',  icon: '📤', label: '공유하기',        sub: '친구에게 알리기',       action: 'share' },
 ];
 
 function getMission() {
@@ -1292,7 +1292,7 @@ function isMissionDone(id) {
   if (id === 'feed')   return m.feedCount >= 3;
   if (id === 'orb')    return m.orbCount >= 1;
   if (id === 'saju')   return m.sajuDone === today;
-  if (id === 'report') return m.reportDone === today;
+  if (id === 'diary')  return m.diaryDone === today;
   if (id === 'share')  return m.shareDone === today;
   return false;
 }
@@ -1312,7 +1312,7 @@ function completeMissionNav(id) {
   var m = getMission();
   var today = todayStr();
   if (id === 'saju')   m.sajuDone   = today;
-  if (id === 'report') m.reportDone = today;
+  if (id === 'diary')  m.diaryDone  = today;
   if (id === 'share')  m.shareDone  = today;
   checkMission();
   saveState();
@@ -1418,8 +1418,15 @@ function doAction(type) {
     if (!state.dailyMission) state.dailyMission = {};
     state.dailyMission.orbCount = (state.dailyMission.orbCount || 0) + 1;
     gainExp(15);
+    var orbMsgs = {
+      wood: '🌿 초목의 기운을 흡수했어요! 성장 에너지 충전 완료!',
+      fire: '🔥 화염 기운이 타올랐어요! 열정 에너지 충전 완료!',
+      earth: '🪨 대지의 기운을 받았어요! 안정 에너지 충전 완료!',
+      metal: '💎 금기(金氣)를 정련했어요! 집중 에너지 충전 완료!',
+      water: '💧 수기(水氣)를 담았어요! 지혜 에너지 충전 완료!',
+    };
     if (!document.querySelector('#toast').textContent.includes('크리티컬'))
-      showToast('✦ 특훈 완료! 용신 기운이 올랐어요!');
+      showToast('✦ ' + (orbMsgs[state.element] || '특훈 완료! 용신 기운이 올랐어요!'));
     specialTrainEffect('pet-' + state.element);
   }
 
@@ -1490,14 +1497,24 @@ function renderMission() {
 
   list.innerHTML = DAILY_MISSIONS.map(function(ms) {
     var done = isMissionDone(ms.id);
-    var progress = '';
-    if (ms.id === 'feed' && !done) progress = Math.min(m.feedCount, 3) + '/3';
 
-    var rightHtml = done
-      ? '<span style="font-size:12px;color:#2a8a40;font-weight:700;">✅ 완료</span>'
-      : (ms.action
-          ? '<span style="font-size:11px;color:var(--gold);font-weight:600;">이동 →</span>'
-          : (progress ? '<span style="font-size:11px;color:var(--muted);">' + progress + '</span>' : ''));
+    // 밥주기: 점 3개로 진행 표시
+    var rightHtml;
+    if (ms.id === 'feed') {
+      if (done) {
+        rightHtml = '<span style="font-size:12px;color:#2a8a40;font-weight:700;">✅ 완료</span>';
+      } else {
+        var fc = Math.min(m.feedCount || 0, 3);
+        var dots = [0,1,2].map(function(i) {
+          return '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 2px;background:' + (i < fc ? '#c8a830' : 'rgba(200,168,48,0.2)') + ';border:1.5px solid rgba(200,168,48,0.5);"></span>';
+        }).join('');
+        rightHtml = '<span style="font-size:11px;color:var(--muted);">' + dots + '</span>';
+      }
+    } else {
+      rightHtml = done
+        ? '<span style="font-size:12px;color:#2a8a40;font-weight:700;">✅ 완료</span>'
+        : '<span style="font-size:11px;color:var(--gold);font-weight:600;">이동 →</span>';
+    }
 
     var clickable = !done && ms.action;
     var style = [
