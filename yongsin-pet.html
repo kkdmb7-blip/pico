@@ -803,8 +803,9 @@ nav {
   <div class="info-card" id="missionCard">
     <div class="info-title">📋 오늘의 미션 <span id="missionBonus" style="color:#c8a830;font-size:11px;"></span></div>
     <div class="info-row"><span>🍚 밥 3번 주기</span><span class="info-val" id="mFeed">0/3</span></div>
-    <div class="info-row"><span>⚡ 운세 2번 보기</span><span class="info-val" id="mPlay">0/2</span></div>
-    <div style="font-size:10px;color:var(--muted);margin-top:6px;">완료 시 EXP +80 보너스</div>
+    <div class="info-row"><span>⚡ 운세 보기</span><span class="info-val" id="mPlay">0/1</span></div>
+    <div class="info-row"><span>✦ 특훈하기</span><span class="info-val" id="mOrb">0/1</span></div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px;">완료 시 EXP +100 보너스</div>
   </div>
 
   <!-- 정보 카드 -->
@@ -1211,16 +1212,18 @@ function fmtCooldown(ms) {
 function getMission() {
   var today = todayStr();
   if (!state.dailyMission || state.dailyMission.date !== today) {
-    state.dailyMission = { date: today, feedCount: 0, playCount: 0, bonusDone: false };
+    state.dailyMission = { date: today, feedCount: 0, playCount: 0, orbCount: 0, bonusDone: false };
   }
+  if (state.dailyMission.orbCount === undefined) state.dailyMission.orbCount = 0;
   return state.dailyMission;
 }
 function checkMission() {
   var m = getMission();
-  if (!m.bonusDone && m.feedCount >= 3 && m.playCount >= 2) {
+  var playDone = (m.playDate === todayStr()) || m.playCount >= 1;
+  if (!m.bonusDone && m.feedCount >= 3 && playDone && m.orbCount >= 1) {
     m.bonusDone = true;
-    state.exp += 80;
-    showToast('🏆 일일 미션 완료! EXP +80');
+    gainExp(100);
+    showToast('🏆 일일 미션 완료! EXP +100');
   }
 }
 
@@ -1321,10 +1324,12 @@ function doAction(type) {
     state.energy = Math.min(100, state.energy + 20);
     if (!state.cooldowns) state.cooldowns = {};
     state.cooldowns.orb = Date.now();
+    if (!state.dailyMission) state.dailyMission = {};
+    state.dailyMission.orbCount = (state.dailyMission.orbCount || 0) + 1;
     gainExp(15);
     if (!document.querySelector('#toast').textContent.includes('크리티컬'))
       showToast('✦ 특훈 완료! 용신 기운이 올랐어요!');
-    bounce('pet-' + state.element);
+    specialTrainEffect('pet-' + state.element);
   }
 
   checkMission();
@@ -1387,9 +1392,12 @@ function renderMission() {
   var m = getMission();
   var fEl = document.getElementById('mFeed');
   var pEl = document.getElementById('mPlay');
+  var oEl = document.getElementById('mOrb');
   var bEl = document.getElementById('missionBonus');
-  if (fEl) fEl.textContent = Math.min(m.feedCount, 3) + '/3';
-  if (pEl) pEl.textContent = Math.min(m.playCount, 2) + '/2';
+  var playDone = (m.playDate === todayStr()) || m.playCount >= 1;
+  if (fEl) { fEl.textContent = (m.feedCount >= 3 ? '✅' : Math.min(m.feedCount, 3) + '/3'); }
+  if (pEl) { pEl.textContent = playDone ? '✅' : '0/1'; }
+  if (oEl) { oEl.textContent = (m.orbCount >= 1 ? '✅' : '0/1'); }
   if (bEl) bEl.textContent = m.bonusDone ? '✅ 완료!' : '';
   // 운세보기 오늘 사용 여부
   var playBtn = document.querySelector('.btn-play');
@@ -1422,6 +1430,54 @@ function bounce(id) {
   el.style.transition = 'transform 0.15s';
   el.style.transform = 'scale(1.18)';
   setTimeout(function() { el.style.transform = ''; }, 150);
+}
+
+function specialTrainEffect(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+
+  // 번쩍 오버레이
+  var flash = document.createElement('div');
+  flash.style.cssText = 'position:absolute;inset:0;background:rgba(255,220,80,0.7);border-radius:inherit;pointer-events:none;z-index:10;transition:opacity 0.4s;';
+  el.style.position = 'relative';
+  el.appendChild(flash);
+  setTimeout(function() { flash.style.opacity = '0'; }, 80);
+  setTimeout(function() { if (flash.parentNode) flash.parentNode.removeChild(flash); }, 500);
+
+  // 강한 스케일 애니메이션
+  el.style.transition = 'transform 0.12s';
+  el.style.transform = 'scale(1.35)';
+  setTimeout(function() { el.style.transform = 'scale(0.92)'; el.style.transition = 'transform 0.1s'; }, 120);
+  setTimeout(function() { el.style.transform = 'scale(1.12)'; el.style.transition = 'transform 0.1s'; }, 220);
+  setTimeout(function() { el.style.transform = ''; el.style.transition = ''; }, 340);
+
+  // 파티클
+  var ELEM_PARTICLES = { wood:'🌿', fire:'✨', earth:'⭐', metal:'💫', water:'💧' };
+  var emoji = ELEM_PARTICLES[state.element] || '✨';
+  var rect = el.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2;
+  var cy = rect.top + rect.height / 2;
+  for (var i = 0; i < 10; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var p = document.createElement('div');
+        p.textContent = idx % 3 === 0 ? '✦' : emoji;
+        var angle = (Math.random() * 360) * Math.PI / 180;
+        var dist = 50 + Math.random() * 70;
+        var tx = Math.cos(angle) * dist;
+        var ty = Math.sin(angle) * dist - 30;
+        var size = 13 + Math.random() * 10;
+        var dur = (0.7 + Math.random() * 0.4).toFixed(2);
+        p.style.cssText = 'position:fixed;left:' + cx + 'px;top:' + cy + 'px;font-size:' + size + 'px;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform ' + dur + 's cubic-bezier(0.2,0.8,0.4,1),opacity ' + dur + 's ease-out;opacity:1;';
+        document.body.appendChild(p);
+        requestAnimationFrame(function() { requestAnimationFrame(function() {
+          p.style.transform = 'translate(calc(-50% + ' + tx + 'px),calc(-50% + ' + ty + 'px)) scale(0.5)';
+          p.style.opacity = '0';
+        }); });
+        setTimeout(function() { if (p.parentNode) p.parentNode.removeChild(p); }, 1200);
+      }, idx * 40);
+    })(i);
+  }
 }
 
 var _toastTimer;
