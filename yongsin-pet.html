@@ -802,10 +802,11 @@ nav {
   <!-- 일일 미션 카드 -->
   <div class="info-card" id="missionCard">
     <div class="info-title">📋 오늘의 미션 <span id="missionBonus" style="color:#c8a830;font-size:11px;"></span></div>
-    <div class="info-row"><span>🍚 밥 3번 주기</span><span class="info-val" id="mFeed">0/3</span></div>
-    <div class="info-row"><span>⚡ 운세 보기</span><span class="info-val" id="mPlay">0/1</span></div>
-    <div class="info-row"><span>✦ 특훈하기</span><span class="info-val" id="mOrb">0/1</span></div>
-    <div style="font-size:10px;color:var(--muted);margin-top:6px;">완료 시 EXP +100 보너스</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+      <span id="missionSummary" style="font-size:11px;color:var(--muted);">0 / 5 완료</span>
+      <span style="font-size:10px;color:var(--gold);">완료 시 EXP +150</span>
+    </div>
+    <div id="missionList" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;"></div>
   </div>
 
   <!-- 정보 카드 -->
@@ -1209,22 +1210,54 @@ function fmtCooldown(ms) {
 }
 
 // ── 일일 미션 ──
+var DAILY_MISSIONS = [
+  { id: 'feed',   icon: '🍚', label: '밥 3번 주기',    sub: '배고픔 회복',      action: null },
+  { id: 'orb',    icon: '✦',  label: '특훈하기',        sub: 'EXP +15',          action: null },
+  { id: 'saju',   icon: '🔮', label: '사주 분석하기',   sub: '오행 에너지 확인', action: '/saju.html' },
+  { id: 'report', icon: '📊', label: '리포트 보기',     sub: 'AI 운세 리포트',   action: '/report.html' },
+  { id: 'share',  icon: '📤', label: '공유하기',        sub: '친구에게 알리기',  action: 'share' },
+];
+
 function getMission() {
   var today = todayStr();
   if (!state.dailyMission || state.dailyMission.date !== today) {
-    state.dailyMission = { date: today, feedCount: 0, playCount: 0, orbCount: 0, bonusDone: false };
+    state.dailyMission = { date: today, feedCount: 0, orbCount: 0, bonusDone: false };
   }
-  if (state.dailyMission.orbCount === undefined) state.dailyMission.orbCount = 0;
-  return state.dailyMission;
+  var m = state.dailyMission;
+  if (m.orbCount === undefined) m.orbCount = 0;
+  return m;
 }
+
+function isMissionDone(id) {
+  var m = getMission();
+  var today = todayStr();
+  if (id === 'feed')   return m.feedCount >= 3;
+  if (id === 'orb')    return m.orbCount >= 1;
+  if (id === 'saju')   return m.sajuDone === today;
+  if (id === 'report') return m.reportDone === today;
+  if (id === 'share')  return m.shareDone === today;
+  return false;
+}
+
 function checkMission() {
   var m = getMission();
-  var playDone = (m.playDate === todayStr()) || m.playCount >= 1;
-  if (!m.bonusDone && m.feedCount >= 3 && playDone && m.orbCount >= 1) {
+  if (m.bonusDone) return;
+  var allDone = DAILY_MISSIONS.every(function(ms) { return isMissionDone(ms.id); });
+  if (allDone) {
     m.bonusDone = true;
-    gainExp(100);
-    showToast('🏆 일일 미션 완료! EXP +100');
+    gainExp(150);
+    showToast('🏆 오늘 미션 전부 완료! EXP +150');
   }
+}
+
+function completeMissionNav(id) {
+  var m = getMission();
+  var today = todayStr();
+  if (id === 'saju')   m.sajuDone   = today;
+  if (id === 'report') m.reportDone = today;
+  if (id === 'share')  m.shareDone  = today;
+  checkMission();
+  saveState();
 }
 
 // ── 길일 보너스 (오늘 운세 점수 연동) ──
@@ -1390,23 +1423,54 @@ async function fetchAdvice() {
 
 function renderMission() {
   var m = getMission();
-  var fEl = document.getElementById('mFeed');
-  var pEl = document.getElementById('mPlay');
-  var oEl = document.getElementById('mOrb');
+  var list = document.getElementById('missionList');
   var bEl = document.getElementById('missionBonus');
-  var playDone = (m.playDate === todayStr()) || m.playCount >= 1;
-  if (fEl) { fEl.textContent = (m.feedCount >= 3 ? '✅' : Math.min(m.feedCount, 3) + '/3'); }
-  if (pEl) { pEl.textContent = playDone ? '✅' : '0/1'; }
-  if (oEl) { oEl.textContent = (m.orbCount >= 1 ? '✅' : '0/1'); }
   if (bEl) bEl.textContent = m.bonusDone ? '✅ 완료!' : '';
-  // 운세보기 오늘 사용 여부
-  var playBtn = document.querySelector('.btn-play');
-  var playDesc = document.getElementById('playBtnDesc');
-  if (playBtn && playDesc) {
-    var usedToday = (getMission().playDate === todayStr());
-    playBtn.style.opacity = usedToday ? '0.55' : '';
-    playDesc.textContent = usedToday ? '오늘 완료 ✓' : '하루 1회 · AI 맞춤조언';
-  }
+  if (!list) return;
+
+  var doneCount = DAILY_MISSIONS.filter(function(ms) { return isMissionDone(ms.id); }).length;
+
+  list.innerHTML = DAILY_MISSIONS.map(function(ms) {
+    var done = isMissionDone(ms.id);
+    var progress = '';
+    if (ms.id === 'feed' && !done) progress = Math.min(m.feedCount, 3) + '/3';
+
+    var rightHtml = done
+      ? '<span style="font-size:12px;color:#2a8a40;font-weight:700;">✅ 완료</span>'
+      : (ms.action
+          ? '<span style="font-size:11px;color:var(--gold);font-weight:600;">이동 →</span>'
+          : (progress ? '<span style="font-size:11px;color:var(--muted);">' + progress + '</span>' : ''));
+
+    var clickable = !done && ms.action;
+    var style = [
+      'display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;',
+      done ? 'background:rgba(42,138,64,0.08);border:1px solid rgba(42,138,64,0.2);' : 'background:var(--surface);border:1px solid var(--border);',
+      clickable ? 'cursor:pointer;' : '',
+    ].join('');
+
+    var onclick = '';
+    if (clickable) {
+      if (ms.action === 'share') {
+        onclick = ' onclick="doMissionShare()"';
+      } else {
+        onclick = ' onclick="doMissionNav(\'' + ms.id + '\',\'' + ms.action + '\')"';
+      }
+    }
+
+    return '<div style="' + style + '"' + onclick + '>'
+      + '<span style="font-size:20px;width:26px;text-align:center;flex-shrink:0;">' + ms.icon + '</span>'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="font-size:13px;font-weight:600;color:' + (done ? 'var(--muted)' : 'var(--text)') + ';' + (done ? 'text-decoration:line-through;' : '') + '">' + ms.label + '</div>'
+      + '<div style="font-size:11px;color:var(--muted);">' + ms.sub + '</div>'
+      + '</div>'
+      + '<div style="flex-shrink:0;">' + rightHtml + '</div>'
+      + '</div>';
+  }).join('');
+
+  // 진행 요약
+  var summaryEl = document.getElementById('missionSummary');
+  if (summaryEl) summaryEl.textContent = doneCount + ' / ' + DAILY_MISSIONS.length + ' 완료';
+
   // 쿨타임 버튼 비활성화 표시
   ['feed','orb'].forEach(function(type) {
     var btn = document.querySelector('.btn-' + (type === 'feed' ? 'feed' : 'orb'));
@@ -1422,6 +1486,29 @@ function renderMission() {
       btn.style.opacity = '';
     }
   });
+}
+
+function doMissionNav(id, url) {
+  completeMissionNav(id);
+  renderMission();
+  setTimeout(function() { window.location.href = url; }, 300);
+}
+
+function doMissionShare() {
+  var url = 'https://picolab.kr';
+  var text = '🔮 피코랩에서 용신 다마고치 키우고 있어요!\n내 용신 오행을 캐릭터로 키워보세요 👇\n' + url;
+  if (navigator.share) {
+    navigator.share({ title: '피코랩 용신 다마고치', text: text, url: url }).then(function() {
+      completeMissionNav('share');
+      renderMission();
+    }).catch(function(){});
+  } else {
+    navigator.clipboard && navigator.clipboard.writeText(text).then(function() {
+      showToast('📋 링크가 복사됐어요!');
+      completeMissionNav('share');
+      renderMission();
+    });
+  }
 }
 
 function bounce(id) {
