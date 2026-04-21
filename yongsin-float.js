@@ -50,21 +50,23 @@
   var MOVE_TRANSITION = 'left 1.8s cubic-bezier(0.34,1.2,0.64,1), top 1.8s cubic-bezier(0.34,1.2,0.64,1)';
 
   // ── 캐릭터 SVG (원소별 미니 버전) ──
+  function getWoodStageIdx() {
+    try {
+      var s = JSON.parse(localStorage.getItem(PET_KEY) || '{}');
+      var lv = s.level || 1;
+      return Math.min(Math.floor(lv / 3), 4);
+    } catch(e) { return 0; }
+  }
+
   function buildPetSVG(elem) {
     var s = ELEM_STYLE[elem] || ELEM_STYLE.water;
-    if (elem === 'wood') return `
-      <svg width="44" height="50" viewBox="0 0 44 50" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="22" cy="32" rx="16" ry="14" fill="#1a8a40"/>
-        <ellipse cx="22" cy="26" rx="11" ry="10" fill="#2aaa50"/>
-        <ellipse cx="14" cy="20" rx="8" ry="6" fill="#3aba60" transform="rotate(-20,14,20)"/>
-        <ellipse cx="30" cy="21" rx="7" ry="5" fill="#3aba60" transform="rotate(20,30,21)"/>
-        <rect x="19" y="42" width="6" height="8" rx="2" fill="#6a3a10"/>
-        <circle cx="17" cy="30" r="3" fill="white"/>
-        <circle cx="27" cy="30" r="3" fill="white"/>
-        <circle cx="18" cy="31" r="1.8" fill="#1a3a10"/>
-        <circle cx="28" cy="31" r="1.8" fill="#1a3a10"/>
-        <path d="M18 36 Q22 39 26 36" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      </svg>`;
+    if (elem === 'wood') {
+      var stageIdx = getWoodStageIdx();
+      var n = stageIdx + 1;
+      var hasRb = (n === 1 || n === 5);
+      var src = hasRb ? '/img/pet_wood_' + n + '_rb.png' : '/img/pet_wood_' + n + '.png';
+      return '<img src="' + src + '" alt="목 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
+    }
     if (elem === 'fire') return `
       <svg width="40" height="52" viewBox="0 0 40 52" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="20" cy="38" rx="14" ry="12" fill="#e53935"/>
