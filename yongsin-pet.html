@@ -653,7 +653,13 @@ nav {
 <div class="wrap">
   <div class="page-header">
     <div class="page-title">용신 키우기</div>
-    <div class="page-sub">내 사주의 용신을 키워 행운을 불러오세요</div>
+    <div class="page-sub">내 사주의 용신·희신을 키워 행운을 불러오세요</div>
+  </div>
+
+  <!-- 슬롯 탭 (용신 / 희신) -->
+  <div style="display:flex;gap:0;margin-bottom:14px;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--surface);">
+    <button id="slotBtn1" onclick="switchSlot('slot1')" style="flex:1;padding:11px 0;background:var(--gold);color:#1a1200;font-weight:700;border:none;cursor:pointer;font-size:13px;transition:background 0.2s,color 0.2s;">🔮 용신</button>
+    <button id="slotBtn2" onclick="switchSlot('slot2')" style="flex:1;padding:11px 0;background:transparent;color:var(--muted);font-weight:600;border:none;cursor:pointer;font-size:13px;transition:background 0.2s,color 0.2s;">✨ 희신</button>
   </div>
 
   <!-- 원소 선택 탭 -->
@@ -940,6 +946,8 @@ var SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 
 // 오행별 독립 상태 저장소
 var allStates = {};
+var slotElements = { slot1: null, slot2: null }; // 용신/희신 슬롯
+var activeSlot = 'slot1';
 
 function getDefaultState() {
   return { hunger: 20, happy: 20, energy: 30, exp: 0, level: 1, feedCount: 0,
@@ -956,7 +964,7 @@ function getCurrentUserId() {
 function syncToServer() {
   var uid = getCurrentUserId();
   if (!uid) return;
-  var body = JSON.stringify({ all: allStates, element: state.element, updated_at: new Date().toISOString() });
+  var body = JSON.stringify({ all: allStates, element: slotElements.slot1, element2: slotElements.slot2, updated_at: new Date().toISOString() });
   fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state', {
     method: 'DELETE',
     headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
@@ -998,15 +1006,20 @@ function loadState() {
     var saved = JSON.parse(localStorage.getItem('yongsin_pet'));
     if (saved) {
       if (saved.all) {
-        // 신형 포맷: 오행별 독립 상태
         allStates = saved.all || {};
-        state.element = saved.element || null;
-        if (state.element && allStates[state.element]) {
-          Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[state.element])));
+        slotElements.slot1 = saved.element  || null;
+        slotElements.slot2 = saved.element2 || null;
+        // activeSlot 기준 원소 로드
+        var el = slotElements[activeSlot] || slotElements.slot1;
+        state.element = el;
+        if (el && allStates[el]) {
+          Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[el])));
+          state.element = el;
         }
       } else if (saved.element) {
         // 구형 포맷 → 마이그레이션
         var elState = Object.assign({}, saved);
+        slotElements.slot1 = saved.element;
         state.element = saved.element;
         delete elState.element;
         allStates[state.element] = elState;
@@ -1017,9 +1030,9 @@ function loadState() {
 
   try {
     var ys = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached');
-    if (!state.element && ys) {
+    if (!slotElements.slot1 && ys) {
       var map = { '목': 'wood', '화': 'fire', '토': 'earth', '금': 'metal', '수': 'water' };
-      for (var k in map) if (ys.includes(k)) { state.element = map[k]; break; }
+      for (var k in map) if (ys.includes(k)) { slotElements.slot1 = map[k]; state.element = map[k]; break; }
     }
   } catch(e) {}
 }
@@ -1027,18 +1040,23 @@ function loadState() {
 var _syncTimer;
 function saveState() {
   state.lastVisit = Date.now();
-  // 현재 오행 상태를 allStates에 저장
   if (state.element) {
     var elState = Object.assign({}, state);
     delete elState.element;
     allStates[state.element] = elState;
   }
-  try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: state.element })); } catch(e) {}
+  try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: slotElements.slot1, element2: slotElements.slot2 })); } catch(e) {}
   clearTimeout(_syncTimer);
   _syncTimer = setTimeout(syncToServer, 3000);
 }
 
 function selectElement(el) {
+  // 다른 슬롯에서 이미 사용 중인 원소 방지
+  var otherSlot = activeSlot === 'slot1' ? 'slot2' : 'slot1';
+  if (slotElements[otherSlot] === el) {
+    showToast('이미 다른 슬롯에서 키우고 있어요!');
+    return;
+  }
   // 현재 오행 상태 저장
   if (state.element) {
     state.lastVisit = Date.now();
@@ -1046,6 +1064,7 @@ function selectElement(el) {
     delete curState.element;
     allStates[state.element] = curState;
   }
+  slotElements[activeSlot] = el;
   // 새 오행 상태 로드 (없으면 새로 시작)
   var fresh = getDefaultState();
   fresh.birthDate = new Date().toLocaleDateString('ko-KR');
@@ -1053,11 +1072,53 @@ function selectElement(el) {
   Object.assign(state, getDefaultState(), newElState, { element: el });
   saveState();
   render();
+  renderSlotTabs();
+}
+
+function switchSlot(slot) {
+  if (slot === activeSlot) return;
+  // 현재 슬롯 상태 저장
+  if (state.element) {
+    var curState = Object.assign({}, state);
+    delete curState.element;
+    allStates[state.element] = curState;
+  }
+  activeSlot = slot;
+  var el = slotElements[slot];
+  state.element = el || null;
+  if (el && allStates[el]) {
+    Object.assign(state, getDefaultState(), _applyOfflineTime(Object.assign({}, allStates[el])), { element: el });
+  } else if (!el) {
+    Object.assign(state, getDefaultState(), { element: null });
+  }
+  saveState();
+  render();
+  renderMission();
+  renderSlotTabs();
+}
+
+function renderSlotTabs() {
+  var ELEM_SHORT = { wood:'목(木)', fire:'화(火)', earth:'토(土)', metal:'금(金)', water:'수(水)' };
+  var btn1 = document.getElementById('slotBtn1');
+  var btn2 = document.getElementById('slotBtn2');
+  if (!btn1 || !btn2) return;
+  var lbl1 = '🔮 용신' + (slotElements.slot1 ? ' · ' + ELEM_SHORT[slotElements.slot1] : '');
+  var lbl2 = '✨ 희신' + (slotElements.slot2 ? ' · ' + ELEM_SHORT[slotElements.slot2] : '');
+  btn1.textContent = lbl1;
+  btn2.textContent = lbl2;
+  btn1.style.background = activeSlot === 'slot1' ? 'var(--gold)' : 'transparent';
+  btn1.style.color      = activeSlot === 'slot1' ? '#1a1200'      : 'var(--muted)';
+  btn2.style.background = activeSlot === 'slot2' ? 'var(--gold)' : 'transparent';
+  btn2.style.color      = activeSlot === 'slot2' ? '#1a1200'      : 'var(--muted)';
 }
 
 function render() {
   if (!state.element) {
-    document.getElementById('petMessage').textContent = '오행을 선택해서 용신을 소환하세요!';
+    var emptyMsg = activeSlot === 'slot1' ? '용신 원소를 선택해서 소환하세요!' : '희신 원소를 선택해서 소환하세요!';
+    document.getElementById('petMessage').textContent = emptyMsg;
+    ['wood','fire','earth','metal','water'].forEach(function(e) {
+      document.getElementById('pet-' + e).style.display = 'none';
+    });
     return;
   }
   var el = ELEMENTS[state.element];
@@ -1608,6 +1669,7 @@ try { localStorage.removeItem('yongsin_float_hidden'); localStorage.removeItem('
 loadState();
 render();
 renderMission();
+renderSlotTabs();
 
 // 서버에서 더 최신 데이터 로드 (현재 오행 레벨 기준 높은 쪽 우선)
 loadFromServer(function(serverData) {
@@ -1621,13 +1683,16 @@ loadFromServer(function(serverData) {
     var srvLv   = srvElState ? (srvElState.level || 1) : 0;
     if (srvLv >= localLv) {
       allStates = Object.assign({}, srvAll);
-      state.element = srvEl;
+      slotElements.slot1 = serverData.element  || srvEl;
+      slotElements.slot2 = serverData.element2 || slotElements.slot2;
+      var activeEl = slotElements[activeSlot] || slotElements.slot1;
+      state.element = activeEl;
       if (state.element && allStates[state.element]) {
         Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[state.element])));
-        state.element = srvEl;
+        state.element = activeEl;
       }
-      try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: state.element })); } catch(e) {}
-      render(); renderMission();
+      try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: slotElements.slot1, element2: slotElements.slot2 })); } catch(e) {}
+      render(); renderMission(); renderSlotTabs();
     } else { syncToServer(); }
   } else if (serverData.state) {
     // 구형 포맷
