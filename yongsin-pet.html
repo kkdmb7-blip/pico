@@ -677,7 +677,7 @@ nav {
     <div class="pet-stage" id="petStage">
       <!-- 각 원소별 캐릭터 -->
       <div class="pet-wood" id="pet-wood" style="display:none;">
-        <img id="pet-wood-img" src="/img/pet_wood_1.png" alt="목 용신" style="width:130px;height:130px;object-fit:contain;mix-blend-mode:multiply;">
+        <img id="pet-wood-img" src="/img/pet_wood_1.png" alt="목 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
       </div>
 
       <div class="pet-fire" id="pet-fire" style="display:none;">
@@ -853,6 +853,35 @@ var ELEMENTS = {
   water: { name:'수령(水靈)',  nameShort:'수(水)', color:'#1565c0', color2:'#42a5f5', glow:'rgba(21,101,192,0.12)', badge:'rgba(21,101,192,0.12)', borderBadge:'rgba(21,101,192,0.4)', bgStyle:'linear-gradient(135deg,rgba(21,101,192,0.06),rgba(66,165,245,0.04))' },
 };
 var STAGES = ['새싹','성장','각성','정화','신화'];
+
+// PNG 배경(흰색/회색 체크보드) 제거 후 img에 적용
+function removeBgAndApply(src, imgEl) {
+  var tmp = new Image();
+  tmp.crossOrigin = 'anonymous';
+  tmp.onload = function() {
+    var cv = document.createElement('canvas');
+    cv.width = tmp.naturalWidth; cv.height = tmp.naturalHeight;
+    var ctx = cv.getContext('2d');
+    ctx.drawImage(tmp, 0, 0);
+    var data = ctx.getImageData(0, 0, cv.width, cv.height);
+    var d = data.data;
+    // 모서리 4점 샘플링해서 배경색 결정
+    function sample(x, y) { var i=(y*cv.width+x)*4; return [d[i],d[i+1],d[i+2]]; }
+    var corners = [
+      sample(0,0), sample(cv.width-1,0),
+      sample(0,cv.height-1), sample(cv.width-1,cv.height-1)
+    ];
+    var bg = [0,1,2].map(function(c){ return Math.round(corners.reduce(function(s,p){return s+p[c];},0)/4); });
+    var thr = 40; // 유사 색상 허용 범위
+    for (var i=0; i<d.length; i+=4) {
+      var dr=Math.abs(d[i]-bg[0]), dg=Math.abs(d[i+1]-bg[1]), db=Math.abs(d[i+2]-bg[2]);
+      if (dr<thr && dg<thr && db<thr) d[i+3]=0; // 투명 처리
+    }
+    ctx.putImageData(data, 0, 0);
+    imgEl.src = cv.toDataURL('image/png');
+  };
+  tmp.src = src;
+}
 function expNeeded(lv) { return lv * lv * 100; } // 레벨²×100 (Lv1=100, Lv3=900, Lv5=2500...)
 var MESSAGES = {
   wood:  ['나무처럼 천천히, 하지만 깊게 뿌리내릴게요 🌱','목기운이 강해졌어요! 창의력이 넘치는 날이에요 🌿','오늘 청록색을 가까이 하면 좋아요 🍃'],
@@ -1018,7 +1047,12 @@ function render() {
 
   // 목(木) 이미지 단계별 교체: 새싹→1, 성장→2, 각성→3, 정화→4, 신화→5
   if (state.element === 'wood') {
-    document.getElementById('pet-wood-img').src = '/img/pet_wood_' + (stageIdx + 1) + '.png';
+    var woodSrc = '/img/pet_wood_' + (stageIdx + 1) + '.png';
+    var woodImg = document.getElementById('pet-wood-img');
+    if (woodImg.getAttribute('data-src') !== woodSrc) {
+      woodImg.setAttribute('data-src', woodSrc);
+      removeBgAndApply(woodSrc, woodImg);
+    }
   }
 
   document.getElementById('petName').textContent = el.name;
