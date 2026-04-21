@@ -854,33 +854,82 @@ var ELEMENTS = {
 };
 var STAGES = ['새싹','성장','각성','정화','신화'];
 
-// PNG 배경(흰색/회색 체크보드) 제거 후 img에 적용
+// PNG 배경 제거 (flood fill 외곽 제거 + 내부 고립 픽셀 제거)
 function removeBgAndApply(src, imgEl) {
   var tmp = new Image();
   tmp.crossOrigin = 'anonymous';
   tmp.onload = function() {
     var cv = document.createElement('canvas');
-    cv.width = tmp.naturalWidth; cv.height = tmp.naturalHeight;
+    var W = tmp.naturalWidth, H = tmp.naturalHeight;
+    cv.width = W; cv.height = H;
     var ctx = cv.getContext('2d');
     ctx.drawImage(tmp, 0, 0);
-    var data = ctx.getImageData(0, 0, cv.width, cv.height);
+    var data = ctx.getImageData(0, 0, W, H);
     var d = data.data;
-    // 모서리 4점 샘플링해서 배경색 결정
-    function sample(x, y) { var i=(y*cv.width+x)*4; return [d[i],d[i+1],d[i+2]]; }
-    var corners = [
-      sample(0,0), sample(cv.width-1,0),
-      sample(0,cv.height-1), sample(cv.width-1,cv.height-1)
-    ];
-    var bg = [0,1,2].map(function(c){ return Math.round(corners.reduce(function(s,p){return s+p[c];},0)/4); });
-    var thr = 40; // 유사 색상 허용 범위
-    for (var i=0; i<d.length; i+=4) {
-      var dr=Math.abs(d[i]-bg[0]), dg=Math.abs(d[i+1]-bg[1]), db=Math.abs(d[i+2]-bg[2]);
-      if (dr<thr && dg<thr && db<thr) d[i+3]=0; // 투명 처리
+
+    // 테두리 픽셀로 배경색 후보 2개 (체크보드 밝은색/어두운색) 수집
+    var colorMap = {};
+    function addSample(x,y){
+      var i=(y*W+x)*4;
+      if(d[i+3]<10) return;
+      var key = (d[i]>>4)+','+(d[i+1]>>4)+','+(d[i+2]>>4);
+      colorMap[key]=(colorMap[key]||{count:0,r:d[i],g:d[i+1],b:d[i+2]});
+      colorMap[key].count++;
     }
-    ctx.putImageData(data, 0, 0);
-    imgEl.src = cv.toDataURL('image/png');
+    for(var x=0;x<W;x++){addSample(x,0);addSample(x,H-1);}
+    for(var y=0;y<H;y++){addSample(0,y);addSample(W-1,y);}
+    // 가장 많이 나온 색 2개를 배경색으로
+    var sorted=Object.values(colorMap).sort(function(a,b){return b.count-a.count;});
+    var bgColors=sorted.slice(0,2).map(function(c){return[c.r,c.g,c.b];});
+
+    var thr=45;
+    function isBg(i){
+      return bgColors.some(function(bg){
+        return Math.abs(d[i]-bg[0])<thr && Math.abs(d[i+1]-bg[1])<thr && Math.abs(d[i+2]-bg[2])<thr && d[i+3]>10;
+      });
+    }
+    function transp(i){ d[i+3]=0; }
+
+    // 1단계: flood fill — 테두리에서 연결된 배경 제거
+    var visited=new Uint8Array(W*H);
+    var queue=[];
+    function tryAdd(x,y){
+      if(x<0||x>=W||y<0||y>=H) return;
+      var idx=y*W+x;
+      if(visited[idx]) return;
+      if(isBg(idx*4)){visited[idx]=1;queue.push(idx);}
+    }
+    for(var x=0;x<W;x++){tryAdd(x,0);tryAdd(x,H-1);}
+    for(var y=0;y<H;y++){tryAdd(0,y);tryAdd(W-1,y);}
+    var qi=0;
+    while(qi<queue.length){
+      var idx=queue[qi++];
+      transp(idx*4);
+      var cx=idx%W,cy=(idx/W)|0;
+      tryAdd(cx-1,cy);tryAdd(cx+1,cy);tryAdd(cx,cy-1);tryAdd(cx,cy+1);
+    }
+
+    // 2단계: 남은 고립 배경 픽셀 제거 (주변 8방향이 모두 투명이거나 배경이면 제거) — 3회 반복
+    for(var pass=0;pass<3;pass++){
+      for(var y=1;y<H-1;y++){
+        for(var x=1;x<W-1;x++){
+          var i=(y*W+x)*4;
+          if(!isBg(i)) continue;
+          var nbTransp=0;
+          for(var dy=-1;dy<=1;dy++) for(var dx=-1;dx<=1;dx++){
+            if(dx===0&&dy===0) continue;
+            var ni=((y+dy)*W+(x+dx))*4;
+            if(d[ni+3]<10||isBg(ni)) nbTransp++;
+          }
+          if(nbTransp>=6) transp(i);
+        }
+      }
+    }
+
+    ctx.putImageData(data,0,0);
+    imgEl.src=cv.toDataURL('image/png');
   };
-  tmp.src = src;
+  tmp.src=src;
 }
 function expNeeded(lv) { return lv * lv * 100; } // 레벨²×100 (Lv1=100, Lv3=900, Lv5=2500...)
 var MESSAGES = {
