@@ -6297,14 +6297,18 @@ window.togglePushSubscription = async function() {
 
     document.getElementById('btnShareQuote').addEventListener('click', function() {
       var pageUrl = 'https://picolab.kr';
-      var shareText = '\u201c' + data.quote + '\u201d\n\u2014 ' + data.source;
+      var shareText = '\u201c' + data.quote + '\u201d\n\u2014 ' + data.source + '\n\n\uD83D\uDD2E ' + pageUrl;
+      if (navigator.share) {
+        navigator.share({ title: '\u2728 \uC624\uB298\uC758 \uC6B0\uC8FC \uBA54\uC2DC\uC9C0', text: shareText, url: pageUrl }).catch(function(){});
+        return;
+      }
       if (window.Kakao && Kakao.Share) {
         if (!Kakao.isInitialized()) { try { Kakao.init(KAKAO_JS_KEY); } catch(e) {} }
         Kakao.Share.sendDefault({
           objectType: 'feed',
           content: {
             title: '✨ 오늘의 우주 메시지',
-            description: shareText,
+            description: '\u201c' + data.quote + '\u201d\n\u2014 ' + data.source,
             imageUrl: 'https://picolab.kr/img/goddess-app.png',
             link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
           },
@@ -6312,7 +6316,7 @@ window.togglePushSubscription = async function() {
         });
         return;
       }
-      navigator.clipboard && navigator.clipboard.writeText(shareText + '\n\n\uD83D\uDD2E ' + pageUrl)
+      navigator.clipboard && navigator.clipboard.writeText(shareText)
         .then(function() { alert('\uD83D\uDCCB \uBCF5\uC0AC\uB418\uC5C8\uC5B4\uC694! \uCE74\uCE74\uC624\uD1A1\uC5D0 \uBD99\uC5EC\uB123\uAE30 \uD574\uBCF4\uC138\uC694 \uD83D\uDE0A'); });
     });
   } catch(e) {}
