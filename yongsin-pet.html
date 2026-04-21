@@ -776,7 +776,7 @@ nav {
       <span class="btn-desc" id="sleepDesc">수련 중 EXP 자동 적립</span>
     </button>
     <button class="action-btn btn-orb"   onclick="doAction('orb')">
-      <span class="btn-icon">✦</span>Orb 주기
+      <span class="btn-icon">✦</span>특훈하기
       <span class="btn-desc">전체↑ EXP+15</span>
     </button>
   </div>
@@ -930,7 +930,7 @@ var MESSAGES = {
   hungry:['배고파요... 밥 주세요 😢','꼬르륵... 밥이 필요해요 🙏','조금만 먹여주시면 안 될까요...'],
   happy: ['너무 행복해요! 고마워요 🥰','행복지수 최고! 오늘 운이 좋아요 💕','함께라서 좋아요 ✨'],
   sleep: ['Zzz... 잘 자고 있어요 😴','꿈에서 용신의 기운을 채우고 있어요 🌙','푹 자고 나면 더 강해질 거예요 💤'],
-  orb:   ['Orb의 에너지를 받았어요! ⭐','강해지는 게 느껴져요! 고마워요 🌟','Orb가 용신 기운을 증폭시켜요 ✦'],
+  orb:   ['특훈 효과가 나타나고 있어요! ⭐','강해지는 게 느껴져요! 고마워요 🌟','특훈으로 용신 기운이 올랐어요 ✦'],
 };
 
 var SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
@@ -1323,7 +1323,7 @@ function doAction(type) {
     state.cooldowns.orb = Date.now();
     gainExp(15);
     if (!document.querySelector('#toast').textContent.includes('크리티컬'))
-      showToast('✦ Orb 에너지가 용신을 강하게 해요!');
+      showToast('✦ 특훈 완료! 용신 기운이 올랐어요!');
     bounce('pet-' + state.element);
   }
 
