@@ -554,24 +554,55 @@
     } catch(e) {}
     if (!uid) return;
 
-    fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state&select=content&order=created_at.desc&limit=1', {
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-    }).then(function(r) { return r.json(); }).then(function(rows) {
-      if (!rows || !rows[0] || !rows[0].content || !rows[0].content[0]) return;
-      try {
-        var raw = JSON.parse(rows[0].content[0]);
-        var elem = raw.element;
-        if (!elem) return;
-        // all[element] 구조에서 평탄화
-        var stats = (raw.all && raw.all[elem]) ? raw.all[elem] : raw;
-        _overrideState = Object.assign({ element: elem }, stats);
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', init);
-        } else {
-          setTimeout(init, 1000);
-        }
-      } catch(e) {}
-    }).catch(function() {});
+    function fetchAndApply(onNew) {
+      fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state&select=content&order=created_at.desc&limit=1', {
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+      }).then(function(r) { return r.json(); }).then(function(rows) {
+        if (!rows || !rows[0] || !rows[0].content || !rows[0].content[0]) return;
+        try {
+          var raw = JSON.parse(rows[0].content[0]);
+          var elem = raw.element;
+          if (!elem) return;
+          var stats = (raw.all && raw.all[elem]) ? raw.all[elem] : raw;
+          var newState = Object.assign({ element: elem }, stats);
+          // 원소가 바뀌었으면 펫 재생성
+          var prevElem = _overrideState ? _overrideState.element : null;
+          _overrideState = newState;
+          if (onNew) { onNew(); }
+          else if (prevElem && prevElem !== elem && wrapper) {
+            // 원소 변경 → 기존 펫 제거 후 재생성
+            clearTimeout(moveTimer);
+            if (bubble && bubble.parentNode) bubble.parentNode.removeChild(bubble);
+            if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+            pet = null; bubble = null; wrapper = null;
+            init();
+          } else if (wrapper) {
+            // 같은 원소 → 레벨/에너지 바만 갱신
+            var lvEl = document.getElementById('yongsin-float-lv');
+            var fillEl = document.getElementById('yongsin-float-efill');
+            if (lvEl) lvEl.textContent = 'Lv.' + (newState.level || 1);
+            if (fillEl) fillEl.style.width = Math.round(newState.energy || 0) + '%';
+          }
+        } catch(e) {}
+      }).catch(function() {});
+    }
+
+    // 첫 로드
+    fetchAndApply(function() {
+      if (!_overrideState || !_overrideState.element) return;
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        setTimeout(init, 1000);
+      }
+    });
+
+    // 탭이 다시 활성화될 때마다 Supabase 재조회 (피코에서 바꾼 내용 반영)
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') {
+        fetchAndApply(null);
+      }
+    });
   }
 
 })();
