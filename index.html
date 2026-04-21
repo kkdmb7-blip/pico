@@ -2073,14 +2073,14 @@
         <p>당신의 직관 신호</p>
         <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#6a4aa0;background:rgba(106,74,160,0.1);border:1px solid rgba(106,74,160,0.35);border-radius:8px;padding:4px 10px;">카드 뽑기</div>
       </div>
-      <div class="why-card why-card-full" onclick="openGunghapModal()" style="cursor:pointer;">
+      <div class="why-card why-card-full" style="flex-direction:column;align-items:stretch;gap:10px;">
         <div class="why-card-body">
           <h3>궁합</h3>
           <p>사주 오행·띠·계절 조화로 보는 두 사람의 인연</p>
         </div>
-        <div style="flex-shrink:0;display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
-          <div style="font-size:11px;font-weight:600;color:#8b2447;background:rgba(184,82,110,0.14);border:1px solid rgba(184,82,110,0.35);border-radius:8px;padding:4px 10px;">궁합 보기</div>
-          <div onclick="event.stopPropagation();location.href='/gunghap2.html'" style="font-size:11px;font-weight:700;color:#7a5800;background:rgba(138,106,21,0.12);border:1.5px solid rgba(138,106,21,0.55);border-radius:8px;padding:4px 10px;cursor:pointer;white-space:nowrap;">궁합 2.0 ✨ NEW</div>
+        <div style="display:flex;gap:8px;">
+          <div onclick="openGunghapModal()" style="flex:1;text-align:center;font-size:12px;font-weight:600;color:#8b2447;background:rgba(184,82,110,0.14);border:1px solid rgba(184,82,110,0.35);border-radius:8px;padding:7px 10px;cursor:pointer;">궁합 보기</div>
+          <div onclick="location.href='/gunghap2.html'" style="flex:1;text-align:center;font-size:12px;font-weight:700;color:#7a5800;background:rgba(138,106,21,0.12);border:1.5px solid rgba(138,106,21,0.55);border-radius:8px;padding:7px 10px;cursor:pointer;white-space:nowrap;">궁합 2.0 ✨ NEW</div>
         </div>
       </div>
     </div>
