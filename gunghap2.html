@@ -550,8 +550,11 @@ async function fetchSaju(p) {
 }
 
 async function fetchAstro(p) {
-  var params = new URLSearchParams({ year: p.y, month: p.m, day: p.d, hour: p.h, min: p.min, lat: 37.5665, lon: 126.9780, tzone: 9 });
-  var res = await fetch(WORKER + '/astro?' + params);
+  var res = await fetch(WORKER + '/astro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ year: p.y, month: p.m, day: p.d, hour: p.h, min: p.min, lat: 37.5665, lon: 126.9780, tzone: 9 })
+  });
   if (!res.ok) throw new Error('점성술 API 오류 (' + res.status + ')');
   return res.json();
 }
