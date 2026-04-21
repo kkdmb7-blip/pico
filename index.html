@@ -6281,12 +6281,32 @@ window.togglePushSubscription = async function() {
         '</div>' +
         '<p style="font-size:14px;font-style:italic;color:var(--text);line-height:1.75;margin:0 0 6px;font-family:\'Noto Serif KR\',serif;">&ldquo;' + esc(data.quote) + '&rdquo;</p>' +
         '<p style="font-size:11px;color:#8b2a1e;margin:0 0 10px;letter-spacing:0.04em;font-weight:600;">— ' + esc(data.source) + '</p>' +
-        '<p style="font-size:12px;color:var(--text2);line-height:1.65;margin:0;background:rgba(168,132,42,0.1);border-radius:10px;padding:10px 12px;">' + esc(data.message) + '</p>' +
+        '<p style="font-size:12px;color:var(--text2);line-height:1.65;margin:0 0 12px;background:rgba(168,132,42,0.1);border-radius:10px;padding:10px 12px;">' + esc(data.message) + '</p>' +
+        '<button id="btnShareQuote" style="width:100%;padding:10px;background:#fee500;border:none;border-radius:12px;font-size:13px;font-weight:700;color:#3c1e1e;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="pi pi-share-alt"></i> 함께 나누기</button>' +
       '</div>';
 
     document.getElementById('btnDismissQuote').addEventListener('click', function() {
       localStorage.setItem('pico_quote_dismissed', today);
       wrap.style.display = 'none';
+    });
+
+    document.getElementById('btnShareQuote').addEventListener('click', function() {
+      var shareText = '\u201c' + data.quote + '\u201d\n\u2014 ' + data.source + '\n\n\uD83D\uDD2E 나의 사주 운세 보러가기\nhttps://picolab.kr';
+      if (window.Kakao && window.Kakao.isInitialized()) {
+        try {
+          window.Kakao.Share.sendDefault({
+            objectType: 'text',
+            text: shareText,
+            link: { mobileWebUrl: 'https://picolab.kr', webUrl: 'https://picolab.kr' }
+          });
+          return;
+        } catch(e) {}
+      }
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareText).then(function() { alert('\uD83D\uDCCB \uBCF5\uC0AC\uB418\uC5C8\uC5B4\uC694!\uC9C4\uAD6C\uC5D0\uAC8C \uBD99\uC5EC\uB123\uAE30 \uD574\uBCF4\uC138\uC694 \uD83D\uDE0A'); });
+      } else {
+        alert(shareText);
+      }
     });
   } catch(e) {}
 })();
