@@ -1483,7 +1483,7 @@
         +'</a>';
       return;
     }
-    var st = raw;
+    var st = (raw.all && raw.all[raw.element]) ? Object.assign({element: raw.element}, raw.all[raw.element]) : raw;
     var el = ELEM[st.element] || ELEM.water;
     var expNeeded = (st.level||1)*100;
     var expPct = Math.min(100, ((st.exp||0)/expNeeded*100));
