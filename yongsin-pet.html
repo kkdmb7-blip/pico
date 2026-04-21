@@ -1585,18 +1585,17 @@ function doMissionScroll(btnClass) {
 }
 
 function doMissionShare() {
+  if (isMissionDone('share')) return; // 오늘 이미 완료
   var url = 'https://picolab.kr';
   var text = '🔮 피코랩에서 용신 다마고치 키우고 있어요!\n내 용신 오행을 캐릭터로 키워보세요 👇\n' + url;
+  // 공유 즉시 완료 처리 (중복 방지)
+  completeMissionNav('share');
+  renderMission();
   if (navigator.share) {
-    navigator.share({ title: '피코랩 용신 다마고치', text: text, url: url }).then(function() {
-      completeMissionNav('share');
-      renderMission();
-    }).catch(function(){});
+    navigator.share({ title: '피코랩 용신 다마고치', text: text, url: url }).catch(function(){});
   } else {
     navigator.clipboard && navigator.clipboard.writeText(text).then(function() {
       showToast('📋 링크가 복사됐어요!');
-      completeMissionNav('share');
-      renderMission();
     });
   }
 }
