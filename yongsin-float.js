@@ -50,7 +50,7 @@
   var MOVE_TRANSITION = 'left 1.8s cubic-bezier(0.34,1.2,0.64,1), top 1.8s cubic-bezier(0.34,1.2,0.64,1)';
 
   // ── 캐릭터 SVG (원소별 미니 버전) ──
-  function getWoodStageIdx() {
+  function getPetStageIdx() {
     try {
       var s = JSON.parse(localStorage.getItem(PET_KEY) || '{}');
       var lv = s.level || 1;
@@ -61,24 +61,17 @@
   function buildPetSVG(elem) {
     var s = ELEM_STYLE[elem] || ELEM_STYLE.water;
     if (elem === 'wood') {
-      var stageIdx = getWoodStageIdx();
+      var stageIdx = getPetStageIdx();
       var n = stageIdx + 1;
       var hasRb = (n === 1 || n === 5);
       var src = hasRb ? '/img/pet_wood_' + n + '_rb.png' : '/img/pet_wood_' + n + '.png';
       return '<img src="' + src + '" alt="목 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
     }
-    if (elem === 'fire') return `
-      <svg width="40" height="52" viewBox="0 0 40 52" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="20" cy="38" rx="14" ry="12" fill="#e53935"/>
-        <ellipse cx="20" cy="28" rx="10" ry="14" fill="#ef5350"/>
-        <ellipse cx="20" cy="20" rx="7" ry="10" fill="#ffcc02"/>
-        <ellipse cx="20" cy="14" rx="4" ry="6" fill="white" opacity="0.9"/>
-        <circle cx="15" cy="34" r="3" fill="white"/>
-        <circle cx="25" cy="34" r="3" fill="white"/>
-        <circle cx="16" cy="35" r="1.8" fill="#3a0a00"/>
-        <circle cx="26" cy="35" r="1.8" fill="#3a0a00"/>
-        <path d="M16 40 Q20 43 24 40" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      </svg>`;
+    if (elem === 'fire') {
+      var fireStageIdx = getPetStageIdx();
+      var fn = fireStageIdx + 1;
+      return '<img src="/img/pet_fire_' + fn + '.png" alt="화 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
+    }
     if (elem === 'earth') return `
       <svg width="48" height="44" viewBox="0 0 48 44" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="24" cy="26" rx="20" ry="16" fill="#8a5a2a"/>

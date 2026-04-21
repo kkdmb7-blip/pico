@@ -681,18 +681,7 @@ nav {
       </div>
 
       <div class="pet-fire" id="pet-fire" style="display:none;">
-        <div class="ember"></div><div class="ember"></div><div class="ember"></div>
-        <div class="flame-body">
-          <div class="flame-main">
-            <div class="flame-inner">
-              <div class="flame-tip"></div>
-            </div>
-          </div>
-        </div>
-        <div class="face">
-          <span class="eye"></span><span class="eye"></span>
-          <div class="mouth"></div>
-        </div>
+        <img id="pet-fire-img" src="/img/pet_fire_1.png" alt="화 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
       </div>
 
       <div class="pet-earth" id="pet-earth" style="display:none;">
@@ -1094,22 +1083,32 @@ function render() {
   // 이름·레벨
   var stageIdx = Math.min(Math.floor(state.level / 3), STAGES.length - 1);
 
-  // 목(木) 이미지 단계별 교체: 새싹→1, 성장→2, 각성→3, 정화→4, 신화→5
-  // _rb.png = remove.bg 처리된 투명 버전 (직접 표시), 없으면 canvas 배경 제거
+  // 목(木) 이미지 단계별 교체
   if (state.element === 'wood') {
     var n = stageIdx + 1;
     var rbSrc = '/img/pet_wood_' + n + '_rb.png';
     var origSrc = '/img/pet_wood_' + n + '.png';
     var woodImg = document.getElementById('pet-wood-img');
-    var hasRb = [1,5].indexOf(n) !== -1; // remove.bg 완료 단계
+    var hasRb = [1,5].indexOf(n) !== -1;
     var woodSrc = hasRb ? rbSrc : origSrc;
     if (woodImg.getAttribute('data-src') !== woodSrc) {
       woodImg.setAttribute('data-src', woodSrc);
       if (hasRb) {
-        woodImg.src = woodSrc; // 투명 PNG 직접 사용
+        woodImg.src = woodSrc;
       } else {
-        removeBgAndApply(woodSrc, woodImg); // canvas 배경 제거
+        removeBgAndApply(woodSrc, woodImg);
       }
+    }
+  }
+
+  // 화(火) 이미지 단계별 교체
+  if (state.element === 'fire') {
+    var fn = stageIdx + 1;
+    var fireSrc = '/img/pet_fire_' + fn + '.png';
+    var fireImg = document.getElementById('pet-fire-img');
+    if (fireImg.getAttribute('data-src') !== fireSrc) {
+      fireImg.setAttribute('data-src', fireSrc);
+      removeBgAndApply(fireSrc, fireImg);
     }
   }
 
