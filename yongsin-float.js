@@ -570,9 +570,66 @@
       }).catch(function() {});
     }
 
+    // 용신 미각성 유저용 알 버튼
+    function showEggButton() {
+      if (document.getElementById('yongsin-egg-btn')) return;
+      var egg = document.createElement('button');
+      egg.id = 'yongsin-egg-btn';
+      egg.style.cssText = [
+        'position:fixed','bottom:80px','right:16px',
+        'width:52px','height:60px',
+        'background:linear-gradient(160deg,#fff9f0,#f0e8d8)',
+        'border:2px solid rgba(180,140,80,0.4)',
+        'border-radius:50% 50% 48% 48% / 55% 55% 45% 45%',
+        'box-shadow:0 4px 16px rgba(0,0,0,0.15),inset 0 2px 4px rgba(255,255,255,0.8)',
+        'cursor:pointer','z-index:9990','pointer-events:auto',
+        'display:flex','align-items:center','justify-content:center',
+        'font-size:22px','animation:egg-idle 3s ease-in-out infinite',
+        'transition:transform 0.2s',
+      ].join(';');
+      egg.textContent = '🥚';
+      egg.setAttribute('aria-label', '용신 깨우기');
+
+      var eggStyle = document.createElement('style');
+      eggStyle.textContent = '@keyframes egg-idle{0%,100%{transform:rotate(-4deg) scale(1)}40%{transform:rotate(4deg) scale(1.05)}70%{transform:rotate(-2deg) scale(0.97)}}';
+      document.head.appendChild(eggStyle);
+
+      var eggBubble = document.createElement('div');
+      eggBubble.style.cssText = 'position:fixed;bottom:148px;right:12px;background:rgba(26,18,10,0.92);color:#fcf7ea;padding:10px 14px;border-radius:14px;font-size:13px;font-weight:500;line-height:1.55;max-width:190px;text-align:center;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:9991;font-family:\'Pretendard Variable\',Pretendard,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,0.25);';
+      eggBubble.innerHTML = '<b style="color:#f5c842;">용신이 기다리고 있어요!</b><br>피코에서 나만의 용신을<br>깨워보세요 🥚✨';
+      document.body.appendChild(eggBubble);
+      document.body.appendChild(egg);
+
+      var bubTimer;
+      egg.addEventListener('click', function() {
+        egg.style.animation = 'none'; void egg.offsetWidth;
+        egg.style.animation = 'egg-idle 3s ease-in-out infinite';
+        eggBubble.style.opacity = '1';
+        clearTimeout(bubTimer);
+        bubTimer = setTimeout(function() { eggBubble.style.opacity = '0'; }, 3500);
+      });
+      egg.addEventListener('dblclick', function() {
+        window.open(PICO_PET_URL, '_blank');
+      });
+
+      // 3초 후 자동으로 한 번 말풍선 표시
+      setTimeout(function() {
+        eggBubble.style.opacity = '1';
+        bubTimer = setTimeout(function() { eggBubble.style.opacity = '0'; }, 4000);
+      }, 2500);
+    }
+
     // 첫 로드
     fetchAndApply(function() {
-      if (!_overrideState || !_overrideState.element) return;
+      if (!_overrideState || !_overrideState.element) {
+        // 용신 없음 → 알 버튼 표시
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', showEggButton);
+        } else {
+          setTimeout(showEggButton, 1200);
+        }
+        return;
+      }
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
       } else {
