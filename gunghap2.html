@@ -630,7 +630,7 @@ async function analyzeCompatibility(a, b, sA, sB, aA, aB, vA, vB) {
   });
   if (!res.ok) throw new Error('AI 분석 오류 (' + res.status + ')');
   var data = await res.json();
-  var text = (data.content || data.message || data.text || '').trim();
+  var text = (data.reply || data.content || data.message || '').trim();
   var match = text.match(/\{[\s\S]*\}/);
   if (!match) throw new Error('AI 응답 파싱 오류');
   var parsed = JSON.parse(match[0]);
@@ -734,7 +734,7 @@ async function fetchPremiumDetail() {
   });
   if (!res.ok) throw new Error('AI 상세 분석 오류 (' + res.status + ')');
   var data = await res.json();
-  var text = (data.content || data.message || data.text || '').trim();
+  var text = (data.reply || data.content || data.message || '').trim();
   var match = text.match(/\{[\s\S]*\}/);
   if (!match) throw new Error('AI 응답 파싱 오류');
   return JSON.parse(match[0]);
