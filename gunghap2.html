@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>궁합 2.0 · FORTUNA</title>
+<meta name="description" content="사주·서양점성·베딕 3엔진 AI 궁합 분석 — FORTUNA">
+<meta property="og:title" content="궁합 2.0 · FORTUNA">
+<meta property="og:description" content="사주·서양점성·베딕 3가지 운명체계로 분석하는 AI 궁합">
+<meta property="og:image" content="https://picolab.kr/img/goddess-app.png?v=2">
+<meta property="og:url" content="https://picolab.kr/gunghap2.html">
+<meta name="theme-color" content="#f5efe4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.json?v=4.0.0">
+<link rel="apple-touch-icon" href="/img/goddess-app.png?v=3">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#f4ede0;--surface:#f9f1de;--surface2:#e8dcc0;--border:#9a8a60;
+  --border-soft:rgba(60,40,20,0.22);--accent:#7a2418;--accent2:#2a1f1a;
+  --text:#1a120a;--text2:#4a3a2a;--muted:#5a4830;--gold:#8a6a15;
+  --gold-deep:#6a4f0c;--ink:#241a10;--orb:#5f8cb5;
+  --orb-bg:rgba(122,196,255,0.12);--orb-border:rgba(95,140,181,0.30);
+  --radius:14px;
+  --shadow-soft:0 1px 3px rgba(60,40,20,0.08),0 6px 20px rgba(60,40,20,0.07);
+  --shadow-lift:0 3px 8px rgba(60,40,20,0.12),0 14px 36px rgba(60,40,20,0.14);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;min-height:100vh;-webkit-text-size-adjust:100%;}
+.wrap{max-width:480px;margin:0 auto;padding:0 0 80px;}
+
+/* NAV */
+nav{display:flex;align-items:center;padding:14px 16px 10px;gap:8px;border-bottom:1px solid var(--border-soft);background:var(--surface);}
+.nav-back{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text);padding:4px;line-height:1;}
+.nav-title{font-size:17px;font-weight:700;color:var(--ink);}
+.nav-sub{font-size:11px;color:var(--muted);margin-left:auto;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius);padding:18px 16px;margin:12px 12px 0;box-shadow:var(--shadow-soft);}
+.card-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:0.09em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.05em;}
+.badge-a{background:rgba(122,36,24,0.12);color:var(--accent);}
+.badge-b{background:rgba(95,140,181,0.15);color:var(--orb);}
+
+/* FORM */
+.f-label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;letter-spacing:0.04em;}
+.f-input,.f-select{width:100%;background:rgba(252,247,234,0.85);border:1px solid rgba(80,55,30,0.18);border-radius:10px;color:var(--text);padding:11px 12px;font-size:14px;font-family:inherit;-webkit-appearance:none;appearance:none;}
+.f-input:focus,.f-select:focus{outline:none;border-color:var(--accent);}
+.f-select option{background:#fcf7ea;color:var(--text);}
+.f-field{margin-bottom:12px;}
+.f-row{display:flex;gap:6px;}
+.f-row .f-select{flex:1;}
+.g-row{display:flex;gap:8px;}
+.g-btn{flex:1;padding:10px;border-radius:10px;font-size:14px;background:rgba(252,247,234,0.85);border:1.5px solid rgba(80,55,30,0.18);color:var(--muted);cursor:pointer;transition:all .2s;font-family:inherit;}
+.g-btn.on{background:rgba(122,36,24,0.10);border-color:var(--accent);color:var(--accent);font-weight:700;}
+
+/* BUTTONS */
+.main-btn{display:block;width:calc(100% - 24px);margin:14px 12px 0;padding:15px;border-radius:12px;font-size:16px;font-weight:700;background:var(--ink);color:#fcf7ea;border:none;cursor:pointer;font-family:inherit;box-shadow:0 2px 12px rgba(0,0,0,0.18);letter-spacing:0.04em;text-align:center;}
+.main-btn:disabled{opacity:.4;cursor:not-allowed;}
+.sub-btn{background:var(--surface2);color:var(--ink);box-shadow:none;border:1px solid var(--border-soft);}
+.orb-note{text-align:center;font-size:12px;color:var(--muted);margin:7px 12px 0;}
+
+/* LOADING */
+#loadSection{display:none;padding:70px 20px;text-align:center;}
+.spin{width:44px;height:44px;border:3px solid rgba(80,55,30,0.15);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.load-text{font-size:14px;color:var(--muted);line-height:1.6;}
+.load-steps{margin-top:16px;display:flex;flex-direction:column;gap:6px;}
+.load-step{font-size:12px;color:var(--muted);opacity:.5;transition:opacity .4s;}
+.load-step.active{opacity:1;color:var(--accent);font-weight:600;}
+.load-step.done{opacity:.7;text-decoration:line-through;}
+
+/* FREE RESULT */
+#freeSection{display:none;}
+.type-hero{text-align:center;padding:32px 20px 20px;}
+.type-label{font-size:11px;font-weight:700;letter-spacing:0.12em;margin-bottom:10px;opacity:.65;}
+.type-name{font-size:36px;font-weight:900;line-height:1.2;margin-bottom:14px;font-family:'Noto Serif KR',serif;}
+.type-summary{font-size:15px;line-height:1.7;color:var(--text2);max-width:340px;margin:0 auto;word-break:keep-all;}
+/* type colors */
+.type-destiny .type-name{color:#8a6a15;}
+.type-flame .type-name{color:#7a2418;}
+.type-growth .type-name{color:#2a6a20;}
+.type-karma .type-name{color:#5a3a8a;}
+.type-clash .type-name{color:#8a5a10;}
+.type-trial .type-name{color:#1a4a8a;}
+
+/* ENGINE BARS */
+.engine-bars{margin:4px 12px 0;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius);padding:16px;}
+.engine-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.engine-row:last-child{margin-bottom:0;}
+.engine-name{font-size:12px;color:var(--muted);width:50px;flex-shrink:0;}
+.engine-bar-bg{flex:1;height:9px;background:var(--surface2);border-radius:5px;overflow:hidden;}
+.engine-bar-fill{height:100%;border-radius:5px;width:0%;transition:width 1s ease;}
+.bar-saju{background:linear-gradient(90deg,#7a2418,#b04832);}
+.bar-astro{background:linear-gradient(90deg,#4a6aa0,#7a9cd0);}
+.bar-vedic{background:linear-gradient(90deg,#8a6a15,#c09a30);}
+.engine-score-val{font-size:13px;font-weight:700;color:var(--ink);width:28px;text-align:right;flex-shrink:0;}
+
+/* PREMIUM TEASER */
+.prem-teaser{margin:12px 12px 0;background:linear-gradient(135deg,rgba(138,106,21,0.10),rgba(122,36,24,0.07));border:1px solid rgba(138,106,21,0.30);border-radius:var(--radius);padding:20px 18px;}
+.prem-title{font-size:14px;font-weight:700;color:var(--gold-deep);margin-bottom:10px;}
+.prem-list{list-style:none;margin-bottom:16px;}
+.prem-list li{font-size:13px;color:var(--text2);padding:3px 0;display:flex;align-items:center;gap:7px;}
+.prem-list li::before{content:'✦';font-size:9px;color:var(--gold);flex-shrink:0;}
+.prem-btn{width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:700;background:linear-gradient(135deg,#8a6a15,#6a4f0c);color:#fcf7ea;border:none;cursor:pointer;font-family:inherit;letter-spacing:0.04em;}
+.prem-btn:disabled{opacity:.4;cursor:not-allowed;}
+.orb-cost{font-size:12px;font-weight:400;opacity:.85;margin-left:6px;}
+
+/* PREMIUM RESULT */
+#premSection{display:none;}
+.radar-wrap{padding:20px 12px 8px;display:flex;justify-content:center;background:var(--surface);margin:12px 12px 0;border-radius:var(--radius);border:1px solid var(--border-soft);}
+.analysis-card{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius);padding:16px 16px;margin:10px 12px 0;box-shadow:var(--shadow-soft);}
+.analysis-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.08em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.analysis-text{font-size:14px;color:var(--text2);line-height:1.75;word-break:keep-all;}
+.analysis-text strong{color:var(--ink);font-weight:700;}
+.streaming-cursor::after{content:'▎';animation:blink .7s infinite;color:var(--accent);}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* SHARE */
+.share-wrap{margin:18px 12px 0;display:flex;flex-direction:column;gap:10px;}
+.share-btn{width:100%;padding:15px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;border:none;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:0.02em;}
+.btn-kakao{background:#fee500;color:#3c1e1e;}
+.btn-img-save{background:var(--surface2);color:var(--ink);border:1px solid var(--border-soft);}
+
+/* ERR / TOAST */
+.err-box{display:none;background:rgba(255,23,68,0.10);border:1px solid rgba(255,23,68,0.25);border-radius:10px;padding:12px 14px;font-size:13px;color:#b01a1a;margin:10px 12px 0;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(26,18,10,0.90);color:#fcf7ea;padding:10px 22px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+/* CANVAS */
+.canvas-hidden{position:absolute;left:-9999px;top:-9999px;}
+
+@media(max-width:400px){
+  .type-name{font-size:30px;}
+  .card,.engine-bars,.prem-teaser,.analysis-card,.share-wrap,.err-box,.main-btn{margin-left:8px;margin-right:8px;}
+  .main-btn{width:calc(100% - 16px);}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <button class="nav-back" onclick="history.back()">←</button>
+    <span class="nav-title">궁합 2.0</span>
+    <span class="nav-sub">3엔진 AI 분석</span>
+  </nav>
+
+  <!-- ── FORM ────────────────────────────────── -->
+  <div id="formSection">
+    <div class="card">
+      <div class="card-title"><span class="badge badge-a">나</span> 첫 번째 사람</div>
+      <div class="f-field">
+        <label class="f-label">이름 (선택)</label>
+        <input id="a_name" type="text" class="f-input" placeholder="홍길동">
+      </div>
+      <div class="f-field">
+        <label class="f-label">양력 / 음력</label>
+        <div class="g-row">
+          <button class="g-btn on" id="a_cal_solar" onclick="selCal('a','solar')">양력</button>
+          <button class="g-btn" id="a_cal_lunar" onclick="selCal('a','lunar')">음력</button>
+        </div>
+      </div>
+      <div class="f-field">
+        <label class="f-label">생년월일</label>
+        <div class="f-row">
+          <select id="a_y" class="f-select" style="flex:1.4"></select>
+          <select id="a_m" class="f-select"></select>
+          <select id="a_d" class="f-select"></select>
+        </div>
+      </div>
+      <div class="f-field">
+        <label class="f-label">태어난 시간</label>
+        <div class="f-row">
+          <select id="a_h" class="f-select" style="flex:1.2"></select>
+          <select id="a_min" class="f-select"></select>
+        </div>
+      </div>
+      <div class="f-field" style="margin-bottom:0;">
+        <label class="f-label">성별</label>
+        <div class="g-row">
+          <button class="g-btn on" id="a_M" onclick="selGender('a','M')">남성 ♂</button>
+          <button class="g-btn" id="a_F" onclick="selGender('a','F')">여성 ♀</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:8px;">
+      <div class="card-title"><span class="badge badge-b">상대</span> 두 번째 사람</div>
+      <div class="f-field">
+        <label class="f-label">이름 (선택)</label>
+        <input id="b_name" type="text" class="f-input" placeholder="홍길동">
+      </div>
+      <div class="f-field">
+        <label class="f-label">양력 / 음력</label>
+        <div class="g-row">
+          <button class="g-btn on" id="b_cal_solar" onclick="selCal('b','solar')">양력</button>
+          <button class="g-btn" id="b_cal_lunar" onclick="selCal('b','lunar')">음력</button>
+        </div>
+      </div>
+      <div class="f-field">
+        <label class="f-label">생년월일</label>
+        <div class="f-row">
+          <select id="b_y" class="f-select" style="flex:1.4"></select>
+          <select id="b_m" class="f-select"></select>
+          <select id="b_d" class="f-select"></select>
+        </div>
+      </div>
+      <div class="f-field">
+        <label class="f-label">태어난 시간</label>
+        <div class="f-row">
+          <select id="b_h" class="f-select" style="flex:1.2"></select>
+          <select id="b_min" class="f-select"></select>
+        </div>
+      </div>
+      <div class="f-field" style="margin-bottom:0;">
+        <label class="f-label">성별</label>
+        <div class="g-row">
+          <button class="g-btn" id="b_M" onclick="selGender('b','M')">남성 ♂</button>
+          <button class="g-btn on" id="b_F" onclick="selGender('b','F')">여성 ♀</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="err-box" id="errBox"></div>
+    <button class="main-btn" id="analyzeBtn" onclick="startAnalysis()">무료 궁합 분석하기</button>
+    <p class="orb-note">기본 분석 무료 · 상세 분석 300 Orb</p>
+  </div>
+
+  <!-- ── LOADING ─────────────────────────────── -->
+  <div id="loadSection">
+    <div class="spin"></div>
+    <p class="load-text" id="loadText">두 사람의 운명 데이터를 분석 중…</p>
+    <div class="load-steps">
+      <div class="load-step" id="step1">사주 계산 중…</div>
+      <div class="load-step" id="step2">서양 점성술 분석 중…</div>
+      <div class="load-step" id="step3">베딕 점성술 분석 중…</div>
+      <div class="load-step" id="step4">AI 궁합 해석 중…</div>
+    </div>
+  </div>
+
+  <!-- ── FREE RESULT ─────────────────────────── -->
+  <div id="freeSection">
+    <div class="type-hero" id="typeHero">
+      <div class="type-label" id="typeLabel">궁합 유형</div>
+      <div class="type-name" id="typeName"></div>
+      <p class="type-summary" id="typeSummary"></p>
+    </div>
+
+    <div class="engine-bars">
+      <div class="engine-row">
+        <span class="engine-name">사주</span>
+        <div class="engine-bar-bg"><div class="engine-bar-fill bar-saju" id="barSaju"></div></div>
+        <span class="engine-score-val" id="valSaju">0</span>
+      </div>
+      <div class="engine-row">
+        <span class="engine-name">서양점성</span>
+        <div class="engine-bar-bg"><div class="engine-bar-fill bar-astro" id="barAstro"></div></div>
+        <span class="engine-score-val" id="valAstro">0</span>
+      </div>
+      <div class="engine-row">
+        <span class="engine-name">베딕</span>
+        <div class="engine-bar-bg"><div class="engine-bar-fill bar-vedic" id="barVedic"></div></div>
+        <span class="engine-score-val" id="valVedic">0</span>
+      </div>
+    </div>
+
+    <div class="prem-teaser">
+      <div class="prem-title">상세 궁합 리포트 잠금 해제</div>
+      <ul class="prem-list">
+        <li>사주·서양점성·베딕 각 엔진별 심층 분석</li>
+        <li>3축 궁합 레이더 차트 시각화</li>
+        <li>두 사람의 시너지와 갈등 포인트</li>
+        <li>관계 유형 이미지 공유 카드</li>
+      </ul>
+      <button class="prem-btn" id="premBtn" onclick="unlockPremium()">
+        상세 분석 보기 <span class="orb-cost">300 Orb</span>
+      </button>
+    </div>
+
+    <div class="err-box" id="errBox2"></div>
+    <button class="main-btn sub-btn" onclick="resetForm()">다시 분석하기</button>
+  </div>
+
+  <!-- ── PREMIUM RESULT ──────────────────────── -->
+  <div id="premSection">
+    <div class="type-hero" id="typeHero2" style="padding-bottom:8px;">
+      <div class="type-label" id="typeLabel2">궁합 유형</div>
+      <div class="type-name" id="typeName2"></div>
+    </div>
+
+    <div class="radar-wrap">
+      <canvas id="radarChart" width="320" height="260"></canvas>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-label">사주 궁합</div>
+      <div class="analysis-text" id="textSaju"></div>
+    </div>
+    <div class="analysis-card">
+      <div class="analysis-label">서양 점성</div>
+      <div class="analysis-text" id="textAstro"></div>
+    </div>
+    <div class="analysis-card">
+      <div class="analysis-label">베딕 점성</div>
+      <div class="analysis-text" id="textVedic"></div>
+    </div>
+    <div class="analysis-card">
+      <div class="analysis-label">종합 조언</div>
+      <div class="analysis-text" id="textOverall"></div>
+    </div>
+
+    <div class="share-wrap">
+      <button class="share-btn btn-kakao" onclick="shareKakao()">카카오로 공유하기</button>
+      <button class="share-btn btn-img-save" onclick="saveCard()">이미지 저장</button>
+    </div>
+    <button class="main-btn sub-btn" onclick="resetForm()" style="margin-top:10px;">다시 분석하기</button>
+  </div>
+
+  <div class="err-box" id="errBox3" style="margin-bottom:12px;"></div>
+</div>
+
+<canvas id="shareCanvas" class="canvas-hidden" width="900" height="600"></canvas>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONSTANTS ──────────────────────────────────────────────────
+var SB_URL   = 'https://ymghmfkqctckxxysxkvy.supabase.co';
+var SB_KEY   = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
+var WORKER   = 'https://fortuna.kkdmb7.workers.dev';
+var CHAT_URL = 'https://fortuna-silk.vercel.app/api/chat';
+var KAKAO_JS_KEY = '2543c896dead8185e2edfa0976396f25';
+
+var CARD_IMAGES = {
+  '운명의 실':    '/img/gunghap/fortuna_card_1_destiny.png',
+  '불꽃 인연':    '/img/gunghap/fortuna_card_2_flame.png',
+  '상생의 파트너':'/img/gunghap/fortuna_card_3_growth.png',
+  '카르마 연결':  '/img/gunghap/fortuna_card_4_karma.png',
+  '대립과 성장':  '/img/gunghap/fortuna_card_5_clash.png',
+  '수련의 인연':  '/img/gunghap/fortuna_card_6_trial.png'
+};
+var TYPE_CLASS = {
+  '운명의 실':'type-destiny','불꽃 인연':'type-flame','상생의 파트너':'type-growth',
+  '카르마 연결':'type-karma','대립과 성장':'type-clash','수련의 인연':'type-trial'
+};
+
+// ── STATE ──────────────────────────────────────────────────────
+var _sb = null;
+var _user = null;
+var _aGender = 'M', _bGender = 'F';
+var _aCal = 'solar', _bCal = 'solar';
+var _freeResult = null;
+var _radarChart = null;
+
+function getSb() { if (!_sb) _sb = supabase.createClient(SB_URL, SB_KEY); return _sb; }
+
+// ── INIT ───────────────────────────────────────────────────────
+(function init() {
+  try { var u = localStorage.getItem('pico_user'); if (u) _user = JSON.parse(u); } catch(e) {}
+  if (window.Kakao && !window.Kakao.isInitialized()) try { Kakao.init(KAKAO_JS_KEY); } catch(e) {}
+  buildAllSelects();
+  autoFillA();
+})();
+
+function buildAllSelects() {
+  var cy = new Date().getFullYear();
+  ['a', 'b'].forEach(function(p) {
+    var ys = document.getElementById(p + '_y');
+    for (var y = cy; y >= 1930; y--) {
+      var o = document.createElement('option');
+      o.value = y; o.textContent = y + '년'; if (y === 1990) o.selected = true;
+      ys.appendChild(o);
+    }
+    var ms = document.getElementById(p + '_m');
+    for (var m = 1; m <= 12; m++) {
+      var o = document.createElement('option');
+      o.value = m; o.textContent = m + '월'; if (m === 1) o.selected = true;
+      ms.appendChild(o);
+    }
+    rebuildDays(p);
+    var hs = document.getElementById(p + '_h');
+    var unk = document.createElement('option'); unk.value = 'unknown'; unk.textContent = '시 모름';
+    hs.appendChild(unk);
+    for (var h = 0; h <= 23; h++) {
+      var o = document.createElement('option');
+      o.value = h; o.textContent = h + '시'; if (h === 12) o.selected = true;
+      hs.appendChild(o);
+    }
+    var mins = document.getElementById(p + '_min');
+    [0,5,10,15,20,25,30,35,40,45,50,55].forEach(function(mn) {
+      var o = document.createElement('option');
+      o.value = mn; o.textContent = (mn < 10 ? '0' : '') + mn + '분'; if (mn === 0) o.selected = true;
+      mins.appendChild(o);
+    });
+    document.getElementById(p + '_y').addEventListener('change', function() { rebuildDays(p); });
+    document.getElementById(p + '_m').addEventListener('change', function() { rebuildDays(p); });
+  });
+}
+
+function rebuildDays(p) {
+  var y = parseInt(document.getElementById(p + '_y').value) || 1990;
+  var m = parseInt(document.getElementById(p + '_m').value) || 1;
+  var ds = document.getElementById(p + '_d');
+  var cur = parseInt(ds.value) || 1;
+  ds.innerHTML = '';
+  var days = new Date(y, m, 0).getDate();
+  for (var d = 1; d <= days; d++) {
+    var o = document.createElement('option');
+    o.value = d; o.textContent = d + '일';
+    if (d === Math.min(cur, days)) o.selected = true;
+    ds.appendChild(o);
+  }
+}
+
+function autoFillA() {
+  try {
+    var pr = localStorage.getItem('pico_profile');
+    if (!pr) return;
+    var pf = JSON.parse(pr);
+    if (pf.name) document.getElementById('a_name').value = pf.name;
+    if (pf.year) { document.getElementById('a_y').value = pf.year; }
+    if (pf.month) { document.getElementById('a_m').value = pf.month; }
+    rebuildDays('a');
+    if (pf.day) document.getElementById('a_d').value = pf.day;
+    if (pf.hour !== undefined && pf.hour !== null) {
+      var hv = (pf.hour === 'unknown' || pf.hour === -1) ? 'unknown' : parseInt(pf.hour);
+      document.getElementById('a_h').value = hv;
+    }
+    if (pf.gender) {
+      var g = (pf.gender === 'female' || pf.gender === 'F') ? 'F' : 'M';
+      _aGender = g;
+      document.getElementById('a_M').className = 'g-btn' + (g === 'M' ? ' on' : '');
+      document.getElementById('a_F').className = 'g-btn' + (g === 'F' ? ' on' : '');
+    }
+  } catch(e) {}
+}
+
+function selCal(p, v) {
+  if (p === 'a') {
+    _aCal = v;
+    document.getElementById('a_cal_solar').className = 'g-btn' + (v === 'solar' ? ' on' : '');
+    document.getElementById('a_cal_lunar').className = 'g-btn' + (v === 'lunar' ? ' on' : '');
+  } else {
+    _bCal = v;
+    document.getElementById('b_cal_solar').className = 'g-btn' + (v === 'solar' ? ' on' : '');
+    document.getElementById('b_cal_lunar').className = 'g-btn' + (v === 'lunar' ? ' on' : '');
+  }
+}
+function selGender(p, v) {
+  if (p === 'a') {
+    _aGender = v;
+    document.getElementById('a_M').className = 'g-btn' + (v === 'M' ? ' on' : '');
+    document.getElementById('a_F').className = 'g-btn' + (v === 'F' ? ' on' : '');
+  } else {
+    _bGender = v;
+    document.getElementById('b_M').className = 'g-btn' + (v === 'M' ? ' on' : '');
+    document.getElementById('b_F').className = 'g-btn' + (v === 'F' ? ' on' : '');
+  }
+}
+
+function getPerson(p) {
+  var y = parseInt(document.getElementById(p + '_y').value);
+  var m = parseInt(document.getElementById(p + '_m').value);
+  var d = parseInt(document.getElementById(p + '_d').value);
+  var hv = document.getElementById(p + '_h').value;
+  var h = (hv === 'unknown') ? 12 : parseInt(hv);
+  var mn = parseInt(document.getElementById(p + '_min').value) || 0;
+  var gender = (p === 'a') ? _aGender : _bGender;
+  var cal = (p === 'a') ? _aCal : _bCal;
+  var name = document.getElementById(p + '_name').value.trim() || (p === 'a' ? '나' : '상대');
+  var birth = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0')
+              + 'T' + String(h).padStart(2,'0') + ':' + String(mn).padStart(2,'0') + ':00';
+  return { y:y, m:m, d:d, h:h, min:mn, gender:gender, cal:cal, name:name, birth:birth, unknownHour:(hv==='unknown') };
+}
+
+function showErr(id, msg) { var e = document.getElementById(id); e.textContent = msg; e.style.display = 'block'; }
+function hideErr(id) { document.getElementById(id).style.display = 'none'; }
+function showToast(msg) {
+  var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+// ── STEP INDICATOR ─────────────────────────────────────────────
+function setStep(n) {
+  for (var i = 1; i <= 4; i++) {
+    var el = document.getElementById('step' + i);
+    if (i < n) el.className = 'load-step done';
+    else if (i === n) el.className = 'load-step active';
+    else el.className = 'load-step';
+  }
+}
+
+// ── ANALYSIS FLOW ─────────────────────────────────────────────
+async function startAnalysis() {
+  hideErr('errBox');
+  var a = getPerson('a'), b = getPerson('b');
+  if (!a.y || !b.y) { showErr('errBox', '생년월일을 입력해주세요.'); return; }
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('formSection').style.display = 'none';
+  document.getElementById('loadSection').style.display = 'block';
+  window.scrollTo(0, 0);
+  try {
+    setStep(1);
+    var results = await Promise.all([fetchSaju(a), fetchSaju(b)]);
+    var sajuA = results[0], sajuB = results[1];
+
+    setStep(2);
+    var astroResults = await Promise.all([fetchAstro(a), fetchAstro(b)]);
+    var astroA = astroResults[0], astroB = astroResults[1];
+
+    setStep(3);
+    var vedicResults = await Promise.all([fetchVedic(a), fetchVedic(b)]);
+    var vedicA = vedicResults[0], vedicB = vedicResults[1];
+
+    setStep(4);
+    var result = await analyzeCompatibility(a, b, sajuA, sajuB, astroA, astroB, vedicA, vedicB);
+
+    _freeResult = Object.assign({}, result, {
+      nameA: a.name, nameB: b.name,
+      sajuA: sajuA, sajuB: sajuB,
+      astroA: astroA, astroB: astroB,
+      vedicA: vedicA, vedicB: vedicB,
+      personA: a, personB: b
+    });
+
+    document.getElementById('loadSection').style.display = 'none';
+    renderFreeResult(result);
+    document.getElementById('freeSection').style.display = 'block';
+    window.scrollTo(0, 0);
+  } catch(e) {
+    document.getElementById('loadSection').style.display = 'none';
+    document.getElementById('formSection').style.display = 'block';
+    document.getElementById('analyzeBtn').disabled = false;
+    showErr('errBox', '오류: ' + (e.message || '분석 중 문제가 발생했습니다.'));
+  }
+}
+
+// ── API CALLS ──────────────────────────────────────────────────
+async function fetchSaju(p) {
+  var res = await fetch(WORKER + '/saju-test', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ birth: p.birth, gender: p.gender === 'M' ? 'male' : 'female', calendar: p.cal, midnightType: 0 })
+  });
+  if (!res.ok) throw new Error('사주 API 오류 (' + res.status + ')');
+  return res.json();
+}
+
+async function fetchAstro(p) {
+  var params = new URLSearchParams({ year: p.y, month: p.m, day: p.d, hour: p.h, min: p.min, lat: 37.5665, lon: 126.9780, tzone: 9 });
+  var res = await fetch(WORKER + '/astro?' + params);
+  if (!res.ok) throw new Error('점성술 API 오류 (' + res.status + ')');
+  return res.json();
+}
+
+async function fetchVedic(p) {
+  var params = new URLSearchParams({ year: p.y, month: p.m, day: p.d, hour: p.h, minute: p.min, tz: 9, lat: 37.5665, lon: 126.9780, gender: p.gender === 'M' ? 'male' : 'female' });
+  var res = await fetch(WORKER + '/vedic?' + params);
+  if (!res.ok) throw new Error('베딕 API 오류 (' + res.status + ')');
+  return res.json();
+}
+
+// ── AI COMPATIBILITY SCORING ───────────────────────────────────
+function buildDataSummary(a, b, sA, sB, aA, aB, vA, vB) {
+  function safeGet(obj, keys, def) {
+    var cur = obj;
+    for (var i = 0; i < keys.length; i++) {
+      if (!cur || typeof cur !== 'object') return def;
+      cur = cur[keys[i]];
+    }
+    return cur !== undefined && cur !== null ? cur : def;
+  }
+  var lines = [];
+  lines.push('=== ' + a.name + ' (' + (a.gender === 'M' ? '남' : '여') + ') ===');
+  lines.push('생년월일: ' + a.birth);
+  if (sA) {
+    var pA = safeGet(sA, ['summary','pillars'], {});
+    lines.push('사주기둥: ' + JSON.stringify(pA));
+    lines.push('오행: ' + JSON.stringify(safeGet(sA, ['five_count'], {})));
+    lines.push('용신: ' + safeGet(sA, ['yongshin','primary'], '?'));
+    lines.push('일간: ' + safeGet(sA, ['summary','pillars','day','stem'], '?'));
+  }
+  if (aA && aA.planets) {
+    lines.push('태양궁: ' + safeGet(aA, ['planets','Sun','sign'], '?'));
+    lines.push('달궁: '  + safeGet(aA, ['planets','Moon','sign'], '?'));
+    lines.push('금성궁: '+ safeGet(aA, ['planets','Venus','sign'], '?'));
+    lines.push('화성궁: '+ safeGet(aA, ['planets','Mars','sign'], '?'));
+  }
+  if (vA) {
+    lines.push('베딕달자리: ' + (vA.moon_sign || vA.moonSign || '?'));
+    lines.push('나크샤트라: ' + (vA.nakshatra || vA.moon_nakshatra || '?'));
+  }
+  lines.push('');
+  lines.push('=== ' + b.name + ' (' + (b.gender === 'M' ? '남' : '여') + ') ===');
+  lines.push('생년월일: ' + b.birth);
+  if (sB) {
+    var pB = safeGet(sB, ['summary','pillars'], {});
+    lines.push('사주기둥: ' + JSON.stringify(pB));
+    lines.push('오행: ' + JSON.stringify(safeGet(sB, ['five_count'], {})));
+    lines.push('용신: ' + safeGet(sB, ['yongshin','primary'], '?'));
+    lines.push('일간: ' + safeGet(sB, ['summary','pillars','day','stem'], '?'));
+  }
+  if (aB && aB.planets) {
+    lines.push('태양궁: ' + safeGet(aB, ['planets','Sun','sign'], '?'));
+    lines.push('달궁: '  + safeGet(aB, ['planets','Moon','sign'], '?'));
+    lines.push('금성궁: '+ safeGet(aB, ['planets','Venus','sign'], '?'));
+    lines.push('화성궁: '+ safeGet(aB, ['planets','Mars','sign'], '?'));
+  }
+  if (vB) {
+    lines.push('베딕달자리: ' + (vB.moon_sign || vB.moonSign || '?'));
+    lines.push('나크샤트라: ' + (vB.nakshatra || vB.moon_nakshatra || '?'));
+  }
+  return lines.join('\n');
+}
+
+async function analyzeCompatibility(a, b, sA, sB, aA, aB, vA, vB) {
+  var sysPrompt = '당신은 동서양 운명 궁합 전문가입니다. 두 사람의 사주·서양점성·베딕 데이터를 정밀 분석해 JSON만 반환하세요. 코드블록(\`\`\`) 없이 순수 JSON만.\n\n반환 형식:\n{"saju_score":정수0~100,"astro_score":정수0~100,"vedic_score":정수0~100,"total_score":세점수평균정수,"type":"운명의 실|불꽃 인연|상생의 파트너|카르마 연결|대립과 성장|수련의 인연","summary":"두 사람의 궁합을 소름 돋도록 구체적으로 50자 이내 한 문장"}\n\n점수 기준: 90이상=운명의 실, 80~89=불꽃 인연, 70~79=상생의 파트너, 60~69=카르마 연결, 50~59=대립과 성장, 49이하=수련의 인연\n\n사주: 일간합·충·오행균형·용신 관계 분석\n서양점성: 태양·달·금성·화성 각도 및 원소 궁합\n베딕: 나크샤트라 쿠타(Kuta) 8항목 종합';
+  var userMsg = buildDataSummary(a, b, sA, sB, aA, aB, vA, vB);
+
+  var res = await fetch(CHAT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: _user ? _user.id : 'anonymous', skip_orb: true, system_prompt: sysPrompt, messages: [{ role: 'user', content: userMsg }] })
+  });
+  if (!res.ok) throw new Error('AI 분석 오류 (' + res.status + ')');
+  var data = await res.json();
+  var text = (data.content || data.message || data.text || '').trim();
+  var match = text.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('AI 응답 파싱 오류');
+  var parsed = JSON.parse(match[0]);
+  if (!parsed.total_score) parsed.total_score = Math.round(((parsed.saju_score||50)+(parsed.astro_score||50)+(parsed.vedic_score||50))/3);
+  if (!parsed.type) parsed.type = getTypeByScore(parsed.total_score);
+  return parsed;
+}
+
+function getTypeByScore(s) {
+  if (s >= 90) return '운명의 실';
+  if (s >= 80) return '불꽃 인연';
+  if (s >= 70) return '상생의 파트너';
+  if (s >= 60) return '카르마 연결';
+  if (s >= 50) return '대립과 성장';
+  return '수련의 인연';
+}
+
+// ── FREE RESULT RENDER ─────────────────────────────────────────
+function renderFreeResult(r) {
+  var type = r.type || getTypeByScore(r.total_score || 0);
+  var cls = TYPE_CLASS[type] || '';
+  var hero = document.getElementById('typeHero');
+  hero.className = 'type-hero ' + cls;
+  document.getElementById('typeLabel').textContent = '궁합 유형';
+  document.getElementById('typeName').textContent = type;
+  document.getElementById('typeSummary').textContent = r.summary || '';
+  setTimeout(function() {
+    setBar('barSaju', 'valSaju', r.saju_score || 0);
+    setBar('barAstro', 'valAstro', r.astro_score || 0);
+    setBar('barVedic', 'valVedic', r.vedic_score || 0);
+  }, 120);
+}
+
+function setBar(barId, valId, v) {
+  document.getElementById(barId).style.width = v + '%';
+  document.getElementById(valId).textContent = v;
+}
+
+// ── PREMIUM UNLOCK ─────────────────────────────────────────────
+async function unlockPremium() {
+  if (!_user) {
+    showToast('카카오 로그인 후 이용 가능합니다.');
+    setTimeout(function() { location.href = '/'; }, 1600);
+    return;
+  }
+  var btn = document.getElementById('premBtn');
+  btn.disabled = true; btn.textContent = '분석 중…';
+  hideErr('errBox2');
+  try {
+    var ok = await deductOrb(300);
+    if (!ok) { btn.disabled = false; btn.innerHTML = '상세 분석 보기 <span class="orb-cost">300 Orb</span>'; return; }
+
+    document.getElementById('freeSection').style.display = 'none';
+    document.getElementById('loadSection').style.display = 'block';
+    document.getElementById('loadText').textContent = '상세 리포트를 생성 중…';
+    setStep(4);
+
+    var detail = await fetchPremiumDetail();
+    document.getElementById('loadSection').style.display = 'none';
+    renderPremium(detail);
+    document.getElementById('premSection').style.display = 'block';
+    window.scrollTo(0, 0);
+  } catch(e) {
+    document.getElementById('loadSection').style.display = 'none';
+    document.getElementById('freeSection').style.display = 'block';
+    btn.disabled = false; btn.innerHTML = '상세 분석 보기 <span class="orb-cost">300 Orb</span>';
+    showErr('errBox2', '오류: ' + (e.message || '상세 분석 실패'));
+  }
+}
+
+async function deductOrb(cost) {
+  var sb = getSb();
+  var resp = await sb.from('orb_balance').select('balance,free_balance,paid_balance').eq('user_id', _user.id).single();
+  if (resp.error || !resp.data) { showErr('errBox2', 'Orb 잔액 조회 실패'); return false; }
+  var bal = resp.data;
+  var total = bal.balance || 0;
+  if (total < cost) { showErr('errBox2', 'Orb가 부족합니다. (보유: ' + total + ' / 필요: ' + cost + ')'); return false; }
+  var free = bal.free_balance || 0;
+  var paid = bal.paid_balance || 0;
+  var rem = cost;
+  var newFree = free, newPaid = paid;
+  if (free >= rem) { newFree = free - rem; rem = 0; }
+  else { rem -= free; newFree = 0; newPaid = Math.max(0, paid - rem); }
+  var newBal = newFree + newPaid;
+  var upRes = await sb.from('orb_balance').update({ balance: newBal, free_balance: newFree, paid_balance: newPaid }).eq('user_id', _user.id);
+  if (upRes.error) throw new Error('Orb 차감 실패: ' + upRes.error.message);
+  await sb.from('orb_transactions').insert({ user_id: _user.id, amount: -cost, type: 'use', description: '궁합 2.0 상세 분석', balance_after: newBal });
+  return true;
+}
+
+async function fetchPremiumDetail() {
+  var r = _freeResult;
+  var sysPrompt = '당신은 사주·점성술·베딕 전문가입니다.\n전문 용어 없이 심리 언어로 두 사람의 관계를 설명하세요.\n소름 돋을 만큼 구체적이고 공감되는 문장으로.\n#헤더 금지, 표 금지, **볼드**는 핵심 단어에만 3~5개.\n\nJSON만 반환하세요 (코드블록 없이):\n{"saju_analysis":"사주 관점 분석 200~300자","astro_analysis":"서양점성 관점 분석 200~300자","vedic_analysis":"베딕 관점 분석 200~300자","overall":"종합 조언 — 두 사람이 함께 성장하는 방향 300~400자"}';
+  var userMsg = buildDataSummary(r.personA, r.personB, r.sajuA, r.sajuB, r.astroA, r.astroB, r.vedicA, r.vedicB);
+  userMsg += '\n\n점수: 사주=' + r.saju_score + ' 점성=' + r.astro_score + ' 베딕=' + r.vedic_score + ' 총합=' + r.total_score + ' 유형=' + r.type;
+
+  var res = await fetch(CHAT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: _user ? _user.id : 'anonymous', skip_orb: true, system_prompt: sysPrompt, messages: [{ role: 'user', content: userMsg }] })
+  });
+  if (!res.ok) throw new Error('AI 상세 분석 오류 (' + res.status + ')');
+  var data = await res.json();
+  var text = (data.content || data.message || data.text || '').trim();
+  var match = text.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('AI 응답 파싱 오류');
+  return JSON.parse(match[0]);
+}
+
+// ── PREMIUM RENDER ─────────────────────────────────────────────
+function renderPremium(d) {
+  var r = _freeResult;
+  var type = r.type || '';
+  var cls = TYPE_CLASS[type] || '';
+  document.getElementById('typeHero2').className = 'type-hero ' + cls;
+  document.getElementById('typeLabel2').textContent = '궁합 유형';
+  document.getElementById('typeName2').textContent = type;
+
+  if (_radarChart) _radarChart.destroy();
+  var ctx = document.getElementById('radarChart').getContext('2d');
+  _radarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['사주', '서양점성', '베딕'],
+      datasets: [
+        { label: r.nameA, data: [r.saju_score, r.astro_score, r.vedic_score], backgroundColor: 'rgba(122,36,24,0.18)', borderColor: 'rgba(122,36,24,0.9)', pointBackgroundColor: '#7a2418', borderWidth: 2.5, pointRadius: 5 },
+        { label: r.nameB, data: [r.saju_score, r.astro_score, r.vedic_score], backgroundColor: 'rgba(95,140,181,0.18)', borderColor: 'rgba(95,140,181,0.9)', pointBackgroundColor: '#5f8cb5', borderWidth: 2.5, pointRadius: 5 }
+      ]
+    },
+    options: {
+      responsive: false,
+      scales: { r: { min: 0, max: 100, ticks: { stepSize: 25, font: { size: 10 } }, grid: { color: 'rgba(154,138,96,0.2)' }, pointLabels: { font: { size: 14, family: "'Pretendard Variable',sans-serif" }, color: '#4a3a2a' } } },
+      plugins: { legend: { labels: { font: { size: 13 }, color: '#4a3a2a', padding: 12 } } }
+    }
+  });
+
+  function setAnalysis(id, text) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = (text || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }
+  setAnalysis('textSaju', d.saju_analysis);
+  setAnalysis('textAstro', d.astro_analysis);
+  setAnalysis('textVedic', d.vedic_analysis);
+  setAnalysis('textOverall', d.overall);
+}
+
+// ── CANVAS SHARE CARD ──────────────────────────────────────────
+function drawShareCard(cb) {
+  var r = _freeResult;
+  if (!r) return;
+  var canvas = document.getElementById('shareCanvas');
+  var ctx = canvas.getContext('2d');
+  var W = 900, H = 600;
+  canvas.width = W; canvas.height = H;
+
+  var imgSrc = CARD_IMAGES[r.type] || CARD_IMAGES['상생의 파트너'];
+  var img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    ctx.drawImage(img, 0, 0, W, H);
+
+    // Dark overlay
+    var ov = ctx.createLinearGradient(0, 0, 0, H);
+    ov.addColorStop(0, 'rgba(0,0,0,0.35)');
+    ov.addColorStop(0.5, 'rgba(0,0,0,0.15)');
+    ov.addColorStop(1, 'rgba(0,0,0,0.55)');
+    ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+
+    // Brand
+    ctx.textAlign = 'center';
+    ctx.font = '600 15px Cinzel, serif'; ctx.fillStyle = 'rgba(255,255,255,0.70)';
+    ctx.fillText('FORTUNA', W/2, 36);
+
+    // Type name
+    ctx.font = '900 48px "Noto Serif KR", serif'; ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 12;
+    ctx.fillText(r.type || '', W/2, H/2 - 40);
+
+    // Summary
+    ctx.font = '400 19px "Pretendard Variable", sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.shadowBlur = 8;
+    wrapTextCenter(ctx, r.summary || '', W/2, H/2 + 18, W - 120, 30);
+
+    // Names
+    ctx.shadowBlur = 0;
+    ctx.font = '600 20px "Pretendard Variable", sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.80)';
+    ctx.fillText(r.nameA + ' ♥ ' + r.nameB, W/2, H - 60);
+
+    // Footer
+    ctx.font = '400 13px Cinzel, serif'; ctx.fillStyle = 'rgba(255,255,255,0.40)';
+    ctx.fillText('picolab.kr', W/2, H - 28);
+
+    ctx.shadowBlur = 0;
+    if (cb) cb();
+  };
+  img.onerror = function() {
+    // Fallback: dark gradient background
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#1a120a'); g.addColorStop(1, '#2d1e10');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+    ctx.font = '900 48px "Noto Serif KR", serif'; ctx.fillStyle = '#f4ede0';
+    ctx.fillText(r.type || '', W/2, H/2 - 30);
+    ctx.font = '400 18px "Pretendard Variable", sans-serif'; ctx.fillStyle = 'rgba(244,237,224,0.8)';
+    wrapTextCenter(ctx, r.summary || '', W/2, H/2 + 20, W - 120, 28);
+    ctx.font = '600 18px "Pretendard Variable", sans-serif'; ctx.fillStyle = 'rgba(244,237,224,0.7)';
+    ctx.fillText(r.nameA + ' ♥ ' + r.nameB, W/2, H - 60);
+    ctx.font = '400 12px Cinzel, serif'; ctx.fillStyle = 'rgba(244,237,224,0.35)';
+    ctx.fillText('picolab.kr', W/2, H - 28);
+    if (cb) cb();
+  };
+  img.src = imgSrc;
+}
+
+function wrapTextCenter(ctx, text, x, y, maxW, lh) {
+  if (!text) return;
+  var words = text.split(' '); var line = '';
+  for (var i = 0; i < words.length; i++) {
+    var test = line + words[i] + ' ';
+    if (ctx.measureText(test).width > maxW && i > 0) {
+      ctx.fillText(line.trim(), x, y); line = words[i] + ' '; y += lh;
+    } else { line = test; }
+  }
+  ctx.fillText(line.trim(), x, y);
+}
+
+function saveCard() {
+  drawShareCard(function() {
+    var canvas = document.getElementById('shareCanvas');
+    var a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'gunghap_' + Date.now() + '.png';
+    a.click();
+    showToast('이미지가 저장되었습니다.');
+  });
+}
+
+// ── KAKAO SHARE ────────────────────────────────────────────────
+function shareKakao() {
+  var r = _freeResult;
+  if (!r) return;
+  var text = '[FORTUNA 궁합 2.0]\n' + r.nameA + ' ♥ ' + r.nameB + '\n' + r.type + '\n\n' + (r.summary || '');
+  var url = 'https://picolab.kr/gunghap2.html';
+  if (window.Kakao && window.Kakao.Share) {
+    if (!Kakao.isInitialized()) try { Kakao.init(KAKAO_JS_KEY); } catch(e) {}
+    try {
+      Kakao.Share.sendDefault({ objectType: 'text', text: text, link: { mobileWebUrl: url, webUrl: url }, buttons: [{ title: '무료로 확인하기', link: { mobileWebUrl: url, webUrl: url } }] });
+      return;
+    } catch(e) {}
+  }
+  if (navigator.share) {
+    navigator.share({ title: '궁합 2.0 · FORTUNA', text: text, url: url });
+  } else {
+    try { navigator.clipboard.writeText(text + '\n' + url); } catch(e) {}
+    showToast('링크가 복사되었습니다.');
+  }
+}
+
+// ── RESET ──────────────────────────────────────────────────────
+function resetForm() {
+  document.getElementById('freeSection').style.display = 'none';
+  document.getElementById('premSection').style.display = 'none';
+  document.getElementById('formSection').style.display = 'block';
+  document.getElementById('analyzeBtn').disabled = false;
+  hideErr('errBox'); hideErr('errBox2'); hideErr('errBox3');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
