@@ -1591,11 +1591,12 @@ function showToast(msg) {
   _toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2200);
 }
 
-// 시간 경과 decay (앱 열려있는 동안)
+// 시간 경과 decay + 에너지 자동 회복 (화면 켜둘수록 에너지 충전)
 setInterval(function() {
   if (!state.element || state.sleeping) return;
-  state.hunger = Math.max(0, state.hunger - 0.5);
-  state.happy  = Math.max(0, state.happy  - 0.3);
+  state.hunger = Math.max(0,   state.hunger - 0.5);
+  state.happy  = Math.max(0,   state.happy  - 0.3);
+  state.energy = Math.min(100, state.energy + 0.4); // 화면 켜두면 30초마다 +0.4 (~시간당 +48)
   render();
   saveState();
 }, 30000); // 30초마다

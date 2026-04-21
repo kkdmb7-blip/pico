@@ -189,6 +189,39 @@
     pet.setAttribute('aria-label', '용신 찾기');
     pet.innerHTML = buildPetSVG(elem);
 
+    // 레벨 뱃지
+    var lvBadge = document.createElement('div');
+    lvBadge.id = 'yongsin-float-lv';
+    lvBadge.style.cssText = [
+      'position:absolute',
+      'top:-4px', 'right:-4px',
+      'background:' + s.bg,
+      'color:#fff',
+      'font-size:9px',
+      'font-weight:700',
+      'line-height:1',
+      'padding:2px 4px',
+      'border-radius:6px',
+      'border:1.5px solid #f9f1de',
+      'pointer-events:none',
+      'font-family:\'Pretendard Variable\',Pretendard,sans-serif',
+      'z-index:2',
+    ].join(';');
+    var ps = getPetState();
+    lvBadge.textContent = 'Lv.' + (ps.level || 1);
+    pet.appendChild(lvBadge);
+
+    // 에너지 바 (하단 얇은 바)
+    var energyBar = document.createElement('div');
+    energyBar.id = 'yongsin-float-ebar';
+    energyBar.style.cssText = 'position:absolute;bottom:0;left:0;right:0;height:4px;background:rgba(0,0,0,0.15);pointer-events:none;z-index:2;';
+    var energyFill = document.createElement('div');
+    energyFill.id = 'yongsin-float-efill';
+    var energyPct = Math.round(ps.energy || 0);
+    energyFill.style.cssText = 'height:100%;width:' + energyPct + '%;background:' + s.bg + ';transition:width 0.6s;';
+    energyBar.appendChild(energyFill);
+    pet.appendChild(energyBar);
+
     // 숨김 힌트 (반쯤 튀어나온 눈)
     var hint = document.createElement('div');
     hint.id = 'yongsin-float-hint';
@@ -468,6 +501,11 @@
       if (state.exp >= needed) { state.exp -= needed; state.level = (state.level || 1) + 1; }
       state.lastVisit = Date.now();
       try { localStorage.setItem(PET_KEY, JSON.stringify(state)); } catch(e) {}
+      // 레벨·에너지 바 갱신
+      var lvEl = document.getElementById('yongsin-float-lv');
+      var fillEl = document.getElementById('yongsin-float-efill');
+      if (lvEl) lvEl.textContent = 'Lv.' + (state.level || 1);
+      if (fillEl) fillEl.style.width = Math.round(state.energy || 0) + '%';
     }
 
     // 탭할 때마다 다른 콘텐츠 순환
