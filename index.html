@@ -6285,7 +6285,9 @@ window.togglePushSubscription = async function() {
         '<p style="font-size:14px;font-style:italic;color:var(--text);line-height:1.75;margin:0 0 6px;font-family:\'Noto Serif KR\',serif;">&ldquo;' + esc(data.quote) + '&rdquo;</p>' +
         '<p style="font-size:11px;color:#8b2a1e;margin:0 0 10px;letter-spacing:0.04em;font-weight:600;">— ' + esc(data.source) + '</p>' +
         '<p style="font-size:12px;color:var(--text2);line-height:1.65;margin:0 0 12px;background:rgba(168,132,42,0.1);border-radius:10px;padding:10px 12px;">' + esc(data.message) + '</p>' +
-        '<button id="btnShareQuote" style="width:100%;padding:10px;background:rgba(254,229,0,0.35);border:1px solid rgba(254,229,0,0.55);border-radius:12px;font-size:13px;font-weight:700;color:#6b4c00;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="pi pi-share-alt"></i> 함께 나누기</button>' +
+        '<div style="display:flex;justify-content:flex-end;margin-top:4px;">' +
+          '<button id="btnShareQuote" style="padding:7px 14px;background:rgba(254,229,0,0.35);border:1px solid rgba(254,229,0,0.55);border-radius:20px;font-size:12px;font-weight:700;color:#6b4c00;cursor:pointer;display:flex;align-items:center;gap:5px;">🔗 함께 나누기</button>' +
+        '</div>' +
       '</div>';
 
     document.getElementById('btnDismissQuote').addEventListener('click', function() {
