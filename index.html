@@ -1477,48 +1477,38 @@
         +'<div style="font-size:32px;line-height:1;">🥚</div>'
         +'<div style="flex:1;">'
           +'<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;">용신 다마고치</div>'
-          +'<div style="font-size:11px;color:var(--muted);">용신·희신 오행을 캐릭터로 키워보세요</div>'
+          +'<div style="font-size:11px;color:var(--muted);">내 용신 오행을 캐릭터로 키워보세요</div>'
         +'</div>'
         +'<div style="color:var(--muted);font-size:14px;">›</div>'
         +'</a>';
       return;
     }
-    function petMini(elKey, label) {
-      if (!elKey || !raw.all || !raw.all[elKey]) return '';
-      var s = raw.all[elKey];
-      var e = ELEM[elKey] || ELEM.water;
-      var xp = Math.min(100, ((s.exp||0)/((s.level||1)*100)*100));
-      return '<div style="flex:1;min-width:0;background:'+e.bg+';border:1px solid '+e.border+';border-radius:12px;padding:10px 12px;">'
-        +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">'
-          +'<span style="font-size:16px;">'+e.emoji+'</span>'
-          +'<span style="font-size:11px;font-weight:700;color:'+e.color+';">'+e.label+'</span>'
-          +'<span style="font-size:10px;color:var(--muted);">Lv.'+(s.level||1)+'</span>'
-          +'<span style="font-size:9px;color:var(--muted);margin-left:auto;">'+label+'</span>'
+    var st = (raw.all && raw.all[raw.element]) ? Object.assign({element: raw.element}, raw.all[raw.element]) : raw;
+    var el = ELEM[st.element] || ELEM.water;
+    var expNeeded = (st.level||1)*100;
+    var expPct = Math.min(100, ((st.exp||0)/expNeeded*100));
+    wrap.innerHTML = '<a href="yongsin-pet.html" style="display:flex;align-items:center;gap:12px;background:'+el.bg+';border:1px solid '+el.border+';border-radius:16px;padding:14px 16px;text-decoration:none;color:var(--text);">'
+      +'<div style="font-size:30px;line-height:1;">'+el.emoji+'</div>'
+      +'<div style="flex:1;min-width:0;">'
+        +'<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px;">'
+          +'<span style="font-size:13px;font-weight:700;color:'+el.color+';">'+el.label+'</span>'
+          +'<span style="font-size:11px;color:var(--muted);">Lv.'+( st.level||1)+' '+getStage(st.level||1)+' 단계</span>'
         +'</div>'
-        +'<div style="display:flex;align-items:center;gap:3px;margin-bottom:4px;">'
-          +'<span style="font-size:9px;color:var(--muted);width:16px;">밥</span>'+bar(s.hunger||0,'#e8a87c')
-          +'<span style="font-size:9px;color:var(--muted);width:18px;margin-left:3px;">행복</span>'+bar(s.happy||0,'#e87ca0')
+        +'<div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;">'
+          +'<span style="font-size:10px;color:var(--muted);width:20px;flex-shrink:0;">밥</span>'+bar(st.hunger||0,'#e8a87c')
+          +'<span style="font-size:10px;color:var(--muted);width:22px;flex-shrink:0;margin-left:4px;">행복</span>'+bar(st.happy||0,'#e87ca0')
+          +'<span style="font-size:10px;color:var(--muted);width:22px;flex-shrink:0;margin-left:4px;">기운</span>'+bar(st.energy||0,'#7ca0e8')
         +'</div>'
-        +'<div style="display:flex;align-items:center;gap:3px;">'
-          +'<span style="font-size:9px;color:var(--muted);width:16px;">EXP</span>'
-          +'<div style="flex:1;height:3px;background:rgba(0,0,0,0.1);border-radius:2px;overflow:hidden;">'
-            +'<div style="height:100%;width:'+xp+'%;background:'+e.color+';border-radius:2px;"></div>'
+        +'<div style="display:flex;align-items:center;gap:4px;">'
+          +'<span style="font-size:10px;color:var(--muted);">EXP</span>'
+          +'<div style="flex:1;height:4px;background:rgba(0,0,0,0.1);border-radius:2px;overflow:hidden;">'
+            +'<div style="height:100%;width:'+expPct+'%;background:linear-gradient(90deg,'+el.color+',rgba(212,175,55,0.8));border-radius:2px;"></div>'
           +'</div>'
+          +'<span style="font-size:9px;color:var(--muted);">'+(st.exp||0)+'/'+expNeeded+'</span>'
         +'</div>'
-      +'</div>';
-    }
-    var el1html = petMini(raw.element,  '🔮용신');
-    var el2html = petMini(raw.element2, '✨희신');
-    var bothHtml = (el1html && el2html)
-      ? '<div style="display:flex;gap:8px;">' + el1html + el2html + '</div>'
-      : el1html || el2html;
-    wrap.innerHTML = '<a href="yongsin-pet.html" style="display:block;text-decoration:none;color:var(--text);padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;">'
-      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'
-        +'<span style="font-size:13px;font-weight:700;color:var(--text);">용신 다마고치</span>'
-        +'<span style="color:var(--muted);font-size:13px;">›</span>'
       +'</div>'
-      + bothHtml
-    +'</a>';
+      +'<div style="color:var(--muted);font-size:14px;">›</div>'
+      +'</a>';
   }
   document.addEventListener('DOMContentLoaded', render);
   window._refreshPetCard = render;
