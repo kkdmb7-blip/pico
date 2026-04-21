@@ -77,31 +77,14 @@
       var fn = getPetStageIdx() + 1;
       return '<img src="' + IMG_BASE + '/img/pet_fire_' + fn + '.png" alt="화 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
     }
-    if (elem === 'earth') return `
-      <svg width="48" height="44" viewBox="0 0 48 44" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="24" cy="26" rx="20" ry="16" fill="#8a5a2a"/>
-        <ellipse cx="24" cy="22" rx="14" ry="10" fill="#a07040"/>
-        <ellipse cx="24" cy="28" rx="12" ry="8" fill="#c89060"/>
-        <circle cx="18" cy="22" r="3.5" fill="white"/>
-        <circle cx="30" cy="22" r="3.5" fill="white"/>
-        <circle cx="19" cy="23" r="2" fill="#2a1a08"/>
-        <circle cx="31" cy="23" r="2" fill="#2a1a08"/>
-        <ellipse cx="13" cy="23" rx="4" ry="2.5" fill="rgba(200,100,80,0.35)"/>
-        <ellipse cx="35" cy="23" rx="4" ry="2.5" fill="rgba(200,100,80,0.35)"/>
-        <path d="M19 29 Q24 32 29 29" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      </svg>`;
-    if (elem === 'metal') return `
-      <svg width="42" height="50" viewBox="0 0 42 50" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="21,2 40,16 40,36 21,50 2,36 2,16" fill="#a09070"/>
-        <polygon points="21,2 40,16 40,36 21,50 2,36 2,16" fill="url(#mg)" opacity="0.8"/>
-        <defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="white" stop-opacity="0.4"/><stop offset="100%" stop-color="black" stop-opacity="0.1"/></linearGradient></defs>
-        <polygon points="21,8 36,18 21,16" fill="white" opacity="0.3"/>
-        <circle cx="15" cy="28" r="3" fill="white"/>
-        <circle cx="27" cy="28" r="3" fill="white"/>
-        <circle cx="16" cy="29" r="1.8" fill="#1a1a2a"/>
-        <circle cx="28" cy="29" r="1.8" fill="#1a1a2a"/>
-        <path d="M16 35 Q21 38 26 35" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      </svg>`;
+    if (elem === 'earth') {
+      var en = getPetStageIdx() + 1;
+      return '<img src="' + IMG_BASE + '/img/pet_earth_' + en + '.png" alt="토 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
+    }
+    if (elem === 'metal') {
+      var mn = Math.min(getPetStageIdx() + 1, 2);
+      return '<img src="' + IMG_BASE + '/img/pet_metal_' + mn + '.png" alt="금 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
+    }
     return `
       <svg width="40" height="50" viewBox="0 0 40 50" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 2 C20 2 36 20 36 32 C36 42 29 50 20 50 C11 50 4 42 4 32 C4 20 20 2 20 2Z" fill="#1976d2"/>

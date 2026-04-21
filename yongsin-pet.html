@@ -685,30 +685,11 @@ nav {
       </div>
 
       <div class="pet-earth" id="pet-earth" style="display:none;">
-        <div class="pebble"></div><div class="pebble"></div><div class="pebble"></div>
-        <div class="body">
-          <div class="tummy"></div>
-          <div class="face">
-            <span class="eye"></span><span class="eye"></span>
-            <div class="blush left"></div><div class="blush right"></div>
-            <div class="mouth"></div>
-          </div>
-        </div>
+        <img id="pet-earth-img" src="/img/pet_earth_1.png" alt="토 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
       </div>
 
       <div class="pet-metal" id="pet-metal" style="display:none;">
-        <span class="sparkle">✦</span>
-        <span class="sparkle">✦</span>
-        <span class="sparkle">✦</span>
-        <div class="crystal">
-          <div class="crystal-body">
-            <div class="crystal-shine"></div>
-          </div>
-        </div>
-        <div class="face">
-          <span class="eye"></span><span class="eye"></span>
-          <div class="mouth"></div>
-        </div>
+        <img id="pet-metal-img" src="/img/pet_metal_1.png" alt="금 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
       </div>
 
       <div class="pet-water" id="pet-water" style="display:none;">
@@ -1166,6 +1147,28 @@ function render() {
     if (fireImg.getAttribute('data-src') !== fireSrc) {
       fireImg.setAttribute('data-src', fireSrc);
       removeBgAndApply(fireSrc, fireImg);
+    }
+  }
+
+  // 토(土) 이미지 단계별 교체 (5단계 모두 있음)
+  if (state.element === 'earth') {
+    var en = stageIdx + 1;
+    var earthSrc = '/img/pet_earth_' + en + '.png';
+    var earthImg = document.getElementById('pet-earth-img');
+    if (earthImg && earthImg.getAttribute('data-src') !== earthSrc) {
+      earthImg.setAttribute('data-src', earthSrc);
+      removeBgAndApply(earthSrc, earthImg);
+    }
+  }
+
+  // 금(金) 이미지 단계별 교체 (2장: 1~2단계 각, 3~5단계는 2번 이미지)
+  if (state.element === 'metal') {
+    var mn = Math.min(stageIdx + 1, 2);
+    var metalSrc = '/img/pet_metal_' + mn + '.png';
+    var metalImg = document.getElementById('pet-metal-img');
+    if (metalImg && metalImg.getAttribute('data-src') !== metalSrc) {
+      metalImg.setAttribute('data-src', metalSrc);
+      removeBgAndApply(metalSrc, metalImg);
     }
   }
 
