@@ -336,3 +336,50 @@ wg는 STEP3 system_prompt 문자열 끝에 직접 연결됨 (`...쓰면 안 됨'
 ## report.html 현재 상태
 - `generateCharacterReport()`: saju.html STEP2~STEP3 이식 필요
 - `money/love/daeun/year`: 기존 `generateReport()` 유지 중
+
+---
+
+## 공유 버튼 구현 패턴 (실수 방지용)
+
+**순서**: `navigator.share` (모바일 우선) → `Kakao.Share.sendDefault` (PC) → `clipboard` fallback
+
+### 핵심 규칙
+- **objectType 반드시 `'feed'`** — `'text'`는 Error 4019 발생
+- **imageUrl은 실존 파일만** — `og-image.png` 없음, `https://picolab.kr/img/goddess-app.png` 사용
+- **모바일에서 Kakao Share 직접 호출 시 4019 오류** — `navigator.share`로 우회하면 해결
+- Kakao SDK: `Kakao.Share` 존재 확인 → `isInitialized()` → `init(KAKAO_JS_KEY)` 순서
+
+### 표준 구현 코드
+```javascript
+document.getElementById('btnShare').addEventListener('click', function() {
+  var pageUrl = 'https://picolab.kr';
+  var shareText = '공유할 텍스트\n\n🔮 ' + pageUrl;
+  // 1. 모바일 OS 네이티브 공유 (iOS/Android)
+  if (navigator.share) {
+    navigator.share({ title: '제목', text: shareText, url: pageUrl }).catch(function(){});
+    return;
+  }
+  // 2. PC 카카오 공유
+  if (window.Kakao && Kakao.Share) {
+    if (!Kakao.isInitialized()) { try { Kakao.init(KAKAO_JS_KEY); } catch(e) {} }
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '제목',
+        description: '설명 텍스트',
+        imageUrl: 'https://picolab.kr/img/goddess-app.png',
+        link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+      },
+      buttons: [{ title: '내 운세 보러가기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+    });
+    return;
+  }
+  // 3. 클립보드 fallback
+  navigator.clipboard && navigator.clipboard.writeText(shareText).then(function() { alert('📋 복사됐어요!'); });
+});
+```
+
+### KAKAO_JS_KEY
+```javascript
+var KAKAO_JS_KEY = '25432f8a37e0ac51a5e10cbcba8ae413';
+```
