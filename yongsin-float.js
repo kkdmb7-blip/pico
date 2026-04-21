@@ -62,18 +62,20 @@
     return Math.min(Math.floor(lv / 3), 4);
   }
 
+  var IMG_BASE = IS_PICO ? '' : 'https://picolab.kr';
+
   function buildPetSVG(elem) {
     var s = ELEM_STYLE[elem] || ELEM_STYLE.water;
     if (elem === 'wood') {
       var stageIdx = getPetStageIdx();
       var n = stageIdx + 1;
       var hasRb = (n === 1 || n === 5);
-      var src = hasRb ? '/img/pet_wood_' + n + '_rb.png' : '/img/pet_wood_' + n + '.png';
+      var src = IMG_BASE + (hasRb ? '/img/pet_wood_' + n + '_rb.png' : '/img/pet_wood_' + n + '.png');
       return '<img src="' + src + '" alt="목 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
     }
     if (elem === 'fire') {
       var fn = getPetStageIdx() + 1;
-      return '<img src="/img/pet_fire_' + fn + '.png" alt="화 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
+      return '<img src="' + IMG_BASE + '/img/pet_fire_' + fn + '.png" alt="화 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
     }
     if (elem === 'earth') return `
       <svg width="48" height="44" viewBox="0 0 48 44" xmlns="http://www.w3.org/2000/svg">
