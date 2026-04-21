@@ -1016,10 +1016,9 @@ function render() {
   // 이름·레벨
   var stageIdx = Math.min(Math.floor(state.level / 3), STAGES.length - 1);
 
-  // 목(木) 이미지 단계별 교체: 새싹→1, 성장→2, 각성→3, 정화+신화→4
+  // 목(木) 이미지 단계별 교체: 새싹→1, 성장→2, 각성→3, 정화→4, 신화→5
   if (state.element === 'wood') {
-    var woodImgNum = Math.min(stageIdx + 1, 4);
-    document.getElementById('pet-wood-img').src = '/img/pet_wood_' + woodImgNum + '.png';
+    document.getElementById('pet-wood-img').src = '/img/pet_wood_' + (stageIdx + 1) + '.png';
   }
 
   document.getElementById('petName').textContent = el.name;
