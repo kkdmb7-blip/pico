@@ -1211,8 +1211,8 @@ function fmtCooldown(ms) {
 
 // ── 일일 미션 ──
 var DAILY_MISSIONS = [
-  { id: 'feed',   icon: '🍚', label: '밥 3번 주기',    sub: '배고픔 회복',      action: null },
-  { id: 'orb',    icon: '✦',  label: '특훈하기',        sub: 'EXP +15',          action: null },
+  { id: 'feed',   icon: '🍚', label: '밥 3번 주기',    sub: '배고픔 회복',      action: 'scroll:btn-feed' },
+  { id: 'orb',    icon: '✦',  label: '특훈하기',        sub: 'EXP +15',          action: 'scroll:btn-orb' },
   { id: 'saju',   icon: '🔮', label: '사주 분석하기',   sub: '오행 에너지 확인', action: '/saju.html' },
   { id: 'report', icon: '📊', label: '리포트 보기',     sub: 'AI 운세 리포트',   action: '/report.html' },
   { id: 'share',  icon: '📤', label: '공유하기',        sub: '친구에게 알리기',  action: 'share' },
@@ -1452,6 +1452,8 @@ function renderMission() {
     if (clickable) {
       if (ms.action === 'share') {
         onclick = ' onclick="doMissionShare()"';
+      } else if (ms.action.indexOf('scroll:') === 0) {
+        onclick = ' onclick="doMissionScroll(\'' + ms.action.slice(7) + '\')"';
       } else {
         onclick = ' onclick="doMissionNav(\'' + ms.id + '\',\'' + ms.action + '\')"';
       }
@@ -1492,6 +1494,19 @@ function doMissionNav(id, url) {
   completeMissionNav(id);
   renderMission();
   setTimeout(function() { window.location.href = url; }, 300);
+}
+
+function doMissionScroll(btnClass) {
+  var btn = document.querySelector('.' + btnClass);
+  if (!btn) return;
+  btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  btn.style.transition = 'box-shadow 0.2s, transform 0.2s';
+  btn.style.boxShadow = '0 0 0 3px #c8a830';
+  btn.style.transform = 'scale(1.06)';
+  setTimeout(function() {
+    btn.style.boxShadow = '';
+    btn.style.transform = '';
+  }, 900);
 }
 
 function doMissionShare() {
