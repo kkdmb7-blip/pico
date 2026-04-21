@@ -1075,7 +1075,7 @@ function setBar(name, val) {
 }
 
 // ── 유틸 ──
-function todayStr() { return new Date().toISOString().slice(0,10); }
+function todayStr() { var d = new Date(Date.now() + 9*3600000); return d.toISOString().slice(0,10); }
 
 function conditionMultiplier() {
   var avg = (state.hunger + state.happy + state.energy) / 3;
@@ -1262,9 +1262,9 @@ async function fetchAdvice() {
     try { profile = JSON.parse(localStorage.getItem('pico_profile') || '{}'); } catch(e) {}
     var yongsin = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached') || '';
 
-    // 오늘 일진 조회
-    var today = new Date();
-    var birth = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0') + ' 12:00';
+    // 오늘 일진 조회 (KST 기준)
+    var today = new Date(Date.now() + 9*3600000);
+    var birth = today.getUTCFullYear() + '-' + String(today.getUTCMonth()+1).padStart(2,'0') + '-' + String(today.getUTCDate()).padStart(2,'0') + ' 12:00';
     var sajuRes = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
