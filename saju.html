@@ -1927,15 +1927,10 @@ function _sajuTabActiveStyle()   { return 'flex:1;padding:8px 0;border:none;bord
 function _sajuTabInactiveStyle() { return 'flex:1;padding:8px 0;border:none;border-radius:8px;background:rgba(80,55,30,0.10);color:rgba(74,58,42,0.65);font-size:12px;font-weight:600;cursor:pointer;font-family:\'Pretendard Variable\',Pretendard,-apple-system,\'Noto Sans KR\',sans-serif;'; }
 
 function shareSajuKakao() {
-  var btn = document.getElementById('sajuShareBtn');
-  if (btn) { btn.innerHTML = '⏳ 생성 중...'; btn.disabled = true; }
-  var modal = document.getElementById('sajuShareModal');
-  modal.style.display = 'flex';
-  function resetBtn() { if (btn) { btn.innerHTML = '<i class="pi pi-crystal"></i> 카카오톡 공유'; btn.disabled = false; } }
+  document.getElementById('sajuShareModal').style.display = 'flex';
   _sajuCardMode = 'story';
   _sajuStoryCanvas = null;
   _sajuLoadCard('story');
-  resetBtn();
 }
 
 function doSajuShare() {
