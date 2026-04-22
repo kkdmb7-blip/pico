@@ -2707,11 +2707,73 @@ function buildAccuracyLayerBlock() {
   // 사주+베딕+필요한 외부 데이터 선제 로드 (stateIntro 표시하면서 백그라운드)
   const _bgWithZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
   const _bgWithAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
-  loadAllData(_bgWithZiwei, _bgWithAstro).catch(() => {});
+  loadAllData(_bgWithZiwei, _bgWithAstro)
+    .then(() => { if (_type === 'character') renderCharVisual(); })
+    .catch(() => {});
 
   renderIntro();
   showState('intro');
 })();
+
+// ── 기질 오행 시각화 카드 (character 타입 전용) ──
+function renderCharVisual() {
+  if (!_ohaeng || _type !== 'character') return;
+  const OH_COLOR = { 목:'#3d7a3a', 화:'#b84c1a', 토:'#8a6200', 금:'#5a6a7a', 수:'#1a5fa0' };
+  const name = (_profile && _profile.name) || (_user && _user.name) || '';
+  const ohList = Object.entries(_ohaeng)
+    .filter(([k]) => ['목','화','토','금','수'].includes(k))
+    .sort(([,a],[,b]) => Number(b) - Number(a));
+
+  const barsHtml = ohList.map(([elem, pct]) => {
+    const color = OH_COLOR[elem] || '#888';
+    const isYong = _yongsin && _yongsin.includes(elem);
+    const w = Math.max(4, Math.round(Number(pct)));
+    return `<div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:26px;font-size:12px;font-weight:800;color:${color};flex-shrink:0;text-align:right;">${elem}</div>
+      <div style="flex:1;background:rgba(0,0,0,0.07);border-radius:20px;height:10px;overflow:hidden;">
+        <div style="height:100%;width:${w}%;background:${color};border-radius:20px;opacity:0.8;"></div>
+      </div>
+      <div style="width:30px;font-size:11px;color:rgba(42,26,10,0.45);text-align:left;flex-shrink:0;">${Math.round(Number(pct))}%</div>
+      ${isYong ? `<span style="font-size:10px;font-weight:700;color:#5f8cb5;background:rgba(95,140,181,0.14);border:1px solid rgba(95,140,181,0.32);border-radius:10px;padding:1px 7px;flex-shrink:0;">용신</span>` : `<span style="width:34px;flex-shrink:0;"></span>`}
+    </div>`;
+  }).join('');
+
+  const badges = [
+    _singang ? `<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(155,120,0,0.12);border:1px solid rgba(155,120,0,0.24);color:#7a5c00;">${_singang}</span>` : '',
+    _ilju ? `<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(95,140,181,0.12);border:1px solid rgba(95,140,181,0.28);color:#3a6a9a;">${_ilju} 일주</span>` : ''
+  ].filter(Boolean).join('');
+
+  let el = document.getElementById('charVisualCard');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'charVisualCard';
+    el.style.cssText = 'padding:0 0 16px;';
+    const anchor = document.getElementById('introPreview') || document.getElementById('btnGenerate');
+    anchor.parentNode.insertBefore(el, anchor);
+  }
+  el.innerHTML = `
+    <div style="background:linear-gradient(145deg,#fdf8ee,#f4ece0);border-radius:22px;overflow:hidden;box-shadow:0 4px 20px rgba(120,80,20,0.12);border:1px solid rgba(180,140,60,0.18);">
+      <div style="padding:18px 18px 14px;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(155,120,0,0.10);color:#7a5c00;border:1px solid rgba(155,120,0,0.22);"><i class="pi pi-person"></i> 타고난 기질</div>
+          ${badges}
+        </div>
+        <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:16px;">${name ? name + ' 님의 ' : ''}오행 에너지 구조</div>
+        <div style="display:flex;flex-direction:column;gap:9px;">${barsHtml}</div>
+      </div>
+      <div style="padding:0 18px 18px;">
+        <div style="position:relative;overflow:hidden;border-radius:14px;margin-top:4px;">
+          <div style="color:rgba(60,40,10,0.55);font-size:13px;line-height:1.8;filter:blur(5px);user-select:none;pointer-events:none;padding:14px;background:rgba(120,80,20,0.06);border:1px solid rgba(120,80,20,0.08);border-radius:14px;">
+            일간의 본질적 에너지와 격국이 가리키는 삶의 방향성, 오행의 강약이 만드는 타고난 성격 구조와 숨겨진 잠재력까지 AI가 분석합니다.
+          </div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;">
+            <div style="font-size:22px;">🔒</div>
+            <div style="font-size:12px;color:rgba(60,40,10,0.55);font-weight:600;">리포트 열람 시 공개</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
 
 function renderIntro() {
   const d = TYPE_DETAIL[_type];
