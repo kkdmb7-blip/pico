@@ -2866,7 +2866,7 @@ function renderCharVisual() {
       <div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:8px;letter-spacing:0.3px;">대운 흐름 (현재 <span style="color:#5a1a9a;">${curDaeunVal}</span> 진행 중)</div>
       <div style="display:flex;gap:6px;">${cards||'<div style="color:rgba(60,40,10,0.3);font-size:12px;">대운 데이터 없음</div>'}</div>
     </div>
-    <div style="position:relative;width:300px;height:140px;margin:4px auto 0;overflow:visible;">${bubblesHtml}</div>`;
+    ${miniBubbleBlock}`;
 
   } else if (_type === 'love') {
     // 오행 버블 + 아래 관성·원진살 인포바
@@ -2927,7 +2927,7 @@ function renderCharVisual() {
         <div style="font-size:13px;font-weight:700;color:#3a2000;">${rel}</div>
         ${inter?.판정?`<div style="font-size:11px;color:rgba(60,40,10,0.55);margin-top:3px;">${inter.판정}</div>`:''}
       </div>
-      <div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">${bubblesHtml}</div>
+      ${miniBubbleBlock}
     </div>`;
 
   } else if (_type === 'career_deep') {
@@ -2935,7 +2935,7 @@ function renderCharVisual() {
     const jobOh = ipd?.직업적성 ? ipd.직업적성.slice(0,30) : null;
     const gwanRok = _rptFull?.['십신궁위'] || _tenGodPosData;
     visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
-      <div style="position:relative;width:300px;height:160px;margin:0 auto;overflow:visible;">${bubblesHtml}</div>
+      ${miniBubbleBlock}
       <div style="display:flex;gap:8px;">
         <div style="flex:1;background:rgba(60,80,160,0.09);border-radius:12px;padding:12px;border:1px solid rgba(60,80,160,0.18);text-align:center;">
           <div style="font-size:10px;font-weight:700;color:#2a3a9a;margin-bottom:4px;">격국</div>
@@ -2966,7 +2966,7 @@ function renderCharVisual() {
     visualHtml = `<div style="padding:14px 18px 6px;display:flex;flex-direction:column;gap:12px;">
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${badgeHtml}</div>
       <div style="font-size:11px;color:rgba(60,40,10,0.45);">위 시스템을 교차 분석해 더 높은 정밀도를 제공합니다</div>
-      <div style="position:relative;width:300px;height:160px;margin:0 auto;overflow:visible;">${bubblesHtml}</div>
+      ${miniBubbleBlock}
     </div>`;
 
   } else if (_type === 'month') {
@@ -2993,7 +2993,7 @@ function renderCharVisual() {
       + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.45);margin-bottom:3px;">용신 여부</div>'
       + '<div style="font-size:13px;font-weight:900;color:' + (yE===mpOh?'#1a6a30':'#8a2010') + ';">' + (yE===mpOh?'용신월 ✓':'비용신월') + '</div>'
       + '</div></div></div>'
-      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'yongsin') {
@@ -3018,7 +3018,7 @@ function renderCharVisual() {
       + '<div style="font-size:13px;font-weight:800;color:#2a1a0a;">' + (OH_NAME[yE]||'') + '</div>'
       + (hints.length ? hints.map(h => '<div style="font-size:12px;padding:5px 10px;background:' + yBg + ';border-radius:8px;border:1px solid ' + yBrd + ';color:' + yCol + ';font-weight:600;">' + h + '</div>').join('') : '<div style="font-size:12px;color:rgba(60,40,10,0.4);">상세 데이터 로드 중...</div>')
       + '</div></div>'
-      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'health') {
@@ -3039,7 +3039,7 @@ function renderCharVisual() {
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:6px;">'
       + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:4px;">오행별 담당 장기 · 취약 부위 확인</div>'
       + orgHtml
-      + '<div style="position:relative;width:300px;height:140px;margin:8px auto 0;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (['wealth_timing','timing'].includes(_type)) {
@@ -3061,7 +3061,7 @@ function renderCharVisual() {
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:12px;">'
       + '<div><div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:8px;">대운 타이밍 (현재 <span style="color:#7a4200;">' + curDaeunVal + '</span>)</div>'
       + '<div style="display:flex;gap:6px;">' + (cards2||'<div style="font-size:12px;color:rgba(60,40,10,0.3);">데이터 없음</div>') + '</div></div>'
-      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'character') {
@@ -3086,7 +3086,7 @@ function renderCharVisual() {
       + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.45);margin-bottom:2px;">용신</div>'
       + '<div style="font-size:15px;font-weight:900;color:' + (OH_COLOR[yE]||'#3a2000') + ';">' + (yE||'—') + '</div>'
       + '</div></div></div>'
-      + '<div style="position:relative;width:300px;height:150px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'child_career') {
@@ -3106,7 +3106,7 @@ function renderCharVisual() {
       + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.4);margin-bottom:8px;">적합한 진로 방향</div>'
       + '<div style="display:flex;flex-wrap:wrap;gap:6px;">' + talentBadges + '</div>'
       + '</div>'
-      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'family') {
@@ -3125,7 +3125,7 @@ function renderCharVisual() {
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
       + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:2px;">육친 오행 — 원국 내 십신 분포</div>'
       + '<div style="display:flex;gap:6px;">' + yukHtml + '</div>'
-      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'classic') {
@@ -3147,7 +3147,7 @@ function renderCharVisual() {
       + '<div style="flex:1;background:rgba(40,100,60,0.08);border-radius:12px;padding:12px;border:1px solid rgba(40,100,60,0.18);text-align:center;"><div style="font-size:10px;font-weight:700;color:#1a6030;margin-bottom:3px;">강약</div><div style="font-size:14px;font-weight:900;color:#0a4020;">' + (_singang||'—') + '</div></div>'
       + '<div style="flex:1;background:' + (OH_BG[yE]||'rgba(120,80,20,0.08)') + ';border-radius:12px;padding:12px;border:1px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.15)') + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + (OH_COLOR[yE]||'#7a4200') + ';margin-bottom:3px;">용신</div><div style="font-size:14px;font-weight:900;color:' + (OH_COLOR[yE]||'#5a2a00') + ';">' + (yE||'—') + '</div></div>'
       + '</div>'
-      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'guide') {
@@ -3166,7 +3166,7 @@ function renderCharVisual() {
       + '</div>'
       + '<div style="flex:1;"><div style="font-size:12px;font-weight:800;color:#2a1a0a;margin-bottom:8px;">' + guideAdj + ' 사람</div>' + tipsHtml + '</div>'
       + '</div>'
-      + '<div style="position:relative;width:300px;height:130px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'summary') {
@@ -3184,7 +3184,7 @@ function renderCharVisual() {
       + '<div style="flex:1;background:rgba(40,100,60,0.08);border-radius:12px;padding:10px;border:1px solid rgba(40,100,60,0.18);text-align:center;"><div style="font-size:10px;font-weight:700;color:#1a6030;margin-bottom:3px;">격국</div><div style="font-size:13px;font-weight:900;color:#0a4020;">' + (_geokguk||'정격') + '</div></div>'
       + '<div style="flex:1;background:' + (OH_BG[yE]||'rgba(120,80,20,0.08)') + ';border-radius:12px;padding:10px;border:1px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.15)') + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + (OH_COLOR[yE]||'#7a4200') + ';margin-bottom:3px;">용신</div><div style="font-size:14px;font-weight:900;color:' + (OH_COLOR[yE]||'#5a2a00') + ';">' + (yE||'—') + '</div></div>'
       + '</div>'
-      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'balance') {
@@ -3206,7 +3206,7 @@ function renderCharVisual() {
     visualHtml = '<div style="padding:14px 18px 10px;">'
       + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:10px;">오행 비율 분포 — 부족 오행과 과잉 오행 확인</div>'
       + barHtmlB
-      + '<div style="position:relative;width:300px;height:140px;margin:12px auto 0;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'sinsal') {
@@ -3228,7 +3228,7 @@ function renderCharVisual() {
       + (gilHtmlS?'<div><div style="font-size:10px;font-weight:700;color:rgba(40,130,80,0.7);margin-bottom:6px;">길신 · 보호성 신살</div><div style="display:flex;flex-wrap:wrap;gap:6px;">' + gilHtmlS + '</div></div>':'')
       + (hyungHtmlS?'<div><div style="font-size:10px;font-weight:700;color:rgba(180,40,40,0.7);margin-bottom:6px;">흉신 · 주의 신살</div><div style="display:flex;flex-wrap:wrap;gap:6px;">' + hyungHtmlS + '</div></div>':'')
       + (fallbackS?'<div style="display:flex;flex-wrap:wrap;gap:6px;">' + fallbackS + '</div>':'')
-      + '<div style="position:relative;width:300px;height:130px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + miniBubbleBlock
       + '</div>';
 
   } else {
