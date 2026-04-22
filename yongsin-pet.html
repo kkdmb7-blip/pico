@@ -542,6 +542,7 @@ nav {
   line-height: 1.6; margin-bottom: 6px;
   min-height: 44px;
   transition: all 0.3s;
+  cursor: pointer; user-select: none;
 }
 
 /* ACTION BUTTONS */
@@ -910,6 +911,54 @@ function removeBgAndApply(src, imgEl) {
   tmp.src=src;
 }
 function expNeeded(lv) { return lv * lv * 100; } // 레벨²×100 (Lv1=100, Lv3=900, Lv5=2500...)
+
+// ── 일진 반응 문구 ──
+var ILJI_MESSAGES = {
+  good: [
+    '오늘 나 완전 텐션 최고야! 뭐든 잘 될 것 같은 느낌?',
+    '오늘은 내가 너한테 행운 나눠줄 수 있어! 나 따라다녀~',
+    '오늘 용신 들어오는 날! 중요한 일 오늘 다 해치워버려!',
+    '기분이 너무 좋아서 날아갈 것 같아 🌟',
+    '오늘 나 엄청 강해! 무서운 거 없음!',
+    '이런 날 집에만 있으면 아까워~ 나가서 뭔가 해봐!',
+    '오늘 운이 나한테 몰려있어. 같이 있어줄게!',
+    '오늘 하루 뭘 해도 잘 풀릴 것 같은 느낌적인 느낌!',
+    '용신 들어온 날이라 나 지금 빛나고 있지 않아?',
+    '오늘 결정 내려야 할 거 있으면 지금이 딱이야!',
+  ],
+  bad: [
+    '오늘은 나 좀 힘을 못 써... 조용히 있어줄게',
+    '오늘 괜히 무리하지 마. 나도 좀 쉬고 싶어...',
+    '흉신 들어온 날이라 살짝 조심하는 게 좋을 것 같아',
+    '오늘은 중요한 결정 미루는 게 나을 것 같아...',
+    '나 오늘 기운이 좀 빠져. 같이 누워있자',
+    '오늘 괜히 새로운 거 시작하지 말고 기다려봐',
+    '흉신 날이라고 너무 걱정하진 마. 그냥 조심하면 돼',
+    '오늘 나 힘들어... 그래도 옆에 있어줄게',
+    '오늘은 조용히 충전하는 날로 보내자',
+    '내일은 더 좋아질 거야. 오늘은 그냥 쉬어가자',
+  ],
+  normal: [
+    '오늘은 그냥 평범한 날! 그래도 나 여기 있어~',
+    '오늘 특별히 좋지도 나쁘지도 않은 날이야. 안정적이지!',
+    '평범한 날도 소중해. 오늘 하루도 잘 부탁해!',
+    '오늘은 무난하게 보내면 딱 좋을 것 같아',
+    '그냥 보통 날이야. 뭐든 무리만 안 하면 돼!',
+  ],
+};
+function getIljiGrade() {
+  try {
+    var score = parseInt(localStorage.getItem('pico_today_score') || '0', 10);
+    if (score >= 70) return 'good';
+    if (score >= 1 && score <= 40) return 'bad';
+  } catch(e) {}
+  return 'normal';
+}
+function getIljiMsg() {
+  var msgs = ILJI_MESSAGES[getIljiGrade()];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
 var MESSAGES = {
   wood:  ['나무처럼 천천히, 하지만 깊게 뿌리내릴게요 🌱','목기운이 강해졌어요! 창의력이 넘치는 날이에요 🌿','오늘 청록색을 가까이 하면 좋아요 🍃'],
   fire:  ['오늘 활활 타오르고 싶어요! 🔥','화기운으로 열정적인 하루가 될 거예요 ✨','빨간색 소품이 행운을 불러요 🌹'],
@@ -1208,7 +1257,7 @@ function render() {
   } else {
     document.getElementById('zzzContainer').style.display = 'none';
     if (state.hunger < 30) msg = MESSAGES.hungry[Math.floor(Math.random()*MESSAGES.hungry.length)];
-    else msg = MESSAGES[state.element][Math.floor(Math.random()*MESSAGES[state.element].length)];
+    else msg = getIljiMsg();
     var si = document.getElementById('sleepIcon'); if(si) si.textContent = '🌙';
     var sl = document.getElementById('sleepLabel'); if(sl) sl.textContent = '재우기';
     var sd = document.getElementById('sleepDesc'); if(sd) sd.textContent = '수련 중 EXP 자동 적립';
@@ -1754,6 +1803,14 @@ loadFromServer(function(serverData) {
 });
 
 checkLuckyBonus();
+
+// petMessage 탭 → 같은 일진 등급 내 새 문구
+document.getElementById('petMessage').addEventListener('click', function() {
+  if (!state.element || state.sleeping) return;
+  if (state.hunger < 30) return;
+  document.getElementById('petMessage').textContent = getIljiMsg();
+});
+
 if (state.element) {
   document.querySelectorAll('.elem-btn').forEach(function(b) {
     b.classList.toggle('active', b.classList.contains(state.element));
