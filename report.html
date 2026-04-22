@@ -3041,75 +3041,110 @@ function renderCharVisual() {
     const jaeLabel = total >= 3 ? '재성과다' : total === 0 ? '재성부재' : total === 1 ? '재성약' : '재성적당';
     const wdM = _rptFull?.['재물운'];
     const wealthOhName = wdM?.재물성향 || (jj > pj ? '정재 우위 — 안정·저축형' : pj > jj ? '편재 우위 — 투자·사업형' : total > 0 ? '균형형' : '재성 부재');
-    visualHtml = '<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">' + bubblesHtml + '</div>'
-      + '<div style="padding:0 18px 10px;display:flex;gap:8px;">'
-      + '<div style="flex:1;background:rgba(40,130,60,0.09);border-radius:12px;padding:12px;border:1px solid rgba(40,130,60,0.2);text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#1a6a30;margin-bottom:4px;">정재</div>'
-      + '<div style="font-size:28px;font-weight:900;color:#1a5020;line-height:1;">' + jj + '</div>'
-      + '<div style="font-size:10px;color:#1a6a30;margin-top:2px;">안정 수입</div></div>'
-      + '<div style="flex:1;background:rgba(200,120,0,0.09);border-radius:12px;padding:12px;border:1px solid rgba(200,120,0,0.2);text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#8a5000;margin-bottom:4px;">편재</div>'
-      + '<div style="font-size:28px;font-weight:900;color:#6a3800;line-height:1;">' + pj + '</div>'
-      + '<div style="font-size:10px;color:#8a5000;margin-top:2px;">투자·사업</div></div>'
-      + '<div style="flex:1;background:rgba(120,80,20,0.07);border-radius:12px;padding:12px;border:1px solid rgba(120,80,20,0.15);text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#7a4e00;margin-bottom:4px;">판정</div>'
-      + '<div style="font-size:13px;font-weight:900;color:#5a2e00;line-height:1.2;">' + jaeLabel + '</div>'
+    const judgeCol = total >= 3 ? '#c8700a' : total === 0 ? '#8a2010' : '#7a4e00';
+    visualHtml = '<div style="position:relative;width:300px;height:220px;margin:12px auto 4px;overflow:visible;">' + bubblesHtml + '</div>'
+      + '<div style="padding:0 18px 8px;display:flex;gap:7px;">'
+      + '<div style="flex:1;background:linear-gradient(160deg,rgba(40,130,60,0.18),rgba(40,130,60,0.04));border-radius:14px;padding:11px 6px;border:1.5px solid rgba(40,130,60,0.32);text-align:center;box-shadow:0 4px 14px rgba(40,130,60,0.12);">'
+      + '<div style="font-size:18px;margin-bottom:2px;filter:drop-shadow(0 1px 2px rgba(40,130,60,0.3));">🏦</div>'
+      + '<div style="font-size:9px;font-weight:800;color:#1a6a30;opacity:0.75;letter-spacing:0.5px;">정재 JJ</div>'
+      + '<div style="font-size:30px;font-weight:900;color:#1a5020;line-height:1;text-shadow:0 2px 6px rgba(40,130,60,0.2);">' + jj + '</div>'
+      + '<div style="font-size:9px;color:#1a6a30;margin-top:3px;font-weight:700;">안정 수입</div></div>'
+      + '<div style="flex:1;background:linear-gradient(160deg,rgba(200,120,0,0.2),rgba(200,120,0,0.04));border-radius:14px;padding:11px 6px;border:1.5px solid rgba(200,120,0,0.35);text-align:center;box-shadow:0 4px 14px rgba(200,120,0,0.12);">'
+      + '<div style="font-size:18px;margin-bottom:2px;filter:drop-shadow(0 1px 2px rgba(200,120,0,0.3));">💎</div>'
+      + '<div style="font-size:9px;font-weight:800;color:#8a5000;opacity:0.75;letter-spacing:0.5px;">편재 PJ</div>'
+      + '<div style="font-size:30px;font-weight:900;color:#6a3800;line-height:1;text-shadow:0 2px 6px rgba(200,120,0,0.2);">' + pj + '</div>'
+      + '<div style="font-size:9px;color:#8a5000;margin-top:3px;font-weight:700;">투자·사업</div></div>'
+      + '<div style="flex:1;background:linear-gradient(160deg,' + judgeCol + '22,' + judgeCol + '06);border-radius:14px;padding:11px 6px;border:1.5px solid ' + judgeCol + '50;text-align:center;box-shadow:0 4px 14px ' + judgeCol + '22;">'
+      + '<div style="font-size:18px;margin-bottom:2px;filter:drop-shadow(0 1px 2px ' + judgeCol + '50);">⚖️</div>'
+      + '<div style="font-size:9px;font-weight:800;color:' + judgeCol + ';opacity:0.8;letter-spacing:0.5px;">JUDGE</div>'
+      + '<div style="font-size:14px;font-weight:900;color:' + judgeCol + ';line-height:1.15;margin-top:6px;">' + jaeLabel + '</div>'
       + '</div></div>'
-      + '<div style="margin:0 18px 10px;padding:10px 14px;background:rgba(120,80,20,0.05);border-radius:10px;border:1px solid rgba(120,80,20,0.1);font-size:12px;font-weight:700;color:#3a2000;">' + wealthOhName + '</div>';
+      + '<div style="margin:0 18px 10px;padding:11px 14px;background:linear-gradient(135deg,rgba(200,140,30,0.12),rgba(120,80,20,0.04));border-radius:12px;border:1.2px solid rgba(180,120,30,0.25);font-size:12px;font-weight:800;color:#3a2000;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(180,120,30,0.1);">'
+      + '<span style="font-size:16px;">💰</span>'
+      + '<span>' + wealthOhName + '</span>'
+      + '</div>';
 
   } else if (_type === 'daeun') {
-    // 대운 타임라인 스트립
+    // 대운 타임라인 스트립 (오행색 강화 + 배경 장식)
     const nowY = new Date().getFullYear();
     const curIdx = bigLuck.findIndex(d => { const r=(d.year_range||'').split(/[–\-~]/); return nowY>=parseInt(r[0])&&nowY<=parseInt(r[1]); });
     const startIdx = Math.max(0, curIdx - 1);
     const shown = bigLuck.slice(startIdx, startIdx + 5);
+    const STEM2OH_D = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
     const cards = shown.map((d, i) => {
       const isCur = (startIdx + i) === curIdx;
+      const isPast = (startIdx + i) < curIdx;
       const yr = (d.year_range||'').split(/[–\-~]/);
       const progress = isCur && yr[0] ? Math.round((nowY - parseInt(yr[0])) / 10 * 100) : 0;
-      return `<div style="flex:${isCur?1.6:1};background:${isCur?'rgba(120,60,180,0.13)':'rgba(120,80,20,0.05)'};border:${isCur?'2px solid rgba(120,60,180,0.4)':'1px solid rgba(120,80,20,0.1)'};border-radius:12px;padding:10px 8px;text-align:center;min-width:0;">
-        <div style="font-size:${isCur?17:13}px;font-weight:900;color:${isCur?'#5a1a9a':'rgba(60,40,10,0.5)'};">${d.pillar_kor||'—'}</div>
-        <div style="font-size:9px;color:${isCur?'rgba(90,26,154,0.7)':'rgba(60,40,10,0.3)'};margin-top:3px;">${d.year_range||''}</div>
-        ${isCur?`<div style="height:3px;background:rgba(120,80,20,0.08);border-radius:2px;margin-top:6px;"><div style="height:3px;background:rgba(120,60,180,0.5);border-radius:2px;width:${progress}%;"></div></div>`:''}
+      const stem = (d.pillar_kor||'')[0] || '';
+      const ohK = STEM2OH_D[stem] || '';
+      const col = OH_COLOR[ohK] || '#7a4e00';
+      const bg = OH_BG[ohK] || 'rgba(120,80,20,0.06)';
+      const brd = OH_BORDER[ohK] || 'rgba(120,80,20,0.2)';
+      return `<div style="flex:${isCur?1.8:1};background:${isCur?`radial-gradient(circle at 50% 30%,${bg},rgba(255,255,255,0.5))`:isPast?'rgba(180,160,130,0.12)':bg};border:${isCur?'2.5px solid '+col:'1.2px solid '+brd};border-radius:13px;padding:${isCur?'11px 6px 9px':'9px 4px'};text-align:center;min-width:0;box-shadow:${isCur?'0 6px 18px '+col+'38,inset 0 1px 2px rgba(255,255,255,0.5)':'none'};position:relative;${isPast?'opacity:0.55;':''}">
+        ${isCur?`<div style="position:absolute;top:-7px;left:50%;transform:translateX(-50%);font-size:10px;background:${col};color:#fff;padding:1px 8px;border-radius:10px;font-weight:900;letter-spacing:0.5px;box-shadow:0 2px 6px ${col}70;">NOW</div>`:''}
+        <div style="font-size:${isCur?20:13}px;font-weight:900;color:${isCur?col:'rgba(60,40,10,0.55)'};line-height:1.1;text-shadow:${isCur?'0 2px 4px '+col+'30':'none'};">${d.pillar_kor||'—'}</div>
+        <div style="font-size:${isCur?10:9}px;color:${isCur?col:'rgba(60,40,10,0.35)'};margin-top:3px;font-weight:${isCur?700:500};">${d.year_range||''}</div>
+        ${isCur?`<div style="height:4px;background:rgba(255,255,255,0.55);border-radius:3px;margin-top:7px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.08);"><div style="height:4px;background:linear-gradient(90deg,${col},${col}aa);border-radius:3px;width:${progress}%;box-shadow:0 0 6px ${col}70;"></div></div><div style="font-size:8px;color:${col};opacity:0.6;margin-top:2px;font-weight:700;">${progress}%</div>`:''}
       </div>`;
     }).join('');
-    visualHtml = `<div style="padding:14px 18px;">
-      <div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:8px;letter-spacing:0.3px;">대운 흐름 (현재 <span style="color:#5a1a9a;">${curDaeunVal}</span> 진행 중)</div>
-      <div style="display:flex;gap:6px;">${cards||'<div style="color:rgba(60,40,10,0.3);font-size:12px;">대운 데이터 없음</div>'}</div>
+    visualHtml = `<div style="padding:14px 18px 10px;">
+      <div style="text-align:center;font-size:10px;font-weight:800;color:rgba(60,40,10,0.5);letter-spacing:1.5px;margin-bottom:10px;">🌊 대운 타임라인 · 10년 주기</div>
+      <div style="display:flex;gap:5px;align-items:stretch;">${cards||'<div style="color:rgba(60,40,10,0.3);font-size:12px;">대운 데이터 없음</div>'}</div>
+      <div style="text-align:center;font-size:10px;color:rgba(60,40,10,0.45);margin-top:10px;font-weight:600;">현재 <b style="color:#5a1a9a;">${curDaeunVal}</b> 대운 진행 중</div>
     </div>
     ${miniBubbleBlock}`;
 
   } else if (_type === 'love') {
-    // 오행 버블 + 아래 관성·원진살 인포바
+    // 오행 버블 + 배우자성 하트 + 살신 배지
     const cycle2 = ['목','화','토','금','수'];
     const gender = _profile?.gender || 'M';
     const mi2 = cycle2.indexOf(ohList[0]?.[0]);
     const gwanOh = mi2 >= 0 ? cycle2[(mi2+3)%5] : null;
     const wonjin = _wonjinData?.있음;
     const gwimun = _gwimungwanData?.있음;
-    const infoBar = [
-      gwanOh ? `<div style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(180,60,120,0.08);border-radius:10px;border:1px solid rgba(180,60,120,0.2);">
-        <div style="width:28px;height:28px;border-radius:50%;background:${OH_BG[gwanOh]||'rgba(100,50,80,0.1)'};border:2px solid ${OH_COLOR[gwanOh]||'#8a1a50'};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:${OH_COLOR[gwanOh]||'#8a1a50'};">${gwanOh}</div>
-        <div><div style="font-size:10px;color:rgba(100,20,60,0.6);font-weight:700;">${gender==='F'?'남편성 (관성)':'아내성 (재성)'}</div><div style="font-size:12px;font-weight:800;color:#6a1040;">${gwanOh} 오행이 배우자를 상징</div></div>
-      </div>` : '',
-      `<div style="display:flex;gap:6px;">
-        <div style="flex:1;padding:8px 12px;border-radius:10px;background:${wonjin?'rgba(200,60,60,0.09)':'rgba(40,140,80,0.09)'};border:1px solid ${wonjin?'rgba(200,60,60,0.2)':'rgba(40,140,80,0.2)'};text-align:center;">
-          <div style="font-size:10px;font-weight:700;color:${wonjin?'#8a2010':'#1a6a30'};margin-bottom:2px;">원진살</div>
-          <div style="font-size:13px;font-weight:900;color:${wonjin?'#8a2010':'#1a6a30'};">${wonjin?'있음':'없음'}</div>
+    const gwanCol = gwanOh ? (OH_COLOR[gwanOh]||'#8a1a50') : '#8a1a50';
+    const gwanBg = gwanOh ? (OH_BG[gwanOh]||'rgba(120,60,100,0.1)') : 'rgba(120,60,100,0.1)';
+    const spouseLabel = gender === 'F' ? '남편성' : '아내성';
+    const spouseDesc = gender === 'F' ? '관성 — 나를 제어하는 기운' : '재성 — 내가 제어하는 기운';
+    const spouseCard = gwanOh ? `<div style="background:linear-gradient(135deg,rgba(200,80,140,0.15),${gwanBg});border-radius:14px;padding:12px 14px;border:1.5px solid rgba(200,80,140,0.3);display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(180,60,120,0.15);">
+        <div style="position:relative;flex-shrink:0;">
+          <div style="width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 30% 30%,${gwanBg},${gwanCol}22);border:2.5px solid ${gwanCol};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:${gwanCol};box-shadow:0 3px 10px ${gwanCol}35;">${gwanOh}</div>
+          <div style="position:absolute;bottom:-4px;right:-4px;font-size:18px;filter:drop-shadow(0 2px 3px rgba(200,60,120,0.4));">💕</div>
         </div>
-        <div style="flex:1;padding:8px 12px;border-radius:10px;background:${gwimun?'rgba(180,60,180,0.09)':'rgba(40,140,80,0.09)'};border:1px solid ${gwimun?'rgba(180,60,180,0.2)':'rgba(40,140,80,0.2)'};text-align:center;">
-          <div style="font-size:10px;font-weight:700;color:${gwimun?'#6a1a8a':'#1a6a30'};margin-bottom:2px;">귀문관살</div>
-          <div style="font-size:13px;font-weight:900;color:${gwimun?'#6a1a8a':'#1a6a30'};">${gwimun?'있음':'없음'}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:10px;font-weight:800;color:#6a1040;opacity:0.75;letter-spacing:0.5px;">${spouseLabel} · SPOUSE</div>
+          <div style="font-size:13px;font-weight:900;color:#5a0a30;line-height:1.3;">${gwanOh} 오행이 배우자를 상징</div>
+          <div style="font-size:10px;color:rgba(100,10,50,0.55);margin-top:2px;">${spouseDesc}</div>
         </div>
-      </div>`
-    ].filter(Boolean).join('');
+      </div>` : '';
+    const killStat = `<div style="display:flex;gap:7px;">
+        <div style="flex:1;padding:10px;border-radius:12px;background:linear-gradient(160deg,${wonjin?'rgba(200,60,60,0.18)':'rgba(40,140,80,0.18)'},${wonjin?'rgba(200,60,60,0.04)':'rgba(40,140,80,0.04)'});border:1.5px solid ${wonjin?'rgba(200,60,60,0.35)':'rgba(40,140,80,0.35)'};text-align:center;box-shadow:0 3px 10px ${wonjin?'rgba(200,60,60,0.12)':'rgba(40,140,80,0.12)'};">
+          <div style="font-size:14px;margin-bottom:2px;">${wonjin?'💔':'💚'}</div>
+          <div style="font-size:9px;font-weight:800;color:${wonjin?'#8a2010':'#1a6a30'};opacity:0.8;letter-spacing:0.3px;">원진살</div>
+          <div style="font-size:13px;font-weight:900;color:${wonjin?'#8a2010':'#0a4a20'};">${wonjin?'있음':'없음'}</div>
+        </div>
+        <div style="flex:1;padding:10px;border-radius:12px;background:linear-gradient(160deg,${gwimun?'rgba(180,60,180,0.18)':'rgba(40,140,80,0.18)'},${gwimun?'rgba(180,60,180,0.04)':'rgba(40,140,80,0.04)'});border:1.5px solid ${gwimun?'rgba(180,60,180,0.35)':'rgba(40,140,80,0.35)'};text-align:center;box-shadow:0 3px 10px ${gwimun?'rgba(180,60,180,0.12)':'rgba(40,140,80,0.12)'};">
+          <div style="font-size:14px;margin-bottom:2px;">${gwimun?'🌀':'💚'}</div>
+          <div style="font-size:9px;font-weight:800;color:${gwimun?'#6a1a8a':'#1a6a30'};opacity:0.8;letter-spacing:0.3px;">귀문관살</div>
+          <div style="font-size:13px;font-weight:900;color:${gwimun?'#6a1a8a':'#0a4a20'};">${gwimun?'있음':'없음'}</div>
+        </div>
+      </div>`;
     visualHtml = `
-      <div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">${bubblesHtml}</div>
-      <div style="padding:0 18px 10px;display:flex;flex-direction:column;gap:8px;">${infoBar}</div>`;
+      <div style="position:relative;width:300px;height:220px;margin:12px auto 4px;overflow:visible;">${bubblesHtml}</div>
+      <div style="padding:0 18px 10px;display:flex;flex-direction:column;gap:8px;">${spouseCard}${killStat}</div>`;
 
   } else if (_type === 'year') {
-    // 2026 병오년 세운 vs 내 오행 비교 패널
-    const sewunOh = '화';
+    // 세운 vs 내 오행 — 서버 응답 기반 동적 파싱
+    const STEM2OH_Y = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
+    const sewunStr = _sewunFull?.['년도'] || (_sewun || '');
+    const yMatch = String(sewunStr).match(/(\d{4})/);
+    const sewunYear = yMatch ? yMatch[1] : new Date().getFullYear();
+    const gMatch = String(sewunStr).match(/([갑을병정무기경신임계])([자축인묘진사오미신유술해])/);
+    const sewunStem = gMatch ? gMatch[1] : null;
+    const sewunBranch = gMatch ? gMatch[2] : null;
+    const sewunOh = STEM2OH_Y[sewunStem] || '화';
+    const sewunHanja = sewunStr.match(/\(([^)]+)\)/)?.[1] || '';
     const sewunCol = OH_COLOR[sewunOh], sewunBg2 = OH_BG[sewunOh], sewunBrd = OH_BORDER[sewunOh];
     const myTop = ohList[0]?.[0], myTopPct = Math.round(Number(ohList[0]?.[1]||0));
     const cycle3 = ['목','화','토','금','수'];
@@ -3118,47 +3153,78 @@ function renderCharVisual() {
                 si === (mi3+1)%5 ? '상생 — 세운이 나를 생하는 구조' :
                 mi3 === (si+1)%5 ? '상생 — 내가 세운을 생하는 구조' :
                 si === (mi3+3)%5 ? '상극 — 세운이 나를 극하는 도전기' : '상극 — 내가 세운을 제어하는 구조';
+    const relIcon = si === mi3 ? '⚡' : (si === (mi3+1)%5 || mi3 === (si+1)%5) ? '🌿' : '⚔️';
     const inter = _sewunInterData;
-    visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="flex:1;background:${OH_BG[myTop]||'rgba(120,80,20,0.08)'};border-radius:12px;padding:14px;border:1px solid ${OH_BORDER[myTop]||'rgba(120,80,20,0.2)'};text-align:center;">
-          <div style="font-size:10px;font-weight:700;color:${OH_COLOR[myTop]||'#555'};opacity:0.7;margin-bottom:4px;">내 주도 오행</div>
-          <div style="font-size:36px;font-weight:900;color:${OH_COLOR[myTop]||'#555'};line-height:1;">${myTop||'—'}</div>
-          <div style="font-size:11px;color:${OH_COLOR[myTop]||'#555'};margin-top:4px;">${myTopPct}%</div>
+    const ganjiLabel = sewunStem && sewunBranch ? `${sewunStem}${sewunBranch}${sewunHanja?'('+sewunHanja+')':''}` : '—';
+    visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:12px;">
+      <div style="text-align:center;font-size:11px;font-weight:800;color:rgba(60,40,10,0.55);letter-spacing:2px;">✨ ${sewunYear} 세운 ✨</div>
+      <div style="display:flex;align-items:stretch;gap:8px;">
+        <div style="flex:1;background:radial-gradient(circle at 50% 30%, ${OH_BG[myTop]||'rgba(120,80,20,0.13)'}, transparent 70%), ${OH_BG[myTop]||'rgba(120,80,20,0.06)'};border-radius:14px;padding:14px 10px;border:1.5px solid ${OH_BORDER[myTop]||'rgba(120,80,20,0.3)'};text-align:center;box-shadow:0 4px 14px ${OH_BG[myTop]||'rgba(120,80,20,0.1)'};">
+          <div style="font-size:9px;font-weight:800;color:${OH_COLOR[myTop]||'#555'};opacity:0.7;letter-spacing:0.5px;margin-bottom:4px;">MY</div>
+          <div style="font-size:44px;font-weight:900;color:${OH_COLOR[myTop]||'#555'};line-height:1;text-shadow:0 2px 8px ${OH_BG[myTop]||'rgba(120,80,20,0.2)'};">${myTop||'—'}</div>
+          <div style="font-size:11px;color:${OH_COLOR[myTop]||'#555'};margin-top:4px;font-weight:700;">${myTopPct}%</div>
         </div>
-        <div style="font-size:20px;color:rgba(60,40,10,0.25);font-weight:300;">vs</div>
-        <div style="flex:1;background:${sewunBg2};border-radius:12px;padding:14px;border:2px solid ${sewunCol};text-align:center;">
-          <div style="font-size:10px;font-weight:700;color:${sewunCol};opacity:0.8;margin-bottom:4px;">2026 세운</div>
-          <div style="font-size:36px;font-weight:900;color:${sewunCol};line-height:1;">화</div>
-          <div style="font-size:11px;color:${sewunCol};margin-top:4px;">병오(丙午)</div>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 2px;">
+          <div style="font-size:24px;">${relIcon}</div>
+          <div style="font-size:9px;color:rgba(60,40,10,0.4);margin-top:2px;font-weight:700;letter-spacing:0.5px;">VS</div>
+        </div>
+        <div style="flex:1;background:radial-gradient(circle at 50% 30%, ${sewunBg2}, transparent 70%), ${sewunBg2};border-radius:14px;padding:14px 10px;border:2px solid ${sewunCol};text-align:center;box-shadow:0 4px 18px ${sewunBg2};">
+          <div style="font-size:9px;font-weight:800;color:${sewunCol};opacity:0.8;letter-spacing:0.5px;margin-bottom:4px;">SEWUN</div>
+          <div style="font-size:44px;font-weight:900;color:${sewunCol};line-height:1;text-shadow:0 2px 8px ${sewunBg2};">${sewunOh}</div>
+          <div style="font-size:11px;color:${sewunCol};margin-top:4px;font-weight:700;">${ganjiLabel}</div>
         </div>
       </div>
-      <div style="background:rgba(120,80,20,0.06);border-radius:10px;padding:10px 14px;border:1px solid rgba(120,80,20,0.1);">
-        <div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.45);margin-bottom:3px;">세운 관계</div>
-        <div style="font-size:13px;font-weight:700;color:#3a2000;">${rel}</div>
-        ${inter?.판정?`<div style="font-size:11px;color:rgba(60,40,10,0.55);margin-top:3px;">${inter.판정}</div>`:''}
+      <div style="background:linear-gradient(135deg,rgba(120,80,20,0.08),rgba(120,80,20,0.02));border-radius:12px;padding:12px 14px;border:1px solid rgba(120,80,20,0.15);">
+        <div style="font-size:10px;font-weight:800;color:rgba(60,40,10,0.5);margin-bottom:4px;letter-spacing:0.5px;">⚖️ 세운 관계</div>
+        <div style="font-size:13px;font-weight:800;color:#3a2000;">${rel}</div>
+        ${inter?.판정?`<div style="font-size:11px;color:rgba(60,40,10,0.6);margin-top:4px;">${inter.판정}</div>`:''}
       </div>
       ${miniBubbleBlock}
     </div>`;
 
   } else if (_type === 'career_deep') {
-    // 직업·사업: 격국 + 직업 오행 + 관록 구조
-    const jobOh = ipd?.직업적성 ? ipd.직업적성.slice(0,30) : null;
-    const gwanRok = _rptFull?.['십신궁위'] || _tenGodPosData;
+    // 직업·사업: 십신궁위 기반 4기둥 역할 지도 + 격국/강약/용신
+    const tgPos = _tenGodPosData;
+    const posAnalysis = tgPos?.궁위분석 || [];
+    const posMap = {};
+    posAnalysis.forEach(function(g){
+      var loc = (g.위치||'').includes('년')?'year':(g.위치||'').includes('월')?'month':(g.위치||'').includes('일')?'day':(g.위치||'').includes('시')?'hour':null;
+      if (loc) posMap[loc] = g;
+    });
+    const GUNGWI = {year:'조상·어린시절',month:'부모·사회·직장',day:'배우자·나 자신',hour:'자식·말년·결실'};
+    const pillarKeysC = ['year','month','day','hour'];
+    const pillarLabelsC = ['년주','월주','일주','시주'];
+    const TG_COL = {'비견':'#1a6030','겁재':'#2a7a50','식신':'#c8700a','상관':'#b84c1a','편재':'#8a6200','정재':'#a08020','편관':'#8a1a50','정관':'#5a1a9a','편인':'#1a3a9a','정인':'#2a4aaa'};
+    const pillarHtml = pillarKeysC.map(function(k,i) {
+      const info = posMap[k];
+      const tg = info ? info.십신 : '';
+      const glyph = info ? info.글자 : '';
+      const col = TG_COL[tg] || '#7a4e00';
+      const bg = info ? col+'15' : 'rgba(120,80,20,0.05)';
+      return '<div style="flex:1;background:' + bg + ';border-radius:12px;padding:10px 4px 8px;border:1.5px solid ' + (info?col+'35':'rgba(120,80,20,0.12)') + ';text-align:center;">'
+        + '<div style="font-size:9px;font-weight:800;color:rgba(60,40,10,0.5);margin-bottom:2px;">' + pillarLabelsC[i] + '</div>'
+        + '<div style="font-size:18px;font-weight:900;color:' + col + ';line-height:1;margin-bottom:3px;">' + (glyph||'?') + '</div>'
+        + (tg?'<div style="font-size:10px;font-weight:800;color:' + col + ';background:rgba(255,255,255,0.45);border-radius:8px;padding:2px 4px;display:inline-block;">' + tg + '</div>':'<div style="font-size:9px;color:rgba(60,40,10,0.3);">—</div>')
+        + '<div style="font-size:8px;color:rgba(60,40,10,0.45);margin-top:4px;">' + GUNGWI[k] + '</div>'
+        + '</div>';
+    }).join('');
+    const spouse = tgPos?.핵심?.배우자궁?.십신;
     visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
-      ${miniBubbleBlock}
-      <div style="display:flex;gap:8px;">
-        <div style="flex:1;background:rgba(60,80,160,0.09);border-radius:12px;padding:12px;border:1px solid rgba(60,80,160,0.18);text-align:center;">
-          <div style="font-size:10px;font-weight:700;color:#2a3a9a;margin-bottom:4px;">격국</div>
-          <div style="font-size:15px;font-weight:900;color:#1a2a7a;">${_geokguk||'정격'}</div>
+      <div style="text-align:center;font-size:11px;font-weight:800;color:rgba(60,40,10,0.55);letter-spacing:1px;">🎯 십신 궁위 지도</div>
+      <div style="display:flex;gap:5px;">${pillarHtml}</div>
+      ${spouse?`<div style="background:linear-gradient(135deg,rgba(180,80,40,0.08),rgba(180,80,40,0.02));border-radius:10px;padding:8px 12px;border:1px solid rgba(180,80,40,0.2);font-size:11px;color:#8a3010;text-align:center;"><b>일지(배우자·자아궁)</b> · ${spouse}</div>`:''}
+      <div style="display:flex;gap:6px;">
+        <div style="flex:1;background:linear-gradient(160deg,rgba(60,80,160,0.12),rgba(60,80,160,0.03));border-radius:12px;padding:12px 8px;border:1.5px solid rgba(60,80,160,0.28);text-align:center;box-shadow:0 2px 10px rgba(60,80,160,0.08);">
+          <div style="font-size:9px;font-weight:800;color:#2a3a9a;opacity:0.8;margin-bottom:3px;letter-spacing:0.3px;">격국</div>
+          <div style="font-size:14px;font-weight:900;color:#1a2a7a;">${_geokguk||'정격'}</div>
         </div>
-        <div style="flex:1;background:rgba(40,100,60,0.09);border-radius:12px;padding:12px;border:1px solid rgba(40,100,60,0.18);text-align:center;">
-          <div style="font-size:10px;font-weight:700;color:#1a6030;margin-bottom:4px;">강약</div>
-          <div style="font-size:15px;font-weight:900;color:#0a4020;">${_singang||'—'}</div>
+        <div style="flex:1;background:linear-gradient(160deg,rgba(40,120,80,0.12),rgba(40,120,80,0.03));border-radius:12px;padding:12px 8px;border:1.5px solid rgba(40,120,80,0.28);text-align:center;box-shadow:0 2px 10px rgba(40,120,80,0.08);">
+          <div style="font-size:9px;font-weight:800;color:#1a6030;opacity:0.8;margin-bottom:3px;letter-spacing:0.3px;">강약</div>
+          <div style="font-size:14px;font-weight:900;color:#0a4020;">${_singang||'—'}</div>
         </div>
-        <div style="flex:1;background:rgba(160,90,0,0.09);border-radius:12px;padding:12px;border:1px solid rgba(160,90,0,0.18);text-align:center;">
-          <div style="font-size:10px;font-weight:700;color:#7a4200;margin-bottom:4px;">용신</div>
-          <div style="font-size:15px;font-weight:900;color:#5a2a00;">${yE||'—'}</div>
+        <div style="flex:1;background:linear-gradient(160deg,${OH_BG[yE]||'rgba(160,90,0,0.13)'},${OH_BG[yE]||'rgba(160,90,0,0.03)'});border-radius:12px;padding:12px 8px;border:1.5px solid ${OH_BORDER[yE]||'rgba(160,90,0,0.3)'};text-align:center;box-shadow:0 2px 10px ${OH_BG[yE]||'rgba(160,90,0,0.1)'};">
+          <div style="font-size:9px;font-weight:800;color:${OH_COLOR[yE]||'#7a4200'};opacity:0.85;margin-bottom:3px;letter-spacing:0.3px;">용신</div>
+          <div style="font-size:14px;font-weight:900;color:${OH_COLOR[yE]||'#5a2a00'};">${yE||'—'}</div>
         </div>
       </div>
     </div>`;
@@ -3310,28 +3376,46 @@ function renderCharVisual() {
       + '</div>';
 
   } else if (_type === 'yongsin') {
-    // 용신 생활 가이드: 용신 원 + 활용 힌트
-    const ysAct = _rptFull && _rptFull['용신활용'];
+    // 용신 생활 가이드: 용신 원 + 활용 힌트 (오행별 하드코딩 매핑)
     const yCol = OH_COLOR[yE] || '#7a4e00';
     const yBg  = OH_BG[yE]  || 'rgba(120,80,20,0.08)';
     const yBrd = OH_BORDER[yE] || 'rgba(120,80,20,0.2)';
     const OH_NAME = {목:'나무·성장',화:'불·표현',토:'흙·안정',금:'쇠·결단',수:'물·지혜'};
-    const hints = ysAct ? [
-      ysAct['색상'] ? '색상: ' + ysAct['색상'] : null,
-      ysAct['방위'] ? '방위: ' + ysAct['방위'] : null,
-      ysAct['음식'] ? '음식: ' + ysAct['음식'] : null,
-    ].filter(Boolean) : [];
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:12px;">'
-      + '<div style="display:flex;align-items:center;gap:16px;">'
-      + '<div style="width:100px;height:100px;border-radius:50%;background:' + yBg + ';border:3px solid ' + yCol + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">'
-      + '<div style="font-size:36px;font-weight:900;color:' + yCol + ';line-height:1;">' + (yE||'—') + '</div>'
-      + '<div style="font-size:10px;color:' + yCol + ';margin-top:4px;font-weight:700;">용신</div>'
-      + '</div>'
-      + '<div style="display:flex;flex-direction:column;gap:6px;flex:1;">'
-      + '<div style="font-size:13px;font-weight:800;color:#2a1a0a;">' + (OH_NAME[yE]||'') + '</div>'
-      + (hints.length ? hints.map(h => '<div style="font-size:12px;padding:5px 10px;background:' + yBg + ';border-radius:8px;border:1px solid ' + yBrd + ';color:' + yCol + ';font-weight:600;">' + h + '</div>').join('') : '<div style="font-size:12px;color:rgba(60,40,10,0.4);">상세 데이터 로드 중...</div>')
+    const OH_GLYPH = {목:'🌳',화:'🔥',토:'🏔️',금:'⚔️',수:'💧'};
+    const YS_GUIDE = {
+      목:{색상:'초록·연두',방위:'동쪽',음식:'신맛·채소',시간:'오전 3-7시'},
+      화:{색상:'빨강·주황',방위:'남쪽',음식:'쓴맛·튀김',시간:'오전 9-13시'},
+      토:{색상:'노랑·갈색',방위:'중앙',음식:'단맛·곡류',시간:'환절기'},
+      금:{색상:'흰색·금색',방위:'서쪽',음식:'매운맛·고기',시간:'오후 3-7시'},
+      수:{색상:'검정·파랑',방위:'북쪽',음식:'짠맛·해산물',시간:'오후 9시-새벽1시'}
+    };
+    const g = YS_GUIDE[yE] || {};
+    const items = [
+      {icon:'🎨',label:'색상',val:g.색상||'—'},
+      {icon:'🧭',label:'방위',val:g.방위||'—'},
+      {icon:'🍽️',label:'음식',val:g.음식||'—'},
+      {icon:'⏰',label:'시간',val:g.시간||'—'}
+    ];
+    const gridHtml = items.map(it =>
+      '<div style="background:linear-gradient(135deg,' + yBg + ',rgba(255,255,255,0.5));border:1.5px solid ' + yBrd + ';border-radius:12px;padding:9px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px ' + yCol + '18;">'
+      + '<div style="font-size:18px;flex-shrink:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.15));">' + it.icon + '</div>'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="font-size:9px;font-weight:800;color:' + yCol + ';opacity:0.7;letter-spacing:0.3px;">' + it.label + '</div>'
+      + '<div style="font-size:12px;font-weight:900;color:' + yCol + ';line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + it.val + '</div>'
       + '</div></div>'
-      + miniBubbleBlock
+    ).join('');
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:12px;">'
+      + '<div style="display:flex;align-items:center;gap:14px;">'
+      + '<div style="width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 30% 30%,' + yBg + ',' + yCol + '22);border:3px solid ' + yCol + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 20px ' + yCol + '35,inset 0 2px 8px rgba(255,255,255,0.4);position:relative;">'
+      + '<div style="position:absolute;top:-6px;right:-6px;font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2));">' + (OH_GLYPH[yE]||'✦') + '</div>'
+      + '<div style="font-size:38px;font-weight:900;color:' + yCol + ';line-height:1;text-shadow:0 2px 4px ' + yCol + '25;">' + (yE||'—') + '</div>'
+      + '<div style="font-size:9px;color:' + yCol + ';margin-top:3px;font-weight:800;letter-spacing:1.5px;">YONGSIN</div>'
+      + '</div>'
+      + '<div style="flex:1;display:flex;flex-direction:column;gap:6px;">'
+      + '<div style="font-size:14px;font-weight:900;color:#2a1a0a;">' + (OH_NAME[yE]||'') + '</div>'
+      + '<div style="font-size:10px;color:rgba(60,40,10,0.55);line-height:1.5;">이 오행을 보강하는 생활 요소를 일상에 반영하면 사주 균형이 살아납니다.</div>'
+      + '</div></div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">' + gridHtml + '</div>'
       + '</div>';
 
   } else if (_type === 'health') {
@@ -3378,26 +3462,31 @@ function renderCharVisual() {
       + '</div>';
 
   } else if (_type === 'character') {
-    // 기질 리포트: 일주 대형 카드 + 강약/용신 + 미니 버블
+    // 기질 리포트: 일주 대형 카드 + 강약/용신 + 바이럴 장식
     const iljuDisp = _ilju || '—';
     const iljuOh = ohList[0]?.[0];
     const iljuCol = OH_COLOR[iljuOh] || '#7a4e00';
     const iljuBg  = OH_BG[iljuOh]  || 'rgba(120,80,20,0.08)';
     const iljuBrd = OH_BORDER[iljuOh] || 'rgba(120,80,20,0.2)';
+    const yCol2 = OH_COLOR[yE] || '#7a4e00';
+    const yBg2 = OH_BG[yE] || 'rgba(120,80,20,0.08)';
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="display:flex;align-items:center;gap:12px;">'
-      + '<div style="width:90px;height:90px;border-radius:20px;background:' + iljuBg + ';border:2px solid ' + iljuBrd + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">'
-      + '<div style="font-size:34px;font-weight:900;color:' + iljuCol + ';line-height:1;">' + iljuDisp + '</div>'
-      + '<div style="font-size:10px;color:' + iljuCol + ';margin-top:4px;opacity:0.7;">일주</div>'
+      + '<div style="display:flex;align-items:stretch;gap:11px;">'
+      + '<div style="width:100px;height:100px;border-radius:22px;background:radial-gradient(circle at 30% 25%,' + iljuBg + ',' + iljuCol + '18);border:2.5px solid ' + iljuCol + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 20px ' + iljuCol + '35,inset 0 2px 6px rgba(255,255,255,0.4);position:relative;">'
+      + '<div style="position:absolute;top:-7px;right:-7px;background:' + iljuCol + ';color:#fff;font-size:8px;font-weight:900;padding:2px 7px;border-radius:8px;letter-spacing:0.5px;box-shadow:0 2px 6px ' + iljuCol + '70;">ILJU</div>'
+      + '<div style="font-size:36px;font-weight:900;color:' + iljuCol + ';line-height:1;text-shadow:0 2px 6px ' + iljuCol + '30;">' + iljuDisp + '</div>'
+      + '<div style="font-size:9px;color:' + iljuCol + ';margin-top:4px;opacity:0.75;font-weight:800;letter-spacing:1px;">일주</div>'
       + '</div>'
-      + '<div style="flex:1;display:flex;flex-direction:column;gap:6px;">'
-      + '<div style="background:rgba(120,80,20,0.06);border-radius:10px;padding:10px 12px;border:1px solid rgba(120,80,20,0.1);">'
-      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.45);margin-bottom:2px;">일간 강약</div>'
-      + '<div style="font-size:15px;font-weight:900;color:#3a2000;">' + (_singang||'—') + '</div>'
+      + '<div style="flex:1;display:flex;flex-direction:column;gap:7px;">'
+      + '<div style="background:linear-gradient(135deg,rgba(40,120,80,0.14),rgba(40,120,80,0.03));border-radius:11px;padding:9px 12px;border:1.3px solid rgba(40,120,80,0.3);box-shadow:0 2px 8px rgba(40,120,80,0.1);display:flex;align-items:center;gap:8px;">'
+      + '<div style="font-size:14px;">💪</div>'
+      + '<div style="flex:1;"><div style="font-size:9px;font-weight:800;color:#1a6030;opacity:0.75;letter-spacing:0.3px;">일간 강약</div>'
+      + '<div style="font-size:14px;font-weight:900;color:#0a4020;">' + (_singang||'—') + '</div></div>'
       + '</div>'
-      + '<div style="background:' + (OH_BG[yE]||'rgba(120,80,20,0.06)') + ';border-radius:10px;padding:10px 12px;border:1px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.1)') + ';">'
-      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.45);margin-bottom:2px;">용신</div>'
-      + '<div style="font-size:15px;font-weight:900;color:' + (OH_COLOR[yE]||'#3a2000') + ';">' + (yE||'—') + '</div>'
+      + '<div style="background:linear-gradient(135deg,' + yBg2 + ',rgba(255,255,255,0.4));border-radius:11px;padding:9px 12px;border:1.3px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.25)') + ';box-shadow:0 2px 8px ' + yBg2 + ';display:flex;align-items:center;gap:8px;">'
+      + '<div style="font-size:14px;">🔑</div>'
+      + '<div style="flex:1;"><div style="font-size:9px;font-weight:800;color:' + yCol2 + ';opacity:0.8;letter-spacing:0.3px;">용신 YONGSIN</div>'
+      + '<div style="font-size:14px;font-weight:900;color:' + yCol2 + ';">' + (yE||'—') + '</div></div>'
       + '</div></div></div>'
       + miniBubbleBlock
       + '</div>';
@@ -3423,21 +3512,27 @@ function renderCharVisual() {
       + '</div>';
 
   } else if (_type === 'family') {
-    // 가족 인연: 육친 오행 구조 (십신맵 기반)
+    // 가족 인연: 육친 십신 분포 (男/女 정통 규칙 + 오행 매핑)
     const tgmF = _sdFull?.ten_gods_map || {};
     const tgValsF = Object.values(tgmF);
     const genderF = _profile?.gender || 'M';
+    // 정통 사주 육친 규칙
+    // 남자: 부=편재, 모=정인/편인, 처=정재/편재, 자녀=편관/정관
+    // 여자: 부=편재, 모=정인/편인, 남편=정관/편관, 자녀=식신/상관
     const YUKCH = genderF === 'F'
-      ? [{label:'부성',keys:['편관','정관']},{label:'모성',keys:['정인','편인']},{label:'배우자',keys:['편관','정관']},{label:'자녀성',keys:['식신','상관']}]
-      : [{label:'부성',keys:['편재']},{label:'모성',keys:['정인','편인']},{label:'배우자',keys:['정재','편재']},{label:'자녀성',keys:['식신','상관']}];
+      ? [{label:'아버지',icon:'👨',keys:['편재']},{label:'어머니',icon:'👩',keys:['정인','편인']},{label:'남편',icon:'💑',keys:['정관','편관']},{label:'자녀',icon:'👶',keys:['식신','상관']}]
+      : [{label:'아버지',icon:'👨',keys:['편재']},{label:'어머니',icon:'👩',keys:['정인','편인']},{label:'아내',icon:'💑',keys:['정재','편재']},{label:'자녀',icon:'👶',keys:['편관','정관']}];
     const yukHtml = YUKCH.map(function(obj) {
       const cnt = tgValsF.filter(function(v){ return v && obj.keys.some(function(k){ return v.includes(k); }); }).length;
       const has = cnt > 0;
-      return '<div style="flex:1;min-width:60px;background:' + (has?'rgba(40,130,80,0.08)':'rgba(120,80,20,0.05)') + ';border-radius:12px;padding:10px 6px;border:' + (has?'1.5px solid rgba(40,130,80,0.25)':'1px solid rgba(120,80,20,0.1)') + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + (has?'#1a6a30':'rgba(60,40,10,0.4)') + ';margin-bottom:4px;">' + obj.label + '</div><div style="font-size:20px;font-weight:900;color:' + (has?'#1a6a30':'rgba(60,40,10,0.3)') + ';">' + cnt + '개</div><div style="font-size:9px;color:' + (has?'rgba(26,106,48,0.7)':'rgba(60,40,10,0.3)') + ';margin-top:2px;">' + obj.keys[0] + '</div></div>';
+      const strength = cnt >= 2 ? '강함' : cnt === 1 ? '있음' : '없음';
+      const baseCol = has ? (cnt>=2?'#1a5a90':'#1a6a30') : '#8a7050';
+      const bgGrad = has ? (cnt>=2?'linear-gradient(160deg,rgba(40,110,170,0.13),rgba(40,110,170,0.04))':'linear-gradient(160deg,rgba(40,130,80,0.12),rgba(40,130,80,0.03))') : 'rgba(120,80,20,0.04)';
+      return '<div style="flex:1;min-width:60px;background:' + bgGrad + ';border-radius:14px;padding:12px 6px;border:1.5px solid ' + (has?(cnt>=2?'rgba(40,110,170,0.3)':'rgba(40,130,80,0.28)'):'rgba(120,80,20,0.12)') + ';text-align:center;' + (has?'box-shadow:0 2px 10px '+(cnt>=2?'rgba(40,110,170,0.12)':'rgba(40,130,80,0.1)')+';':'') + '"><div style="font-size:18px;margin-bottom:2px;opacity:' + (has?1:0.35) + ';">' + obj.icon + '</div><div style="font-size:10px;font-weight:800;color:' + baseCol + ';margin-bottom:4px;">' + obj.label + '</div><div style="font-size:22px;font-weight:900;color:' + baseCol + ';line-height:1;">' + cnt + '</div><div style="font-size:9px;color:' + baseCol + ';opacity:0.7;margin-top:3px;font-weight:700;">' + strength + '</div></div>';
     }).join('');
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:2px;">육친 오행 — 원국 내 십신 분포</div>'
-      + '<div style="display:flex;gap:6px;">' + yukHtml + '</div>'
+      + '<div style="text-align:center;font-size:11px;font-weight:800;color:rgba(60,40,10,0.55);letter-spacing:1px;">👪 육친 지도 · ' + (genderF==='F'?'여명':'남명') + ' 기준</div>'
+      + '<div style="display:flex;gap:5px;">' + yukHtml + '</div>'
       + miniBubbleBlock
       + '</div>';
 
@@ -3523,25 +3618,54 @@ function renderCharVisual() {
       + '</div>';
 
   } else if (_type === 'sinsal') {
-    // 신살: 길신·흉신 배지 + 미니 버블
+    // 신살: 길신·흉신 배지 + 다중 폴백
     const ssObj = _specialPatternData || _sdFull?.special_pattern || {};
     const gilsin = Array.isArray(ssObj.길신) ? ssObj.길신 : (ssObj.길신 ? [ssObj.길신] : []);
     const hyungsin = Array.isArray(ssObj.흉신) ? ssObj.흉신 : (ssObj.흉신 ? [ssObj.흉신] : []);
     const sinsalArr = Array.isArray(ssObj.신살) ? ssObj.신살 : [];
-    const allGil = [...gilsin, ...sinsalArr.filter(function(s){return s.유형==='길신'||s.길흉==='길';})].slice(0,5);
-    const allHyung = [...hyungsin, ...sinsalArr.filter(function(s){return s.유형==='흉신'||s.길흉==='흉';})].slice(0,5);
-    const gilHtmlS = allGil.map(function(s){return '<div style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(40,130,80,0.1);border:1px solid rgba(40,130,80,0.25);color:#1a6a30;">' + (typeof s==='string'?s:(s.이름||s.신살||'')) + '</div>';}).join('');
-    const hyungHtmlS = allHyung.map(function(s){return '<div style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(180,40,40,0.1);border:1px solid rgba(180,40,40,0.25);color:#8a1010;">' + (typeof s==='string'?s:(s.이름||s.신살||'')) + '</div>';}).join('');
+    // 추가 폴백: _sinsalSummaryData / _specialShinsalData / _guiinData / _yanginData
+    const sumArr = Array.isArray(_sinsalSummaryData?.길신) ? _sinsalSummaryData.길신 : [];
+    const sumHyung = Array.isArray(_sinsalSummaryData?.흉신) ? _sinsalSummaryData.흉신 : [];
+    const guiinList = Array.isArray(_guiinData?.귀인) ? _guiinData.귀인 : [];
+    const yanginActive = _yanginData?.있음;
+    const allGil = [...gilsin, ...sumArr, ...guiinList, ...sinsalArr.filter(function(s){return s.유형==='길신'||s.길흉==='길';})].slice(0,6);
+    const allHyung = [...hyungsin, ...sumHyung, ...sinsalArr.filter(function(s){return s.유형==='흉신'||s.길흉==='흉';})].slice(0,6);
+    const mkBadge = (s, isGil) => {
+      const name = typeof s==='string' ? s : (s.이름||s.신살||s.귀인||'');
+      if (!name) return '';
+      const col = isGil ? '#1a6a30' : '#8a1010';
+      const bg = isGil ? 'linear-gradient(135deg,rgba(40,130,80,0.18),rgba(40,130,80,0.06))' : 'linear-gradient(135deg,rgba(180,40,40,0.18),rgba(180,40,40,0.06))';
+      const brd = isGil ? 'rgba(40,130,80,0.35)' : 'rgba(180,40,40,0.35)';
+      const icon = isGil ? '✦' : '⚠';
+      return '<div style="padding:6px 13px;border-radius:20px;font-size:11px;font-weight:800;background:' + bg + ';border:1.2px solid ' + brd + ';color:' + col + ';box-shadow:0 2px 6px ' + col + '22;display:inline-flex;align-items:center;gap:4px;"><span style="font-size:10px;opacity:0.75;">' + icon + '</span>' + name + '</div>';
+    };
+    const gilHtmlS = allGil.map(s => mkBadge(s, true)).filter(Boolean).join('');
+    const hyungHtmlS = allHyung.map(s => mkBadge(s, false)).filter(Boolean).join('');
     const wonjinF = _wonjinData?.있음, gwimunF = _gwimungwanData?.있음;
-    const fallbackS = !gilHtmlS && !hyungHtmlS ? [
-      wonjinF!==undefined?'<div style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:' + (wonjinF?'rgba(180,40,40,0.1)':'rgba(40,130,80,0.1)') + ';border:1px solid ' + (wonjinF?'rgba(180,40,40,0.25)':'rgba(40,130,80,0.25)') + ';color:' + (wonjinF?'#8a1010':'#1a6a30') + ';">원진살 ' + (wonjinF?'있음':'없음') + '</div>':'',
-      gwimunF!==undefined?'<div style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:' + (gwimunF?'rgba(180,40,180,0.1)':'rgba(40,130,80,0.1)') + ';border:1px solid ' + (gwimunF?'rgba(180,40,180,0.25)':'rgba(40,130,80,0.25)') + ';color:' + (gwimunF?'#6a108a':'#1a6a30') + ';">귀문관살 ' + (gwimunF?'있음':'없음') + '</div>':''
-    ].filter(Boolean).join('') : '';
+    const fallbackBadges = [];
+    if (!gilHtmlS && !hyungHtmlS) {
+      if (wonjinF !== undefined) fallbackBadges.push(mkBadge('원진살 ' + (wonjinF?'있음':'없음'), !wonjinF));
+      if (gwimunF !== undefined) fallbackBadges.push(mkBadge('귀문관살 ' + (gwimunF?'있음':'없음'), !gwimunF));
+      if (yanginActive !== undefined) fallbackBadges.push(mkBadge('양인살 ' + (yanginActive?'있음':'없음'), !yanginActive));
+      if (!fallbackBadges.length) fallbackBadges.push(mkBadge('신살 분석 진행 중', true));
+    }
+    const gCount = allGil.length, hCount = allHyung.length;
+    const scoreHtml = '<div style="display:flex;gap:8px;justify-content:center;">'
+      + '<div style="flex:1;max-width:110px;background:linear-gradient(135deg,rgba(40,130,80,0.14),rgba(40,130,80,0.04));border:1.5px solid rgba(40,130,80,0.3);border-radius:12px;padding:8px;text-align:center;box-shadow:0 3px 10px rgba(40,130,80,0.15);">'
+      + '<div style="font-size:18px;filter:drop-shadow(0 1px 2px rgba(40,130,80,0.3));">✦</div>'
+      + '<div style="font-size:22px;font-weight:900;color:#1a6a30;line-height:1;">' + gCount + '</div>'
+      + '<div style="font-size:9px;font-weight:800;color:#1a6a30;opacity:0.7;letter-spacing:0.5px;">길신 GIL</div>'
+      + '</div>'
+      + '<div style="flex:1;max-width:110px;background:linear-gradient(135deg,rgba(180,40,40,0.14),rgba(180,40,40,0.04));border:1.5px solid rgba(180,40,40,0.3);border-radius:12px;padding:8px;text-align:center;box-shadow:0 3px 10px rgba(180,40,40,0.15);">'
+      + '<div style="font-size:18px;filter:drop-shadow(0 1px 2px rgba(180,40,40,0.3));">⚠</div>'
+      + '<div style="font-size:22px;font-weight:900;color:#8a1010;line-height:1;">' + hCount + '</div>'
+      + '<div style="font-size:9px;font-weight:800;color:#8a1010;opacity:0.7;letter-spacing:0.5px;">흉신 HYUNG</div>'
+      + '</div></div>';
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + (gilHtmlS?'<div><div style="font-size:10px;font-weight:700;color:rgba(40,130,80,0.7);margin-bottom:6px;">길신 · 보호성 신살</div><div style="display:flex;flex-wrap:wrap;gap:6px;">' + gilHtmlS + '</div></div>':'')
-      + (hyungHtmlS?'<div><div style="font-size:10px;font-weight:700;color:rgba(180,40,40,0.7);margin-bottom:6px;">흉신 · 주의 신살</div><div style="display:flex;flex-wrap:wrap;gap:6px;">' + hyungHtmlS + '</div></div>':'')
-      + (fallbackS?'<div style="display:flex;flex-wrap:wrap;gap:6px;">' + fallbackS + '</div>':'')
-      + miniBubbleBlock
+      + scoreHtml
+      + (gilHtmlS?'<div><div style="font-size:10px;font-weight:800;color:rgba(40,130,80,0.75);margin-bottom:6px;letter-spacing:0.3px;">보호성 길신</div><div style="display:flex;flex-wrap:wrap;gap:5px;">' + gilHtmlS + '</div></div>':'')
+      + (hyungHtmlS?'<div><div style="font-size:10px;font-weight:800;color:rgba(180,40,40,0.75);margin-bottom:6px;letter-spacing:0.3px;">주의 흉신</div><div style="display:flex;flex-wrap:wrap;gap:5px;">' + hyungHtmlS + '</div></div>':'')
+      + (fallbackBadges.length?'<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;">' + fallbackBadges.join('') + '</div>':'')
       + '</div>';
 
   } else {
