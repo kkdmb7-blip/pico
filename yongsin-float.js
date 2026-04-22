@@ -341,6 +341,9 @@
     var ps = getPetState();
     var profile = {};
     try { profile = JSON.parse(localStorage.getItem('pico_profile') || '{}'); } catch(e) {}
+    if (!profile.birth_date && !profile.year) {
+      try { var _ku = JSON.parse(localStorage.getItem('fortuna_kakao_user') || '{}'); if (_ku.birth_date) profile = _ku; } catch(e) {}
+    }
     var yongsin = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached') || ps.element || '';
     fetch('https://fortuna-silk.vercel.app/api/pet-advice', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -353,7 +356,9 @@
   }
 
   function getOwnerName() {
-    try { var p = JSON.parse(localStorage.getItem('pico_profile') || '{}'); return p && p.name ? p.name : null; } catch(e) { return null; }
+    try { var p = JSON.parse(localStorage.getItem('pico_profile') || '{}'); if (p && p.name) return p.name; } catch(e) {}
+    try { var k = JSON.parse(localStorage.getItem('fortuna_kakao_user') || '{}'); if (k && k.name) return k.name; } catch(e) {}
+    return null;
   }
   function ownerNa() {
     var name = getOwnerName(); if (!name) return '';
