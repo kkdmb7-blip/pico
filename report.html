@@ -2814,35 +2814,29 @@ function renderCharVisual() {
   let visualHtml = '';
 
   if (_type === 'money') {
-    // 정재 vs 편재 원형 + 재성 오행 하이라이트
-    const jj = wd?.정재수 || 0, pj = wd?.편재수 || 0, total = jj + pj;
-    const wOh = ohList.find(([k]) => {
-      const cycle = ['목','화','토','금','수'];
-      const myOh = ohList[0]?.[0];
-      const mi = cycle.indexOf(myOh);
-      return k === cycle[(mi+2)%5];
-    })?.[0];
-    const mkDots = (n, col, label) => Array(Math.min(n,6)).fill(0).map((_, i) =>
-      `<div style="width:${32+i*0}px;height:${32}px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;">${label}</div>`
-    ).join('');
-    const noDots = (label) => `<div style="font-size:12px;color:rgba(60,40,10,0.35);padding:8px 0;">${label} 없음</div>`;
-    visualHtml = `<div style="padding:18px;display:flex;flex-direction:column;gap:14px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="font-size:11px;font-weight:700;color:#7a4e00;width:44px;flex-shrink:0;">정재<br><span style="font-size:18px;font-weight:900;">${jj}</span>개</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">${jj>0?mkDots(jj,'rgba(60,140,60,0.8)','正'):noDots('정재')}</div>
+    // 재성 현황 스탯 카드 4칸
+    const jj = wd?.정재수 ?? 0, pj = wd?.편재수 ?? 0, total = jj + pj;
+    const statCard = (label, val, sub, bg, col) =>
+      `<div style="background:${bg};border-radius:12px;padding:12px 14px;border:1px solid ${col}20;">
+        <div style="font-size:10px;font-weight:700;color:${col};opacity:0.7;margin-bottom:4px;">${label}</div>
+        <div style="font-size:22px;font-weight:900;color:${col};line-height:1;">${val}</div>
+        ${sub?`<div style="font-size:10px;color:${col};opacity:0.6;margin-top:3px;">${sub}</div>`:''}
+      </div>`;
+    const jaeBar = (n, col) => Array(Math.max(0,Math.min(n,8))).fill(0).map(()=>
+      `<div style="width:18px;height:18px;border-radius:4px;background:${col};"></div>`).join('')
+      + (n===0?`<span style="font-size:11px;color:rgba(60,40,10,0.3);">없음</span>`:'');
+    visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${statCard('정재 (안정 수입)', jj+'개', '월급·저축형', 'rgba(40,130,60,0.09)', '#1a7a30')}
+        ${statCard('편재 (투자·사업)', pj+'개', '리스크·기회형', 'rgba(200,120,0,0.09)', '#a05800')}
       </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="font-size:11px;font-weight:700;color:#7a4e00;width:44px;flex-shrink:0;">편재<br><span style="font-size:18px;font-weight:900;">${pj}</span>개</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">${pj>0?mkDots(pj,'rgba(200,130,0,0.8)','偏'):noDots('편재')}</div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:4px;">
-        <div style="flex:1;background:rgba(120,80,20,0.06);border-radius:10px;padding:10px 12px;border:1px solid rgba(120,80,20,0.1);">
-          <div style="font-size:10px;color:rgba(60,40,10,0.45);margin-bottom:3px;">재성 총합</div>
-          <div style="font-size:20px;font-weight:900;color:#5a2e00;">${total}개</div>
-        </div>
-        <div style="flex:2;background:rgba(120,80,20,0.06);border-radius:10px;padding:10px 12px;border:1px solid rgba(120,80,20,0.1);">
-          <div style="font-size:10px;color:rgba(60,40,10,0.45);margin-bottom:3px;">통근 상태</div>
-          <div style="font-size:12px;font-weight:700;color:#3a2000;">${(wd?.재성통근||'계산 중').replace(/–.*$/,'').slice(0,20)}</div>
+      <div style="display:flex;gap:8px;">
+        ${statCard('재성 총합', total+'개', total>=3?'재성과다':total===0?'재성부재':'적정', 'rgba(120,80,20,0.07)', '#7a4e00')}
+        <div style="flex:1;background:rgba(120,80,20,0.05);border-radius:12px;padding:12px 14px;">
+          <div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.5);margin-bottom:6px;">재성 위치</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            ${wd?.재성위치?.length ? wd.재성위치.map(p=>`<span style="font-size:10px;padding:2px 7px;border-radius:6px;background:rgba(120,80,20,0.1);color:#5a3000;">${p.위치}</span>`).join('') : '<span style="font-size:11px;color:rgba(60,40,10,0.3);">재성 없음</span>'}
+          </div>
         </div>
       </div>
     </div>`;
@@ -2869,40 +2863,107 @@ function renderCharVisual() {
     </div>`;
 
   } else if (_type === 'love') {
-    // 오행 버블 + 관성 오행 강조 + 원진살 뱃지
-    const cycle = ['목','화','토','금','수'];
-    const myOh = ohList[0]?.[0];
+    // 오행 버블 + 아래 관성·원진살 인포바
+    const cycle2 = ['목','화','토','금','수'];
     const gender = _profile?.gender || 'M';
-    // 관성 오행: 나를 극하는 오행
-    const mi = cycle.indexOf(myOh);
-    const gwanOh = mi >= 0 ? cycle[(mi+3)%5] : null;
+    const mi2 = cycle2.indexOf(ohList[0]?.[0]);
+    const gwanOh = mi2 >= 0 ? cycle2[(mi2+3)%5] : null;
     const wonjin = _wonjinData?.있음;
-    // 버블에 관성 오행 표시 추가
-    const loveBubbles = bubblesHtml + (gwanOh ? `
-      <div style="position:absolute;right:0;bottom:0;background:rgba(180,60,120,0.12);border:2px dashed rgba(180,60,120,0.4);border-radius:12px;padding:6px 10px;font-size:11px;color:#8a1a50;font-weight:700;">
-        관성 오행 <b>${gwanOh}</b>${gender==='F'?'(남편성)':'(아내성)'}
-      </div>` : '') + (wonjin ? `
-      <div style="position:absolute;left:0;bottom:0;background:rgba(200,60,60,0.1);border:1.5px solid rgba(200,60,60,0.3);border-radius:10px;padding:4px 8px;font-size:10px;color:#8a2010;font-weight:700;">⚠ 원진살</div>` : '');
-    visualHtml = `<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">${loveBubbles}</div>`;
+    const gwimun = _gwimungwanData?.있음;
+    const infoBar = [
+      gwanOh ? `<div style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(180,60,120,0.08);border-radius:10px;border:1px solid rgba(180,60,120,0.2);">
+        <div style="width:28px;height:28px;border-radius:50%;background:${OH_BG[gwanOh]||'rgba(100,50,80,0.1)'};border:2px solid ${OH_COLOR[gwanOh]||'#8a1a50'};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:${OH_COLOR[gwanOh]||'#8a1a50'};">${gwanOh}</div>
+        <div><div style="font-size:10px;color:rgba(100,20,60,0.6);font-weight:700;">${gender==='F'?'남편성 (관성)':'아내성 (재성)'}</div><div style="font-size:12px;font-weight:800;color:#6a1040;">${gwanOh} 오행이 배우자를 상징</div></div>
+      </div>` : '',
+      `<div style="display:flex;gap:6px;">
+        <div style="flex:1;padding:8px 12px;border-radius:10px;background:${wonjin?'rgba(200,60,60,0.09)':'rgba(40,140,80,0.09)'};border:1px solid ${wonjin?'rgba(200,60,60,0.2)':'rgba(40,140,80,0.2)'};text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:${wonjin?'#8a2010':'#1a6a30'};margin-bottom:2px;">원진살</div>
+          <div style="font-size:13px;font-weight:900;color:${wonjin?'#8a2010':'#1a6a30'};">${wonjin?'있음':'없음'}</div>
+        </div>
+        <div style="flex:1;padding:8px 12px;border-radius:10px;background:${gwimun?'rgba(180,60,180,0.09)':'rgba(40,140,80,0.09)'};border:1px solid ${gwimun?'rgba(180,60,180,0.2)':'rgba(40,140,80,0.2)'};text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:${gwimun?'#6a1a8a':'#1a6a30'};margin-bottom:2px;">귀문관살</div>
+          <div style="font-size:13px;font-weight:900;color:${gwimun?'#6a1a8a':'#1a6a30'};">${gwimun?'있음':'없음'}</div>
+        </div>
+      </div>`
+    ].filter(Boolean).join('');
+    visualHtml = `
+      <div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">${bubblesHtml}</div>
+      <div style="padding:0 18px 10px;display:flex;flex-direction:column;gap:8px;">${infoBar}</div>`;
 
   } else if (_type === 'year') {
-    // 내 오행 버블 + 2026 병오년(화) 세운 오버레이
-    const sewunOh = '화'; // 병오년 = 화
-    const sewunColor = OH_COLOR[sewunOh];
-    const sewunBg = OH_BG[sewunOh];
-    const isConflict = ohList[0]?.[0] === '수'; // 수일간: 수극화 충돌
-    visualHtml = `<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">
-      ${bubblesHtml}
-      <div style="position:absolute;top:4px;right:0;background:${sewunBg};border:2px solid ${sewunColor};border-radius:14px;padding:6px 12px;text-align:center;">
-        <div style="font-size:9px;font-weight:700;color:${sewunColor};opacity:0.8;">2026 세운</div>
-        <div style="font-size:16px;font-weight:900;color:${sewunColor};">병오(丙午)</div>
-        <div style="font-size:9px;color:${sewunColor};opacity:0.75;">${sewunOh} 에너지</div>
+    // 2026 병오년 세운 vs 내 오행 비교 패널
+    const sewunOh = '화';
+    const sewunCol = OH_COLOR[sewunOh], sewunBg2 = OH_BG[sewunOh], sewunBrd = OH_BORDER[sewunOh];
+    const myTop = ohList[0]?.[0], myTopPct = Math.round(Number(ohList[0]?.[1]||0));
+    const cycle3 = ['목','화','토','금','수'];
+    const si = cycle3.indexOf(sewunOh), mi3 = cycle3.indexOf(myTop);
+    const rel = si === mi3 ? '비화 — 세운이 내 기운을 강화함' :
+                si === (mi3+1)%5 ? '상생 — 세운이 나를 생하는 구조' :
+                mi3 === (si+1)%5 ? '상생 — 내가 세운을 생하는 구조' :
+                si === (mi3+3)%5 ? '상극 — 세운이 나를 극하는 도전기' : '상극 — 내가 세운을 제어하는 구조';
+    const inter = _sewunInterData;
+    visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="flex:1;background:${OH_BG[myTop]||'rgba(120,80,20,0.08)'};border-radius:12px;padding:14px;border:1px solid ${OH_BORDER[myTop]||'rgba(120,80,20,0.2)'};text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:${OH_COLOR[myTop]||'#555'};opacity:0.7;margin-bottom:4px;">내 주도 오행</div>
+          <div style="font-size:36px;font-weight:900;color:${OH_COLOR[myTop]||'#555'};line-height:1;">${myTop||'—'}</div>
+          <div style="font-size:11px;color:${OH_COLOR[myTop]||'#555'};margin-top:4px;">${myTopPct}%</div>
+        </div>
+        <div style="font-size:20px;color:rgba(60,40,10,0.25);font-weight:300;">vs</div>
+        <div style="flex:1;background:${sewunBg2};border-radius:12px;padding:14px;border:2px solid ${sewunCol};text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:${sewunCol};opacity:0.8;margin-bottom:4px;">2026 세운</div>
+          <div style="font-size:36px;font-weight:900;color:${sewunCol};line-height:1;">화</div>
+          <div style="font-size:11px;color:${sewunCol};margin-top:4px;">병오(丙午)</div>
+        </div>
       </div>
-      ${isConflict?`<div style="position:absolute;bottom:0;right:0;background:rgba(200,60,60,0.1);border:1.5px solid rgba(200,60,60,0.3);border-radius:8px;padding:3px 8px;font-size:10px;color:#8a2010;font-weight:700;">수극화 충돌 주의</div>`:''}
+      <div style="background:rgba(120,80,20,0.06);border-radius:10px;padding:10px 14px;border:1px solid rgba(120,80,20,0.1);">
+        <div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.45);margin-bottom:3px;">세운 관계</div>
+        <div style="font-size:13px;font-weight:700;color:#3a2000;">${rel}</div>
+        ${inter?.판정?`<div style="font-size:11px;color:rgba(60,40,10,0.55);margin-top:3px;">${inter.판정}</div>`:''}
+      </div>
+    </div>`;
+
+  } else if (_type === 'career_deep') {
+    // 직업·사업: 격국 + 직업 오행 + 관록 구조
+    const jobOh = ipd?.직업적성 ? ipd.직업적성.slice(0,30) : null;
+    const gwanRok = _rptFull?.['십신궁위'] || _tenGodPosData;
+    visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
+      <div style="position:relative;width:300px;height:160px;margin:0 auto;overflow:visible;">${bubblesHtml}</div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;background:rgba(60,80,160,0.09);border-radius:12px;padding:12px;border:1px solid rgba(60,80,160,0.18);text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:#2a3a9a;margin-bottom:4px;">격국</div>
+          <div style="font-size:15px;font-weight:900;color:#1a2a7a;">${_geokguk||'정격'}</div>
+        </div>
+        <div style="flex:1;background:rgba(40,100,60,0.09);border-radius:12px;padding:12px;border:1px solid rgba(40,100,60,0.18);text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:#1a6030;margin-bottom:4px;">강약</div>
+          <div style="font-size:15px;font-weight:900;color:#0a4020;">${_singang||'—'}</div>
+        </div>
+        <div style="flex:1;background:rgba(160,90,0,0.09);border-radius:12px;padding:12px;border:1px solid rgba(160,90,0,0.18);text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:#7a4200;margin-bottom:4px;">용신</div>
+          <div style="font-size:15px;font-weight:900;color:#5a2a00;">${yE||'—'}</div>
+        </div>
+      </div>
+    </div>`;
+
+  } else if (['triple','astro_full','vedic_full','ziwei_full'].includes(_type)) {
+    // 동서양 교차: 분석 시스템 뱃지 + 오행 버블
+    const systemBadges = {
+      triple:     [['사주','#7a4e00'],['베딕','#2a5a00'],['서양점성','#1a3a9a'],['자미두수','#5a1a9a']],
+      astro_full: [['사주','#7a4e00'],['서양점성','#1a3a9a']],
+      vedic_full: [['사주','#7a4e00'],['베딕','#2a5a00']],
+      ziwei_full: [['사주','#7a4e00'],['자미두수','#5a1a9a']],
+    }[_type] || [['사주','#7a4e00']];
+    const badgeHtml = systemBadges.map(([name,col])=>
+      `<div style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:800;color:${col};background:${col}18;border:1.5px solid ${col}40;">${name}</div>`
+    ).join('<div style="font-size:12px;color:rgba(60,40,10,0.25);align-self:center;">×</div>');
+    visualHtml = `<div style="padding:14px 18px 6px;display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${badgeHtml}</div>
+      <div style="font-size:11px;color:rgba(60,40,10,0.45);">위 시스템을 교차 분석해 더 높은 정밀도를 제공합니다</div>
+      <div style="position:relative;width:300px;height:160px;margin:0 auto;overflow:visible;">${bubblesHtml}</div>
     </div>`;
 
   } else {
-    // character + 기타: 기본 오행 버블
+    // character + 기타 기본 오행 버블
     visualHtml = `<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">${bubblesHtml}</div>`;
   }
 
