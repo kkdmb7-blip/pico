@@ -2814,32 +2814,29 @@ function renderCharVisual() {
   let visualHtml = '';
 
   if (_type === 'money') {
-    // 재성 현황 스탯 카드 4칸
-    const jj = wd?.정재수 ?? 0, pj = wd?.편재수 ?? 0, total = jj + pj;
-    const statCard = (label, val, sub, bg, col) =>
-      `<div style="background:${bg};border-radius:12px;padding:12px 14px;border:1px solid ${col}20;">
-        <div style="font-size:10px;font-weight:700;color:${col};opacity:0.7;margin-bottom:4px;">${label}</div>
-        <div style="font-size:22px;font-weight:900;color:${col};line-height:1;">${val}</div>
-        ${sub?`<div style="font-size:10px;color:${col};opacity:0.6;margin-top:3px;">${sub}</div>`:''}
-      </div>`;
-    const jaeBar = (n, col) => Array(Math.max(0,Math.min(n,8))).fill(0).map(()=>
-      `<div style="width:18px;height:18px;border-radius:4px;background:${col};"></div>`).join('')
-      + (n===0?`<span style="font-size:11px;color:rgba(60,40,10,0.3);">없음</span>`:'');
-    visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        ${statCard('정재 (안정 수입)', jj+'개', '월급·저축형', 'rgba(40,130,60,0.09)', '#1a7a30')}
-        ${statCard('편재 (투자·사업)', pj+'개', '리스크·기회형', 'rgba(200,120,0,0.09)', '#a05800')}
-      </div>
-      <div style="display:flex;gap:8px;">
-        ${statCard('재성 총합', total+'개', total>=3?'재성과다':total===0?'재성부재':'적정', 'rgba(120,80,20,0.07)', '#7a4e00')}
-        <div style="flex:1;background:rgba(120,80,20,0.05);border-radius:12px;padding:12px 14px;">
-          <div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.5);margin-bottom:6px;">재성 위치</div>
-          <div style="display:flex;gap:4px;flex-wrap:wrap;">
-            ${wd?.재성위치?.length ? wd.재성위치.map(p=>`<span style="font-size:10px;padding:2px 7px;border-radius:6px;background:rgba(120,80,20,0.1);color:#5a3000;">${p.위치}</span>`).join('') : '<span style="font-size:11px;color:rgba(60,40,10,0.3);">재성 없음</span>'}
-          </div>
-        </div>
-      </div>
-    </div>`;
+    // ten_gods_map에서 직접 재성 카운트
+    const tgm = _sdFull?.ten_gods_map || {};
+    const tgVals = Object.values(tgm);
+    const jj = tgVals.filter(v => v && v.includes('정재')).length;
+    const pj = tgVals.filter(v => v && v.includes('편재')).length;
+    const total = jj + pj;
+    const jaeLabel = total >= 3 ? '재성과다' : total === 0 ? '재성부재' : total === 1 ? '재성약' : '재성적당';
+    const wealthOhName = wd?.재물성향 || (jj > pj ? '정재 우위 — 안정·저축형' : pj > jj ? '편재 우위 — 투자·사업형' : total > 0 ? '균형형' : '재성 부재');
+    visualHtml = '<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">' + bubblesHtml + '</div>'
+      + '<div style="padding:0 18px 10px;display:flex;gap:8px;">'
+      + '<div style="flex:1;background:rgba(40,130,60,0.09);border-radius:12px;padding:12px;border:1px solid rgba(40,130,60,0.2);text-align:center;">'
+      + '<div style="font-size:10px;font-weight:700;color:#1a6a30;margin-bottom:4px;">정재</div>'
+      + '<div style="font-size:28px;font-weight:900;color:#1a5020;line-height:1;">' + jj + '</div>'
+      + '<div style="font-size:10px;color:#1a6a30;margin-top:2px;">안정 수입</div></div>'
+      + '<div style="flex:1;background:rgba(200,120,0,0.09);border-radius:12px;padding:12px;border:1px solid rgba(200,120,0,0.2);text-align:center;">'
+      + '<div style="font-size:10px;font-weight:700;color:#8a5000;margin-bottom:4px;">편재</div>'
+      + '<div style="font-size:28px;font-weight:900;color:#6a3800;line-height:1;">' + pj + '</div>'
+      + '<div style="font-size:10px;color:#8a5000;margin-top:2px;">투자·사업</div></div>'
+      + '<div style="flex:1;background:rgba(120,80,20,0.07);border-radius:12px;padding:12px;border:1px solid rgba(120,80,20,0.15);text-align:center;">'
+      + '<div style="font-size:10px;font-weight:700;color:#7a4e00;margin-bottom:4px;">판정</div>'
+      + '<div style="font-size:13px;font-weight:900;color:#5a2e00;line-height:1.2;">' + jaeLabel + '</div>'
+      + '</div></div>'
+      + '<div style="margin:0 18px 10px;padding:10px 14px;background:rgba(120,80,20,0.05);border-radius:10px;border:1px solid rgba(120,80,20,0.1);font-size:12px;font-weight:700;color:#3a2000;">' + wealthOhName + '</div>';
 
   } else if (_type === 'daeun') {
     // 대운 타임라인 스트립
@@ -2962,9 +2959,101 @@ function renderCharVisual() {
       <div style="position:relative;width:300px;height:160px;margin:0 auto;overflow:visible;">${bubblesHtml}</div>
     </div>`;
 
+  } else if (_type === 'month') {
+    // 이번달 운세: 월건 간지 카드 + 이달 십신
+    const mp = _currentMonthPillar || '—';
+    const mtg = _currentMonthTenGod || '—';
+    const mpOh = mp.length >= 2 ? (({'갑':'목','을':'목','병':'화','정':'화','무':'토','기':'토','경':'금','신':'금','임':'수','계':'수'})[mp[0]]||'') : '';
+    const mpCol = OH_COLOR[mpOh] || '#7a4e00';
+    const mpBg  = OH_BG[mpOh]  || 'rgba(120,80,20,0.08)';
+    const mpBrd = OH_BORDER[mpOh] || 'rgba(120,80,20,0.2)';
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="display:flex;align-items:center;gap:12px;">'
+      + '<div style="flex:1;background:' + mpBg + ';border-radius:16px;padding:18px;border:2px solid ' + mpBrd + ';text-align:center;">'
+      + '<div style="font-size:10px;font-weight:700;color:' + mpCol + ';opacity:0.7;margin-bottom:6px;">이번달 월건</div>'
+      + '<div style="font-size:40px;font-weight:900;color:' + mpCol + ';line-height:1;">' + mp + '</div>'
+      + '<div style="font-size:11px;color:' + mpCol + ';margin-top:5px;opacity:0.75;">' + mpOh + ' 에너지</div>'
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:8px;flex:1;">'
+      + '<div style="background:rgba(120,80,20,0.06);border-radius:12px;padding:12px;border:1px solid rgba(120,80,20,0.12);">'
+      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.45);margin-bottom:3px;">이달 십신</div>'
+      + '<div style="font-size:16px;font-weight:900;color:#3a2000;">' + mtg + '</div>'
+      + '</div>'
+      + '<div style="background:rgba(120,80,20,0.06);border-radius:12px;padding:12px;border:1px solid rgba(120,80,20,0.12);">'
+      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.45);margin-bottom:3px;">용신 여부</div>'
+      + '<div style="font-size:13px;font-weight:900;color:' + (yE===mpOh?'#1a6a30':'#8a2010') + ';">' + (yE===mpOh?'용신월 ✓':'비용신월') + '</div>'
+      + '</div></div></div>'
+      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
+
+  } else if (_type === 'yongsin') {
+    // 용신 생활 가이드: 용신 원 + 활용 힌트
+    const ysAct = _rptFull && _rptFull['용신활용'];
+    const yCol = OH_COLOR[yE] || '#7a4e00';
+    const yBg  = OH_BG[yE]  || 'rgba(120,80,20,0.08)';
+    const yBrd = OH_BORDER[yE] || 'rgba(120,80,20,0.2)';
+    const OH_NAME = {목:'나무·성장',화:'불·표현',토:'흙·안정',금:'쇠·결단',수:'물·지혜'};
+    const hints = ysAct ? [
+      ysAct['색상'] ? '색상: ' + ysAct['색상'] : null,
+      ysAct['방위'] ? '방위: ' + ysAct['방위'] : null,
+      ysAct['음식'] ? '음식: ' + ysAct['음식'] : null,
+    ].filter(Boolean) : [];
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:12px;">'
+      + '<div style="display:flex;align-items:center;gap:16px;">'
+      + '<div style="width:100px;height:100px;border-radius:50%;background:' + yBg + ';border:3px solid ' + yCol + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">'
+      + '<div style="font-size:36px;font-weight:900;color:' + yCol + ';line-height:1;">' + (yE||'—') + '</div>'
+      + '<div style="font-size:10px;color:' + yCol + ';margin-top:4px;font-weight:700;">용신</div>'
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:6px;flex:1;">'
+      + '<div style="font-size:13px;font-weight:800;color:#2a1a0a;">' + (OH_NAME[yE]||'') + '</div>'
+      + (hints.length ? hints.map(h => '<div style="font-size:12px;padding:5px 10px;background:' + yBg + ';border-radius:8px;border:1px solid ' + yBrd + ';color:' + yCol + ';font-weight:600;">' + h + '</div>').join('') : '<div style="font-size:12px;color:rgba(60,40,10,0.4);">상세 데이터 로드 중...</div>')
+      + '</div></div>'
+      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
+
+  } else if (_type === 'health') {
+    // 건강·체질: 오행별 장기 매핑 + 취약 오행 강조
+    const OH_ORGAN = {목:'간·담낭',화:'심장·소장',토:'비위·위장',금:'폐·대장',수:'신장·방광'};
+    const sorted = [...ohList];
+    const weakEl = sorted[sorted.length-1]?.[0];
+    const weakPct = Math.round(Number(sorted[sorted.length-1]?.[1]||0));
+    const orgHtml = sorted.map(([el,pct]) => {
+      const isWeak = el === weakEl;
+      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px;background:' + (isWeak?OH_BG[el]:'rgba(120,80,20,0.04)') + ';border:' + (isWeak?'1.5px solid '+OH_BORDER[el]:'1px solid rgba(120,80,20,0.08)') + ';">'
+        + '<div style="width:28px;height:28px;border-radius:50%;background:' + OH_BG[el] + ';border:' + (isWeak?'2px':'1px') + ' solid ' + OH_COLOR[el] + ';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:' + OH_COLOR[el] + ';flex-shrink:0;">' + el + '</div>'
+        + '<div style="flex:1;font-size:11px;color:#3a2000;font-weight:600;">' + (OH_ORGAN[el]||'') + '</div>'
+        + '<div style="font-size:12px;font-weight:800;color:' + OH_COLOR[el] + ';">' + Math.round(Number(pct)) + '%</div>'
+        + (isWeak?'<div style="font-size:9px;color:#8a2010;font-weight:700;background:rgba(200,60,60,0.1);padding:2px 6px;border-radius:6px;">주의</div>':'')
+        + '</div>';
+    }).join('');
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:6px;">'
+      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:4px;">오행별 담당 장기 · 취약 부위 확인</div>'
+      + orgHtml + '</div>';
+
+  } else if (['wealth_timing','timing'].includes(_type)) {
+    // 재물타이밍·인생타이밍: 대운 타임라인 (daeun과 동일)
+    const nowY2 = new Date().getFullYear();
+    const curIdx2 = bigLuck.findIndex(d => { const r=(d.year_range||'').split(/[–\-~]/); return nowY2>=parseInt(r[0])&&nowY2<=parseInt(r[1]); });
+    const si2 = Math.max(0, curIdx2 - 1);
+    const shown2 = bigLuck.slice(si2, si2 + 5);
+    const cards2 = shown2.map((d, i) => {
+      const isCur = (si2+i)===curIdx2;
+      const yr = (d.year_range||'').split(/[–\-~]/);
+      const prog = isCur&&yr[0] ? Math.round((nowY2-parseInt(yr[0]))/10*100) : 0;
+      return '<div style="flex:' + (isCur?1.6:1) + ';background:' + (isCur?'rgba(180,100,0,0.12)':'rgba(120,80,20,0.05)') + ';border:' + (isCur?'2px solid rgba(180,100,0,0.4)':'1px solid rgba(120,80,20,0.1)') + ';border-radius:12px;padding:10px 8px;text-align:center;min-width:0;">'
+        + '<div style="font-size:' + (isCur?17:13) + 'px;font-weight:900;color:' + (isCur?'#7a4200':'rgba(60,40,10,0.5)') + ';">' + (d.pillar_kor||'—') + '</div>'
+        + '<div style="font-size:9px;color:' + (isCur?'rgba(120,60,0,0.7)':'rgba(60,40,10,0.3)') + ';margin-top:3px;">' + (d.year_range||'') + '</div>'
+        + (isCur?'<div style="height:3px;background:rgba(120,80,20,0.08);border-radius:2px;margin-top:6px;"><div style="height:3px;background:rgba(180,100,0,0.5);border-radius:2px;width:'+prog+'%;"></div></div>':'')
+        + '</div>';
+    }).join('');
+    visualHtml = '<div style="padding:14px 18px;">'
+      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:8px;">대운 타이밍 (현재 <span style="color:#7a4200;">' + curDaeunVal + '</span>)</div>'
+      + '<div style="display:flex;gap:6px;">' + (cards2||'<div style="font-size:12px;color:rgba(60,40,10,0.3);">데이터 없음</div>') + '</div></div>'
+      + '<div style="position:relative;width:300px;height:140px;margin:8px auto 0;overflow:visible;">' + bubblesHtml + '</div>';
+
   } else {
-    // character + 기타 기본 오행 버블
-    visualHtml = `<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">${bubblesHtml}</div>`;
+    // character + child_career + family + classic + guide + 기타
+    visualHtml = '<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">' + bubblesHtml + '</div>';
   }
 
   // ── 실제 DB 데이터 항목 ──

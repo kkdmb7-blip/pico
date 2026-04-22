@@ -921,9 +921,7 @@ function fillMsg(tpl) {
   var name = getPetOwnerName();
   var lv = state ? (state.level || 1) : 1;
   if (name) {
-    var code = name.charCodeAt(name.length - 1);
-    var hasJong = code >= 0xAC00 && ((code - 0xAC00) % 28 !== 0);
-    var na = name + (hasJong ? '아' : '야');
+    var na = name + '님';
     tpl = tpl.replace(/\{na\}/g, na).replace(/\{name\}/g, name);
   } else {
     tpl = tpl.replace(/^\{na\},?\s*/g, '').replace(/,?\s*\{na\}/g, '')

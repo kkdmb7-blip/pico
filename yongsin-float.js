@@ -362,9 +362,7 @@
   }
   function ownerNa() {
     var name = getOwnerName(); if (!name) return '';
-    var code = name.charCodeAt(name.length - 1);
-    var hasJong = code >= 0xAC00 && ((code - 0xAC00) % 28 !== 0);
-    return name + (hasJong ? '아' : '야');
+    return name + '님';
   }
 
   function showPetStatus() {
