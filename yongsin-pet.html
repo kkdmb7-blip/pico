@@ -1778,43 +1778,57 @@ renderSlotTabs();
 // 서버에서 더 최신 데이터 로드 (현재 오행 레벨 기준 높은 쪽 우선)
 loadFromServer(function(serverData) {
   if (!serverData) return;
-  // 신형 포맷 (all 포함)
   var srvAll = serverData.all || null;
-  // 로컬 원소 선택 보존 — 서버 element로 덮어쓰지 않음
-  var localEl = slotElements.slot1 || state.element;
-  var srvEl   = serverData.element || localEl;
+  // 슬롯 원소는 절대 서버가 덮어쓰지 않음. 없을 때만 서버에서 복원.
+  var _pref; try { _pref = localStorage.getItem('yongsin_pet_pref'); } catch(e) {}
+  var currentSlot1 = _pref || slotElements.slot1 || state.element;
+  var needsServerRestore = !currentSlot1; // 로컬에 선택된 원소가 전혀 없을 때만 서버 원소 사용
+
   if (srvAll) {
-    // 로컬에서 선택된 원소 기준으로 레벨 비교
-    var compareEl  = localEl || srvEl;
-    var srvElState = srvAll[compareEl];
-    var localLv = state.level || 1;
-    var srvLv   = srvElState ? (srvElState.level || 1) : 0;
-    if (srvLv >= localLv) {
-      allStates = Object.assign({}, srvAll);
-      // 사용자 직접 선택 > 로컬 원소 > 서버 원소 순으로 우선
-      var _p; try { _p = localStorage.getItem('yongsin_pet_pref'); } catch(e) {}
-      slotElements.slot1 = _p || localEl || serverData.element || srvEl;
-      slotElements.slot2 = serverData.element2 || slotElements.slot2;
-      var activeEl = slotElements[activeSlot] || slotElements.slot1;
+    // 오행별로 서버 레벨이 더 높을 때만 그 원소 데이터를 업데이트 (원소 선택 자체는 건드리지 않음)
+    var merged = Object.assign({}, allStates);
+    var didMerge = false;
+    Object.keys(srvAll).forEach(function(k) {
+      var sLv = srvAll[k] ? (srvAll[k].level || 1) : 0;
+      var lLv = merged[k]  ? (merged[k].level  || 1) : 0;
+      if (sLv > lLv) { merged[k] = srvAll[k]; didMerge = true; }
+    });
+    allStates = merged;
+    // 슬롯1 원소: 로컬 우선, 없을 때만 서버에서 복원
+    if (needsServerRestore) {
+      slotElements.slot1 = serverData.element || null;
+      slotElements.slot2 = serverData.element2 || null;
+    }
+    // 현재 활성 원소 상태 반영
+    var activeEl = slotElements[activeSlot] || slotElements.slot1;
+    if (activeEl) {
       state.element = activeEl;
-      if (state.element && allStates[state.element]) {
-        Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[state.element])));
+      if (allStates[activeEl]) {
+        Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[activeEl])));
         state.element = activeEl;
       }
+    }
+    if (didMerge || needsServerRestore) {
       try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: slotElements.slot1, element2: slotElements.slot2 })); } catch(e) {}
       render(); renderMission(); renderSlotTabs();
-    } else { syncToServer(); }
+    }
+    syncToServer();
   } else if (serverData.state) {
-    // 구형 포맷
-    var srv = serverData.state;
-    var localLv = state.level || 1;
-    var srvLv   = srv.level  || 1;
-    if (srvLv >= localLv) {
-      Object.assign(state, _applyOfflineTime(Object.assign({}, srv)));
-      if (state.element) { var es = Object.assign({}, state); delete es.element; allStates[state.element] = es; }
-      try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: state.element })); } catch(e) {}
+    // 구형 포맷: element 필드 제외하고 레벨/exp만 반영
+    var srv = Object.assign({}, serverData.state);
+    var srvEl = srv.element; delete srv.element;
+    var targetEl = currentSlot1 || srvEl;
+    var srvLv = srv.level || 1;
+    var localLv = (allStates[targetEl] ? allStates[targetEl].level : null) || state.level || 1;
+    if (srvLv > localLv && targetEl) {
+      allStates[targetEl] = srv;
+      if (!slotElements.slot1 && srvEl) slotElements.slot1 = srvEl;
+      var activeEl2 = slotElements[activeSlot] || slotElements.slot1;
+      if (activeEl2) { Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[activeEl2] || {})), { element: activeEl2 }); }
+      try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: slotElements.slot1 })); } catch(e) {}
       render(); renderMission();
-    } else { syncToServer(); }
+    }
+    syncToServer();
   }
 });
 
