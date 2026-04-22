@@ -2727,7 +2727,9 @@ function renderCharVisual() {
   const SING_DESC = { 신강:'주도적으로 밀어붙이는 강한 의지력', 신약:'섬세하고 배려심 깊은 감수성', 중화:'강함과 유연함이 균형 잡힌 구조', 극강:'넘치는 에너지를 방향으로 잡는 힘', 극약:'외부의 힘을 빌려 크게 성장하는 구조' };
 
   const name   = (_profile && _profile.name) || (_user && _user.name) || '';
-  const ohList = Object.entries(_ohaeng)
+  const ENG2KOR = { wood:'목', fire:'화', earth:'토', metal:'금', water:'수' };
+  const rawEntries = Object.entries(_ohaeng).map(([k,v]) => [ENG2KOR[k]||k, v]);
+  const ohList = rawEntries
     .filter(([k]) => ['목','화','토','금','수'].includes(k))
     .sort(([,a],[,b]) => Number(b) - Number(a));
   const maxPct = Number(ohList[0]?.[1] || 100);
