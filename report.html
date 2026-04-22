@@ -2818,45 +2818,56 @@ function renderCharVisual() {
   const ssd = _strengthScoreData;     // 강약수치
   const spd = _specialPatternData;    // 특수패턴
 
-  // ── 공통 공개 항목 ──
-  const openRows = [];
-  if (ipd?.성격)   openRows.push({ label:'일주 성격', text: ipd.성격 });
-  if (gkd?.격특징) openRows.push({ label:'격국 특징', text: gkd.격특징 });
-  if (ssd?.해석)   openRows.push({ label:'강약 분석', text: `점수 ${ssd.종합점수||'?'}/100 · ${ssd.해석}` });
-
-  // ── 타입별 블러 항목 ──
-  const blurRows = [];
+  // ── 타입별 완전 다른 공개·블러 항목 ──
+  const openRows = [], blurRows = [];
   const wd = _rptFull?.['재물운'];
+  const dt = _daeunTransitionData;
 
   if (_type === 'money') {
-    if (wd?.재성강약) openRows.push({ label:'재성 구조', text: wd.재성강약 });
-    if (wd?.재물성향) blurRows.push({ label:'재물 성향', text: wd.재물성향 });
-    if (ipd?.직업적성) blurRows.push({ label:'직업 적성', text: ipd.직업적성 });
+    // 재물 리포트: 재성 구조 중심
+    if (wd?.재성강약)  openRows.push({ label:'재성 구조',  text: wd.재성강약 });
+    if (wd?.재물성향)  openRows.push({ label:'재물 성향',  text: wd.재물성향 });
+    if (wd?.재성통근)  openRows.push({ label:'재성 통근',  text: wd.재성통근 });
+    if (wd?.재물성향)  blurRows.push({ label:'재물 대운',  text: wd.재물대운?.length ? `재성 대운: ${wd.재물대운.map(d=>d.대운).join(', ')}` : '재성 대운 흐름과 최적 투자 시기' });
+    if (ipd?.직업적성) blurRows.push({ label:'직업 적성',  text: ipd.직업적성 });
 
   } else if (_type === 'love') {
-    if (ipd?.연애패턴) openRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
-    if (_wonjinData?.있음) blurRows.push({ label:'원진살', text: _wonjinData.설명 || '원진살이 감지됩니다.' });
-    if (gkd?.기신경계) blurRows.push({ label:'기신 경계', text: gkd.기신경계 });
-    else if (ipd?.직업적성) blurRows.push({ label:'배우자궁', text: `${_ilju||'이 일주'}의 배우자궁 구조와 인연 패턴` });
+    // 연애 리포트: 연애·배우자궁 중심
+    if (ipd?.연애패턴)    openRows.push({ label:'연애 패턴',  text: ipd.연애패턴 });
+    if (_wonjinData)      openRows.push({ label:'원진살',     text: _wonjinData.있음 ? (_wonjinData.설명||'원진살 작용 감지') : '원진살 없음 — 관계 마찰 적음' });
+    if (gkd?.기신경계)    openRows.push({ label:'기신 경계',  text: gkd.기신경계 });
+    if (ipd?.연애패턴)    blurRows.push({ label:'이상형 유형', text: `${_ilju||'이 일주'}와 잘 맞는 일간과 피해야 할 유형` });
+    if (_gwimungwanData)  blurRows.push({ label:'귀문관살',   text: _gwimungwanData.있음 ? '귀문관살 작용 — 관계의 특수 패턴 존재' : '귀문관살 없음' });
+    else                  blurRows.push({ label:'인연 시기',  text: '관성이 활성화되는 대운·세운 교차 시기 분석' });
 
   } else if (_type === 'daeun') {
+    // 대운 리포트: 대운 흐름 중심
     if (curDaeunVal !== '—') openRows.push({ label:'현재 대운', text: `${curDaeunVal} 대운 진행 중` });
-    const dt = _daeunTransitionData;
-    if (dt?.전환기여부 && dt.전환목록?.length) blurRows.push({ label:'대운 전환기', text: dt.전환목록[0].설명 });
+    if (ssd?.해석)           openRows.push({ label:'강약 수치', text: `${ssd.종합점수||'?'}/100 · ${ssd.해석}` });
+    if (dt?.전환기여부 && dt.전환목록?.length)
+                             openRows.push({ label:'대운 전환기', text: dt.전환목록[0].설명 });
+    else                     openRows.push({ label:'대운 전환기', text: '다음 대운 전환까지 남은 기간과 준비 방향' });
     if (_sewunInterData?.문장) blurRows.push({ label:'세운 교차', text: _sewunInterData.문장 });
-    else blurRows.push({ label:'세운 교차', text: `현재 대운 ${curDaeunVal}과 2026 세운의 교차 영향` });
+    else                       blurRows.push({ label:'세운 교차', text: `${curDaeunVal} 대운 × 2026 병오년 교차 분석` });
+    blurRows.push({ label:'대운별 전략', text: '재물·직업·관계 영역별 현재 대운 실전 전략' });
 
   } else if (_type === 'year') {
-    if (_sewunFull?.키워드) openRows.push({ label:'올해 키워드', text: _sewunFull.키워드 });
-    if (_sewunFull?.분석) blurRows.push({ label:'올해 분석', text: _sewunFull.분석 });
-    if (_ageAdvice) blurRows.push({ label:'연령대 조언', text: _ageAdvice });
-    else blurRows.push({ label:'월별 흐름', text: '2026 병오년 월별 운세 포인트와 주의 시기' });
+    // 올해 리포트: 2026년 세운 중심
+    if (_sewunFull?.키워드)    openRows.push({ label:'올해 키워드', text: _sewunFull.키워드 });
+    if (_sewunFull?.분석)      openRows.push({ label:'올해 분석',   text: _sewunFull.분석 });
+    if (_sewunInterData?.문장) openRows.push({ label:'세운 교차',   text: _sewunInterData.문장 });
+    if (_ageAdvice)            blurRows.push({ label:'연령대 조언', text: _ageAdvice });
+    else                       blurRows.push({ label:'월별 흐름',   text: '2026년 상반기·하반기 핵심 변곡점과 주의 월' });
+    blurRows.push({ label:'분야별 운세', text: '재물·직업·연애·건강 분야별 2026 흐름 상세' });
 
   } else {
-    // character + 기타 전체 (career_deep, triple, health, family 등)
+    // character + 기타(career_deep, health, family, triple 등)
+    if (ipd?.성격)              openRows.push({ label:'일주 성격',  text: ipd.성격 });
+    if (gkd?.격특징)            openRows.push({ label:'격국 특징',  text: gkd.격특징 });
+    if (ssd?.해석)              openRows.push({ label:'강약 분석',  text: `점수 ${ssd.종합점수||'?'}/100 · ${ssd.해석}` });
     if (_ohangWarning?.현대조언) openRows.push({ label:'오행 경고', text: _ohangWarning.현대조언 });
-    if (ipd?.직업적성) blurRows.push({ label:'직업 적성', text: ipd.직업적성 });
-    if (ipd?.연애패턴) blurRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
+    if (ipd?.직업적성)           blurRows.push({ label:'직업 적성', text: ipd.직업적성 });
+    if (ipd?.연애패턴)           blurRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
     if (!blurRows.length && _ageAdvice) blurRows.push({ label:'연령대 조언', text: _ageAdvice });
   }
 
