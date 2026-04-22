@@ -2821,7 +2821,8 @@ function renderCharVisual() {
     const pj = tgVals.filter(v => v && v.includes('편재')).length;
     const total = jj + pj;
     const jaeLabel = total >= 3 ? '재성과다' : total === 0 ? '재성부재' : total === 1 ? '재성약' : '재성적당';
-    const wealthOhName = wd?.재물성향 || (jj > pj ? '정재 우위 — 안정·저축형' : pj > jj ? '편재 우위 — 투자·사업형' : total > 0 ? '균형형' : '재성 부재');
+    const wdM = _rptFull?.['재물운'];
+    const wealthOhName = wdM?.재물성향 || (jj > pj ? '정재 우위 — 안정·저축형' : pj > jj ? '편재 우위 — 투자·사업형' : total > 0 ? '균형형' : '재성 부재');
     visualHtml = '<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">' + bubblesHtml + '</div>'
       + '<div style="padding:0 18px 10px;display:flex;gap:8px;">'
       + '<div style="flex:1;background:rgba(40,130,60,0.09);border-radius:12px;padding:12px;border:1px solid rgba(40,130,60,0.2);text-align:center;">'
