@@ -3415,7 +3415,7 @@ async function submitGunghap() {
   var aiBtn = document.getElementById('ghAiBtn');
   if (aiBtn) aiBtn.textContent = 'AI 분석 시작';
 
-  if (resultOverlay) { resultOverlay.style.display = 'flex'; history.pushState({ modal: 'gunghapResult' }, ''); }
+  if (resultOverlay) { resultOverlay.style.display = 'flex'; history.replaceState({ modal: 'gunghapResult' }, ''); }
 }
 
 async function requestGunghapAI() {
@@ -5197,6 +5197,8 @@ window.addEventListener('popstate', function(e) {
   if (document.getElementById('birthOverlay').classList.contains('open')) { closeBirthModal(); return; }
   if (document.getElementById('gunghapOverlay').style.display === 'flex') { closeGunghapModal(); return; }
   if (document.getElementById('gunghapResultOverlay').style.display === 'flex') { closeGunghapResult(); return; }
+  // 모달이 닫혀있는데 modal 상태로 복귀한 경우(phantom entry) → 깨끗한 상태로 교체
+  if (e.state && e.state.modal) { history.replaceState({}, '', window.location.pathname); }
 });
 
 // checkAuth는 score.js 로드 후 실행 (onload에서 호출)
