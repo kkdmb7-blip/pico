@@ -768,6 +768,8 @@ const TYPE_CONFIG = {
     desc: '45종 정밀 데이터 + 4개 동서양 시스템 동시 교차 — 최고 정밀도 분석' },
   career_deep:{ title: '직업·사업 심층 분석', orb: 600, emoji: '<i class="pi pi-target"></i>', focus: '사주 관록·자미두수 관록궁·서양 토성·목성으로 보는 직업 구조',
     desc: '격국·직업적성·십성분포 정밀 데이터 + 3시스템 교차 직업 분석' },
+  child_career:{ title: '우리 아이 진로 적성', orb: 400, emoji: '<i class="pi pi-star"></i>', focus: '아이의 타고난 기질·재능·적성 분야·교육 방향·진로 개화 시기',
+    desc: '오행·용신·격국으로 보는 아이의 타고난 재능과 최적 진로 방향' },
   summary:    { title: '사주 포인트 요약', orb: 200, emoji: '<i class="pi pi-sparkle"></i>', focus: '사주 핵심 요약, 올해 포인트, 즉시 실천법',
     desc: '45종 정밀 데이터에서 핵심만 뽑은 3분 사주 요약' },
   balance:    { title: '오행 밸런스 가이드', orb: 300, emoji: '<i class="pi pi-yinyang"></i>', focus: '오행 균형 분석, 부족 오행 보완, 색상·음식·방위 실천법',
@@ -872,6 +874,13 @@ const TYPE_SECTIONS = {
     { name: '자미두수 관록궁과 베딕 교차',   chars: 500 },
     { name: '지금 대운의 커리어 흐름',       chars: 500 },
     { name: '직업·창업·성장 맞춤 전략',      chars: 400 }
+  ],
+  child_career: [
+    { name: '아이의 타고난 기질 요약',        chars: 300 },
+    { name: '재능·적성 분야 분석',           chars: 500 },
+    { name: '맞는 교육 방향과 환경',          chars: 500 },
+    { name: '진로 개화 시기 (대운)',          chars: 400 },
+    { name: '부모가 지금 해줄 수 있는 것',    chars: 400 }
   ],
   summary: [
     { name: '나의 사주 핵심 프로필',          chars: 300 },
@@ -2931,7 +2940,8 @@ async function generateReport() {
   if (_type === 'astro_full')  { await generateAstroFullReport();  return; }
   if (_type === 'ziwei_full')  { await generateZiweiFullReport();  return; }
   if (_type === 'triple')      { await generateTripleReport();     return; }
-  if (_type === 'career_deep') { await generateCareerDeepReport(); return; }
+  if (_type === 'career_deep')  { await generateCareerDeepReport();  return; }
+  if (_type === 'child_career') { await generateChildCareerReport(); return; }
   if (_type === 'summary')      { await generateSummaryReport();     return; }
   if (_type === 'balance')      { await generateBalanceReport();     return; }
   if (_type === 'sinsal')       { await generateSinsalReport();      return; }
@@ -4145,6 +4155,75 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
+// ── 우리 아이 진로 적성 ──
+async function generateChildCareerReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const db  = buildDaeunBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const name   = _profile?.name || '아이';
+  const gender = _profile?.gender === 'F' ? '여아' : '남아';
+  const fivePctStr   = fivePctToKor(_sdFull?.five_pct);
+  const fiveCountStr = fiveCountToKor(_sdFull?.five_count);
+  const profileStr = `이름: ${name} / 성별: ${gender} / 일주: ${_ilju||'미확인'} / 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal}`;
+
+  const prompt = `당신은 학부모에게 아이의 사주를 설명하는 따뜻하고 전문적인 상담사입니다.
+부모가 아이를 이해하고 올바른 방향으로 지원할 수 있도록 실질적인 내용을 써주세요.
+
+${profileStr}
+${sb2}
+${db}
+오행 개수: ${fiveCountStr} / 오행 비율: ${fivePctStr}
+신강/신약: ${_singang||'미확인'}
+${buildYongsinBlock(['직업','피해야할것'])}
+${buildAdviceBlock(['이직/커리어'])}
+${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
+
+작성 규칙:
+- 독자는 부모님. "아이는", "이 사주를 가진 아이는" 으로 서술
+- 직업군보다 '어떤 환경에서 꽃피는지'에 초점
+- 겁박하거나 단정짓지 말 것 — 가능성으로 서술
+- **볼드** 핵심단어 3~5개
+- #헤더 금지, 표 금지
+
+섹션 구성:
+1. 아이의 타고난 기질 요약 (250~350자)
+   일간 ${_ilju||''}의 타고난 성향과 격국 ${_geokguk||''}이 만드는 에너지. 이 아이가 어떤 상황에서 빛나는지, 어떤 환경이 맞는지 부모 눈높이로 설명.
+
+2. 재능·적성 분야 분석 (400~500자)
+   오행 분포(${fivePctStr})와 용신(${ysFinal}) 기반으로 두드러지는 적성 분야. 어느 오행이 강해 어떤 재능으로 발현되는지. 추천 직업군 2~3개를 '이런 분야가 잘 맞아요' 형식으로.
+
+3. 맞는 교육 방향과 환경 (400~500자)
+   이 사주의 아이에게 맞는 학습 방식(암기형/창의형/실습형 등), 피해야 할 교육 환경, 집중력이 올라가는 조건. 용신(${ysFinal}) 오행을 활용한 공부 환경 팁 포함.
+
+4. 진로 개화 시기 (대운) (350~450자)
+   현재 대운 ${_daeun||'미확인'}과 향후 대운 흐름에서 언제 재능이 꽃피는 시기인지. 어느 나이대에 어떤 분야가 강해지는지 구체적 흐름.
+
+5. 부모가 지금 해줄 수 있는 것 (350~450자)
+   지금 이 아이에게 가장 필요한 환경과 지원 방식 3가지. 억지로 시키면 역효과인 것, 자연스럽게 성장하는 방향. 용신 오행 기반 실천 팁(색상·활동·취미) 포함.
+
+총 1600~2200자. 섹션 번호(1. 2. 3. 4. 5.) 붙여 작성.`;
+
+  await streamToSections(prompt, [0,1,2,3,4], '우리 아이 진로 적성', ysFinal, '', true);
+
+  try {
+    const sb = getSb();
+    const allTexts = Array.from({length:5}, (_, i) => document.getElementById(`sbody-${i}`)?.innerText || '');
+    const {data} = await sb.from('reports').insert({
+      user_id: _user.id, report_type: _type,
+      content: [...allTexts, getProfileKey()],
+      orb_spent: _config.orb, created_at: new Date().toISOString()
+    }).select().maybeSingle();
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
+  } catch(e) {}
+
+  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display = 'flex';
+  showConsultBanner();
+}
+
 // ── 사주 포인트 요약 ──
 async function generateSummaryReport() {
   if (!await setupSectionsAndDeductOrb()) return;
@@ -4541,6 +4620,7 @@ function showConsultBanner() {
     ziwei_full:    { title: '자미두수 12궁, 맞춤 해석이 필요하다면', desc: '본명궁·대한·유년 흐름을\n<em>전문 상담사</em>가 1:1로 짚어드립니다.' },
     triple:        { title: '동서양 3계보 교차 해석, 더 깊이 듣고 싶다면', desc: '사주·베딕·점성의 공통점과 차이를\n<em>전문 상담사</em>가 통합적으로 풀어드립니다.' },
     career_deep:   { title: '직업·사업 전략, 실전 코칭이 필요하다면', desc: '적성·타이밍·리스크까지\n<em>전문 상담사</em>가 현실적인 액션으로 안내합니다.' },
+    child_career:  { title: '아이 진로, 더 깊이 알고 싶다면', desc: 'AI 리포트를 바탕으로 <em>전문 상담사</em>가\n아이 기질·교육 방향을 1:1로 구체화해 드립니다.' },
     summary:       { title: '핵심 요약 너머, 맞춤 해석을 원하신다면', desc: '요약 뒤에 감춰진 디테일을\n<em>전문 상담사</em>가 풀어드립니다.' },
     balance:       { title: '오행 균형 처방, 생활에 적용하려면', desc: '색·방위·음식·직업까지 일상 처방을\n<em>전문 상담사</em>가 구체적으로 안내합니다.' },
     sinsal:        { title: '신살의 의미와 대응법이 궁금하다면', desc: '작용 강도와 완화법을\n<em>전문 상담사</em>가 실전 조언으로 풀어드립니다.' },
@@ -4601,6 +4681,8 @@ function showRelatedReports() {
                    {t:'triple',icon:'🌐',title:'3계보 교차',desc:'사주·베딕·점성 통합'}],
     triple:       [{t:'character',icon:'🌟',title:'기질 분석',desc:'3계보 공통 기질 확인'},
                    {t:'daeun',icon:'🌊',title:'대운 흐름',desc:'큰 흐름 맥락'}],
+    child_career: [{t:'career_deep',icon:'<i class="pi pi-target"></i>',title:'직업·사업 심층',desc:'성인 버전 커리어 분석'},
+                   {t:'character',icon:'<i class="pi pi-sparkle"></i>',title:'기질 분석',desc:'타고난 성격과 기질'}],
     career_deep:  [{t:'money',icon:'💰',title:'재물운',desc:'일의 성과로 이어지는 재물'},
                    {t:'timing',icon:'⏱️',title:'타이밍',desc:'이직·창업 시점'}],
     summary:      [{t:'character',icon:'🌟',title:'기질 분석',desc:'요약 뒤의 세부 구조'},
