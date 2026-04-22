@@ -2708,16 +2708,16 @@ function buildAccuracyLayerBlock() {
   const _bgWithZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
   const _bgWithAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
   loadAllData(_bgWithZiwei, _bgWithAstro)
-    .then(() => { if (_type === 'character') renderCharVisual(); })
+    .then(() => { renderCharVisual(); })
     .catch(() => {});
 
   renderIntro();
   showState('intro');
 })();
 
-// ── 기질 오행 시각화 카드 (character 타입 전용) ──
+// ── 오행 시각화 + DB 미리보기 카드 (전 타입 공통) ──
 function renderCharVisual() {
-  if (!_ohaeng || _type !== 'character') return;
+  if (!_ohaeng) return;
 
   const OH_COLOR  = { 목:'#3d7a3a', 화:'#b84c1a', 토:'#8a6200', 금:'#5a6a7a', 수:'#1a5fa0' };
   const OH_BG     = { 목:'rgba(61,122,58,0.13)', 화:'rgba(184,76,26,0.13)', 토:'rgba(138,98,0,0.13)', 금:'rgba(90,106,122,0.13)', 수:'rgba(26,95,160,0.13)' };
@@ -2818,20 +2818,47 @@ function renderCharVisual() {
   const ssd = _strengthScoreData;     // 강약수치
   const spd = _specialPatternData;    // 특수패턴
 
-  // 공개 항목: 일주 성격 + 격국특징 + 강약 해석
+  // ── 공통 공개 항목 ──
   const openRows = [];
-  if (ipd?.성격) openRows.push({ label:'일주 성격', text: ipd.성격 });
+  if (ipd?.성격)   openRows.push({ label:'일주 성격', text: ipd.성격 });
   if (gkd?.격특징) openRows.push({ label:'격국 특징', text: gkd.격특징 });
-  if (ssd?.해석) openRows.push({ label:'강약 분석', text: `점수 ${ssd.종합점수||'?'}/100 · ${ssd.해석}` });
-  if (_ohangWarning?.현대조언 && openRows.length < 3) openRows.push({ label:'오행 경고', text: _ohangWarning.현대조언 });
+  if (ssd?.해석)   openRows.push({ label:'강약 분석', text: `점수 ${ssd.종합점수||'?'}/100 · ${ssd.해석}` });
 
-  // 블러 항목: 직업적성, 연애패턴, 기신경계, 연령대 조언
+  // ── 타입별 블러 항목 ──
   const blurRows = [];
-  if (ipd?.직업적성) blurRows.push({ label:'직업 적성', text: ipd.직업적성 });
-  if (ipd?.연애패턴) blurRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
-  if (gkd?.기신경계) blurRows.push({ label:'기신 경계', text: gkd.기신경계 });
-  if (_ageAdvice)   blurRows.push({ label:'연령대 조언', text: _ageAdvice });
-  if (spd?.패턴명) blurRows.push({ label:'특수패턴', text: `${spd.패턴명} — ${spd.설명||''}` });
+  const wd = _rptFull?.['재물운'];
+
+  if (_type === 'money') {
+    if (wd?.재성강약) openRows.push({ label:'재성 구조', text: wd.재성강약 });
+    if (wd?.재물성향) blurRows.push({ label:'재물 성향', text: wd.재물성향 });
+    if (ipd?.직업적성) blurRows.push({ label:'직업 적성', text: ipd.직업적성 });
+
+  } else if (_type === 'love') {
+    if (ipd?.연애패턴) openRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
+    if (_wonjinData?.있음) blurRows.push({ label:'원진살', text: _wonjinData.설명 || '원진살이 감지됩니다.' });
+    if (gkd?.기신경계) blurRows.push({ label:'기신 경계', text: gkd.기신경계 });
+    else if (ipd?.직업적성) blurRows.push({ label:'배우자궁', text: `${_ilju||'이 일주'}의 배우자궁 구조와 인연 패턴` });
+
+  } else if (_type === 'daeun') {
+    if (curDaeunVal !== '—') openRows.push({ label:'현재 대운', text: `${curDaeunVal} 대운 진행 중` });
+    const dt = _daeunTransitionData;
+    if (dt?.전환기여부 && dt.전환목록?.length) blurRows.push({ label:'대운 전환기', text: dt.전환목록[0].설명 });
+    if (_sewunInterData?.문장) blurRows.push({ label:'세운 교차', text: _sewunInterData.문장 });
+    else blurRows.push({ label:'세운 교차', text: `현재 대운 ${curDaeunVal}과 2026 세운의 교차 영향` });
+
+  } else if (_type === 'year') {
+    if (_sewunFull?.키워드) openRows.push({ label:'올해 키워드', text: _sewunFull.키워드 });
+    if (_sewunFull?.분석) blurRows.push({ label:'올해 분석', text: _sewunFull.분석 });
+    if (_ageAdvice) blurRows.push({ label:'연령대 조언', text: _ageAdvice });
+    else blurRows.push({ label:'월별 흐름', text: '2026 병오년 월별 운세 포인트와 주의 시기' });
+
+  } else {
+    // character + 기타 전체 (career_deep, triple, health, family 등)
+    if (_ohangWarning?.현대조언) openRows.push({ label:'오행 경고', text: _ohangWarning.현대조언 });
+    if (ipd?.직업적성) blurRows.push({ label:'직업 적성', text: ipd.직업적성 });
+    if (ipd?.연애패턴) blurRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
+    if (!blurRows.length && _ageAdvice) blurRows.push({ label:'연령대 조언', text: _ageAdvice });
+  }
 
   const rowStyle = (blur) => `font-size:12.5px;line-height:1.75;padding:10px 14px;border-radius:10px;background:rgba(120,80,20,0.05);border:1px solid rgba(120,80,20,0.09);margin-bottom:7px;${blur?'filter:blur(5px);user-select:none;pointer-events:none;':''}`;
   const labelStyle = `font-size:10px;font-weight:700;color:rgba(120,70,0,0.55);letter-spacing:0.3px;margin-bottom:3px;`;
@@ -2867,7 +2894,7 @@ function renderCharVisual() {
         <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(155,120,0,0.10);color:#7a5c00;border:1px solid rgba(155,120,0,0.22);"><i class="pi pi-person"></i> 내 사주 미리보기</div>
         ${badges}
       </div>
-      <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:4px;">${name ? name + ' 님의 ' : ''}오행 에너지 구조</div>
+      <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:4px;">${name ? name + ' 님의 ' : ''}${{character:'오행 에너지 구조', money:'재물 오행 구조', love:'연애 오행 구조', daeun:'대운 오행 흐름', year:'올해 오행 에너지'}[_type] || '오행 에너지 구조'}</div>
     </div>
 
     <!-- 버블 차트 -->
