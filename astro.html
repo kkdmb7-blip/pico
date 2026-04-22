@@ -644,7 +644,9 @@ async function loadChart(year, month, day, hour, min) {
     setVisible('card-interp', true);
 
 
-    window._astroData = { planets, aspects };
+    var _u = (function(){ try{ return JSON.parse(localStorage.getItem('pico_user'))||{}; }catch(e){return{};} })();
+    var _pn = _prof.name || _u.name || '';
+    window._astroData = { planets, aspects, name: _pn, birthYear: year, birthMonth: month, birthDay: day };
     var wrap = document.getElementById('astroShareBtnWrap');
     wrap.style.display = 'flex';
     document.getElementById('astroReportHook').style.display = 'block';
@@ -692,9 +694,8 @@ function _drawAstroCard(cb) {
   var elRgb    = EL_RGB[el] || '255,230,109';
   var sunSym   = SIGN_SYM[sunSign] || '★';
   var sunEn    = SIGN_EN[sunSign]  || '';
-
-  var today   = new Date(Date.now()+9*3600000);
-  var dateStr = today.getUTCFullYear()+'. '+(today.getUTCMonth()+1)+'. '+today.getUTCDate()+'.';
+  var userName  = d.name || '';
+  var dateStr   = d.birthYear ? d.birthYear+'년 '+d.birthMonth+'월 '+d.birthDay+'일 생' : '';
 
   var W=1080, H=1920;
   var canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
@@ -735,8 +736,17 @@ function _drawAstroCard(cb) {
   ctx.font='500 26px sans-serif'; ctx.letterSpacing='7px';
   ctx.fillStyle='rgba(255,215,120,0.80)'; ctx.fillText('F O R T U N A',W/2,y);
   ctx.letterSpacing='0px';
-  y+=40; ctx.font='400 24px "Noto Sans KR",sans-serif';
-  ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fillText('서양 점성술 차트  ·  '+dateStr,W/2,y);
+  y+=42;
+  if(userName){
+    ctx.font='700 38px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.90)';
+    ctx.fillText(userName+'의 별자리 차트',W/2,y);
+    y+=36;
+    ctx.font='400 22px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.35)';
+    ctx.fillText(dateStr,W/2,y);
+  } else {
+    ctx.font='400 24px "Noto Sans KR",sans-serif';
+    ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fillText('서양 점성술 차트'+(dateStr?'  ·  '+dateStr:''),W/2,y);
+  }
 
   // 상단 골드 라인
   y+=38;
