@@ -624,36 +624,6 @@ nav {
       <div id="introSections"></div>
     </div>
 
-    <!-- 아이 진로 전용: 아이 프로필 입력 폼 (child_career 타입에서만 표시) -->
-    <div id="childProfileForm" style="display:none;background:linear-gradient(160deg,rgba(255,245,225,0.9),rgba(250,235,205,0.6));border-radius:18px;padding:20px 20px 18px;margin:14px 16px;border:1.5px solid rgba(170,130,60,0.28);box-shadow:0 4px 18px rgba(120,80,20,0.08);">
-      <div style="font-size:15px;font-weight:900;color:#5a3a10;margin-bottom:4px;display:flex;align-items:center;gap:8px;"><i class="pi pi-user" style="color:#a0701a;"></i> 아이 정보 입력</div>
-      <div style="font-size:11px;color:rgba(90,60,20,0.7);margin-bottom:14px;">우리 아이의 정확한 정보를 입력해주세요</div>
-      <div id="childSavedPicker" style="display:none;margin-bottom:12px;"></div>
-      <label style="display:block;font-size:11px;font-weight:700;color:rgba(90,60,20,0.75);margin-bottom:4px;">아이 이름</label>
-      <input id="childName" type="text" placeholder="예: 지우" maxlength="12" style="width:100%;padding:12px 14px;border:1.5px solid rgba(170,130,60,0.3);border-radius:10px;font-size:14px;background:#fff;color:#3a2000;box-sizing:border-box;margin-bottom:12px;" />
-      <label style="display:block;font-size:11px;font-weight:700;color:rgba(90,60,20,0.75);margin-bottom:4px;">생년월일</label>
-      <div style="display:flex;gap:6px;margin-bottom:12px;">
-        <input id="childYear" type="number" min="1900" max="2030" placeholder="2018" style="flex:1.2;padding:12px 10px;border:1.5px solid rgba(170,130,60,0.3);border-radius:10px;font-size:14px;background:#fff;color:#3a2000;box-sizing:border-box;text-align:center;" />
-        <input id="childMonth" type="number" min="1" max="12" placeholder="월" style="flex:1;padding:12px 6px;border:1.5px solid rgba(170,130,60,0.3);border-radius:10px;font-size:14px;background:#fff;color:#3a2000;box-sizing:border-box;text-align:center;" />
-        <input id="childDay" type="number" min="1" max="31" placeholder="일" style="flex:1;padding:12px 6px;border:1.5px solid rgba(170,130,60,0.3);border-radius:10px;font-size:14px;background:#fff;color:#3a2000;box-sizing:border-box;text-align:center;" />
-      </div>
-      <label style="display:block;font-size:11px;font-weight:700;color:rgba(90,60,20,0.75);margin-bottom:4px;">태어난 시간</label>
-      <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;">
-        <input id="childHour" type="number" min="0" max="23" placeholder="시" style="flex:1;padding:12px 6px;border:1.5px solid rgba(170,130,60,0.3);border-radius:10px;font-size:14px;background:#fff;color:#3a2000;box-sizing:border-box;text-align:center;" />
-        <span style="font-size:13px;color:rgba(90,60,20,0.5);font-weight:700;">:</span>
-        <input id="childMinute" type="number" min="0" max="59" placeholder="분" style="flex:1;padding:12px 6px;border:1.5px solid rgba(170,130,60,0.3);border-radius:10px;font-size:14px;background:#fff;color:#3a2000;box-sizing:border-box;text-align:center;" />
-        <label style="flex:1.3;display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(90,60,20,0.75);cursor:pointer;">
-          <input id="childHourUnknown" type="checkbox" style="accent-color:#a0701a;" />모름
-        </label>
-      </div>
-      <label style="display:block;font-size:11px;font-weight:700;color:rgba(90,60,20,0.75);margin-bottom:6px;">성별</label>
-      <div style="display:flex;gap:8px;margin-bottom:16px;">
-        <button type="button" id="childGenderM" class="child-gender-btn" data-v="M" style="flex:1;padding:12px 0;border:1.5px solid rgba(60,100,180,0.28);border-radius:10px;background:rgba(60,100,180,0.06);color:#1a3a7a;font-size:13px;font-weight:800;cursor:pointer;">👦 남</button>
-        <button type="button" id="childGenderF" class="child-gender-btn" data-v="F" style="flex:1;padding:12px 0;border:1.5px solid rgba(180,60,120,0.28);border-radius:10px;background:rgba(180,60,120,0.06);color:#8a1a50;font-size:13px;font-weight:800;cursor:pointer;">👧 여</button>
-      </div>
-      <button id="btnChildSubmit" type="button" style="width:100%;padding:14px 0;background:linear-gradient(135deg,#a0701a,#c89030);color:#fff7e0;border:none;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 4px 14px rgba(120,80,20,0.25);">이 정보로 분석하기</button>
-    </div>
-
     <button class="btn-intro-gen" id="btnGenerate">
       <i class="pi pi-sparkle"></i> 리포트 생성하기
       <span class="btn-intro-gen-sub" id="introOrbCost"></span>
@@ -767,6 +737,113 @@ nav {
     <button class="modal-btn modal-btn-cancel" onclick="document.getElementById('orbModal').classList.remove('open');location.href='index.html?tab=report'">돌아가기</button>
   </div>
 </div>
+
+<!-- CHILD PROFILE MODAL (아이 진로 전용) -->
+<div id="childModal" class="modal-overlay" style="align-items:center;padding:20px;">
+  <div class="modal-sheet" style="border-radius:22px;text-align:left;padding:26px 22px 26px;max-width:460px;border:1px solid rgba(170,130,60,0.18);background:linear-gradient(160deg,var(--surface),rgba(255,250,240,0.98));">
+    <div style="font-family:'Noto Serif KR',serif;font-size:19px;font-weight:800;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:8px;"><i class="pi pi-user" style="color:#a0701a;font-size:18px;"></i> 아이 정보 입력</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:18px;">우리 아이의 정확한 정보를 입력해주세요</div>
+    <div id="childSavedPicker" style="display:none;margin-bottom:14px;"></div>
+    <div class="cf-group">
+      <label>아이 이름</label>
+      <input type="text" id="childName" placeholder="예: 지우" maxlength="12" />
+    </div>
+    <div class="cf-group">
+      <label>생년월일</label>
+      <div class="cf-row">
+        <select id="childYear"><option value="">년</option></select>
+        <select id="childMonth"><option value="">월</option></select>
+        <select id="childDay"><option value="">일</option></select>
+      </div>
+    </div>
+    <div class="cf-group">
+      <label>태어난 시간</label>
+      <div class="cf-row">
+        <select id="childHour" style="flex:1.3;">
+          <option value="">시 모름</option>
+          <option value="0">0시 (자시)</option><option value="1">1시</option><option value="2">2시</option><option value="3">3시</option>
+          <option value="4">4시</option><option value="5">5시</option><option value="6">6시</option><option value="7">7시</option>
+          <option value="8">8시</option><option value="9">9시</option><option value="10">10시</option><option value="11">11시</option>
+          <option value="12">12시</option><option value="13">13시</option><option value="14">14시</option><option value="15">15시</option>
+          <option value="16">16시</option><option value="17">17시</option><option value="18">18시</option><option value="19">19시</option>
+          <option value="20">20시</option><option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
+        </select>
+        <select id="childMinute"><option value="">분</option></select>
+      </div>
+    </div>
+    <div class="cf-group">
+      <label>성별</label>
+      <div class="cf-gender-row">
+        <button type="button" class="cf-gender-btn" data-v="M" id="childGenderM">남</button>
+        <button type="button" class="cf-gender-btn" data-v="F" id="childGenderF">여</button>
+      </div>
+    </div>
+    <button id="btnChildSubmit" class="cf-submit-btn" type="button">이 정보로 분석하기 <i class="pi pi-sparkle"></i></button>
+    <button type="button" class="modal-btn modal-btn-cancel" style="margin-top:6px;" onclick="location.href='index.html?tab=report'">돌아가기</button>
+  </div>
+</div>
+
+<style>
+  .cf-group { margin-bottom: 14px; }
+  .cf-group label {
+    display: block; font-size: 11px; font-weight: 700;
+    color: rgba(90,60,20,0.7); letter-spacing: 0.4px;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .cf-group input,
+  .cf-group select {
+    width: 100%; padding: 11px 14px;
+    background: rgba(255,250,240,0.8);
+    border: 1px solid rgba(170,130,60,0.22);
+    border-radius: 10px; color: #2a1a05; font-size: 14px;
+    font-family: 'Noto Serif KR', serif; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none; -webkit-appearance: none; box-sizing: border-box;
+  }
+  .cf-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a88646'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    padding-right: 32px;
+  }
+  .cf-group input:focus, .cf-group select:focus {
+    border-color: rgba(170,130,60,0.55);
+    box-shadow: 0 0 0 3px rgba(170,130,60,0.1);
+  }
+  .cf-row { display: flex; gap: 8px; }
+  .cf-row select { flex: 1; min-width: 0; }
+  .cf-gender-row { display: flex; gap: 8px; }
+  .cf-gender-btn {
+    flex: 1; padding: 11px 0;
+    background: rgba(255,250,240,0.8);
+    border: 1px solid rgba(170,130,60,0.22);
+    border-radius: 10px; color: rgba(90,60,20,0.7);
+    font-size: 14px; font-weight: 700;
+    font-family: 'Noto Serif KR', serif; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cf-gender-btn.active {
+    background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(170,130,60,0.08));
+    border-color: rgba(170,130,60,0.5);
+    color: #5a3a10;
+  }
+  .cf-submit-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(170,130,60,0.06));
+    color: #a0741a;
+    border: 1.5px solid rgba(170,130,60,0.38);
+    border-radius: 12px; font-size: 14px; font-weight: 800;
+    font-family: 'Noto Serif KR', serif; cursor: pointer;
+    letter-spacing: 0.3px; margin-top: 4px;
+    box-shadow: 0 0 20px rgba(212,175,55,0.06), inset 0 1px 0 rgba(255,240,200,0.3);
+    transition: all 0.25s;
+  }
+  .cf-submit-btn:hover {
+    border-color: rgba(170,130,60,0.6);
+    box-shadow: 0 4px 18px rgba(170,130,60,0.18), inset 0 1px 0 rgba(255,240,200,0.5);
+    transform: translateY(-1px);
+  }
+  .cf-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+</style>
 
 <script>
 const SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
@@ -2720,14 +2797,13 @@ function buildAccuracyLayerBlock() {
       return;
     }
   } else if (_useChild) {
-    // 아이 진로: sessionStorage에 저장된 아이 프로필 사용 (없으면 폼 노출)
+    // 아이 진로: sessionStorage에 저장된 아이 프로필 사용 (없으면 모달 노출)
     try { _profile = JSON.parse(sessionStorage.getItem('pico_child_profile')); } catch(e) {}
     if (!_profile || !_profile.year) {
-      // 폼 노출, 생성 버튼 숨김
       _profile = null;
-      document.getElementById('childProfileForm').style.display = 'block';
       document.getElementById('btnGenerate').style.display = 'none';
       setupChildProfileForm();
+      document.getElementById('childModal').classList.add('open');
       renderIntro();
       showState('intro');
       return;
@@ -2762,65 +2838,59 @@ function buildAccuracyLayerBlock() {
 
 // ── 아이 프로필 입력 폼 핸들러 (child_career 전용) ──
 function setupChildProfileForm() {
-  var selectedGender = 'M';
+  // 드롭다운 채우기 (년/월/일/분)
+  var yearSel = document.getElementById('childYear');
+  var monthSel = document.getElementById('childMonth');
+  var daySel = document.getElementById('childDay');
+  var minuteSel = document.getElementById('childMinute');
+  var nowYear = new Date().getFullYear();
+  for (var y = nowYear; y >= 1950; y--) {
+    var op = document.createElement('option'); op.value = y; op.textContent = y + '년'; yearSel.appendChild(op);
+  }
+  for (var m = 1; m <= 12; m++) {
+    var op = document.createElement('option'); op.value = m; op.textContent = m + '월'; monthSel.appendChild(op);
+  }
+  for (var d = 1; d <= 31; d++) {
+    var op = document.createElement('option'); op.value = d; op.textContent = d + '일'; daySel.appendChild(op);
+  }
+  for (var mi = 0; mi < 60; mi += 5) {
+    var op = document.createElement('option'); op.value = mi; op.textContent = mi + '분'; minuteSel.appendChild(op);
+  }
+
+  var selectedGender = null;
   var btnM = document.getElementById('childGenderM');
   var btnF = document.getElementById('childGenderF');
-  var hourUnknown = document.getElementById('childHourUnknown');
-  var hourInput = document.getElementById('childHour');
-  var minuteInput = document.getElementById('childMinute');
-
   function paintGender() {
-    if (selectedGender === 'M') {
-      btnM.style.background = 'linear-gradient(135deg,#3a60b0,#5a80d0)';
-      btnM.style.color = '#fff';
-      btnM.style.borderColor = '#3a60b0';
-      btnF.style.background = 'rgba(180,60,120,0.06)';
-      btnF.style.color = '#8a1a50';
-      btnF.style.borderColor = 'rgba(180,60,120,0.28)';
-    } else {
-      btnF.style.background = 'linear-gradient(135deg,#b03a70,#d05090)';
-      btnF.style.color = '#fff';
-      btnF.style.borderColor = '#b03a70';
-      btnM.style.background = 'rgba(60,100,180,0.06)';
-      btnM.style.color = '#1a3a7a';
-      btnM.style.borderColor = 'rgba(60,100,180,0.28)';
-    }
+    btnM.classList.toggle('active', selectedGender === 'M');
+    btnF.classList.toggle('active', selectedGender === 'F');
   }
-  paintGender();
   btnM.onclick = function() { selectedGender = 'M'; paintGender(); };
   btnF.onclick = function() { selectedGender = 'F'; paintGender(); };
-  hourUnknown.onchange = function() {
-    var d = hourUnknown.checked;
-    hourInput.disabled = d; minuteInput.disabled = d;
-    hourInput.style.opacity = d ? 0.4 : 1;
-    minuteInput.style.opacity = d ? 0.4 : 1;
-    if (d) { hourInput.value = ''; minuteInput.value = ''; }
-  };
 
-  // 저장된 아이 프로필 목록 (최대 5개 localStorage)
+  // 저장된 아이 프로필 칩 (최대 5명)
   var savedList = [];
   try { savedList = JSON.parse(localStorage.getItem('pico_child_profiles')) || []; } catch(e) {}
   if (savedList.length) {
     var picker = document.getElementById('childSavedPicker');
     picker.style.display = 'block';
-    picker.innerHTML = '<div style="font-size:11px;font-weight:700;color:rgba(90,60,20,0.7);margin-bottom:6px;">저장된 아이</div>' +
+    picker.innerHTML = '<div style="font-size:11px;font-weight:700;color:rgba(90,60,20,0.65);margin-bottom:6px;letter-spacing:0.3px;">저장된 아이</div>' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
       savedList.map(function(c,i) {
-        return '<button type="button" data-idx="' + i + '" class="child-saved-btn" style="padding:8px 12px;background:rgba(160,112,26,0.1);border:1.5px solid rgba(160,112,26,0.3);border-radius:18px;font-size:12px;font-weight:800;color:#5a3a10;cursor:pointer;">' + (c.name || '이름없음') + ' <span style="opacity:0.6;font-weight:500;">(' + c.year + '.' + c.month + ')</span></button>';
+        return '<button type="button" data-idx="' + i + '" class="child-saved-chip" style="padding:7px 12px;background:rgba(170,130,60,0.08);border:1px solid rgba(170,130,60,0.25);border-radius:16px;font-size:12px;font-weight:700;color:#5a3a10;cursor:pointer;font-family:\'Noto Serif KR\',serif;">' + (c.name || '이름없음') + ' <span style="opacity:0.55;font-weight:500;">(' + c.year + '.' + c.month + ')</span></button>';
       }).join('') + '</div>';
-    picker.querySelectorAll('.child-saved-btn').forEach(function(b) {
+    picker.querySelectorAll('.child-saved-chip').forEach(function(b) {
       b.onclick = function() {
         var c = savedList[parseInt(b.dataset.idx)];
         document.getElementById('childName').value = c.name || '';
-        document.getElementById('childYear').value = c.year || '';
-        document.getElementById('childMonth').value = c.month || '';
-        document.getElementById('childDay').value = c.day || '';
+        yearSel.value = c.year || '';
+        monthSel.value = c.month || '';
+        daySel.value = c.day || '';
         if (c.hour === 'unknown' || c.hour == null || c.hour === '') {
-          hourUnknown.checked = true; hourUnknown.onchange();
+          document.getElementById('childHour').value = '';
+          minuteSel.value = '';
         } else {
-          hourUnknown.checked = false; hourUnknown.onchange();
-          hourInput.value = c.hour;
-          minuteInput.value = c.minute || 0;
+          document.getElementById('childHour').value = c.hour;
+          minuteSel.value = c.minute || 0;
         }
         selectedGender = c.gender || 'M';
         paintGender();
@@ -2830,23 +2900,21 @@ function setupChildProfileForm() {
 
   document.getElementById('btnChildSubmit').onclick = function() {
     var name = document.getElementById('childName').value.trim();
-    var year = parseInt(document.getElementById('childYear').value);
-    var month = parseInt(document.getElementById('childMonth').value);
-    var day = parseInt(document.getElementById('childDay').value);
-    var hourUnk = hourUnknown.checked;
-    var hour = hourUnk ? 'unknown' : parseInt(hourInput.value);
-    var minute = hourUnk ? 0 : (parseInt(minuteInput.value) || 0);
+    var year = parseInt(yearSel.value);
+    var month = parseInt(monthSel.value);
+    var day = parseInt(daySel.value);
+    var hourVal = document.getElementById('childHour').value;
+    var hour = hourVal === '' ? 'unknown' : parseInt(hourVal);
+    var minute = hour === 'unknown' ? 0 : (parseInt(minuteSel.value) || 0);
 
     if (!name) { alert('아이 이름을 입력해주세요'); return; }
-    if (!year || year < 1900 || year > 2030) { alert('태어난 연도를 확인해주세요'); return; }
-    if (!month || month < 1 || month > 12) { alert('태어난 월을 확인해주세요'); return; }
-    if (!day || day < 1 || day > 31) { alert('태어난 일을 확인해주세요'); return; }
-    if (!hourUnk && (isNaN(hour) || hour < 0 || hour > 23)) { alert('태어난 시간을 확인해주세요'); return; }
-    if (!hourUnk && (minute < 0 || minute > 59)) { alert('태어난 분을 확인해주세요'); return; }
+    if (!year) { alert('태어난 연도를 선택해주세요'); return; }
+    if (!month) { alert('태어난 월을 선택해주세요'); return; }
+    if (!day) { alert('태어난 일을 선택해주세요'); return; }
+    if (!selectedGender) { alert('성별을 선택해주세요'); return; }
 
     var childProfile = { name: name, year: year, month: month, day: day, hour: hour, minute: minute, gender: selectedGender };
     sessionStorage.setItem('pico_child_profile', JSON.stringify(childProfile));
-    // localStorage에 누적 저장 (최대 5개)
     try {
       var list = JSON.parse(localStorage.getItem('pico_child_profiles')) || [];
       list = list.filter(function(c) { return !(c.name === name && c.year === year && c.month === month && c.day === day); });
@@ -2854,7 +2922,6 @@ function setupChildProfileForm() {
       if (list.length > 5) list = list.slice(0, 5);
       localStorage.setItem('pico_child_profiles', JSON.stringify(list));
     } catch(e) {}
-    // 페이지 재진입으로 깔끔하게 재시작
     location.reload();
   };
 }
