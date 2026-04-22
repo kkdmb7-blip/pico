@@ -2837,7 +2837,10 @@ function renderCharVisual() {
   const labelStyle = `font-size:10px;font-weight:700;color:rgba(120,70,0,0.55);letter-spacing:0.3px;margin-bottom:3px;`;
 
   const openHtml = openRows.map(r => `<div style="${rowStyle(false)}"><div style="${labelStyle}">${r.label}</div><div style="color:#3a2000;">${r.text}</div></div>`).join('');
-  const blurHtml = blurRows.slice(0,3).map(r => `<div style="${rowStyle(true)}"><div style="${labelStyle}">${r.label}</div><div style="color:#3a2000;">${r.text}</div></div>`).join('');
+  const blurHtml = blurRows.slice(0,2).map(r => {
+    const short = r.text.length > 40 ? r.text.slice(0,40) + '…' : r.text;
+    return `<div style="${rowStyle(true)}"><div style="${labelStyle}">${r.label}</div><div style="color:#3a2000;">${short}</div></div>`;
+  }).join('');
 
   const badges = [
     _singang ? `<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(155,120,0,0.12);border:1px solid rgba(155,120,0,0.24);color:#7a5c00;">${_singang}</span>` : '',
