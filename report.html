@@ -3419,24 +3419,28 @@ function renderCharVisual() {
       + '</div>';
 
   } else if (_type === 'health') {
-    // 건강·체질: 오행별 장기 매핑 + 취약 오행 강조
+    // 건강·체질: 오행별 장기 매핑 + 취약 오행 강조 (의료 차트 스타일)
     const OH_ORGAN = {목:'간·담낭',화:'심장·소장',토:'비위·위장',금:'폐·대장',수:'신장·방광'};
+    const OH_MED_ICON = {목:'🌿',화:'❤️',토:'🍃',금:'🫁',수:'💧'};
     const sorted = [...ohList];
     const weakEl = sorted[sorted.length-1]?.[0];
-    const weakPct = Math.round(Number(sorted[sorted.length-1]?.[1]||0));
     const orgHtml = sorted.map(([el,pct]) => {
       const isWeak = el === weakEl;
-      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px;background:' + (isWeak?OH_BG[el]:'rgba(120,80,20,0.04)') + ';border:' + (isWeak?'1.5px solid '+OH_BORDER[el]:'1px solid rgba(120,80,20,0.08)') + ';">'
-        + '<div style="width:28px;height:28px;border-radius:50%;background:' + OH_BG[el] + ';border:' + (isWeak?'2px':'1px') + ' solid ' + OH_COLOR[el] + ';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:' + OH_COLOR[el] + ';flex-shrink:0;">' + el + '</div>'
-        + '<div style="flex:1;font-size:11px;color:#3a2000;font-weight:600;">' + (OH_ORGAN[el]||'') + '</div>'
-        + '<div style="font-size:12px;font-weight:800;color:' + OH_COLOR[el] + ';">' + Math.round(Number(pct)) + '%</div>'
-        + (isWeak?'<div style="font-size:9px;color:#8a2010;font-weight:700;background:rgba(200,60,60,0.1);padding:2px 6px;border-radius:6px;">주의</div>':'')
+      const p = Math.round(Number(pct));
+      return '<div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:11px;background:' + (isWeak?'linear-gradient(135deg,rgba(200,60,60,0.14),rgba(200,60,60,0.03))':'linear-gradient(135deg,'+(OH_BG[el]||'rgba(120,80,20,0.06)')+',rgba(255,255,255,0.4))') + ';border:' + (isWeak?'1.8px solid rgba(200,60,60,0.4)':'1.2px solid '+(OH_BORDER[el]||'rgba(120,80,20,0.15)')) + ';' + (isWeak?'box-shadow:0 3px 10px rgba(200,60,60,0.15);':'') + '">'
+        + '<div style="font-size:16px;flex-shrink:0;filter:drop-shadow(0 1px 2px ' + (OH_COLOR[el]||'#7a4e00') + '40);">' + (OH_MED_ICON[el]||'🫀') + '</div>'
+        + '<div style="width:30px;height:30px;border-radius:50%;background:' + (OH_BG[el]||'rgba(120,80,20,0.08)') + ';border:' + (isWeak?'2px':'1.5px') + ' solid ' + (OH_COLOR[el]||'#7a4e00') + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:' + (OH_COLOR[el]||'#7a4e00') + ';flex-shrink:0;">' + el + '</div>'
+        + '<div style="flex:1;min-width:0;">'
+        + '<div style="font-size:12px;color:#3a2000;font-weight:800;line-height:1.2;">' + (OH_ORGAN[el]||'') + '</div>'
+        + '<div style="height:4px;background:rgba(120,80,20,0.08);border-radius:3px;margin-top:4px;overflow:hidden;"><div style="height:4px;background:' + (OH_COLOR[el]||'#7a4e00') + ';border-radius:3px;width:' + Math.max(p,3) + '%;opacity:' + (isWeak?0.55:0.85) + ';"></div></div>'
+        + '</div>'
+        + '<div style="font-size:13px;font-weight:900;color:' + (OH_COLOR[el]||'#7a4e00') + ';min-width:32px;text-align:right;">' + p + '%</div>'
+        + (isWeak?'<div style="font-size:9px;color:#8a2010;font-weight:900;background:rgba(200,60,60,0.15);padding:3px 7px;border-radius:7px;border:1px solid rgba(200,60,60,0.3);">⚠ 주의</div>':'')
         + '</div>';
     }).join('');
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:6px;">'
-      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:4px;">오행별 담당 장기 · 취약 부위 확인</div>'
+      + '<div style="text-align:center;font-size:10px;font-weight:800;color:rgba(60,40,10,0.5);letter-spacing:1px;margin-bottom:4px;">🫀 오행 · 장부 건강 지도</div>'
       + orgHtml
-      + miniBubbleBlock
       + '</div>';
 
   } else if (['wealth_timing','timing'].includes(_type)) {
@@ -3492,23 +3496,28 @@ function renderCharVisual() {
       + '</div>';
 
   } else if (_type === 'child_career') {
-    // 아이 진로: 재능 오행 TOP2 + 진로 방향 키워드
+    // 아이 진로: 재능 오행 TOP2 + 진로 방향 키워드 (동화풍 별 뱃지)
     const OH_TALENT = {목:['예술·창작','리더십','스포츠'],화:['발표·표현','연예·공연','마케팅'],토:['교육·복지','꼼꼼한 관리','요리·서비스'],금:['이공계·분석','법·금융','엔지니어링'],수:['연구·철학','IT·프로그래밍','외교·언어']};
+    const OH_CHILD_ICON = {목:'🌱',화:'🎨',토:'🏡',금:'⚙️',수:'📚'};
     const topEl = ohList[0]?.[0], secEl = ohList[1]?.[0];
+    const topPct = Math.round(Number(ohList[0]?.[1]||0));
+    const secPct = Math.round(Number(ohList[1]?.[1]||0));
     const t1 = OH_TALENT[topEl]||[], t2 = OH_TALENT[secEl]||[];
-    const talentBadges = [...t1.slice(0,2), ...t2.slice(0,1)].map(t =>
-      '<div style="padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(120,80,20,0.08);border:1px solid rgba(120,80,20,0.15);color:#3a2000;">' + t + '</div>'
+    const talents = [...t1.slice(0,2), ...t2.slice(0,1)];
+    const talentBadges = talents.map((t,i) =>
+      '<div style="padding:7px 13px;border-radius:20px;font-size:12px;font-weight:800;background:linear-gradient(135deg,' + (OH_BG[i<2?topEl:secEl]||'rgba(120,80,20,0.1)') + ',rgba(255,255,255,0.4));border:1.2px solid ' + (OH_BORDER[i<2?topEl:secEl]||'rgba(120,80,20,0.2)') + ';color:' + (OH_COLOR[i<2?topEl:secEl]||'#3a2000') + ';display:inline-flex;align-items:center;gap:5px;box-shadow:0 2px 6px ' + (OH_COLOR[i<2?topEl:secEl]||'#7a4e00') + '18;"><span style="font-size:10px;">✨</span>' + t + '</div>'
     ).join('');
+    const topCol = OH_COLOR[topEl]||'#7a4e00', secCol = OH_COLOR[secEl]||'#7a4e00';
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="text-align:center;font-size:11px;font-weight:800;color:rgba(60,40,10,0.55);letter-spacing:1px;">🌟 아이의 타고난 재능 오행</div>'
       + '<div style="display:flex;gap:8px;">'
-      + (topEl ? '<div style="flex:1;background:' + OH_BG[topEl] + ';border-radius:14px;padding:14px;border:1.5px solid ' + OH_BORDER[topEl] + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + OH_COLOR[topEl] + ';margin-bottom:4px;">주 재능 오행</div><div style="font-size:32px;font-weight:900;color:' + OH_COLOR[topEl] + ';line-height:1;">' + topEl + '</div><div style="font-size:10px;color:' + OH_COLOR[topEl] + ';margin-top:4px;">' + Math.round(Number(ohList[0]?.[1]||0)) + '%</div></div>' : '')
-      + (secEl ? '<div style="flex:1;background:' + OH_BG[secEl] + ';border-radius:14px;padding:14px;border:1px solid ' + OH_BORDER[secEl] + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + OH_COLOR[secEl] + ';margin-bottom:4px;">보조 재능 오행</div><div style="font-size:32px;font-weight:900;color:' + OH_COLOR[secEl] + ';line-height:1;">' + secEl + '</div><div style="font-size:10px;color:' + OH_COLOR[secEl] + ';margin-top:4px;">' + Math.round(Number(ohList[1]?.[1]||0)) + '%</div></div>' : '')
+      + (topEl ? '<div style="flex:1.4;background:radial-gradient(circle at 30% 25%,' + (OH_BG[topEl]||'rgba(120,80,20,0.2)') + ',' + topCol + '15);border-radius:16px;padding:14px 8px;border:2.5px solid ' + topCol + ';text-align:center;box-shadow:0 6px 18px ' + topCol + '35,inset 0 2px 6px rgba(255,255,255,0.45);position:relative;"><div style="position:absolute;top:-7px;right:-7px;background:' + topCol + ';color:#fff;font-size:8px;font-weight:900;padding:2px 7px;border-radius:8px;letter-spacing:0.5px;box-shadow:0 2px 6px ' + topCol + '70;">TOP</div><div style="font-size:22px;margin-bottom:2px;filter:drop-shadow(0 2px 3px ' + topCol + '40);">' + (OH_CHILD_ICON[topEl]||'✨') + '</div><div style="font-size:10px;font-weight:800;color:' + topCol + ';opacity:0.75;letter-spacing:0.5px;">주 재능</div><div style="font-size:38px;font-weight:900;color:' + topCol + ';line-height:1;text-shadow:0 2px 6px ' + topCol + '30;">' + topEl + '</div><div style="font-size:11px;color:' + topCol + ';margin-top:4px;font-weight:700;">' + topPct + '%</div></div>' : '')
+      + (secEl ? '<div style="flex:1;background:radial-gradient(circle at 30% 25%,' + (OH_BG[secEl]||'rgba(120,80,20,0.15)') + ',' + secCol + '10);border-radius:16px;padding:14px 8px;border:1.8px solid ' + (OH_BORDER[secEl]||'rgba(120,80,20,0.3)') + ';text-align:center;box-shadow:0 4px 12px ' + secCol + '25,inset 0 1px 4px rgba(255,255,255,0.35);"><div style="font-size:18px;margin-bottom:2px;filter:drop-shadow(0 1px 2px ' + secCol + '35);">' + (OH_CHILD_ICON[secEl]||'✦') + '</div><div style="font-size:10px;font-weight:800;color:' + secCol + ';opacity:0.7;letter-spacing:0.5px;">보조 재능</div><div style="font-size:28px;font-weight:900;color:' + secCol + ';line-height:1;">' + secEl + '</div><div style="font-size:10px;color:' + secCol + ';margin-top:4px;font-weight:700;">' + secPct + '%</div></div>' : '')
       + '</div>'
-      + '<div style="background:rgba(120,80,20,0.04);border-radius:12px;padding:12px 14px;border:1px solid rgba(120,80,20,0.1);">'
-      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.4);margin-bottom:8px;">적합한 진로 방향</div>'
+      + '<div style="background:linear-gradient(135deg,rgba(210,160,60,0.1),rgba(120,80,20,0.03));border-radius:13px;padding:12px 14px;border:1.2px solid rgba(200,150,50,0.22);">'
+      + '<div style="font-size:10px;font-weight:800;color:rgba(140,90,20,0.7);margin-bottom:8px;letter-spacing:0.5px;">🎯 적합한 진로 방향</div>'
       + '<div style="display:flex;flex-wrap:wrap;gap:6px;">' + talentBadges + '</div>'
       + '</div>'
-      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'family') {
