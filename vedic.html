@@ -842,10 +842,14 @@ function doVedicShare() {
     } else if (window.Kakao && Kakao.Share) {
       if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
       Kakao.Share.sendDefault({
-        objectType: 'text',
-        text: text,
-        link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
-        buttons: [{ title: '무료로 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+        objectType: 'feed',
+        content: {
+          title: 'FORTUNA 베딕 점성술',
+          description: '나만의 카르마 차트 확인하기',
+          imageUrl: 'https://picolab.kr/img/goddess-app.png',
+          link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+        },
+        buttons: [{ title: '내 운세 보러가기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
       });
     } else { _vedicShowToast('<i class="pi pi-link"></i> 링크가 클립보드에 복사됐어요!'); }
   },'image/png');

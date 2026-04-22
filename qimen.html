@@ -2243,10 +2243,14 @@ function shareQimenKakao() {
       } else if (window.Kakao && Kakao.Share) {
         if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
         Kakao.Share.sendDefault({
-          objectType: 'text',
-          text: kText,
-          link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
-          buttons: [{ title: '무료로 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+          objectType: 'feed',
+          content: {
+            title: 'FORTUNA 기문둔갑',
+            description: '나만의 기문 포국 확인하기',
+            imageUrl: 'https://picolab.kr/img/goddess-app.png',
+            link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+          },
+          buttons: [{ title: '내 운세 보러가기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
         });
       } else {
         try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
