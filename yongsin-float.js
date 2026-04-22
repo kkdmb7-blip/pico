@@ -73,6 +73,34 @@
 
   var IMG_BASE = IS_PICO ? '' : 'https://picolab.kr';
 
+  function removeBgFloat(src, imgEl) {
+    var tmp = new Image();
+    tmp.crossOrigin = 'anonymous';
+    tmp.onload = function() {
+      var cv = document.createElement('canvas');
+      var W = tmp.naturalWidth, H = tmp.naturalHeight;
+      cv.width = W; cv.height = H;
+      var ctx = cv.getContext('2d');
+      ctx.drawImage(tmp, 0, 0);
+      var data = ctx.getImageData(0, 0, W, H);
+      var d = data.data;
+      var colorMap = {};
+      function addSample(x,y){ var i=(y*W+x)*4; if(d[i+3]<10) return; var key=(d[i]>>4)+','+(d[i+1]>>4)+','+(d[i+2]>>4); colorMap[key]=(colorMap[key]||{count:0,r:d[i],g:d[i+1],b:d[i+2]}); colorMap[key].count++; }
+      for(var x=0;x<W;x++){addSample(x,0);addSample(x,H-1);}
+      for(var y=0;y<H;y++){addSample(0,y);addSample(W-1,y);}
+      var sorted=Object.values(colorMap).sort(function(a,b){return b.count-a.count;});
+      var bgColors=sorted.slice(0,2).map(function(c){return[c.r,c.g,c.b];});
+      var thr=45;
+      for(var i=0;i<d.length;i+=4){
+        var ok=bgColors.some(function(bg){ return Math.abs(d[i]-bg[0])+Math.abs(d[i+1]-bg[1])+Math.abs(d[i+2]-bg[2])<thr; });
+        if(ok) d[i+3]=0;
+      }
+      ctx.putImageData(data,0,0);
+      imgEl.src = cv.toDataURL('image/png');
+    };
+    tmp.src = src;
+  }
+
   function buildPetSVG(elem) {
     var s = ELEM_STYLE[elem] || ELEM_STYLE.water;
     if (elem === 'wood') {
@@ -376,6 +404,12 @@
     ].join(';');
     pet.setAttribute('aria-label', '용신 찾기');
     pet.innerHTML = buildPetSVG(elem);
+    // 배경 미제거 이미지는 canvas로 배경 제거
+    var _stIdx = getPetStageIdx();
+    if (elem === 'wood' && _stIdx === 5) {
+      var _wImg = pet.querySelector('img');
+      if (_wImg) removeBgFloat(IMG_BASE + '/img/pet_wood_9.png', _wImg);
+    }
 
     // 숨김 힌트
     var hint = document.createElement('div');
