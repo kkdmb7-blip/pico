@@ -33,6 +33,15 @@
     try { return JSON.parse(localStorage.getItem(PET_KEY)) || {}; } catch(e) { return {}; }
   }
 
+  // raw.all[element] 까지 파고든 실제 상태 반환
+  function getActiveState() {
+    var raw = getPetState();
+    if (raw.all && raw.element && raw.all[raw.element]) {
+      return Object.assign({ element: raw.element }, raw.all[raw.element]);
+    }
+    return raw;
+  }
+
   function getElement() {
     return getPetState().element || null;
   }
@@ -67,7 +76,7 @@
 
   // ── 이미지 ──
   function getPetStageIdx() {
-    var lv = getPetState().level || 1;
+    var lv = getActiveState().level || 1;
     return Math.min(Math.floor(lv / 3), 5);
   }
 
@@ -279,7 +288,7 @@
   }
 
   function showPetStatus() {
-    var state = getPetState();
+    var state = getActiveState();
     var lv = state.level || 1;
     showBubble([
       'Lv.' + lv + ' 상태 보고 📊',
@@ -317,18 +326,24 @@
     // EXP 지급 (picolab에서만, 오늘 처음)
     if (IS_PICO && found !== today) {
       localStorage.setItem(FOUND_KEY, today);
-      var state = getPetState();
-      state.hunger = Math.min(100, (state.hunger || 20) + 15);
-      state.happy  = Math.min(100, (state.happy  || 20) + 20);
-      state.exp    = (state.exp || 0) + 10;
-      var needed = Math.pow(state.level || 1, 2) * 100;
-      if (state.exp >= needed) { state.exp -= needed; state.level = (state.level || 1) + 1; }
-      state.lastVisit = Date.now();
-      try { localStorage.setItem(PET_KEY, JSON.stringify(state)); } catch(e) {}
-      var lvEl = document.getElementById('yongsin-float-lv');
-      var fillEl = document.getElementById('yongsin-float-efill');
-      if (lvEl) lvEl.textContent = 'Lv.' + (state.level || 1);
-      if (fillEl) fillEl.style.width = Math.round(state.energy || 0) + '%';
+      var raw = getPetState();
+      var elem = raw.element;
+      if (elem) {
+        if (!raw.all) raw.all = {};
+        if (!raw.all[elem]) raw.all[elem] = {};
+        var s = raw.all[elem];
+        s.hunger = Math.min(100, (s.hunger || 20) + 15);
+        s.happy  = Math.min(100, (s.happy  || 20) + 20);
+        s.exp    = (s.exp || 0) + 10;
+        var needed = Math.pow(s.level || 1, 2) * 100;
+        if (s.exp >= needed) { s.exp -= needed; s.level = (s.level || 1) + 1; }
+        s.lastVisit = Date.now();
+        try { localStorage.setItem(PET_KEY, JSON.stringify(raw)); } catch(e) {}
+        var lvEl = document.getElementById('yongsin-float-lv');
+        var fillEl = document.getElementById('yongsin-float-efill');
+        if (lvEl) lvEl.textContent = 'Lv.' + (s.level || 1);
+        if (fillEl) fillEl.style.width = Math.round(s.energy || 0) + '%';
+      }
     }
 
     var mode = TAP_MODES[tapModeIdx % TAP_MODES.length]; tapModeIdx++;
@@ -348,7 +363,7 @@
   function buildPet() {
     var elem = getElement();
     var s = ELEM_STYLE[elem] || ELEM_STYLE.water;
-    var ps = getPetState();
+    var ps = getActiveState();
 
     wrapper = document.createElement('div');
     wrapper.id = 'yongsin-float-wrapper';
