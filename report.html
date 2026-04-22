@@ -2920,6 +2920,7 @@ function renderCharVisual() {
         <div style="font-size:13px;font-weight:700;color:#3a2000;">${rel}</div>
         ${inter?.판정?`<div style="font-size:11px;color:rgba(60,40,10,0.55);margin-top:3px;">${inter.판정}</div>`:''}
       </div>
+      <div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">${bubblesHtml}</div>
     </div>`;
 
   } else if (_type === 'career_deep') {
@@ -3030,7 +3031,9 @@ function renderCharVisual() {
     }).join('');
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:6px;">'
       + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:4px;">오행별 담당 장기 · 취약 부위 확인</div>'
-      + orgHtml + '</div>';
+      + orgHtml
+      + '<div style="position:relative;width:300px;height:140px;margin:8px auto 0;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
 
   } else if (['wealth_timing','timing'].includes(_type)) {
     // 재물타이밍·인생타이밍: 대운 타임라인 (daeun과 동일)
@@ -3094,7 +3097,9 @@ function renderCharVisual() {
       + '<div style="background:rgba(120,80,20,0.04);border-radius:12px;padding:12px 14px;border:1px solid rgba(120,80,20,0.1);">'
       + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.4);margin-bottom:8px;">적합한 진로 방향</div>'
       + '<div style="display:flex;flex-wrap:wrap;gap:6px;">' + talentBadges + '</div>'
-      + '</div></div>';
+      + '</div>'
+      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
 
   } else if (_type === 'family') {
     // 가족 인연: 육친 오행 구조 (십신맵 기반)
@@ -3133,7 +3138,9 @@ function renderCharVisual() {
       + '<div style="flex:1;background:rgba(60,80,160,0.08);border-radius:12px;padding:12px;border:1px solid rgba(60,80,160,0.18);text-align:center;"><div style="font-size:10px;font-weight:700;color:#2a3a9a;margin-bottom:3px;">격국</div><div style="font-size:14px;font-weight:900;color:#1a2a7a;">' + (_geokguk||'정격') + '</div></div>'
       + '<div style="flex:1;background:rgba(40,100,60,0.08);border-radius:12px;padding:12px;border:1px solid rgba(40,100,60,0.18);text-align:center;"><div style="font-size:10px;font-weight:700;color:#1a6030;margin-bottom:3px;">강약</div><div style="font-size:14px;font-weight:900;color:#0a4020;">' + (_singang||'—') + '</div></div>'
       + '<div style="flex:1;background:' + (OH_BG[yE]||'rgba(120,80,20,0.08)') + ';border-radius:12px;padding:12px;border:1px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.15)') + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + (OH_COLOR[yE]||'#7a4200') + ';margin-bottom:3px;">용신</div><div style="font-size:14px;font-weight:900;color:' + (OH_COLOR[yE]||'#5a2a00') + ';">' + (yE||'—') + '</div></div>'
-      + '</div></div>';
+      + '</div>'
+      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
 
   } else if (_type === 'guide') {
     // 관계 가이드: 대상 인물 주기질 + 대화 팁
@@ -3168,7 +3175,9 @@ function renderCharVisual() {
       + '<div style="flex:1;background:rgba(60,80,160,0.08);border-radius:12px;padding:10px;border:1px solid rgba(60,80,160,0.18);text-align:center;"><div style="font-size:10px;font-weight:700;color:#2a3a9a;margin-bottom:3px;">일주</div><div style="font-size:14px;font-weight:900;color:#1a2a7a;">' + (_ilju||'—') + '</div></div>'
       + '<div style="flex:1;background:rgba(40,100,60,0.08);border-radius:12px;padding:10px;border:1px solid rgba(40,100,60,0.18);text-align:center;"><div style="font-size:10px;font-weight:700;color:#1a6030;margin-bottom:3px;">격국</div><div style="font-size:13px;font-weight:900;color:#0a4020;">' + (_geokguk||'정격') + '</div></div>'
       + '<div style="flex:1;background:' + (OH_BG[yE]||'rgba(120,80,20,0.08)') + ';border-radius:12px;padding:10px;border:1px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.15)') + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + (OH_COLOR[yE]||'#7a4200') + ';margin-bottom:3px;">용신</div><div style="font-size:14px;font-weight:900;color:' + (OH_COLOR[yE]||'#5a2a00') + ';">' + (yE||'—') + '</div></div>'
-      + '</div></div>';
+      + '</div>'
+      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
 
   } else if (_type === 'balance') {
     // 오행 밸런스: 수평 바 차트 (부족/과잉 강조)
@@ -3188,7 +3197,9 @@ function renderCharVisual() {
     }).join('');
     visualHtml = '<div style="padding:14px 18px 10px;">'
       + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:10px;">오행 비율 분포 — 부족 오행과 과잉 오행 확인</div>'
-      + barHtmlB + '</div>';
+      + barHtmlB
+      + '<div style="position:relative;width:300px;height:140px;margin:12px auto 0;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
 
   } else if (_type === 'sinsal') {
     // 신살: 길신·흉신 배지 + 미니 버블
