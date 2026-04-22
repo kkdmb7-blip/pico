@@ -1598,8 +1598,12 @@ function doMissionShare() {
   if (isMissionDone('share')) return;
   var url = 'https://picolab.kr/yongsin-pet.html';
   var text = '🔮 피코랩에서 용신 다마고치 키우고 있어요!\n내 용신 오행을 캐릭터로 키워보세요 👇\n' + url;
-  completeMissionNav('share');
-  renderMission();
+  showToast('공유 중... 📤');
+  setTimeout(function() {
+    completeMissionNav('share');
+    renderMission();
+    showToast('📤 공유 완료! 미션 달성 🎉');
+  }, 2500);
   if (navigator.share) {
     navigator.share({ title: '피코랩 용신 다마고치', text: text, url: url }).catch(function(){});
     return;
