@@ -1291,8 +1291,8 @@ function isMissionDone(id) {
   var today = todayStr();
   if (id === 'feed')   return m.feedCount >= 3;
   if (id === 'orb')    return m.orbCount >= 1;
-  if (id === 'saju')   return m.sajuDone === today;
-  if (id === 'diary')  return m.diaryDone === today;
+  if (id === 'saju')   return localStorage.getItem('pet_mission_saju') === today;
+  if (id === 'diary')  return localStorage.getItem('pet_mission_diary') === today;
   if (id === 'share')  return m.shareDone === today;
   return false;
 }
@@ -1566,7 +1566,8 @@ function renderMission() {
 }
 
 function doMissionNav(id, url) {
-  completeMissionNav(id);
+  // saju/diary: 완료는 실제 행동 후 해당 페이지에서 localStorage 플래그로 처리
+  if (id !== 'saju' && id !== 'diary') completeMissionNav(id);
   renderMission();
   setTimeout(function() { window.location.href = url; }, 300);
 }
@@ -1728,6 +1729,12 @@ if (state.element) {
   });
 }
 setInterval(renderMission, 60000);
+
+// 사주/일기 페이지 다녀온 후 미션 완료 감지
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') renderMission();
+});
+window.addEventListener('focus', function() { renderMission(); });
 </script>
 </body>
 </html>

@@ -632,7 +632,7 @@ async function fetchSaju() {
     // 용신 펫 EXP 연동 (사주 분석 완료 시 +50, 하루 1번)
     try {
       var _petS = JSON.parse(localStorage.getItem('yongsin_pet') || '{}');
-      var _petD = new Date().toISOString().slice(0,10);
+      var _petD = new Date(Date.now() + 9*3600000).toISOString().slice(0,10);
       if (_petS.element && _petS._sajuExpDate !== _petD) {
         _petS._sajuExpDate = _petD;
         _petS.exp = (_petS.exp || 0) + 50;
@@ -641,6 +641,8 @@ async function fetchSaju() {
         localStorage.setItem('yongsin_pet', JSON.stringify(_petS));
         if (window._refreshPetCard) window._refreshPetCard();
       }
+      // 오늘의 미션 사주 확인 완료 플래그
+      localStorage.setItem('pet_mission_saju', _petD);
     } catch(e2) {}
   } catch(e) {
     document.getElementById('S_load').style.display='none';

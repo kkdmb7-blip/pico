@@ -531,6 +531,8 @@ async function submitDiary(skipMemo) {
       localStorage.setItem('yongsin_pet', JSON.stringify(_ps));
       if (window._refreshPetCard) window._refreshPetCard();
     }
+    // 오늘의 미션 일기 완료 플래그
+    localStorage.setItem('pet_mission_diary', new Date(Date.now() + 9*3600000).toISOString().slice(0,10));
   } catch(e) {}
 
   // 캘린더/통계 즉시 갱신 (AI 피드백 기다리지 않고 저장 직후 반영)
