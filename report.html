@@ -2798,30 +2798,35 @@ function renderCharVisual() {
   if (sK) summary += `<br>일간의 힘이 <b>${_singang}</b> 구조라 ${SING_DESC[sK]}.`;
   if (yE) summary += ` 삶의 균형을 잡아주는 용신은 <b>${yE}(${['목','화','토','금','수'].includes(yE)?{목:'나무·성장',화:'불·표현',토:'흙·안정',금:'쇠·결단',수:'물·지혜'}[yE]:''})</b>.`;
 
-  // ── 핵심 정보 그리드 ──
-  const ysColor = {목:'#3d7a3a',화:'#b84c1a',토:'#8a6200',금:'#5a6a7a',수:'#1a5fa0'};
+  // ── 현재 대운 직접 추출 ──
+  let curDaeunVal = '—';
+  if (_rptFull && Array.isArray(_rptFull['대운분석']) && _rptFull['대운분석'].length) {
+    const nowY = new Date().getFullYear();
+    const cur = _rptFull['대운분석'].find(d => {
+      const r = (d.year_range||'').split(/[–\-~]/);
+      return nowY >= parseInt(r[0]) && nowY <= parseInt(r[1]);
+    }) || _rptFull['대운분석'][0];
+    if (cur) curDaeunVal = (cur.ganjee||cur.간지||cur.daeun||'').replace(/\(.*\)/,'').trim() || '—';
+  } else if (_daeun) {
+    curDaeunVal = _daeun.replace(/\(.*\)/,'').trim();
+  }
+
+  // ── 핵심 정보 그리드 (색상 적용) ──
   const infoItems = [
-    { label:'격국', value: _geokguk || '정격', icon:'pi-scroll' },
-    { label:'신강약', value: _singang || '—', icon:'pi-bolt' },
-    { label:'일주', value: _ilju ? _ilju+' 일주' : '—', icon:'pi-star' },
-    { label:'현재 대운', value: _daeun || '—', icon:'pi-compass' },
+    { label:'격국', value: _geokguk || '정격', icon:'pi-scroll',
+      bg:'rgba(180,120,0,0.12)', border:'rgba(180,120,0,0.25)', color:'#7a4e00', icolor:'#b87800' },
+    { label:'신강약', value: _singang || '—', icon:'pi-bolt',
+      bg:'rgba(60,90,200,0.11)', border:'rgba(60,90,200,0.22)', color:'#1a3a9a', icolor:'#2a5add' },
+    { label:'일주', value: _ilju ? _ilju+' 일주' : '—', icon:'pi-star',
+      bg:'rgba(20,130,110,0.11)', border:'rgba(20,130,110,0.22)', color:'#0a6040', icolor:'#12937a' },
+    { label:'현재 대운', value: curDaeunVal, icon:'pi-compass',
+      bg:'rgba(120,60,180,0.11)', border:'rgba(120,60,180,0.22)', color:'#5a1a9a', icolor:'#8040cc' },
   ];
   const infoGrid = infoItems.map(it => `
-    <div style="background:rgba(255,255,255,0.55);border-radius:12px;padding:10px 12px;border:1px solid rgba(180,140,60,0.15);">
-      <div style="font-size:10px;color:rgba(60,40,10,0.42);font-weight:600;margin-bottom:4px;"><i class="pi ${it.icon}" style="font-size:9px;"></i> ${it.label}</div>
-      <div style="font-size:13px;font-weight:800;color:#3a2000;">${it.value}</div>
+    <div style="background:${it.bg};border-radius:12px;padding:10px 12px;border:1px solid ${it.border};">
+      <div style="font-size:10px;color:${it.icolor};font-weight:700;margin-bottom:5px;opacity:0.85;"><i class="pi ${it.icon}" style="font-size:9px;"></i> ${it.label}</div>
+      <div style="font-size:14px;font-weight:900;color:${it.color};letter-spacing:-0.3px;">${it.value}</div>
     </div>`).join('');
-
-  // ── 용신 활용 힌트 ──
-  const ys = _rptFull && _rptFull['용신활용'];
-  let ysTip = '';
-  if (ys && yE) {
-    const hints = [];
-    if (ys['색상']) hints.push(`<b>행운색</b> ${ys['색상']}`);
-    if (ys['방위']) hints.push(`<b>유리한 방향</b> ${ys['방위']}`);
-    if (ys['음식']) hints.push(`<b>보완 음식</b> ${ys['음식']}`);
-    if (hints.length) ysTip = hints.slice(0,2).join('&ensp;·&ensp;');
-  }
 
   // ── 블러 텍스트 (더 구체적으로) ──
   const blurLines = [
@@ -2867,12 +2872,6 @@ function renderCharVisual() {
 
     <!-- 요약 (공개) -->
     <div style="margin:0 18px 14px;font-size:13px;line-height:1.9;color:#3a2510;padding:14px;background:rgba(120,80,20,0.05);border-radius:14px;border:1px solid rgba(120,80,20,0.08);">${summary}</div>
-
-    ${ysTip ? `<!-- 용신 힌트 -->
-    <div style="margin:0 18px 14px;display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(${ysColor[yE]?ysColor[yE].replace('#','').match(/../g).map(h=>parseInt(h,16)).join(','):'155,120,0'},0.07);border-radius:12px;border:1px solid rgba(${ysColor[yE]?ysColor[yE].replace('#','').match(/../g).map(h=>parseInt(h,16)).join(','):'155,120,0'},0.18);">
-      <i class="pi pi-sparkle" style="color:${ysColor[yE]||'#8a6200'};font-size:14px;"></i>
-      <span style="font-size:12px;color:#3a2000;">${ysTip}</span>
-    </div>` : ''}
 
     <!-- 블러 구역 -->
     <div style="padding:0 18px 18px;">
