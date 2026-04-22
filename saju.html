@@ -1706,37 +1706,30 @@ function openSajuStoryCard(cb) {
 
     // 배경
     var grd = ctx.createLinearGradient(0, 0, 0, H);
-    grd.addColorStop(0, '#12082a');
-    grd.addColorStop(0.5, '#0c1525');
-    grd.addColorStop(1, '#0a1020');
+    grd.addColorStop(0, '#fdf6e8');
+    grd.addColorStop(1, '#f4ede0');
     ctx.fillStyle = grd;
     ctx.fillRect(0, 0, W, H);
-
-    // 별빛 점
-    [[55,38,1.1],[318,52,0.8],[175,28,1.4],[290,130,0.7],[35,200,0.9],[370,420,1.0],[90,680,1.2],[340,695,0.8],[210,705,1.3]].forEach(function(s){
-      ctx.beginPath(); ctx.arc(s[0],s[1],s[2],0,Math.PI*2);
-      ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
-    });
 
     var y = PAD;
 
     // ── 헤더 ──
-    ctx.fillStyle = '#d4a843';
+    ctx.fillStyle = '#7a2418';
     ctx.font = 'bold 11px "Noto Sans KR"';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('● F O R T U N A', W/2, y+14);
-    ctx.strokeStyle = 'rgba(212,168,67,0.25)';
+    ctx.strokeStyle = 'rgba(80,55,30,0.18)';
     ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(PAD,y+26); ctx.lineTo(W-PAD,y+26); ctx.stroke();
-    ctx.fillStyle = 'rgba(212,168,67,0.55)';
+    ctx.fillStyle = 'rgba(74,58,42,0.55)';
     ctx.font = '9px "Noto Sans KR"';
     ctx.fillText('나의 사주 원국', W/2, y+40);
     y += 56;
 
     // ── 일간 대형 쇼케이스 ──
     var glowGrd = ctx.createRadialGradient(W/2, y+54, 8, W/2, y+54, 80);
-    glowGrd.addColorStop(0, EL_GLOW[dayEl]||'rgba(100,100,100,0.18)');
-    glowGrd.addColorStop(1, 'rgba(0,0,0,0)');
+    glowGrd.addColorStop(0, EL_GLOW[dayEl]||'rgba(100,100,100,0.12)');
+    glowGrd.addColorStop(1, 'rgba(244,237,224,0)');
     ctx.fillStyle = glowGrd;
     ctx.fillRect(W/2-80, y, 160, 110);
 
@@ -1750,7 +1743,7 @@ function openSajuStoryCard(cb) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(dayHanja, W/2, y+52);
 
-    ctx.fillStyle = 'rgba(212,168,67,0.80)';
+    ctx.fillStyle = 'rgba(74,58,42,0.65)';
     ctx.font = '9px "Noto Sans KR"';
     ctx.fillText('일간 · ' + dayEl + '(' + dayKor + ')', W/2, y+104);
     y += 118;
@@ -1759,16 +1752,16 @@ function openSajuStoryCard(cb) {
 
     // ── 프로필 ──
     var name = pName || '이름 미입력';
-    ctx.fillStyle = '#f0e6d2';
+    ctx.fillStyle = '#1a120a';
     ctx.font = 'bold 18px "Noto Sans KR"';
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     ctx.fillText(name, PAD, y+10);
     var byear = parseInt((pBirth||'2000-01-01').split('-')[0]);
     ctx.font = 'bold 14px "Noto Sans KR"';
     ctx.textAlign = 'right';
-    ctx.fillStyle = 'rgba(240,230,210,0.65)';
+    ctx.fillStyle = 'rgba(26,18,10,0.65)';
     ctx.fillText((new Date().getFullYear()-byear+1)+'세', W-PAD, y+10);
-    ctx.fillStyle = 'rgba(240,230,210,0.45)';
+    ctx.fillStyle = 'rgba(74,58,42,0.65)';
     ctx.font = '10px "Noto Sans KR"';
     ctx.textAlign = 'left';
     ctx.fillText('양력 '+(pBirth||'')+'  ·  '+pHour+'시 '+(pMinute||0)+'분  ·  '+(pGender==='male'?'남성':'여성'), PAD, y+27);
@@ -1777,9 +1770,9 @@ function openSajuStoryCard(cb) {
     ctx.font = '9px "Noto Sans KR"';
     badges.forEach(function(txt){
       var tw = ctx.measureText(txt).width + 12;
-      ctx.fillStyle = 'rgba(212,168,67,0.14)'; ctx.strokeStyle = 'rgba(212,168,67,0.38)'; ctx.lineWidth = 0.5;
+      ctx.fillStyle = 'rgba(80,55,30,0.12)'; ctx.strokeStyle = 'rgba(80,55,30,0.22)'; ctx.lineWidth = 0.5;
       rr(bx, y+38, tw, 17, 8); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = 'rgba(212,168,67,0.85)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(26,18,10,0.82)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(txt, bx+tw/2, y+46); bx += tw+5;
     });
     y += 62;
@@ -1790,13 +1783,13 @@ function openSajuStoryCard(cb) {
     pls.forEach(function(pl, i){
       var cx = PAD + i*(colW+COL_GAP);
       var isDay = (i===1);
-      ctx.fillStyle = isDay ? 'rgba(212,168,67,0.09)' : 'rgba(255,255,255,0.035)';
-      ctx.strokeStyle = isDay ? 'rgba(212,168,67,0.5)' : 'rgba(255,255,255,0.09)';
+      ctx.fillStyle = isDay ? 'rgba(122,36,24,0.06)' : 'rgba(80,55,30,0.05)';
+      ctx.strokeStyle = isDay ? 'rgba(122,36,24,0.40)' : 'rgba(80,55,30,0.12)';
       ctx.lineWidth = isDay ? 1 : 0.5;
       rr(cx, y, colW, PILLAR_H, 8); ctx.fill(); ctx.stroke();
       var mx = cx + colW/2;
       var iy = y + 8;
-      ctx.fillStyle = 'rgba(240,230,210,0.55)';
+      ctx.fillStyle = 'rgba(80,55,30,0.70)';
       ctx.font = '9px "Noto Sans KR"'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(LABELS[i], mx, iy+7); iy += 14;
       var hx = mx - HBOX/2;
@@ -1816,7 +1809,7 @@ function openSajuStoryCard(cb) {
     y += 14;
 
     // ── 오행 분포 ──
-    ctx.fillStyle = 'rgba(240,230,210,0.50)';
+    ctx.fillStyle = 'rgba(74,58,42,0.65)';
     ctx.font = '9px "Noto Sans KR"'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     ctx.fillText('오행 분포', PAD, y+8);
     if (ysStr) {
@@ -1838,11 +1831,11 @@ function openSajuStoryCard(cb) {
       ctx.fillStyle = elCols[i];
       ctx.font = 'bold 9px "Noto Sans KR"'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       ctx.fillText(el, PAD, y + i*(barH+barGap) + barH/2);
-      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillStyle = 'rgba(80,55,30,0.10)';
       rr(PAD+14, y + i*(barH+barGap), barMaxW-14-28, barH, barH/2); ctx.fill();
       var barW = Math.max(0, (barMaxW-14-28) * pct / 100);
       if (barW > 0) { ctx.fillStyle = elCols[i]; rr(PAD+14, y + i*(barH+barGap), barW, barH, barH/2); ctx.fill(); }
-      ctx.fillStyle = 'rgba(240,230,210,0.50)';
+      ctx.fillStyle = 'rgba(74,58,42,0.60)';
       ctx.font = '9px "Noto Sans KR"'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
       ctx.fillText(Math.round(pct)+'%', W-PAD, y + i*(barH+barGap) + barH/2);
     });
@@ -1867,9 +1860,9 @@ function openSajuStoryCard(cb) {
 
     // ── 푸터 (항상 하단에 고정) ──
     var footerY = H - PAD - 14;
-    ctx.strokeStyle = 'rgba(212,168,67,0.20)'; ctx.lineWidth = 0.5;
+    ctx.strokeStyle = 'rgba(80,55,30,0.14)'; ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(PAD, footerY-10); ctx.lineTo(W-PAD, footerY-10); ctx.stroke();
-    ctx.fillStyle = 'rgba(212,168,67,0.55)';
+    ctx.fillStyle = 'rgba(74,58,42,0.65)';
     ctx.font = '10px "Noto Sans KR"'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('picolab.kr에서 무료로 확인하세요', W/2, footerY);
 
