@@ -1598,10 +1598,10 @@ function doMissionShare() {
   if (isMissionDone('share')) return;
   var url = 'https://picolab.kr/yongsin-pet.html';
   var text = '🔮 피코랩에서 용신 다마고치 키우고 있어요!\n내 용신 오행을 캐릭터로 키워보세요 👇\n' + url;
+  completeMissionNav('share');
+  renderMission();
   if (navigator.share) {
-    navigator.share({ title: '피코랩 용신 다마고치', text: text, url: url })
-      .then(function() { completeMissionNav('share'); renderMission(); })
-      .catch(function(e) { if (e.name !== 'AbortError') showToast('공유에 실패했어요.'); });
+    navigator.share({ title: '피코랩 용신 다마고치', text: text, url: url }).catch(function(){});
     return;
   }
   if (window.Kakao && window.Kakao.Share) {
@@ -1616,14 +1616,10 @@ function doMissionShare() {
       },
       buttons: [{ title: '지금 키우러 가기', link: { mobileWebUrl: url, webUrl: url } }]
     });
-    completeMissionNav('share');
-    renderMission();
     return;
   }
   navigator.clipboard && navigator.clipboard.writeText(text).then(function() {
     showToast('📋 링크가 복사됐어요!');
-    completeMissionNav('share');
-    renderMission();
   });
 }
 
