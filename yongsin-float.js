@@ -59,7 +59,7 @@
   // ── 이미지 ──
   function getPetStageIdx() {
     var lv = getPetState().level || 1;
-    return Math.min(Math.floor(lv / 3), 4);
+    return Math.min(Math.floor(lv / 3), 5);
   }
 
   var IMG_BASE = IS_PICO ? '' : 'https://picolab.kr';
@@ -68,9 +68,8 @@
     var s = ELEM_STYLE[elem] || ELEM_STYLE.water;
     if (elem === 'wood') {
       var stageIdx = getPetStageIdx();
-      var n = stageIdx + 1;
-      var hasRb = (n === 1 || n === 5);
-      var src = IMG_BASE + (hasRb ? '/img/pet_wood_' + n + '_rb.png' : '/img/pet_wood_' + n + '.png');
+      var _wfm = { 0:'pet_wood_1_rb.png', 1:'pet_wood_2-removebg-preview.png', 2:'pet_wood_3-removebg-preview.png', 3:'pet_wood_4-removebg-preview.png', 4:'pet_wood_5_rb.png', 5:'pet_wood_9.png' };
+      var src = IMG_BASE + '/img/' + (_wfm[stageIdx] || _wfm[4]);
       return '<img src="' + src + '" alt="목 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
     }
     if (elem === 'fire') {

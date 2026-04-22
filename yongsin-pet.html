@@ -824,7 +824,13 @@ var ELEMENTS = {
   metal: { name:'금령(金靈)',  nameShort:'금(金)', color:'#5a5a4a', color2:'#c8b870', glow:'rgba(90,90,74,0.12)',  badge:'rgba(90,90,74,0.12)',  borderBadge:'rgba(90,90,74,0.4)',  bgStyle:'linear-gradient(135deg,rgba(90,90,74,0.06),rgba(200,184,112,0.04))' },
   water: { name:'수령(水靈)',  nameShort:'수(水)', color:'#1565c0', color2:'#42a5f5', glow:'rgba(21,101,192,0.12)', badge:'rgba(21,101,192,0.12)', borderBadge:'rgba(21,101,192,0.4)', bgStyle:'linear-gradient(135deg,rgba(21,101,192,0.06),rgba(66,165,245,0.04))' },
 };
-var STAGES = ['새싹','성장','각성','정화','신화'];
+var STAGES = ['새싹','성장','각성','정화','신화','전설'];
+
+// 미리보기: ?preview_stage=N 파라미터로 강제 스테이지
+var _previewStage = (function() {
+  var p = new URLSearchParams(window.location.search).get('preview_stage');
+  return p !== null ? Math.max(0, Math.min(parseInt(p,10)-1, STAGES.length-1)) : null;
+})();
 
 // PNG 배경 제거 (flood fill 외곽 제거 + 내부 고립 픽셀 제거)
 function removeBgAndApply(src, imgEl) {
@@ -1119,16 +1125,15 @@ function render() {
   badge.style.color = el.color;
 
   // 이름·레벨
-  var stageIdx = Math.min(Math.floor(state.level / 3), STAGES.length - 1);
+  var stageIdx = _previewStage !== null ? _previewStage : Math.min(Math.floor(state.level / 3), STAGES.length - 1);
 
   // 목(木) 이미지 단계별 교체
   if (state.element === 'wood') {
-    var n = stageIdx + 1;
-    var rbSrc = '/img/pet_wood_' + n + '_rb.png';
-    var origSrc = '/img/pet_wood_' + n + '.png';
+    var _woodFileMap = { 0:'pet_wood_1_rb.png', 1:'pet_wood_2-removebg-preview.png', 2:'pet_wood_3-removebg-preview.png', 3:'pet_wood_4-removebg-preview.png', 4:'pet_wood_5_rb.png', 5:'pet_wood_9.png' };
+    var _woodHasRb   = { 0:true, 1:false, 2:false, 3:false, 4:true, 5:false };
     var woodImg = document.getElementById('pet-wood-img');
-    var hasRb = [1,5].indexOf(n) !== -1;
-    var woodSrc = hasRb ? rbSrc : origSrc;
+    var woodSrc = '/img/' + (_woodFileMap[stageIdx] || _woodFileMap[4]);
+    var hasRb = !!_woodHasRb[stageIdx];
     if (woodImg.getAttribute('data-src') !== woodSrc) {
       woodImg.setAttribute('data-src', woodSrc);
       if (hasRb) {
