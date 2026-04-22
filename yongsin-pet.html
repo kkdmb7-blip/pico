@@ -646,7 +646,7 @@ nav {
 <body>
 
 <nav>
-  <a href="/" class="nav-brand"><img src="img/goddess.png" alt="FORTUNA"><span>FORTUNA</span></a>
+  <a href="/" class="nav-brand"><img src="img/goddess/goddess.png" alt="FORTUNA"><span>FORTUNA</span></a>
   <button class="nav-back" onclick="history.back()">← 돌아가기</button>
 </nav>
 
@@ -677,19 +677,19 @@ nav {
     <div class="pet-stage" id="petStage">
       <!-- 각 원소별 캐릭터 -->
       <div class="pet-wood" id="pet-wood" style="display:none;">
-        <img id="pet-wood-img" src="/img/pet_wood_1.png" alt="목 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
+        <img id="pet-wood-img" src="/img/pet_wood/pet_wood_1_rb.png" alt="목 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
       </div>
 
       <div class="pet-fire" id="pet-fire" style="display:none;">
-        <img id="pet-fire-img" src="/img/pet_fire_1.png" alt="화 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
+        <img id="pet-fire-img" src="/img/pet_fire/pet_fire_1.png" alt="화 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
       </div>
 
       <div class="pet-earth" id="pet-earth" style="display:none;">
-        <img id="pet-earth-img" src="/img/pet_earth_1.png" alt="토 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
+        <img id="pet-earth-img" src="/img/pet_earth/pet_earth_1.png" alt="토 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
       </div>
 
       <div class="pet-metal" id="pet-metal" style="display:none;">
-        <img id="pet-metal-img" src="/img/pet_metal_1.png" alt="금 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
+        <img id="pet-metal-img" src="/img/pet_metal/pet_metal_1.png" alt="금 용신" style="width:130px;height:130px;object-fit:contain;" crossorigin="anonymous">
       </div>
 
       <div class="pet-water" id="pet-water" style="display:none;">
@@ -1129,7 +1129,7 @@ function render() {
 
   // 목(木) 이미지 단계별 교체
   if (state.element === 'wood') {
-    var _woodFileMap = { 0:'pet_wood_1_rb.png', 1:'pet_wood_2-removebg-preview.png', 2:'pet_wood_3-removebg-preview.png', 3:'pet_wood_4-removebg-preview.png', 4:'pet_wood_5_rb.png', 5:'pet_wood_9.png' };
+    var _woodFileMap = { 0:'pet_wood_1_rb.png', 1:'pet_wood_2.png', 2:'pet_wood_3.png', 3:'pet_wood_4.png', 4:'pet_wood_5.png', 5:'pet_wood_9.png' };
     var _woodHasRb   = { 0:true, 1:false, 2:false, 3:false, 4:true, 5:false };
     var woodImg = document.getElementById('pet-wood-img');
     var woodSrc = '/img/' + (_woodFileMap[stageIdx] || _woodFileMap[4]);
@@ -1147,7 +1147,7 @@ function render() {
   // 화(火) 이미지 단계별 교체
   if (state.element === 'fire') {
     var fn = stageIdx + 1;
-    var fireSrc = '/img/pet_fire_' + fn + '.png';
+    var fireSrc = '/img/pet_fire/pet_fire_' + fn + '.png';
     var fireImg = document.getElementById('pet-fire-img');
     if (fireImg.getAttribute('data-src') !== fireSrc) {
       fireImg.setAttribute('data-src', fireSrc);
@@ -1158,7 +1158,7 @@ function render() {
   // 토(土) 이미지 단계별 교체 (5단계 모두 있음)
   if (state.element === 'earth') {
     var en = stageIdx + 1;
-    var earthSrc = '/img/pet_earth_' + en + '.png';
+    var earthSrc = '/img/pet_earth/pet_earth_' + en + '.png';
     var earthImg = document.getElementById('pet-earth-img');
     if (earthImg && earthImg.getAttribute('data-src') !== earthSrc) {
       earthImg.setAttribute('data-src', earthSrc);
@@ -1169,7 +1169,7 @@ function render() {
   // 금(金) 이미지 단계별 교체 (2장: 1~2단계 각, 3~5단계는 2번 이미지)
   if (state.element === 'metal') {
     var mn = Math.min(stageIdx + 1, 2);
-    var metalSrc = '/img/pet_metal_' + mn + '.png';
+    var metalSrc = '/img/pet_metal/pet_metal_' + mn + '.png';
     var metalImg = document.getElementById('pet-metal-img');
     if (metalImg && metalImg.getAttribute('data-src') !== metalSrc) {
       metalImg.setAttribute('data-src', metalSrc);
@@ -1615,7 +1615,7 @@ function doMissionShare() {
       content: {
         title: '피코랩 용신 다마고치',
         description: '내 용신 오행을 캐릭터로 키워보세요!',
-        imageUrl: 'https://picolab.kr/img/goddess-app.png',
+        imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
         link: { mobileWebUrl: url, webUrl: url }
       },
       buttons: [{ title: '지금 키우러 가기', link: { mobileWebUrl: url, webUrl: url } }]

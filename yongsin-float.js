@@ -114,23 +114,23 @@
     var s = ELEM_STYLE[elem] || ELEM_STYLE.water;
     if (elem === 'wood') {
       var stageIdx = getPetStageIdx();
-      var _wfm = { 0:'pet_wood_1_rb.png', 1:'pet_wood_2-removebg-preview.png', 2:'pet_wood_3-removebg-preview.png', 3:'pet_wood_4-removebg-preview.png', 4:'pet_wood_5_rb.png', 5:'pet_wood_9.png' };
-      var src = IMG_BASE + '/img/' + (_wfm[stageIdx] || _wfm[4]);
+      var _wfm = { 0:'pet_wood_1_rb.png', 1:'pet_wood_2.png', 2:'pet_wood_3.png', 3:'pet_wood_4.png', 4:'pet_wood_5.png', 5:'pet_wood_9.png' };
+      var src = IMG_BASE + '/img/pet_wood/' + (_wfm[stageIdx] || _wfm[4]);
       var _imgSizes = [48, 52, 56, 61, 68, 76];
       var _sz = (_imgSizes[stageIdx] || 48) + 'px';
       return '<img src="' + src + '" alt="목 용신" style="width:'+_sz+';height:'+_sz+';object-fit:contain;" crossorigin="anonymous">';
     }
     if (elem === 'fire') {
       var fn = getPetStageIdx() + 1;
-      return '<img src="' + IMG_BASE + '/img/pet_fire_' + fn + '.png" alt="화 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
+      return '<img src="' + IMG_BASE + '/img/pet_fire/pet_fire_' + fn + '.png" alt="화 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
     }
     if (elem === 'earth') {
       var en = getPetStageIdx() + 1;
-      return '<img src="' + IMG_BASE + '/img/pet_earth_' + en + '.png" alt="토 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
+      return '<img src="' + IMG_BASE + '/img/pet_earth/pet_earth_' + en + '.png" alt="토 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
     }
     if (elem === 'metal') {
       var mn = Math.min(getPetStageIdx() + 1, 2);
-      return '<img src="' + IMG_BASE + '/img/pet_metal_' + mn + '.png" alt="금 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
+      return '<img src="' + IMG_BASE + '/img/pet_metal/pet_metal_' + mn + '.png" alt="금 용신" style="width:48px;height:48px;object-fit:contain;" crossorigin="anonymous">';
     }
     return `
       <svg width="40" height="50" viewBox="0 0 40 50" xmlns="http://www.w3.org/2000/svg">
@@ -427,7 +427,7 @@
     var _stIdx = getPetStageIdx();
     if (elem === 'wood' && _stIdx === 5) {
       var _wImg = pet.querySelector('img');
-      if (_wImg) removeBgFloat(IMG_BASE + '/img/pet_wood_9.png', _wImg);
+      if (_wImg) removeBgFloat(IMG_BASE + '/img/pet_wood/pet_wood_9.png', _wImg);
     }
 
     // 숨김 힌트

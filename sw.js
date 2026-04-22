@@ -6,8 +6,8 @@ self.addEventListener('push', function(e) {
   var title = data.title || '🔮 피코랩';
   var options = {
     body: data.body || '오늘의 운세 메시지가 도착했어요.',
-    icon: '/img/goddess.png',
-    badge: '/img/goddess-badge.png',
+    icon: '/img/goddess/goddess.png',
+    badge: '/img/goddess/goddess-badge.png',
     data: { url: data.url || 'https://picolab.kr' },
     vibrate: [200, 100, 200]
   };
