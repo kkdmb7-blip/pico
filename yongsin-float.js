@@ -253,8 +253,55 @@
   }
 
   // ── 클릭 콘텐츠 ──
-  var TAP_MODES = ['fortune', 'pet_status', 'yongsin_tip', 'lucky_draw'];
+  var TAP_MODES = ['fortune', 'ilji_msg', 'pet_status', 'yongsin_tip', 'lucky_draw'];
   var tapModeIdx = 0;
+
+  // ── 일진 개인화 메시지 (원소별) ──
+  var FLOAT_ILJI = {
+    good: {
+      wood: ['{na}, 오늘 목기운 넘쳐! 창의적인 일 다 잘 될 것 같아 🌿','{name}의 성장이 가속되는 날! 새로운 거 시작하기 딱이야 🌱','목기운 가득한 날이라 계획 세우고 실행하기 딱이야, {na}! 🌳','오늘 나무 에너지 활활! 뭐든 뿌리내리기 좋은 날이야 {na} 🍃'],
+      fire: ['{na}, 오늘 화기운 폭발이야! 열정 가득한 하루 될 거야 🔥','불꽃이 활활! {name} 오늘 앞에 나서기 딱이야 ✨','{na} 오늘 존재감 빛날 거야! 중요한 만남 오늘 해버려 🌟','화기운으로 오늘 뭐든 뜨겁게 태울 수 있어, {na}! 도전해봐 🔥'],
+      earth: ['{na}, 오늘 토기운 안정적이야! 중요한 결정 오늘 내려도 좋아 🪨','든든한 토기운 가득! {name} 오늘 믿음직스럽게 이루어져 🌾','{na} 오늘 안정감 넘치는 날! 뭐든 탄탄하게 굳어갈 거야 🌽','토기운 좋은 날이라 재물 관련 일 보기 딱이야, {na}! 🪨'],
+      metal: ['{na}, 오늘 금기운 번뜩여! 집중력 최상이니까 어려운 일 처리해버려 💎','쨍하고 맑은 금기운! {name} 오늘 날카로운 판단이 빛나는 날 ⚡','{na} 오늘 정확하고 빠른 결단! 계약·협상 오늘이 딱이야 🤍','금기운 넘치는 날! {name}의 분석력이 최고조야, 믿어봐 💎'],
+      water: ['{na}, 오늘 수기운이 흘러넘쳐! 직관이 예리한 날이야 💧','물처럼 유연하게 흐르는 날! {name} 오늘 감이 잘 맞을 거야 🌊','{na} 수기운 가득한 날이라 나 오늘 진짜 강해! 같이 빛나자 🫧','오늘 {name}의 직관을 믿어봐. 수기운이 열어주는 날이야 💧'],
+    },
+    bad: {
+      wood: ['{na}, 오늘 목기운이 약해... 새 시작은 내일로 미루자 🍂','나무도 폭풍엔 휘어지거든. {name} 오늘은 조용히 버티는 날이야 🌧️','오늘 창의력 안 나온다고 자책하지 마, {na}. 그냥 그런 날 있어 🌿','목기운 약한 날이라 무리해서 시작하면 흔들려. {na} 오늘은 쉬자 🍂'],
+      fire: ['{na}, 오늘 화기운이 꺼져가... 감정 소모 줄이는 게 좋아 🕯️','불씨 약한 날! {name} 오늘 충돌·논쟁은 피하는 게 나을 것 같아 🌫️','오늘 열정이 안 타오른다고 걱정 마, {na}. 그냥 쉬어가는 날이야 💤','화기운 빠진 날이라 흥분하거나 무리하면 더 지쳐. {na} 천천히 가자 🕯️'],
+      earth: ['{na}, 오늘 토기운이 흔들려... 중요한 계약·결정은 미루자 🪨','기반이 흔들리는 날. {name} 오늘은 조용히 중심 잡는 게 최선이야 🌾','오늘 불안하면 나한테 기대, {na}. 내가 옆에 있을게 🤲','토기운 약한 날이라 새 투자나 거래는 오늘 피해. {na} 기다려봐 🪨'],
+      metal: ['{na}, 오늘 금기운이 녹슬었어... 예민해지기 쉬운 날이니까 주의해 💔','날이 안 서는 날. {name} 오늘 급한 판단보다는 관찰하는 날로 ⛅','{na} 오늘 결정력이 흐릿해. 급하지 않으면 내일 해도 돼 🤍','금기운 약한 날이라 감정적 충돌 조심해, {na}. 오늘 말 아끼자 💎'],
+      water: ['{na}, 오늘 수기운이 탁해... 감정 기복 조심하고 마음 정돈해 🌊','흐름이 막힌 날. {name} 오늘은 억지로 밀어붙이지 마 🌧️','오늘 나도 좀 쳐져있어, {na}... 같이 조용히 있자 💧','수기운 흐린 날이라 직관이 흐릿할 수 있어. {na} 충동 결정 주의 🌊'],
+    },
+    normal: {
+      wood: ['{na}, 오늘 목기운 무난해. 꾸준히 하면 충분해 🌱','평범한 목기운의 날! {name} 그냥 루틴대로 가면 돼 🌿','{na} 특별히 강하지도 약하지도 않아. 오늘 차분하게 가자 🌳'],
+      fire: ['{na}, 오늘 화기운 안정적. 무리만 안 하면 괜찮은 날이야 🕯️','잔잔한 불꽃 같은 날! {name} 평소대로 하면 돼 ✨','{na} 오늘 에너지 보통. 집중력 유지하면서 한 가지씩 해봐 🔥'],
+      earth: ['{na}, 오늘 토기운 무난해. 편하게 보내도 좋아 🌾','안정적인 보통 날! {name} 뭐든 차분하게 하면 돼 🪨','{na} 오늘 흔들림 없이 조용한 날. 내실 다지기 딱이야 🌽'],
+      metal: ['{na}, 오늘 금기운 평범해. 급한 것만 챙기면 충분해 💎','그럭저럭 괜찮은 날! {name} 무리 없이 보내자 ⚡','{na} 오늘 집중력 보통. 한 번에 하나씩 처리하면 돼 🤍'],
+      water: ['{na}, 오늘 수기운 잔잔해. 흐름 타면서 편하게 가자 💧','평온한 물결 같은 날! {name} 오늘은 천천히 가도 돼 🌊','{na} 오늘 감 보통. 직관에 너무 의존하지 말고 차분하게 🫧'],
+    },
+  };
+  function floatIljiGrade() {
+    try { var s = parseInt(localStorage.getItem('pico_today_score')||'0',10); if(s>=70) return 'good'; if(s>=1&&s<=40) return 'bad'; } catch(e) {}
+    return 'normal';
+  }
+  function floatFillMsg(tpl) {
+    var name = getOwnerName();
+    if (name) {
+      var code = name.charCodeAt(name.length-1);
+      var na = name + (((code-0xAC00)%28!==0&&code>=0xAC00)?'아':'야');
+      tpl = tpl.replace(/\{na\}/g, na).replace(/\{name\}/g, name);
+    } else {
+      tpl = tpl.replace(/^\{na\},?\s*/g,'').replace(/,?\s*\{na\}/g,'').replace(/\{name\}의\s*/g,'').replace(/\{name\}\s*/g,'');
+    }
+    return tpl.replace(/\s{2,}/g,' ').trim();
+  }
+  function showIljiMsg() {
+    var grade = floatIljiGrade();
+    var el = getElement() || 'water';
+    var pool = FLOAT_ILJI[grade];
+    var msgs = pool[el] || pool.water;
+    showBubble(floatFillMsg(msgs[Math.floor(Math.random()*msgs.length)]), 0);
+  }
 
   var ELEM_TIPS = {
     wood:  ['초록색 옷이 오늘 행운을 불러요 🌿', '동쪽 방향이 유리해요 🧭', '나무 소재 물건이 좋아요 🪵', '채소 먹으면 기운 올라요 🥗', '오전에 중요한 일 처리해요 ☀️'],
@@ -384,6 +431,7 @@
         var text = (data.keyword ? '✦ ' + data.keyword + '\n' : '') + data.advice + (data.lucky ? '\n🍀 ' + data.lucky : '');
         showBubble(text, 0);
       });
+    } else if (mode === 'ilji_msg')   { showIljiMsg();
     } else if (mode === 'pet_status') { showPetStatus();
     } else if (mode === 'yongsin_tip') { showYongsinTip();
     } else if (mode === 'lucky_draw')  { showLuckyDraw(); }
