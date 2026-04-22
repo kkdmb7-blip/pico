@@ -912,39 +912,119 @@ function removeBgAndApply(src, imgEl) {
 }
 function expNeeded(lv) { return lv * lv * 100; } // 레벨²×100 (Lv1=100, Lv3=900, Lv5=2500...)
 
-// ── 일진 반응 문구 ──
+// ── 이름 치환 헬퍼 ──
+function getPetOwnerName() {
+  try { var p = JSON.parse(localStorage.getItem('pico_profile')); if (p && p.name) return p.name; } catch(e) {}
+  return null;
+}
+function fillMsg(tpl) {
+  var name = getPetOwnerName();
+  var lv = state ? (state.level || 1) : 1;
+  if (name) {
+    var code = name.charCodeAt(name.length - 1);
+    var hasJong = code >= 0xAC00 && ((code - 0xAC00) % 28 !== 0);
+    var na = name + (hasJong ? '아' : '야');
+    tpl = tpl.replace(/\{na\}/g, na).replace(/\{name\}/g, name);
+  } else {
+    tpl = tpl.replace(/^\{na\},?\s*/g, '').replace(/,?\s*\{na\}/g, '')
+             .replace(/\{name\}의\s*/g, '').replace(/\{name\}\s*/g, '');
+  }
+  return tpl.replace(/\{lv\}/g, lv).replace(/\s{2,}/g, ' ').trim();
+}
+
+// ── 일진 반응 문구 (원소별 개인화) ──
 var ILJI_MESSAGES = {
-  good: [
-    '오늘 나 완전 텐션 최고야! 뭐든 잘 될 것 같은 느낌?',
-    '오늘은 내가 너한테 행운 나눠줄 수 있어! 나 따라다녀~',
-    '오늘 용신 들어오는 날! 중요한 일 오늘 다 해치워버려!',
-    '기분이 너무 좋아서 날아갈 것 같아 🌟',
-    '오늘 나 엄청 강해! 무서운 거 없음!',
-    '이런 날 집에만 있으면 아까워~ 나가서 뭔가 해봐!',
-    '오늘 운이 나한테 몰려있어. 같이 있어줄게!',
-    '오늘 하루 뭘 해도 잘 풀릴 것 같은 느낌적인 느낌!',
-    '용신 들어온 날이라 나 지금 빛나고 있지 않아?',
-    '오늘 결정 내려야 할 거 있으면 지금이 딱이야!',
-  ],
-  bad: [
-    '오늘은 나 좀 힘을 못 써... 조용히 있어줄게',
-    '오늘 괜히 무리하지 마. 나도 좀 쉬고 싶어...',
-    '흉신 들어온 날이라 살짝 조심하는 게 좋을 것 같아',
-    '오늘은 중요한 결정 미루는 게 나을 것 같아...',
-    '나 오늘 기운이 좀 빠져. 같이 누워있자',
-    '오늘 괜히 새로운 거 시작하지 말고 기다려봐',
-    '흉신 날이라고 너무 걱정하진 마. 그냥 조심하면 돼',
-    '오늘 나 힘들어... 그래도 옆에 있어줄게',
-    '오늘은 조용히 충전하는 날로 보내자',
-    '내일은 더 좋아질 거야. 오늘은 그냥 쉬어가자',
-  ],
-  normal: [
-    '오늘은 그냥 평범한 날! 그래도 나 여기 있어~',
-    '오늘 특별히 좋지도 나쁘지도 않은 날이야. 안정적이지!',
-    '평범한 날도 소중해. 오늘 하루도 잘 부탁해!',
-    '오늘은 무난하게 보내면 딱 좋을 것 같아',
-    '그냥 보통 날이야. 뭐든 무리만 안 하면 돼!',
-  ],
+  good: {
+    wood: [
+      '{na}, 오늘 목기운 넘쳐! 창의적인 아이디어 다 잘 될 것 같아 🌿',
+      '{name}의 성장이 가속되는 날! 새로운 거 시작하기 딱이야 🌱',
+      '목기운 가득한 날이라 계획 세우고 실행하기 딱이야, {na}! 🌳',
+      '오늘 나무 에너지 활활! 뭐든 뿌리내리기 좋은 날이야 {na} 🍃',
+    ],
+    fire: [
+      '{na}, 오늘 화기운 폭발이야! 열정 가득한 하루 될 거야 🔥',
+      '불꽃이 활활! {name} 오늘 앞에 나서기 딱이야 ✨',
+      '{na} 오늘 존재감 빛날 거야! 중요한 만남이나 발표 오늘 해버려 🌟',
+      '화기운으로 오늘 뭐든 뜨겁게 태울 수 있어, {na}! 도전해봐 🔥',
+    ],
+    earth: [
+      '{na}, 오늘 토기운 안정적이야! 중요한 결정 오늘 내려도 좋아 🪨',
+      '든든한 토기운 가득! {name} 오늘 믿음직스럽게 이루어져 🌾',
+      '{na} 오늘 안정감이 넘치는 날! 뭐든 탄탄하게 굳어갈 거야 🌽',
+      '토기운 좋은 날이라 재물·실물 관련 일 보기 딱이야, {na}! 🪨',
+    ],
+    metal: [
+      '{na}, 오늘 금기운 번뜩여! 집중력 최상이니까 어려운 일 처리해버려 💎',
+      '쨍하고 맑은 금기운! {name} 오늘 날카로운 판단이 빛나는 날 ⚡',
+      '{na} 오늘 정확하고 빠른 결단! 계약·협상 오늘이 딱이야 🤍',
+      '금기운 넘치는 날! {name}의 분석력이 최고조야, 믿어봐 💎',
+    ],
+    water: [
+      '{na}, 오늘 수기운이 흘러넘쳐! 직관이 예리한 날이야 💧',
+      '물처럼 유연하게 흐르는 날! {name} 오늘 감이 잘 맞을 거야 🌊',
+      '{na} 수기운 가득한 날이라 나 오늘 진짜 강해! 같이 빛나자 🫧',
+      '오늘 {name}의 직관을 믿어봐. 수기운이 열어주는 날이야 💧',
+    ],
+  },
+  bad: {
+    wood: [
+      '{na}, 오늘 목기운이 약해... 새 시작은 내일로 미루자 🍂',
+      '나무도 폭풍엔 휘어지거든. {name} 오늘은 조용히 버티는 날이야 🌧️',
+      '오늘 창의력 안 나온다고 자책하지 마, {na}. 그냥 그런 날 있어 🌿',
+      '목기운 약한 날이라 무리해서 시작하면 흔들려. {na} 오늘은 쉬자 🍂',
+    ],
+    fire: [
+      '{na}, 오늘 화기운이 꺼져가... 감정 소모 줄이는 게 좋아 🕯️',
+      '불씨 약한 날! {name} 오늘 충돌·논쟁은 피하는 게 나을 것 같아 🌫️',
+      '오늘 열정이 안 타오른다고 걱정 마, {na}. 그냥 쉬어가는 날이야 💤',
+      '화기운 빠진 날이라 흥분하거나 무리하면 더 지쳐. {na} 천천히 가자 🕯️',
+    ],
+    earth: [
+      '{na}, 오늘 토기운이 흔들려... 중요한 계약·결정은 미루자 🪨',
+      '기반이 흔들리는 날. {name} 오늘은 조용히 중심 잡는 게 최선이야 🌾',
+      '오늘 불안하면 나한테 기대, {na}. 내가 옆에 있을게 🤲',
+      '토기운 약한 날이라 새 투자나 거래는 오늘 피해. {na} 기다려봐 🪨',
+    ],
+    metal: [
+      '{na}, 오늘 금기운이 녹슬었어... 예민해지기 쉬운 날이니까 주의해 💔',
+      '날이 안 서는 날. {name} 오늘 급한 판단보다는 관찰하는 날로 ⛅',
+      '{na} 오늘 결정력이 흐릿해. 급하지 않으면 내일 해도 돼 🤍',
+      '금기운 약한 날이라 감정적 충돌 조심해, {na}. 오늘 말 아끼자 💎',
+    ],
+    water: [
+      '{na}, 오늘 수기운이 탁해... 감정 기복 조심하고 마음 정돈해 🌊',
+      '흐름이 막힌 날. {name} 오늘은 억지로 밀어붙이지 마 🌧️',
+      '오늘 나도 좀 쳐져있어, {na}... 같이 조용히 있자 💧',
+      '수기운 흐린 날이라 직관이 흐릿할 수 있어. {na} 충동 결정 주의 🌊',
+    ],
+  },
+  normal: {
+    wood: [
+      '{na}, 오늘 목기운 무난해. 꾸준히 하면 충분해 🌱',
+      '평범한 목기운의 날! {name} 그냥 루틴대로 가면 돼 🌿',
+      '{na} 특별히 강하지도 약하지도 않아. 오늘 차분하게 가자 🌳',
+    ],
+    fire: [
+      '{na}, 오늘 화기운 안정적. 무리만 안 하면 괜찮은 날이야 🕯️',
+      '잔잔한 불꽃 같은 날! {name} 평소대로 하면 돼 ✨',
+      '{na} 오늘 에너지 보통. 집중력 유지하면서 한 가지씩 해봐 🔥',
+    ],
+    earth: [
+      '{na}, 오늘 토기운 무난해. 편하게 보내도 좋아 🌾',
+      '안정적인 보통 날! {name} 뭐든 차분하게 하면 돼 🪨',
+      '{na} 오늘 흔들림 없이 조용한 날. 내실 다지기 딱이야 🌽',
+    ],
+    metal: [
+      '{na}, 오늘 금기운 평범해. 급한 것만 챙기면 충분해 💎',
+      '그럭저럭 괜찮은 날! {name} 무리 없이 보내자 ⚡',
+      '{na} 오늘 집중력 보통. 한 번에 하나씩 처리하면 돼 🤍',
+    ],
+    water: [
+      '{na}, 오늘 수기운 잔잔해. 흐름 타면서 편하게 가자 💧',
+      '평온한 물결 같은 날! {name} 오늘은 천천히 가도 돼 🌊',
+      '{na} 오늘 감 보통. 직관에 너무 의존하지 말고 차분하게 🫧',
+    ],
+  },
 };
 function getIljiGrade() {
   try {
@@ -955,17 +1035,15 @@ function getIljiGrade() {
   return 'normal';
 }
 function getIljiMsg() {
-  var msgs = ILJI_MESSAGES[getIljiGrade()];
-  return msgs[Math.floor(Math.random() * msgs.length)];
+  var grade = getIljiGrade();
+  var el = (state && state.element) ? state.element : null;
+  var pool = ILJI_MESSAGES[grade];
+  var msgs = (el && pool[el]) ? pool[el] : (pool.wood || []); // fallback
+  return fillMsg(msgs[Math.floor(Math.random() * msgs.length)]);
 }
 
 var MESSAGES = {
-  wood:  ['나무처럼 천천히, 하지만 깊게 뿌리내릴게요 🌱','목기운이 강해졌어요! 창의력이 넘치는 날이에요 🌿','오늘 청록색을 가까이 하면 좋아요 🍃'],
-  fire:  ['오늘 활활 타오르고 싶어요! 🔥','화기운으로 열정적인 하루가 될 거예요 ✨','빨간색 소품이 행운을 불러요 🌹'],
-  earth: ['든든하게 옆에 있을게요 🪨','토기운으로 안정적인 하루예요. 천천히 해도 돼요 🌾','노란색·갈색 음식이 좋아요 🌽'],
-  metal: ['번뜩이는 아이디어가 떠오를 거예요 💎','금기운으로 집중력이 최고예요 ⚡','흰색·은색이 오늘의 행운색이에요 🤍'],
-  water: ['흐르는 물처럼 유연하게 💧','수기운으로 직관이 예리해졌어요 🌊','검정색·파란색이 오늘 도움돼요 🫧'],
-  hungry:['배고파요... 밥 주세요 😢','꼬르륵... 밥이 필요해요 🙏','조금만 먹여주시면 안 될까요...'],
+  hungry:['배고파요... {na} 밥 좀 줘요 😢', '꼬르륵... {name}! 밥이 필요해요 🙏', '{na} 조금만 먹여주면 안 될까요...', '진짜 너무 배고파... {na} 제발요 😭'],
   happy: ['너무 행복해요! 고마워요 🥰','행복지수 최고! 오늘 운이 좋아요 💕','함께라서 좋아요 ✨'],
   sleep: ['Zzz... 잘 자고 있어요 😴','꿈에서 용신의 기운을 채우고 있어요 🌙','푹 자고 나면 더 강해질 거예요 💤'],
   orb:   ['특훈 효과가 나타나고 있어요! ⭐','강해지는 게 느껴져요! 고마워요 🌟','특훈으로 용신 기운이 올랐어요 ✦'],
@@ -1276,7 +1354,7 @@ function render() {
     var sd = document.getElementById('sleepDesc'); if(sd) sd.textContent = '깨우면 EXP 지급';
   } else {
     document.getElementById('zzzContainer').style.display = 'none';
-    if (state.hunger < 30) msg = MESSAGES.hungry[Math.floor(Math.random()*MESSAGES.hungry.length)];
+    if (state.hunger < 30) msg = fillMsg(MESSAGES.hungry[Math.floor(Math.random()*MESSAGES.hungry.length)]);
     else msg = getIljiMsg();
     var si = document.getElementById('sleepIcon'); if(si) si.textContent = '🌙';
     var sl = document.getElementById('sleepLabel'); if(sl) sl.textContent = '재우기';
@@ -1843,7 +1921,7 @@ checkLuckyBonus();
 document.getElementById('petMessage').addEventListener('click', function() {
   if (!state.element || state.sleeping) return;
   if (state.hunger < 30) return;
-  document.getElementById('petMessage').textContent = getIljiMsg();
+  document.getElementById('petMessage').textContent = getIljiMsg(); // fillMsg 이미 내부 적용
 });
 
 if (state.element) {
