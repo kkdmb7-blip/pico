@@ -1427,6 +1427,8 @@ function renderSajuTeaser(data) {
 
 // ── 사주 공유 카드 ──────────────────────────────────
 var _sajuCanvas = null;
+var _sajuStoryCanvas = null;
+var _sajuCardMode = 'story'; // 'compact' | 'story'
 var _sajuData = null;
 
 function openSajuShareCard(cb) {
@@ -1635,45 +1637,317 @@ function openSajuShareCard(cb) {
   });
 }
 
+// ── 9:16 스토리 카드 ──────────────────────────────────
+function openSajuStoryCard(cb) {
+  if (!_sajuData) { if(cb) cb(null); return; }
+  _sajuStoryCanvas = null;
+  var d = _sajuData;
+  var pk = ['hour','day','month','year'];
+  var LABELS = ['시주','일주','월주','년주'];
+  var EL_BG_D = { 목:'#1a6e35', 화:'#a92a1f', 토:'#8a6510', 금:'#5a6472', 수:'#1a3e6e' };
+  var EL_GLOW = { 목:'rgba(26,110,53,0.32)', 화:'rgba(169,42,31,0.32)', 토:'rgba(138,101,16,0.32)', 금:'rgba(90,100,114,0.32)', 수:'rgba(26,62,110,0.32)' };
+
+  var pls = pk.map(function(k) {
+    var str = d.summary.pillars[k] || '';
+    var si = STEMS.indexOf(str[0]);
+    var bi = BRANCHES.indexOf(str[1]);
+    return { si: si, bi: bi, sEl: STEM_EL[si] || '수', bEl: BRANCH_EL[bi] || '수' };
+  });
+
+  var dayPillarStr = d.summary.pillars.day || '';
+  var daySi = STEMS.indexOf(dayPillarStr[0]);
+  var dayEl = STEM_EL[daySi] || '수';
+  var dayHanja = STEM_H[daySi] || '?';
+  var dayKor = STEMS[daySi] || '';
+
+  var fc = d.five_count || {};
+  var fp = d.five_pct || {};
+  var elKeys = ['목','화','토','금','수'];
+  var elEngKeys = ['wood','fire','earth','metal','water'];
+  var elCols = ['#2d9e55','#d44030','#c49a20','#7a8898','#2b5ea8'];
+
+  var EN_EL = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
+  var ysStr = d.yongshin ? (EN_EL[d.yongshin.primary] || d.yongshin.primary || '') : '';
+
+  var rel = d.branch_relations_kor || {};
+  var allTags = [
+    ...(rel.harmonies   ||[]).map(function(s){return{t:s,c:'#fff',bg:'rgba(0,160,70,0.75)',bd:'rgba(0,130,55,0.9)'};}),
+    ...(rel.clashes     ||[]).map(function(s){return{t:s,c:'#fff',bg:'rgba(190,40,40,0.75)',bd:'rgba(160,20,20,0.9)'};}),
+    ...(rel.punishments ||[]).map(function(s){return{t:s,c:'#fff',bg:'rgba(170,110,0,0.75)',bd:'rgba(140,85,0,0.9)'};}),
+    ...(rel.harms       ||[]).map(function(s){return{t:s,c:'#fff',bg:'rgba(30,90,170,0.75)',bd:'rgba(20,70,140,0.9)'};}),
+    ...(rel.breaks      ||[]).map(function(s){return{t:s,c:'#fff',bg:'rgba(80,75,70,0.75)',bd:'rgba(60,55,50,0.9)'};})
+  ];
+
+  document.fonts.ready.then(function() {
+    var SC = 2;
+    var W = 400;
+    var H = Math.round(W * 16 / 9); // 711
+    var PAD = 22;
+    var HBOX = 44;
+    var COL_GAP = 6;
+    var colW = Math.floor((W - PAD*2 - COL_GAP*3) / 4);
+    var PILLAR_H = 8 + 14 + HBOX + 6 + HBOX + 6;
+
+    var cv = document.createElement('canvas');
+    cv.width = W * SC;
+    cv.height = H * SC;
+    var ctx = cv.getContext('2d');
+    ctx.scale(SC, SC);
+
+    function rr(x,y,w,h,r){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);
+      ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+      ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+      ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+      ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+      ctx.closePath();
+    }
+
+    // 배경
+    var grd = ctx.createLinearGradient(0, 0, 0, H);
+    grd.addColorStop(0, '#12082a');
+    grd.addColorStop(0.5, '#0c1525');
+    grd.addColorStop(1, '#0a1020');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    // 별빛 점
+    [[55,38,1.1],[318,52,0.8],[175,28,1.4],[290,130,0.7],[35,200,0.9],[370,420,1.0],[90,680,1.2],[340,695,0.8],[210,705,1.3]].forEach(function(s){
+      ctx.beginPath(); ctx.arc(s[0],s[1],s[2],0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
+    });
+
+    var y = PAD;
+
+    // ── 헤더 ──
+    ctx.fillStyle = '#d4a843';
+    ctx.font = 'bold 11px "Noto Sans KR"';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('● F O R T U N A', W/2, y+14);
+    ctx.strokeStyle = 'rgba(212,168,67,0.25)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(PAD,y+26); ctx.lineTo(W-PAD,y+26); ctx.stroke();
+    ctx.fillStyle = 'rgba(212,168,67,0.55)';
+    ctx.font = '9px "Noto Sans KR"';
+    ctx.fillText('나의 사주 원국', W/2, y+40);
+    y += 56;
+
+    // ── 일간 대형 쇼케이스 ──
+    var glowGrd = ctx.createRadialGradient(W/2, y+54, 8, W/2, y+54, 80);
+    glowGrd.addColorStop(0, EL_GLOW[dayEl]||'rgba(100,100,100,0.18)');
+    glowGrd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glowGrd;
+    ctx.fillRect(W/2-80, y, 160, 110);
+
+    ctx.beginPath(); ctx.arc(W/2, y+52, 42, 0, Math.PI*2);
+    ctx.fillStyle = EL_BG_D[dayEl]||'#333'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 50px "Noto Serif KR"';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(dayHanja, W/2, y+52);
+
+    ctx.fillStyle = 'rgba(212,168,67,0.80)';
+    ctx.font = '9px "Noto Sans KR"';
+    ctx.fillText('일간 · ' + dayEl + '(' + dayKor + ')', W/2, y+104);
+    y += 118;
+
+    y += 12;
+
+    // ── 프로필 ──
+    var name = pName || '이름 미입력';
+    ctx.fillStyle = '#f0e6d2';
+    ctx.font = 'bold 18px "Noto Sans KR"';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(name, PAD, y+10);
+    var byear = parseInt((pBirth||'2000-01-01').split('-')[0]);
+    ctx.font = 'bold 14px "Noto Sans KR"';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(240,230,210,0.65)';
+    ctx.fillText((new Date().getFullYear()-byear+1)+'세', W-PAD, y+10);
+    ctx.fillStyle = 'rgba(240,230,210,0.45)';
+    ctx.font = '10px "Noto Sans KR"';
+    ctx.textAlign = 'left';
+    ctx.fillText('양력 '+(pBirth||'')+'  ·  '+pHour+'시 '+(pMinute||0)+'분  ·  '+(pGender==='male'?'남성':'여성'), PAD, y+27);
+    var badges = [(d.summary.zodiac||'')+'띠', d.summary.strength||''].filter(function(s){return s && s!=='띠';});
+    var bx = PAD;
+    ctx.font = '9px "Noto Sans KR"';
+    badges.forEach(function(txt){
+      var tw = ctx.measureText(txt).width + 12;
+      ctx.fillStyle = 'rgba(212,168,67,0.14)'; ctx.strokeStyle = 'rgba(212,168,67,0.38)'; ctx.lineWidth = 0.5;
+      rr(bx, y+38, tw, 17, 8); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = 'rgba(212,168,67,0.85)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(txt, bx+tw/2, y+46); bx += tw+5;
+    });
+    y += 62;
+
+    y += 12;
+
+    // ── 4주 ──
+    pls.forEach(function(pl, i){
+      var cx = PAD + i*(colW+COL_GAP);
+      var isDay = (i===1);
+      ctx.fillStyle = isDay ? 'rgba(212,168,67,0.09)' : 'rgba(255,255,255,0.035)';
+      ctx.strokeStyle = isDay ? 'rgba(212,168,67,0.5)' : 'rgba(255,255,255,0.09)';
+      ctx.lineWidth = isDay ? 1 : 0.5;
+      rr(cx, y, colW, PILLAR_H, 8); ctx.fill(); ctx.stroke();
+      var mx = cx + colW/2;
+      var iy = y + 8;
+      ctx.fillStyle = 'rgba(240,230,210,0.55)';
+      ctx.font = '9px "Noto Sans KR"'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(LABELS[i], mx, iy+7); iy += 14;
+      var hx = mx - HBOX/2;
+      ctx.fillStyle = EL_BG_D[pl.sEl]||'#333';
+      rr(hx, iy, HBOX, HBOX, 6); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 22px "Noto Serif KR"';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(STEM_H[pl.si]||'?', mx, iy+HBOX/2); iy += HBOX+6;
+      ctx.fillStyle = EL_BG_D[pl.bEl]||'#333';
+      rr(hx, iy, HBOX, HBOX, 6); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 22px "Noto Serif KR"';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(BRANCH_H[pl.bi]||'?', mx, iy+HBOX/2);
+    });
+    y += PILLAR_H;
+
+    y += 14;
+
+    // ── 오행 분포 ──
+    ctx.fillStyle = 'rgba(240,230,210,0.50)';
+    ctx.font = '9px "Noto Sans KR"'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('오행 분포', PAD, y+8);
+    if (ysStr) {
+      var ysColD = EL_BG_D[ysStr]||'#555';
+      ctx.font = '9px "Noto Sans KR"';
+      var ysW = ctx.measureText('용신 ' + ysStr).width + 14;
+      ctx.fillStyle = ysColD;
+      rr(W-PAD-ysW, y+1, ysW, 15, 7); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('용신 '+ysStr, W-PAD-ysW/2, y+8);
+    }
+    y += 18;
+
+    var barMaxW = W - PAD*2;
+    var barH = 9, barGap = 5;
+    elKeys.forEach(function(el, i){
+      var eng = elEngKeys[i];
+      var pct = fp[eng] || 0;
+      ctx.fillStyle = elCols[i];
+      ctx.font = 'bold 9px "Noto Sans KR"'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(el, PAD, y + i*(barH+barGap) + barH/2);
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      rr(PAD+14, y + i*(barH+barGap), barMaxW-14-28, barH, barH/2); ctx.fill();
+      var barW = Math.max(0, (barMaxW-14-28) * pct / 100);
+      if (barW > 0) { ctx.fillStyle = elCols[i]; rr(PAD+14, y + i*(barH+barGap), barW, barH, barH/2); ctx.fill(); }
+      ctx.fillStyle = 'rgba(240,230,210,0.50)';
+      ctx.font = '9px "Noto Sans KR"'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillText(Math.round(pct)+'%', W-PAD, y + i*(barH+barGap) + barH/2);
+    });
+    y += elKeys.length * (barH+barGap) + 6;
+
+    // ── 형충회합 태그 ──
+    if (allTags.length > 0) {
+      y += 12;
+      var TAG_H2 = 19, TAG_PX2 = 7, TAG_GAP2 = 4;
+      ctx.font = '10px "Noto Sans KR"';
+      var tx = PAD, ty = y;
+      allTags.forEach(function(tag){
+        var tw = ctx.measureText(tag.t).width + TAG_PX2*2;
+        if(tx+tw > W-PAD && tx > PAD){ tx=PAD; ty+=TAG_H2+TAG_GAP2; }
+        ctx.fillStyle = tag.bg; ctx.strokeStyle = tag.bd; ctx.lineWidth = 0.5;
+        rr(tx, ty, tw, TAG_H2, 9); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = tag.c; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(tag.t, tx+tw/2, ty+TAG_H2/2); tx += tw+TAG_GAP2;
+      });
+      y = ty + TAG_H2;
+    }
+
+    // ── 푸터 (항상 하단에 고정) ──
+    var footerY = H - PAD - 14;
+    ctx.strokeStyle = 'rgba(212,168,67,0.20)'; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(PAD, footerY-10); ctx.lineTo(W-PAD, footerY-10); ctx.stroke();
+    ctx.fillStyle = 'rgba(212,168,67,0.55)';
+    ctx.font = '10px "Noto Sans KR"'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('picolab.kr에서 무료로 확인하세요', W/2, footerY);
+
+    _sajuStoryCanvas = cv;
+    if (cb) cb(cv);
+  }).catch(function(e){ console.error('스토리카드 생성 실패:', e); if(cb) cb(null); });
+}
+
 function closeSajuShareModal() {
   document.getElementById('sajuShareModal').style.display = 'none';
   document.removeEventListener('keydown', _sajuEsc);
 }
 function _sajuEsc(e) { if (e.key === 'Escape') closeSajuShareModal(); }
 
+function _getActiveCanvas() {
+  return _sajuCardMode === 'compact' ? _sajuCanvas : _sajuStoryCanvas;
+}
+
 function downloadSajuCard() {
-  if (!_sajuCanvas) return;
-  _sajuCanvas.toBlob(function(blob) {
+  var cv = _getActiveCanvas();
+  if (!cv) return;
+  cv.toBlob(function(blob) {
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a'); a.download = 'fortuna_saju.png'; a.href = url; a.click();
     setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
   }, 'image/png');
 }
 
+function _sajuLoadCard(mode) {
+  _sajuCardMode = mode;
+  var preview = document.getElementById('sajuPreviewArea');
+  // 탭 스타일 업데이트
+  var tabStory   = document.getElementById('sajuTabStory');
+  var tabCompact = document.getElementById('sajuTabCompact');
+  if (tabStory)   tabStory.style.cssText   = mode==='story'   ? _sajuTabActiveStyle() : _sajuTabInactiveStyle();
+  if (tabCompact) tabCompact.style.cssText = mode==='compact' ? _sajuTabActiveStyle() : _sajuTabInactiveStyle();
+
+  var cached = _getActiveCanvas();
+  if (cached) {
+    _sajuShowPreview(cached);
+    return;
+  }
+  preview.innerHTML = '<div style="padding:40px 0;text-align:center;color:rgba(74,58,42,0.6);font-family:\'Noto Sans KR\',sans-serif;">카드 생성 중…</div>';
+  var cb = function(cv) {
+    if (!cv) { preview.innerHTML = '<div style="color:#b01a1a;padding:20px;text-align:center;">카드 생성 실패</div>'; return; }
+    _sajuShowPreview(cv);
+  };
+  if (mode === 'compact') { openSajuShareCard(cb); } else { openSajuStoryCard(cb); }
+}
+
+function _sajuShowPreview(cv) {
+  var preview = document.getElementById('sajuPreviewArea');
+  var img = new Image();
+  img.src = cv.toDataURL('image/png');
+  img.style.cssText = _sajuCardMode === 'story'
+    ? 'width:55%;max-width:260px;border-radius:16px;display:block;margin:0 auto;box-shadow:0 8px 32px rgba(0,0,0,0.35);'
+    : 'width:100%;border-radius:12px;display:block;';
+  preview.innerHTML = ''; preview.appendChild(img);
+}
+
+function _sajuTabActiveStyle()   { return 'flex:1;padding:8px 0;border:none;border-radius:8px;background:#7a2418;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:\'Pretendard Variable\',Pretendard,-apple-system,\'Noto Sans KR\',sans-serif;'; }
+function _sajuTabInactiveStyle() { return 'flex:1;padding:8px 0;border:none;border-radius:8px;background:rgba(80,55,30,0.10);color:rgba(74,58,42,0.65);font-size:12px;font-weight:600;cursor:pointer;font-family:\'Pretendard Variable\',Pretendard,-apple-system,\'Noto Sans KR\',sans-serif;'; }
+
 function shareSajuKakao() {
   var btn = document.getElementById('sajuShareBtn');
-  if (btn) { btn.textContent = '⏳ 생성 중...'; btn.disabled = true; }
+  if (btn) { btn.innerHTML = '⏳ 생성 중...'; btn.disabled = true; }
   var modal = document.getElementById('sajuShareModal');
-  var preview = document.getElementById('sajuPreviewArea');
-  preview.innerHTML = '<div style="color:rgba(74,58,42,0.65);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
   modal.style.display = 'flex';
-
   function resetBtn() { if (btn) { btn.innerHTML = '<i class="pi pi-crystal"></i> 카카오톡 공유'; btn.disabled = false; } }
-
-  var cb = function(cv) {
-    resetBtn();
-    if (!cv) { preview.innerHTML = '<div style="color:#b01a1a;font-family:\'Noto Sans KR\',sans-serif;padding:20px;">카드 생성 실패 <i class="pi pi-sad"></i></div>'; return; }
-    _sajuCanvas = cv;
-    var img = new Image();
-    img.src = cv.toDataURL('image/png');
-    img.style.cssText = 'width:100%;border-radius:12px;display:block;';
-    preview.innerHTML = ''; preview.appendChild(img);
-  };
-  if (_sajuCanvas) { cb(_sajuCanvas); } else { openSajuShareCard(cb); }
+  _sajuCardMode = 'story';
+  _sajuStoryCanvas = null;
+  _sajuLoadCard('story');
+  resetBtn();
 }
 
 function doSajuShare() {
-  if (!_sajuCanvas) return;
+  var cv = _getActiveCanvas();
+  if (!cv) return;
   var d = _sajuData || {};
   var dayPillar = (d.summary && d.summary.pillars && d.summary.pillars.day) || '';
   var EN_EL_MAP = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
@@ -1682,7 +1956,7 @@ function doSajuShare() {
   var text = '🔮 FORTUNA 사주 분석\n일주: '+dayPillar+(yongshin?' · 용신: '+yongshin:'')+(d.summary&&d.summary.strength?' · '+d.summary.strength:'')+'\n\n나도 확인해봐 👇\n'+pageUrl;
   try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
   var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  _sajuCanvas.toBlob(function(blob) {
+  cv.toBlob(function(blob) {
     var file = new File([blob], 'fortuna_saju.png', { type: 'image/png' });
     if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       navigator.share({ files: [file], text: text }).catch(function(){});
@@ -1691,10 +1965,14 @@ function doSajuShare() {
     } else if (window.Kakao && Kakao.Share) {
       if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
       Kakao.Share.sendDefault({
-        objectType: 'text',
-        text: text,
-        link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
-        buttons: [{ title: '무료로 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+        objectType: 'feed',
+        content: {
+          title: 'FORTUNA 사주 분석',
+          description: '일주: '+dayPillar+(yongshin?' · 용신: '+yongshin:''),
+          imageUrl: 'https://picolab.kr/img/goddess-app.png',
+          link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+        },
+        buttons: [{ title: '내 운세 보러가기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
       });
     } else {
       alert('클립보드에 복사됐어요!');
@@ -1739,11 +2017,16 @@ window.addEventListener('load', function() {
 <div id="sajuShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(40,25,10,0.55);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
   <div style="background:#fcf7ea;border-top:1px solid rgba(80,55,30,0.10);border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 40px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -8px 32px rgba(60,40,20,0.12);">
     <button onclick="closeSajuShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(74,58,42,0.65);font-size:22px;cursor:pointer;line-height:1;">✕</button>
-    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.65);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
+    <div style="text-align:center;margin-bottom:12px;font-size:13px;color:rgba(74,58,42,0.65);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;">공유할 카드 선택</div>
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <button id="sajuTabStory" onclick="_sajuLoadCard('story')" style="flex:1;padding:8px 0;border:none;border-radius:8px;background:#7a2418;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;">스토리 9:16</button>
+      <button id="sajuTabCompact" onclick="_sajuLoadCard('compact')" style="flex:1;padding:8px 0;border:none;border-radius:8px;background:rgba(80,55,30,0.10);color:rgba(74,58,42,0.65);font-size:12px;font-weight:600;cursor:pointer;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;">콤팩트</button>
+    </div>
     <div id="sajuPreviewArea" style="text-align:center;min-height:120px;margin-bottom:16px;"></div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <button onclick="doSajuShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;"><i class="pi pi-crystal"></i> 카카오톡으로 공유하기</button>
-      <button onclick="closeSajuShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(80,55,30,0.10);color:rgba(74,58,42,0.78);border:none;border-radius:14px;font-size:14px;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
+      <button onclick="downloadSajuCard()" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 0;background:rgba(80,55,30,0.08);color:rgba(74,58,42,0.70);border:none;border-radius:14px;font-size:13px;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;"><i class="pi pi-download"></i> 이미지로 저장</button>
+      <button onclick="closeSajuShareModal()" style="display:flex;align-items:center;justify-content:center;padding:10px 0;background:none;color:rgba(74,58,42,0.50);border:none;border-radius:14px;font-size:13px;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
     </div>
   </div>
 </div>
