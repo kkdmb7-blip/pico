@@ -1032,12 +1032,15 @@ function _applyOfflineTime(s) {
 
 // localStorage에서 불러오기
 function loadState() {
+  // 사용자가 직접 선택한 원소 (최우선 — 서버/자동 로직이 절대 덮어쓰지 못함)
+  var _pref; try { _pref = localStorage.getItem('yongsin_pet_pref'); } catch(e) {}
+
   try {
     var saved = JSON.parse(localStorage.getItem('yongsin_pet'));
     if (saved) {
       if (saved.all) {
         allStates = saved.all || {};
-        slotElements.slot1 = saved.element  || null;
+        slotElements.slot1 = _pref || saved.element  || null;
         slotElements.slot2 = saved.element2 || null;
         // activeSlot 기준 원소 로드
         var el = slotElements[activeSlot] || slotElements.slot1;
@@ -1049,14 +1052,24 @@ function loadState() {
       } else if (saved.element) {
         // 구형 포맷 → 마이그레이션
         var elState = Object.assign({}, saved);
-        slotElements.slot1 = saved.element;
-        state.element = saved.element;
+        slotElements.slot1 = _pref || saved.element;
+        state.element = slotElements.slot1;
         delete elState.element;
         allStates[state.element] = elState;
         Object.assign(state, _applyOfflineTime(Object.assign({}, elState)));
       }
     }
   } catch(e) {}
+
+  // _pref 있으면 상태도 해당 원소로 보정
+  if (_pref && slotElements.slot1 !== _pref) {
+    slotElements.slot1 = _pref;
+    state.element = _pref;
+    if (allStates[_pref]) {
+      Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[_pref])));
+      state.element = _pref;
+    }
+  }
 
   try {
     var ys = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached');
@@ -1087,6 +1100,8 @@ function selectElement(el) {
     showToast('이미 다른 슬롯에서 키우고 있어요!');
     return;
   }
+  // 사용자 직접 선택 → 별도 키에 영구 저장 (서버 동기화에 절대 덮어씌워지지 않음)
+  if (activeSlot === 'slot1') { try { localStorage.setItem('yongsin_pet_pref', el); } catch(e) {} }
   // 현재 오행 상태 저장
   if (state.element) {
     state.lastVisit = Date.now();
@@ -1776,8 +1791,9 @@ loadFromServer(function(serverData) {
     var srvLv   = srvElState ? (srvElState.level || 1) : 0;
     if (srvLv >= localLv) {
       allStates = Object.assign({}, srvAll);
-      // 로컬 선택 원소 유지, 없을 때만 서버 원소 사용
-      slotElements.slot1 = localEl || serverData.element || srvEl;
+      // 사용자 직접 선택 > 로컬 원소 > 서버 원소 순으로 우선
+      var _p; try { _p = localStorage.getItem('yongsin_pet_pref'); } catch(e) {}
+      slotElements.slot1 = _p || localEl || serverData.element || srvEl;
       slotElements.slot2 = serverData.element2 || slotElements.slot2;
       var activeEl = slotElements[activeSlot] || slotElements.slot1;
       state.element = activeEl;
