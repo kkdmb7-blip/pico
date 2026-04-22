@@ -671,133 +671,185 @@ function _drawAstroCard(cb) {
   var d = window._astroData;
   if (!d) { cb(null); return; }
   var planets = d.planets || [];
-  var aspects = d.aspects || [];
 
   var SIGN_SYM = {'양자리':'♈','황소자리':'♉','쌍둥이자리':'♊','게자리':'♋','사자자리':'♌','처녀자리':'♍','천칭자리':'♎','전갈자리':'♏','사수자리':'♐','염소자리':'♑','물병자리':'♒','물고기자리':'♓'};
-  var EL_COLOR = {'화':'#FF6B6B','지':'#7BC67A','풍':'#FFE66D','수':'#74B9FF'};
+  var EL_HEX   = {'화':'#FF7B7B','지':'#7BC67A','풍':'#FFE66D','수':'#74B9FF'};
+  var EL_RGB   = {'화':'255,123,123','지':'123,198,122','풍':'255,230,109','수':'116,185,255'};
   var SIGN_EL  = {'양자리':'화','사자자리':'화','사수자리':'화','황소자리':'지','처녀자리':'지','염소자리':'지','쌍둥이자리':'풍','천칭자리':'풍','물병자리':'풍','게자리':'수','전갈자리':'수','물고기자리':'수'};
-  var SIGN_KO_EN = {'양자리':'Aries','황소자리':'Taurus','쌍둥이자리':'Gemini','게자리':'Cancer','사자자리':'Leo','처녀자리':'Virgo','천칭자리':'Libra','전갈자리':'Scorpio','사수자리':'Sagittarius','염소자리':'Capricorn','물병자리':'Aquarius','물고기자리':'Pisces'};
-  var ASPECT_KO   = {'Conjunction':'합','Sextile':'육합','Square':'스퀘어','Trine':'트라인','Opposition':'대립'};
-  var PLANET_KO   = {'Sun':'태양','Moon':'달','Mercury':'수성','Venus':'금성','Mars':'화성','Jupiter':'목성','Saturn':'토성'};
+  var SIGN_EN  = {'양자리':'Aries','황소자리':'Taurus','쌍둥이자리':'Gemini','게자리':'Cancer','사자자리':'Leo','처녀자리':'Virgo','천칭자리':'Libra','전갈자리':'Scorpio','사수자리':'Sagittarius','염소자리':'Capricorn','물병자리':'Aquarius','물고기자리':'Pisces'};
+  var EL_EN    = {'화':'Fire','지':'Earth','풍':'Air','수':'Water'};
+  var PLANET_KO = {'Sun':'태양','Moon':'달','Mercury':'수성','Venus':'금성','Mars':'화성','Jupiter':'목성','Saturn':'토성'};
+  var PLANET_IC = {'Sun':'☀️','Moon':'🌙','Mercury':'☿','Venus':'♀','Mars':'♂','Jupiter':'♃','Saturn':'♄'};
 
-  var today = new Date(Date.now()+9*3600000);
-  var dateStr = today.getUTCFullYear()+'년 '+(today.getUTCMonth()+1)+'월 '+today.getUTCDate()+'일';
+  var sunP   = planets.find(function(p){return p.name==='Sun';}) || {};
+  var moonP  = planets.find(function(p){return p.name==='Moon';}) || {};
+  var ascP   = planets.find(function(p){return p.name==='Ascendant';}) || {};
+  var sunSign  = sunP.sign  || '';
+  var moonSign = moonP.sign || '';
+  var ascSign  = ascP.sign  || '';
+  var el       = SIGN_EL[sunSign] || '풍';
+  var elHex    = EL_HEX[el] || '#FFE66D';
+  var elRgb    = EL_RGB[el] || '255,230,109';
+  var sunSym   = SIGN_SYM[sunSign] || '★';
+  var sunEn    = SIGN_EN[sunSign]  || '';
+
+  var today   = new Date(Date.now()+9*3600000);
+  var dateStr = today.getUTCFullYear()+'. '+(today.getUTCMonth()+1)+'. '+today.getUTCDate()+'.';
 
   var W=1080, H=1920;
-  var PAD=60;
   var canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
   var ctx=canvas.getContext('2d');
 
-  // 배경 (아이보리)
-  var bg=ctx.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0,'#fcf7ea'); bg.addColorStop(0.5,'#f4ede0'); bg.addColorStop(1,'#ede4cf');
-  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-  [{cx:0.2,cy:0.1,r:0.5,c:'154,122,38,0.06'},{cx:0.8,cy:0.5,r:0.5,c:'122,36,24,0.05'},{cx:0.5,cy:0.9,r:0.4,c:'154,122,38,0.05'}].forEach(function(n){
-    var g=ctx.createRadialGradient(n.cx*W,n.cy*H,0,n.cx*W,n.cy*H,n.r*W); g.addColorStop(0,'rgba('+n.c+')'); g.addColorStop(1,'transparent'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-  });
-  [[8,12,2],[20,35,1.5],[38,8,2.5],[55,22,1],[72,10,2],[85,28,1.5],[6,52,1],[18,68,2],[32,80,1.5],[50,60,1],[66,78,2],[82,48,1],[90,65,1.5],[14,90,2],[44,45,1],[78,35,2],[60,90,1],[25,15,2],[92,82,1.5],[48,30,1],[35,55,1.5],[15,42,2],[70,25,1.5]].forEach(function(s){
-    ctx.beginPath(); ctx.arc(s[0]/100*W,s[1]/100*H,s[2],0,Math.PI*2); ctx.fillStyle='rgba(154,122,38,'+(0.18+((s[0]+s[1])%5)*0.08)+')'; ctx.fill();
-  });
-
-  ctx.textAlign='center';
-  function drawLine(cy,w2,al,clr){ var lg=ctx.createLinearGradient(W/2-w2,0,W/2+w2,0); lg.addColorStop(0,'transparent'); lg.addColorStop(0.5,'rgba('+(clr||'154,122,38')+','+al+')'); lg.addColorStop(1,'transparent'); ctx.strokeStyle=lg; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(W/2-w2,cy); ctx.lineTo(W/2+w2,cy); ctx.stroke(); }
   function fRR(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);} ctx.fill(); }
   function sRR(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);} ctx.stroke(); }
 
-  // 텍스트 줄바꿈 helper
-  function fillWrapped(text, x, y, maxW, lineH, maxL) {
-    var words=text.split(' '), line='', n=0;
-    for(var i=0;i<words.length;i++){
-      var test=line+(line?' ':'')+words[i];
-      if(ctx.measureText(test).width>maxW && line){ ctx.fillText(line,x,y); y+=lineH; line=words[i]; if(++n>=maxL-1){line=line.slice(0,20)+'…';break;} }
-      else line=test;
-    }
-    if(line) ctx.fillText(line,x,y);
-    return y+lineH;
-  }
+  // ── 배경: 깊은 우주 다크
+  var bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#080618'); bg.addColorStop(0.45,'#0d0921'); bg.addColorStop(0.75,'#120b2a'); bg.addColorStop(1,'#080618');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
 
-  // ── 헤더
-  var y=100;
-  ctx.font='600 22px sans-serif'; ctx.fillStyle='rgba(122,36,24,0.7)'; ctx.letterSpacing='4px';
-  ctx.fillText('✨  F O R T U N A  ✨',W/2,y); ctx.letterSpacing='0px';
-  y+=44; ctx.font='700 52px "Noto Sans KR",sans-serif'; ctx.fillStyle='#1a120a'; ctx.fillText('나의 별자리 차트',W/2,y);
-  y+=40; ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(74,58,42,0.7)'; ctx.fillText(dateStr,W/2,y);
-  y+=36; drawLine(y,260,0.4);
+  // 원소 색상 네뷸라 (중앙)
+  var neb=ctx.createRadialGradient(W/2,520,0,W/2,520,560);
+  neb.addColorStop(0,'rgba('+elRgb+',0.20)'); neb.addColorStop(0.5,'rgba('+elRgb+',0.07)'); neb.addColorStop(1,'transparent');
+  ctx.fillStyle=neb; ctx.fillRect(0,0,W,H);
+  // 하단 보라 글로우
+  var neb2=ctx.createRadialGradient(W/2,H-300,0,W/2,H-300,500);
+  neb2.addColorStop(0,'rgba(120,40,200,0.10)'); neb2.addColorStop(1,'transparent');
+  ctx.fillStyle=neb2; ctx.fillRect(0,0,W,H);
 
-  // ── BIG 3 — 세로 배치, 각 카드에 설명 포함
-  var big3=[
-    {emoji:'☀️', label:'태양궁', role:'핵심 자아 · 본질적 성격',
-     sign:(planets.find(function(p){return p.name==='Sun';})||{}).sign||'',
-     interp:SUN_INTERP},
-    {emoji:'🌙', label:'달궁',  role:'감정 패턴 · 내면의 자아',
-     sign:(planets.find(function(p){return p.name==='Moon';})||{}).sign||'',
-     interp:MOON_INTERP},
-    {emoji:'↑',  label:'상승궁', role:'외적 인상 · 첫인상',
-     sign:(planets.find(function(p){return p.name==='Ascendant';})||{}).sign||'',
-     interp:ASC_INTERP},
-  ];
+  // ── 별들
+  [[5,8,1.8],[12,18,1.2],[22,5,2.2],[35,12,1],[48,3,1.6],[60,15,1.2],[75,8,2],[88,20,1.2],[96,6,1.6],
+   [3,32,1.2],[15,45,1.6],[28,38,1],[42,28,2.2],[55,40,1.2],[68,33,1.6],[82,25,1],[93,38,1.2],
+   [8,58,1.6],[20,65,1],[32,72,2],[45,55,1.2],[58,68,1.6],[72,60,1],[85,52,2.2],[97,65,1.2],
+   [10,80,1],[25,88,1.6],[38,82,1.2],[52,78,2],[65,85,1],[78,90,1.6],[91,78,1.2],
+   [18,93,1.6],[48,96,1],[70,94,2],[89,89,1.2],[30,50,1],[55,22,1.4],[80,68,1]].forEach(function(s){
+    var a=0.3+(s[0]*s[1]%11)/22;
+    ctx.beginPath(); ctx.arc(s[0]/100*W,s[1]/100*H,s[2],0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,'+a+')'; ctx.fill();
+  });
 
-  var cH=360, cGap=24, cW=W-PAD*2;
-  y+=46;
-  big3.forEach(function(c){
-    var ec=EL_COLOR[SIGN_EL[c.sign]]||'#8888ee';
-    var sym=SIGN_SYM[c.sign]||'✨';
-    var enKey=SIGN_KO_EN[c.sign]||'';
-    var desc=(c.interp&&enKey&&c.interp[enKey])||'';
+  ctx.textAlign='center';
 
-    // 카드 배경
-    var cg=ctx.createLinearGradient(PAD,y,PAD,y+cH); cg.addColorStop(0,'rgba(252,247,234,0.85)'); cg.addColorStop(1,'rgba(237,228,207,0.7)'); ctx.fillStyle=cg; fRR(PAD,y,cW,cH,20);
-    // 상단 컬러바
-    var tg=ctx.createLinearGradient(PAD,y,PAD+cW,y); tg.addColorStop(0,'transparent'); tg.addColorStop(0.3,ec); tg.addColorStop(0.7,ec); tg.addColorStop(1,'transparent'); ctx.fillStyle=tg; fRR(PAD,y,cW,4,2);
-    // 테두리
-    ctx.strokeStyle='rgba(80,55,30,0.18)'; ctx.lineWidth=1.5; sRR(PAD,y,cW,cH,20);
+  // ── 브랜드 헤더
+  var y=96;
+  ctx.font='500 26px sans-serif'; ctx.letterSpacing='7px';
+  ctx.fillStyle='rgba(255,215,120,0.80)'; ctx.fillText('F O R T U N A',W/2,y);
+  ctx.letterSpacing='0px';
+  y+=40; ctx.font='400 24px "Noto Sans KR",sans-serif';
+  ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fillText('서양 점성술 차트  ·  '+dateStr,W/2,y);
 
-    // 이모지 + 라벨
-    ctx.textAlign='left';
-    ctx.font='700 22px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(74,58,42,0.75)'; ctx.fillText(c.emoji+'  '+c.label+' · '+c.role, PAD+28, y+46);
+  // 상단 골드 라인
+  y+=38;
+  var gl=ctx.createLinearGradient(W/2-320,0,W/2+320,0);
+  gl.addColorStop(0,'transparent'); gl.addColorStop(0.5,'rgba(255,215,120,0.35)'); gl.addColorStop(1,'transparent');
+  ctx.strokeStyle=gl; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-320,y); ctx.lineTo(W/2+320,y); ctx.stroke();
 
-    // 별자리 심볼 크게 (우측)
-    ctx.textAlign='right'; ctx.font='80px serif'; ctx.fillStyle='rgba(80,55,30,0.12)'; ctx.fillText(sym, PAD+cW-28, y+120);
+  // ── HERO 구역: 태양궁 심볼
+  y+=90;
+  // 원 글로우 2겹
+  var cg1=ctx.createRadialGradient(W/2,y+200,0,W/2,y+200,300);
+  cg1.addColorStop(0,'rgba('+elRgb+',0.25)'); cg1.addColorStop(0.6,'rgba('+elRgb+',0.07)'); cg1.addColorStop(1,'transparent');
+  ctx.fillStyle=cg1; ctx.fillRect(0,y-20,W,440);
+  // 원 테두리 장식
+  ctx.beginPath(); ctx.arc(W/2,y+200,215,0,Math.PI*2);
+  ctx.strokeStyle='rgba('+elRgb+',0.18)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(W/2,y+200,230,0,Math.PI*2);
+  ctx.strokeStyle='rgba('+elRgb+',0.07)'; ctx.lineWidth=1; ctx.stroke();
 
-    // 별자리 이름
-    ctx.textAlign='left'; ctx.font='700 62px "Noto Sans KR",sans-serif'; ctx.fillStyle=ec; ctx.fillText(c.sign||'—', PAD+28, y+132);
+  // 초대형 별자리 심볼
+  ctx.font='280px serif'; ctx.fillStyle=elHex; ctx.globalAlpha=0.92;
+  ctx.fillText(sunSym,W/2,y+300);
+  ctx.globalAlpha=1;
 
-    // 설명 텍스트 (최대 4줄)
-    ctx.font='400 22px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(26,18,10,0.75)';
-    if(desc){
-      var words=desc.split(' '), line='', ty=y+172, maxW=cW-56, ln=0;
-      for(var wi=0;wi<words.length;wi++){
-        var test=line+(line?' ':'')+words[wi];
-        if(ctx.measureText(test).width>maxW&&line){ ctx.fillText(line,PAD+28,ty); ty+=30; line=words[wi]; if(++ln>=3){ctx.fillText(line.slice(0,22)+'…',PAD+28,ty);line='';break;} }
-        else line=test;
-      }
-      if(line&&ln<3) ctx.fillText(line,PAD+28,ty);
-    }
+  y+=400;
+
+  // 별자리 이름 (대형)
+  ctx.font='800 104px "Noto Sans KR",sans-serif'; ctx.fillStyle='#ffffff';
+  ctx.fillText(sunSign||'—',W/2,y);
+  y+=64;
+
+  // 영문명 · 원소
+  ctx.font='600 36px sans-serif'; ctx.letterSpacing='4px';
+  ctx.fillStyle=elHex;
+  ctx.fillText((sunEn).toUpperCase()+'   ·   '+(EL_EN[el]||''),W/2,y);
+  ctx.letterSpacing='0px';
+
+  // ── 구분선
+  y+=70;
+  var gl2=ctx.createLinearGradient(W/2-300,0,W/2+300,0);
+  gl2.addColorStop(0,'transparent'); gl2.addColorStop(0.5,'rgba(255,215,120,0.30)'); gl2.addColorStop(1,'transparent');
+  ctx.strokeStyle=gl2; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-300,y); ctx.lineTo(W/2+300,y); ctx.stroke();
+
+  // ── BIG 3
+  y+=52;
+  ctx.font='400 22px sans-serif'; ctx.letterSpacing='3px';
+  ctx.fillStyle='rgba(255,215,120,0.55)'; ctx.fillText('✦   B I G   3   ✦',W/2,y);
+  ctx.letterSpacing='0px';
+  y+=40;
+
+  var big3=[{ico:'☀️',lbl:'태양',sign:sunSign},{ico:'🌙',lbl:'달',sign:moonSign},{ico:'↑',lbl:'상승',sign:ascSign}];
+  var bW=(W-120-40)/3, bH=154, bX=60;
+  big3.forEach(function(b,i){
+    var bx=bX+i*(bW+20);
+    var bel=SIGN_EL[b.sign]||''; var brgb=EL_RGB[bel]||'180,160,120'; var bhex=EL_HEX[bel]||'#c8b48c';
+    var cbg=ctx.createLinearGradient(bx,y,bx,y+bH);
+    cbg.addColorStop(0,'rgba('+brgb+',0.16)'); cbg.addColorStop(1,'rgba('+brgb+',0.06)');
+    ctx.fillStyle=cbg; fRR(bx,y,bW,bH,18);
+    ctx.strokeStyle='rgba('+brgb+',0.32)'; ctx.lineWidth=1.2; sRR(bx,y,bW,bH,18);
+
     ctx.textAlign='center';
-    y+=cH+cGap;
+    ctx.font='30px serif'; ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.fillText(b.ico,bx+bW/2,y+44);
+    ctx.font='400 20px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.42)'; ctx.fillText(b.lbl,bx+bW/2,y+74);
+    ctx.font='700 32px "Noto Sans KR",sans-serif'; ctx.fillStyle=b.sign?bhex:'rgba(255,255,255,0.2)'; ctx.fillText(b.sign||'—',bx+bW/2,y+114);
+    ctx.font='20px serif'; ctx.fillStyle='rgba(255,255,255,0.32)'; ctx.fillText(SIGN_SYM[b.sign]||'',bx+bW/2,y+143);
   });
 
-  // ── 행성 배치 간결하게 (2열 compact)
-  y+=10; drawLine(y,260,0.3);
-  y+=40; ctx.font='600 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(74,58,42,0.75)'; ctx.fillText('🌟 행성 배치',W/2,y); y+=32;
+  y+=bH+64;
+
+  // ── 구분선
+  var gl3=ctx.createLinearGradient(W/2-220,0,W/2+220,0);
+  gl3.addColorStop(0,'transparent'); gl3.addColorStop(0.5,'rgba(255,215,120,0.22)'); gl3.addColorStop(1,'transparent');
+  ctx.strokeStyle=gl3; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-220,y); ctx.lineTo(W/2+220,y); ctx.stroke();
+
+  // ── 행성 배치
+  y+=48;
+  ctx.font='400 22px sans-serif'; ctx.letterSpacing='3px';
+  ctx.fillStyle='rgba(255,215,120,0.50)'; ctx.fillText('✦   행 성 배 치   ✦',W/2,y);
+  ctx.letterSpacing='0px';
+  y+=48;
+
   var pNames=['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn'];
-  var pIcons={'Sun':'☀️','Moon':'🌙','Mercury':'☿','Venus':'♀','Mars':'♂','Jupiter':'♃','Saturn':'♄'};
-  var colW2=(W-PAD*2-20)/2, gx=PAD, sy2=y;
-  pNames.forEach(function(nm,idx){
+  var colW=(W-120-24)/2;
+  var pXs=[60,60+colW+24];
+  pNames.forEach(function(nm,i){
     var p=planets.find(function(x){return x.name===nm;}); if(!p) return;
-    var col=idx%2, row=Math.floor(idx/2);
-    var px=gx+col*(colW2+20), py=sy2+row*46;
-    var ec2=EL_COLOR[SIGN_EL[p.sign]]||'rgba(122,104,80,0.8)';
-    ctx.textAlign='left'; ctx.font='400 19px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(74,58,42,0.78)';
-    ctx.fillText((pIcons[nm]||'')+'  '+(PLANET_KO[nm]||nm), px, py+24);
-    ctx.textAlign='right'; ctx.font='600 19px "Noto Sans KR",sans-serif'; ctx.fillStyle=ec2;
-    ctx.fillText((SIGN_SYM[p.sign]||'')+' '+(p.sign||''), px+colW2, py+24); ctx.textAlign='center';
+    var col=i%2, row=Math.floor(i/2);
+    var px=pXs[col], py=y+row*62;
+    var pel=SIGN_EL[p.sign]||''; var prgb=EL_RGB[pel]||'180,160,120'; var phex=EL_HEX[pel]||'#c8b48c';
+    ctx.fillStyle='rgba(255,255,255,0.04)'; fRR(px,py,colW,50,12);
+    ctx.strokeStyle='rgba(255,255,255,0.09)'; ctx.lineWidth=1; sRR(px,py,colW,50,12);
+    ctx.textAlign='left';
+    ctx.font='22px serif'; ctx.fillStyle='rgba(255,255,255,0.65)'; ctx.fillText(PLANET_IC[nm]||'',px+14,py+33);
+    ctx.font='400 20px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fillText(PLANET_KO[nm]||nm,px+50,py+33);
+    ctx.textAlign='right';
+    ctx.font='600 21px "Noto Sans KR",sans-serif'; ctx.fillStyle=phex;
+    ctx.fillText((SIGN_SYM[p.sign]||'')+' '+(p.sign||''),px+colW-14,py+33);
   });
-  y=sy2+4*46+16;
 
-  // ── 푸터
-  y=H-100; drawLine(y,200,0.3);
-  y+=38; ctx.font='400 22px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(80,55,30,0.45)'; ctx.fillText('picolab.kr',W/2,y);
+  var pRows=Math.ceil(pNames.filter(function(n){return planets.find(function(x){return x.name===n;});}).length/2);
+  y+=pRows*62+20;
+
+  // ── 하단 푸터
+  var fy=H-118;
+  var fl=ctx.createLinearGradient(W/2-240,0,W/2+240,0);
+  fl.addColorStop(0,'transparent'); fl.addColorStop(0.5,'rgba(255,255,255,0.10)'); fl.addColorStop(1,'transparent');
+  ctx.strokeStyle=fl; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-240,fy); ctx.lineTo(W/2+240,fy); ctx.stroke();
+  ctx.textAlign='center';
+  ctx.font='400 24px sans-serif'; ctx.letterSpacing='2px'; ctx.fillStyle='rgba(255,215,120,0.50)';
+  ctx.fillText('picolab.kr',W/2,fy+46);
+  ctx.letterSpacing='0px';
+  ctx.font='400 19px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.20)';
+  ctx.fillText('AI 점성술 · 사주 · 운세',W/2,fy+76);
 
   cb(canvas);
 }
