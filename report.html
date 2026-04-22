@@ -2716,55 +2716,84 @@ function buildAccuracyLayerBlock() {
 })();
 
 // ── 기질 오행 시각화 카드 (character 타입 전용) ──
-function _charSummary(ohList) {
-  const OH_ADJ = { 목:'창의적이고 성장을 추구하는', 화:'열정적이고 표현력이 강한', 토:'안정을 중시하고 포용력 있는', 금:'원칙적이고 분석력이 뛰어난', 수:'지혜롭고 유연한' };
-  const OH_STRENGTH = { 목:'새로운 것을 시작하고 이끄는 추진력', 화:'사람을 끌어당기는 표현력과 카리스마', 토:'꾸준히 신뢰를 쌓고 중심을 잡는 힘', 금:'끝까지 파고드는 집중력과 결단력', 수:'상황을 읽고 유연하게 대처하는 직관' };
-  const YONG_HINT = { 목:'성장·창의 활동이 막힌 흐름을 열어줘요', 화:'열정적인 활동과 교류가 운을 살려요', 토:'안정된 루틴과 꾸준함이 기운을 채워요', 금:'구조와 원칙이 있는 환경에서 빛나요', 수:'내면을 탐구하고 배움을 쌓을 때 흐름이 열려요' };
-  const SINGANG_DESC = { 신강:'주도적으로 밀어붙이는 강한 의지력을 타고났어요.', 신약:'섬세하고 배려심 깊은 감수성이 강점이에요.', 중화:'강함과 유연함의 균형이 잘 잡힌 구조예요.', 극강:'에너지가 넘쳐서 방향을 잘 잡는 것이 핵심이에요.', 극약:'외부 환경의 힘을 빌려 크게 성장하는 구조예요.' };
-
-  const top = ohList[0]?.[0];
-  const sec = ohList[1]?.[0];
-  const yongElem = ['목','화','토','금','수'].find(k => _yongsin && _yongsin.includes(k));
-  const singDesc = Object.keys(SINGANG_DESC).find(k => _singang && _singang.includes(k));
-
-  let lines = [];
-  if (top) lines.push(`<b>${OH_ADJ[top] || top}</b> 기질이 가장 강하게 드러납니다${sec ? `, ${OH_STRENGTH[top] || ''}과(와) ${OH_ADJ[sec] || sec} 성향이 더해져` : '.'}`);
-  if (sec && top) lines[0] += ` 독특한 에너지 구조를 만들어요.`;
-  if (singDesc) lines.push(SINGANG_DESC[singDesc]);
-  if (yongElem) lines.push(`균형을 채워주는 용신은 <b>${yongElem}(${({목:'木',화:'火',토:'土',금:'金',수:'水'})[yongElem]})</b> — ${YONG_HINT[yongElem] || ''}`);
-  return lines.join(' ');
-}
-
 function renderCharVisual() {
   if (!_ohaeng || _type !== 'character') return;
-  const OH_COLOR = { 목:'#3d7a3a', 화:'#b84c1a', 토:'#8a6200', 금:'#5a6a7a', 수:'#1a5fa0' };
-  const name = (_profile && _profile.name) || (_user && _user.name) || '';
+
+  const OH_COLOR  = { 목:'#3d7a3a', 화:'#b84c1a', 토:'#8a6200', 금:'#5a6a7a', 수:'#1a5fa0' };
+  const OH_BG     = { 목:'rgba(61,122,58,0.13)', 화:'rgba(184,76,26,0.13)', 토:'rgba(138,98,0,0.13)', 금:'rgba(90,106,122,0.13)', 수:'rgba(26,95,160,0.13)' };
+  const OH_BORDER = { 목:'rgba(61,122,58,0.35)', 화:'rgba(184,76,26,0.35)', 토:'rgba(138,98,0,0.35)', 금:'rgba(90,106,122,0.35)', 수:'rgba(26,95,160,0.35)' };
+  const OH_KW     = { 목:['창의력','리더십','추진력','성장 지향'], 화:['열정','표현력','카리스마','사교성'], 토:['안정감','신뢰','포용력','인내심'], 금:['결단력','원칙','분석력','완벽주의'], 수:['지혜','직관','유연성','깊은 사고'] };
+  const OH_ADJ    = { 목:'창의적이고 성장을 추구하는', 화:'열정적이고 표현력이 강한', 토:'안정을 중시하고 포용력 있는', 금:'원칙적이고 분석력이 뛰어난', 수:'지혜롭고 유연한' };
+  const SING_DESC = { 신강:'주도적으로 밀어붙이는 강한 의지력', 신약:'섬세하고 배려심 깊은 감수성', 중화:'강함과 유연함이 균형 잡힌 구조', 극강:'넘치는 에너지를 방향으로 잡는 힘', 극약:'외부의 힘을 빌려 크게 성장하는 구조' };
+
+  const name   = (_profile && _profile.name) || (_user && _user.name) || '';
   const ohList = Object.entries(_ohaeng)
     .filter(([k]) => ['목','화','토','금','수'].includes(k))
     .sort(([,a],[,b]) => Number(b) - Number(a));
+  const maxPct = Number(ohList[0]?.[1] || 100);
 
-  const barsHtml = ohList.map(([elem, pct]) => {
-    const color = OH_COLOR[elem] || '#888';
-    const isYong = _yongsin && _yongsin.includes(elem);
-    const w = Math.max(4, Math.round(Number(pct)));
-    return `<div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:26px;font-size:12px;font-weight:800;color:${color};flex-shrink:0;text-align:right;">${elem}</div>
-      <div style="flex:1;background:rgba(0,0,0,0.07);border-radius:20px;height:10px;overflow:hidden;">
-        <div style="height:100%;width:${w}%;background:${color};border-radius:20px;opacity:0.8;"></div>
-      </div>
-      <div style="width:30px;font-size:11px;color:rgba(42,26,10,0.45);text-align:left;flex-shrink:0;">${Math.round(Number(pct))}%</div>
-      ${isYong ? `<span style="font-size:10px;font-weight:700;color:#5f8cb5;background:rgba(95,140,181,0.14);border:1px solid rgba(95,140,181,0.32);border-radius:10px;padding:1px 7px;flex-shrink:0;">용신</span>` : `<span style="width:34px;flex-shrink:0;"></span>`}
+  // ── 버블 위치/크기 ──
+  const PCONF = [
+    { left:'8px',   top:'24px',  right:'auto', baseS:162 },
+    { left:'auto',  top:'8px',   right:'10px', baseS:108 },
+    { left:'auto',  top:'136px', right:'16px', baseS:86  },
+    { left:'170px', top:'6px',   right:'auto', baseS:68  },
+    { left:'178px', top:'158px', right:'auto', baseS:52  }
+  ];
+  const bubblesHtml = ohList.slice(0,5).map(([elem, pct], i) => {
+    const pc  = PCONF[i] || PCONF[4];
+    const sz  = Math.max(44, Math.round(pc.baseS * (Number(pct)/maxPct)));
+    const col = OH_COLOR[elem] || '#888';
+    const bg  = OH_BG[elem]   || 'rgba(128,128,128,0.1)';
+    const brd = OH_BORDER[elem]|| 'rgba(128,128,128,0.3)';
+    const isY = _yongsin && _yongsin.includes(elem);
+    const fs  = sz > 100 ? 16 : sz > 72 ? 13 : sz > 54 ? 11 : 9;
+    const ps  = sz > 100 ? 12 : sz > 72 ? 10 : 8;
+    return `<div style="position:absolute;left:${pc.left};right:${pc.right};top:${pc.top};width:${sz}px;height:${sz}px;border-radius:50%;background:${bg};border:${isY?'2.5px solid '+col:('1.5px solid '+brd)};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;${isY?'box-shadow:0 0 18px '+bg+';':''}">
+      <div style="font-size:${fs}px;font-weight:800;color:${col};line-height:1;">${elem}</div>
+      <div style="font-size:${ps}px;color:${col};opacity:0.75;">${Math.round(Number(pct))}%</div>
+      ${isY && sz>60 ? `<div style="font-size:${Math.max(7,ps-1)}px;color:${col};font-weight:700;background:rgba(255,255,255,0.5);border-radius:6px;padding:1px 4px;">용신</div>` : ''}
     </div>`;
   }).join('');
 
+  // ── 키워드 ──
+  const visKw = [], blurKw = [];
+  ohList.slice(0,3).forEach(([elem],i) => {
+    const kws = OH_KW[elem] || [];
+    if (i===0) { visKw.push(kws[0],kws[1]); blurKw.push(kws[2],kws[3]); }
+    else if (i===1) { visKw.push(kws[0]); blurKw.push(kws[1],kws[2]); }
+    else { blurKw.push(kws[0],kws[1]); }
+  });
+  const kwHtml = [
+    ...visKw.filter(Boolean).map(k => {
+      const e = Object.keys(OH_KW).find(x => OH_KW[x].includes(k));
+      return `<span style="display:inline-block;padding:5px 13px;border-radius:100px;font-size:12px;font-weight:700;background:${OH_BG[e]||'rgba(128,128,128,0.1)'};border:1px solid ${OH_BORDER[e]||'rgba(128,128,128,0.25)'};color:${OH_COLOR[e]||'#555'};">${k}</span>`;
+    }),
+    ...blurKw.filter(Boolean).map(k =>
+      `<span style="display:inline-block;padding:5px 13px;border-radius:100px;font-size:12px;font-weight:700;background:rgba(100,80,40,0.08);border:1px solid rgba(100,80,40,0.12);color:rgba(60,40,10,0.15);filter:blur(4px);user-select:none;">${k}</span>`
+    )
+  ].join('');
+
+  // ── 요약 1줄 ──
+  const top = ohList[0]?.[0], sec = ohList[1]?.[0];
+  const yE  = ['목','화','토','금','수'].find(k => _yongsin && _yongsin.includes(k));
+  const sK  = Object.keys(SING_DESC).find(k => _singang && _singang.includes(k));
+  let summary = '';
+  if (top) summary += `<b>${OH_ADJ[top]}</b> 기질이 지배적`;
+  if (sec) summary += `이며, <b>${OH_ADJ[sec]}</b> 에너지가 공존합니다.`;
+  else if (top) summary += '입니다.';
+  if (sK)  summary += ` ${SING_DESC[sK]}.`;
+  if (yE)  summary += ` 용신 <b>${yE}</b>이 균형의 열쇠예요.`;
+
+  // ── 블러 텍스트 ──
+  const blur1 = `이 기질이 직장·사업·인간관계에서 어떻게 드러나는지`;
+  const blur2 = `반복되는 강점과 약점의 패턴, 지금 이 대운에서 특히 주목해야 할 기질 포인트`;
+  const blur3 = `그리고 이 일주만의 숨겨진 잠재력까지 — AI가 45종 데이터로 분석합니다.`;
+
   const badges = [
     _singang ? `<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(155,120,0,0.12);border:1px solid rgba(155,120,0,0.24);color:#7a5c00;">${_singang}</span>` : '',
-    _ilju ? `<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(95,140,181,0.12);border:1px solid rgba(95,140,181,0.28);color:#3a6a9a;">${_ilju} 일주</span>` : ''
+    _ilju    ? `<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(95,140,181,0.12);border:1px solid rgba(95,140,181,0.28);color:#3a6a9a;">${_ilju} 일주</span>` : ''
   ].filter(Boolean).join('');
-
-  const summaryText = _charSummary(ohList);
-
-  const blurText = `일간 ${_ilju ? _ilju[0] : ''}의 본질적 기질, 격국이 드러내는 사회적 역할, 십신 구조로 보는 인간관계 패턴과 잠재된 재능까지 — AI가 45종 데이터를 교차 분석해 이 사주만의 성격 지도를 그려드립니다. 숨겨진 강점과 반복되는 약점의 패턴, 지금 이 나이에 특히 중요한 기질 포인트를 확인해보세요.`;
 
   let el = document.getElementById('charVisualCard');
   if (!el) {
@@ -2775,27 +2804,39 @@ function renderCharVisual() {
     anchor.parentNode.insertBefore(el, anchor);
   }
   el.innerHTML = `
-    <div style="background:linear-gradient(145deg,#fdf8ee,#f4ece0);border-radius:22px;overflow:hidden;box-shadow:0 4px 20px rgba(120,80,20,0.12);border:1px solid rgba(180,140,60,0.18);">
-      <div style="padding:18px 18px 14px;">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
-          <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(155,120,0,0.10);color:#7a5c00;border:1px solid rgba(155,120,0,0.22);"><i class="pi pi-person"></i> 사주 분석 미리보기</div>
-          ${badges}
-        </div>
-        <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:14px;">${name ? name + ' 님의 ' : ''}오행 에너지 구조</div>
-        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px;">${barsHtml}</div>
-        <div style="font-size:13px;line-height:1.85;color:#3a2510;padding:14px;background:rgba(120,80,20,0.05);border-radius:14px;border:1px solid rgba(120,80,20,0.08);">${summaryText}</div>
+  <div style="background:linear-gradient(145deg,#fdf8ee,#f4ece0);border-radius:22px;overflow:hidden;box-shadow:0 4px 20px rgba(120,80,20,0.12);border:1px solid rgba(180,140,60,0.18);">
+    <div style="padding:18px 18px 0;">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(155,120,0,0.10);color:#7a5c00;border:1px solid rgba(155,120,0,0.22);"><i class="pi pi-person"></i> 사주 분석 미리보기</div>
+        ${badges}
       </div>
-      <div style="padding:0 18px 18px;">
-        <div style="font-size:11px;font-weight:600;color:rgba(60,40,10,0.40);margin-bottom:8px;letter-spacing:0.3px;">AI 심층 분석 미리보기</div>
-        <div style="position:relative;overflow:hidden;border-radius:14px;">
-          <div style="color:rgba(60,40,10,0.6);font-size:13px;line-height:1.85;filter:blur(5px);user-select:none;pointer-events:none;padding:14px;background:rgba(120,80,20,0.06);border:1px solid rgba(120,80,20,0.08);border-radius:14px;">${blurText}</div>
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;background:linear-gradient(to bottom,rgba(253,248,238,0) 0%,rgba(253,248,238,0.6) 100%);">
-            <div style="font-size:20px;">🔒</div>
-            <div style="font-size:12px;color:rgba(60,40,10,0.6);font-weight:700;">리포트 생성 후 전체 공개</div>
-          </div>
+      <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:0;">${name ? name + ' 님의 ' : ''}오행 에너지 구조</div>
+    </div>
+
+    <!-- 버블 차트 -->
+    <div style="position:relative;height:242px;overflow:hidden;padding:0 18px;">${bubblesHtml}</div>
+
+    <!-- 키워드 -->
+    <div style="padding:0 18px 14px;">
+      <div style="font-size:11px;font-weight:600;color:rgba(60,40,10,0.38);margin-bottom:8px;letter-spacing:0.3px;">타고난 기질 키워드</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">${kwHtml}</div>
+    </div>
+
+    <!-- 요약 1줄 (공개) -->
+    <div style="margin:0 18px 14px;font-size:13px;line-height:1.85;color:#3a2510;padding:14px;background:rgba(120,80,20,0.05);border-radius:14px;border:1px solid rgba(120,80,20,0.08);">${summary}</div>
+
+    <!-- 블러 구역 -->
+    <div style="padding:0 18px 18px;">
+      <div style="font-size:11px;font-weight:600;color:rgba(60,40,10,0.38);margin-bottom:8px;letter-spacing:0.3px;">AI 심층 분석 미리보기</div>
+      <div style="position:relative;overflow:hidden;border-radius:14px;">
+        <div style="font-size:13px;line-height:1.85;filter:blur(5px);user-select:none;pointer-events:none;padding:14px;background:rgba(120,80,20,0.06);border:1px solid rgba(120,80,20,0.08);border-radius:14px;color:rgba(60,40,10,0.7);">${blur1}<br>${blur2}<br>${blur3}</div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;background:linear-gradient(to bottom,rgba(253,248,238,0),rgba(253,248,238,0.55));">
+          <div style="font-size:22px;">🔒</div>
+          <div style="font-size:12px;color:rgba(60,40,10,0.65);font-weight:700;">리포트 생성 후 전체 공개</div>
         </div>
       </div>
-    </div>`;
+    </div>
+  </div>`;
 }
 
 function renderIntro() {
