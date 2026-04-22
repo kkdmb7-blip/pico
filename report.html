@@ -2787,21 +2787,49 @@ function renderCharVisual() {
     )
   ].join('');
 
-  // ── 요약 1줄 ──
+  // ── 요약 ──
   const top = ohList[0]?.[0], sec = ohList[1]?.[0];
   const yE  = ['목','화','토','금','수'].find(k => _yongsin && _yongsin.includes(k));
   const sK  = Object.keys(SING_DESC).find(k => _singang && _singang.includes(k));
   let summary = '';
-  if (top) summary += `<b>${OH_ADJ[top]}</b> 기질이 지배적`;
-  if (sec) summary += `이며, <b>${OH_ADJ[sec]}</b> 에너지가 공존합니다.`;
+  if (top) summary += `<b>${OH_ADJ[top]}</b> 기질이 가장 강하게 작동하며`;
+  if (sec) summary += `, <b>${OH_ADJ[sec]}</b> 에너지가 함께 흐릅니다.`;
   else if (top) summary += '입니다.';
-  if (sK)  summary += ` ${SING_DESC[sK]}.`;
-  if (yE)  summary += ` 용신 <b>${yE}</b>이 균형의 열쇠예요.`;
+  if (sK) summary += `<br>일간의 힘이 <b>${_singang}</b> 구조라 ${SING_DESC[sK]}.`;
+  if (yE) summary += ` 삶의 균형을 잡아주는 용신은 <b>${yE}(${['목','화','토','금','수'].includes(yE)?{목:'나무·성장',화:'불·표현',토:'흙·안정',금:'쇠·결단',수:'물·지혜'}[yE]:''})</b>.`;
 
-  // ── 블러 텍스트 ──
-  const blur1 = `이 기질이 직장·사업·인간관계에서 어떻게 드러나는지`;
-  const blur2 = `반복되는 강점과 약점의 패턴, 지금 이 대운에서 특히 주목해야 할 기질 포인트`;
-  const blur3 = `그리고 이 일주만의 숨겨진 잠재력까지 — AI가 45종 데이터로 분석합니다.`;
+  // ── 핵심 정보 그리드 ──
+  const ysColor = {목:'#3d7a3a',화:'#b84c1a',토:'#8a6200',금:'#5a6a7a',수:'#1a5fa0'};
+  const infoItems = [
+    { label:'격국', value: _geokguk || '정격', icon:'pi-scroll' },
+    { label:'신강약', value: _singang || '—', icon:'pi-bolt' },
+    { label:'일주', value: _ilju ? _ilju+' 일주' : '—', icon:'pi-star' },
+    { label:'현재 대운', value: _daeun || '—', icon:'pi-compass' },
+  ];
+  const infoGrid = infoItems.map(it => `
+    <div style="background:rgba(255,255,255,0.55);border-radius:12px;padding:10px 12px;border:1px solid rgba(180,140,60,0.15);">
+      <div style="font-size:10px;color:rgba(60,40,10,0.42);font-weight:600;margin-bottom:4px;"><i class="pi ${it.icon}" style="font-size:9px;"></i> ${it.label}</div>
+      <div style="font-size:13px;font-weight:800;color:#3a2000;">${it.value}</div>
+    </div>`).join('');
+
+  // ── 용신 활용 힌트 ──
+  const ys = _rptFull && _rptFull['용신활용'];
+  let ysTip = '';
+  if (ys && yE) {
+    const hints = [];
+    if (ys['색상']) hints.push(`<b>행운색</b> ${ys['색상']}`);
+    if (ys['방위']) hints.push(`<b>유리한 방향</b> ${ys['방위']}`);
+    if (ys['음식']) hints.push(`<b>보완 음식</b> ${ys['음식']}`);
+    if (hints.length) ysTip = hints.slice(0,2).join('&ensp;·&ensp;');
+  }
+
+  // ── 블러 텍스트 (더 구체적으로) ──
+  const blurLines = [
+    `${_ilju||'이 일주'}가 직장·사업 현장에서 실제로 어떤 패턴으로 드러나는지`,
+    `오행 ${top} 과잉이 만드는 반복되는 실수와 그것을 역이용하는 전략`,
+    `현재 ${_daeun||'대운'}에서 기질이 어떻게 증폭되고 있는지, 지금 가장 주의할 것`,
+    `그리고 ${_ilju||'이 일주'}만이 가진 숨겨진 잠재력과 타인이 절대 모르는 내면의 욕구`,
+  ];
 
   const badges = [
     _singang ? `<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(155,120,0,0.12);border:1px solid rgba(155,120,0,0.24);color:#7a5c00;">${_singang}</span>` : '',
@@ -2820,14 +2848,16 @@ function renderCharVisual() {
   <div style="background:linear-gradient(145deg,#fdf8ee,#f4ece0);border-radius:22px;overflow:hidden;box-shadow:0 4px 20px rgba(120,80,20,0.12);border:1px solid rgba(180,140,60,0.18);">
     <div style="padding:18px 18px 0;">
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-        <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(155,120,0,0.10);color:#7a5c00;border:1px solid rgba(155,120,0,0.22);"><i class="pi pi-person"></i> 사주 분석 미리보기</div>
+        <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(155,120,0,0.10);color:#7a5c00;border:1px solid rgba(155,120,0,0.22);"><i class="pi pi-person"></i> 내 사주 미리보기</div>
         ${badges}
       </div>
-      <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:0;">${name ? name + ' 님의 ' : ''}오행 에너지 구조</div>
+      <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:12px;">${name ? name + ' 님의 ' : ''}오행 에너지 구조</div>
+      <!-- 핵심 정보 그리드 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;">${infoGrid}</div>
     </div>
 
     <!-- 버블 차트 -->
-    <div style="position:relative;width:300px;height:220px;margin:12px auto 4px;overflow:visible;">${bubblesHtml}</div>
+    <div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">${bubblesHtml}</div>
 
     <!-- 키워드 -->
     <div style="padding:0 18px 14px;">
@@ -2835,16 +2865,22 @@ function renderCharVisual() {
       <div style="display:flex;flex-wrap:wrap;gap:6px;">${kwHtml}</div>
     </div>
 
-    <!-- 요약 1줄 (공개) -->
-    <div style="margin:0 18px 14px;font-size:13px;line-height:1.85;color:#3a2510;padding:14px;background:rgba(120,80,20,0.05);border-radius:14px;border:1px solid rgba(120,80,20,0.08);">${summary}</div>
+    <!-- 요약 (공개) -->
+    <div style="margin:0 18px 14px;font-size:13px;line-height:1.9;color:#3a2510;padding:14px;background:rgba(120,80,20,0.05);border-radius:14px;border:1px solid rgba(120,80,20,0.08);">${summary}</div>
+
+    ${ysTip ? `<!-- 용신 힌트 -->
+    <div style="margin:0 18px 14px;display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(${ysColor[yE]?ysColor[yE].replace('#','').match(/../g).map(h=>parseInt(h,16)).join(','):'155,120,0'},0.07);border-radius:12px;border:1px solid rgba(${ysColor[yE]?ysColor[yE].replace('#','').match(/../g).map(h=>parseInt(h,16)).join(','):'155,120,0'},0.18);">
+      <i class="pi pi-sparkle" style="color:${ysColor[yE]||'#8a6200'};font-size:14px;"></i>
+      <span style="font-size:12px;color:#3a2000;">${ysTip}</span>
+    </div>` : ''}
 
     <!-- 블러 구역 -->
     <div style="padding:0 18px 18px;">
       <div style="font-size:11px;font-weight:600;color:rgba(60,40,10,0.38);margin-bottom:8px;letter-spacing:0.3px;">AI 심층 분석 미리보기</div>
-      <div style="position:relative;overflow:hidden;border-radius:14px;">
-        <div style="font-size:13px;line-height:1.85;filter:blur(5px);user-select:none;pointer-events:none;padding:14px;background:rgba(120,80,20,0.06);border:1px solid rgba(120,80,20,0.08);border-radius:14px;color:rgba(60,40,10,0.7);">${blur1}<br>${blur2}<br>${blur3}</div>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;background:linear-gradient(to bottom,rgba(253,248,238,0),rgba(253,248,238,0.55));">
-          <div style="font-size:22px;">🔒</div>
+      <div style="position:relative;border-radius:14px;overflow:hidden;">
+        <div style="font-size:13px;line-height:1.9;filter:blur(5px);user-select:none;pointer-events:none;padding:14px;background:rgba(120,80,20,0.06);border:1px solid rgba(120,80,20,0.08);border-radius:14px;color:rgba(60,40,10,0.75);">${blurLines.join('<br>')}</div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;background:linear-gradient(to bottom,rgba(253,248,238,0) 0%,rgba(253,248,238,0.7) 60%,rgba(253,248,238,0.92) 100%);">
+          <div style="font-size:22px;margin-top:40px;">🔒</div>
           <div style="font-size:12px;color:rgba(60,40,10,0.65);font-weight:700;">리포트 생성 후 전체 공개</div>
         </div>
       </div>
