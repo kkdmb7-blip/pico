@@ -6002,7 +6002,7 @@ function _urlBase64ToUint8Array(b64) {
   function show(count) {
     var chip = document.getElementById('visitCountChip');
     var txt  = document.getElementById('visitCountText');
-    if (!chip || !txt || !count) return;
+    if (!chip || !txt || count < 50) return;
     txt.textContent = '오늘 ' + count.toLocaleString() + '명이 운세를 확인했어요';
     chip.style.opacity = '1';
   }
