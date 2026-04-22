@@ -2750,11 +2750,11 @@ function renderCharVisual() {
     { cx: 0.18, cy: 0.75 },  // 4위: 왼쪽 아래
     { cx: 0.82, cy: 0.75 },  // 5위: 오른쪽 아래
   ];
-  const bubblesHtml = ohList.slice(0,5).map(([elem, pct], i) => {
-    const sz  = sizes[i];
+  const makeBubbles = (w, h, sizeArr) => ohList.slice(0,5).map(([elem, pct], i) => {
+    const sz  = sizeArr[i];
     const anc = ANCHOR[i];
-    const lx  = Math.round(anc.cx * CW - sz/2);
-    const ty  = Math.round(anc.cy * CH - sz/2);
+    const lx  = Math.round(anc.cx * w - sz/2);
+    const ty  = Math.round(anc.cy * h - sz/2);
     const col = OH_COLOR[elem] || '#888';
     const bg  = OH_BG[elem]   || 'rgba(128,128,128,0.1)';
     const brd = OH_BORDER[elem]|| 'rgba(128,128,128,0.3)';
@@ -2768,6 +2768,13 @@ function renderCharVisual() {
       ${showYong ? `<div style="font-size:${Math.max(7,ps-1)}px;color:${col};font-weight:700;background:rgba(255,255,255,0.55);border-radius:6px;padding:1px 4px;">용신</div>` : ''}
     </div>`;
   }).join('');
+  const bubblesHtml = makeBubbles(CW, CH, sizes);
+  // 미니 버블: 다른 요소와 겹치지 않도록 4·5위 버블이 컨테이너 안에 들어오게 계산
+  // cy_max=0.75, max bubble ≈ sz*0.6=89, 필요 높이 = 135 + 45 = 180
+  const MINI_W = 300, MINI_H = 180;
+  const miniSizes = sizes.map(s => Math.max(18, Math.round(s * 0.6)));
+  const miniBubblesHtml = makeBubbles(MINI_W, MINI_H, miniSizes);
+  const miniBubbleBlock = `<div style="position:relative;width:${MINI_W}px;height:${MINI_H}px;margin:0 auto;overflow:visible;">${miniBubblesHtml}</div>`;
 
   // ── 키워드 ──
   const visKw = [], blurKw = [];
@@ -3051,10 +3058,11 @@ function renderCharVisual() {
         + (isCur?'<div style="height:3px;background:rgba(120,80,20,0.08);border-radius:2px;margin-top:6px;"><div style="height:3px;background:rgba(180,100,0,0.5);border-radius:2px;width:'+prog+'%;"></div></div>':'')
         + '</div>';
     }).join('');
-    visualHtml = '<div style="padding:14px 18px;">'
-      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:8px;">대운 타이밍 (현재 <span style="color:#7a4200;">' + curDaeunVal + '</span>)</div>'
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:12px;">'
+      + '<div><div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:8px;">대운 타이밍 (현재 <span style="color:#7a4200;">' + curDaeunVal + '</span>)</div>'
       + '<div style="display:flex;gap:6px;">' + (cards2||'<div style="font-size:12px;color:rgba(60,40,10,0.3);">데이터 없음</div>') + '</div></div>'
-      + '<div style="position:relative;width:300px;height:140px;margin:8px auto 0;overflow:visible;">' + bubblesHtml + '</div>';
+      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
 
   } else if (_type === 'character') {
     // 기질 리포트: 일주 대형 카드 + 강약/용신 + 미니 버블
