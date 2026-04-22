@@ -1022,7 +1022,7 @@ function saveState() {
   }
   try { localStorage.setItem('yongsin_pet', JSON.stringify({ all: allStates, element: slotElements.slot1, element2: slotElements.slot2 })); } catch(e) {}
   clearTimeout(_syncTimer);
-  _syncTimer = setTimeout(syncToServer, 3000);
+  _syncTimer = setTimeout(syncToServer, 1000);
 }
 
 function selectElement(el) {

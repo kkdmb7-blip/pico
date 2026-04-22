@@ -637,12 +637,59 @@
       }
     });
 
-    // 탭이 다시 활성화될 때마다 Supabase 재조회 (피코에서 바꾼 내용 반영)
+    // 탭이 다시 활성화될 때마다 Supabase 재조회
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'visible') {
         fetchAndApply(null);
       }
     });
+
+    // 60초 주기 폴링 (Realtime 연결 끊김 백업)
+    var _pollTimer = setInterval(function() {
+      if (document.visibilityState === 'visible') {
+        fetchAndApply(null);
+      }
+    }, 60000);
+
+    // Supabase Realtime — 피코에서 저장되는 즉시 반영
+    try {
+      var _realtimeUrl = SB_URL.replace('https://', 'wss://') + '/realtime/v1/websocket?apikey=' + SB_KEY + '&vsn=1.0.0';
+      var _ws = new WebSocket(_realtimeUrl);
+      var _wsHb;
+
+      _ws.onopen = function() {
+        // 채널 구독 (reports 테이블, pet_state, 해당 user_id만)
+        _ws.send(JSON.stringify({
+          topic: 'realtime:public:reports:user_id=eq.' + uid,
+          event: 'phx_join',
+          payload: { config: { broadcast: { self: false }, presence: { key: '' }, postgres_changes: [{ event: '*', schema: 'public', table: 'reports', filter: 'user_id=eq.' + uid }] } },
+          ref: '1'
+        }));
+        // 30초마다 heartbeat (연결 유지)
+        _wsHb = setInterval(function() {
+          if (_ws.readyState === WebSocket.OPEN) {
+            _ws.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: 'hb' }));
+          }
+        }, 30000);
+      };
+
+      _ws.onmessage = function(e) {
+        try {
+          var msg = JSON.parse(e.data);
+          // postgres_changes 이벤트 수신 시 즉시 재조회
+          if (msg.event === 'postgres_changes' || (msg.payload && msg.payload.data && msg.payload.data.table === 'reports')) {
+            fetchAndApply(null);
+          }
+        } catch(ex) {}
+      };
+
+      _ws.onclose = function() {
+        clearInterval(_wsHb);
+        // 연결 끊기면 폴링이 백업으로 동작 (이미 위에서 설정됨)
+      };
+
+      _ws.onerror = function() { _ws.close(); };
+    } catch(ex) {}
   }
 
 })();
