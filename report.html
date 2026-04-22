@@ -2858,7 +2858,8 @@ function renderCharVisual() {
     visualHtml = `<div style="padding:14px 18px;">
       <div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:8px;letter-spacing:0.3px;">대운 흐름 (현재 <span style="color:#5a1a9a;">${curDaeunVal}</span> 진행 중)</div>
       <div style="display:flex;gap:6px;">${cards||'<div style="color:rgba(60,40,10,0.3);font-size:12px;">대운 데이터 없음</div>'}</div>
-    </div>`;
+    </div>
+    <div style="position:relative;width:300px;height:140px;margin:4px auto 0;overflow:visible;">${bubblesHtml}</div>`;
 
   } else if (_type === 'love') {
     // 오행 버블 + 아래 관성·원진살 인포바
