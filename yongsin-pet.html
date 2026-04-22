@@ -1375,8 +1375,8 @@ function doAction(type) {
     if (!state.cooldowns) state.cooldowns = {};
     state.cooldowns.feed = Date.now();
     gainExp(5);
-    if (!document.querySelector('#toast').textContent.includes('크리티컬'))
-      showToast('냠냠! 맛있어요 🍚');
+    var _t1 = document.querySelector('#toast');
+    if (!_t1 || !_t1.textContent.includes('크리티컬')) showToast('냠냠! 맛있어요 🍚');
     bounce('pet-' + state.element);
   } else if (type === 'play') {
     // 하루 1회 제한
@@ -1408,8 +1408,8 @@ function doAction(type) {
       state.energy = Math.min(100, state.energy + Math.round(sleptHours * 8));
       if (earnedExp > 0) {
         gainExp(earnedExp);
-        if (!document.querySelector('#toast').textContent.includes('크리티컬'))
-          showToast('☀️ ' + Math.round(sleptHours * 60) + '분 수련! EXP +' + earnedExp);
+        var _t2 = document.querySelector('#toast');
+        if (!_t2 || !_t2.textContent.includes('크리티컬')) showToast('☀️ ' + Math.round(sleptHours * 60) + '분 수련! EXP +' + earnedExp);
       } else {
         showToast('잠깐 쉬었어요 ☀️');
       }
@@ -1430,8 +1430,8 @@ function doAction(type) {
       metal: '💎 금기(金氣)를 정련했어요! 집중 에너지 충전 완료!',
       water: '💧 수기(水氣)를 담았어요! 지혜 에너지 충전 완료!',
     };
-    if (!document.querySelector('#toast').textContent.includes('크리티컬'))
-      showToast('✦ ' + (orbMsgs[state.element] || '특훈 완료! 용신 기운이 올랐어요!'));
+    var _t3 = document.querySelector('#toast');
+    if (!_t3 || !_t3.textContent.includes('크리티컬')) showToast('✦ ' + (orbMsgs[state.element] || '특훈 완료! 용신 기운이 올랐어요!'));
     specialTrainEffect('pet-' + state.element);
   }
 
@@ -1481,13 +1481,17 @@ async function fetchAdvice() {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ yongsin: yongsin, element: state.element, day_pillar: dayPillar, profile: profile })
     });
+    if (!aiRes.ok) throw new Error('pet-advice API ' + aiRes.status);
     var advice = await aiRes.json();
+    if (!advice || typeof advice !== 'object') throw new Error('Invalid advice response');
 
-    textEl.textContent = advice.advice || '오늘도 용신 기운을 잘 활용해보세요!';
-    keyEl.textContent  = advice.keyword ? '✦ ' + advice.keyword : '';
-    luckyEl.textContent = advice.lucky ? '🍀 ' + advice.lucky : '';
+    textEl.textContent = advice.advice || advice.message || '오늘도 용신 기운을 잘 활용해보세요!';
+    keyEl.textContent  = (advice.keyword && typeof advice.keyword === 'string') ? '✦ ' + advice.keyword : '';
+    luckyEl.textContent = (advice.lucky && typeof advice.lucky === 'string') ? '🍀 ' + advice.lucky : '';
   } catch(e) {
     textEl.textContent = '오늘 용신 기운을 충전했어요. 긍정적인 하루 보내세요! 🌟';
+    keyEl.textContent = '';
+    luckyEl.textContent = '';
   }
 }
 
@@ -1591,19 +1595,36 @@ function doMissionScroll(btnClass) {
 }
 
 function doMissionShare() {
-  if (isMissionDone('share')) return; // 오늘 이미 완료
-  var url = 'https://picolab.kr';
+  if (isMissionDone('share')) return;
+  var url = 'https://picolab.kr/yongsin-pet.html';
   var text = '🔮 피코랩에서 용신 다마고치 키우고 있어요!\n내 용신 오행을 캐릭터로 키워보세요 👇\n' + url;
-  // 공유 즉시 완료 처리 (중복 방지)
-  completeMissionNav('share');
-  renderMission();
   if (navigator.share) {
-    navigator.share({ title: '피코랩 용신 다마고치', text: text, url: url }).catch(function(){});
-  } else {
-    navigator.clipboard && navigator.clipboard.writeText(text).then(function() {
-      showToast('📋 링크가 복사됐어요!');
-    });
+    navigator.share({ title: '피코랩 용신 다마고치', text: text, url: url })
+      .then(function() { completeMissionNav('share'); renderMission(); })
+      .catch(function(e) { if (e.name !== 'AbortError') showToast('공유에 실패했어요.'); });
+    return;
   }
+  if (window.Kakao && window.Kakao.Share) {
+    if (!Kakao.isInitialized()) { try { Kakao.init('25432f8a37e0ac51a5e10cbcba8ae413'); } catch(e) {} }
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '피코랩 용신 다마고치',
+        description: '내 용신 오행을 캐릭터로 키워보세요!',
+        imageUrl: 'https://picolab.kr/img/goddess-app.png',
+        link: { mobileWebUrl: url, webUrl: url }
+      },
+      buttons: [{ title: '지금 키우러 가기', link: { mobileWebUrl: url, webUrl: url } }]
+    });
+    completeMissionNav('share');
+    renderMission();
+    return;
+  }
+  navigator.clipboard && navigator.clipboard.writeText(text).then(function() {
+    showToast('📋 링크가 복사됐어요!');
+    completeMissionNav('share');
+    renderMission();
+  });
 }
 
 function bounce(id) {
