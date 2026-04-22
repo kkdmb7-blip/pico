@@ -729,7 +729,7 @@ function _drawAstroCard(cb) {
     {emoji:'☀️', label:'태양궁', role:'핵심 자아 · 본질적 성격',
      sign:(planets.find(function(p){return p.name==='Sun';})||{}).sign||'',
      interp:SUN_INTERP},
-    {emoji:'<i class="pi pi-moon"></i>', label:'달궁',  role:'감정 패턴 · 내면의 자아',
+    {emoji:'🌙', label:'달궁',  role:'감정 패턴 · 내면의 자아',
      sign:(planets.find(function(p){return p.name==='Moon';})||{}).sign||'',
      interp:MOON_INTERP},
     {emoji:'↑',  label:'상승궁', role:'외적 인상 · 첫인상',
@@ -741,7 +741,7 @@ function _drawAstroCard(cb) {
   y+=46;
   big3.forEach(function(c){
     var ec=EL_COLOR[SIGN_EL[c.sign]]||'#8888ee';
-    var sym=SIGN_SYM[c.sign]||'<i class="pi pi-sparkle"></i>';
+    var sym=SIGN_SYM[c.sign]||'✨';
     var enKey=SIGN_KO_EN[c.sign]||'';
     var desc=(c.interp&&enKey&&c.interp[enKey])||'';
 
@@ -781,7 +781,7 @@ function _drawAstroCard(cb) {
   y+=10; drawLine(y,260,0.3);
   y+=40; ctx.font='600 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(74,58,42,0.75)'; ctx.fillText('🌟 행성 배치',W/2,y); y+=32;
   var pNames=['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn'];
-  var pIcons={'Sun':'☀️','Moon':'<i class="pi pi-moon"></i>','Mercury':'☿','Venus':'♀','Mars':'♂','Jupiter':'♃','Saturn':'♄'};
+  var pIcons={'Sun':'☀️','Moon':'🌙','Mercury':'☿','Venus':'♀','Mars':'♂','Jupiter':'♃','Saturn':'♄'};
   var colW2=(W-PAD*2-20)/2, gx=PAD, sy2=y;
   pNames.forEach(function(nm,idx){
     var p=planets.find(function(x){return x.name===nm;}); if(!p) return;
