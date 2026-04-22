@@ -1224,6 +1224,12 @@
     <div class="memox-banner-btn">상담 시작 →</div>
   </div>
 </div>
+<div style="text-align:center;padding:0 16px 14px;">
+  <span id="visitCountChip" style="display:inline-flex;align-items:center;gap:5px;background:rgba(212,175,55,0.10);border:1px solid rgba(212,175,55,0.22);border-radius:20px;padding:4px 14px;font-size:11px;color:var(--muted);opacity:0;transition:opacity 0.4s;">
+    <span style="color:var(--gold);font-size:10px;">✦</span>
+    <span id="visitCountText"></span>
+  </span>
+</div>
 <div class="section-divider"></div>
 <!-- 오늘의 행운 뽑기 -->
 <div style="padding:16px 16px;">
@@ -5987,6 +5993,26 @@ function _urlBase64ToUint8Array(b64) {
   for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
   return arr;
 }
+
+// ── 일일 방문자 카운터 ─────────────────────────────────────────
+(function() {
+  var today = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+  var lsKey = 'pico_visit_' + today;
+  var API = 'https://fortuna.kkdmb7.workers.dev/visit-count';
+  function show(count) {
+    var chip = document.getElementById('visitCountChip');
+    var txt  = document.getElementById('visitCountText');
+    if (!chip || !txt || !count) return;
+    txt.textContent = '오늘 ' + count.toLocaleString() + '명이 운세를 확인했어요';
+    chip.style.opacity = '1';
+  }
+  if (!localStorage.getItem(lsKey)) {
+    localStorage.setItem(lsKey, '1');
+    fetch(API, { method: 'POST' }).then(function(r){ return r.json(); }).then(function(d){ show(d.count); }).catch(function(){});
+  } else {
+    fetch(API).then(function(r){ return r.json(); }).then(function(d){ show(d.count); }).catch(function(){});
+  }
+})();
 
 // SW 등록 (페이지 로드 시)
 var APP_VERSION = '1.0.1';
