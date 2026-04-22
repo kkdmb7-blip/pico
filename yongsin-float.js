@@ -83,7 +83,7 @@
 
   var pet, bubble, wrapper;
   var currentPos = 0;
-  var moveTimer, hideTimer, bubbleTimer;
+  var moveTimer, hideTimer, bubbleTimer, fortuneInterval;
   var isHiding = false;
   var MOVE_TRANSITION = 'left 1.8s cubic-bezier(0.34,1.2,0.64,1), top 1.8s cubic-bezier(0.34,1.2,0.64,1)';
 
@@ -430,13 +430,26 @@
       }
     }
 
+    clearInterval(fortuneInterval);
     var mode = TAP_MODES[tapModeIdx % TAP_MODES.length]; tapModeIdx++;
     if (mode === 'fortune') {
       showBubble('운세 읽는 중... ✨', 0);
       fetchTodayAdvice(function(data) {
         if (!data || !data.advice) { showBubble('오늘도 용신 기운을 잘 활용해요! 🌟', 0); return; }
-        var text = (data.keyword ? '✦ ' + data.keyword + '\n' : '') + data.advice + (data.lucky ? '\n🍀 ' + data.lucky : '');
-        showBubble(text, 0);
+        var sents = String(data.advice).split(/(?<=[.!?])\s+/).map(function(s){return s.trim();}).filter(Boolean);
+        if (!sents.length) sents = [String(data.advice).trim()];
+        var parts = [];
+        if (data.keyword) parts.push('✦ ' + data.keyword);
+        parts = parts.concat(sents);
+        if (data.lucky) parts.push('🍀 ' + data.lucky);
+        var pi = 0;
+        showBubble(parts[pi], 0);
+        clearInterval(fortuneInterval);
+        fortuneInterval = setInterval(function() {
+          pi++;
+          if (pi >= parts.length || !isBubbleOpen()) { clearInterval(fortuneInterval); return; }
+          showBubble(parts[pi], 0);
+        }, 3500);
       });
     } else if (mode === 'ilji_msg')   { showIljiMsg();
     } else if (mode === 'pet_status') { showPetStatus();
