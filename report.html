@@ -2952,21 +2952,123 @@ function renderCharVisual() {
       </div>
     </div>`;
 
-  } else if (['triple','astro_full','vedic_full','ziwei_full'].includes(_type)) {
-    // 동서양 교차: 분석 시스템 뱃지 + 오행 버블
-    const systemBadges = {
-      triple:     [['사주','#7a4e00'],['베딕','#2a5a00'],['서양점성','#1a3a9a'],['자미두수','#5a1a9a']],
-      astro_full: [['사주','#7a4e00'],['서양점성','#1a3a9a']],
-      vedic_full: [['사주','#7a4e00'],['베딕','#2a5a00']],
-      ziwei_full: [['사주','#7a4e00'],['자미두수','#5a1a9a']],
-    }[_type] || [['사주','#7a4e00']];
-    const badgeHtml = systemBadges.map(([name,col])=>
-      `<div style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:800;color:${col};background:${col}18;border:1.5px solid ${col}40;">${name}</div>`
-    ).join('<div style="font-size:12px;color:rgba(60,40,10,0.25);align-self:center;">×</div>');
-    visualHtml = `<div style="padding:14px 18px 6px;display:flex;flex-direction:column;gap:12px;">
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${badgeHtml}</div>
-      <div style="font-size:11px;color:rgba(60,40,10,0.45);">위 시스템을 교차 분석해 더 높은 정밀도를 제공합니다</div>
-      ${miniBubbleBlock}
+  } else if (_type === 'vedic_full') {
+    // 베딕: 낙샤트라 중앙 큰 원 + 라시/어센던트/다샤 카드
+    const nak = _vedicData?.nakshatra || '낙샤트라 미확인';
+    const rashi = _vedicData?.rashi || '—';
+    const asc = _vedicData?.ascendant || '—';
+    const dasha = _vedicData?.dasha || '—';
+    const antar = _vedicData?.antardasha || '—';
+    visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
+      <div style="position:relative;background:radial-gradient(circle at 50% 45%, rgba(210,120,40,0.18), rgba(90,50,20,0.04) 70%);border-radius:16px;padding:18px 14px 14px;border:1px solid rgba(210,120,40,0.25);text-align:center;">
+        <div style="font-size:10px;font-weight:800;color:rgba(160,80,20,0.7);letter-spacing:1px;margin-bottom:6px;">🕉️ NAKSHATRA · 월성</div>
+        <div style="display:inline-block;min-width:110px;padding:14px 22px;border-radius:50px;background:linear-gradient(135deg,#d87828,#a85020);color:#fff7e8;font-size:18px;font-weight:900;box-shadow:0 6px 18px rgba(160,80,20,0.28);border:2px solid rgba(255,230,180,0.35);">${nak}</div>
+        <div style="font-size:11px;color:rgba(140,70,20,0.65);margin-top:8px;">27개 낙샤트라 중 당신의 월성 좌표</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <div style="flex:1;background:rgba(100,140,60,0.09);border-radius:10px;padding:10px 8px;border:1px solid rgba(100,140,60,0.2);text-align:center;">
+          <div style="font-size:9px;font-weight:800;color:#3a6020;margin-bottom:3px;letter-spacing:0.3px;">RASHI · 월궁</div>
+          <div style="font-size:13px;font-weight:900;color:#1a4010;">${rashi}</div>
+        </div>
+        <div style="flex:1;background:rgba(100,140,60,0.09);border-radius:10px;padding:10px 8px;border:1px solid rgba(100,140,60,0.2);text-align:center;">
+          <div style="font-size:9px;font-weight:800;color:#3a6020;margin-bottom:3px;letter-spacing:0.3px;">ASCENDANT · 상승궁</div>
+          <div style="font-size:13px;font-weight:900;color:#1a4010;">${asc}</div>
+        </div>
+      </div>
+      <div style="background:rgba(180,100,30,0.08);border-radius:10px;padding:10px 14px;border:1px solid rgba(180,100,30,0.18);">
+        <div style="font-size:9px;font-weight:800;color:rgba(140,70,20,0.7);margin-bottom:4px;letter-spacing:0.5px;">MAHĀDAŚĀ · 행운기</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:14px;font-weight:900;color:#7a4010;">${dasha}</div>
+          <div style="font-size:10px;color:rgba(120,60,10,0.5);">→</div>
+          <div style="font-size:12px;font-weight:700;color:rgba(120,60,10,0.75);">${antar}</div>
+        </div>
+      </div>
+    </div>`;
+
+  } else if (_type === 'astro_full') {
+    // 서양 점성술: 7행성 원형 배치 + 아스펙트
+    const planets = _astroData?.planets || [];
+    const PSYM = { '태양':'☉','달':'☽','수성':'☿','금성':'♀','화성':'♂','목성':'♃','토성':'♄','천왕성':'♅','해왕성':'♆','명왕성':'♇','Sun':'☉','Moon':'☽','Mercury':'☿','Venus':'♀','Mars':'♂','Jupiter':'♃','Saturn':'♄' };
+    const PCOL = { '태양':'#c8700a','달':'#6a7f9a','수성':'#6f9f6f','금성':'#b8608a','화성':'#b23030','목성':'#7a3f9a','토성':'#4a4a2a' };
+    const CORE = ['태양','달','수성','금성','화성','목성','토성'];
+    const rows = CORE.map(n => {
+      const p = planets.find(pl => pl.name === n || pl.id === ({태양:'Sun',달:'Moon',수성:'Mercury',금성:'Venus',화성:'Mars',목성:'Jupiter',토성:'Saturn'})[n]);
+      const sym = PSYM[n] || '○';
+      const col = PCOL[n] || '#3a3a7a';
+      const sign = p?.sign || '—';
+      const deg = p ? `${Math.floor(p.degree||0)}°` : '';
+      const retro = p?.retrograde ? ' ℞' : '';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:${col}12;border-radius:9px;border:1px solid ${col}30;">
+        <div style="width:26px;height:26px;border-radius:50%;background:${col};color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">${sym}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:9px;font-weight:700;color:${col};opacity:0.7;">${n}</div>
+          <div style="font-size:12px;font-weight:900;color:${col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sign} ${deg}${retro}</div>
+        </div>
+      </div>`;
+    }).join('');
+    const aspectCount = _astroData?.aspects?.length || 0;
+    visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:10px;font-weight:800;color:rgba(40,50,130,0.7);letter-spacing:0.5px;">✨ NATAL CHART · 출생 행성 배치</div>
+        ${aspectCount?`<div style="font-size:10px;font-weight:700;color:rgba(40,50,130,0.6);background:rgba(40,50,130,0.08);padding:3px 8px;border-radius:10px;">${aspectCount} aspects</div>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">${rows}</div>
+    </div>`;
+
+  } else if (_type === 'ziwei_full') {
+    // 자미두수: 명궁 중앙 + 주요 4궁 카드
+    const sp = _ziweiData?.soulPalace;
+    const cd = _ziweiData?.currentDecade;
+    const palaces = _ziweiData?.palaces || [];
+    const pick = (names) => palaces.find(p => names.some(n => (p.name||p.palaceName||'').includes(n)));
+    const jae = pick(['재백']);
+    const gwan = pick(['관록']);
+    const bucheo = pick(['부처']);
+    const mingStar = sp?.majorStars?.[0] || sp?.stars?.[0] || '—';
+    const mkCard = (label,col,p) => {
+      const stars = p ? (p.majorStars||p.stars||[]).slice(0,2).join('·') : '—';
+      return `<div style="flex:1;min-width:0;background:${col}0e;border-radius:10px;padding:8px 6px;border:1px solid ${col}28;text-align:center;">
+        <div style="font-size:9px;font-weight:800;color:${col};opacity:0.75;margin-bottom:2px;">${label}</div>
+        <div style="font-size:11px;font-weight:900;color:${col};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${stars||'—'}</div>
+      </div>`;
+    };
+    visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
+      <div style="background:radial-gradient(circle at 50% 40%, rgba(140,60,180,0.16), rgba(60,20,100,0.04) 70%);border-radius:14px;padding:14px;border:1px solid rgba(140,60,180,0.25);text-align:center;">
+        <div style="font-size:9px;font-weight:800;color:rgba(100,40,140,0.7);letter-spacing:1px;margin-bottom:6px;">★ 命宮 · 명궁</div>
+        <div style="display:inline-block;padding:10px 20px;border-radius:40px;background:linear-gradient(135deg,#7a2a9a,#4a1070);color:#fff2ff;font-size:15px;font-weight:900;box-shadow:0 4px 14px rgba(100,40,140,0.28);border:1.5px solid rgba(220,180,255,0.35);">${sp?.name||'명궁'} · ${mingStar}</div>
+        ${cd?`<div style="font-size:10px;color:rgba(100,40,140,0.65);margin-top:6px;">현재 대한 ${cd.name||''} ${cd.ageRange||''}</div>`:''}
+      </div>
+      <div style="display:flex;gap:5px;">
+        ${mkCard('財帛 재백','#8a5020',jae)}
+        ${mkCard('官祿 관록','#1a4a8a',gwan)}
+        ${mkCard('夫妻 부처','#a02060',bucheo)}
+      </div>
+    </div>`;
+
+  } else if (_type === 'triple') {
+    // 동서양 통합: 4시스템 대표 심볼 + 사주 오행 작게
+    const dayPillar = _sd?.summary?.pillars?.day || _ilju || '—';
+    const nak = _vedicData?.nakshatra || '—';
+    const sun = _astroData?.planets?.find?.(p=>p.name==='태양'||p.id==='Sun');
+    const sunSign = sun?.sign || '—';
+    const mingName = _ziweiData?.soulPalace?.majorStars?.[0] || _ziweiData?.soulPalace?.name || '—';
+    const sys = [
+      ['사주 四柱','#7a4e00',dayPillar,'일주'],
+      ['베딕 吠陀','#c86020',nak,'낙샤트라'],
+      ['점성 ASTRO','#2a4aaa',sunSign,'태양 별자리'],
+      ['자미 紫微','#7a2a9a',mingName,'명궁 주성'],
+    ];
+    const cards = sys.map(([sysName,col,val,sub]) =>
+      `<div style="flex:1;min-width:0;background:linear-gradient(160deg,${col}14,${col}06);border-radius:11px;padding:10px 8px;border:1px solid ${col}35;text-align:center;">
+        <div style="font-size:9px;font-weight:800;color:${col};opacity:0.8;letter-spacing:0.3px;margin-bottom:4px;">${sysName}</div>
+        <div style="font-size:13px;font-weight:900;color:${col};line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${val}</div>
+        <div style="font-size:9px;color:${col};opacity:0.55;margin-top:3px;">${sub}</div>
+      </div>`
+    ).join('');
+    visualHtml = `<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">
+      <div style="text-align:center;font-size:10px;font-weight:800;color:rgba(60,40,10,0.6);letter-spacing:1px;">🌐 4-SYSTEM CROSS ANALYSIS</div>
+      <div style="display:flex;gap:5px;">${cards}</div>
+      <div style="font-size:10px;color:rgba(60,40,10,0.42);text-align:center;">네 계보가 공통으로 가리키는 지점과 서로 다른 관점을 한 리포트에서 비교합니다</div>
     </div>`;
 
   } else if (_type === 'month') {
