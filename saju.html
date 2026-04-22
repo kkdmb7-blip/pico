@@ -1571,12 +1571,13 @@ function _startCTSocialProof(){
       +'padding:10px 20px;font-size:13px;color:#3a2510;font-family:"Pretendard Variable",Pretendard,sans-serif;'
       +'z-index:9999;white-space:nowrap;opacity:0;transition:opacity 0.35s,transform 0.35s;'
       +'box-shadow:0 4px 20px rgba(120,80,20,0.18);';
-    t.innerHTML='✨ <strong>'+names[idx%names.length]+'</strong>님이 진로 리포트를 확인했어요';
+    var _msgs=['님이 진로 리포트를 열람했어요','님이 방금 결과를 확인했어요','님이 진로 분야를 확인했어요','님의 리포트가 방금 발송됐어요'];
+    t.innerHTML='⭐ <strong>'+names[idx%names.length]+'</strong>'+_msgs[idx%_msgs.length];
     idx++;
     document.body.appendChild(t);
     requestAnimationFrame(function(){t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});
-    setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(-50%) translateY(-14px)';setTimeout(function(){t.remove();},380);},3200);
-    _ctSPTimeout=setTimeout(next, 9000+Math.random()*8000);
+    setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(-50%) translateY(-14px)';setTimeout(function(){t.remove();},380);},2600+Math.random()*900);
+    _ctSPTimeout=setTimeout(next, 16000+Math.random()*18000);
   }
   next();
 }
