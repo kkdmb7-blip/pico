@@ -33,17 +33,30 @@
     try { return JSON.parse(localStorage.getItem(PET_KEY)) || {}; } catch(e) { return {}; }
   }
 
+  function getElement() {
+    try { var p = localStorage.getItem('yongsin_pet_pref'); if (p) return p; } catch(e) {}
+    var el = getPetState().element;
+    if (el) return el;
+    // pico_yongsin: 사주 분석 후 자동 저장된 용신 원소
+    try {
+      var ys = localStorage.getItem('pico_yongsin');
+      var valid = ['wood','fire','earth','metal','water'];
+      if (ys && valid.indexOf(ys) !== -1) return ys;
+    } catch(e) {}
+    return null;
+  }
+
   // raw.all[element] 까지 파고든 실제 상태 반환
   function getActiveState() {
     var raw = getPetState();
+    var el = getElement(); // pref 우선
+    if (raw.all && el && raw.all[el]) {
+      return Object.assign({ element: el }, raw.all[el]);
+    }
     if (raw.all && raw.element && raw.all[raw.element]) {
       return Object.assign({ element: raw.element }, raw.all[raw.element]);
     }
     return raw;
-  }
-
-  function getElement() {
-    return getPetState().element || null;
   }
 
   var ELEM_STYLE = {
@@ -327,8 +340,10 @@
     if (IS_PICO && found !== today) {
       localStorage.setItem(FOUND_KEY, today);
       var raw = getPetState();
-      var elem = raw.element;
+      var elem = getElement(); // pref 우선
+      if (!elem) elem = raw.element;
       if (elem) {
+        raw.element = elem;
         if (!raw.all) raw.all = {};
         if (!raw.all[elem]) raw.all[elem] = {};
         var s = raw.all[elem];

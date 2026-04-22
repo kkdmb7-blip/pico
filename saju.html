@@ -671,15 +671,24 @@ async function fetchSaju() {
     renderCareerTeaser(data);
     document.getElementById('sajuShareBtnWrap').style.display = 'flex';
     document.getElementById('sajuReportHook').style.display = 'block';
+    // 용신 pico_yongsin 저장 (사주 분석 결과 → float/pet 기본 원소로 활용)
+    try {
+      if (data.yongshin && data.yongshin.primary) {
+        localStorage.setItem('pico_yongsin', data.yongshin.primary); // 'metal','fire' 등 영문 키
+      }
+    } catch(e2) {}
     // 용신 펫 EXP 연동 (사주 분석 완료 시 +50, 하루 1번)
     try {
       var _petS = JSON.parse(localStorage.getItem('yongsin_pet') || '{}');
       var _petD = new Date(Date.now() + 9*3600000).toISOString().slice(0,10);
-      if (_petS.element && _petS._sajuExpDate !== _petD) {
+      var _petEl = (_petS.all && _petS.element && _petS.all[_petS.element]) ? _petS.element : null;
+      if (_petEl && _petS._sajuExpDate !== _petD) {
         _petS._sajuExpDate = _petD;
-        _petS.exp = (_petS.exp || 0) + 50;
-        var _petN = (_petS.level||1)*(_petS.level||1)*100;
-        if (_petS.exp >= _petN) { _petS.exp -= _petN; _petS.level = (_petS.level||1)+1; }
+        var _elS = _petS.all[_petEl];
+        _elS.exp = (_elS.exp || 0) + 50;
+        var _petN = (_elS.level||1)*(_elS.level||1)*100;
+        if (_elS.exp >= _petN) { _elS.exp -= _petN; _elS.level = (_elS.level||1)+1; }
+        _petS.all[_petEl] = _elS;
         localStorage.setItem('yongsin_pet', JSON.stringify(_petS));
         if (window._refreshPetCard) window._refreshPetCard();
       }
