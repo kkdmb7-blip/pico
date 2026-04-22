@@ -12,6 +12,14 @@
 
   var IS_PICO = (window.location.hostname === 'picolab.kr' || window.location.hostname === 'localhost');
 
+  // ── 미리보기 파라미터: ?float_preview=wood:18 ──
+  var _previewState = (function() {
+    var p = new URLSearchParams(window.location.search).get('float_preview');
+    if (!p) return null;
+    var parts = p.split(':');
+    return { element: parts[0], level: parseInt(parts[1]||'18', 10) };
+  })();
+
   // ── 상태 (picolab: localStorage / 외부: Supabase 후 주입) ──
   var _overrideState = null;
 
@@ -20,6 +28,7 @@
   }
 
   function getPetState() {
+    if (_previewState) return _previewState;
     if (_overrideState) return _overrideState;
     try { return JSON.parse(localStorage.getItem(PET_KEY)) || {}; } catch(e) { return {}; }
   }
