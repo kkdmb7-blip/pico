@@ -300,11 +300,23 @@
     }).catch(function() { cb(null); });
   }
 
+  function getOwnerName() {
+    try { var p = JSON.parse(localStorage.getItem('pico_profile') || '{}'); return p && p.name ? p.name : null; } catch(e) { return null; }
+  }
+  function ownerNa() {
+    var name = getOwnerName(); if (!name) return '';
+    var code = name.charCodeAt(name.length - 1);
+    var hasJong = code >= 0xAC00 && ((code - 0xAC00) % 28 !== 0);
+    return name + (hasJong ? '아' : '야');
+  }
+
   function showPetStatus() {
     var state = getActiveState();
     var lv = state.level || 1;
+    var na = ownerNa();
+    var header = na ? na + ', Lv.' + lv + ' 상태 보고 📊' : 'Lv.' + lv + ' 상태 보고 📊';
     showBubble([
-      'Lv.' + lv + ' 상태 보고 📊',
+      header,
       '🍖 ' + ((state.hunger||0) < 30 ? '배고파요 😢' : (state.hunger||0) > 75 ? '배불러요 😊' : '보통이에요'),
       '😊 ' + ((state.happy||0) < 30 ? '심심해요 🥺' : (state.happy||0) > 75 ? '너무 행복해요 🥰' : '괜찮아요'),
       '⚡ ' + ((state.energy||0) < 30 ? '피곤해요 😴' : (state.energy||0) > 75 ? '에너지 넘쳐요 💪' : '적당해요'),
@@ -314,7 +326,10 @@
   function showYongsinTip() {
     var elem = getElement() || 'water';
     var tips = ELEM_TIPS[elem] || ELEM_TIPS.water;
-    showBubble('오늘의 용신 팁 💫\n' + tips[Math.floor(Math.random() * tips.length)], 0);
+    var na = ownerNa();
+    var tip = tips[Math.floor(Math.random() * tips.length)];
+    var header = na ? na + ' 오늘의 용신 팁 💫' : '오늘의 용신 팁 💫';
+    showBubble(header + '\n' + tip, 0);
   }
 
   function showLuckyDraw() {
@@ -323,7 +338,7 @@
     var interval = setInterval(function() {
       fi++;
       if (fi < frames.length) { showBubble(frames[fi], 0); }
-      else { clearInterval(interval); var r = weightedRandom(LUCK_TABLE); showBubble('오늘의 운 뽑기!\n' + r.label + '\n' + r.msg, 0); }
+      else { clearInterval(interval); var r = weightedRandom(LUCK_TABLE); var na = ownerNa(); showBubble((na ? na + ' ' : '') + '오늘의 운 뽑기!\n' + r.label + '\n' + r.msg, 0); }
     }, 600);
   }
 
