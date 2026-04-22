@@ -403,7 +403,7 @@
   <!-- 버블 차트 카드 -->
   <div style="background:linear-gradient(145deg,#fdf8ee,#f4ece0);border-radius:22px;overflow:hidden;box-shadow:0 4px 20px rgba(120,80,20,0.12);border:1px solid rgba(180,140,60,0.18);margin-bottom:10px;">
     <div style="padding:18px 18px 0 18px;">
-      <div id="ctPill" style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;margin-bottom:12px;background:rgba(155,120,0,0.10);color:#7a5c00;border:1px solid rgba(155,120,0,0.22);">✨ 사주 속 진로</div>
+      <div id="ctPill" style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;margin-bottom:12px;background:rgba(155,120,0,0.10);color:#7a5c00;border:1px solid rgba(155,120,0,0.22);"><i class="pi pi-briefcase" style="font-size:12px;"></i> 사주 속 진로</div>
       <div style="font-size:17px;font-weight:800;color:#2a1a0a;font-family:'Pretendard Variable',Pretendard,sans-serif;"><span id="ctName"></span> 님의 진로 예측</div>
     </div>
     <div id="ctBubbles" style="position:relative;height:228px;overflow:hidden;"></div>
@@ -1572,7 +1572,7 @@ function _startCTSocialProof(){
       +'z-index:9999;white-space:nowrap;opacity:0;transition:opacity 0.35s,transform 0.35s;'
       +'box-shadow:0 4px 20px rgba(120,80,20,0.18);';
     var _msgs=['님이 진로 리포트를 열람했어요','님이 방금 결과를 확인했어요','님이 진로 분야를 확인했어요','님의 리포트가 방금 발송됐어요'];
-    t.innerHTML='⭐ <strong>'+names[idx%names.length]+'</strong>'+_msgs[idx%_msgs.length];
+    t.innerHTML='<i class="pi pi-people" style="font-size:13px;vertical-align:middle;"></i> <strong>'+names[idx%names.length]+'</strong>'+_msgs[idx%_msgs.length];
     idx++;
     document.body.appendChild(t);
     requestAnimationFrame(function(){t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});
