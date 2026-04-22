@@ -2798,17 +2798,16 @@ function renderCharVisual() {
   if (sK) summary += `<br>일간의 힘이 <b>${_singang}</b> 구조라 ${SING_DESC[sK]}.`;
   if (yE) summary += ` 삶의 균형을 잡아주는 용신은 <b>${yE}(${['목','화','토','금','수'].includes(yE)?{목:'나무·성장',화:'불·표현',토:'흙·안정',금:'쇠·결단',수:'물·지혜'}[yE]:''})</b>.`;
 
-  // ── 현재 대운 직접 추출 ──
+  // ── 현재 대운 직접 추출 (big_luck_analysis 배열 기준) ──
   let curDaeunVal = '—';
-  if (_rptFull && Array.isArray(_rptFull['대운분석']) && _rptFull['대운분석'].length) {
+  const bigLuck = _sdFull?.big_luck_analysis || _sdFull?.summary?.big_luck || [];
+  if (bigLuck.length) {
     const nowY = new Date().getFullYear();
-    const cur = _rptFull['대운분석'].find(d => {
+    const cur = bigLuck.find(d => {
       const r = (d.year_range||'').split(/[–\-~]/);
       return nowY >= parseInt(r[0]) && nowY <= parseInt(r[1]);
-    }) || _rptFull['대운분석'][0];
-    if (cur) curDaeunVal = (cur.ganjee||cur.간지||cur.daeun||'').replace(/\(.*\)/,'').trim() || '—';
-  } else if (_daeun) {
-    curDaeunVal = _daeun.replace(/\(.*\)/,'').trim();
+    }) || bigLuck[0];
+    if (cur) curDaeunVal = (cur.pillar_kor || cur.ganjee || '').trim() || '—';
   }
 
   // ── 핵심 정보 그리드 (색상 적용) ──
