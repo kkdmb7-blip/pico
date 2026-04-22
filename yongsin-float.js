@@ -107,7 +107,7 @@
       var stageIdx = getPetStageIdx();
       var _wfm = { 0:'pet_wood_1_rb.png', 1:'pet_wood_2-removebg-preview.png', 2:'pet_wood_3-removebg-preview.png', 3:'pet_wood_4-removebg-preview.png', 4:'pet_wood_5_rb.png', 5:'pet_wood_9.png' };
       var src = IMG_BASE + '/img/' + (_wfm[stageIdx] || _wfm[4]);
-      var _sz = (stageIdx === 5) ? '72px' : '48px';
+      var _sz = (stageIdx === 5) ? '76px' : '48px';
       return '<img src="' + src + '" alt="목 용신" style="width:'+_sz+';height:'+_sz+';object-fit:contain;" crossorigin="anonymous">';
     }
     if (elem === 'fire') {
@@ -391,7 +391,7 @@
     wrapper.appendChild(lvBadge);
 
     // 펫 버튼 (6단계는 64px)
-    var _petSize = (getPetStageIdx() === 5) ? '76px' : '52px';
+    var _petSize = (getPetStageIdx() === 5) ? '80px' : '52px';
     pet = document.createElement('button');
     pet.style.cssText = [
       'width:'+_petSize, 'height:'+_petSize, 'border-radius:50%', 'border:2px solid ' + s.bg,
