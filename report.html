@@ -2734,27 +2734,38 @@ function renderCharVisual() {
     .sort(([,a],[,b]) => Number(b) - Number(a));
   const maxPct = Number(ohList[0]?.[1] || 100);
 
-  // ── 버블 위치/크기 ──
-  const PCONF = [
-    { left:'8px',   top:'24px',  right:'auto', baseS:162 },
-    { left:'auto',  top:'8px',   right:'10px', baseS:108 },
-    { left:'auto',  top:'136px', right:'16px', baseS:86  },
-    { left:'170px', top:'6px',   right:'auto', baseS:68  },
-    { left:'178px', top:'158px', right:'auto', baseS:52  }
+  // ── 버블 크기: 퍼센트에 비례, 최소 28px 최대 148px ──
+  const MIN_SZ = 28, MAX_SZ = 148;
+  const sizes = ohList.slice(0,5).map(([,pct]) => {
+    const p = Number(pct);
+    return p <= 0 ? MIN_SZ : Math.max(MIN_SZ, Math.round(MIN_SZ + (MAX_SZ - MIN_SZ) * (p / maxPct)));
+  });
+
+  // ── 중앙 기준 배치: 1위 중앙, 나머지 주변 ──
+  const CW = 300, CH = 220;
+  const ANCHOR = [
+    { cx: 0.50, cy: 0.48 },  // 1위: 중앙
+    { cx: 0.18, cy: 0.25 },  // 2위: 왼쪽 위
+    { cx: 0.82, cy: 0.25 },  // 3위: 오른쪽 위
+    { cx: 0.18, cy: 0.75 },  // 4위: 왼쪽 아래
+    { cx: 0.82, cy: 0.75 },  // 5위: 오른쪽 아래
   ];
   const bubblesHtml = ohList.slice(0,5).map(([elem, pct], i) => {
-    const pc  = PCONF[i] || PCONF[4];
-    const sz  = Math.max(44, Math.round(pc.baseS * (Number(pct)/maxPct)));
+    const sz  = sizes[i];
+    const anc = ANCHOR[i];
+    const lx  = Math.round(anc.cx * CW - sz/2);
+    const ty  = Math.round(anc.cy * CH - sz/2);
     const col = OH_COLOR[elem] || '#888';
     const bg  = OH_BG[elem]   || 'rgba(128,128,128,0.1)';
     const brd = OH_BORDER[elem]|| 'rgba(128,128,128,0.3)';
     const isY = _yongsin && _yongsin.includes(elem);
-    const fs  = sz > 100 ? 16 : sz > 72 ? 13 : sz > 54 ? 11 : 9;
-    const ps  = sz > 100 ? 12 : sz > 72 ? 10 : 8;
-    return `<div style="position:absolute;left:${pc.left};right:${pc.right};top:${pc.top};width:${sz}px;height:${sz}px;border-radius:50%;background:${bg};border:${isY?'2.5px solid '+col:('1.5px solid '+brd)};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;${isY?'box-shadow:0 0 18px '+bg+';':''}">
+    const fs  = sz > 100 ? 16 : sz > 72 ? 13 : sz > 44 ? 11 : 9;
+    const ps  = sz > 100 ? 12 : sz > 72 ? 10 : sz > 44 ? 8 : 7;
+    const showYong = isY && sz > 56;
+    return `<div style="position:absolute;left:${lx}px;top:${ty}px;width:${sz}px;height:${sz}px;border-radius:50%;background:${bg};border:${isY?'2.5px solid '+col:'1.5px solid '+brd};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;${isY?'box-shadow:0 0 16px '+brd+';':''}">
       <div style="font-size:${fs}px;font-weight:800;color:${col};line-height:1;">${elem}</div>
-      <div style="font-size:${ps}px;color:${col};opacity:0.75;">${Math.round(Number(pct))}%</div>
-      ${isY && sz>60 ? `<div style="font-size:${Math.max(7,ps-1)}px;color:${col};font-weight:700;background:rgba(255,255,255,0.5);border-radius:6px;padding:1px 4px;">용신</div>` : ''}
+      ${sz > 36 ? `<div style="font-size:${ps}px;color:${col};opacity:0.75;">${Math.round(Number(pct))}%</div>` : ''}
+      ${showYong ? `<div style="font-size:${Math.max(7,ps-1)}px;color:${col};font-weight:700;background:rgba(255,255,255,0.55);border-radius:6px;padding:1px 4px;">용신</div>` : ''}
     </div>`;
   }).join('');
 
@@ -2816,7 +2827,7 @@ function renderCharVisual() {
     </div>
 
     <!-- 버블 차트 -->
-    <div style="position:relative;height:242px;overflow:hidden;padding:0 18px;">${bubblesHtml}</div>
+    <div style="position:relative;width:300px;height:220px;margin:12px auto 4px;overflow:visible;">${bubblesHtml}</div>
 
     <!-- 키워드 -->
     <div style="padding:0 18px 14px;">
