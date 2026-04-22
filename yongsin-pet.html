@@ -1761,6 +1761,11 @@ if (state.element) {
 }
 setInterval(renderMission, 60000);
 
+// BFCache 복원 시 재로드 (뒤로가기 후 최신 상태 반영)
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) { loadState(); render(); renderMission(); renderSlotTabs(); }
+});
+
 // 사주/일기 페이지 다녀온 후 미션 완료 감지
 document.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'visible') renderMission();

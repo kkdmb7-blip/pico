@@ -1518,6 +1518,8 @@
       +'</a>';
   }
   document.addEventListener('DOMContentLoaded', render);
+  // BFCache 복원 시 재렌더 (뒤로가기 후 최신 localStorage 반영)
+  window.addEventListener('pageshow', function(e) { if (e.persisted) render(); });
   window._refreshPetCard = render;
 })();
 </script>
