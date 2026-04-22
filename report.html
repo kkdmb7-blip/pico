@@ -2846,8 +2846,13 @@ function renderCharVisual() {
     el = document.createElement('div');
     el.id = 'charVisualCard';
     el.style.cssText = 'padding:0 0 16px;';
-    const anchor = document.getElementById('introPreview') || document.getElementById('btnGenerate');
-    anchor.parentNode.insertBefore(el, anchor);
+    const engEl = document.getElementById('introEngines');
+    if (engEl && engEl.nextSibling) {
+      engEl.parentNode.insertBefore(el, engEl.nextSibling);
+    } else {
+      const anchor = document.getElementById('introPreview') || document.getElementById('btnGenerate');
+      anchor.parentNode.insertBefore(el, anchor);
+    }
   }
   el.innerHTML = `
   <div style="background:linear-gradient(145deg,#fdf8ee,#f4ece0);border-radius:22px;overflow:hidden;box-shadow:0 4px 20px rgba(120,80,20,0.12);border:1px solid rgba(180,140,60,0.18);">
