@@ -2807,8 +2807,8 @@ function renderIntro() {
     previewEl = document.createElement('div');
     previewEl.id = 'introPreview';
     previewEl.className = 'intro-preview-box';
-    const orbBox = document.querySelector('.intro-orb-box');
-    orbBox.parentNode.insertBefore(previewEl, orbBox);
+    const btnGen = document.getElementById('btnGenerate');
+    btnGen.parentNode.insertBefore(previewEl, btnGen);
   }
   previewEl.innerHTML = `<div class="intro-preview-label">미리보기</div>
     <div class="intro-preview-inner">
