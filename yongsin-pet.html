@@ -1716,14 +1716,19 @@ loadFromServer(function(serverData) {
   if (!serverData) return;
   // 신형 포맷 (all 포함)
   var srvAll = serverData.all || null;
-  var srvEl  = serverData.element || state.element;
+  // 로컬 원소 선택 보존 — 서버 element로 덮어쓰지 않음
+  var localEl = slotElements.slot1 || state.element;
+  var srvEl   = serverData.element || localEl;
   if (srvAll) {
-    var srvElState = srvAll[state.element || srvEl];
+    // 로컬에서 선택된 원소 기준으로 레벨 비교
+    var compareEl  = localEl || srvEl;
+    var srvElState = srvAll[compareEl];
     var localLv = state.level || 1;
     var srvLv   = srvElState ? (srvElState.level || 1) : 0;
     if (srvLv >= localLv) {
       allStates = Object.assign({}, srvAll);
-      slotElements.slot1 = serverData.element  || srvEl;
+      // 로컬 선택 원소 유지, 없을 때만 서버 원소 사용
+      slotElements.slot1 = localEl || serverData.element || srvEl;
       slotElements.slot2 = serverData.element2 || slotElements.slot2;
       var activeEl = slotElements[activeSlot] || slotElements.slot1;
       state.element = activeEl;
