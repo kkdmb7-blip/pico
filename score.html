@@ -759,7 +759,7 @@ function shareScoreDirectKakao() {
   var overall = _scoreResult ? _scoreResult.overall : 0;
   var today = _scoreResult ? _scoreResult.today : '';
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '🔮 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n재물/관계/건강/학업/이동 5개 분야 종합\n나도 확인해봐 👇';
+  var text = '✨ 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n재물/관계/건강/학업/이동 5개 분야 종합\n나도 확인해봐 👇';
   try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
 
   if (!_ssmCanvas) {
@@ -801,7 +801,7 @@ function shareScoreKakao() {
   var overall = _scoreResult ? _scoreResult.overall : 0;
   var today = _scoreResult ? _scoreResult.today : '';
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '🔮 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n\n재물/관계/건강/학업/이동 5개 분야 종합\n\n나도 확인해봐 👇';
+  var text = '✨ 오늘(' + today + ') 포르투나 운세점수: ' + overall + '점\n\n재물/관계/건강/학업/이동 5개 분야 종합\n\n나도 확인해봐 👇';
   var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (isMobile && navigator.share) {
     navigator.share({ title: 'FORTUNA 운세점수', text: text, url: pageUrl }).catch(function(){});

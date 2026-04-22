@@ -771,7 +771,7 @@ nav {
       <span style="font-size:11px;color:var(--muted);">저장 시 EXP +20</span>
     </a>
     <a href="saju.html" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(154,138,96,0.15);text-decoration:none;color:var(--text);">
-      <span style="font-size:13px;">🔮 사주 분석하기</span>
+      <span style="font-size:13px;">✨ 사주 분석하기</span>
       <span style="font-size:11px;color:var(--muted);">완료 시 EXP +50</span>
     </a>
     <a href="report.html" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;text-decoration:none;color:var(--text);">
@@ -1147,7 +1147,7 @@ function renderSlotTabs() {
   var btn1 = document.getElementById('slotBtn1');
   var btn2 = document.getElementById('slotBtn2');
   if (!btn1 || !btn2) return;
-  var lbl1 = '🔮 용신' + (slotElements.slot1 ? ' · ' + ELEM_SHORT[slotElements.slot1] : '');
+  var lbl1 = '✨ 용신' + (slotElements.slot1 ? ' · ' + ELEM_SHORT[slotElements.slot1] : '');
   var lbl2 = '✨ 희신' + (slotElements.slot2 ? ' · ' + ELEM_SHORT[slotElements.slot2] : '');
   btn1.textContent = lbl1;
   btn2.textContent = lbl2;
@@ -1340,7 +1340,7 @@ function fmtCooldown(ms) {
 var DAILY_MISSIONS = [
   { id: 'feed',   icon: '🍚', label: '밥 3번 주기',    sub: '1회·2회·3회 채워주기', action: 'scroll:btn-feed' },
   { id: 'orb',    icon: '✦',  label: '특훈하기',        sub: '용신 기운 집중 수련',  action: 'scroll:btn-orb' },
-  { id: 'saju',   icon: '🔮', label: '사주 확인하기',   sub: '오늘 오행 에너지 보기', action: '/saju.html' },
+  { id: 'saju',   icon: '✨', label: '사주 확인하기',   sub: '오늘 오행 에너지 보기', action: '/saju.html' },
   { id: 'diary',  icon: '📔', label: '일기 쓰기',       sub: '하루 기록 + EXP +20',  action: '/diary.html' },
   { id: 'share',  icon: '📤', label: '공유하기',        sub: '친구에게 알리기',       action: 'share' },
 ];
@@ -1661,7 +1661,7 @@ function doMissionScroll(btnClass) {
 function doMissionShare() {
   if (isMissionDone('share')) return;
   var url = 'https://picolab.kr/yongsin-pet.html';
-  var text = '🔮 피코랩에서 용신 다마고치 키우고 있어요!\n내 용신 오행을 캐릭터로 키워보세요 👇\n' + url;
+  var text = '✨ 피코랩에서 용신 다마고치 키우고 있어요!\n내 용신 오행을 캐릭터로 키워보세요 👇\n' + url;
   showToast('공유 중... 📤');
   setTimeout(function() {
     completeMissionNav('share');

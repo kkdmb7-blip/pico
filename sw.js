@@ -3,7 +3,7 @@
 self.addEventListener('push', function(e) {
   var data = {};
   try { data = e.data ? e.data.json() : {}; } catch(err) {}
-  var title = data.title || '🔮 피코랩';
+  var title = data.title || '✨ 피코랩';
   var options = {
     body: data.body || '오늘의 운세 메시지가 도착했어요.',
     icon: '/img/goddess/goddess.png',

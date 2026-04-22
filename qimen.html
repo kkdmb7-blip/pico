@@ -2228,7 +2228,7 @@ function shareQimenKakao() {
     try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
 
     var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    var kText = '🔮 FORTUNA 기문둔갑\n\n나도 확인해봐 👇';
+    var kText = '✨ FORTUNA 기문둔갑\n\n나도 확인해봐 👇';
     canvas.toBlob(function(blob) {
       if (!blob) { _qimenShowToast('이미지 생성 실패 <i class="pi pi-sad"></i>'); return; }
       var file = new File([blob], 'fortuna_qimen.png', { type: 'image/png' });

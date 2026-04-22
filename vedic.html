@@ -774,7 +774,7 @@ function _drawVedicCard(cb) {
 
   // ── 다샤
   drawLine(y,180,0.3);y+=44;
-  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.8)';ctx.fillText('🔮 현재 다샤 (행성 대운)',W/2,y);y+=48;
+  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.8)';ctx.fillText('✨ 현재 다샤 (행성 대운)',W/2,y);y+=48;
   if(d.dasha){
     var dashaItems=[];
     if(d.dasha.mahadasha)dashaItems.push({label:'마하다샤',val:d.dasha.mahadasha});
@@ -830,7 +830,7 @@ function shareVedicKakao() {
 function doVedicShare() {
   var canvas = window._vedicCanvas; if (!canvas) return;
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '🔮 FORTUNA 베딕 점성술\n\n나도 확인해봐 👇';
+  var text = '✨ FORTUNA 베딕 점성술\n\n나도 확인해봐 👇';
   try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
   var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   canvas.toBlob(function(blob){
