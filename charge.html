@@ -659,9 +659,19 @@ function handleInviteCharge() {
   var link = 'https://kkdmb7-blip.github.io/memox/?ref=' + currentUserId;
   var msg = '<i class="pi pi-crystal"></i> 포르투나 — 사주·점성술 AI 운세 상담\n' + link;
   if (navigator.share) {
-    navigator.share({ title: '포르투나 초대', text: msg, url: link });
-  } else if (window.Kakao && Kakao.isInitialized && Kakao.isInitialized()) {
-    Kakao.Share.sendDefault({ objectType: 'text', text: msg, link: { mobileWebUrl: link, webUrl: link } });
+    navigator.share({ title: '포르투나 초대', text: msg, url: link }).catch(function(){});
+  } else if (window.Kakao && window.Kakao.Share) {
+    if (!Kakao.isInitialized()) { try { Kakao.init('25432f8a37e0ac51a5e10cbcba8ae413'); } catch(e) {} }
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '포르투나 — AI 운세 상담',
+        description: '사주·점성술 기반 AI 운세, 지금 무료로 시작해보세요',
+        imageUrl: 'https://picolab.kr/img/goddess-app.png',
+        link: { mobileWebUrl: link, webUrl: link }
+      },
+      buttons: [{ title: '무료로 시작하기', link: { mobileWebUrl: link, webUrl: link } }]
+    });
   } else {
     navigator.clipboard.writeText(link).then(function() {
       toast('초대 링크가 복사됐어요! 친구에게 공유해보세요 <i class="pi pi-crystal"></i>');
