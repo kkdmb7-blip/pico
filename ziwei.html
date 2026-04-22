@@ -734,14 +734,11 @@ function _drawZiweiCard(cb) {
 }
 
 function shareZiweiKakao() {
-  var btn = document.getElementById('ziweiKakaoBtn');
-  if(btn){ btn.disabled=true; btn.textContent='⏳ 생성 중...'; }
   var modal = document.getElementById('ziweiShareModal');
   var preview = document.getElementById('ziweiPreviewArea');
   preview.innerHTML = '<div style="color:rgba(74,58,42,0.7);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
   modal.style.display = 'flex';
   _drawZiweiCard(function(canvas){
-    if(btn){ btn.disabled=false; btn.textContent='⭐ 카카오톡 공유'; }
     if(!canvas){ preview.innerHTML='<div style="color:#c0392b;padding:20px;">카드 생성 실패 <i class="pi pi-sad"></i></div>'; return; }
     window._ziweiCanvas = canvas;
     var img = new Image(); img.src = canvas.toDataURL('image/png');

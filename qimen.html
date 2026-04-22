@@ -2219,13 +2219,9 @@ function _drawQimenCard(cb) {
 
 function shareQimenKakao() {
   if (!_qimenData) return;
-  var btn = document.querySelector('#qimenShareBtnWrap button');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ 생성 중...'; }
-
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
 
   _drawQimenCard(function(canvas) {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="pi pi-compass"></i> 카카오톡 공유'; }
     if (!canvas) { _qimenShowToast('카드 생성 실패 <i class="pi pi-sad"></i>'); return; }
 
     // URL 클립보드 복사

@@ -803,14 +803,11 @@ function _drawAstroCard(cb) {
 }
 
 function shareAstroKakao() {
-  var btn = document.getElementById('astroKakaoBtn');
-  if (btn) { btn.disabled=true; btn.textContent='⏳ 생성 중...'; }
   var modal = document.getElementById('astroShareModal');
   var preview = document.getElementById('astroPreviewArea');
   preview.innerHTML = '<div style="color:rgba(74,58,42,0.7);font-family:\'Noto Sans KR\',sans-serif;padding:40px 0;">카드 생성 중... <i class="pi pi-sparkle"></i></div>';
   modal.style.display = 'flex';
   _drawAstroCard(function(canvas){
-    if(btn){ btn.disabled=false; btn.innerHTML='<i class="pi pi-star"></i> 카카오톡 공유'; }
     if(!canvas){ preview.innerHTML='<div style="color:#b02a1a;padding:20px;">카드 생성 실패 <i class="pi pi-sad"></i></div>'; return; }
     window._astroCanvas = canvas;
     var img = new Image(); img.src = canvas.toDataURL('image/png');
