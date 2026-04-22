@@ -1586,7 +1586,7 @@ function goCareerReport(){
   var prof=(function(){try{return JSON.parse(localStorage.getItem('pico_profile'))||{};}catch(e){return{};}})();
   var p=new URLSearchParams();
   ['year','month','day','hour','gender','name'].forEach(function(k){if(prof[k]!=null)p.set(k,prof[k]);});
-  window.location.href='report.html?type=money&'+p.toString();
+  window.location.href='report.html?type=career_deep&'+p.toString();
 }
 
 function openSajuShareCard(cb) {
