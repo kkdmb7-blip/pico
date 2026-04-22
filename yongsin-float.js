@@ -180,10 +180,15 @@
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
+  function isBubbleOpen() {
+    return bubble && parseFloat(bubble.style.opacity) > 0;
+  }
+
   function scheduleMove() {
     clearTimeout(moveTimer);
     var delay = 8000 + Math.random() * 12000;
     moveTimer = setTimeout(function() {
+      if (isBubbleOpen()) { scheduleMove(); return; }
       var pos = pickNextPos();
       moveTo(pos);
       if (pos.hide) showBubble('...', 1500);
