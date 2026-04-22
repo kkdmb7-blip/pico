@@ -2827,13 +2827,32 @@ function renderCharVisual() {
       <div style="font-size:14px;font-weight:900;color:${it.color};letter-spacing:-0.3px;">${it.value}</div>
     </div>`).join('');
 
-  // ── 블러 텍스트 (더 구체적으로) ──
-  const blurLines = [
-    `${_ilju||'이 일주'}가 직장·사업 현장에서 실제로 어떤 패턴으로 드러나는지`,
-    `오행 ${top} 과잉이 만드는 반복되는 실수와 그것을 역이용하는 전략`,
-    `현재 ${_daeun||'대운'}에서 기질이 어떻게 증폭되고 있는지, 지금 가장 주의할 것`,
-    `그리고 ${_ilju||'이 일주'}만이 가진 숨겨진 잠재력과 타인이 절대 모르는 내면의 욕구`,
-  ];
+  // ── 실제 DB 데이터 항목 ──
+  const ipd = _iljuProfileData;       // 일주론
+  const gkd = _geokDetailData;        // 격국 세분화
+  const ssd = _strengthScoreData;     // 강약수치
+  const spd = _specialPatternData;    // 특수패턴
+
+  // 공개 항목: 일주 성격 + 격국특징 + 강약 해석
+  const openRows = [];
+  if (ipd?.성격) openRows.push({ label:'일주 성격', text: ipd.성격 });
+  if (gkd?.격특징) openRows.push({ label:'격국 특징', text: gkd.격특징 });
+  if (ssd?.해석) openRows.push({ label:'강약 분석', text: `점수 ${ssd.종합점수||'?'}/100 · ${ssd.해석}` });
+  if (_ohangWarning?.현대조언 && openRows.length < 3) openRows.push({ label:'오행 경고', text: _ohangWarning.현대조언 });
+
+  // 블러 항목: 직업적성, 연애패턴, 기신경계, 연령대 조언
+  const blurRows = [];
+  if (ipd?.직업적성) blurRows.push({ label:'직업 적성', text: ipd.직업적성 });
+  if (ipd?.연애패턴) blurRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
+  if (gkd?.기신경계) blurRows.push({ label:'기신 경계', text: gkd.기신경계 });
+  if (_ageAdvice)   blurRows.push({ label:'연령대 조언', text: _ageAdvice });
+  if (spd?.패턴명) blurRows.push({ label:'특수패턴', text: `${spd.패턴명} — ${spd.설명||''}` });
+
+  const rowStyle = (blur) => `font-size:12.5px;line-height:1.75;padding:10px 14px;border-radius:10px;background:rgba(120,80,20,0.05);border:1px solid rgba(120,80,20,0.09);margin-bottom:7px;${blur?'filter:blur(5px);user-select:none;pointer-events:none;':''}`;
+  const labelStyle = `font-size:10px;font-weight:700;color:rgba(120,70,0,0.55);letter-spacing:0.3px;margin-bottom:3px;`;
+
+  const openHtml = openRows.map(r => `<div style="${rowStyle(false)}"><div style="${labelStyle}">${r.label}</div><div style="color:#3a2000;">${r.text}</div></div>`).join('');
+  const blurHtml = blurRows.slice(0,3).map(r => `<div style="${rowStyle(true)}"><div style="${labelStyle}">${r.label}</div><div style="color:#3a2000;">${r.text}</div></div>`).join('');
 
   const badges = [
     _singang ? `<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(155,120,0,0.12);border:1px solid rgba(155,120,0,0.24);color:#7a5c00;">${_singang}</span>` : '',
@@ -2875,16 +2894,21 @@ function renderCharVisual() {
     </div>
 
     <!-- 요약 (공개) -->
-    <div style="margin:0 18px 14px;font-size:13px;line-height:1.9;color:#3a2510;padding:14px;background:rgba(120,80,20,0.05);border-radius:14px;border:1px solid rgba(120,80,20,0.08);">${summary}</div>
+    <div style="margin:0 18px 10px;font-size:13px;line-height:1.9;color:#3a2510;padding:14px;background:rgba(120,80,20,0.05);border-radius:14px;border:1px solid rgba(120,80,20,0.08);">${summary}</div>
+
+    <!-- 공개 DB 항목 -->
+    ${openHtml ? `<div style="padding:0 18px 4px;">${openHtml}</div>` : ''}
 
     <!-- 블러 구역 -->
     <div style="padding:0 18px 18px;">
-      <div style="font-size:11px;font-weight:600;color:rgba(60,40,10,0.38);margin-bottom:8px;letter-spacing:0.3px;">AI 심층 분석 미리보기</div>
+      <div style="font-size:11px;font-weight:600;color:rgba(60,40,10,0.38);margin-bottom:8px;letter-spacing:0.3px;">리포트에서 추가 공개</div>
       <div style="position:relative;border-radius:14px;overflow:hidden;">
-        <div style="font-size:13px;line-height:1.9;filter:blur(5px);user-select:none;pointer-events:none;padding:14px;background:rgba(120,80,20,0.06);border:1px solid rgba(120,80,20,0.08);border-radius:14px;color:rgba(60,40,10,0.75);">${blurLines.join('<br>')}</div>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;background:linear-gradient(to bottom,rgba(253,248,238,0) 0%,rgba(253,248,238,0.7) 60%,rgba(253,248,238,0.92) 100%);">
-          <div style="font-size:22px;margin-top:40px;">🔒</div>
-          <div style="font-size:12px;color:rgba(60,40,10,0.65);font-weight:700;">리포트 생성 후 전체 공개</div>
+        <div style="padding:4px 0;">${blurHtml || `<div style="${rowStyle(true)}"><div style="${labelStyle}">직업 적성</div><div style="color:#3a2000;">${_ilju||'이 일주'}에게 가장 잘 맞는 직업군과 피해야 할 환경</div></div><div style="${rowStyle(true)}"><div style="${labelStyle}">연애 패턴</div><div style="color:#3a2000;">반복되는 연애 실패의 구조적 원인과 궁합 방향</div></div><div style="${rowStyle(true)}"><div style="${labelStyle}">연령대 조언</div><div style="color:#3a2000;">지금 이 시기에 집중해야 할 핵심 방향</div></div>`}</div>
+        <div style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:16px;background:linear-gradient(to bottom,rgba(253,248,238,0) 0%,rgba(253,248,238,0.85) 55%,rgba(253,248,238,0.97) 100%);">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div style="font-size:18px;">🔒</div>
+            <div style="font-size:12px;color:rgba(60,40,10,0.65);font-weight:700;">리포트 생성 후 전체 공개</div>
+          </div>
         </div>
       </div>
     </div>
