@@ -3051,8 +3051,167 @@ function renderCharVisual() {
       + '<div style="display:flex;gap:6px;">' + (cards2||'<div style="font-size:12px;color:rgba(60,40,10,0.3);">데이터 없음</div>') + '</div></div>'
       + '<div style="position:relative;width:300px;height:140px;margin:8px auto 0;overflow:visible;">' + bubblesHtml + '</div>';
 
+  } else if (_type === 'character') {
+    // 기질 리포트: 일주 대형 카드 + 강약/용신 + 미니 버블
+    const iljuDisp = _ilju || '—';
+    const iljuOh = ohList[0]?.[0];
+    const iljuCol = OH_COLOR[iljuOh] || '#7a4e00';
+    const iljuBg  = OH_BG[iljuOh]  || 'rgba(120,80,20,0.08)';
+    const iljuBrd = OH_BORDER[iljuOh] || 'rgba(120,80,20,0.2)';
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="display:flex;align-items:center;gap:12px;">'
+      + '<div style="width:90px;height:90px;border-radius:20px;background:' + iljuBg + ';border:2px solid ' + iljuBrd + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">'
+      + '<div style="font-size:34px;font-weight:900;color:' + iljuCol + ';line-height:1;">' + iljuDisp + '</div>'
+      + '<div style="font-size:10px;color:' + iljuCol + ';margin-top:4px;opacity:0.7;">일주</div>'
+      + '</div>'
+      + '<div style="flex:1;display:flex;flex-direction:column;gap:6px;">'
+      + '<div style="background:rgba(120,80,20,0.06);border-radius:10px;padding:10px 12px;border:1px solid rgba(120,80,20,0.1);">'
+      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.45);margin-bottom:2px;">일간 강약</div>'
+      + '<div style="font-size:15px;font-weight:900;color:#3a2000;">' + (_singang||'—') + '</div>'
+      + '</div>'
+      + '<div style="background:' + (OH_BG[yE]||'rgba(120,80,20,0.06)') + ';border-radius:10px;padding:10px 12px;border:1px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.1)') + ';">'
+      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.45);margin-bottom:2px;">용신</div>'
+      + '<div style="font-size:15px;font-weight:900;color:' + (OH_COLOR[yE]||'#3a2000') + ';">' + (yE||'—') + '</div>'
+      + '</div></div></div>'
+      + '<div style="position:relative;width:300px;height:150px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
+
+  } else if (_type === 'child_career') {
+    // 아이 진로: 재능 오행 TOP2 + 진로 방향 키워드
+    const OH_TALENT = {목:['예술·창작','리더십','스포츠'],화:['발표·표현','연예·공연','마케팅'],토:['교육·복지','꼼꼼한 관리','요리·서비스'],금:['이공계·분석','법·금융','엔지니어링'],수:['연구·철학','IT·프로그래밍','외교·언어']};
+    const topEl = ohList[0]?.[0], secEl = ohList[1]?.[0];
+    const t1 = OH_TALENT[topEl]||[], t2 = OH_TALENT[secEl]||[];
+    const talentBadges = [...t1.slice(0,2), ...t2.slice(0,1)].map(t =>
+      '<div style="padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;background:rgba(120,80,20,0.08);border:1px solid rgba(120,80,20,0.15);color:#3a2000;">' + t + '</div>'
+    ).join('');
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="display:flex;gap:8px;">'
+      + (topEl ? '<div style="flex:1;background:' + OH_BG[topEl] + ';border-radius:14px;padding:14px;border:1.5px solid ' + OH_BORDER[topEl] + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + OH_COLOR[topEl] + ';margin-bottom:4px;">주 재능 오행</div><div style="font-size:32px;font-weight:900;color:' + OH_COLOR[topEl] + ';line-height:1;">' + topEl + '</div><div style="font-size:10px;color:' + OH_COLOR[topEl] + ';margin-top:4px;">' + Math.round(Number(ohList[0]?.[1]||0)) + '%</div></div>' : '')
+      + (secEl ? '<div style="flex:1;background:' + OH_BG[secEl] + ';border-radius:14px;padding:14px;border:1px solid ' + OH_BORDER[secEl] + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + OH_COLOR[secEl] + ';margin-bottom:4px;">보조 재능 오행</div><div style="font-size:32px;font-weight:900;color:' + OH_COLOR[secEl] + ';line-height:1;">' + secEl + '</div><div style="font-size:10px;color:' + OH_COLOR[secEl] + ';margin-top:4px;">' + Math.round(Number(ohList[1]?.[1]||0)) + '%</div></div>' : '')
+      + '</div>'
+      + '<div style="background:rgba(120,80,20,0.04);border-radius:12px;padding:12px 14px;border:1px solid rgba(120,80,20,0.1);">'
+      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.4);margin-bottom:8px;">적합한 진로 방향</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:6px;">' + talentBadges + '</div>'
+      + '</div></div>';
+
+  } else if (_type === 'family') {
+    // 가족 인연: 육친 오행 구조 (십신맵 기반)
+    const tgmF = _sdFull?.ten_gods_map || {};
+    const tgValsF = Object.values(tgmF);
+    const genderF = _profile?.gender || 'M';
+    const YUKCH = genderF === 'F'
+      ? [{label:'부성',keys:['편관','정관']},{label:'모성',keys:['정인','편인']},{label:'배우자',keys:['편관','정관']},{label:'자녀성',keys:['식신','상관']}]
+      : [{label:'부성',keys:['편재']},{label:'모성',keys:['정인','편인']},{label:'배우자',keys:['정재','편재']},{label:'자녀성',keys:['식신','상관']}];
+    const yukHtml = YUKCH.map(function(obj) {
+      const cnt = tgValsF.filter(function(v){ return v && obj.keys.some(function(k){ return v.includes(k); }); }).length;
+      const has = cnt > 0;
+      return '<div style="flex:1;min-width:60px;background:' + (has?'rgba(40,130,80,0.08)':'rgba(120,80,20,0.05)') + ';border-radius:12px;padding:10px 6px;border:' + (has?'1.5px solid rgba(40,130,80,0.25)':'1px solid rgba(120,80,20,0.1)') + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + (has?'#1a6a30':'rgba(60,40,10,0.4)') + ';margin-bottom:4px;">' + obj.label + '</div><div style="font-size:20px;font-weight:900;color:' + (has?'#1a6a30':'rgba(60,40,10,0.3)') + ';">' + cnt + '개</div><div style="font-size:9px;color:' + (has?'rgba(26,106,48,0.7)':'rgba(60,40,10,0.3)') + ';margin-top:2px;">' + obj.keys[0] + '</div></div>';
+    }).join('');
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:2px;">육친 오행 — 원국 내 십신 분포</div>'
+      + '<div style="display:flex;gap:6px;">' + yukHtml + '</div>'
+      + '<div style="position:relative;width:300px;height:140px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
+
+  } else if (_type === 'classic') {
+    // 고전 사주: 4기둥 한자 + 격국/강약/용신 3통계
+    const pillarsC = _sdFull?.summary?.pillars || {};
+    const STEM2OH = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
+    const pillarKeys = ['year','month','day','hour'], pillarLabels = ['년주','월주','일주','시주'];
+    const pillarHtml = pillarKeys.map(function(k,i) {
+      const p = pillarsC[k] || {};
+      const st = p.stem||'?', br = p.branch||'?';
+      const oh = STEM2OH[st]||'';
+      const col = OH_COLOR[oh]||'#7a4e00';
+      return '<div style="flex:1;text-align:center;padding:10px 4px;background:rgba(120,80,20,0.05);border-radius:12px;border:1px solid rgba(120,80,20,0.12);"><div style="font-size:9px;font-weight:700;color:rgba(60,40,10,0.4);margin-bottom:4px;">' + pillarLabels[i] + '</div><div style="font-size:22px;font-weight:900;color:' + col + ';line-height:1.2;">' + st + '</div><div style="font-size:18px;font-weight:700;color:rgba(60,40,10,0.55);">' + br + '</div></div>';
+    }).join('');
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="display:flex;gap:6px;">' + pillarHtml + '</div>'
+      + '<div style="display:flex;gap:8px;">'
+      + '<div style="flex:1;background:rgba(60,80,160,0.08);border-radius:12px;padding:12px;border:1px solid rgba(60,80,160,0.18);text-align:center;"><div style="font-size:10px;font-weight:700;color:#2a3a9a;margin-bottom:3px;">격국</div><div style="font-size:14px;font-weight:900;color:#1a2a7a;">' + (_geokguk||'정격') + '</div></div>'
+      + '<div style="flex:1;background:rgba(40,100,60,0.08);border-radius:12px;padding:12px;border:1px solid rgba(40,100,60,0.18);text-align:center;"><div style="font-size:10px;font-weight:700;color:#1a6030;margin-bottom:3px;">강약</div><div style="font-size:14px;font-weight:900;color:#0a4020;">' + (_singang||'—') + '</div></div>'
+      + '<div style="flex:1;background:' + (OH_BG[yE]||'rgba(120,80,20,0.08)') + ';border-radius:12px;padding:12px;border:1px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.15)') + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + (OH_COLOR[yE]||'#7a4200') + ';margin-bottom:3px;">용신</div><div style="font-size:14px;font-weight:900;color:' + (OH_COLOR[yE]||'#5a2a00') + ';">' + (yE||'—') + '</div></div>'
+      + '</div></div>';
+
+  } else if (_type === 'guide') {
+    // 관계 가이드: 대상 인물 주기질 + 대화 팁
+    const gOh = ohList[0]?.[0];
+    const gCol = OH_COLOR[gOh]||'#7a4e00', gBg = OH_BG[gOh]||'rgba(120,80,20,0.08)';
+    const OH_GUIDE = {목:['성장·인정 욕구가 높아요','구체적 칭찬이 효과적이에요','지나친 간섭은 역효과예요'],화:['표현과 공감을 중요시해요','감정 공유를 먼저 해주세요','형식적 대화를 불편해해요'],토:['신뢰와 안정을 최우선해요','급하게 밀어붙이면 거부감을 느껴요','장기적 관계를 선호해요'],금:['원칙과 논리로 접근하세요','감정보다 팩트가 효과적이에요','약속은 반드시 지켜야 해요'],수:['혼자 생각하는 시간이 필요해요','깊은 대화를 선호해요','피상적 관계를 불편해해요']};
+    const guideAdj = OH_ADJ[gOh] || '독특한 기질의';
+    const tips = OH_GUIDE[gOh] || [];
+    const tipsHtml = tips.map(function(t){return '<div style="display:flex;align-items:flex-start;gap:6px;font-size:12px;color:#3a2000;margin-bottom:4px;"><span style="color:' + gCol + ';font-weight:900;flex-shrink:0;">·</span>' + t + '</div>';}).join('');
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="display:flex;align-items:center;gap:12px;">'
+      + '<div style="width:72px;height:72px;border-radius:50%;background:' + gBg + ';border:2.5px solid ' + gCol + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">'
+      + '<div style="font-size:26px;font-weight:900;color:' + gCol + ';line-height:1;">' + (gOh||'?') + '</div>'
+      + '<div style="font-size:9px;color:' + gCol + ';margin-top:2px;font-weight:700;">주 기질</div>'
+      + '</div>'
+      + '<div style="flex:1;"><div style="font-size:12px;font-weight:800;color:#2a1a0a;margin-bottom:8px;">' + guideAdj + ' 사람</div>' + tipsHtml + '</div>'
+      + '</div>'
+      + '<div style="position:relative;width:300px;height:130px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
+
+  } else if (_type === 'summary') {
+    // 사주 요약: 오행 수평 바 차트 + 3 핵심 통계
+    const barHtmlS = ohList.map(function(pair) {
+      const el = pair[0], pct = pair[1];
+      const p = Math.round(Number(pct));
+      const col = OH_COLOR[el]||'#888', bg = OH_BG[el]||'rgba(128,128,128,0.1)';
+      return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;"><div style="width:22px;height:22px;border-radius:50%;background:' + bg + ';border:1.5px solid ' + col + ';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:' + col + ';flex-shrink:0;">' + el + '</div><div style="flex:1;height:10px;background:rgba(120,80,20,0.07);border-radius:5px;overflow:hidden;"><div style="height:100%;width:' + p + '%;background:' + col + ';border-radius:5px;opacity:0.8;"></div></div><div style="font-size:11px;font-weight:700;color:' + col + ';min-width:28px;text-align:right;">' + p + '%</div></div>';
+    }).join('');
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="background:rgba(120,80,20,0.04);border-radius:14px;padding:12px 14px;border:1px solid rgba(120,80,20,0.09);">' + barHtmlS + '</div>'
+      + '<div style="display:flex;gap:8px;">'
+      + '<div style="flex:1;background:rgba(60,80,160,0.08);border-radius:12px;padding:10px;border:1px solid rgba(60,80,160,0.18);text-align:center;"><div style="font-size:10px;font-weight:700;color:#2a3a9a;margin-bottom:3px;">일주</div><div style="font-size:14px;font-weight:900;color:#1a2a7a;">' + (_ilju||'—') + '</div></div>'
+      + '<div style="flex:1;background:rgba(40,100,60,0.08);border-radius:12px;padding:10px;border:1px solid rgba(40,100,60,0.18);text-align:center;"><div style="font-size:10px;font-weight:700;color:#1a6030;margin-bottom:3px;">격국</div><div style="font-size:13px;font-weight:900;color:#0a4020;">' + (_geokguk||'정격') + '</div></div>'
+      + '<div style="flex:1;background:' + (OH_BG[yE]||'rgba(120,80,20,0.08)') + ';border-radius:12px;padding:10px;border:1px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.15)') + ';text-align:center;"><div style="font-size:10px;font-weight:700;color:' + (OH_COLOR[yE]||'#7a4200') + ';margin-bottom:3px;">용신</div><div style="font-size:14px;font-weight:900;color:' + (OH_COLOR[yE]||'#5a2a00') + ';">' + (yE||'—') + '</div></div>'
+      + '</div></div>';
+
+  } else if (_type === 'balance') {
+    // 오행 밸런스: 수평 바 차트 (부족/과잉 강조)
+    const weakEl2 = ohList[ohList.length-1]?.[0];
+    const barHtmlB = ohList.map(function(pair) {
+      const el = pair[0], pct = pair[1];
+      const p = Math.round(Number(pct));
+      const col = OH_COLOR[el]||'#888', bg = OH_BG[el]||'rgba(128,128,128,0.1)', brd = OH_BORDER[el]||'rgba(128,128,128,0.3)';
+      const isYong = yE && yE === el;
+      const isWeak = el === weakEl2 && p < 15;
+      return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;">'
+        + '<div style="width:28px;height:28px;border-radius:50%;background:' + bg + ';border:' + (isYong?'2.5px':'1.5px') + ' solid ' + col + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:' + col + ';flex-shrink:0;">' + el + '</div>'
+        + '<div style="flex:1;height:14px;background:rgba(120,80,20,0.06);border-radius:7px;overflow:hidden;position:relative;"><div style="height:100%;width:' + Math.max(p,2) + '%;background:' + col + ';border-radius:7px;opacity:' + (isWeak?0.4:0.8) + ';"></div>' + (isYong?'<div style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:8px;font-weight:800;color:' + col + ';">용신</div>':'') + '</div>'
+        + '<div style="font-size:12px;font-weight:800;color:' + col + ';min-width:32px;text-align:right;">' + p + '%</div>'
+        + (isWeak?'<div style="font-size:9px;color:#8a2010;font-weight:700;background:rgba(200,60,60,0.1);padding:2px 5px;border-radius:5px;">부족</div>':'')
+        + '</div>';
+    }).join('');
+    visualHtml = '<div style="padding:14px 18px 10px;">'
+      + '<div style="font-size:10px;font-weight:700;color:rgba(60,40,10,0.38);margin-bottom:10px;">오행 비율 분포 — 부족 오행과 과잉 오행 확인</div>'
+      + barHtmlB + '</div>';
+
+  } else if (_type === 'sinsal') {
+    // 신살: 길신·흉신 배지 + 미니 버블
+    const ssObj = _specialPatternData || _sdFull?.special_pattern || {};
+    const gilsin = Array.isArray(ssObj.길신) ? ssObj.길신 : (ssObj.길신 ? [ssObj.길신] : []);
+    const hyungsin = Array.isArray(ssObj.흉신) ? ssObj.흉신 : (ssObj.흉신 ? [ssObj.흉신] : []);
+    const sinsalArr = Array.isArray(ssObj.신살) ? ssObj.신살 : [];
+    const allGil = [...gilsin, ...sinsalArr.filter(function(s){return s.유형==='길신'||s.길흉==='길';})].slice(0,5);
+    const allHyung = [...hyungsin, ...sinsalArr.filter(function(s){return s.유형==='흉신'||s.길흉==='흉';})].slice(0,5);
+    const gilHtmlS = allGil.map(function(s){return '<div style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(40,130,80,0.1);border:1px solid rgba(40,130,80,0.25);color:#1a6a30;">' + (typeof s==='string'?s:(s.이름||s.신살||'')) + '</div>';}).join('');
+    const hyungHtmlS = allHyung.map(function(s){return '<div style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(180,40,40,0.1);border:1px solid rgba(180,40,40,0.25);color:#8a1010;">' + (typeof s==='string'?s:(s.이름||s.신살||'')) + '</div>';}).join('');
+    const wonjinF = _wonjinData?.있음, gwimunF = _gwimungwanData?.있음;
+    const fallbackS = !gilHtmlS && !hyungHtmlS ? [
+      wonjinF!==undefined?'<div style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:' + (wonjinF?'rgba(180,40,40,0.1)':'rgba(40,130,80,0.1)') + ';border:1px solid ' + (wonjinF?'rgba(180,40,40,0.25)':'rgba(40,130,80,0.25)') + ';color:' + (wonjinF?'#8a1010':'#1a6a30') + ';">원진살 ' + (wonjinF?'있음':'없음') + '</div>':'',
+      gwimunF!==undefined?'<div style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:' + (gwimunF?'rgba(180,40,180,0.1)':'rgba(40,130,80,0.1)') + ';border:1px solid ' + (gwimunF?'rgba(180,40,180,0.25)':'rgba(40,130,80,0.25)') + ';color:' + (gwimunF?'#6a108a':'#1a6a30') + ';">귀문관살 ' + (gwimunF?'있음':'없음') + '</div>':''
+    ].filter(Boolean).join('') : '';
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + (gilHtmlS?'<div><div style="font-size:10px;font-weight:700;color:rgba(40,130,80,0.7);margin-bottom:6px;">길신 · 보호성 신살</div><div style="display:flex;flex-wrap:wrap;gap:6px;">' + gilHtmlS + '</div></div>':'')
+      + (hyungHtmlS?'<div><div style="font-size:10px;font-weight:700;color:rgba(180,40,40,0.7);margin-bottom:6px;">흉신 · 주의 신살</div><div style="display:flex;flex-wrap:wrap;gap:6px;">' + hyungHtmlS + '</div></div>':'')
+      + (fallbackS?'<div style="display:flex;flex-wrap:wrap;gap:6px;">' + fallbackS + '</div>':'')
+      + '<div style="position:relative;width:300px;height:130px;margin:0 auto;overflow:visible;">' + bubblesHtml + '</div>'
+      + '</div>';
+
   } else {
-    // character + child_career + family + classic + guide + 기타
+    // 기타 폴백 — 오행 버블
     visualHtml = '<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">' + bubblesHtml + '</div>';
   }
 
@@ -3104,14 +3263,114 @@ function renderCharVisual() {
     else                       blurRows.push({ label:'월별 흐름',   text: '2026년 상반기·하반기 핵심 변곡점과 주의 월' });
     blurRows.push({ label:'분야별 운세', text: '재물·직업·연애·건강 분야별 2026 흐름 상세' });
 
-  } else {
-    // character + 기타(career_deep, health, family, triple 등)
-    if (ipd?.성격)              openRows.push({ label:'일주 성격',  text: ipd.성격 });
-    if (gkd?.격특징)            openRows.push({ label:'격국 특징',  text: gkd.격특징 });
-    if (ssd?.해석)              openRows.push({ label:'강약 분석',  text: `점수 ${ssd.종합점수||'?'}/100 · ${ssd.해석}` });
+  } else if (_type === 'character') {
+    if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
+    if (gkd?.격특징)   openRows.push({ label:'격국 특징', text: gkd.격특징 });
+    if (ssd?.해석)     openRows.push({ label:'강약 분석', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    if (ipd?.직업적성) blurRows.push({ label:'직업 적성', text: ipd.직업적성 });
+    if (ipd?.연애패턴) blurRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
+    if (!blurRows.length && _ageAdvice) blurRows.push({ label:'연령대 조언', text: _ageAdvice });
+
+  } else if (_type === 'child_career') {
+    if (ipd?.성격)     openRows.push({ label:'아이 기질', text: ipd.성격 });
+    if (gkd?.격특징)   openRows.push({ label:'격국 특징', text: gkd.격특징 });
+    if (ssd?.해석)     openRows.push({ label:'강약 구조', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    if (ipd?.직업적성) blurRows.push({ label:'적합 직업군', text: ipd.직업적성 });
+    blurRows.push({ label:'진로 개화 시기', text: '이 아이의 재능이 꽃피는 대운과 최적 준비 시기' });
+
+  } else if (_type === 'family') {
+    if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
+    if (_wonjinData)   openRows.push({ label:'원진살', text: _wonjinData.있음 ? (_wonjinData.설명||'원진살 작용 — 가족 관계 마찰 구조 존재') : '원진살 없음 — 가족 관계 비교적 안정적' });
+    if (gkd?.격특징)   openRows.push({ label:'인연 구조', text: gkd.격특징 });
+    blurRows.push({ label:'부모·형제 관계', text: '부모성 십신 강약과 형제 인연 구조 심층 분석' });
+    blurRows.push({ label:'배우자·자녀 인연', text: '배우자궁 상태와 자녀 인연의 시기·구조 분석' });
+
+  } else if (_type === 'classic') {
+    if (gkd?.격특징)   openRows.push({ label:'격국 특징', text: gkd.격특징 });
+    if (ssd?.해석)     openRows.push({ label:'강약 분석', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
+    blurRows.push({ label:'적천수 해석', text: '일간에 해당하는 적천수 원문과 고전 관점 해설' });
+    blurRows.push({ label:'자평진전 격국', text: '격국의 성격(成格)·파격(破格) 여부와 이론적 근거' });
+
+  } else if (_type === 'guide') {
+    if (ipd?.성격)     openRows.push({ label:'이 사람 기질', text: ipd.성격 });
+    if (ipd?.연애패턴) openRows.push({ label:'관계 패턴',   text: ipd.연애패턴 });
+    if (gkd?.격특징)   openRows.push({ label:'성격 구조',   text: gkd.격특징 });
+    blurRows.push({ label:'대화 주의 포인트', text: '이 사람에게 절대 하면 안 되는 말과 행동 패턴' });
+    blurRows.push({ label:'신뢰 얻는 법', text: '이 사람의 마음을 여는 접근법과 관계 개선 전략' });
+
+  } else if (_type === 'summary') {
+    if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
+    if (ssd?.해석)     openRows.push({ label:'강약 요약', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    if (curDaeunVal !== '—') openRows.push({ label:'현재 대운', text: curDaeunVal + ' 대운 진행 중' });
+    blurRows.push({ label:'올해 핵심 포인트', text: '2026 병오년이 이 사주에 미치는 핵심 영향' });
+    blurRows.push({ label:'지금 할 것 3가지', text: '이 사주가 지금 이 시점에 집중해야 할 액션 3가지' });
+
+  } else if (_type === 'balance') {
     if (_ohangWarning?.현대조언) openRows.push({ label:'오행 경고', text: _ohangWarning.현대조언 });
-    if (ipd?.직업적성)           blurRows.push({ label:'직업 적성', text: ipd.직업적성 });
-    if (ipd?.연애패턴)           blurRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
+    if (ssd?.해석)     openRows.push({ label:'강약 분석', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    if (yE)            openRows.push({ label:'용신', text: yE + ' — 부족한 오행을 보완해주는 핵심 에너지' });
+    blurRows.push({ label:'부족 오행 보완법', text: '색상·방위·음식·직업으로 오행 균형 맞추는 실전법' });
+    blurRows.push({ label:'과잉 오행 조절법', text: '과잉 기운이 유발하는 문제 패턴과 해소 방향' });
+
+  } else if (_type === 'sinsal') {
+    if (_wonjinData)     openRows.push({ label:'원진살', text: _wonjinData.있음 ? (_wonjinData.설명||'원진살 작용 감지') : '원진살 없음' });
+    if (_gwimungwanData) openRows.push({ label:'귀문관살', text: _gwimungwanData.있음 ? '귀문관살 작용 — 관계의 특수 패턴 존재' : '귀문관살 없음' });
+    if (ssd?.해석)       openRows.push({ label:'강약 구조', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    blurRows.push({ label:'길신 활용법', text: '나의 길신이 활성화되는 시기와 구체적 활용 전략' });
+    blurRows.push({ label:'흉신 해소법', text: '흉살의 영향을 최소화하는 개운법과 주의 시기' });
+
+  } else if (_type === 'month') {
+    if (_currentMonthPillar) openRows.push({ label:'월건', text: _currentMonthPillar + ' — 이달 주도 에너지' });
+    if (_currentMonthTenGod) openRows.push({ label:'이달 십신', text: _currentMonthTenGod });
+    if (ssd?.해석)           openRows.push({ label:'강약 구조', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    blurRows.push({ label:'이달 재물 흐름', text: '월건이 재성에 미치는 영향과 이달 돈의 흐름' });
+    blurRows.push({ label:'이달 인간관계', text: '이달 관성·인성 작용과 관계에서 주의할 포인트' });
+
+  } else if (_type === 'yongsin') {
+    if (yE) openRows.push({ label:'용신 오행', text: yE + ' — ' + ({목:'나무·성장 에너지',화:'불·표현 에너지',토:'흙·안정 에너지',금:'쇠·결단 에너지',수:'물·지혜 에너지'}[yE]||'') });
+    if (gkd?.격특징) openRows.push({ label:'격국 특징', text: gkd.격특징 });
+    if (ssd?.해석)   openRows.push({ label:'강약 구조', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    blurRows.push({ label:'용신 색상·방위', text: '용신 오행에 맞는 색상과 방위로 기운 보완하는 법' });
+    blurRows.push({ label:'용신 직업·환경', text: '용신을 살리는 직업군과 주거·사무실 환경 구성법' });
+
+  } else if (_type === 'health') {
+    const weakElH = ohList[ohList.length-1]?.[0];
+    const OH_ORGAN2 = {목:'간·담낭',화:'심장·소장',토:'비위·위장',금:'폐·대장',수:'신장·방광'};
+    if (weakElH) openRows.push({ label:'취약 장기', text: weakElH + ' 기운 부족 — ' + (OH_ORGAN2[weakElH]||'') + ' 주의' });
+    if (_ohangWarning?.현대조언) openRows.push({ label:'오행 경고', text: _ohangWarning.현대조언 });
+    if (ssd?.해석) openRows.push({ label:'체질 강약', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    blurRows.push({ label:'취약 시기', text: '건강 주의가 필요한 대운·세운 시기와 예방 포인트' });
+    blurRows.push({ label:'체질 맞춤 식단', text: '오행 체질에 맞는 음식과 피해야 할 음식 목록' });
+
+  } else if (['wealth_timing','timing'].includes(_type)) {
+    if (curDaeunVal !== '—') openRows.push({ label:'현재 대운', text: curDaeunVal + ' 대운 진행 중' });
+    if (ssd?.해석)           openRows.push({ label:'강약 구조', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    if (dt?.전환기여부 && dt.전환목록?.length) openRows.push({ label:'대운 전환기', text: dt.전환목록[0].설명 });
+    else openRows.push({ label:'대운 전환기', text: '다음 대운 전환까지 남은 기간과 준비 방향' });
+    blurRows.push({ label:'최고 타이밍', text: '재물·사업에서 가장 강한 기운이 오는 대운과 세운' });
+    blurRows.push({ label:'주의 시기', text: '에너지 소진 및 손실 위험이 높은 기간과 대응법' });
+
+  } else if (['triple','astro_full','vedic_full','ziwei_full'].includes(_type)) {
+    if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
+    if (gkd?.격특징)   openRows.push({ label:'격국 특징', text: gkd.격특징 });
+    if (ssd?.해석)     openRows.push({ label:'강약 분석', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    if (ipd?.직업적성) blurRows.push({ label:'통합 직업 방향', text: ipd.직업적성 });
+    blurRows.push({ label:'교차 분석 핵심', text: '동서양 시스템이 공통으로 가리키는 운명 키워드' });
+
+  } else if (_type === 'career_deep') {
+    if (gkd?.격특징)   openRows.push({ label:'격국 특징', text: gkd.격특징 });
+    if (ssd?.해석)     openRows.push({ label:'강약 구조', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    if (ipd?.직업적성) openRows.push({ label:'직업 적성', text: ipd.직업적성 });
+    blurRows.push({ label:'커리어 대운', text: '현재 대운에서 직업·창업에 최적인 방향과 타이밍' });
+    blurRows.push({ label:'적합 사업 방향', text: '격국과 용신을 살린 창업 아이디어와 성공 구조' });
+
+  } else {
+    if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
+    if (gkd?.격특징)   openRows.push({ label:'격국 특징', text: gkd.격특징 });
+    if (ssd?.해석)     openRows.push({ label:'강약 분석', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
+    if (ipd?.직업적성) blurRows.push({ label:'직업 적성', text: ipd.직업적성 });
+    if (ipd?.연애패턴) blurRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
     if (!blurRows.length && _ageAdvice) blurRows.push({ label:'연령대 조언', text: _ageAdvice });
   }
 
@@ -3149,7 +3408,7 @@ function renderCharVisual() {
         <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(155,120,0,0.10);color:#7a5c00;border:1px solid rgba(155,120,0,0.22);"><i class="pi pi-person"></i> 내 사주 미리보기</div>
         ${badges}
       </div>
-      <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:4px;">${name ? name + ' 님의 ' : ''}${{character:'오행 에너지 구조', money:'재물 오행 구조', love:'연애 오행 구조', daeun:'대운 오행 흐름', year:'올해 오행 에너지'}[_type] || '오행 에너지 구조'}</div>
+      <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:4px;">${name ? name + ' 님의 ' : ''}${{character:'오행 기질 구조', money:'재물 오행 구조', love:'연애 오행 구조', daeun:'대운 오행 흐름', year:'올해 오행 에너지', month:'이번달 오행 구조', yongsin:'용신 오행 에너지', health:'체질 오행 분포', wealth_timing:'재물 타이밍 구조', timing:'인생 타이밍 구조', career_deep:'직업·사업 오행 구조', child_career:'재능 오행 구조', family:'육친 오행 구조', classic:'고전 사주 원국', guide:'상대방 오행 기질', summary:'내 사주 핵심 요약', balance:'오행 밸런스', sinsal:'신살 구조', triple:'동서양 통합 분석', astro_full:'사주·서양 교차 구조', vedic_full:'사주·베딕 교차 구조', ziwei_full:'사주·자미 교차 구조'}[_type] || '오행 에너지 구조'}</div>
     </div>
 
     <!-- 타입별 시각화 -->
