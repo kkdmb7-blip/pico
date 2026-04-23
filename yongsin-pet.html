@@ -1418,6 +1418,7 @@ function render() {
   // 친밀도 라벨
   var b = state.bond || 0;
   var bLabel = b < 3 ? '낯선' : b < 10 ? '친근한' : b < 30 ? '친한' : b < 100 ? '절친' : '평생친구';
+  var bTier = b < 5 ? 0 : b < 15 ? 1 : b < 30 ? 2 : b < 60 ? 3 : 4;
   document.getElementById('infoBond').textContent = bLabel + ' (' + b + ')';
   // 연속 출석
   var sObj = {}; try { sObj = JSON.parse(localStorage.getItem('yongsin_streak') || '{}') || {}; } catch(e) {}
@@ -1436,7 +1437,6 @@ function render() {
   // 배경 테마
   applyBgTheme();
   var bgLabels = ['기본','한지방','대나무 뜰','달빛 정원','구름 위 신전'];
-  var bTier = b < 5 ? 0 : b < 15 ? 1 : b < 30 ? 2 : b < 60 ? 3 : 4;
   var bgEl = document.getElementById('infoBgTheme');
   if (bgEl) bgEl.textContent = bgLabels[bTier] + ' (친밀도 ' + b + ')';
   // 다이어리 렌더
@@ -1994,9 +1994,10 @@ function showToast(msg) {
 
 // ── 먹이 피커 ──
 function openFeedPicker() {
-  var m = document.getElementById('feedPicker');
-  if (m) { m.style.display = 'flex'; return; }
-  m = document.createElement('div');
+  // 매번 새로 렌더 (캐시하면 간식 카운트/영약 쿨타임이 최신 반영 안 됨)
+  var prev = document.getElementById('feedPicker');
+  if (prev) prev.remove();
+  var m = document.createElement('div');
   m.id = 'feedPicker';
   m.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9100;align-items:center;justify-content:center;padding:20px;';
   var tDay = todayStr();
@@ -2023,12 +2024,12 @@ function openFeedPicker() {
     + '</div>';
   document.body.appendChild(m);
   m.addEventListener('click', function(e) {
-    if (e.target === m || e.target.id === 'fpCancel') { m.style.display = 'none'; return; }
+    if (e.target === m || e.target.id === 'fpCancel') { m.remove(); return; }
     var btn = e.target.closest('.fp-btn');
     if (!btn) return;
     var k = btn.getAttribute('data-k');
     if (k === 'elixir' && elixDisabled) return;
-    m.style.display = 'none';
+    m.remove();
     doAction(k);
   });
 }
@@ -2049,9 +2050,9 @@ function grantRandomItem() {
   return k;
 }
 function openInventory() {
-  var m = document.getElementById('invModal');
-  if (m) { m.style.display = 'flex'; return; }
-  m = document.createElement('div');
+  var prev = document.getElementById('invModal');
+  if (prev) prev.remove();
+  var m = document.createElement('div');
   m.id = 'invModal';
   m.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9100;align-items:center;justify-content:center;padding:20px;';
   var items = state.items || {};
