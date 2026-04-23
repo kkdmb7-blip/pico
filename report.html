@@ -3682,12 +3682,13 @@ function renderCharVisual() {
 
   } else if (_type === 'child_career') {
     // 바이럴 패턴: 시적 헤드라인 + 빅% 버블 + 8축 레이더 + 3카드 잠금
+    // 적천수(滴天髓) 천간론 기반 비유 — 명리학 정통 표현
     const STEM_METAPHOR_C = {
       갑:'뿌리 깊은 큰 나무', 을:'유연하게 자라는 풀잎',
-      병:'한낮의 태양', 정:'은은한 촛불',
-      무:'드넓은 들판', 기:'비옥한 흙',
-      경:'은빛 조각칼', 신:'정교한 보석',
-      임:'큰 강물', 계:'맑은 이슬'
+      병:'한낮의 태양',       정:'은은한 등촉',
+      무:'드넓은 산과 들',     기:'비옥한 정원의 흙',
+      경:'잘 벼린 강철검',     신:'정련된 옥(玉)',
+      임:'바다로 흐르는 큰 강', 계:'촉촉한 새벽 이슬'
     };
     const iljuStemC = (_ilju||'')[0];
     const metaphorC = STEM_METAPHOR_C[iljuStemC] || '특별한 기운';
@@ -3702,6 +3703,7 @@ function renderCharVisual() {
     const inCntC  = tgValsC.filter(function(v){return v.includes('정인')||v.includes('편인');}).length;
     const gwanCntC= tgValsC.filter(function(v){return v.includes('정관')||v.includes('편관');}).length;
     const jaeCntC = tgValsC.filter(function(v){return v.includes('정재')||v.includes('편재');}).length;
+    const bigeCntC= tgValsC.filter(function(v){return v.includes('비견')||v.includes('겁재');}).length;
     const STEM2OH_C = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
     const dayStemC = _sdFull?.summary?.pillars?.day?.stem || iljuStemC || '';
     const dayOhC = STEM2OH_C[dayStemC] || '';
@@ -3716,7 +3718,7 @@ function renderCharVisual() {
       {name:'연구·학문',  score: calcFieldC({수:0.7, 금:0.3}, inCntC*1.2 + sikCntC*0.3, dayOhC==='수'?14:dayOhC==='금'?6:0), color:'#1a5fa0', bg:'#6db4ff'},
       {name:'예술·창작',  score: calcFieldC({목:0.5, 화:0.5}, sikCntC*1.4 + inCntC*0.3, dayOhC==='화'?14:dayOhC==='목'?10:0), color:'#c2236a', bg:'#f489c4'},
       {name:'IT·공학',    score: calcFieldC({금:0.6, 수:0.4}, gwanCntC*0.8 + sikCntC*0.4, dayOhC==='금'?14:dayOhC==='수'?6:0), color:'#5a6a7a', bg:'#8aa0b8'},
-      {name:'경영·리더십', score: calcFieldC({목:0.4, 금:0.3, 화:0.2}, gwanCntC*1.0 + jaeCntC*0.8, dayOhC==='목'?10:dayOhC==='금'?6:0), color:'#7a4e00', bg:'#f4d860'},
+      {name:'경영·리더십', score: calcFieldC({목:0.4, 금:0.3, 화:0.2}, gwanCntC*1.0 + jaeCntC*0.8 + bigeCntC*0.5, dayOhC==='목'?10:dayOhC==='금'?6:0), color:'#7a4e00', bg:'#f4d860'},
       {name:'교육·복지',  score: calcFieldC({토:0.5, 화:0.3}, inCntC*1.0 + sikCntC*0.5, dayOhC==='토'?14:dayOhC==='화'?6:0), color:'#3d7a3a', bg:'#7ad48f'},
       {name:'미디어·표현', score: calcFieldC({화:0.7, 목:0.2}, sikCntC*1.5, dayOhC==='화'?12:dayOhC==='목'?5:0), color:'#b84c1a', bg:'#f4a062'},
       {name:'의료·치유',  score: calcFieldC({수:0.4, 토:0.4}, inCntC*0.9 + sikCntC*0.4, dayOhC==='수'?10:dayOhC==='토'?8:0), color:'#1a6a30', bg:'#7ad4a0'}
@@ -3776,10 +3778,10 @@ function renderCharVisual() {
       + '</svg>';
 
     const bigC = top3C[0], midC = top3C[1], smlC = top3C[2];
-    // 빅 원만 블러 (사용자 요청), 좌·우 작은 원은 진짜 % 노출
+    // 1위(빅원): 분야명·% 모두 블러 (답 노출 X), 2·3위(좌·우): 분야명·% 진짜 노출
     const bubblesViralC = '<div style="position:relative;width:100%;height:170px;display:flex;align-items:center;justify-content:center;">'
       + '<div style="position:absolute;left:6%;top:55%;width:66px;height:66px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+smlC.bg+'cc,'+smlC.color+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 14px '+smlC.color+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+smlC.name+'</div><div style="font-size:18px;font-weight:900;line-height:1;margin-top:2px;">'+smlC.pct+'%</div></div>'
-      + '<div style="width:138px;height:138px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b8,#f4d860);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(244,216,96,0.6),inset 0 3px 8px rgba(255,255,255,0.55);position:relative;z-index:2;"><div style="font-size:11px;font-weight:800;color:#5a3a00;letter-spacing:-0.2px;">'+bigC.name+'</div><div style="font-size:36px;font-weight:900;color:#3a2400;line-height:1;filter:blur(7px);user-select:none;">'+bigC.pct+'%</div><div style="font-size:9px;color:#5a3a00;margin-top:3px;font-weight:700;opacity:0.78;">🔒 잠금</div></div>'
+      + '<div style="width:138px;height:138px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b8,#f4d860);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(244,216,96,0.6),inset 0 3px 8px rgba(255,255,255,0.55);position:relative;z-index:2;"><div style="font-size:11px;font-weight:800;color:#5a3a00;letter-spacing:-0.2px;filter:blur(6px);user-select:none;">'+bigC.name+'</div><div style="font-size:38px;font-weight:900;color:#3a2400;line-height:1;margin-top:2px;">'+bigC.pct+'%</div><div style="font-size:9px;color:#5a3a00;margin-top:4px;font-weight:800;letter-spacing:0.3px;">🔒 분야명 잠금</div></div>'
       + '<div style="position:absolute;right:5%;top:18%;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+midC.bg+'dd,'+midC.color+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 16px '+midC.color+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+midC.name+'</div><div style="font-size:22px;font-weight:900;line-height:1;margin-top:2px;">'+midC.pct+'%</div></div>'
       + '</div>';
 
