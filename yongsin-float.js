@@ -500,6 +500,78 @@
     showBubble(lines.join('\n'), 7000);
   }
 
+  // ── 계절/절기 이벤트 ──
+  // 대표 절기 + 명절. 날짜는 ±1일 오차 허용.
+  var SEASONAL_EVENTS = {
+    '01-01': '🎊 새해 복 많이 받으세요! 올해도 함께해요',
+    '01-06': '🌨️ 소한이에요, 따뜻하게 지내요',
+    '01-20': '❄️ 대한, 1년 중 가장 춥대요',
+    '02-04': '🌱 입춘! 새 기운이 시작돼요',
+    '02-19': '💧 우수, 얼음이 풀리는 날',
+    '03-06': '🐛 경칩, 개구리가 깨어나요',
+    '03-21': '🌸 춘분, 밤낮 길이가 같아요',
+    '04-05': '🌿 청명, 봄 햇살이 맑아요',
+    '04-20': '🌾 곡우, 씨앗 뿌리기 좋은 날',
+    '05-05': '🎏 어린이날! 즐거운 하루 되세요',
+    '05-06': '🌞 입하, 여름이 시작돼요',
+    '06-06': '🌾 망종, 한 해의 씨앗을 뿌려요',
+    '06-21': '☀️ 하지, 낮이 가장 긴 날',
+    '07-07': '🌌 소서, 더위가 시작돼요',
+    '08-08': '🍃 입추, 가을의 문턱',
+    '08-23': '🍂 처서, 더위가 물러가요',
+    '09-08': '🌾 백로, 이슬이 맺혀요',
+    '09-23': '🍁 추분, 밤이 길어져요',
+    '10-08': '🌾 한로, 찬 이슬의 계절',
+    '11-07': '❄️ 입동, 겨울이 시작돼요',
+    '12-07': '⛄ 대설, 눈이 많은 계절',
+    '12-22': '🕯️ 동지, 팥죽 한 그릇 어때요?',
+    '12-25': '🎄 메리 크리스마스!',
+    '12-31': '🎆 올 한 해 함께해줘서 고마워요'
+  };
+  function getSeasonalMsg() {
+    var d = new Date();
+    var mm = ('0' + (d.getMonth() + 1)).slice(-2);
+    var dd = ('0' + d.getDate()).slice(-2);
+    var key = mm + '-' + dd;
+    return SEASONAL_EVENTS[key] || null;
+  }
+
+  // ── 친구 고치 방문 (하루 1회, 랜덤) ──
+  // proactive greeter 틱에서 낮은 확률로 발생. 선물 자동 지급.
+  var FRIEND_VISIT_KEY = 'yongsin_friend_visit_day';
+  var FRIEND_NAMES = ['봉실이','별구름','해오름','달토끼','꽃잎이','솔바람','청이','비비','하늘이','단풍이','물방울','불꽃이','돌돌이','바위','은구슬'];
+  var FRIEND_ELEMS = ['🌿','🔥','🪨','💎','💧'];
+  function maybeFriendVisit() {
+    if (!IS_PICO) return false;
+    var today = getTodayStr();
+    try { if (localStorage.getItem(FRIEND_VISIT_KEY) === today) return false; } catch(e) {}
+    if (Math.random() > 0.12) return false; // 한 틱당 12% (하루에 1~2번 정도 기회)
+    // 보상
+    try {
+      var raw = getPetState();
+      var elem = getElement() || raw.element;
+      if (elem) {
+        if (!raw.all) raw.all = {};
+        if (!raw.all[elem]) raw.all[elem] = {};
+        var st = raw.all[elem];
+        st.exp = (st.exp || 0) + 5;
+        st.happy = Math.min(100, (st.happy || 0) + 3);
+        raw.element = elem;
+        localStorage.setItem(PET_KEY, JSON.stringify(raw));
+      }
+      localStorage.setItem(FRIEND_VISIT_KEY, today);
+    } catch(e) {}
+    var nm = FRIEND_NAMES[Math.floor(Math.random()*FRIEND_NAMES.length)];
+    var em = FRIEND_ELEMS[Math.floor(Math.random()*FRIEND_ELEMS.length)];
+    var msgs = [
+      em + ' 친구 ' + nm + '가 놀러왔어요!\n선물을 두고 갔어요 (+5 EXP · +3 기분)',
+      em + ' ' + nm + ': "안녕? 잘 지내?"\n두 고치가 잠깐 인사했어요 (+5 EXP · +3 기분)',
+      em + ' 친구 ' + nm + '가 잠깐 다녀갔어요\n응원을 주고 갔어요 (+5 EXP · +3 기분)'
+    ];
+    showBubble(msgs[Math.floor(Math.random()*msgs.length)], 5000);
+    return true;
+  }
+
   // ── 수면/꿈 시스템 ──
   // 23:00~06:00 = 수면. 이때 접속하면 "자는 중" + 꿈 예약.
   // 다음날 아침 첫 방문에서 꿈 이야기 + 보상(+5 EXP, +3 happy).
@@ -748,13 +820,29 @@
     showBubble(header + '\n' + tip + footer, 5000);
   }
 
+  var LUCK_DRAW_KEY = 'yongsin_luck_draw';       // { date, label, msg }
+  function getSavedLuck() { try { return JSON.parse(localStorage.getItem(LUCK_DRAW_KEY) || 'null'); } catch(e) { return null; } }
   function showLuckyDraw() {
+    var today = getTodayStr();
+    var saved = getSavedLuck();
+    // 오늘 이미 뽑았으면 같은 결과 재표시
+    if (saved && saved.date === today) {
+      var naS = ownerNa();
+      showBubble((naS ? naS + ' ' : '') + '오늘의 운 (이미 뽑음)\n' + saved.label + '\n' + saved.msg + '\n— 내일 또 뽑아요 ✨', 5500);
+      return;
+    }
     var frames = ['🎲 뽑는 중...', '🎰 두근두근...', '✨ 거의 다 됐어요...'];
     var fi = 0; showBubble(frames[fi], 0);
     var interval = setInterval(function() {
       fi++;
       if (fi < frames.length) { showBubble(frames[fi], 0); }
-      else { clearInterval(interval); var r = weightedRandom(LUCK_TABLE); var na = ownerNa(); showBubble((na ? na + ' ' : '') + '오늘의 운 뽑기!\n' + r.label + '\n' + r.msg, 0); }
+      else {
+        clearInterval(interval);
+        var r = weightedRandom(LUCK_TABLE);
+        try { localStorage.setItem(LUCK_DRAW_KEY, JSON.stringify({ date: today, label: r.label, msg: r.msg })); } catch(e) {}
+        var na = ownerNa();
+        showBubble((na ? na + ' ' : '') + '오늘의 운 뽑기!\n' + r.label + '\n' + r.msg + '\n(내일 또 뽑을 수 있어요)', 6000);
+      }
     }, 600);
   }
 
@@ -1158,15 +1246,17 @@
         return;
       }
       var anni = getAnniversaryMsg();
+      var season = getSeasonalMsg();
       var petNm = getPetName();
       var tier = getBondTier();
       var ret = getReturnMsg();
       var sObj = getStreak();
       var gift = sObj.boxReady;
-      if (gift)       { showBubble('🎁 선물 상자 준비 완료!\n펫을 탭해서 열어보세요', 4500); }
-      else if (anni)  { showBubble(anni + '\n' + petNm + '와(과) 함께해요', 4500); }
-      else if (ret)   { showBubble(ret + '\n— ' + petNm + ' (' + tier.label + ')', 4000); }
-      else            { showBubble(timeGreet() + '\n' + petNm + ': ' + tier.honorific + (sObj.count ? '\n🔥 ' + sObj.count + '일 연속 출석!' : ''), 3500); }
+      if (gift)        { showBubble('🎁 선물 상자 준비 완료!\n펫을 탭해서 열어보세요', 4500); }
+      else if (anni)   { showBubble(anni + '\n' + petNm + '와(과) 함께해요', 4500); }
+      else if (season) { showBubble(season + '\n' + petNm + ': ' + tier.honorific, 4500); }
+      else if (ret)    { showBubble(ret + '\n— ' + petNm + ' (' + tier.label + ')', 4000); }
+      else             { showBubble(timeGreet() + '\n' + petNm + ': ' + tier.honorific + (sObj.count ? '\n🔥 ' + sObj.count + '일 연속 출석!' : ''), 3500); }
     }, 1500);
     scheduleMove();
     startIdleExpTicker();
@@ -1182,6 +1272,8 @@
       // 수면 중엔 말 걸지 않음 (자는 연출만 유지)
       if (isSleepHour()) { setSleepVisual(true); return; }
       setSleepVisual(false);
+      // 친구 고치 방문 이벤트 먼저 시도 (하루 1회)
+      if (maybeFriendVisit()) return;
       if (Math.random() > 0.2) return;
       var pool = [
         timeGreet(),
