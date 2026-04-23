@@ -3745,6 +3745,35 @@ function renderCharVisual() {
       + '<div style="position:absolute;right:5%;top:18%;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+midC.bg+'dd,'+midC.color+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 16px '+midC.color+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+midC.name+'</div><div style="font-size:22px;font-weight:900;line-height:1;margin-top:2px;">'+midC.pct+'%</div></div>'
       + '</div>';
 
+    // ★ 현대 진로 추천 — 116개 직업 매트릭스에서 사주 점수 TOP 6 추출
+    // 1~3위는 노출(임팩트), 4~6위는 블러(잠금/CTA)
+    const topJobsC = sfC.scoreCareerJobs(ctxC, { topN: 6 });
+    const ERA_BADGE_C = { 전통:'#7a4e1a', 안정:'#3a6a3a', 성장:'#1f4d8a', 미래:'#5a2a8a' };
+    const ERA_BG_C    = { 전통:'#f4e4c4', 안정:'#d4f0d4', 성장:'#d4e4f8', 미래:'#ecd8f8' };
+    const jobCardsHtmlC = topJobsC.map(function(j, i){
+      const blurred = i >= 3;
+      const eraColor = ERA_BADGE_C[j.era] || '#7a5e2a';
+      const eraBg = ERA_BG_C[j.era] || '#f4e4c4';
+      const rankColor = i === 0 ? '#b89048' : i === 1 ? '#8a6a30' : '#7a5210';
+      return '<div style="background:linear-gradient(160deg,#fffaee,#f4e8c8);border:1.5px solid '+(i===0?'rgba(184,144,72,0.55)':'rgba(180,130,50,0.3)')+';border-radius:13px;padding:11px 11px 12px;display:flex;flex-direction:column;gap:5px;position:relative;'+(i===0?'box-shadow:0 4px 14px rgba(184,144,72,0.3),inset 0 1px 0 rgba(255,255,255,0.6);':'box-shadow:0 2px 8px rgba(180,130,50,0.12),inset 0 1px 0 rgba(255,255,255,0.5);')+'">'
+        + (blurred ? '<div style="position:absolute;top:7px;right:9px;font-size:13px;z-index:3;">🔒</div>' : '')
+        + '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;'+(blurred?'filter:blur(5px);user-select:none;':'')+'">'
+          + '<div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;">'
+            + '<span style="font-size:10px;font-weight:900;color:'+rankColor+';letter-spacing:-0.3px;flex-shrink:0;">'+(i+1)+'위</span>'
+            + '<span style="font-size:13px;font-weight:900;color:#3a2a10;letter-spacing:-0.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+j.name+'</span>'
+          + '</div>'
+          + '<div style="font-size:9px;font-weight:800;color:'+eraColor+';background:'+eraBg+';padding:2px 7px;border-radius:8px;letter-spacing:0.3px;flex-shrink:0;">'+j.era+'</div>'
+        + '</div>'
+        + '<div style="font-size:9.5px;color:'+rankColor+';font-weight:800;letter-spacing:0.2px;'+(blurred?'filter:blur(4px);user-select:none;':'')+'">'+j.field+' · '+j.trait+'</div>'
+        + '<div style="font-size:11px;color:#5a3a0a;line-height:1.45;font-weight:600;'+(blurred?'filter:blur(5px);user-select:none;':'')+'">'+j.hint+'</div>'
+        + '</div>';
+    }).join('');
+    const jobsBlockC = '<div style="background:linear-gradient(160deg,#fbf3da,#f0e2bc);border-radius:18px;padding:16px 14px 16px;border:1.5px solid rgba(180,130,50,0.3);box-shadow:0 4px 14px rgba(180,130,50,0.15),inset 0 1px 0 rgba(255,255,255,0.5);">'
+      + '<div style="text-align:center;font-size:11px;font-weight:900;color:#8a6620;letter-spacing:1.2px;margin-bottom:4px;">🎯 진짜 어울리는 진로 TOP 6</div>'
+      + '<div style="text-align:center;font-size:10px;color:#8a6620;font-weight:700;opacity:0.78;margin-bottom:11px;">현대 직업 116개 매트릭스 × 사주 매칭 결과</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' + jobCardsHtmlC + '</div>'
+      + '</div>';
+
     // 실제 child_career 섹션과 일치하는 라벨 (TYPE_SECTIONS.child_career 기반)
     const lockCardsC = [
       {label:'타고난 기질', hint:'아이만의 핵심 성향 3가지'},
@@ -3766,6 +3795,7 @@ function renderCharVisual() {
       + '<div style="text-align:center;font-size:11px;font-weight:900;color:#8a6620;letter-spacing:1.2px;margin-bottom:6px;">8가지 재능 지표</div>'
       + radarSvgC
       + '</div>'
+      + jobsBlockC
       + '<div style="display:flex;gap:7px;">' + lockHtmlC + '</div>'
       + '<div style="text-align:center;font-size:11px;color:#8a6620;font-weight:800;letter-spacing:0.3px;background:linear-gradient(135deg,rgba(244,216,96,0.22),rgba(180,130,50,0.08));padding:9px 12px;border-radius:10px;border:1px dashed rgba(180,130,50,0.35);">🔒 리포트를 받으면 모든 답이 즉시 공개돼요</div>'
       + '</div>';

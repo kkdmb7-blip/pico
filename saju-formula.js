@@ -559,6 +559,7 @@
     TALENT_AXES: TALENT_AXES, CAREER_FIELDS: CAREER_FIELDS,
     CHARACTER_TRAITS: CHARACTER_TRAITS, MONEY_PATTERNS: MONEY_PATTERNS,
     LOVE_STYLES: LOVE_STYLES, HEALTH_AREAS: HEALTH_AREAS,
+    CAREER_JOBS: CAREER_JOBS,
     // 사주 추출
     fromSajuData: fromSajuData,
     // 점수 (저수준)
@@ -567,6 +568,8 @@
     scoreCareerFields: scoreCareerFields, scoreTalentAxes: scoreTalentAxes,
     scoreCharacterTraits: scoreCharacterTraits,
     scoreMoneyPatterns: scoreMoneyPatterns, scoreLoveStyles: scoreLoveStyles,
+    scoreCareerJobs: scoreCareerJobs, jobsByField: jobsByField,
+    recommendJobs: recommendJobs,
     // 분포
     distributeTopHeavy: distributeTopHeavy, normalizeAxis: normalizeAxis,
     // 검증
