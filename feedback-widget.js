@@ -36,6 +36,7 @@
     if (_cssInjected) return;
     _cssInjected = true;
     const css = `
+/* dark theme (memox 기본) */
 .fw-root { margin:14px 0; padding:14px; border-radius:14px;
   background:rgba(255,255,255,0.04); border:1px solid rgba(212,175,55,0.18);
   font-family:'Noto Sans KR',sans-serif; color:rgba(240,240,245,0.92); }
@@ -70,6 +71,21 @@
 .fw-done { padding:10px; border-radius:10px; text-align:center; font-size:13px;
   background:rgba(76,175,80,0.12); border:1px solid rgba(76,175,80,0.35); color:#a8e6a8; }
 .fw-error { color:#f08a80; font-size:12px; margin-top:6px; }
+/* light theme (pico 기본) */
+.fw-root.fw-light { background:rgba(255,255,255,0.55); border-color:rgba(154,122,38,0.22); color:#1a120a; }
+.fw-root.fw-light .fw-ask { color:#4a3a2a; }
+.fw-root.fw-light .fw-btn { color:#1a120a; background:rgba(0,0,0,0.03); border-color:rgba(0,0,0,0.10); }
+.fw-root.fw-light .fw-btn-up   { background:rgba(45,134,89,0.10); border-color:rgba(45,134,89,0.32); color:#1e6b3a; }
+.fw-root.fw-light .fw-btn-down { background:rgba(180,30,30,0.08); border-color:rgba(180,30,30,0.26); color:#8b2020; }
+.fw-root.fw-light .fw-btn:hover { filter:brightness(0.94); }
+.fw-root.fw-light .fw-btn.active-up   { background:rgba(45,134,89,0.18); border-color:rgba(45,134,89,0.55); color:#155a2e; }
+.fw-root.fw-light .fw-btn.active-down { background:rgba(180,30,30,0.15); border-color:rgba(180,30,30,0.48); color:#7a1010; }
+.fw-root.fw-light .fw-tag { color:#4a3a2a; background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.12); }
+.fw-root.fw-light .fw-tag:hover { background:rgba(0,0,0,0.07); }
+.fw-root.fw-light .fw-tag.selected { background:rgba(154,122,38,0.14); border-color:rgba(154,122,38,0.45); color:#6a4f0c; }
+.fw-root.fw-light .fw-comment { background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.12); color:#1a120a; }
+.fw-root.fw-light .fw-done { background:rgba(45,134,89,0.10); border-color:rgba(45,134,89,0.30); color:#1e6b3a; }
+.fw-root.fw-light .fw-error { color:#8b2020; }
 `;
     const style = document.createElement('style');
     style.textContent = css;
@@ -103,7 +119,7 @@
       : (REASON_PRESETS[source] || REASON_PRESETS.report);
 
     container.innerHTML = '';
-    const root = h('div', { className:'fw-root' });
+    const root = h('div', { className:'fw-root' + (opts.theme === 'light' ? ' fw-light' : '') });
 
     const ask = h('div', { className:'fw-ask' }, ['이번 응답 어떠셨어요?']);
     root.appendChild(ask);

@@ -472,17 +472,17 @@ nav {
   color: var(--muted);
 }
 .btn-memox {
-  background: #fff;
-  border: 1.5px solid rgba(80,55,30,0.15);
-  color: #1a120a;
+  background: linear-gradient(135deg,#7b5ea7,#a07fd4);
+  border: none;
+  color: #fff;
   text-decoration: none;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px rgba(123,94,167,0.25);
 }
 .btn-share {
-  background: #fee500;
+  background: linear-gradient(135deg,#c9a84c,#b89048);
   border: none;
-  color: #3c1e1e;
-  box-shadow: 0 2px 12px rgba(254,229,0,0.25);
+  color: #1a120a;
+  box-shadow: 0 2px 12px rgba(184,144,72,0.25);
 }
 .orb-note {
   font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px;
@@ -598,7 +598,7 @@ nav {
   <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
-<script src="feedback-widget.js?v=2"></script>
+<script src="feedback-widget.js?v=3"></script>
 
 <nav>
   <a onclick="location.href='index.html?tab=report'" class="nav-back">←</a>
@@ -2029,6 +2029,108 @@ const TYPE_DETAIL = {
       '이번 생에 설명하기 어렵지만 타고난 것들 — 재능, 두려움, 습관, 끌림 — 의 전생 기원을 납음·오행 분포로 읽어냅니다.',
       '전생 인연이 이번 생에서 반복되는 방식. 왜 특정 유형에 끌리거나 거부감을 느끼는지, 십신·원진살·암합 데이터 기반.',
       '이 사주가 이번 생에 완성해야 할 카르마 과제. 용신과 격국이 가리키는 방향, 실천 미션 3가지.'
+    ]
+  },
+  soulmate: {
+    emoji: '<i class="pi pi-heart"></i>',
+    subtitle: '사주가 말해주는 운명적 파트너의 유형',
+    desc: '일간·관성·재성 구조와 일지(배우자궁)의 십신으로 — 나와 에너지가 맞는 사람의 유형, 끌리지만 결국 힘든 유형, 가장 오래 함께할 수 있는 파트너의 특성을 구체적으로 읽어냅니다.',
+    recommend: [
+      '연애·결혼에서 반복되는 패턴이 궁금한 분',
+      '이상형이 막연하게 느껴지는 분',
+      '관계에서 자꾸 같은 실수를 반복하는 분',
+      '운명적 파트너를 만나고 싶은 분'
+    ],
+    sectionDesc: [
+      '나의 관성·재성 구조로 본 이상형 유형',
+      '일지 배우자궁이 가리키는 파트너 기질',
+      '끌리지만 결국 힘든 유형과 이유',
+      '가장 오래 함께할 수 있는 관계 패턴',
+      '운명적 파트너를 만나는 시기와 조건'
+    ],
+    preview: '일간과 관성(여성)·재성(남성)의 강약·위치·십신 관계를 통해 — 내가 끌리는 사람의 유형, 실제로 잘 맞는 사람의 유형, 그리고 반복되는 관계 패턴의 이유를 사주 구조에서 직접 읽어냅니다.',
+    faq: [
+      { q: '이 리포트로 이상형을 정확히 알 수 있나요?', a: '사주 구조가 가리키는 에너지 유형과 관계 패턴을 읽어냅니다. 특정 인물을 지목하는 것이 아니라 "어떤 에너지의 사람"과 잘 맞는지를 봅니다.' },
+      { q: '남성과 여성의 분석 방식이 다른가요?', a: '네, 남성은 재성(財星)이 여성·파트너를, 여성은 관성(官星)이 남성·파트너를 상징합니다. 성별을 정확히 입력해야 분석이 맞습니다.' },
+      { q: '궁합 리포트와 다른 점은?', a: '궁합은 두 사람의 사주를 대조하는 반면, 이 리포트는 내 사주 구조에서 나에게 맞는 유형을 읽어냅니다. 아직 만나지 않은 상대를 위한 분석입니다.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['나에게 맞는 파트너 유형은?', '끌리지만 힘든 유형은 왜 끌리는가?', '관계에서 반복되는 패턴은?', '인연이 오는 시기와 조건은?'],
+    sectionDetail: [
+      '일간과 관성(여성)/재성(남성)의 십신 관계, 강약, 위치로 내가 에너지적으로 끌리는 파트너의 기질·성향·직업 유형을 구체적으로 서술.',
+      '일지(배우자궁)에 자리한 십신과 지지의 의미로 실제 함께 살아갈 때 궁합이 맞는 사람의 성격·생활 방식·가치관 특성.',
+      '끌리지만 결국 에너지가 충돌하는 유형 — 합·충·형·파 관계와 십신 간 충돌 구조에서 왜 특정 유형에 끌리면서도 힘든지.',
+      '장기적 안정과 성장을 함께할 수 있는 파트너 유형. 용신과 기신의 관점에서 나를 보완하는 에너지 조합.',
+      '인연의 시기 — 관성·재성이 활성화되는 대운과 세운 교차점. 만남이 일어나기 좋은 에너지 조건과 구체적 시기대.'
+    ]
+  },
+  saju_poem: {
+    emoji: '<i class="pi pi-book"></i>',
+    subtitle: '사주 전체를 한 편의 시로 읽다',
+    desc: '일간·격국·납음·오행 분포·대운 흐름까지 — 이 사람의 사주 전체를 분석적 언어가 아닌 시적 언어로 풀어냅니다. 당신의 인생을 관통하는 한 편의 시.',
+    recommend: [
+      '내 사주를 감성적으로 이해하고 싶은 분',
+      '사주 용어가 어렵게 느껴지는 분',
+      '나를 표현하는 특별한 문장이 필요한 분',
+      'SNS에 공유하고 싶은 감성 콘텐츠를 찾는 분'
+    ],
+    sectionDesc: [
+      '일간이 가진 에너지를 시적 언어로',
+      '격국의 구조를 한 편의 이야기로',
+      '오행 분포가 말하는 나의 풍경',
+      '납음이 가리키는 삶의 질감',
+      '지금 이 대운에서 나에게 전하는 시 한 편'
+    ],
+    preview: '10개 천간, 12개 지지, 60갑자 납음 — 사주의 언어는 본래 자연의 언어입니다. 甲은 거대한 나무, 壬은 대하(大河), 해중금은 바다 속 금속. 당신의 사주를 자연의 언어로 되돌려 놓으면 거기에 당신의 이야기가 있습니다.',
+    faq: [
+      { q: '이 리포트는 시(詩)인가요, 분석인가요?', a: '시적 형식으로 쓰인 분석입니다. 사주 데이터를 근거로 하되 분석 용어 대신 이미지·은유·감성 언어로 표현합니다. 읽기 쉽고 공유하기 좋습니다.' },
+      { q: '다른 리포트와 중복되나요?', a: '같은 사주 데이터를 쓰지만 전혀 다른 결과물이 나옵니다. 기질·재물·연애 분석이 "무엇을 알려줄까"라면, 사주 시는 "어떻게 느끼게 할까"입니다.' },
+      { q: 'SNS에 공유해도 되나요?', a: '네, 오히려 공유를 위해 만들어진 리포트입니다. 친구에게 보여주거나 인스타그램 스토리에 올리기 좋습니다.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['나의 일간은 어떤 자연물인가?', '내 격국은 어떤 이야기 구조인가?', '오행 분포는 어떤 풍경인가?', '지금 이 대운은 어떤 계절인가?'],
+    sectionDetail: [
+      '일간(천간)의 자연적 이미지를 중심으로 — 甲은 거대한 나무, 丁은 촛불처럼 — 나라는 존재의 본질 에너지를 시적 은유로 묘사.',
+      '격국 구조를 하나의 이야기 구도로 — 정격/특수격/양신성상의 특징을 갈등·긴장·해소의 서사로 표현. 용신의 역할을 주인공의 동반자로.',
+      '오행의 과다/부족을 자연 풍경으로 — 화(火)가 많으면 뜨거운 여름의 들판, 수(水)가 부족하면 건조한 바람 등. 나의 내면 풍경.',
+      '납음 이미지를 시의 핵심 모티프로 — 납음 이름 자체가 시어(詩語). 납음이 암시하는 삶의 질감과 운명의 색깔.',
+      '현재 대운의 에너지를 계절·날씨·시간대로 표현. 지금 이 시기 나에게 전하고 싶은 시 한 줄 혹은 한 연.'
+    ]
+  },
+  life_mission: {
+    emoji: '<i class="pi pi-send"></i>',
+    subtitle: '이번 생에 내가 완성해야 할 단 하나의 미션',
+    desc: '격국·용신·십신 분포·신살·납음까지 — 사주 전체 구조가 가리키는 이번 생의 핵심 목적을 읽어냅니다. 왜 이 시대, 이 몸으로 태어났는지. 내가 완성해야 할 것과 내려놓아야 할 것.',
+    recommend: [
+      '인생의 방향이 막연하게 느껴지는 분',
+      '열심히 사는데 뭔가 빠진 느낌이 드는 분',
+      '타고난 목적을 알고 싶은 분',
+      '삶의 의미를 사주에서 찾고 싶은 분'
+    ],
+    sectionDesc: [
+      '사주 전체 구조가 가리키는 핵심 미션 키워드',
+      '이번 생에 완성해야 할 것 — 격국과 용신의 방향',
+      '반드시 내려놓아야 할 것 — 기신과 과다 오행',
+      '미션을 방해하는 패턴과 극복 전략',
+      '지금 당장 미션을 실천하는 3가지 방법'
+    ],
+    preview: '격국은 이번 생의 구조적 방향을, 용신은 나를 살리는 에너지를, 기신은 내가 극복해야 할 과제를 가리킵니다. 사주 전체를 하나의 설계도로 보면 — 나는 이번 생에 어떤 미션을 가지고 태어났는지가 보입니다.',
+    faq: [
+      { q: '인생 미션은 직업적인 것인가요?', a: '직업에 국한되지 않습니다. 관계 방식, 내면의 성장 방향, 극복해야 할 패턴까지 포함합니다. 사주가 말하는 "이번 생에 이루어야 할 것"은 직업보다 훨씬 넓습니다.' },
+      { q: '미션을 못 이루면 어떻게 되나요?', a: '이 리포트는 당위나 예언이 아닙니다. 사주가 가리키는 방향을 알면 에너지를 낭비하지 않고 자신에게 맞는 흐름을 선택할 수 있습니다.' },
+      { q: '전생 리포트와 다른 점은?', a: '전생 리포트가 "어디서 왔는가"를 보다면, 이 리포트는 "어디로 가야 하는가"를 봅니다. 두 리포트를 함께 보면 전생-현재-미션의 흐름이 연결됩니다.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['이번 생에 완성해야 할 미션은?', '내가 내려놓아야 할 것은?', '미션을 방해하는 패턴은?', '지금 실천할 수 있는 것은?'],
+    sectionDetail: [
+      '격국 유형과 용신 오행이 가리키는 이번 생의 핵심 키워드. 정관격→질서·책임·완성, 식신격→창조·표현·나눔 등 격국 본질을 미션 언어로 전환.',
+      '용신과 격국의 방향을 따를 때 에너지가 가장 잘 발현되는 삶의 영역과 방식. 직업·관계·창작·봉사 중 어느 방향이 이번 생의 완성 미션인지.',
+      '기신(忌神) 오행과 과다 오행이 만드는 반복 패턴 — 집착, 두려움, 회피, 과잉 등 — 이것이 미션을 방해하는 그림자. 내려놓아야 완성된다.',
+      '미션을 방해하는 구체적 패턴 (십신 과다가 만드는 행동 습관)과 이를 인식하고 전환하는 방법. 신살이 있다면 신살의 역할도 포함.',
+      '지금 이 대운과 세운에서 미션을 실천하는 구체적 3가지 방법. 추상적 방향이 아닌 오늘, 이번 달, 올해 할 수 있는 실제 액션.'
     ]
   }
 };
@@ -4268,6 +4370,83 @@ function renderCharVisual() {
       + miniBubbleBlock
       + '</div>';
 
+  } else if (_type === 'soulmate') {
+    const partnerStar = _profile?.gender === 'F' ? '관성' : '재성';
+    const tenG = _sdFull?.ten_gods_map || {};
+    const partnerVal = _profile?.gender === 'F'
+      ? (tenG['정관'] ? '정관 작용' : tenG['편관'] ? '편관 작용' : '관성 미약')
+      : (tenG['정재'] ? '정재 작용' : tenG['편재'] ? '편재 작용' : '재성 미약');
+    const dayStemSM = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+    const SOULMATE_TYPE = {甲:'내 뜻을 존중하는 안정형',乙:'유연하고 감성이 풍부한 이',丙:'활발하고 솔직한 에너지',丁:'섬세하고 따뜻한 내면',戊:'묵직하고 신뢰 가는 사람',己:'차분하고 현실적인 사람',庚:'원칙과 추진력이 강한 이',辛:'세련되고 감각 있는 사람',壬:'자유롭고 깊이 있는 이',癸:'감수성 풍부한 이상주의자'};
+    const smType = SOULMATE_TYPE[dayStemSM] || '나와 에너지가 맞는 사람';
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="display:flex;gap:8px;">'
+      + '<div style="flex:1;background:rgba(194,24,91,0.08);border:1.5px solid rgba(194,24,91,0.3);border-radius:14px;padding:12px;text-align:center;">'
+      + '<div style="font-size:10px;font-weight:700;color:#c2185b;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">파트너 별</div>'
+      + '<div style="font-size:20px;font-weight:900;color:#c2185b;line-height:1;">' + partnerStar + '</div>'
+      + '<div style="font-size:10px;color:#c2185b;opacity:0.6;margin-top:3px;">' + partnerVal + '</div>'
+      + '</div>'
+      + '<div style="flex:2;background:rgba(194,24,91,0.05);border:1px solid rgba(194,24,91,0.18);border-radius:14px;padding:12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#c2185b;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">이상형 유형</div>'
+      + '<div style="font-size:11px;font-weight:700;color:#8b1a4a;line-height:1.5;">' + smType + '</div>'
+      + '</div>'
+      + '</div>'
+      + '<div style="background:rgba(194,24,91,0.04);border:1px solid rgba(194,24,91,0.14);border-radius:12px;padding:10px 12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#c2185b;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">사주 강약</div>'
+      + '<div style="font-size:12px;font-weight:700;color:#8b1a4a;">' + (_singang||'미확인') + ' — 관계 에너지 구조</div>'
+      + '</div>'
+      + miniBubbleBlock
+      + '</div>';
+
+  } else if (_type === 'saju_poem') {
+    const napeumPoem = _napeumData?.일주납음?.납음 || '';
+    const napeumOhPoem = _napeumData?.일주납음?.오행 || '';
+    const napeumImgPoem = _napeumData?.일주납음?.이미지 || '자연의 언어';
+    const poemColMap = {목:'#2d6a4f',화:'#9b2335',토:'#7a5c2e',금:'#5a7a9b',수:'#1a3a5c'};
+    const poemCol = poemColMap[napeumOhPoem] || '#4a4a7a';
+    const poemBgRgb = napeumOhPoem==='목'?'45,106,79':napeumOhPoem==='화'?'155,35,53':napeumOhPoem==='토'?'122,92,46':napeumOhPoem==='금'?'90,122,155':'26,58,92';
+    const STEM_NATURE = {甲:'거대한 나무',乙:'들풀과 넝쿨',丙:'태양',丁:'촛불',戊:'높은 산',己:'들판',庚:'강한 바위',辛:'다듬은 보석',壬:'대하(大河)',癸:'안개와 이슬'};
+    const dayStemPoem = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+    const stemNature = STEM_NATURE[dayStemPoem] || '자연의 기운';
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="display:flex;gap:8px;">'
+      + '<div style="flex:1;background:rgba(' + poemBgRgb + ',0.08);border:1.5px solid ' + poemCol + ';border-radius:14px;padding:12px;text-align:center;">'
+      + '<div style="font-size:10px;font-weight:700;color:' + poemCol + ';opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">일간의 자연</div>'
+      + '<div style="font-size:14px;font-weight:900;color:' + poemCol + ';line-height:1.3;">' + stemNature + '</div>'
+      + '</div>'
+      + '<div style="flex:2;background:rgba(106,27,154,0.05);border:1px solid rgba(106,27,154,0.18);border-radius:14px;padding:12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#6a1b9a;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">시의 배경 — 납음</div>'
+      + '<div style="font-size:11px;font-weight:700;color:#4a0a6a;line-height:1.5;">' + (napeumPoem||'?') + (napeumImgPoem ? ' · ' + napeumImgPoem : '') + '</div>'
+      + '</div>'
+      + '</div>'
+      + miniBubbleBlock
+      + '</div>';
+
+  } else if (_type === 'life_mission') {
+    const missionGkV = _geokguk || _sdFull?.geokguk || '미확인';
+    const missionYsV = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+    const missionSgV = _singang || _sdFull?.strength_level_5 || '미확인';
+    const MISSION_MAP = {'정관격':'질서·책임·완성','편관격':'극복·도전·혁신','정재격':'현실·안정·축적','편재격':'유연·확장·가능성','정인격':'학습·성장·전달','편인격':'직관·탐구·독립','식신격':'창조·표현·나눔','상관격':'자유·혁신·예술','비겁격':'자립·협력·정체성'};
+    const missionKey = Object.keys(MISSION_MAP).find(k => (missionGkV||'').includes(k)) || null;
+    const missionKw = missionKey ? MISSION_MAP[missionKey] : '나만의 방향으로';
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="display:flex;gap:8px;">'
+      + '<div style="flex:1;background:rgba(0,105,92,0.08);border:1.5px solid rgba(0,105,92,0.3);border-radius:14px;padding:12px;text-align:center;">'
+      + '<div style="font-size:10px;font-weight:700;color:#00695c;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">격국</div>'
+      + '<div style="font-size:13px;font-weight:900;color:#00695c;line-height:1.3;">' + missionGkV + '</div>'
+      + '</div>'
+      + '<div style="flex:2;background:rgba(0,105,92,0.05);border:1px solid rgba(0,105,92,0.18);border-radius:14px;padding:12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#00695c;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">미션 키워드</div>'
+      + '<div style="font-size:12px;font-weight:900;color:#00463c;line-height:1.4;">' + missionKw + '</div>'
+      + '</div>'
+      + '</div>'
+      + '<div style="background:rgba(0,105,92,0.04);border:1px solid rgba(0,105,92,0.14);border-radius:12px;padding:10px 12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#00695c;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">용신 · 에너지 방향</div>'
+      + '<div style="font-size:12px;font-weight:700;color:#00463c;">' + missionYsV + ' — ' + missionSgV + '</div>'
+      + '</div>'
+      + miniBubbleBlock
+      + '</div>';
+
   } else {
     // 기타 폴백 — 오행 버블
     visualHtml = '<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">' + bubblesHtml + '</div>';
@@ -4477,6 +4656,28 @@ function renderCharVisual() {
     if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
     blurRows.push({ label:'전생 정체', text: '납음과 일주가 가리키는 전생의 신분·직업·시대' });
     blurRows.push({ label:'카르마 미션', text: '이번 생에 반드시 풀어야 할 과제와 실천 방향' });
+
+  } else if (_type === 'soulmate') {
+    const partnerStarR = _profile?.gender === 'F' ? '관성(官星)' : '재성(財星)';
+    if (ipd?.연애패턴) openRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
+    openRows.push({ label:'파트너 별', text: partnerStarR + ' — 이상형 에너지 구조' });
+    blurRows.push({ label:'이상형 유형', text: '사주가 가리키는 운명적 파트너의 구체적 기질' });
+    blurRows.push({ label:'인연의 시기', text: '관성·재성이 활성화되는 대운·세운 타이밍' });
+
+  } else if (_type === 'saju_poem') {
+    const napeumPR = _napeumData?.일주납음?.납음 || '';
+    if (napeumPR) openRows.push({ label:'납음 — 시의 배경', text: napeumPR });
+    if (ipd?.성격) openRows.push({ label:'일주의 언어', text: ipd.성격 });
+    blurRows.push({ label:'나를 표현하는 시', text: '이 사주를 관통하는 한 편의 시적 이야기' });
+    blurRows.push({ label:'지금 이 대운의 계절', text: '현재 대운 에너지를 시적 언어로 담은 구절' });
+
+  } else if (_type === 'life_mission') {
+    const missionGkR = _geokguk || '미확인';
+    const missionYsR = _yongsin || '미확인';
+    openRows.push({ label:'격국 — 미션 구조', text: missionGkR });
+    openRows.push({ label:'용신 — 에너지 방향', text: missionYsR });
+    blurRows.push({ label:'이번 생 핵심 미션', text: '사주 전체가 가리키는 이번 생의 완성 과제' });
+    blurRows.push({ label:'내려놓아야 할 것', text: '기신과 과다 오행이 만드는 반복 패턴' });
 
   } else {
     if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
@@ -4853,6 +5054,9 @@ async function generateReport() {
   if (_type === 'classic')      { await generateClassicReport();     return; }
   if (_type === 'guide')        { await generateGuideReport();       return; }
   if (_type === 'pastlife')     { await generatePastlifeReport();    return; }
+  if (_type === 'soulmate')     { await generateSoulmateReport();    return; }
+  if (_type === 'saju_poem')    { await generateSajuPoemReport();    return; }
+  if (_type === 'life_mission') { await generateLifeMissionReport(); return; }
   // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
@@ -6685,16 +6889,43 @@ function showRelatedReports() {
     if (!wrap || !list) return;
     const items = RELATED[_type] || [];
     if (items.length === 0) { wrap.style.display = 'none'; return; }
+    const TC = {
+      character:    {bg:'rgba(212,175,55,0.10)',  bd:'rgba(212,175,55,0.30)',  ic:'#9a7a26'},
+      money:        {bg:'rgba(14,143,138,0.10)',   bd:'rgba(109,213,194,0.30)', ic:'#2a8577'},
+      love:         {bg:'rgba(255,138,176,0.12)',  bd:'rgba(255,138,176,0.30)', ic:'#8b2447'},
+      daeun:        {bg:'rgba(180,143,255,0.12)',  bd:'rgba(180,143,255,0.30)', ic:'#7a4aa8'},
+      year:         {bg:'rgba(122,196,255,0.12)',  bd:'rgba(122,196,255,0.30)', ic:'#2e6ba8'},
+      month:        {bg:'rgba(180,143,255,0.12)',  bd:'rgba(180,143,255,0.30)', ic:'#7a4aa8'},
+      yongsin:      {bg:'rgba(255,200,80,0.12)',   bd:'rgba(255,200,80,0.30)',  ic:'#a16d1f'},
+      summary:      {bg:'rgba(255,200,80,0.12)',   bd:'rgba(255,200,80,0.30)',  ic:'#a16d1f'},
+      balance:      {bg:'rgba(80,200,200,0.12)',   bd:'rgba(80,200,200,0.30)',  ic:'#2a8577'},
+      sinsal:       {bg:'rgba(220,160,100,0.12)',  bd:'rgba(220,160,100,0.30)', ic:'#a16d1f'},
+      health:       {bg:'rgba(100,200,140,0.12)',  bd:'rgba(100,200,140,0.30)', ic:'#2d8659'},
+      family:       {bg:'rgba(240,160,180,0.12)',  bd:'rgba(240,160,180,0.30)', ic:'#8b2447'},
+      timing:       {bg:'rgba(120,160,255,0.12)',  bd:'rgba(120,160,255,0.30)', ic:'#2e6ba8'},
+      wealth_timing:{bg:'rgba(220,180,80,0.12)',   bd:'rgba(220,180,80,0.30)',  ic:'#a16d1f'},
+      guide:        {bg:'rgba(240,140,180,0.12)',  bd:'rgba(240,140,180,0.30)', ic:'#8b2447'},
+      career_deep:  {bg:'rgba(120,160,255,0.12)',  bd:'rgba(120,160,255,0.30)', ic:'#2e6ba8'},
+      child_career: {bg:'rgba(100,200,140,0.12)',  bd:'rgba(100,200,140,0.30)', ic:'#2d8659'},
+      triple:       {bg:'rgba(180,143,255,0.12)',  bd:'rgba(180,143,255,0.30)', ic:'#7a4aa8'},
+      vedic_full:   {bg:'rgba(255,200,80,0.12)',   bd:'rgba(255,200,80,0.30)',  ic:'#a16d1f'},
+      astro_full:   {bg:'rgba(122,196,255,0.12)',  bd:'rgba(122,196,255,0.30)', ic:'#2e6ba8'},
+      ziwei_full:   {bg:'rgba(180,143,255,0.12)',  bd:'rgba(180,143,255,0.30)', ic:'#7a4aa8'},
+      pastlife:     {bg:'rgba(220,160,100,0.12)',  bd:'rgba(220,160,100,0.30)', ic:'#a16d1f'},
+      classic:      {bg:'rgba(212,175,55,0.10)',   bd:'rgba(212,175,55,0.30)',  ic:'#9a7a26'},
+    };
+    const DEF = {bg:'rgba(212,175,55,0.08)', bd:'rgba(212,175,55,0.22)', ic:'#8a6a15'};
     let html = '';
     items.forEach(function(it) {
+      const c = TC[it.t] || DEF;
       const url = 'report.html?type=' + encodeURIComponent(it.t);
-      html += '<a href="'+url+'" style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border-soft);border-radius:12px;padding:11px 13px;text-decoration:none;color:#241a10;transition:background 0.15s;">'
-        + '<div style="font-size:24px;flex-shrink:0;color:#8a6a15;">'+it.icon+'</div>'
+      html += '<a href="'+url+'" style="display:flex;align-items:center;gap:12px;background:'+c.bg+';border:1px solid '+c.bd+';border-radius:12px;padding:11px 13px;text-decoration:none;color:#241a10;transition:all 0.15s;">'
+        + '<div style="font-size:22px;flex-shrink:0;color:'+c.ic+';">'+it.icon+'</div>'
         + '<div style="flex:1;min-width:0;">'
-          + '<div style="font-size:13px;font-weight:700;line-height:1.35;">'+it.title+'</div>'
+          + '<div style="font-size:13px;font-weight:700;line-height:1.35;color:'+c.ic+';">'+it.title+'</div>'
           + '<div style="font-size:11px;color:#5a4830;line-height:1.4;margin-top:1px;">'+it.desc+'</div>'
         + '</div>'
-        + '<div style="flex-shrink:0;color:#5a4830;font-size:14px;">›</div>'
+        + '<div style="flex-shrink:0;color:'+c.ic+';font-size:14px;">›</div>'
         + '</a>';
     });
     list.innerHTML = html;
@@ -6716,6 +6947,7 @@ function mountReportFeedback() {
       source: 'report',
       source_type: _type,
       source_id: null,
+      theme: 'light',
       meta: { profile_key: (typeof getProfileKey==='function' ? getProfileKey() : null), version: REPORT_VERSION },
     });
   } catch(e) { /* 위젯 실패는 무시 */ }
