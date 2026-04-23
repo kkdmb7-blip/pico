@@ -4408,22 +4408,42 @@ function renderIntro() {
   document.getElementById('introTitle').textContent = _config.title;
   document.getElementById('introDesc').textContent = d.subtitle;
 
-  // 분석 대상 표시 (입력한 프로필 확인 + 수정 진입점)
+  // 분석 대상 표시 (입력한 프로필 확인 + 수정 진입점) — 황금 글로우 카드
   if (_profile && _profile.year) {
     let subjEl = document.getElementById('introSubject');
     if (!subjEl) {
       subjEl = document.createElement('div');
       subjEl.id = 'introSubject';
-      subjEl.style.cssText = 'margin:14px auto 4px;padding:10px 14px;background:rgba(212,175,90,0.14);border:1px solid rgba(154,122,38,0.28);border-radius:10px;font-size:13px;color:#8a6b20;text-align:center;max-width:380px;cursor:pointer;';
       subjEl.title = '클릭해서 다른 사람 사주로 변경';
       subjEl.onclick = function() { openChildModal(); };
       document.querySelector('.intro-header').appendChild(subjEl);
     }
+    subjEl.style.cssText = 'position:relative;margin:18px auto 6px;padding:18px 22px 20px;background:linear-gradient(160deg,#fdf5d8 0%,#f4e2a8 50%,#e8cf78 100%);border:1.8px solid rgba(184,144,72,0.6);border-radius:16px;text-align:center;max-width:420px;cursor:pointer;box-shadow:0 6px 22px rgba(184,144,72,0.32),0 0 28px rgba(244,216,96,0.28),inset 0 1px 0 rgba(255,255,255,0.55);overflow:hidden;';
     const hourTxt = (_profile.hour === 'unknown' || _profile.hour === undefined || _profile.hour === null || _profile.hour === '') ? '시 모름' : (_profile.hour + '시' + (_profile.minute ? ' ' + _profile.minute + '분' : ''));
     const genTxt = (_profile.gender === 'F' || _profile.gender === 'female') ? (_type==='child_career'?'여아':'여성') : (_type==='child_career'?'남아':'남성');
-    const relTxt = _profile.relation ? ' · <span style="color:#7a2418;font-weight:700;">' + _profile.relation + '</span>' : '';
-    const subjLabel = _type === 'child_career' ? '분석 대상 (아이)' : '분석 대상';
-    subjEl.innerHTML = '<span style="font-size:11px;color:var(--muted);">' + subjLabel + ' <span style="opacity:0.6;">(클릭해서 변경)</span></span><br><span style="font-size:14px;font-weight:700;color:var(--ink);">' + (_profile.name || '이 사람') + '</span>' + relTxt + '<br><span style="font-size:12px;color:var(--text2);">' + _profile.year + '년 ' + _profile.month + '월 ' + _profile.day + '일 · ' + hourTxt + ' · ' + genTxt + '</span>';
+    const relTxt = _profile.relation ? '<span style="font-size:11px;font-weight:700;color:#7a2418;background:rgba(255,255,255,0.55);padding:3px 9px;border-radius:8px;margin-left:8px;letter-spacing:0.3px;vertical-align:middle;">' + _profile.relation + '</span>' : '';
+    const subjLabel = _type === 'child_career' ? '분석 대상 · 아이' : '분석 대상';
+    subjEl.innerHTML = ''
+      // 골드 광택 라인 (상단)
+      + '<div style="position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,250,210,0.85),transparent);"></div>'
+      // 라벨
+      + '<div style="font-size:10px;font-weight:800;color:#7a5210;letter-spacing:3px;opacity:0.78;margin-bottom:10px;">✦ ' + subjLabel + ' ✦</div>'
+      // 이름 (큰 골드)
+      + '<div style="font-size:24px;font-weight:900;color:#5a3a00;letter-spacing:-0.5px;line-height:1.15;text-shadow:0 1px 0 rgba(255,250,210,0.8),0 2px 8px rgba(184,144,72,0.35);">'
+      +   (_profile.name || '이 사람')
+      +   relTxt
+      + '</div>'
+      // 디바이더
+      + '<div style="width:48px;height:1.5px;background:linear-gradient(90deg,transparent,rgba(122,82,16,0.45),transparent);margin:12px auto 11px;"></div>'
+      // 생년월일
+      + '<div style="font-size:13px;font-weight:700;color:#6a4a10;letter-spacing:0.3px;line-height:1.55;">'
+      +   _profile.year + '년 ' + _profile.month + '월 ' + _profile.day + '일'
+      + '</div>'
+      + '<div style="font-size:12px;font-weight:600;color:#8a6620;letter-spacing:0.2px;margin-top:5px;">'
+      +   hourTxt + ' · ' + genTxt
+      + '</div>'
+      // 클릭 힌트
+      + '<div style="font-size:9.5px;color:#8a6620;opacity:0.6;letter-spacing:0.3px;margin-top:11px;font-weight:600;">탭하여 변경</div>';
   }
 
   // 설명문
