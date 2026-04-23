@@ -1196,6 +1196,8 @@ function loadState() {
         var map = { '목': 'wood', '화': 'fire', '토': 'earth', '금': 'metal', '수': 'water' };
         for (var k in map) if (ys.includes(k)) { slotElements.slot1 = map[k]; state.element = map[k]; break; }
       }
+      // 원소가 결정됐으면 즉시 Supabase 동기화 (memox float 즉시 반영)
+      setTimeout(function() { saveState(); syncToServer(); }, 500);
     }
   } catch(e) {}
 }
