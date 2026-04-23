@@ -940,7 +940,7 @@
   animation: tcShuffle 1.2s ease-out forwards;
 }
 .tarot-shuffle .tc::after {
-  content: '✨';
+  content: '✦';
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
   font-size: 28px; color: rgba(106,74,160,0.55);
@@ -1462,11 +1462,11 @@
 <script>
 (function(){
   var ELEM = {
-    wood:  { label:'목(木)', color:'#2d8a4e', bg:'rgba(26,102,48,0.08)', border:'rgba(26,102,48,0.28)', emoji:'🌿' },
-    fire:  { label:'화(火)', color:'#e53935', bg:'rgba(198,40,40,0.08)', border:'rgba(198,40,40,0.28)', emoji:'🔥' },
-    earth: { label:'토(土)', color:'#b87a1a', bg:'rgba(106,74,16,0.08)', border:'rgba(106,74,16,0.28)', emoji:'🪨' },
-    metal: { label:'금(金)', color:'#8a8a6a', bg:'rgba(90,90,74,0.08)', border:'rgba(90,90,74,0.28)', emoji:'💎' },
-    water: { label:'수(水)', color:'#1976d2', bg:'rgba(21,101,192,0.08)', border:'rgba(21,101,192,0.28)', emoji:'💧' }
+    wood:  { label:'목(木)', color:'#2d8a4e', bg:'rgba(26,102,48,0.08)', border:'rgba(26,102,48,0.28)', emoji:'<i class="pi pi-clover" style="color:#2d8a4e"></i>' },
+    fire:  { label:'화(火)', color:'#e53935', bg:'rgba(198,40,40,0.08)', border:'rgba(198,40,40,0.28)', emoji:'<i class="pi pi-fire" style="color:#e53935"></i>' },
+    earth: { label:'토(土)', color:'#b87a1a', bg:'rgba(106,74,16,0.08)', border:'rgba(106,74,16,0.28)', emoji:'<span style="color:#b87a1a;font-weight:700;font-family:\'Noto Serif KR\',serif;">土</span>' },
+    metal: { label:'금(金)', color:'#8a8a6a', bg:'rgba(90,90,74,0.08)', border:'rgba(90,90,74,0.28)', emoji:'<i class="pi pi-gem" style="color:#8a8a6a"></i>' },
+    water: { label:'수(水)', color:'#1976d2', bg:'rgba(21,101,192,0.08)', border:'rgba(21,101,192,0.28)', emoji:'<i class="pi pi-wave" style="color:#1976d2"></i>' }
   };
   var STAGES = ['새싹','성장','각성','정화','신화'];
   function getStage(lv){ return STAGES[Math.min(Math.floor(lv/3), STAGES.length-1)]; }
@@ -2089,7 +2089,7 @@
         </div>
         <div style="display:flex;gap:8px;">
           <div onclick="openGunghapModal()" style="flex:1;text-align:center;font-size:12px;font-weight:600;color:#8b2447;background:rgba(184,82,110,0.14);border:1px solid rgba(184,82,110,0.35);border-radius:8px;padding:7px 10px;cursor:pointer;">궁합 보기</div>
-          <div onclick="location.href='/gunghap2.html'" style="flex:1;text-align:center;font-size:12px;font-weight:700;color:#7a5800;background:rgba(138,106,21,0.12);border:1.5px solid rgba(138,106,21,0.55);border-radius:8px;padding:7px 10px;cursor:pointer;white-space:nowrap;">궁합 2.0 ✨ NEW</div>
+          <div onclick="location.href='/gunghap2.html'" style="flex:1;text-align:center;font-size:12px;font-weight:700;color:#7a5800;background:rgba(138,106,21,0.12);border:1.5px solid rgba(138,106,21,0.55);border-radius:8px;padding:7px 10px;cursor:pointer;white-space:nowrap;">궁합 2.0 NEW</div>
         </div>
       </div>
     </div>
@@ -3402,7 +3402,7 @@ async function submitGunghap() {
   var commentEl = document.getElementById('ghResComment');
   var detailEl  = document.getElementById('ghResDetail');
 
-  if (namesEl) namesEl.innerHTML = myName + ' ❤ ' + pNameDisp;
+  if (namesEl) namesEl.innerHTML = myName + ' <i class="pi pi-heart" style="color:#c24a8a"></i> ' + pNameDisp;
   if (cardsEl) cardsEl.innerHTML = _sajuMiniCard(mySaju,'나',myName,myGender) + _sajuMiniCard(pSaju,'상대방',pNameDisp,_ghPartnerGender);
   if (aiEl)    { aiEl.innerHTML = ''; aiEl.style.display = 'none'; }
   if (scoreEl) scoreEl.textContent = score.total;
@@ -6054,7 +6054,7 @@ function picoShowInstallBanner() {
     'padding:16px;display:flex;align-items:center;gap:12px;' +
     'box-shadow:0 8px 32px rgba(139,42,30,0.12);';
   banner.innerHTML =
-    '<div style="font-size:28px;flex-shrink:0;">✨</div>' +
+    '<div style="flex-shrink:0;color:#b89048;"><i class="pi pi-home" style="font-size:28px;"></i></div>' +
     '<div style="flex:1;">' +
       '<div style="font-size:13px;font-weight:700;color:#1a120a;margin-bottom:2px;">홈화면에 추가하기</div>' +
       '<div style="font-size:11px;color:#5a4830;">앱처럼 바로 실행할 수 있어요</div>' +
@@ -6164,7 +6164,7 @@ if (picoIsInAppBrowser()) {
         'border:1px solid rgba(139,42,30,0.28);border-radius:16px;padding:16px;' +
         'display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(139,42,30,0.12);';
       b.innerHTML =
-        '<div style="font-size:28px;">✨</div>' +
+        '<div style="color:#b89048;"><i class="pi pi-home" style="font-size:28px;"></i></div>' +
         '<div style="flex:1;font-size:12px;color:#1a120a;line-height:1.5;">' +
           '<div style="font-weight:700;margin-bottom:4px;">홈화면에 추가하기</div>' +
           '<div style="font-size:11px;color:#5a4830;">공유 <b>⬆</b> → "홈 화면에 추가"</div>' +

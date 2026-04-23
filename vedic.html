@@ -202,7 +202,7 @@
     <div class="section-label">현대어 해석</div>
     <div class="interp-tabs">
       <button class="interp-tab active" onclick="showTab('moon')"><i class="pi pi-moon"></i> 달 라시</button>
-      <button class="interp-tab" onclick="showTab('nak')">⭐ 낙샤트라</button>
+      <button class="interp-tab" onclick="showTab('nak')"><i class="pi pi-star"></i> 낙샤트라</button>
       <button class="interp-tab" onclick="showTab('dasha')">⏳ 다샤</button>
     </div>
     <div id="panel-moon"  class="interp-panel active"></div>
@@ -248,7 +248,7 @@ const RASHI_EL = {
   '쌍둥이자리':'풍','천칭자리':'풍','물병자리':'풍',
   '게자리':'수','전갈자리':'수','물고기자리':'수'
 };
-const PLANET_ICON = { '태양':'☀️','달':'<i class="pi pi-moon"></i>','화성':'♂','수성':'☿','목성':'♃','금성':'♀','토성':'♄' };
+const PLANET_ICON = { '태양':'<i class="pi pi-sun"></i>','달':'<i class="pi pi-moon"></i>','화성':'♂','수성':'☿','목성':'♃','금성':'♀','토성':'♄' };
 const DASHA_ORDER = ['케투','금성','태양','달','화성','라후','목성','토성','수성'];
 const DASHA_YEARS = { '케투':7,'금성':20,'태양':6,'달':10,'화성':7,'라후':18,'목성':16,'토성':19,'수성':17 };
 
@@ -468,7 +468,7 @@ function renderBig3(d) {
   grid.innerHTML = '';
   const items = [
     { icon:'<i class="pi pi-moon"></i>', role:'달 라시',   sign: d.moonSign,   sub: '감정·직관' },
-    { icon:'⭐', role:'낙샤트라',  sign: d.nakshatra,  sub: '파다 ' + (d.nakshatraPada || '') + ' · 달의 별자리' },
+    { icon:'<i class="pi pi-star"></i>', role:'낙샤트라',  sign: d.nakshatra,  sub: '파다 ' + (d.nakshatraPada || '') + ' · 달의 별자리' },
     { icon:'↑',  role:'상승궁(라그나)', sign: d.ascendant, sub: '외적 인상' },
   ];
   items.forEach(({ icon, role, sign, sub }) => {
@@ -581,7 +581,7 @@ function renderInterp(d) {
   const nak = d.nakshatra || '';
   nakPanel.innerHTML =
     '<div class="interp-header">' +
-      '<div class="interp-sym el-풍" style="font-size:24px">⭐</div>' +
+      '<div class="interp-sym el-풍" style="font-size:24px"><i class="pi pi-star"></i></div>' +
       '<div><div class="interp-name">' + nak + '</div>' +
       '<div class="interp-role">낙샤트라 · 파다 ' + (d.nakshatraPada||'') + ' · 달의 별자리</div></div>' +
     '</div>' +
@@ -705,7 +705,7 @@ function _drawVedicCard(cb) {
   var RASHI_EL2 = {'양자리':'화','사자자리':'화','사수자리':'화','황소자리':'지','처녀자리':'지','염소자리':'지','쌍둥이자리':'풍','천칭자리':'풍','물병자리':'풍','게자리':'수','전갈자리':'수','물고기자리':'수'};
   var EL_C2 = {'화':'#FF6B6B','지':'#2d8659','풍':'#FFE66D','수':'#74B9FF'};
   var PLANET_KO_MAP2 = {'Sun':'태양','Moon':'달','Mercury':'수성','Venus':'금성','Mars':'화성','Jupiter':'목성','Saturn':'토성','Rahu':'라후','Ketu':'케투'};
-  var PLANET_SYM2 = {'태양':'☀','달':'<i class="pi pi-moon"></i>','수성':'☿','금성':'♀','화성':'♂','목성':'♃','토성':'♄','라후':'☊','케투':'☋'};
+  var PLANET_SYM2 = {'태양':'☀','달':'☾','수성':'☿','금성':'♀','화성':'♂','목성':'♃','토성':'♄','라후':'☊','케투':'☋'};
 
   var W=1080, PAD=60, H=1920;
   var canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;

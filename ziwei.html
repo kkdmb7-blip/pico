@@ -331,7 +331,7 @@
 
     <!-- 상단 핵심 정보 -->
     <div class="hero">
-      <div class="hero-title">⭐ 자미두수 명반 紫微斗數</div>
+      <div class="hero-title"><i class="pi pi-ziwei"></i> 자미두수 명반 紫微斗數</div>
       <div class="hero-badges">
         <div class="hero-badge">
           <div class="hero-badge-label">명주성</div>
@@ -577,7 +577,7 @@ function render(d) {
   var soulText = soulStar
     ? (SOUL_INTERP[soulStar] || soulStar + '이(가) 명궁에 위치. 강한 개성과 운명의 별.')
     : '명궁 정보를 확인 중입니다.';
-  addInterp(interps, '☀️', '명궁 · ' + (soulStar || '주성'), soulText);
+  addInterp(interps, '<i class="pi pi-sun"></i>', '명궁 · ' + (soulStar || '주성'), soulText);
 
   // 대한 흐름 해석
   if (dec && dec.name) {
@@ -784,7 +784,7 @@ function closeZiweiShareModal() {
     <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.7);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;">공유할 카드 미리보기</div>
     <div id="ziweiPreviewArea" style="text-align:center;min-height:120px;margin-bottom:16px;"></div>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button onclick="doZiweiShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">⭐ 카카오톡으로 공유하기</button>
+      <button onclick="doZiweiShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:#fee500;color:#3c1e1e;border:none;border-radius:14px;font-size:15px;font-weight:700;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;"><i class="pi pi-ziwei"></i> 카카오톡으로 공유하기</button>
       <button onclick="closeZiweiShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:#ede4cf;color:#4a3a2a;border:1px solid #c9bc9d;border-radius:14px;font-size:14px;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;cursor:pointer;width:100%;">닫기</button>
     </div>
   </div>

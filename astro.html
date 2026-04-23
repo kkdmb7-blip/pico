@@ -382,7 +382,7 @@ const PLANET_KO = {
   Ascendant:'상승궁', Midheaven:'중천(MC)'
 };
 const PLANET_ICON = {
-  Sun:'☀️', Moon:'<i class="pi pi-moon"></i>', Mercury:'☿', Venus:'♀', Mars:'♂',
+  Sun:'<i class="pi pi-sun"></i>', Moon:'<i class="pi pi-moon"></i>', Mercury:'☿', Venus:'♀', Mars:'♂',
   Jupiter:'♃', Saturn:'♄', Uranus:'♅', Neptune:'♆',
   Ascendant:'↑', Midheaven:'MC'
 };
@@ -503,7 +503,7 @@ function renderBig3(planets) {
   const get = name => planets.find(p => p.name === name);
   const sun = get('Sun'), moon = get('Moon'), asc = get('Ascendant');
   const items = [
-    { icon:'☀️', role:'태양궁', p: sun },
+    { icon:'<i class="pi pi-sun"></i>', role:'태양궁', p: sun },
     { icon:'<i class="pi pi-moon"></i>', role:'달궁',   p: moon },
     { icon:'↑',  role:'상승궁', p: asc },
   ];
