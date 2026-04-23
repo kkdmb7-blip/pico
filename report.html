@@ -3253,17 +3253,17 @@ function renderCharVisual() {
     const judgeColM = totalM >= 3 ? '#c8700a' : totalM === 0 ? '#8a2010' : '#7a4e00';
     const jaeStripM = '<div style="display:flex;gap:7px;">'
       + '<div style="flex:1;background:linear-gradient(160deg,rgba(40,130,60,0.18),rgba(40,130,60,0.04));border-radius:12px;padding:10px 6px;border:1.5px solid rgba(40,130,60,0.32);text-align:center;">'
-      +   '<div style="font-size:9px;font-weight:800;color:#1a6a30;opacity:0.75;letter-spacing:0.5px;">정재 JJ</div>'
+      +   '<div style="font-size:9px;font-weight:800;color:#1a6a30;opacity:0.75;letter-spacing:0.5px;">정재</div>'
       +   '<div style="font-size:24px;font-weight:900;color:#1a5020;line-height:1.1;">'+jjM+'</div>'
       +   '<div style="font-size:9px;color:#1a6a30;margin-top:1px;font-weight:700;">안정 수입</div>'
       + '</div>'
       + '<div style="flex:1;background:linear-gradient(160deg,rgba(200,120,0,0.2),rgba(200,120,0,0.04));border-radius:12px;padding:10px 6px;border:1.5px solid rgba(200,120,0,0.35);text-align:center;">'
-      +   '<div style="font-size:9px;font-weight:800;color:#8a5000;opacity:0.75;letter-spacing:0.5px;">편재 PJ</div>'
+      +   '<div style="font-size:9px;font-weight:800;color:#8a5000;opacity:0.75;letter-spacing:0.5px;">편재</div>'
       +   '<div style="font-size:24px;font-weight:900;color:#6a3800;line-height:1.1;">'+pjM+'</div>'
       +   '<div style="font-size:9px;color:#8a5000;margin-top:1px;font-weight:700;">투자·사업</div>'
       + '</div>'
       + '<div style="flex:1;background:linear-gradient(160deg,'+judgeColM+'22,'+judgeColM+'06);border-radius:12px;padding:10px 6px;border:1.5px solid '+judgeColM+'50;text-align:center;">'
-      +   '<div style="font-size:9px;font-weight:800;color:'+judgeColM+';opacity:0.8;letter-spacing:0.5px;">JUDGE</div>'
+      +   '<div style="font-size:9px;font-weight:800;color:'+judgeColM+';opacity:0.8;letter-spacing:0.5px;">종합 판정</div>'
       +   '<div style="font-size:13px;font-weight:900;color:'+judgeColM+';line-height:1.2;margin-top:7px;">'+jaeLabelM+'</div>'
       + '</div>'
       + '</div>';
@@ -3362,7 +3362,7 @@ function renderCharVisual() {
       +   '<div style="position:absolute;bottom:-4px;right:-4px;font-size:18px;filter:drop-shadow(0 2px 3px rgba(200,60,120,0.4));">💕</div>'
       + '</div>'
       + '<div style="flex:1;min-width:0;">'
-      +   '<div style="font-size:10px;font-weight:800;color:#6a1040;opacity:0.75;letter-spacing:0.5px;">'+spouseLabel+' · SPOUSE</div>'
+      +   '<div style="font-size:10px;font-weight:800;color:#6a1040;opacity:0.75;letter-spacing:0.5px;">'+spouseLabel+'</div>'
       +   '<div style="font-size:13px;font-weight:900;color:#5a0a30;line-height:1.3;">'+gwanOh+' 오행이 배우자를 상징</div>'
       +   '<div style="font-size:10px;color:rgba(100,10,50,0.55);margin-top:2px;">'+spouseDesc+'</div>'
       + '</div>'
@@ -3429,16 +3429,16 @@ function renderCharVisual() {
       <div style="text-align:center;font-size:11px;font-weight:800;color:rgba(60,40,10,0.55);letter-spacing:2px;">✨ ${sewunYear} 세운 ✨</div>
       <div style="display:flex;align-items:stretch;gap:8px;">
         <div style="flex:1;background:radial-gradient(circle at 50% 30%, ${OH_BG[myTop]||'rgba(120,80,20,0.13)'}, transparent 70%), ${OH_BG[myTop]||'rgba(120,80,20,0.06)'};border-radius:14px;padding:14px 10px;border:1.5px solid ${OH_BORDER[myTop]||'rgba(120,80,20,0.3)'};text-align:center;box-shadow:0 4px 14px ${OH_BG[myTop]||'rgba(120,80,20,0.1)'};">
-          <div style="font-size:9px;font-weight:800;color:${OH_COLOR[myTop]||'#555'};opacity:0.7;letter-spacing:0.5px;margin-bottom:4px;">MY</div>
+          <div style="font-size:9px;font-weight:800;color:${OH_COLOR[myTop]||'#555'};opacity:0.7;letter-spacing:0.5px;margin-bottom:4px;">내 오행</div>
           <div style="font-size:44px;font-weight:900;color:${OH_COLOR[myTop]||'#555'};line-height:1;text-shadow:0 2px 8px ${OH_BG[myTop]||'rgba(120,80,20,0.2)'};">${myTop||'—'}</div>
           <div style="font-size:11px;color:${OH_COLOR[myTop]||'#555'};margin-top:4px;font-weight:700;">${myTopPct}%</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 2px;">
           <div style="font-size:24px;">${relIcon}</div>
-          <div style="font-size:9px;color:rgba(60,40,10,0.4);margin-top:2px;font-weight:700;letter-spacing:0.5px;">VS</div>
+          <div style="font-size:9px;color:rgba(60,40,10,0.4);margin-top:2px;font-weight:700;letter-spacing:0.5px;">대비</div>
         </div>
         <div style="flex:1;background:radial-gradient(circle at 50% 30%, ${sewunBg2}, transparent 70%), ${sewunBg2};border-radius:14px;padding:14px 10px;border:2px solid ${sewunCol};text-align:center;box-shadow:0 4px 18px ${sewunBg2};">
-          <div style="font-size:9px;font-weight:800;color:${sewunCol};opacity:0.8;letter-spacing:0.5px;margin-bottom:4px;">SEWUN</div>
+          <div style="font-size:9px;font-weight:800;color:${sewunCol};opacity:0.8;letter-spacing:0.5px;margin-bottom:4px;">올해 세운</div>
           <div style="font-size:44px;font-weight:900;color:${sewunCol};line-height:1;text-shadow:0 2px 8px ${sewunBg2};">${sewunOh}</div>
           <div style="font-size:11px;color:${sewunCol};margin-top:4px;font-weight:700;">${ganjiLabel}</div>
         </div>

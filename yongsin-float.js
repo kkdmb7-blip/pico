@@ -495,6 +495,69 @@
     showBubble(lines.join('\n'), 7000);
   }
 
+  // ── 연속 출석 & 선물 상자 ──
+  var STREAK_KEY = 'yongsin_streak';          // { count, lastDate, boxReady }
+  var STREAK_GOAL = 7;
+  var TITLES = ['빛나는','용맹한','지혜로운','신비로운','귀여운','용감한','영리한','당당한','따스한','예리한','우아한','단단한'];
+  function getStreak() {
+    try { return JSON.parse(localStorage.getItem(STREAK_KEY) || 'null') || {}; } catch(e) { return {}; }
+  }
+  function setStreak(v) {
+    try { localStorage.setItem(STREAK_KEY, JSON.stringify(v)); } catch(e) {}
+  }
+  // 하루 한 번 streak 갱신. 연속이면 +1, 하루 건너뛰면 리셋.
+  function updateStreak() {
+    var today = getTodayStr();
+    var s = getStreak();
+    if (s.lastDate === today) return s;
+    // 어제 방문이면 +1, 아니면 1로 리셋
+    var y = new Date(); y.setDate(y.getDate() - 1);
+    var yStr = y.toISOString().slice(0, 10);
+    s.count = (s.lastDate === yStr) ? ((s.count || 0) + 1) : 1;
+    s.lastDate = today;
+    if (s.count >= STREAK_GOAL && !s.boxReady) s.boxReady = true;
+    setStreak(s);
+    return s;
+  }
+  function openStreakBox() {
+    var s = getStreak();
+    if (!s.boxReady) { showBubble('아직 상자가 없어요. 7일 연속 출석해보세요 🎁', 3500); return; }
+    // 펫 상태 업데이트: EXP+100, bond+5, 칭호 획득
+    var raw = getPetState();
+    var elem = getElement() || raw.element;
+    if (elem) {
+      if (!raw.all) raw.all = {};
+      if (!raw.all[elem]) raw.all[elem] = {};
+      var st = raw.all[elem];
+      st.exp = (st.exp || 0) + 100;
+      st.bond = (st.bond || 0) + 5;
+      var needed = Math.pow(st.level || 1, 2) * 100;
+      if (st.exp >= needed) { st.exp -= needed; st.level = (st.level || 1) + 1; }
+      var owned = Array.isArray(st.titles) ? st.titles : [];
+      var pool = TITLES.filter(function(t){ return owned.indexOf(t) === -1; });
+      var newTitle = null;
+      if (pool.length) {
+        newTitle = pool[Math.floor(Math.random() * pool.length)];
+        owned.push(newTitle);
+        st.titles = owned;
+        if (!st.activeTitle) st.activeTitle = newTitle;
+      }
+      raw.element = elem;
+      try { localStorage.setItem(PET_KEY, JSON.stringify(raw)); } catch(e) {}
+      s.count = 0; s.boxReady = false; setStreak(s);
+      var nm = getPetName();
+      var msg;
+      if (newTitle) {
+        msg = '🎁 선물 상자 오픈!\n칭호 획득: "' + newTitle + '"\n+100 EXP · +5 친밀도';
+      } else {
+        msg = '🎁 선물 상자 오픈!\n(모든 칭호 수집 완료 ✨)\n+100 EXP · +5 친밀도';
+      }
+      showBubble(msg, 6000);
+      // 반짝이 파티클
+      spawnParticles();
+    }
+  }
+
   // ── 친밀도(bond) 시스템 ──
   // - 매일 첫 방문마다 +1, 30일 이상 안 오면 반감기
   // - bond 값에 따라 말투 단계 변화
@@ -954,6 +1017,7 @@
     wrapper.style.transition += ', opacity 0.5s, transform 0.5s';
     bumpVisitCounter();
     updateBond();
+    updateStreak();
     maybeWriteDiary();
     setTimeout(function() {
       wrapper.style.opacity = '1'; wrapper.style.transform = 'scale(1)';
@@ -961,9 +1025,12 @@
       var petNm = getPetName();
       var tier = getBondTier();
       var ret = getReturnMsg();
-      if (anni) { showBubble(anni + '\n' + petNm + '와(과) 함께해요', 4500); }
-      else if (ret) { showBubble(ret + '\n— ' + petNm + ' (' + tier.label + ')', 4000); }
-      else { showBubble(timeGreet() + '\n' + petNm + ': ' + tier.honorific, 3500); }
+      var sObj = getStreak();
+      var gift = sObj.boxReady;
+      if (gift)       { showBubble('🎁 선물 상자 준비 완료!\n펫을 탭해서 열어보세요', 4500); }
+      else if (anni)  { showBubble(anni + '\n' + petNm + '와(과) 함께해요', 4500); }
+      else if (ret)   { showBubble(ret + '\n— ' + petNm + ' (' + tier.label + ')', 4000); }
+      else            { showBubble(timeGreet() + '\n' + petNm + ': ' + tier.honorific + (sObj.count ? '\n🔥 ' + sObj.count + '일 연속 출석!' : ''), 3500); }
     }, 1500);
     scheduleMove();
     startIdleExpTicker();
