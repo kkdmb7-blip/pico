@@ -41,13 +41,15 @@
   font-family:'Noto Sans KR',sans-serif; color:rgba(240,240,245,0.92); }
 .fw-ask { font-size:13px; color:rgba(240,240,245,0.78); margin-bottom:10px; }
 .fw-btns { display:flex; gap:8px; margin-bottom:10px; }
-.fw-btn { flex:1; padding:10px; border-radius:10px; cursor:pointer;
+.fw-btn { flex:1; padding:11px; border-radius:10px; cursor:pointer;
   background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
   color:rgba(240,240,245,0.88); font-size:14px; font-weight:600;
   transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px; }
-.fw-btn:hover { background:rgba(255,255,255,0.1); }
-.fw-btn.active-up { background:rgba(76,175,80,0.18); border-color:rgba(76,175,80,0.5); color:#7fd37f; }
-.fw-btn.active-down { background:rgba(244,67,54,0.14); border-color:rgba(244,67,54,0.45); color:#f08a80; }
+.fw-btn-up   { background:rgba(76,175,80,0.10); border-color:rgba(76,175,80,0.38); color:#9de09d; }
+.fw-btn-down { background:rgba(244,67,54,0.09); border-color:rgba(244,67,54,0.32); color:#f0a09a; }
+.fw-btn:hover { filter:brightness(1.2); }
+.fw-btn.active-up   { background:rgba(76,175,80,0.22); border-color:rgba(76,175,80,0.65); color:#7fd37f; }
+.fw-btn.active-down { background:rgba(244,67,54,0.18); border-color:rgba(244,67,54,0.58); color:#f08a80; }
 .fw-reasons { display:none; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
 .fw-reasons.open { display:flex; }
 .fw-tag { padding:6px 10px; border-radius:999px; cursor:pointer;
@@ -108,8 +110,8 @@
 
     const state = { rating: 0, selected: new Set(), submitting: false };
 
-    const btnUp   = h('button', { className:'fw-btn', type:'button' }, ['👍 도움됐어요']);
-    const btnDown = h('button', { className:'fw-btn', type:'button' }, ['👎 아쉬워요']);
+    const btnUp   = h('button', { className:'fw-btn fw-btn-up',   type:'button' }, ['👍 도움됐어요']);
+    const btnDown = h('button', { className:'fw-btn fw-btn-down', type:'button' }, ['👎 아쉬워요']);
     const btns = h('div', { className:'fw-btns' }, [btnUp, btnDown]);
     root.appendChild(btns);
 

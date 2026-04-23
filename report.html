@@ -598,7 +598,7 @@ nav {
   <link rel="stylesheet" href="pico-icons.css">
 </head>
 <body>
-<script src="feedback-widget.js?v=1"></script>
+<script src="feedback-widget.js?v=2"></script>
 
 <nav>
   <a onclick="location.href='index.html?tab=report'" class="nav-back">←</a>
@@ -969,8 +969,14 @@ const TYPE_CONFIG = {
     desc: '적천수 일간론·자평진전 격국론·납음·조후 고전 심층 해석' },
   guide:      { title: '이 사람 사용설명서', orb: 500, emoji: '<i class="pi pi-people"></i>', focus: '이 사주를 가진 사람을 대하는 법, 대화 스타일, 배려 포인트, 피해야 할 말·행동',
     desc: '부모·배우자·친구·동료가 이 사람을 어떻게 대하면 좋을지 — 일간·십신·격국 데이터로 관계 매뉴얼 정리' },
-  pastlife:   { title: '전생 분석', orb: 400, emoji: '<i class="pi pi-eye"></i>', focus: '납음·일주·신살·격국 기반 전생 정체·삶·카르마·이번 생 미션',
-    desc: '납음 오행과 일주·신살이 가리키는 전생의 정체, 삶의 방식, 죽음, 이번 생에 풀어야 할 카르마 미션' }
+  pastlife:     { title: '전생 분석', orb: 400, emoji: '<i class="pi pi-eye"></i>', focus: '납음·일주·신살·격국 기반 전생 정체·삶·카르마·이번 생 미션',
+    desc: '납음 오행과 일주·신살이 가리키는 전생의 정체, 삶의 방식, 죽음, 이번 생에 풀어야 할 카르마 미션' },
+  soulmate:     { title: '운명의 상대방 유형', orb: 400, emoji: '<i class="pi pi-heart"></i>', focus: '내 사주가 끌리는 사람 유형 — 이상형 사주 프로필, 관계 패턴, 나를 성장시키는 인연',
+    desc: '관성·일주·십신 분포로 읽어낸 "내 사주가 진짜 끌리는 사람"의 프로필 — 이상형 유형, 반복되는 관계 패턴, 최적의 파트너 기질' },
+  saju_poem:    { title: '사주 한 줄 시', orb: 200, emoji: '<i class="pi pi-sparkle"></i>', focus: '이 사주를 시적 문장 한 줄로 압축 — SNS 공유용 감성 카드',
+    desc: '오행·일주·격국의 에너지를 시 한 줄로 압축합니다. 당신의 사주가 가진 아름다움과 방향을 가장 짧고 깊게 담아낸 문장' },
+  life_mission: { title: '이번 생 미션', orb: 400, emoji: '<i class="pi pi-star"></i>', focus: '이 사주가 이번 생에 해결해야 할 과제 — 자기계발+운세 교차 분석',
+    desc: '격국·용신·십신 구조로 읽어낸 이번 생의 핵심 과제 — 반드시 완수해야 할 미션, 방해 요소, 달성 로드맵' }
 };
 
 const TYPE_COLORS = {
@@ -996,7 +1002,10 @@ const TYPE_COLORS = {
   wealth_timing:{ main:'#a67500', soft:'rgba(166,117,0,0.13)',   border:'rgba(166,117,0,0.38)' },
   classic:      { main:'#7a2418', soft:'rgba(122,36,24,0.13)',   border:'rgba(122,36,24,0.38)' },
   guide:        { main:'#d81b60', soft:'rgba(216,27,96,0.13)',   border:'rgba(216,27,96,0.38)' },
-  pastlife:     { main:'#4a1d96', soft:'rgba(74,29,150,0.13)',   border:'rgba(74,29,150,0.38)' }
+  pastlife:     { main:'#4a1d96', soft:'rgba(74,29,150,0.13)',   border:'rgba(74,29,150,0.38)' },
+  soulmate:     { main:'#c2185b', soft:'rgba(194,24,91,0.12)',   border:'rgba(194,24,91,0.38)' },
+  saju_poem:    { main:'#6a1b9a', soft:'rgba(106,27,154,0.12)', border:'rgba(106,27,154,0.38)' },
+  life_mission: { main:'#00695c', soft:'rgba(0,105,92,0.12)',   border:'rgba(0,105,92,0.38)' }
 };
 
 function applyTypeTheme() {
@@ -1161,6 +1170,27 @@ const TYPE_SECTIONS = {
     { name: '이번 생에 가져온 재능과 상처',           chars: 450 },
     { name: '전생 인연과 반복되는 관계 패턴',         chars: 450 },
     { name: '이번 생 카르마 미션',                   chars: 400 }
+  ],
+  soulmate: [
+    { name: '내 사주가 끌리는 사람 유형',             chars: 400 },
+    { name: '이상형의 사주 프로필',                   chars: 450 },
+    { name: '반복되는 관계 패턴과 그 이유',           chars: 450 },
+    { name: '나를 성장시키는 인연 vs 소모시키는 인연', chars: 400 },
+    { name: '이상적 관계를 만드는 실천법',            chars: 350 }
+  ],
+  saju_poem: [
+    { name: '당신의 사주 시(詩)',                     chars: 150 },
+    { name: '시 해설 — 왜 이 문장인가',               chars: 400 },
+    { name: '이 사주가 가진 에너지',                  chars: 400 },
+    { name: '운명의 키워드 3가지',                    chars: 350 },
+    { name: '삶의 방향 — 시가 가리키는 곳',           chars: 350 }
+  ],
+  life_mission: [
+    { name: '이번 생 미션 선언',                      chars: 350 },
+    { name: '미션의 기원 — 왜 이 과제인가',           chars: 450 },
+    { name: '이번 생의 핵심 도전 3가지',              chars: 450 },
+    { name: '미션을 방해하는 내면 패턴',              chars: 400 },
+    { name: '미션 달성 로드맵',                       chars: 400 }
   ]
 };
 
@@ -2829,7 +2859,10 @@ function buildAccuracyLayerBlock() {
     wealth_timing:['재물운','대운세운교차','세운확장분석','운세종합점수','대운트렌드','대운분리분석','격국검증','세운상호작용','세운월별'],
     classic:    ['적천수일간론','자평진전분석','납음분석','조후용신분석','격국세분','통근분석','일주론','조후','천간합충','지장간분석','암합암충'],
     guide:      ['일주론','십신궁위','격국세분','특수패턴','사주균형','십성분포','귀인','원진살','귀문관살','특수신살','강약수치'],
-    pastlife:   ['납음분석','일주론','특수패턴','신살종합','암합암충','강약수치','지장간분석','적천수일간론'],
+    pastlife:     ['납음분석','일주론','특수패턴','신살종합','암합암충','강약수치','지장간분석','적천수일간론'],
+    soulmate:     ['일주론','십신궁위','격국세분','특수패턴','원진살','귀인','귀문관살','특수신살','십성분포','암합암충'],
+    saju_poem:    ['일주론','격국세분','강약수치','오행분포','특수패턴','납음분석'],
+    life_mission: ['격국세분','강약수치','십신궁위','특수패턴','일주론','용신재검증','조후','납음분석','귀인','원진살'],
   };
   const detailSet = new Set(DETAIL_MAP[_type] || []);
 
