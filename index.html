@@ -1231,14 +1231,21 @@
   </span>
 </div>
 <div class="section-divider"></div>
-<!-- 오늘의 행운 뽑기 -->
-<div style="padding:16px 16px;">
-  <div class="luck-banner" onclick="window.location.href='game-luck.html'">
+<!-- 오늘의 행운 뽑기 + 도미넌트 행성 -->
+<div style="padding:16px 16px;display:flex;gap:10px;">
+  <div class="luck-banner" onclick="window.location.href='game-luck.html'" style="flex:1;">
     <div class="luck-banner-left">
       <div class="luck-banner-title"><i class="pi pi-sparkle"></i> 오늘의 행운 뽑기</div>
-      <div class="luck-banner-desc">오행 구슬을 골라 오늘의 운을 확인하세요</div>
+      <div class="luck-banner-desc">오행 구슬로 오늘의 운 확인</div>
     </div>
     <div class="luck-banner-btn">뽑기 →</div>
+  </div>
+  <div onclick="window.location.href='dominant.html'" style="flex:1;background:linear-gradient(135deg,rgba(60,35,100,0.55),rgba(10,8,20,0.7));border:1px solid rgba(180,130,255,0.25);border-radius:16px;padding:14px 14px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.borderColor='rgba(180,130,255,0.6)'" onmouseout="this.style.borderColor='rgba(180,130,255,0.25)'">
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#b482ff;margin-bottom:4px;">♅ 도미넌트 행성</div>
+      <div style="font-size:11px;color:rgba(232,224,240,0.6);line-height:1.4;">나를 움직이는 핵심 행성</div>
+    </div>
+    <div style="font-size:11px;color:#b482ff;font-weight:600;margin-top:8px;">무료 확인 →</div>
   </div>
 </div>
 <div class="section-divider"></div>
