@@ -6514,6 +6514,189 @@ ${shinsalStr}
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
+// ── 운명의 상대방 유형 ──
+async function generateSoulmateReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const pillars = _sdFull?.summary?.pillars || {};
+  const fivePctStr = fivePctToKor(_sdFull?.five_pct);
+  const tenGodsStr = _sdFull?.ten_gods_map ? Object.entries(_sdFull.ten_gods_map).map(([k,v])=>`${k}:${v}`).join(', ') : '미확인';
+  const partnerStar = _profile?.gender === 'F' ? '관성(官星)' : '재성(財星)';
+  const genderNote = _profile?.gender === 'F'
+    ? '이 사주의 주인공은 여성입니다. 여성 사주에서 관성(정관·편관)이 남성·파트너를 상징합니다.'
+    : '이 사주의 주인공은 남성입니다. 남성 사주에서 재성(정재·편재)이 여성·파트너를 상징합니다.';
+
+  const soulmatePromptA = `${profileStr}
+
+${sb2}${buildAccuracyLayerBlock()}
+
+사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})
+오행 분포: ${fivePctStr}
+신강도: ${_singang||'미확인'} / 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal}
+십신 분포: ${tenGodsStr}
+
+${genderNote}
+
+섹션 구성:
+1. 나에게 끌리는 이상형 유형 — ${partnerStar}의 강약과 위치, 일지(배우자궁) 십신을 기반으로 내가 에너지적으로 끌리는 파트너의 성향·기질·직업 유형을 구체적으로. 단순한 "다정한 사람" 식의 표현이 아닌 사주 근거 기반 구체적 묘사. 약 400자.
+2. 실제로 잘 맞는 파트너 기질 — 일지 배우자궁의 십신·지지와 용신(${ysFinal}) 관점에서 에너지가 충돌하지 않고 안정적으로 함께할 수 있는 사람의 유형. 겉으로 끌리는 유형과 실제 잘 맞는 유형이 다를 경우 명확하게 구분. 약 400자.
+3. 끌리지만 결국 힘든 유형 — 합·충·형·파와 기신 오행 관점에서 끌리지만 결국 에너지 소모가 큰 유형. 왜 끌리는지, 왜 결국 힘든지 사주 구조로 설명. 약 300자.
+
+총 1000~1200자. 섹션 번호(1. 2. 3.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+  await streamToSections(soulmatePromptA, [0,1,2], '운명의 상대방 분석', ysFinal, '', false);
+
+  const soulmatePromptB = `${profileStr}
+
+${sb2}${buildAccuracyLayerBlock()}
+
+십신 분포: ${tenGodsStr}
+격국: ${_geokguk||'미확인'} / 용신: ${ysFinal}
+${genderNote}
+
+섹션 구성:
+4. 가장 오래 함께할 수 있는 관계 패턴 — 나를 보완하는 에너지 조합. 용신 오행을 가진 상대가 가져오는 안정감. 장기적으로 성장을 함께할 수 있는 관계의 구체적 특성. 약 400자.
+5. 인연이 오는 시기와 조건 — ${partnerStar}이 활성화되는 대운과 세운 교차점. 현재 대운 ${_daeun||'미확인'} 기준 지금 이 시기가 인연 에너지가 강한지 약한지. 만남의 조건이 갖춰지는 구체적 시기대와 주의사항. 약 400자.
+
+총 700~900자. 섹션 번호(4. 5.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+  await streamToSections(soulmatePromptB, [3,4], '운명의 상대방 분석', ysFinal, '', true);
+
+  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
+// ── 사주 한 줄 시 ──
+async function generateSajuPoemReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'}`;
+  const pillars = _sdFull?.summary?.pillars || {};
+  const napeumName2 = _napeumData?.일주납음?.납음 || '미확인';
+  const napeumOh2   = _napeumData?.일주납음?.오행 || '미확인';
+  const napeumImg2  = _napeumData?.일주납음?.이미지 || '';
+  const fivePctStr2 = fivePctToKor(_sdFull?.five_pct);
+
+  const poemSys = `당신은 사주명리의 상징 체계를 시적 언어로 번역하는 시인입니다.
+
+핵심 방식:
+- 천간·지지·오행·격국은 분석 용어가 아닌 자연의 이미지로 변환하세요
+  甲→거대한 나무, 壬→대하, 丁→촛불, 庚→강한 바위
+- 시적 은유와 감각적 언어를 사용하되 내용은 사주 데이터에 근거
+- 서정적이고 아름다우면서도 이 사람의 사주를 정확히 반영
+- 너무 어둡거나 너무 긍정적인 방향으로 왜곡 금지 — 사실에 기반한 시
+- #헤더 금지, 표 금지. 자연스러운 산문시 또는 짧은 이미지 묘사 형식
+- **볼드**는 핵심 시어(詩語) 3~5개만`;
+
+  const poemPromptA = `${profileStr}
+납음: ${napeumName2}(${napeumOh2}) — ${napeumImg2}
+사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})
+오행 분포: ${fivePctStr2}
+격국: ${_geokguk||'미확인'} / 용신: ${ysFinal}
+
+섹션 구성:
+1. 일간의 자연 — 나라는 사람의 본질 에너지
+일간(${_ilju||''}의 천간)이 가진 자연적 이미지로 이 사람의 본질을 묘사. 천간의 계절·방향·기운을 시적 이미지로 변환. 일지의 지지가 그 에너지에 어떤 색깔을 더하는지. 산문시 형식, 약 350자.
+
+2. 격국의 이야기 — 내 인생의 구조적 서사
+${_geokguk||'이 격국'}의 구조를 하나의 이야기 구도로. 격국의 핵심 에너지와 용신(${ysFinal})의 역할을 이야기의 주인공과 동반자로 표현. 갈등과 해소의 서사를 시적으로. 산문시 형식, 약 400자.
+
+3. 오행의 풍경 — 내 내면의 지형도
+오행 분포(${fivePctStr2})를 자연 풍경으로 변환. 강한 오행은 넘치는 물·뜨거운 여름으로, 약한 오행은 건조한 바람·그늘로. 이 사람의 내면이 어떤 풍경인지 시적으로 묘사. 약 350자.
+
+총 1000~1100자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+  await streamToSections(poemPromptA, [0,1,2], '사주 시 창작', '', '', false, poemSys);
+
+  const poemPromptB = `${profileStr}
+납음: ${napeumName2}(${napeumOh2}) — ${napeumImg2}
+현재 대운: ${_daeun||'미확인'} / 올해 세운: ${_sewun||'미확인'}
+
+섹션 구성:
+4. 납음의 시어 — 삶의 질감과 운명의 색깔
+납음 "${napeumName2}"의 이름 자체를 시어(詩語)로. 이 납음이 암시하는 삶의 질감, 지배적 감정, 운명의 색깔을 시적으로 묘사. 납음 이미지("${napeumImg2}")에서 출발해 이 사람의 운명적 분위기를 그린다. 약 350자.
+
+5. 지금 이 계절 — 현재 대운의 시
+현재 대운 ${_daeun||'미확인'}의 에너지를 계절·날씨·시간대로 표현. 봄비·한여름 햇살·가을바람·겨울 호수 중 어느 것에 가까운지. 이 시기 이 사람에게 전하고 싶은 시 한 연. 약 300자.
+
+총 600~700자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(poemPromptB, [3,4], '사주 시 창작', '', '', true, poemSys);
+
+  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
+// ── 이번 생 미션 ──
+async function generateLifeMissionReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const pillars = _sdFull?.summary?.pillars || {};
+  const fivePctStr3 = fivePctToKor(_sdFull?.five_pct);
+  const tenGodsStr3 = _sdFull?.ten_gods_map ? Object.entries(_sdFull.ten_gods_map).map(([k,v])=>`${k}:${v}`).join(', ') : '미확인';
+  const napeumName3 = _napeumData?.일주납음?.납음 || '';
+  const napeumOh3   = _napeumData?.일주납음?.오행 || '';
+  const shinsalStr3 = (() => {
+    const ss = _specialShinsalData;
+    if (!ss) return '';
+    const parts = [];
+    if (ss.역마?.원국보유) parts.push('역마살');
+    if (ss.도화?.원국보유) parts.push('도화살');
+    if (ss.화개?.원국보유) parts.push('화개살');
+    return parts.length ? '원국 신살: ' + parts.join(', ') : '';
+  })();
+
+  const missionPromptA = `${profileStr}
+
+${sb2}${buildAccuracyLayerBlock()}
+
+사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})
+오행 분포: ${fivePctStr3}
+신강도: ${_singang||'미확인'} / 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal}
+십신 분포: ${tenGodsStr3}
+납음: ${napeumName3}(${napeumOh3})
+${shinsalStr3}
+
+이 리포트는 "이번 생의 미션"을 찾는 리포트입니다. 성공/실패가 아닌 완성해야 할 방향과 내려놓아야 할 것을 봅니다.
+
+섹션 구성:
+1. 이번 생의 핵심 미션 키워드 — 격국(${_geokguk||'미확인'})과 용신(${ysFinal})이 가리키는 이번 생의 핵심 방향을 3~5개 키워드로 추출. 단순 직업 방향이 아닌 삶의 태도·가치·역할의 관점. 각 키워드를 한 줄씩 구체적으로 설명. 약 400자.
+2. 이번 생에 완성해야 할 것 — 용신 오행(${ysFinal})과 격국 구조가 충족될 때 어떤 방식의 삶이 되는지. 어떤 역할·관계·방식이 이 사주에서 "완성"을 의미하는지. 현실적이고 구체적으로. 약 450자.
+3. 반드시 내려놓아야 할 것 — 기신(忌神) 오행과 과다 십신이 만드는 반복 패턴. 이 사람이 자꾸 빠지는 함정, 에너지를 소모시키는 방향, 붙잡고 있지만 결국 놓아야 할 것. 약 400자.
+
+총 1200~1400자. 섹션 번호(1. 2. 3.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+  await streamToSections(missionPromptA, [0,1,2], '이번 생 미션 분석', ysFinal, '', false);
+
+  const missionPromptB = `${profileStr}
+
+${sb2}${buildAccuracyLayerBlock()}
+
+격국: ${_geokguk||'미확인'} / 용신: ${ysFinal} / 신강도: ${_singang||'미확인'}
+십신 분포: ${tenGodsStr3}
+현재 대운: ${_daeun||'미확인'} / 올해 세운: ${_sewun||'미확인'}
+${shinsalStr3}
+
+섹션 구성:
+4. 미션을 방해하는 패턴 — 과다한 십신이나 기신 오행이 만드는 행동 패턴. 이 사람이 습관적으로 빠지는 방해 패턴(집착/회피/과잉반응 등)을 사주 구조로 설명하고, 이를 인식하고 전환하는 방법. 신살이 있다면 신살의 역할도 포함. 약 450자.
+5. 지금 당장 미션을 실천하는 3가지 방법 — 현재 대운(${_daeun||'미확인'})과 세운(${_sewun||'미확인'}) 에너지를 고려한 실천 가능한 3가지 액션. 추상적 방향이 아닌 "이번 달, 올해, 앞으로 3년 안에" 할 수 있는 구체적인 것. 약 400자.
+
+총 800~1000자. 섹션 번호(4. 5.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+  await streamToSections(missionPromptB, [3,4], '이번 생 미션 분석', ysFinal, '', true);
+
+  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
 // ── 인생 타이밍 가이드 ──
 async function generateTimingReport() {
   if (!await setupSectionsAndDeductOrb()) return;
@@ -6808,7 +6991,10 @@ function showConsultBanner() {
     timing:        { title: '중요 선택의 타이밍을 잡고 싶다면', desc: '이사·이직·결혼 등 시기 판단을\n<em>전문 상담사</em>가 맞춤 설계해 드립니다.' },
     wealth_timing: { title: '재물 타이밍, 실행 전략이 필요하다면', desc: '투자·계약·사업 개시 시점을\n<em>전문 상담사</em>가 구체적으로 코칭합니다.' },
     classic:       { title: '고전 명리 해석을 현대에 적용하려면', desc: '적천수·궁통보감 관점을\n<em>전문 상담사</em>가 실생활 언어로 풀어드립니다.' },
-    pastlife:      { title: '전생 카르마, 이번 생에 어떻게 풀어야 할지', desc: 'AI가 읽어낸 카르마 미션을 바탕으로\n<em>전문 상담사</em>가 현실적인 실천 방향을 안내합니다.' }
+    pastlife:      { title: '전생 카르마, 이번 생에 어떻게 풀어야 할지', desc: 'AI가 읽어낸 카르마 미션을 바탕으로\n<em>전문 상담사</em>가 현실적인 실천 방향을 안내합니다.' },
+    soulmate:      { title: '운명의 상대방, 더 구체적으로 알고 싶다면', desc: 'AI가 분석한 파트너 유형을 바탕으로\n<em>전문 상담사</em>가 현실적인 만남 전략을 안내합니다.' },
+    saju_poem:     { title: '내 사주를 더 깊이 느끼고 싶다면', desc: '시적 분석 너머의 구체적 맥락을\n<em>전문 상담사</em>가 현실 언어로 풀어드립니다.' },
+    life_mission:  { title: '이번 생 미션, 어떻게 실천할지 막막하다면', desc: 'AI가 도출한 미션을 바탕으로\n<em>전문 상담사</em>가 지금 바로 실천 가능한 방향을 안내합니다.' }
   };
   const t = bannerTexts[_type] || { title: '리포트 내용이 궁금하신가요?', desc: 'AI 분석을 바탕으로 <em>전문 상담사</em>가 더 깊은 해석과<br>실질적인 조언을 1:1로 안내해 드립니다.' };
   document.getElementById('consultTitle').textContent = t.title;
@@ -6881,7 +7067,16 @@ function showRelatedReports() {
     classic:      [{t:'character',icon:'<i class="pi pi-star"></i>',title:'기질 분석',desc:'고전 개념을 현대 기질로'},
                    {t:'yongsin',icon:'<i class="pi pi-compass"></i>',title:'용신 활용',desc:'고전 용신을 일상에'}],
     pastlife:     [{t:'character',icon:'<i class="pi pi-star"></i>',title:'기질 분석',desc:'전생에서 이어진 본질 기질'},
-                   {t:'sinsal',icon:'<i class="pi pi-scroll"></i>',title:'신살 총정리',desc:'카르마와 연결된 신살의 의미'}]
+                   {t:'sinsal',icon:'<i class="pi pi-scroll"></i>',title:'신살 총정리',desc:'카르마와 연결된 신살의 의미'}],
+    soulmate:     [{t:'love',icon:'<i class="pi pi-heart"></i>',title:'연애운 리포트',desc:'인연의 흐름과 시기 분석'},
+                   {t:'guide',icon:'<i class="pi pi-chat"></i>',title:'관계 코칭',desc:'상대를 대하는 방법 매뉴얼'},
+                   {t:'pastlife',icon:'<i class="pi pi-eye"></i>',title:'전생 분석',desc:'관계 패턴의 카르마적 기원'}],
+    saju_poem:    [{t:'character',icon:'<i class="pi pi-star"></i>',title:'기질 분석',desc:'시적 표현 너머의 기질 구조'},
+                   {t:'pastlife',icon:'<i class="pi pi-eye"></i>',title:'전생 분석',desc:'시의 소재가 된 전생의 기운'},
+                   {t:'life_mission',icon:'<i class="pi pi-send"></i>',title:'이번 생 미션',desc:'시가 가리키는 삶의 방향'}],
+    life_mission: [{t:'pastlife',icon:'<i class="pi pi-eye"></i>',title:'전생 분석',desc:'미션의 카르마적 기원'},
+                   {t:'character',icon:'<i class="pi pi-star"></i>',title:'기질 분석',desc:'미션을 실행하는 기질 구조'},
+                   {t:'daeun',icon:'<i class="pi pi-wave"></i>',title:'대운 흐름',desc:'미션을 실천하는 타이밍'}]
   };
   try {
     const wrap = document.getElementById('relatedReportsWrap');
