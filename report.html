@@ -738,13 +738,13 @@ nav {
   </div>
 </div>
 
-<!-- CHILD PROFILE MODAL (아이 진로 전용) — 만세력 동일 포맷 -->
+<!-- REPORT INPUT MODAL (전 리포트 공통) — 만세력 동일 포맷 -->
 <div class="saju-overlay" id="childOverlay" onclick="if(event.target===this)closeChildModal()">
   <div class="saju-modal">
     <button class="saju-modal-close" onclick="closeChildModal()">✕</button>
     <div id="childForm">
-      <h3><i class="pi pi-user"></i> 아이 정보 입력</h3>
-      <p class="saju-modal-sub">우리 아이의 정확한 생년월일을 입력해주세요</p>
+      <h3 id="childModalTitle"><i class="pi pi-user"></i> 사주 정보 입력</h3>
+      <p class="saju-modal-sub" id="childModalSub">분석할 사람의 생년월일을 입력하세요. 본인 정보면 <b>내 정보</b>를 누르세요.</p>
       <div class="modal-profile-row">
         <button class="modal-profile-btn" type="button" onclick="fillChildFromMine()">내 정보</button>
         <select class="modal-profile-select" id="childProfileSelect" onchange="fillChildFromSaved(this.value)">
@@ -2856,36 +2856,25 @@ function buildAccuracyLayerBlock() {
   try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
   if (!_user || !_user.id) { showGuestLanding(false); return; }
 
-  // 프로필 확인 — guide 타입은 sessionStorage의 1회성 프로필 사용 (다른 사람용)
+  // guide 공유링크 (src=session): 별도 흐름, 모달 없이 sessionStorage 프로필 사용
   var _useSession = (_type === 'guide' && new URLSearchParams(location.search).get('src') === 'session');
-  var _useChild = (_type === 'child_career');
   if (_useSession) {
     try { _profile = JSON.parse(sessionStorage.getItem('pico_guide_profile')); } catch(e) {}
-    if (!_profile || !_profile.year) {
-      // 공유링크로 들어온 경우: 안내 화면 + 홈 이동 버튼
-      showGuestLanding(true);
-      return;
-    }
-  } else if (_useChild) {
-    // 아이 진로: sessionStorage에 저장된 아이 프로필 사용 (없으면 모달 노출)
-    try { _profile = JSON.parse(sessionStorage.getItem('pico_child_profile')); } catch(e) {}
-    if (!_profile || !_profile.year) {
-      _profile = null;
-      document.getElementById('btnGenerate').style.display = 'none';
-      openChildModal();
-      renderIntro();
-      showState('intro');
-      return;
-    }
-  } else {
-    try { _profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
-    if (!_profile || !_profile.year) {
-      // 공유링크로 들어온 경우: 리포트 소개 화면 + 사주 입력 유도
-      showGuestLanding(false);
-      return;
-    }
+    if (!_profile || !_profile.year) { showGuestLanding(true); return; }
+    proceedAfterProfile();
+    return;
   }
 
+  // 그 외 22개 리포트: 항상 입력 모달부터 (만세력 포맷)
+  // 캐시: 직전에 같은 타입으로 입력한 프로필이 있으면 우선 채워서 노출 (수정/확정 가능)
+  document.getElementById('btnGenerate').style.display = 'none';
+  openChildModal();
+  renderIntro();
+  showState('intro');
+})();
+
+function proceedAfterProfile() {
+  document.getElementById('btnGenerate').style.display = '';
   document.getElementById('btnGenerate').onclick = function() {
     if (_type === 'character') {
       showState('personality');
@@ -2903,7 +2892,7 @@ function buildAccuracyLayerBlock() {
 
   renderIntro();
   showState('intro');
-})();
+}
 
 // ── 아이 프로필 입력 모달 (child_career 전용) — 만세력 동일 포맷 ──
 var _childGender = 'M';
