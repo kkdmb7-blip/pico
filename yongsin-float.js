@@ -398,6 +398,60 @@
     return map[days] || null;
   }
 
+  // ── 친밀도(bond) 시스템 ──
+  // - 매일 첫 방문마다 +1, 30일 이상 안 오면 반감기
+  // - bond 값에 따라 말투 단계 변화
+  var BOND_KEY_DAY = 'yongsin_bond_day';
+  function updateBond() {
+    var today = getTodayStr();
+    var last; try { last = localStorage.getItem(BOND_KEY_DAY); } catch(e) {}
+    if (last === today) return; // 오늘 이미 올림
+    var raw = getPetState();
+    var elem = getElement() || raw.element;
+    if (!elem) return;
+    if (!raw.all) raw.all = {};
+    if (!raw.all[elem]) raw.all[elem] = {};
+    var s = raw.all[elem];
+    // 30일 이상 방문 안하면 bond 절반
+    if (s.lastDailyVisit) {
+      var gapDays = Math.floor((Date.now() - s.lastDailyVisit) / 86400000);
+      if (gapDays >= 30) s.bond = Math.floor((s.bond || 0) / 2);
+    }
+    s.bond = (s.bond || 0) + 1;
+    s.lastDailyVisit = Date.now();
+    try { localStorage.setItem(PET_KEY, JSON.stringify(raw)); } catch(e) {}
+    try { localStorage.setItem(BOND_KEY_DAY, today); } catch(e) {}
+  }
+  function getBondTier() {
+    var b = getActiveState().bond || 0;
+    if (b < 3)   return { tier: 0, label: '낯선',  honorific: '안녕하세요' };
+    if (b < 10)  return { tier: 1, label: '친근한', honorific: '반가워요' };
+    if (b < 30)  return { tier: 2, label: '친한',   honorific: '오늘도 고마워요' };
+    if (b < 100) return { tier: 3, label: '절친',   honorific: '보고 싶었어요' };
+    return         { tier: 4, label: '평생친구', honorific: '항상 함께예요 💖' };
+  }
+  // 시간대별 인사
+  function timeGreet() {
+    var h = new Date().getHours();
+    if (h < 6)  return '밤늦게까지 수고하셨어요 🌙';
+    if (h < 10) return '좋은 아침이에요 ☀️';
+    if (h < 14) return '점심은 드셨어요?';
+    if (h < 18) return '오후도 힘내요 ✨';
+    if (h < 22) return '오늘 하루 어땠어요?';
+    return '오늘도 수고하셨어요 🌙';
+  }
+  // 재방문 감지: 마지막 방문 이후 경과 시간 기반
+  function getReturnMsg() {
+    var s = getActiveState();
+    if (!s.lastVisit) return null;
+    var hours = (Date.now() - s.lastVisit) / 3600000;
+    if (hours < 3) return null;
+    if (hours < 12) return '금방 다시 오셨네요 ✨';
+    if (hours < 48) return '오늘도 와줘서 기뻐요 🥰';
+    if (hours < 168) return '며칠만이에요! 그리웠어요 🥺';
+    return '오랜만이에요... 보고 싶었어요 😢';
+  }
+
   function showPetStatus() {
     var state = getActiveState();
     var lv = state.level || 1;
@@ -412,8 +466,10 @@
       '⚡ ' + ((state.energy||0) < 30 ? '피곤해요 😴' : (state.energy||0) > 75 ? '에너지 넘쳐요 💪' : '적당해요'),
     ];
     if (days) lines.push('🗓️ 함께한 지 ' + days + '일째');
+    var tier = getBondTier();
+    lines.push('💞 친밀도: ' + tier.label + ' (' + (state.bond||0) + ')');
     lines.push('💡 화면 켜두면 EXP 조금씩 올라요');
-    showBubble(lines.join('\n'), 5000);
+    showBubble(lines.join('\n'), 5500);
   }
 
   function showYongsinTip() {
@@ -716,15 +772,41 @@
     moveTo(startPos);
     wrapper.style.opacity = '0'; wrapper.style.transform = 'scale(0)';
     wrapper.style.transition += ', opacity 0.5s, transform 0.5s';
+    updateBond();
     setTimeout(function() {
       wrapper.style.opacity = '1'; wrapper.style.transform = 'scale(1)';
       var anni = getAnniversaryMsg();
       var petNm = getPetName();
-      if (anni) showBubble(anni + '\n' + petNm + '와(과) 함께해요', 4000);
-      else showBubble(petNm + ', 여기 있어요 👀', 2500);
+      var tier = getBondTier();
+      var ret = getReturnMsg();
+      if (anni) { showBubble(anni + '\n' + petNm + '와(과) 함께해요', 4500); }
+      else if (ret) { showBubble(ret + '\n— ' + petNm + ' (' + tier.label + ')', 4000); }
+      else { showBubble(timeGreet() + '\n' + petNm + ': ' + tier.honorific, 3500); }
     }, 1500);
     scheduleMove();
     startIdleExpTicker();
+    startProactiveGreeter();
+  }
+
+  // ── 주기적으로 먼저 말 걸기 (10분마다 20% 확률) ──
+  function startProactiveGreeter() {
+    if (!IS_PICO) return;
+    setInterval(function() {
+      if (document.visibilityState !== 'visible') return;
+      if (isBubbleOpen()) return;
+      if (Math.random() > 0.2) return;
+      var pool = [
+        timeGreet(),
+        getPetName() + '가(이) 인사해요 👋',
+        '오늘도 화이팅 ✨',
+        '잘 하고 있어요',
+        '잠깐 쉬어가요 🌿',
+      ];
+      var persona = getPersona();
+      if (persona) pool.push(persona.tip);
+      var msg = pool[Math.floor(Math.random() * pool.length)];
+      showBubble(msg, 4000);
+    }, 10 * 60 * 1000);
   }
 
   // ── 화면 켜둔 시간만큼 EXP 소량 획득 (60초마다 +1) ──

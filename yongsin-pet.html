@@ -801,6 +801,7 @@ nav {
     <div class="info-row"><span>총 먹이 횟수</span><span class="info-val" id="infoFeedCount">0회</span></div>
     <div class="info-row"><span>탄생일</span><span class="info-val" id="infoBirth">—</span></div>
     <div class="info-row"><span>함께한 날</span><span class="info-val" id="infoDays">—</span></div>
+    <div class="info-row"><span>친밀도</span><span class="info-val" id="infoBond">—</span></div>
   </div>
 </div>
 
@@ -1404,6 +1405,10 @@ function render() {
     if (milestones[days]) daysTxt += milestones[days];
   }
   document.getElementById('infoDays').textContent = daysTxt;
+  // 친밀도 라벨
+  var b = state.bond || 0;
+  var bLabel = b < 3 ? '낯선' : b < 10 ? '친근한' : b < 30 ? '친한' : b < 100 ? '절친' : '평생친구';
+  document.getElementById('infoBond').textContent = bLabel + ' (' + b + ')';
 }
 
 // 이름 변경
