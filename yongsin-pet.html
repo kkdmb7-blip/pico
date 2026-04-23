@@ -803,6 +803,12 @@ nav {
     <div class="info-row"><span>함께한 날</span><span class="info-val" id="infoDays">—</span></div>
     <div class="info-row"><span>친밀도</span><span class="info-val" id="infoBond">—</span></div>
   </div>
+
+  <!-- 펫 다이어리 -->
+  <div class="info-card" style="margin-top:12px;">
+    <div class="info-title">📖 관찰 일기 (최근 7일)</div>
+    <div id="diaryList" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
 </div>
 
 <!-- 운세 조언 팝업 -->
@@ -1409,6 +1415,23 @@ function render() {
   var b = state.bond || 0;
   var bLabel = b < 3 ? '낯선' : b < 10 ? '친근한' : b < 30 ? '친한' : b < 100 ? '절친' : '평생친구';
   document.getElementById('infoBond').textContent = bLabel + ' (' + b + ')';
+  // 다이어리 렌더
+  renderDiary();
+}
+
+function renderDiary() {
+  var list;
+  try { list = JSON.parse(localStorage.getItem('yongsin_diary') || '[]'); } catch(e) { list = []; }
+  var box = document.getElementById('diaryList');
+  if (!box) return;
+  if (!list.length) {
+    box.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">내일부터 하루 한 줄씩 기록할게요 🌱</div>';
+    return;
+  }
+  box.innerHTML = list.slice(0, 7).map(function(d) {
+    var md = d.date.slice(5).replace('-', '/');
+    return '<div style="display:flex;gap:10px;align-items:flex-start;border-left:2px solid rgba(200,170,80,0.35);padding:4px 0 4px 10px;"><span style="color:var(--muted);font-size:11px;min-width:38px;">'+md+'</span><span style="font-size:13px;line-height:1.5;">'+d.note+'</span></div>';
+  }).join('');
 }
 
 // 이름 변경

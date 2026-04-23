@@ -259,7 +259,7 @@
   }
 
   // ── 클릭 콘텐츠 ──
-  var TAP_MODES = ['fortune', 'ilji_msg', 'pet_status', 'yongsin_tip', 'lucky_draw'];
+  var TAP_MODES = ['fortune', 'ilji_msg', 'pet_status', 'yongsin_tip', 'diary', 'lucky_draw'];
   var tapModeIdx = 0;
 
   // ── 일진 개인화 메시지 (원소별) ──
@@ -396,6 +396,103 @@
     var days = Math.floor((Date.now() - s.birthTs) / 86400000) + 1;
     var map = { 7: '🎉 우리가 만난 지 7일!', 30: '🎉 벌써 30일! 고마워요', 100: '🎉 100일 기념이에요 🎊', 365: '🎊 1주년! 항상 함께해줘서 감사해요', 730: '🎊 2주년! 영원히 함께해요' };
     return map[days] || null;
+  }
+
+  // ── 펫 다이어리 (매일 한 줄 관찰) ──
+  var DIARY_KEY = 'yongsin_diary';
+  var DIARY_MAX = 30;
+  // 활동 신호 집계
+  function collectActivitySignals() {
+    var today = getTodayStr();
+    var sig = { pageCount: 0, visitedSaju: false, visitedChat: false, visitedReport: false, score: null };
+    try {
+      var raw = localStorage.getItem('yongsin_visit_today');
+      if (raw) {
+        var v = JSON.parse(raw);
+        if (v && v.date === today) {
+          sig.pageCount = v.count || 0;
+          sig.visitedSaju = !!v.saju;
+          sig.visitedReport = !!v.report;
+        }
+      }
+    } catch(e) {}
+    try {
+      var sc = parseInt(localStorage.getItem('pico_today_score') || '0', 10);
+      if (sc > 0) sig.score = sc;
+    } catch(e) {}
+    return sig;
+  }
+  // 방문 카운터 (페이지 로드마다 누적)
+  function bumpVisitCounter() {
+    var today = getTodayStr();
+    var v;
+    try { v = JSON.parse(localStorage.getItem('yongsin_visit_today') || 'null'); } catch(e) {}
+    if (!v || v.date !== today) v = { date: today, count: 0 };
+    v.count += 1;
+    var path = (window.location.pathname || '').toLowerCase();
+    if (path.indexOf('saju') !== -1)   v.saju = true;
+    if (path.indexOf('report') !== -1) v.report = true;
+    if (path.indexOf('astro') !== -1 || path.indexOf('vedic') !== -1 || path.indexOf('ziwei') !== -1 || path.indexOf('qimen') !== -1) v.report = true;
+    try { localStorage.setItem('yongsin_visit_today', JSON.stringify(v)); } catch(e) {}
+  }
+  // 오늘의 관찰 멘트 생성
+  function generateDiaryNote() {
+    var sig = collectActivitySignals();
+    var h = new Date().getHours();
+    var petNm = getPetName();
+    var pool = [];
+    // 활동 기반
+    if (sig.pageCount >= 5) pool.push('오늘 바쁘게 여기저기 둘러보셨어요 📚');
+    if (sig.pageCount >= 10) pool.push('오늘 정말 열심이셨어요! 대단해요 ✨');
+    if (sig.visitedSaju) pool.push('오늘 사주를 보셨네요, 잘 나오셨길! 🔍');
+    if (sig.visitedReport) pool.push('오늘 리포트를 꼼꼼히 보셨어요 📖');
+    if (sig.score && sig.score >= 70) pool.push('오늘 운세 점수가 높아서 좋아 보였어요 ✨');
+    if (sig.score && sig.score < 40) pool.push('오늘 운이 살짝 무거웠지만 잘 버티셨어요 🌱');
+    // 시간대 기반
+    if (h < 6)       pool.push('밤늦게까지 함께해주셨네요 🌙');
+    else if (h < 10) pool.push('아침 일찍 저를 찾아주셨어요 ☀️');
+    else if (h >= 22) pool.push('하루를 마무리하는 시간에 오셨네요 🌛');
+    // 친밀도 기반
+    var tier = getBondTier();
+    if (tier.tier >= 3) pool.push(petNm + '는 ' + (getOwnerName() || '당신') + '이 제일 좋아요 💖');
+    if (tier.tier === 0) pool.push('조금 더 친해지고 싶어요 🙂');
+    // 일간 페르소나
+    var persona = getPersona();
+    if (persona && Math.random() < 0.5) pool.push(persona.tip);
+    // 기본 풀
+    pool.push('오늘도 조용히 옆에 있었어요 🌿');
+    pool.push('오늘은 평범했지만 함께라 좋았어요 ✨');
+    pool.push('오늘 기운이 맑았어요 💧');
+    pool.push(petNm + '가(이) 응원하고 있어요 🍀');
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  // 오늘자 일기 저장 (하루 한 번)
+  function maybeWriteDiary() {
+    var today = getTodayStr();
+    var list;
+    try { list = JSON.parse(localStorage.getItem(DIARY_KEY) || '[]'); } catch(e) { list = []; }
+    if (!Array.isArray(list)) list = [];
+    if (list.length && list[0].date === today) return; // 오늘 이미 작성
+    var note = generateDiaryNote();
+    list.unshift({ date: today, note: note });
+    if (list.length > DIARY_MAX) list.length = DIARY_MAX;
+    try { localStorage.setItem(DIARY_KEY, JSON.stringify(list)); } catch(e) {}
+  }
+  function getDiaryList() {
+    try { var l = JSON.parse(localStorage.getItem(DIARY_KEY) || '[]'); return Array.isArray(l) ? l : []; } catch(e) { return []; }
+  }
+  // 일기 말풍선 (최근 3일치)
+  function showDiary() {
+    var list = getDiaryList();
+    if (!list.length) { showBubble('아직 기록이 없어요 📖\n내일부터 하루 한 줄 남길게요', 4000); return; }
+    var nm = getPetName();
+    var recent = list.slice(0, 3);
+    var lines = [nm + '의 관찰 일기 📖'];
+    recent.forEach(function(d) {
+      var md = d.date.slice(5).replace('-', '/');
+      lines.push(md + ' · ' + d.note);
+    });
+    showBubble(lines.join('\n'), 7000);
   }
 
   // ── 친밀도(bond) 시스템 ──
@@ -558,6 +655,7 @@
     } else if (mode === 'ilji_msg')   { showIljiMsg();
     } else if (mode === 'pet_status') { showPetStatus();
     } else if (mode === 'yongsin_tip') { showYongsinTip();
+    } else if (mode === 'diary')       { showDiary();
     } else if (mode === 'lucky_draw')  { showLuckyDraw(); }
   }
 
@@ -854,7 +952,9 @@
     moveTo(startPos);
     wrapper.style.opacity = '0'; wrapper.style.transform = 'scale(0)';
     wrapper.style.transition += ', opacity 0.5s, transform 0.5s';
+    bumpVisitCounter();
     updateBond();
+    maybeWriteDiary();
     setTimeout(function() {
       wrapper.style.opacity = '1'; wrapper.style.transform = 'scale(1)';
       var anni = getAnniversaryMsg();

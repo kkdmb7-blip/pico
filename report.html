@@ -3220,36 +3220,74 @@ function renderCharVisual() {
   let visualHtml = '';
 
   if (_type === 'money') {
-    // ten_gods_map에서 직접 재성 카운트
-    const tgm = _sdFull?.ten_gods_map || {};
-    const tgVals = Object.values(tgm);
-    const jj = tgVals.filter(v => v && v.includes('정재')).length;
-    const pj = tgVals.filter(v => v && v.includes('편재')).length;
-    const total = jj + pj;
-    const jaeLabel = total >= 3 ? '재성과다' : total === 0 ? '재성부재' : total === 1 ? '재성약' : '재성적당';
-    const wdM = _rptFull?.['재물운'];
-    const wealthOhName = wdM?.재물성향 || (jj > pj ? '정재 우위 — 안정·저축형' : pj > jj ? '편재 우위 — 투자·사업형' : total > 0 ? '균형형' : '재성 부재');
-    const judgeCol = total >= 3 ? '#c8700a' : total === 0 ? '#8a2010' : '#7a4e00';
-    visualHtml = '<div style="position:relative;width:300px;height:220px;margin:12px auto 4px;overflow:visible;">' + bubblesHtml + '</div>'
-      + '<div style="padding:0 18px 8px;display:flex;gap:7px;">'
-      + '<div style="flex:1;background:linear-gradient(160deg,rgba(40,130,60,0.18),rgba(40,130,60,0.04));border-radius:14px;padding:11px 6px;border:1.5px solid rgba(40,130,60,0.32);text-align:center;box-shadow:0 4px 14px rgba(40,130,60,0.12);">'
-      + '<div style="font-size:18px;margin-bottom:2px;filter:drop-shadow(0 1px 2px rgba(40,130,60,0.3));">🏦</div>'
-      + '<div style="font-size:9px;font-weight:800;color:#1a6a30;opacity:0.75;letter-spacing:0.5px;">정재 JJ</div>'
-      + '<div style="font-size:30px;font-weight:900;color:#1a5020;line-height:1;text-shadow:0 2px 6px rgba(40,130,60,0.2);">' + jj + '</div>'
-      + '<div style="font-size:9px;color:#1a6a30;margin-top:3px;font-weight:700;">안정 수입</div></div>'
-      + '<div style="flex:1;background:linear-gradient(160deg,rgba(200,120,0,0.2),rgba(200,120,0,0.04));border-radius:14px;padding:11px 6px;border:1.5px solid rgba(200,120,0,0.35);text-align:center;box-shadow:0 4px 14px rgba(200,120,0,0.12);">'
-      + '<div style="font-size:18px;margin-bottom:2px;filter:drop-shadow(0 1px 2px rgba(200,120,0,0.3));">💎</div>'
-      + '<div style="font-size:9px;font-weight:800;color:#8a5000;opacity:0.75;letter-spacing:0.5px;">편재 PJ</div>'
-      + '<div style="font-size:30px;font-weight:900;color:#6a3800;line-height:1;text-shadow:0 2px 6px rgba(200,120,0,0.2);">' + pj + '</div>'
-      + '<div style="font-size:9px;color:#8a5000;margin-top:3px;font-weight:700;">투자·사업</div></div>'
-      + '<div style="flex:1;background:linear-gradient(160deg,' + judgeCol + '22,' + judgeCol + '06);border-radius:14px;padding:11px 6px;border:1.5px solid ' + judgeCol + '50;text-align:center;box-shadow:0 4px 14px ' + judgeCol + '22;">'
-      + '<div style="font-size:18px;margin-bottom:2px;filter:drop-shadow(0 1px 2px ' + judgeCol + '50);">⚖️</div>'
-      + '<div style="font-size:9px;font-weight:800;color:' + judgeCol + ';opacity:0.8;letter-spacing:0.5px;">JUDGE</div>'
-      + '<div style="font-size:14px;font-weight:900;color:' + judgeCol + ';line-height:1.15;margin-top:6px;">' + jaeLabel + '</div>'
-      + '</div></div>'
-      + '<div style="margin:0 18px 10px;padding:11px 14px;background:linear-gradient(135deg,rgba(200,140,30,0.12),rgba(120,80,20,0.04));border-radius:12px;border:1.2px solid rgba(180,120,30,0.25);font-size:12px;font-weight:800;color:#3a2000;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(180,120,30,0.1);">'
-      + '<span style="font-size:16px;">💰</span>'
-      + '<span>' + wealthOhName + '</span>'
+    // 바이럴 패턴: 시적 헤드라인 + TOP3 재물 패턴 빅버블 + 정재/편재 카운트 + 3카드 잠금
+    const sfM = window.SajuFormula;
+    const iljuStemM = (_ilju||'')[0];
+    const metaphorM = (sfM && sfM.STEM_METAPHOR && sfM.STEM_METAPHOR[iljuStemM]) || '특별한 기운';
+    const nameKwM = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + _profile.name + '</span>님 사주는' : '당신의 사주는';
+
+    const ctxM = sfM.fromSajuData(_sdFull, ohList);
+    const patScoredM = sfM.scoreMoneyPatterns(ctxM);
+    const patTopM = sfM.distributeTopHeavy(patScoredM, { pow: 2.5, topBoost: 1.25, minPct: 2 });
+    const top3M = patTopM.slice(0, 3);
+
+    const PAT_COL_M = { 안정축적형:'#1a5a30', 사업가형:'#c8500a', 전문직형:'#3a4a8a', 투자형:'#8a4a1a', 직장형:'#5a6a2a', 프리랜서형:'#6a3a8a' };
+    const PAT_BG_M  = { 안정축적형:'#a4d4b4', 사업가형:'#f8c89a', 전문직형:'#a4b4e4', 투자형:'#e4c8a4', 직장형:'#c8d8a4', 프리랜서형:'#d4b4e4' };
+
+    const bigM = top3M[0], midM = top3M[1] || top3M[0], smlM = top3M[2] || top3M[0];
+    const midColM = PAT_COL_M[midM.name] || '#5a2a8a', midBgM = PAT_BG_M[midM.name] || '#c8a4e4';
+    const smlColM = PAT_COL_M[smlM.name] || '#3a4a8a', smlBgM = PAT_BG_M[smlM.name] || '#a4b4e4';
+    const bubblesViralM = '<div style="position:relative;width:100%;height:170px;display:flex;align-items:center;justify-content:center;">'
+      + '<div style="position:absolute;left:6%;top:55%;width:66px;height:66px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+smlBgM+'cc,'+smlColM+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 14px '+smlColM+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+smlM.name+'</div><div style="font-size:18px;font-weight:900;line-height:1;margin-top:2px;">'+smlM.pct+'%</div></div>'
+      + '<div style="width:138px;height:138px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b8,#f4d860);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(244,216,96,0.6),inset 0 3px 8px rgba(255,255,255,0.55);position:relative;z-index:2;"><div style="font-size:11px;font-weight:800;color:#5a3a00;letter-spacing:-0.2px;filter:blur(6px);user-select:none;">'+bigM.name+'</div><div style="font-size:38px;font-weight:900;color:#3a2400;line-height:1;margin-top:2px;">'+bigM.pct+'%</div><div style="font-size:9px;color:#5a3a00;margin-top:4px;font-weight:800;letter-spacing:0.3px;">🔒 재물 그릇</div></div>'
+      + '<div style="position:absolute;right:5%;top:18%;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+midBgM+'dd,'+midColM+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 16px '+midColM+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+midM.name+'</div><div style="font-size:22px;font-weight:900;line-height:1;margin-top:2px;">'+midM.pct+'%</div></div>'
+      + '</div>';
+
+    // 정재/편재 카운트 + 종합 판정 (기존 정보 유지)
+    const tgmM = _sdFull?.ten_gods_map || {};
+    const tgValsM = Object.values(tgmM);
+    const jjM = tgValsM.filter(v => v && v.includes('정재')).length;
+    const pjM = tgValsM.filter(v => v && v.includes('편재')).length;
+    const totalM = jjM + pjM;
+    const jaeLabelM = totalM >= 3 ? '재성과다' : totalM === 0 ? '재성부재' : totalM === 1 ? '재성약' : '재성적당';
+    const judgeColM = totalM >= 3 ? '#c8700a' : totalM === 0 ? '#8a2010' : '#7a4e00';
+    const jaeStripM = '<div style="display:flex;gap:7px;">'
+      + '<div style="flex:1;background:linear-gradient(160deg,rgba(40,130,60,0.18),rgba(40,130,60,0.04));border-radius:12px;padding:10px 6px;border:1.5px solid rgba(40,130,60,0.32);text-align:center;">'
+      +   '<div style="font-size:9px;font-weight:800;color:#1a6a30;opacity:0.75;letter-spacing:0.5px;">정재 JJ</div>'
+      +   '<div style="font-size:24px;font-weight:900;color:#1a5020;line-height:1.1;">'+jjM+'</div>'
+      +   '<div style="font-size:9px;color:#1a6a30;margin-top:1px;font-weight:700;">안정 수입</div>'
+      + '</div>'
+      + '<div style="flex:1;background:linear-gradient(160deg,rgba(200,120,0,0.2),rgba(200,120,0,0.04));border-radius:12px;padding:10px 6px;border:1.5px solid rgba(200,120,0,0.35);text-align:center;">'
+      +   '<div style="font-size:9px;font-weight:800;color:#8a5000;opacity:0.75;letter-spacing:0.5px;">편재 PJ</div>'
+      +   '<div style="font-size:24px;font-weight:900;color:#6a3800;line-height:1.1;">'+pjM+'</div>'
+      +   '<div style="font-size:9px;color:#8a5000;margin-top:1px;font-weight:700;">투자·사업</div>'
+      + '</div>'
+      + '<div style="flex:1;background:linear-gradient(160deg,'+judgeColM+'22,'+judgeColM+'06);border-radius:12px;padding:10px 6px;border:1.5px solid '+judgeColM+'50;text-align:center;">'
+      +   '<div style="font-size:9px;font-weight:800;color:'+judgeColM+';opacity:0.8;letter-spacing:0.5px;">JUDGE</div>'
+      +   '<div style="font-size:13px;font-weight:900;color:'+judgeColM+';line-height:1.2;margin-top:7px;">'+jaeLabelM+'</div>'
+      + '</div>'
+      + '</div>';
+
+    // 3카드 잠금
+    const lockCardsM = [
+      {label:'재물 그릇 크기', hint:'타고난 재물 흐름의 패턴'},
+      {label:'돈이 모이는 방향', hint:'어떤 활동이 돈을 부르는지'},
+      {label:'최적 직군·시기', hint:'대운 흐름과 맞물린 타이밍'}
+    ];
+    const lockHtmlM = lockCardsM.map(function(c){
+      return '<div style="flex:1;background:linear-gradient(160deg,#fbf3da,#f0e2bc);border:1.5px solid rgba(180,130,50,0.32);border-radius:14px;padding:14px 8px 16px;text-align:center;box-shadow:0 4px 12px rgba(180,130,50,0.18),inset 0 1px 0 rgba(255,255,255,0.5);position:relative;overflow:hidden;">'
+        + '<div style="font-size:10px;font-weight:900;color:#8a6620;letter-spacing:0.3px;margin-bottom:8px;">'+c.label+'</div>'
+        + '<div style="font-size:11px;font-weight:700;color:#5a3a0a;filter:blur(5px);user-select:none;line-height:1.4;">'+c.hint+'</div>'
+        + '<div style="position:absolute;top:6px;right:7px;font-size:11px;">🔒</div>'
+        + '</div>';
+    }).join('');
+
+    visualHtml = '<div style="padding:14px 14px 12px;display:flex;flex-direction:column;gap:14px;">'
+      + '<div style="text-align:center;font-size:13px;font-weight:700;color:#3a2a10;letter-spacing:-0.3px;line-height:1.55;">' + nameKwM + ' <b style="color:#b89048;">' + metaphorM + '</b> 같은 재물 그릇이에요</div>'
+      + bubblesViralM
+      + jaeStripM
+      + '<div style="display:flex;gap:7px;">' + lockHtmlM + '</div>'
+      + '<div style="text-align:center;font-size:11px;color:#8a6620;font-weight:800;letter-spacing:0.3px;background:linear-gradient(135deg,rgba(244,216,96,0.22),rgba(180,130,50,0.08));padding:9px 12px;border-radius:10px;border:1px dashed rgba(180,130,50,0.35);">🔒 리포트를 받으면 모든 답이 즉시 공개돼요</div>'
       + '</div>';
 
   } else if (_type === 'daeun') {
@@ -3284,43 +3322,86 @@ function renderCharVisual() {
     ${miniBubbleBlock}`;
 
   } else if (_type === 'love') {
-    // 오행 버블 + 배우자성 하트 + 살신 배지
+    // 바이럴 패턴: 시적 헤드라인 + TOP3 관계 스타일 빅버블 + 배우자성/살신 + 3카드 잠금
+    const sfL = window.SajuFormula;
+    const iljuStemL = (_ilju||'')[0];
+    const metaphorL = (sfL && sfL.STEM_METAPHOR && sfL.STEM_METAPHOR[iljuStemL]) || '특별한 기운';
+    const nameKwL = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + _profile.name + '</span>님은' : '당신은';
+
+    const ctxL = sfL.fromSajuData(_sdFull, ohList);
+    const styleScoredL = sfL.scoreLoveStyles(ctxL);
+    const styleTopL = sfL.distributeTopHeavy(styleScoredL, { pow: 2.5, topBoost: 1.25, minPct: 2 });
+    const top3L = styleTopL.slice(0, 3);
+
+    const STYLE_COL_L = { 헌신형:'#8a1a50', 카리스마형:'#8a3a1a', 로맨틱형:'#c8508a', 신중형:'#3a4a8a', 자유형:'#3a8a4a', 배려형:'#5a8aaa' };
+    const STYLE_BG_L  = { 헌신형:'#e4a4c4', 카리스마형:'#f8b89a', 로맨틱형:'#f8c4d8', 신중형:'#a4b4e4', 자유형:'#a4d8b4', 배려형:'#b8d8e4' };
+
+    const bigL = top3L[0], midL = top3L[1] || top3L[0], smlL = top3L[2] || top3L[0];
+    const midColL = STYLE_COL_L[midL.name] || '#5a2a8a', midBgL = STYLE_BG_L[midL.name] || '#c8a4e4';
+    const smlColL = STYLE_COL_L[smlL.name] || '#3a4a8a', smlBgL = STYLE_BG_L[smlL.name] || '#a4b4e4';
+    const bubblesViralL = '<div style="position:relative;width:100%;height:170px;display:flex;align-items:center;justify-content:center;">'
+      + '<div style="position:absolute;left:6%;top:55%;width:66px;height:66px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+smlBgL+'cc,'+smlColL+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 14px '+smlColL+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+smlL.name+'</div><div style="font-size:18px;font-weight:900;line-height:1;margin-top:2px;">'+smlL.pct+'%</div></div>'
+      + '<div style="width:138px;height:138px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b8,#f4d860);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(244,216,96,0.6),inset 0 3px 8px rgba(255,255,255,0.55);position:relative;z-index:2;"><div style="font-size:11px;font-weight:800;color:#5a3a00;letter-spacing:-0.2px;filter:blur(6px);user-select:none;">'+bigL.name+'</div><div style="font-size:38px;font-weight:900;color:#3a2400;line-height:1;margin-top:2px;">'+bigL.pct+'%</div><div style="font-size:9px;color:#5a3a00;margin-top:4px;font-weight:800;letter-spacing:0.3px;">🔒 사랑 스타일</div></div>'
+      + '<div style="position:absolute;right:5%;top:18%;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+midBgL+'dd,'+midColL+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 16px '+midColL+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+midL.name+'</div><div style="font-size:22px;font-weight:900;line-height:1;margin-top:2px;">'+midL.pct+'%</div></div>'
+      + '</div>';
+
+    // 배우자성 + 살신 (기존 정보 유지)
     const cycle2 = ['목','화','토','금','수'];
-    const gender = _profile?.gender || 'M';
+    const genderL = _profile?.gender || 'M';
     const mi2 = cycle2.indexOf(ohList[0]?.[0]);
     const gwanOh = mi2 >= 0 ? cycle2[(mi2+3)%5] : null;
-    const wonjin = _wonjinData?.있음;
-    const gwimun = _gwimungwanData?.있음;
+    const wonjin = _wonjinData?.['있음'];
+    const gwimun = _gwimungwanData?.['있음'];
     const gwanCol = gwanOh ? (OH_COLOR[gwanOh]||'#8a1a50') : '#8a1a50';
     const gwanBg = gwanOh ? (OH_BG[gwanOh]||'rgba(120,60,100,0.1)') : 'rgba(120,60,100,0.1)';
-    const spouseLabel = gender === 'F' ? '남편성' : '아내성';
-    const spouseDesc = gender === 'F' ? '관성 — 나를 제어하는 기운' : '재성 — 내가 제어하는 기운';
-    const spouseCard = gwanOh ? `<div style="background:linear-gradient(135deg,rgba(200,80,140,0.15),${gwanBg});border-radius:14px;padding:12px 14px;border:1.5px solid rgba(200,80,140,0.3);display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(180,60,120,0.15);">
-        <div style="position:relative;flex-shrink:0;">
-          <div style="width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 30% 30%,${gwanBg},${gwanCol}22);border:2.5px solid ${gwanCol};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:${gwanCol};box-shadow:0 3px 10px ${gwanCol}35;">${gwanOh}</div>
-          <div style="position:absolute;bottom:-4px;right:-4px;font-size:18px;filter:drop-shadow(0 2px 3px rgba(200,60,120,0.4));">💕</div>
-        </div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:10px;font-weight:800;color:#6a1040;opacity:0.75;letter-spacing:0.5px;">${spouseLabel} · SPOUSE</div>
-          <div style="font-size:13px;font-weight:900;color:#5a0a30;line-height:1.3;">${gwanOh} 오행이 배우자를 상징</div>
-          <div style="font-size:10px;color:rgba(100,10,50,0.55);margin-top:2px;">${spouseDesc}</div>
-        </div>
-      </div>` : '';
-    const killStat = `<div style="display:flex;gap:7px;">
-        <div style="flex:1;padding:10px;border-radius:12px;background:linear-gradient(160deg,${wonjin?'rgba(200,60,60,0.18)':'rgba(40,140,80,0.18)'},${wonjin?'rgba(200,60,60,0.04)':'rgba(40,140,80,0.04)'});border:1.5px solid ${wonjin?'rgba(200,60,60,0.35)':'rgba(40,140,80,0.35)'};text-align:center;box-shadow:0 3px 10px ${wonjin?'rgba(200,60,60,0.12)':'rgba(40,140,80,0.12)'};">
-          <div style="font-size:14px;margin-bottom:2px;">${wonjin?'💔':'💚'}</div>
-          <div style="font-size:9px;font-weight:800;color:${wonjin?'#8a2010':'#1a6a30'};opacity:0.8;letter-spacing:0.3px;">원진살</div>
-          <div style="font-size:13px;font-weight:900;color:${wonjin?'#8a2010':'#0a4a20'};">${wonjin?'있음':'없음'}</div>
-        </div>
-        <div style="flex:1;padding:10px;border-radius:12px;background:linear-gradient(160deg,${gwimun?'rgba(180,60,180,0.18)':'rgba(40,140,80,0.18)'},${gwimun?'rgba(180,60,180,0.04)':'rgba(40,140,80,0.04)'});border:1.5px solid ${gwimun?'rgba(180,60,180,0.35)':'rgba(40,140,80,0.35)'};text-align:center;box-shadow:0 3px 10px ${gwimun?'rgba(180,60,180,0.12)':'rgba(40,140,80,0.12)'};">
-          <div style="font-size:14px;margin-bottom:2px;">${gwimun?'🌀':'💚'}</div>
-          <div style="font-size:9px;font-weight:800;color:${gwimun?'#6a1a8a':'#1a6a30'};opacity:0.8;letter-spacing:0.3px;">귀문관살</div>
-          <div style="font-size:13px;font-weight:900;color:${gwimun?'#6a1a8a':'#0a4a20'};">${gwimun?'있음':'없음'}</div>
-        </div>
-      </div>`;
-    visualHtml = `
-      <div style="position:relative;width:300px;height:220px;margin:12px auto 4px;overflow:visible;">${bubblesHtml}</div>
-      <div style="padding:0 18px 10px;display:flex;flex-direction:column;gap:8px;">${spouseCard}${killStat}</div>`;
+    const spouseLabel = genderL === 'F' ? '남편성' : '아내성';
+    const spouseDesc = genderL === 'F' ? '관성 — 나를 제어하는 기운' : '재성 — 내가 제어하는 기운';
+    const spouseCard = gwanOh ? '<div style="background:linear-gradient(135deg,rgba(200,80,140,0.15),'+gwanBg+');border-radius:14px;padding:12px 14px;border:1.5px solid rgba(200,80,140,0.3);display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(180,60,120,0.15);">'
+      + '<div style="position:relative;flex-shrink:0;">'
+      +   '<div style="width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 30% 30%,'+gwanBg+','+gwanCol+'22);border:2.5px solid '+gwanCol+';display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:'+gwanCol+';box-shadow:0 3px 10px '+gwanCol+'35;">'+gwanOh+'</div>'
+      +   '<div style="position:absolute;bottom:-4px;right:-4px;font-size:18px;filter:drop-shadow(0 2px 3px rgba(200,60,120,0.4));">💕</div>'
+      + '</div>'
+      + '<div style="flex:1;min-width:0;">'
+      +   '<div style="font-size:10px;font-weight:800;color:#6a1040;opacity:0.75;letter-spacing:0.5px;">'+spouseLabel+' · SPOUSE</div>'
+      +   '<div style="font-size:13px;font-weight:900;color:#5a0a30;line-height:1.3;">'+gwanOh+' 오행이 배우자를 상징</div>'
+      +   '<div style="font-size:10px;color:rgba(100,10,50,0.55);margin-top:2px;">'+spouseDesc+'</div>'
+      + '</div>'
+      + '</div>' : '';
+    const killStat = '<div style="display:flex;gap:7px;">'
+      + '<div style="flex:1;padding:10px;border-radius:12px;background:linear-gradient(160deg,'+(wonjin?'rgba(200,60,60,0.18)':'rgba(40,140,80,0.18)')+','+(wonjin?'rgba(200,60,60,0.04)':'rgba(40,140,80,0.04)')+');border:1.5px solid '+(wonjin?'rgba(200,60,60,0.35)':'rgba(40,140,80,0.35)')+';text-align:center;box-shadow:0 3px 10px '+(wonjin?'rgba(200,60,60,0.12)':'rgba(40,140,80,0.12)')+';">'
+      +   '<div style="font-size:14px;margin-bottom:2px;">'+(wonjin?'💔':'💚')+'</div>'
+      +   '<div style="font-size:9px;font-weight:800;color:'+(wonjin?'#8a2010':'#1a6a30')+';opacity:0.8;letter-spacing:0.3px;">원진살</div>'
+      +   '<div style="font-size:13px;font-weight:900;color:'+(wonjin?'#8a2010':'#0a4a20')+';">'+(wonjin?'있음':'없음')+'</div>'
+      + '</div>'
+      + '<div style="flex:1;padding:10px;border-radius:12px;background:linear-gradient(160deg,'+(gwimun?'rgba(180,60,180,0.18)':'rgba(40,140,80,0.18)')+','+(gwimun?'rgba(180,60,180,0.04)':'rgba(40,140,80,0.04)')+');border:1.5px solid '+(gwimun?'rgba(180,60,180,0.35)':'rgba(40,140,80,0.35)')+';text-align:center;box-shadow:0 3px 10px '+(gwimun?'rgba(180,60,180,0.12)':'rgba(40,140,80,0.12)')+';">'
+      +   '<div style="font-size:14px;margin-bottom:2px;">'+(gwimun?'🌀':'💚')+'</div>'
+      +   '<div style="font-size:9px;font-weight:800;color:'+(gwimun?'#6a1a8a':'#1a6a30')+';opacity:0.8;letter-spacing:0.3px;">귀문관살</div>'
+      +   '<div style="font-size:13px;font-weight:900;color:'+(gwimun?'#6a1a8a':'#0a4a20')+';">'+(gwimun?'있음':'없음')+'</div>'
+      + '</div>'
+      + '</div>';
+
+    // 3카드 잠금
+    const lockCardsL = [
+      {label:'사랑 스타일', hint:'관계 속 나의 본 모습'},
+      {label:'궁합 좋은 사주', hint:'어떤 기운과 잘 맞는지'},
+      {label:'주의할 패턴', hint:'반복되는 관계 함정'}
+    ];
+    const lockHtmlL = lockCardsL.map(function(c){
+      return '<div style="flex:1;background:linear-gradient(160deg,#fbf3da,#f0e2bc);border:1.5px solid rgba(180,130,50,0.32);border-radius:14px;padding:14px 8px 16px;text-align:center;box-shadow:0 4px 12px rgba(180,130,50,0.18),inset 0 1px 0 rgba(255,255,255,0.5);position:relative;overflow:hidden;">'
+        + '<div style="font-size:10px;font-weight:900;color:#8a6620;letter-spacing:0.3px;margin-bottom:8px;">'+c.label+'</div>'
+        + '<div style="font-size:11px;font-weight:700;color:#5a3a0a;filter:blur(5px);user-select:none;line-height:1.4;">'+c.hint+'</div>'
+        + '<div style="position:absolute;top:6px;right:7px;font-size:11px;">🔒</div>'
+        + '</div>';
+    }).join('');
+
+    visualHtml = '<div style="padding:14px 14px 12px;display:flex;flex-direction:column;gap:14px;">'
+      + '<div style="text-align:center;font-size:13px;font-weight:700;color:#3a2a10;letter-spacing:-0.3px;line-height:1.55;">' + nameKwL + ' <b style="color:#b89048;">' + metaphorL + '</b> 같은 사랑을 해요</div>'
+      + bubblesViralL
+      + spouseCard
+      + killStat
+      + '<div style="display:flex;gap:7px;">' + lockHtmlL + '</div>'
+      + '<div style="text-align:center;font-size:11px;color:#8a6620;font-weight:800;letter-spacing:0.3px;background:linear-gradient(135deg,rgba(244,216,96,0.22),rgba(180,130,50,0.08));padding:9px 12px;border-radius:10px;border:1px dashed rgba(180,130,50,0.35);">🔒 리포트를 받으면 모든 답이 즉시 공개돼요</div>'
+      + '</div>';
 
   } else if (_type === 'year') {
     // 세운 vs 내 오행 — 서버 응답 기반 동적 파싱
@@ -3654,31 +3735,114 @@ function renderCharVisual() {
       + '</div>';
 
   } else if (_type === 'character') {
-    // 기질 리포트: 일주 카드 + 강약/용신 (아이콘 대신 색상 라인)
-    const iljuDisp = _ilju || '—';
-    const iljuLen = (iljuDisp||'').length;
-    const iljuFontSize = iljuLen >= 2 ? 30 : 38;
-    const iljuOh = ohList[0]?.[0];
-    const iljuCol = OH_COLOR[iljuOh] || '#7a4e00';
-    const iljuBg  = OH_BG[iljuOh]  || 'rgba(120,80,20,0.08)';
-    const yCol2 = OH_COLOR[yE] || '#7a4e00';
-    const yBg2 = OH_BG[yE] || 'rgba(120,80,20,0.08)';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="display:flex;align-items:stretch;gap:11px;">'
-      + '<div style="min-width:100px;padding:0 8px;height:100px;border-radius:18px;background:' + iljuBg + ';border:1.8px solid ' + iljuCol + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">'
-      + '<div style="font-size:9px;color:' + iljuCol + ';opacity:0.7;font-weight:700;letter-spacing:1px;margin-bottom:4px;">일주</div>'
-      + '<div style="font-size:' + iljuFontSize + 'px;font-weight:900;color:' + iljuCol + ';line-height:1;letter-spacing:-1px;white-space:nowrap;">' + iljuDisp + '</div>'
+    // 바이럴 패턴: 시적 헤드라인 + 8축 기질 레이더 + TOP3 빅버블 + 일주/강약/용신 + 3카드 잠금
+    // 점수 공식 단일 출처: saju-formula.js (CHARACTER_TRAITS 매트릭스)
+    const sfH = window.SajuFormula;
+    const iljuStemH = (_ilju||'')[0];
+    const metaphorH = (sfH && sfH.STEM_METAPHOR && sfH.STEM_METAPHOR[iljuStemH]) || '특별한 기운';
+    const nameKwH = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + _profile.name + '</span>님은' : '당신은';
+
+    const ctxH = sfH.fromSajuData(_sdFull, ohList);
+    // 8축 기질 점수 → TOP-heavy(빅버블용) + 정규화(레이더용)
+    const traitsScoredH = sfH.scoreCharacterTraits(ctxH);
+    const traitsTopH = sfH.distributeTopHeavy(traitsScoredH, { pow: 2.5, topBoost: 1.25, minPct: 2 });
+    const top3H = traitsTopH.slice(0, 3);
+    const traitsNormH = sfH.normalizeAxis(traitsScoredH, { min: 0.22 });
+
+    // 기질별 색상 매핑 (서브 버블/레이더 그라데이션용)
+    const TRAIT_COL_H = { 창의력:'#3a8a3a', 분석력:'#3a4a8a', 리더십:'#8a3a3a', 표현력:'#c8500a', 안정감:'#8a6a30', 직관력:'#5a2a8a', 실행력:'#2a6a4a', 공감력:'#5a8aaa' };
+    const TRAIT_BG_H  = { 창의력:'#a4d8a4', 분석력:'#a4b4e4', 리더십:'#e4a4a4', 표현력:'#f8c89a', 안정감:'#e4d4a4', 직관력:'#c8a4e4', 실행력:'#a4d8c4', 공감력:'#b8d8e4' };
+
+    // 8축 레이더 (CHARACTER_TRAITS 8개 순서)
+    const RH=120, RR_H=88;
+    const radarPtsH = traitsNormH.map(function(a,i){
+      const ang = (Math.PI*2 * i/8) - Math.PI/2;
+      const r = RR_H*a.norm;
+      return [RH + Math.cos(ang)*r, RH + Math.sin(ang)*r];
+    });
+    const radarPolyH = radarPtsH.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
+    const gridSvgH = [0.25,0.5,0.75,1].map(function(s){
+      const pts = traitsNormH.map(function(_,i){
+        const ang = (Math.PI*2*i/8) - Math.PI/2;
+        return (RH + Math.cos(ang)*RR_H*s).toFixed(1) + ',' + (RH + Math.sin(ang)*RR_H*s).toFixed(1);
+      }).join(' ');
+      return '<polygon points="'+pts+'" fill="none" stroke="rgba(212,184,108,0.22)" stroke-width="1"/>';
+    }).join('');
+    const axisLinesH = traitsNormH.map(function(_,i){
+      const ang = (Math.PI*2*i/8) - Math.PI/2;
+      return '<line x1="'+RH+'" y1="'+RH+'" x2="'+(RH + Math.cos(ang)*RR_H).toFixed(1)+'" y2="'+(RH + Math.sin(ang)*RR_H).toFixed(1)+'" stroke="rgba(212,184,108,0.18)" stroke-width="1"/>';
+    }).join('');
+    const axisLabelsH = traitsNormH.map(function(a,i){
+      const ang = (Math.PI*2*i/8) - Math.PI/2;
+      const lx = RH + Math.cos(ang)*(RR_H+16);
+      const ly = RH + Math.sin(ang)*(RR_H+16);
+      const cosV = Math.cos(ang);
+      const anchor = cosV > 0.3 ? 'start' : cosV < -0.3 ? 'end' : 'middle';
+      return '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anchor+'" dominant-baseline="middle" font-size="10.5" font-weight="800" fill="#7a5210">'+a.label+'</text>';
+    }).join('');
+    const radarSvgH = '<svg viewBox="-40 -8 320 256" style="width:100%;max-width:300px;height:auto;display:block;margin:0 auto;">'
+      + '<defs><linearGradient id="radGradH" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a07fd4" stop-opacity="0.7"/><stop offset="100%" stop-color="#3d7a3a" stop-opacity="0.7"/></linearGradient></defs>'
+      + gridSvgH + axisLinesH
+      + '<polygon points="'+radarPolyH+'" fill="url(#radGradH)" stroke="#b89048" stroke-width="2.5"/>'
+      + axisLabelsH
+      + '</svg>';
+
+    // 빅버블 (1위 블러, 2·3위 노출)
+    const bigH = top3H[0], midH = top3H[1] || top3H[0], smlH = top3H[2] || top3H[0];
+    const midColH = TRAIT_COL_H[midH.name] || '#5a2a8a', midBgH = TRAIT_BG_H[midH.name] || '#c8a4e4';
+    const smlColH = TRAIT_COL_H[smlH.name] || '#3a4a8a', smlBgH = TRAIT_BG_H[smlH.name] || '#a4b4e4';
+    const bubblesViralH = '<div style="position:relative;width:100%;height:170px;display:flex;align-items:center;justify-content:center;">'
+      + '<div style="position:absolute;left:6%;top:55%;width:66px;height:66px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+smlBgH+'cc,'+smlColH+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 14px '+smlColH+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+smlH.name+'</div><div style="font-size:18px;font-weight:900;line-height:1;margin-top:2px;">'+smlH.pct+'%</div></div>'
+      + '<div style="width:138px;height:138px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b8,#f4d860);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(244,216,96,0.6),inset 0 3px 8px rgba(255,255,255,0.55);position:relative;z-index:2;"><div style="font-size:11px;font-weight:800;color:#5a3a00;letter-spacing:-0.2px;filter:blur(6px);user-select:none;">'+bigH.name+'</div><div style="font-size:38px;font-weight:900;color:#3a2400;line-height:1;margin-top:2px;">'+bigH.pct+'%</div><div style="font-size:9px;color:#5a3a00;margin-top:4px;font-weight:800;letter-spacing:0.3px;">🔒 핵심 기질</div></div>'
+      + '<div style="position:absolute;right:5%;top:18%;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+midBgH+'dd,'+midColH+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 16px '+midColH+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+midH.name+'</div><div style="font-size:22px;font-weight:900;line-height:1;margin-top:2px;">'+midH.pct+'%</div></div>'
+      + '</div>';
+
+    // 일주 + 강약 + 용신 (기존 정보 유지, 컴팩트 가로배치)
+    const iljuDispH = _ilju || '—';
+    const iljuOhH = ohList[0]?.[0];
+    const iljuColH = OH_COLOR[iljuOhH] || '#7a4e00';
+    const iljuBgH  = OH_BG[iljuOhH]  || 'rgba(120,80,20,0.08)';
+    const yColH = OH_COLOR[yE] || '#7a4e00';
+    const yBgH = OH_BG[yE] || 'rgba(120,80,20,0.08)';
+    const sajuStripH = '<div style="display:flex;gap:7px;">'
+      + '<div style="flex:1;background:'+iljuBgH+';border:1.5px solid '+iljuColH+'55;border-radius:12px;padding:10px 6px;text-align:center;">'
+      +   '<div style="font-size:9px;font-weight:800;color:'+iljuColH+';opacity:0.75;letter-spacing:0.5px;margin-bottom:3px;">일주</div>'
+      +   '<div style="font-size:18px;font-weight:900;color:'+iljuColH+';line-height:1;">'+iljuDispH+'</div>'
       + '</div>'
-      + '<div style="flex:1;display:flex;flex-direction:column;gap:7px;">'
-      + '<div style="background:linear-gradient(135deg,rgba(40,120,80,0.12),rgba(40,120,80,0.02));border-radius:11px;padding:10px 12px 10px 14px;border:1.3px solid rgba(40,120,80,0.3);border-left:4px solid #1a6030;">'
-      + '<div style="font-size:9px;font-weight:800;color:#1a6030;opacity:0.75;letter-spacing:0.3px;">일간 강약</div>'
-      + '<div style="font-size:14px;font-weight:900;color:#0a4020;">' + (_singang||'—') + '</div>'
+      + '<div style="flex:1;background:linear-gradient(160deg,rgba(40,120,80,0.12),rgba(40,120,80,0.02));border:1.5px solid rgba(40,120,80,0.3);border-radius:12px;padding:10px 6px;text-align:center;">'
+      +   '<div style="font-size:9px;font-weight:800;color:#1a6030;opacity:0.75;letter-spacing:0.5px;margin-bottom:3px;">일간 강약</div>'
+      +   '<div style="font-size:13px;font-weight:900;color:#0a4020;line-height:1.15;">'+(_singang||'—')+'</div>'
       + '</div>'
-      + '<div style="background:linear-gradient(135deg,' + yBg2 + ',rgba(255,255,255,0.4));border-radius:11px;padding:10px 12px 10px 14px;border:1.3px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.25)') + ';border-left:4px solid ' + yCol2 + ';">'
-      + '<div style="font-size:9px;font-weight:800;color:' + yCol2 + ';opacity:0.8;letter-spacing:0.3px;">용신</div>'
-      + '<div style="font-size:14px;font-weight:900;color:' + yCol2 + ';">' + (yE||'—') + '</div>'
-      + '</div></div></div>'
-      + miniBubbleBlock
+      + '<div style="flex:1;background:'+yBgH+';border:1.5px solid '+yColH+'55;border-radius:12px;padding:10px 6px;text-align:center;">'
+      +   '<div style="font-size:9px;font-weight:800;color:'+yColH+';opacity:0.8;letter-spacing:0.5px;margin-bottom:3px;">용신</div>'
+      +   '<div style="font-size:18px;font-weight:900;color:'+yColH+';line-height:1;">'+(yE||'—')+'</div>'
+      + '</div>'
+      + '</div>';
+
+    // 3카드 잠금 (character 섹션 라벨 매핑)
+    const lockCardsH = [
+      {label:'성격 강점·약점', hint:'타고난 강점과 숨은 약점'},
+      {label:'사주 구조 해석', hint:'일간·격국·용신의 의미'},
+      {label:'실천 방향', hint:'기질을 활용하는 구체 행동'}
+    ];
+    const lockHtmlH = lockCardsH.map(function(c){
+      return '<div style="flex:1;background:linear-gradient(160deg,#fbf3da,#f0e2bc);border:1.5px solid rgba(180,130,50,0.32);border-radius:14px;padding:14px 8px 16px;text-align:center;box-shadow:0 4px 12px rgba(180,130,50,0.18),inset 0 1px 0 rgba(255,255,255,0.5);position:relative;overflow:hidden;">'
+        + '<div style="font-size:10px;font-weight:900;color:#8a6620;letter-spacing:0.3px;margin-bottom:8px;">'+c.label+'</div>'
+        + '<div style="font-size:11px;font-weight:700;color:#5a3a0a;filter:blur(5px);user-select:none;line-height:1.4;">'+c.hint+'</div>'
+        + '<div style="position:absolute;top:6px;right:7px;font-size:11px;">🔒</div>'
+        + '</div>';
+    }).join('');
+
+    visualHtml = '<div style="padding:14px 14px 12px;display:flex;flex-direction:column;gap:14px;">'
+      + '<div style="text-align:center;font-size:13px;font-weight:700;color:#3a2a10;letter-spacing:-0.3px;line-height:1.55;">' + nameKwH + ' <b style="color:#b89048;">' + metaphorH + '</b> 같은 기질을 타고났어요</div>'
+      + bubblesViralH
+      + '<div style="background:linear-gradient(160deg,#fbf3da,#f0e2bc);border-radius:18px;padding:18px 4px 14px;border:1.5px solid rgba(180,130,50,0.3);box-shadow:0 4px 14px rgba(180,130,50,0.15),inset 0 1px 0 rgba(255,255,255,0.5);">'
+      +   '<div style="text-align:center;font-size:11px;font-weight:900;color:#8a6620;letter-spacing:1.2px;margin-bottom:6px;">8가지 기질 지표</div>'
+      +   radarSvgH
+      + '</div>'
+      + sajuStripH
+      + '<div style="display:flex;gap:7px;">' + lockHtmlH + '</div>'
+      + '<div style="text-align:center;font-size:11px;color:#8a6620;font-weight:800;letter-spacing:0.3px;background:linear-gradient(135deg,rgba(244,216,96,0.22),rgba(180,130,50,0.08));padding:9px 12px;border-radius:10px;border:1px dashed rgba(180,130,50,0.35);">🔒 리포트를 받으면 모든 답이 즉시 공개돼요</div>'
       + '</div>';
 
   } else if (_type === 'child_career') {
