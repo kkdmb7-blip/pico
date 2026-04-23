@@ -142,8 +142,8 @@ select.input option{background:#1a1030;}
       </div>
     </div>
     <div class="upsell-card">
-      <p class="upsell-text">도미넌트 행성은 시작일 뿐이에요.<br>내 사주·별자리·베딕까지 AI가 종합 분석하는<br>FORTUNA 심층 리포트에서 확인하세요.</p>
-      <a href="astro.html" class="upsell-btn">✦ 서양 점성술 분석 →</a>
+      <p class="upsell-text">도미넌트 행성은 시작일 뿐이에요.<br>행성 배치·각도·트랜짓까지 — 서양 점성술 분석에서 확인하세요.</p>
+      <button onclick="goAstro()" class="upsell-btn">✦ 서양 점성술 분석 →</button>
     </div>
   </div>
 </div>
@@ -230,6 +230,17 @@ function shareKakao() {
     return;
   }
   copyLink();
+}
+
+function goAstro() {
+  var year = parseInt(document.getElementById('calcYear').value);
+  var month = parseInt(document.getElementById('calcMonth').value);
+  var day = parseInt(document.getElementById('calcDay').value);
+  var hourVal = document.getElementById('calcHour').value;
+  var min = document.getElementById('calcMin').value || '0';
+  if (!year || !month || !day) { showToast('생년월일을 먼저 입력해주세요'); return; }
+  var p = new URLSearchParams({ year: year, month: month, day: day, hour: hourVal, minute: min });
+  window.location.href = 'astro.html?' + p.toString();
 }
 
 function copyLink() {
