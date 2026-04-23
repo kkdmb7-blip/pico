@@ -36,13 +36,18 @@
 
   function getElement() {
     try { var p = localStorage.getItem('yongsin_pet_pref'); if (p) return p; } catch(e) {}
-    var el = getPetState().element;
-    if (el) return el;
-    // pico_yongsin: 사주 분석 후 자동 저장된 용신 원소
+    // pico 외부(memox 등)에서는 pico_yongsin(Supabase 동기화값)을 yongsin_pet보다 우선
     try {
       var ys = localStorage.getItem('pico_yongsin');
       var valid = ['wood','fire','earth','metal','water'];
-      if (ys && valid.indexOf(ys) !== -1) return ys;
+      if (!IS_PICO && ys && valid.indexOf(ys) !== -1) return ys;
+    } catch(e) {}
+    var el = getPetState().element;
+    if (el) return el;
+    try {
+      var ys2 = localStorage.getItem('pico_yongsin');
+      var valid2 = ['wood','fire','earth','metal','water'];
+      if (ys2 && valid2.indexOf(ys2) !== -1) return ys2;
     } catch(e) {}
     return null;
   }
