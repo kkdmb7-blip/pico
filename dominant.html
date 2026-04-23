@@ -68,8 +68,8 @@ select.input option{background:#1a1030;}
 <div class="cosmos"><div class="cosmos-glow"></div><div class="stars-bg" id="stars"></div></div>
 <div class="toast" id="toast"></div>
 <nav>
-  <a href="https://picolab.kr" class="nav-brand">
-    <img src="img/goddess-app.png" alt="FORTUNA">
+  <a href="/" class="nav-brand">
+    <img src="img/goddess/goddess.png" alt="FORTUNA">
     <span>FORTUNA</span>
   </a>
   <button class="nav-back" onclick="history.back()">← 뒤로</button>
@@ -81,8 +81,34 @@ select.input option{background:#1a1030;}
     <p class="hero-sub">생년월일을 입력하면 무료로 확인할 수 있어요<br>출생 시간을 알면 더 정확해요</p>
   </div>
   <div class="form-card">
-    <div class="field"><label class="label">생년월일 *</label><input type="text" id="calcBirth" class="input" placeholder="예: 1990.03.15"></div>
-    <div class="field"><label class="label">출생 시간 <span style="font-size:11px;color:var(--muted)">(모르면 공란)</span></label><input type="text" id="calcTime" class="input" placeholder="예: 14:30"></div>
+    <div class="field">
+      <label class="label">생년월일 *</label>
+      <div style="display:flex;gap:8px;">
+        <select id="calcYear" class="input" style="flex:1.3;"></select>
+        <select id="calcMonth" class="input" style="flex:1;"></select>
+        <select id="calcDay" class="input" style="flex:1;"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">출생 시간 <span style="font-size:11px;color:var(--muted)">(모르면 시 모름 선택)</span></label>
+      <div style="display:flex;gap:8px;">
+        <select id="calcHour" class="input" style="flex:1.2;">
+          <option value="unknown">시 모름</option>
+          <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
+          <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
+          <option value="6">6시</option><option value="7">7시</option><option value="8">8시</option>
+          <option value="9">9시</option><option value="10">10시</option><option value="11">11시</option>
+          <option value="12">12시</option><option value="13">13시</option><option value="14">14시</option>
+          <option value="15">15시</option><option value="16">16시</option><option value="17">17시</option>
+          <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
+          <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
+        </select>
+        <select id="calcMin" class="input" style="flex:1;">
+          <option value="0">0분</option><option value="10">10분</option><option value="20">20분</option>
+          <option value="30">30분</option><option value="40">40분</option><option value="50">50분</option>
+        </select>
+      </div>
+    </div>
     <div class="field">
       <label class="label">태어난 지역 *</label>
       <select id="calcPlace" class="input">
@@ -143,6 +169,36 @@ var PI={
 };
 
 var currentDominant = null;
+
+(function initSelects() {
+  var now = new Date();
+  var yEl = document.getElementById('calcYear');
+  for (var y = now.getFullYear(); y >= 1930; y--) {
+    var o = document.createElement('option'); o.value = y; o.textContent = y + '년';
+    yEl.appendChild(o);
+  }
+  yEl.value = 1990;
+  var mEl = document.getElementById('calcMonth');
+  for (var m = 1; m <= 12; m++) {
+    var o2 = document.createElement('option'); o2.value = m; o2.textContent = m + '월';
+    mEl.appendChild(o2);
+  }
+  function updateDays() {
+    var y2 = parseInt(yEl.value)||1990, m2 = parseInt(mEl.value)||1;
+    var maxD = new Date(y2, m2, 0).getDate();
+    var dEl = document.getElementById('calcDay');
+    var cur = parseInt(dEl.value)||1;
+    dEl.innerHTML = '';
+    for (var d = 1; d <= maxD; d++) {
+      var o3 = document.createElement('option'); o3.value = d; o3.textContent = d + '일';
+      dEl.appendChild(o3);
+    }
+    dEl.value = Math.min(cur, maxD);
+  }
+  yEl.addEventListener('change', updateDays);
+  mEl.addEventListener('change', updateDays);
+  updateDays();
+})();
 
 function showToast(msg) {
   var t = document.getElementById('toast');
@@ -262,14 +318,16 @@ function calcDominantPlanet(planets) {
 }
 
 async function calcDominant() {
-  var birth = document.getElementById('calcBirth').value.trim();
+  var year = parseInt(document.getElementById('calcYear').value);
+  var month = parseInt(document.getElementById('calcMonth').value);
+  var day = parseInt(document.getElementById('calcDay').value);
   var place = document.getElementById('calcPlace').value;
-  if (!birth || !place) { showToast('생년월일과 지역을 선택해주세요'); return; }
-  var bd = parseBirthdate(birth);
-  if (!bd) { showToast('생년월일 형식을 확인해주세요 (예: 1990.03.15)'); return; }
+  if (!year || !month || !day || !place) { showToast('생년월일과 지역을 선택해주세요'); return; }
+  var bd = { year: year, month: month, day: day };
   var city = CITIES[place];
   if (!city) { showToast('지역을 선택해주세요'); return; }
-  var bt = parseTime(document.getElementById('calcTime').value);
+  var hourVal = document.getElementById('calcHour').value;
+  var bt = { hour: hourVal === 'unknown' ? 12 : parseInt(hourVal), min: parseInt(document.getElementById('calcMin').value) || 0 };
   var btn = document.getElementById('calcBtn');
   btn.disabled = true; btn.innerHTML = '<span class="loading"></span>계산 중...';
   try {
