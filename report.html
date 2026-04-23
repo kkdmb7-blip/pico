@@ -3744,7 +3744,7 @@ function renderCharVisual() {
       {label:'음악',     v: ohScoreC.화*0.4 + ohScoreC.수*0.3 + sikCntC*4 + (dayOhC==='화'?8:0)},
       {label:'공감',     v: ohScoreC.수*0.4 + ohScoreC.토*0.4 + inCntC*4 + (dayOhC==='수'?8:dayOhC==='토'?6:0)},
       {label:'손재능',   v: ohScoreC.토*0.4 + ohScoreC.금*0.4 + sikCntC*3 + (dayOhC==='금'?8:0)},
-      {label:'신체운동', v: ohScoreC.목*0.4 + ohScoreC.화*0.4 + (dayOhC==='목'?10:dayOhC==='화'?6:0)}
+      {label:'신체운동', v: ohScoreC.목*0.3 + ohScoreC.화*0.25 + ohScoreC.금*0.35 + bigeCntC*4 + gwanCntC*3 + sikCntC*2 + (dayOhC==='금'?10:dayOhC==='목'?8:dayOhC==='화'?6:0)}
     ];
     const axMaxC = Math.max.apply(null, axesC.map(function(a){return a.v;})) || 1;
     axesC.forEach(function(a){ a.norm = Math.max(0.22, Math.min(1, a.v/axMaxC)); });
