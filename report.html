@@ -3466,31 +3466,30 @@ function renderCharVisual() {
       + '</div>';
 
   } else if (_type === 'character') {
-    // 기질 리포트: 일주 대형 카드 + 강약/용신 + 바이럴 장식
+    // 기질 리포트: 일주 카드 + 강약/용신 (아이콘 대신 색상 라인)
     const iljuDisp = _ilju || '—';
+    const iljuLen = (iljuDisp||'').length;
+    const iljuFontSize = iljuLen >= 2 ? 22 : 28;
     const iljuOh = ohList[0]?.[0];
     const iljuCol = OH_COLOR[iljuOh] || '#7a4e00';
     const iljuBg  = OH_BG[iljuOh]  || 'rgba(120,80,20,0.08)';
-    const iljuBrd = OH_BORDER[iljuOh] || 'rgba(120,80,20,0.2)';
     const yCol2 = OH_COLOR[yE] || '#7a4e00';
     const yBg2 = OH_BG[yE] || 'rgba(120,80,20,0.08)';
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
       + '<div style="display:flex;align-items:stretch;gap:11px;">'
       + '<div style="width:100px;height:100px;border-radius:22px;background:radial-gradient(circle at 30% 25%,' + iljuBg + ',' + iljuCol + '18);border:2.5px solid ' + iljuCol + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 20px ' + iljuCol + '35,inset 0 2px 6px rgba(255,255,255,0.4);position:relative;">'
       + '<div style="position:absolute;top:-7px;right:-7px;background:' + iljuCol + ';color:#fff;font-size:8px;font-weight:900;padding:2px 7px;border-radius:8px;letter-spacing:0.5px;box-shadow:0 2px 6px ' + iljuCol + '70;">ILJU</div>'
-      + '<div style="font-size:36px;font-weight:900;color:' + iljuCol + ';line-height:1;text-shadow:0 2px 6px ' + iljuCol + '30;">' + iljuDisp + '</div>'
-      + '<div style="font-size:9px;color:' + iljuCol + ';margin-top:4px;opacity:0.75;font-weight:800;letter-spacing:1px;">일주</div>'
+      + '<div style="font-size:' + iljuFontSize + 'px;font-weight:900;color:' + iljuCol + ';line-height:1;letter-spacing:-0.5px;">' + iljuDisp + '</div>'
+      + '<div style="font-size:9px;color:' + iljuCol + ';margin-top:6px;opacity:0.75;font-weight:800;letter-spacing:1px;">일주</div>'
       + '</div>'
       + '<div style="flex:1;display:flex;flex-direction:column;gap:7px;">'
-      + '<div style="background:linear-gradient(135deg,rgba(40,120,80,0.14),rgba(40,120,80,0.03));border-radius:11px;padding:9px 12px;border:1.3px solid rgba(40,120,80,0.3);box-shadow:0 2px 8px rgba(40,120,80,0.1);display:flex;align-items:center;gap:8px;">'
-      + '<div style="font-size:14px;">💪</div>'
-      + '<div style="flex:1;"><div style="font-size:9px;font-weight:800;color:#1a6030;opacity:0.75;letter-spacing:0.3px;">일간 강약</div>'
-      + '<div style="font-size:14px;font-weight:900;color:#0a4020;">' + (_singang||'—') + '</div></div>'
+      + '<div style="background:linear-gradient(135deg,rgba(40,120,80,0.12),rgba(40,120,80,0.02));border-radius:11px;padding:10px 12px 10px 14px;border:1.3px solid rgba(40,120,80,0.3);border-left:4px solid #1a6030;">'
+      + '<div style="font-size:9px;font-weight:800;color:#1a6030;opacity:0.75;letter-spacing:0.3px;">일간 강약</div>'
+      + '<div style="font-size:14px;font-weight:900;color:#0a4020;">' + (_singang||'—') + '</div>'
       + '</div>'
-      + '<div style="background:linear-gradient(135deg,' + yBg2 + ',rgba(255,255,255,0.4));border-radius:11px;padding:9px 12px;border:1.3px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.25)') + ';box-shadow:0 2px 8px ' + yBg2 + ';display:flex;align-items:center;gap:8px;">'
-      + '<div style="font-size:14px;">🔑</div>'
-      + '<div style="flex:1;"><div style="font-size:9px;font-weight:800;color:' + yCol2 + ';opacity:0.8;letter-spacing:0.3px;">용신 YONGSIN</div>'
-      + '<div style="font-size:14px;font-weight:900;color:' + yCol2 + ';">' + (yE||'—') + '</div></div>'
+      + '<div style="background:linear-gradient(135deg,' + yBg2 + ',rgba(255,255,255,0.4));border-radius:11px;padding:10px 12px 10px 14px;border:1.3px solid ' + (OH_BORDER[yE]||'rgba(120,80,20,0.25)') + ';border-left:4px solid ' + yCol2 + ';">'
+      + '<div style="font-size:9px;font-weight:800;color:' + yCol2 + ';opacity:0.8;letter-spacing:0.3px;">용신</div>'
+      + '<div style="font-size:14px;font-weight:900;color:' + yCol2 + ';">' + (yE||'—') + '</div>'
       + '</div></div></div>'
       + miniBubbleBlock
       + '</div>';
@@ -3917,8 +3916,8 @@ function renderIntro() {
   document.getElementById('introTitle').textContent = _config.title;
   document.getElementById('introDesc').textContent = d.subtitle;
 
-  // guide 타입: 분석 대상 표시 (다른 사람이므로 누구인지 확인용)
-  if (_type === 'guide' && _profile) {
+  // guide/child_career 타입: 분석 대상 표시 (다른 사람이므로 누구인지 확인용)
+  if ((_type === 'guide' || _type === 'child_career') && _profile) {
     let subjEl = document.getElementById('introSubject');
     if (!subjEl) {
       subjEl = document.createElement('div');
@@ -3927,9 +3926,10 @@ function renderIntro() {
       document.querySelector('.intro-header').appendChild(subjEl);
     }
     const hourTxt = (_profile.hour === 'unknown' || _profile.hour === undefined || _profile.hour === null || _profile.hour === '') ? '시 모름' : (_profile.hour + '시' + (_profile.minute ? ' ' + _profile.minute + '분' : ''));
-    const genTxt = (_profile.gender === 'F' || _profile.gender === 'female') ? '여성' : '남성';
+    const genTxt = (_profile.gender === 'F' || _profile.gender === 'female') ? (_type==='child_career'?'여아':'여성') : (_type==='child_career'?'남아':'남성');
     const relTxt = _profile.relation ? ' · <span style="color:#7a2418;font-weight:700;">' + _profile.relation + '</span>' : '';
-    subjEl.innerHTML = '<span style="font-size:11px;color:var(--muted);">분석 대상</span><br><span style="font-size:14px;font-weight:700;color:var(--ink);">' + (_profile.name || '이 사람') + '</span>' + relTxt + '<br><span style="font-size:12px;color:var(--text2);">' + _profile.year + '년 ' + _profile.month + '월 ' + _profile.day + '일 · ' + hourTxt + ' · ' + genTxt + '</span>';
+    const subjLabel = _type === 'child_career' ? '분석 대상 (아이)' : '분석 대상';
+    subjEl.innerHTML = '<span style="font-size:11px;color:var(--muted);">' + subjLabel + '</span><br><span style="font-size:14px;font-weight:700;color:var(--ink);">' + (_profile.name || '이 사람') + '</span>' + relTxt + '<br><span style="font-size:12px;color:var(--text2);">' + _profile.year + '년 ' + _profile.month + '월 ' + _profile.day + '일 · ' + hourTxt + ' · ' + genTxt + '</span>';
   }
 
   // 설명문
