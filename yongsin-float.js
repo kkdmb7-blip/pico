@@ -364,19 +364,56 @@
     var name = getOwnerName(); if (!name) return '';
     return name + '님';
   }
+  function getPetName() {
+    return (getActiveState().petName) || '고치';
+  }
+  // 일간 오행 → 펫 성격 말투
+  var PERSONA_BY_DAYSTEM = {
+    wood:  { tone: '쭉쭉 자라요!', tip: '오늘도 성장하는 하루예요 🌿' },
+    fire:  { tone: '신나요 같이 놀아요!', tip: '열정 충전 완료 🔥' },
+    earth: { tone: '차근차근 가요', tip: '꾸준함이 힘이에요 🪨' },
+    metal: { tone: '바로 말할게요', tip: '원칙대로 가봐요 💎' },
+    water: { tone: '깊이 생각해봐요', tip: '지혜롭게 판단해요 💧' },
+  };
+  var _STEM_ELEM_MAP = { '갑':'wood','을':'wood','병':'fire','정':'fire','무':'earth','기':'earth','경':'metal','신':'metal','임':'water','계':'water' };
+  var _ELEM_KOR_MAP  = { '목':'wood','화':'fire','토':'earth','금':'metal','수':'water' };
+  function getUserDayStemElem() {
+    try {
+      var cached = localStorage.getItem('pico_daystem');
+      if (cached && _ELEM_KOR_MAP[cached]) return _ELEM_KOR_MAP[cached];
+      if (cached && PERSONA_BY_DAYSTEM[cached]) return cached;
+    } catch(e) {}
+    return null;
+  }
+  function getPersona() {
+    var el = getUserDayStemElem();
+    return el && PERSONA_BY_DAYSTEM[el] ? PERSONA_BY_DAYSTEM[el] : null;
+  }
+  // 기념일 체크: 7/30/100/365/730일
+  function getAnniversaryMsg() {
+    var s = getActiveState();
+    if (!s.birthTs) return null;
+    var days = Math.floor((Date.now() - s.birthTs) / 86400000) + 1;
+    var map = { 7: '🎉 우리가 만난 지 7일!', 30: '🎉 벌써 30일! 고마워요', 100: '🎉 100일 기념이에요 🎊', 365: '🎊 1주년! 항상 함께해줘서 감사해요', 730: '🎊 2주년! 영원히 함께해요' };
+    return map[days] || null;
+  }
 
   function showPetStatus() {
     var state = getActiveState();
     var lv = state.level || 1;
     var na = ownerNa();
-    var header = na ? na + ', Lv.' + lv + ' 상태 보고 📊' : 'Lv.' + lv + ' 상태 보고 📊';
-    showBubble([
+    var nm = getPetName();
+    var header = na ? na + ', ' + nm + ' Lv.' + lv + ' 상태 📊' : nm + ' Lv.' + lv + ' 상태 📊';
+    var days = state.birthTs ? Math.floor((Date.now() - state.birthTs) / 86400000) + 1 : null;
+    var lines = [
       header,
       '🍖 ' + ((state.hunger||0) < 30 ? '배고파요 😢' : (state.hunger||0) > 75 ? '배불러요 😊' : '보통이에요'),
       '😊 ' + ((state.happy||0) < 30 ? '심심해요 🥺' : (state.happy||0) > 75 ? '너무 행복해요 🥰' : '괜찮아요'),
       '⚡ ' + ((state.energy||0) < 30 ? '피곤해요 😴' : (state.energy||0) > 75 ? '에너지 넘쳐요 💪' : '적당해요'),
-      '💡 화면 켜두면 EXP 조금씩 올라요',
-    ].join('\n'), 5000);
+    ];
+    if (days) lines.push('🗓️ 함께한 지 ' + days + '일째');
+    lines.push('💡 화면 켜두면 EXP 조금씩 올라요');
+    showBubble(lines.join('\n'), 5000);
   }
 
   function showYongsinTip() {
@@ -385,7 +422,9 @@
     var na = ownerNa();
     var tip = tips[Math.floor(Math.random() * tips.length)];
     var header = na ? na + ' 오늘의 용신 팁 💫' : '오늘의 용신 팁 💫';
-    showBubble(header + '\n' + tip, 0);
+    var persona = getPersona();
+    var footer = persona ? '\n— ' + getPetName() + ': "' + persona.tone + '"' : '';
+    showBubble(header + '\n' + tip + footer, 5000);
   }
 
   function showLuckyDraw() {
@@ -679,7 +718,10 @@
     wrapper.style.transition += ', opacity 0.5s, transform 0.5s';
     setTimeout(function() {
       wrapper.style.opacity = '1'; wrapper.style.transform = 'scale(1)';
-      showBubble('여기 있어요 👀', 2000);
+      var anni = getAnniversaryMsg();
+      var petNm = getPetName();
+      if (anni) showBubble(anni + '\n' + petNm + '와(과) 함께해요', 4000);
+      else showBubble(petNm + ', 여기 있어요 👀', 2500);
     }, 1500);
     scheduleMove();
     startIdleExpTicker();

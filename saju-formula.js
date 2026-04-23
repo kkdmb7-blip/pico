@@ -102,18 +102,29 @@
     신체운동:   { oh: { 금: 0.35, 목: 0.3, 화: 0.25 },     tg: { bige: 1.5, gwan: 1.2, sik: 0.7 }, dayBoost: { 금: 10, 목: 8, 화: 6 } }
   };
 
-  // 3-2. 진로 분야 (child_career 빅버블)
+  // 3-2. 진로 분야 (child_career 빅버블) — 현대 21개 분야로 확장
   const CAREER_FIELDS = {
-    '연구·학문':   { oh: { 수: 0.7, 금: 0.3 },             tg: { in: 1.2, sik: 0.3 },                    dayBoost: { 수: 14, 금: 6 },  color: '#1a5fa0', bg: '#6db4ff' },
-    '예술·창작':   { oh: { 목: 0.5, 화: 0.5 },             tg: { sik: 1.4, in: 0.3 },                    dayBoost: { 화: 14, 목: 10 },  color: '#c2236a', bg: '#f489c4' },
-    'IT·공학':     { oh: { 금: 0.6, 수: 0.4 },             tg: { gwan: 0.8, sik: 0.5, in: 0.3 },         dayBoost: { 금: 14, 수: 6 },   color: '#5a6a7a', bg: '#8aa0b8' },
-    '경영·리더십': { oh: { 목: 0.4, 금: 0.3, 화: 0.2 },    tg: { gwan: 1.0, jae: 0.8, bige: 0.5 },       dayBoost: { 목: 10, 금: 6 },   color: '#7a4e00', bg: '#f4d860' },
-    '교육·복지':   { oh: { 토: 0.5, 화: 0.3 },             tg: { in: 1.0, sik: 0.5 },                    dayBoost: { 토: 14, 화: 6 },   color: '#3d7a3a', bg: '#7ad48f' },
-    '미디어·표현': { oh: { 화: 0.7, 목: 0.2 },             tg: { sik: 1.5, jae: 0.4 },                   dayBoost: { 화: 12, 목: 5 },   color: '#b84c1a', bg: '#f4a062' },
-    '의료·치유':   { oh: { 수: 0.4, 토: 0.4 },             tg: { in: 0.9, sik: 0.5 },                    dayBoost: { 수: 10, 토: 8 },   color: '#1a6a30', bg: '#7ad4a0' },
-    '법률·행정':   { oh: { 금: 0.5, 토: 0.3, 수: 0.2 },    tg: { gwan: 1.4, in: 0.8 },                   dayBoost: { 금: 12, 토: 8 },   color: '#3a3a6a', bg: '#9a9ad4' },
-    '운동·체육':   { oh: { 금: 0.4, 목: 0.3, 화: 0.3 },    tg: { bige: 1.5, gwan: 1.2, sik: 0.5 },       dayBoost: { 금: 12, 목: 8, 화: 6 }, color: '#a02a2a', bg: '#e87878' },
-    '서비스·외교': { oh: { 화: 0.5, 토: 0.3, 수: 0.2 },    tg: { jae: 1.2, gwan: 0.8, sik: 0.5 },        dayBoost: { 화: 10, 토: 6 },   color: '#a05a8a', bg: '#d49ac4' }
+    '연구·학문':     { oh: { 수: 0.7, 금: 0.3 },             tg: { in: 1.4, sik: 0.3 },                     dayBoost: { 수: 14, 금: 6 },         color: '#1a5fa0', bg: '#6db4ff' },
+    'AI·데이터':     { oh: { 수: 0.5, 금: 0.4, 화: 0.1 },    tg: { in: 1.0, sik: 1.0, gwan: 0.4 },          dayBoost: { 수: 12, 금: 10 },        color: '#1f3a8a', bg: '#7c8df5' },
+    'IT·공학':       { oh: { 금: 0.5, 수: 0.4 },             tg: { sik: 0.8, gwan: 0.6, in: 0.3 },          dayBoost: { 금: 12, 수: 8 },         color: '#5a6a7a', bg: '#8aa0b8' },
+    '공학·제조':     { oh: { 금: 0.5, 토: 0.3, 화: 0.2 },    tg: { gwan: 1.2, sik: 0.6 },                   dayBoost: { 금: 12, 토: 6 },         color: '#3a4a5a', bg: '#788ca0' },
+    '예술·창작':     { oh: { 목: 0.5, 화: 0.5 },             tg: { sik: 1.5, in: 0.3 },                     dayBoost: { 화: 14, 목: 10 },        color: '#c2236a', bg: '#f489c4' },
+    '방송·콘텐츠':   { oh: { 화: 0.5, 목: 0.3, 수: 0.2 },    tg: { sik: 1.6, jae: 0.6 },                    dayBoost: { 화: 12, 목: 6 },         color: '#d04a8a', bg: '#f49ac4' },
+    '미디어·표현':   { oh: { 화: 0.6, 목: 0.2, 수: 0.2 },    tg: { sik: 1.4, jae: 0.4, in: 0.4 },           dayBoost: { 화: 12, 수: 5 },         color: '#b84c1a', bg: '#f4a062' },
+    '경영·리더십':   { oh: { 목: 0.4, 금: 0.3, 화: 0.2 },    tg: { gwan: 1.2, jae: 0.8, bige: 0.6 },        dayBoost: { 목: 10, 금: 6 },         color: '#7a4e00', bg: '#f4d860' },
+    '창업·스타트업': { oh: { 목: 0.4, 화: 0.3, 금: 0.2 },    tg: { jae: 1.2, sik: 1.0, bige: 0.8 },         dayBoost: { 목: 10, 화: 8 },         color: '#a05a00', bg: '#f4b048' },
+    '금융·투자':     { oh: { 금: 0.5, 화: 0.2, 수: 0.2 },    tg: { jae: 1.4, gwan: 0.8, in: 0.4 },          dayBoost: { 금: 12, 수: 6 },         color: '#0a5a3a', bg: '#5ac49a' },
+    '법률·행정':     { oh: { 금: 0.5, 토: 0.3, 수: 0.2 },    tg: { gwan: 1.5, in: 0.8 },                    dayBoost: { 금: 12, 토: 8 },         color: '#3a3a6a', bg: '#9a9ad4' },
+    '의료·치유':     { oh: { 수: 0.4, 토: 0.3, 화: 0.2 },    tg: { in: 1.0, sik: 0.6, gwan: 0.5 },          dayBoost: { 수: 10, 토: 8 },         color: '#1a6a30', bg: '#7ad4a0' },
+    '심리상담':      { oh: { 수: 0.5, 토: 0.3, 화: 0.2 },    tg: { in: 1.3, sik: 0.7 },                     dayBoost: { 수: 10, 토: 6 },         color: '#5a3a8a', bg: '#a48ad4' },
+    '교육·복지':     { oh: { 토: 0.5, 화: 0.3, 수: 0.2 },    tg: { in: 1.2, sik: 0.6 },                     dayBoost: { 토: 12, 화: 6 },         color: '#3d7a3a', bg: '#7ad48f' },
+    '건축·디자인':   { oh: { 목: 0.4, 토: 0.3, 화: 0.2 },    tg: { sik: 1.2, in: 0.5, gwan: 0.5 },          dayBoost: { 목: 10, 토: 8 },         color: '#7a5a2a', bg: '#c4a878' },
+    '요리·식음료':   { oh: { 화: 0.4, 토: 0.4, 목: 0.2 },    tg: { sik: 1.4, jae: 0.7 },                    dayBoost: { 화: 10, 토: 8 },         color: '#a83018', bg: '#ec8a6a' },
+    '농업·환경':     { oh: { 목: 0.5, 토: 0.4, 수: 0.1 },    tg: { in: 0.6, sik: 0.6, jae: 0.4 },           dayBoost: { 목: 14, 토: 8 },         color: '#3a6a1a', bg: '#9ec468' },
+    '운동·체육':     { oh: { 금: 0.4, 목: 0.3, 화: 0.3 },    tg: { bige: 1.6, gwan: 1.2, sik: 0.5 },        dayBoost: { 금: 12, 목: 8, 화: 6 },  color: '#a02a2a', bg: '#e87878' },
+    '서비스·외교':   { oh: { 화: 0.5, 토: 0.3, 수: 0.2 },    tg: { jae: 1.2, gwan: 0.8, sik: 0.5 },         dayBoost: { 화: 10, 토: 6 },         color: '#a05a8a', bg: '#d49ac4' },
+    '군경·보안':     { oh: { 금: 0.5, 화: 0.2, 토: 0.2 },    tg: { gwan: 1.6, bige: 0.8, sik: 0.3 },        dayBoost: { 금: 14, 화: 4 },         color: '#2a3a5a', bg: '#6a7a9a' },
+    '종교·영성':     { oh: { 수: 0.5, 토: 0.4 },             tg: { in: 1.5, sik: 0.4 },                     dayBoost: { 수: 12, 토: 8 },         color: '#5a3a18', bg: '#b89878' }
   };
 
   // 3-3. 기질 (character용)

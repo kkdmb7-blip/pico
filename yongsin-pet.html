@@ -795,10 +795,12 @@ nav {
   <!-- 정보 카드 -->
   <div class="info-card">
     <div class="info-title">용신 정보</div>
+    <div class="info-row"><span>이름</span><span class="info-val" id="infoName" style="cursor:pointer;text-decoration:underline dotted;">—</span></div>
     <div class="info-row"><span>원소</span><span class="info-val" id="infoElem">—</span></div>
     <div class="info-row"><span>단계</span><span class="info-val" id="infoStage">—</span></div>
     <div class="info-row"><span>총 먹이 횟수</span><span class="info-val" id="infoFeedCount">0회</span></div>
     <div class="info-row"><span>탄생일</span><span class="info-val" id="infoBirth">—</span></div>
+    <div class="info-row"><span>함께한 날</span><span class="info-val" id="infoDays">—</span></div>
   </div>
 </div>
 
@@ -1220,6 +1222,7 @@ function selectElement(el) {
   // 새 오행 상태 로드 (없으면 새로 시작)
   var fresh = getDefaultState();
   fresh.birthDate = new Date().toLocaleDateString('ko-KR');
+  fresh.birthTs = Date.now();
   var newElState = allStates[el] ? _applyOfflineTime(Object.assign({}, allStates[el])) : fresh;
   Object.assign(state, getDefaultState(), newElState, { element: el });
   saveState();
@@ -1387,11 +1390,36 @@ function render() {
   document.getElementById('petMessage').textContent = msg;
 
   // 정보 카드
+  document.getElementById('infoName').textContent = state.petName || '고치';
   document.getElementById('infoElem').textContent = el.name;
   document.getElementById('infoStage').textContent = STAGES[stageIdx];
   document.getElementById('infoFeedCount').textContent = state.feedCount + '회';
   document.getElementById('infoBirth').textContent = state.birthDate || '—';
+  // 함께한 날 계산
+  var daysTxt = '—';
+  if (state.birthTs) {
+    var days = Math.floor((Date.now() - state.birthTs) / 86400000) + 1;
+    daysTxt = days + '일째';
+    var milestones = { 7: ' 🎉 일주일 기념!', 30: ' 🎉 한 달 기념!', 100: ' 🎉 100일!', 365: ' 🎊 1주년!', 730: ' 🎊 2주년!' };
+    if (milestones[days]) daysTxt += milestones[days];
+  }
+  document.getElementById('infoDays').textContent = daysTxt;
 }
+
+// 이름 변경
+document.addEventListener('DOMContentLoaded', function() {
+  var el = document.getElementById('infoName');
+  if (el) el.addEventListener('click', function() {
+    var cur = state.petName || '고치';
+    var v = prompt('펫 이름을 입력하세요 (최대 8자)', cur);
+    if (v === null) return;
+    v = String(v).trim().slice(0, 8);
+    if (!v) return;
+    state.petName = v;
+    saveState();
+    render();
+  });
+});
 
 function setBar(name, val) {
   val = Math.round(Math.max(0, Math.min(100, val)));
@@ -1878,6 +1906,11 @@ try { localStorage.removeItem('yongsin_float_hidden'); localStorage.removeItem('
 
 // 초기화: localStorage 먼저, 서버 데이터 있으면 덮어씀
 loadState();
+// 기존 유저 birthTs 보정 (birthDate만 있고 timestamp 없을 때 오늘로 세팅)
+if (state.element && state.birthDate && !state.birthTs) {
+  state.birthTs = Date.now();
+  saveState();
+}
 render();
 renderMission();
 renderSlotTabs();
