@@ -693,10 +693,11 @@
     setStreak(s);
     return s;
   }
+  // 선물 상자에서 나오는 아이템 풀
+  var BOX_ITEMS = ['약초','별조각','구슬','꽃씨앗','깃털'];
   function openStreakBox() {
     var s = getStreak();
     if (!s.boxReady) { showBubble('아직 상자가 없어요. 7일 연속 출석해보세요 🎁', 3500); return; }
-    // 펫 상태 업데이트: EXP+100, bond+5, 칭호 획득
     var raw = getPetState();
     var elem = getElement() || raw.element;
     if (elem) {
@@ -716,18 +717,20 @@
         st.titles = owned;
         if (!st.activeTitle) st.activeTitle = newTitle;
       }
+      // 아이템 지급
+      if (!st.items) st.items = {};
+      var itemKey = BOX_ITEMS[Math.floor(Math.random() * BOX_ITEMS.length)];
+      st.items[itemKey] = (st.items[itemKey] || 0) + 1;
       raw.element = elem;
       try { localStorage.setItem(PET_KEY, JSON.stringify(raw)); } catch(e) {}
       s.count = 0; s.boxReady = false; setStreak(s);
-      var nm = getPetName();
       var msg;
       if (newTitle) {
-        msg = '🎁 선물 상자 오픈!\n칭호 획득: "' + newTitle + '"\n+100 EXP · +5 친밀도';
+        msg = '🎁 선물 상자 오픈!\n칭호 획득: "' + newTitle + '"\n+100 EXP · +5 친밀도\n🎒 아이템: ' + itemKey;
       } else {
-        msg = '🎁 선물 상자 오픈!\n(모든 칭호 수집 완료 ✨)\n+100 EXP · +5 친밀도';
+        msg = '🎁 선물 상자 오픈!\n(모든 칭호 수집 완료 ✨)\n+100 EXP · +5 친밀도\n🎒 아이템: ' + itemKey;
       }
-      showBubble(msg, 6000);
-      // 반짝이 파티클
+      showBubble(msg, 6500);
       spawnParticles();
     }
   }

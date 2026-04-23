@@ -746,9 +746,9 @@ nav {
 
   <!-- 행동 버튼 -->
   <div class="action-grid">
-    <button class="action-btn btn-feed"  onclick="doAction('feed')">
-      <span class="btn-icon">🍚</span>밥 주기
-      <span class="btn-desc">배고픔↑ EXP+5</span>
+    <button class="action-btn btn-feed"  onclick="openFeedPicker()">
+      <span class="btn-icon">🍚</span>먹이 주기
+      <span class="btn-desc">밥·간식·영약 선택</span>
     </button>
     <button class="action-btn btn-play"  onclick="doAction('play')">
       <span class="btn-icon">⚡</span>운세 보기
@@ -804,6 +804,8 @@ nav {
     <div class="info-row"><span>친밀도</span><span class="info-val" id="infoBond">—</span></div>
     <div class="info-row"><span>연속 출석</span><span class="info-val" id="infoStreak">—</span></div>
     <div class="info-row"><span>칭호</span><span class="info-val" id="infoTitle" style="cursor:pointer;text-decoration:underline dotted;">—</span></div>
+    <div class="info-row"><span>🎒 가방</span><span class="info-val" id="infoInventory" onclick="openInventory()" style="cursor:pointer;text-decoration:underline dotted;">—</span></div>
+    <div class="info-row"><span>🏠 배경</span><span class="info-val" id="infoBgTheme">—</span></div>
   </div>
 
   <!-- 펫 다이어리 -->
@@ -1426,6 +1428,17 @@ function render() {
   var titles = Array.isArray(state.titles) ? state.titles : [];
   var titleTxt = state.activeTitle ? (state.activeTitle + ' (보유 ' + titles.length + ')') : (titles.length ? '(보유 ' + titles.length + ' · 탭하여 선택)' : '—');
   document.getElementById('infoTitle').textContent = titleTxt;
+  // 가방
+  var invItems = state.items || {};
+  var invTotal = 0; Object.keys(invItems).forEach(function(k){ invTotal += invItems[k] || 0; });
+  var invEl = document.getElementById('infoInventory');
+  if (invEl) invEl.textContent = invTotal > 0 ? (invTotal + '개 (탭하여 보기)') : '비어있음';
+  // 배경 테마
+  applyBgTheme();
+  var bgLabels = ['기본','한지방','대나무 뜰','달빛 정원','구름 위 신전'];
+  var bTier = b < 5 ? 0 : b < 15 ? 1 : b < 30 ? 2 : b < 60 ? 3 : 4;
+  var bgEl = document.getElementById('infoBgTheme');
+  if (bgEl) bgEl.textContent = bgLabels[bTier] + ' (친밀도 ' + b + ')';
   // 다이어리 렌더
   renderDiary();
 }
@@ -1635,6 +1648,36 @@ function doAction(type) {
     var _t1 = document.querySelector('#toast');
     if (!_t1 || !_t1.textContent.includes('크리티컬')) showToast('냠냠! 맛있어요 🍚');
     bounce('pet-' + state.element);
+  } else if (type === 'snack') {
+    // 간식: 행복 크게, 하루 3회까지만
+    var tDay = todayStr();
+    var snackC = (state.dailyMission && state.dailyMission.snackDate === tDay) ? (state.dailyMission.snackCount || 0) : 0;
+    if (snackC >= 3) { showToast('간식은 하루 3번까지만 🍪'); return; }
+    state.happy  = Math.min(100, state.happy  + 20);
+    state.hunger = Math.min(100, state.hunger + 10);
+    if (!state.dailyMission) state.dailyMission = { date: tDay };
+    state.dailyMission.snackDate = tDay;
+    state.dailyMission.snackCount = snackC + 1;
+    gainExp(8);
+    showToast('🍪 간식 맛있어요! (' + (snackC+1) + '/3)');
+    bounce('pet-' + state.element);
+  } else if (type === 'elixir') {
+    // 영약: 강력 EXP, 7일에 1회
+    var last = (state.cooldowns || {}).elixir || 0;
+    var leftMs = 7 * 86400000 - (Date.now() - last);
+    if (leftMs > 0) {
+      var leftDays = Math.ceil(leftMs / 86400000);
+      showToast('영약은 ' + leftDays + '일 뒤에 가능해요 🧪');
+      return;
+    }
+    state.happy  = Math.min(100, state.happy  + 15);
+    state.hunger = Math.min(100, state.hunger + 5);
+    state.energy = Math.min(100, state.energy + 30);
+    if (!state.cooldowns) state.cooldowns = {};
+    state.cooldowns.elixir = Date.now();
+    gainExp(60);
+    showToast('🧪 영약을 먹었어요! EXP +60');
+    specialTrainEffect('pet-' + state.element);
   } else if (type === 'play') {
     // 하루 1회 제한
     var today = todayStr();
@@ -1947,6 +1990,110 @@ function showToast(msg) {
   t.classList.add('show');
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2200);
+}
+
+// ── 먹이 피커 ──
+function openFeedPicker() {
+  var m = document.getElementById('feedPicker');
+  if (m) { m.style.display = 'flex'; return; }
+  m = document.createElement('div');
+  m.id = 'feedPicker';
+  m.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9100;align-items:center;justify-content:center;padding:20px;';
+  var tDay = todayStr();
+  var snackC = (state.dailyMission && state.dailyMission.snackDate === tDay) ? (state.dailyMission.snackCount || 0) : 0;
+  var elixLast = (state.cooldowns || {}).elixir || 0;
+  var elixLeftMs = 7 * 86400000 - (Date.now() - elixLast);
+  var elixDisabled = elixLeftMs > 0;
+  var elixTxt = elixDisabled ? (Math.ceil(elixLeftMs / 86400000) + '일 후') : '지금 가능';
+  m.innerHTML = '<div style="background:#f9f1de;border-radius:20px;padding:22px 20px;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">'
+    + '<div style="font-size:16px;font-weight:800;text-align:center;color:var(--gold);margin-bottom:14px;">먹이 주기</div>'
+    + '<button class="fp-btn" data-k="feed" style="display:block;width:100%;margin-bottom:8px;padding:14px;border:1px solid rgba(138,106,21,0.3);border-radius:14px;background:#fff;text-align:left;cursor:pointer;">'
+    +   '<div style="font-size:15px;font-weight:700;color:#3a2a1a;">🍚 밥</div>'
+    +   '<div style="font-size:12px;color:var(--muted);margin-top:3px;">배고픔+25 · 행복+5 · EXP+5</div>'
+    + '</button>'
+    + '<button class="fp-btn" data-k="snack" style="display:block;width:100%;margin-bottom:8px;padding:14px;border:1px solid rgba(138,106,21,0.3);border-radius:14px;background:#fff;text-align:left;cursor:pointer;">'
+    +   '<div style="font-size:15px;font-weight:700;color:#3a2a1a;">🍪 간식 <span style="font-size:11px;font-weight:500;color:var(--muted);">(' + snackC + '/3)</span></div>'
+    +   '<div style="font-size:12px;color:var(--muted);margin-top:3px;">행복+20 · 배고픔+10 · EXP+8</div>'
+    + '</button>'
+    + '<button class="fp-btn" data-k="elixir" style="display:block;width:100%;margin-bottom:12px;padding:14px;border:1px solid rgba(138,106,21,0.3);border-radius:14px;background:#fff;text-align:left;cursor:' + (elixDisabled?'not-allowed':'pointer') + ';opacity:' + (elixDisabled?'0.5':'1') + ';">'
+    +   '<div style="font-size:15px;font-weight:700;color:#3a2a1a;">🧪 영약 <span style="font-size:11px;font-weight:500;color:var(--muted);">(' + elixTxt + ')</span></div>'
+    +   '<div style="font-size:12px;color:var(--muted);margin-top:3px;">에너지+30 · EXP+60 · 7일에 1회</div>'
+    + '</button>'
+    + '<button id="fpCancel" style="display:block;width:100%;padding:10px;border:none;border-radius:12px;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;">닫기</button>'
+    + '</div>';
+  document.body.appendChild(m);
+  m.addEventListener('click', function(e) {
+    if (e.target === m || e.target.id === 'fpCancel') { m.style.display = 'none'; return; }
+    var btn = e.target.closest('.fp-btn');
+    if (!btn) return;
+    var k = btn.getAttribute('data-k');
+    if (k === 'elixir' && elixDisabled) return;
+    m.style.display = 'none';
+    doAction(k);
+  });
+}
+
+// ── 가방/아이템 ──
+var ITEMS_DEF = {
+  '약초':   { icon: '🌿', desc: '상처난 마음을 치유' },
+  '별조각': { icon: '✨', desc: '밤하늘의 반짝임' },
+  '구슬':   { icon: '🔮', desc: '맑은 기운의 응축' },
+  '꽃씨앗': { icon: '🌱', desc: '새 생명을 품은 씨앗' },
+  '깃털':   { icon: '🪶', desc: '바람을 닮은 가벼움' }
+};
+function grantRandomItem() {
+  var keys = Object.keys(ITEMS_DEF);
+  var k = keys[Math.floor(Math.random() * keys.length)];
+  if (!state.items) state.items = {};
+  state.items[k] = (state.items[k] || 0) + 1;
+  return k;
+}
+function openInventory() {
+  var m = document.getElementById('invModal');
+  if (m) { m.style.display = 'flex'; return; }
+  m = document.createElement('div');
+  m.id = 'invModal';
+  m.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9100;align-items:center;justify-content:center;padding:20px;';
+  var items = state.items || {};
+  var rows = '';
+  Object.keys(ITEMS_DEF).forEach(function(k) {
+    var n = items[k] || 0;
+    var it = ITEMS_DEF[k];
+    rows += '<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid rgba(138,106,21,0.18);border-radius:12px;margin-bottom:8px;background:' + (n>0?'#fff':'rgba(255,255,255,0.4)') + ';opacity:' + (n>0?'1':'0.55') + ';">'
+      + '<div style="font-size:22px;">' + it.icon + '</div>'
+      + '<div style="flex:1;"><div style="font-size:14px;font-weight:700;color:#3a2a1a;">' + k + '</div><div style="font-size:11px;color:var(--muted);">' + it.desc + '</div></div>'
+      + '<div style="font-size:13px;font-weight:800;color:var(--gold);">×' + n + '</div>'
+      + '</div>';
+  });
+  m.innerHTML = '<div style="background:#f9f1de;border-radius:20px;padding:22px 20px;max-width:360px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">'
+    + '<div style="font-size:16px;font-weight:800;text-align:center;color:var(--gold);margin-bottom:12px;">🎒 ' + (state.petName || '고치') + '의 가방</div>'
+    + '<div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:14px;">선물 상자에서 얻은 아이템들</div>'
+    + rows
+    + '<button id="invClose" style="display:block;width:100%;margin-top:8px;padding:10px;border:none;border-radius:12px;background:var(--gold);color:#fff;cursor:pointer;font-size:13px;font-weight:700;">닫기</button>'
+    + '</div>';
+  document.body.appendChild(m);
+  m.addEventListener('click', function(e) {
+    if (e.target === m || e.target.id === 'invClose') { m.style.display = 'none'; m.remove(); }
+  });
+}
+
+// ── 배경 테마 (친밀도에 따라 변화) ──
+function applyBgTheme() {
+  var card = document.getElementById('petCard');
+  if (!card) return;
+  var b = state.bond || 0;
+  var tier = b < 5 ? 0 : b < 15 ? 1 : b < 30 ? 2 : b < 60 ? 3 : 4;
+  var themes = [
+    { bg: 'radial-gradient(ellipse at 50% 0%, rgba(138,106,21,0.10) 0%, transparent 70%)', label: '기본' },
+    { bg: 'radial-gradient(ellipse at 50% 10%, rgba(168,138,65,0.18) 0%, rgba(138,106,21,0.05) 60%, transparent 90%)', label: '한지방' },
+    { bg: 'linear-gradient(180deg, rgba(40,130,80,0.14) 0%, rgba(140,180,120,0.05) 70%, transparent 100%)', label: '대나무 뜰' },
+    { bg: 'linear-gradient(180deg, rgba(70,80,150,0.22) 0%, rgba(100,110,180,0.08) 60%, transparent 100%)', label: '달빛 정원' },
+    { bg: 'radial-gradient(ellipse at 50% 30%, rgba(230,200,120,0.28) 0%, rgba(200,170,90,0.1) 60%, transparent 100%)', label: '구름 위 신전' }
+  ];
+  card.style.setProperty('--pet-bg-theme', themes[tier].bg);
+  card.style.background = themes[tier].bg + ', #fcf7ea';
+  card.setAttribute('data-bg-tier', tier);
+  card.setAttribute('data-bg-label', themes[tier].label);
 }
 
 // 시간 경과 decay + 에너지 자동 회복 (화면 켜둘수록 에너지 충전)
