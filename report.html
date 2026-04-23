@@ -2179,6 +2179,7 @@ function showState(state) {
   document.getElementById('stateDetail').style.display      = state === 'detail'      ? 'block' : 'none';
   document.getElementById('stateReport').style.display      = state === 'report'      ? 'block' : 'none';
   if (state === 'report') { try { applyTypeTheme(); } catch(e){} }
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 function hideDetail() { showState('intro'); }
 
