@@ -1220,12 +1220,20 @@ async function syncPetElementToMemox(el) {
   var uid = getCurrentUserId();
   if (!uid || !el || !_EL_KOR[el]) return;
   try {
-    var r = await fetch(SB_URL + '/rest/v1/chat_users?kakao_id=eq.' + encodeURIComponent(uid) + '&select=id&limit=1', {
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-    });
-    var users = await r.json();
-    if (!Array.isArray(users) || !users[0]) return;
-    await fetch(SB_URL + '/rest/v1/user_context?user_id=eq.' + encodeURIComponent(users[0].id), {
+    // uid가 UUID면 chat_users.id로, kakao_xxx 형식이면 kakao_id 숫자로 조회
+    var chatUserId;
+    if (uid.indexOf('kakao_') === 0) {
+      var kakaoNum = uid.slice(6);
+      var r = await fetch(SB_URL + '/rest/v1/chat_users?kakao_id=eq.' + encodeURIComponent(kakaoNum) + '&select=id&limit=1', {
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+      });
+      var users = await r.json();
+      if (!Array.isArray(users) || !users[0]) return;
+      chatUserId = users[0].id;
+    } else {
+      chatUserId = uid; // UUID = chat_users.id 직접 사용
+    }
+    await fetch(SB_URL + '/rest/v1/user_context?user_id=eq.' + encodeURIComponent(chatUserId), {
       method: 'PATCH',
       headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
       body: JSON.stringify({ saju_yongshin_primary: _EL_KOR[el] })
@@ -1702,9 +1710,22 @@ function doAction(type) {
     showToast('🧪 영약을 먹었어요! EXP +60');
     specialTrainEffect('pet-' + state.element);
   } else if (type === 'play') {
-    // 하루 1회 제한
+    // 하루 1회 제한: 이미 봤으면 캐시된 내용 재표시
     var today = todayStr();
     if ((state.dailyMission || {}).playDate === today) {
+      try {
+        var cached = JSON.parse(localStorage.getItem('pet_today_advice') || '{}');
+        if (cached.date === today && cached.advice) {
+          var modal = document.getElementById('adviceModal');
+          document.getElementById('adviceText').textContent = cached.advice;
+          document.getElementById('adviceKeyword').textContent = cached.keyword ? '✦ ' + cached.keyword : '';
+          document.getElementById('adviceLucky').textContent = cached.lucky ? '🍀 ' + cached.lucky : '';
+          document.getElementById('advicePillar').textContent = cached.pillar || '오늘의 운세';
+          document.getElementById('adviceDate').textContent = cached.dateLabel || '';
+          modal.style.display = 'flex';
+          return;
+        }
+      } catch(e) {}
       showToast('오늘 운세는 이미 확인했어요 ✨');
       return;
     }
@@ -1808,9 +1829,19 @@ async function fetchAdvice() {
     var advice = await aiRes.json();
     if (!advice || typeof advice !== 'object') throw new Error('Invalid advice response');
 
-    textEl.textContent = advice.advice || advice.message || '오늘도 용신 기운을 잘 활용해보세요!';
-    keyEl.textContent  = (advice.keyword && typeof advice.keyword === 'string') ? '✦ ' + advice.keyword : '';
-    luckyEl.textContent = (advice.lucky && typeof advice.lucky === 'string') ? '🍀 ' + advice.lucky : '';
+    var advText = advice.advice || advice.message || '오늘도 용신 기운을 잘 활용해보세요!';
+    var advKeyword = (advice.keyword && typeof advice.keyword === 'string') ? advice.keyword : '';
+    var advLucky = (advice.lucky && typeof advice.lucky === 'string') ? advice.lucky : '';
+    textEl.textContent = advText;
+    keyEl.textContent  = advKeyword ? '✦ ' + advKeyword : '';
+    luckyEl.textContent = advLucky ? '🍀 ' + advLucky : '';
+    // 하루 캐시 저장 (재열람용)
+    try {
+      localStorage.setItem('pet_today_advice', JSON.stringify({
+        date: todayStr(), advice: advText, keyword: advKeyword, lucky: advLucky,
+        pillar: pillarEl.textContent, dateLabel: dateEl.textContent
+      }));
+    } catch(ec) {}
   } catch(e) {
     textEl.textContent = '오늘 용신 기운을 충전했어요. 긍정적인 하루 보내세요! 🌟';
     keyEl.textContent = '';
@@ -2061,7 +2092,7 @@ function openFeedPicker() {
 var ITEMS_DEF = {
   '약초':   { icon: '🌿', desc: '사용 시 행복 +15 · 배고픔 +10',  use: function(){ state.happy=Math.min(100,state.happy+15); state.hunger=Math.min(100,state.hunger+10); } },
   '별조각': { icon: '✨', desc: '사용 시 EXP +30',                  use: function(){ gainExp(30); } },
-  '구슬':   { icon: '🔮', desc: '사용 시 에너지 +30 · 행복 +10',   use: function(){ state.energy=Math.min(100,state.energy+30); state.happy=Math.min(100,state.happy+10); } },
+  '구슬':   { icon: '🔷', desc: '사용 시 에너지 +30 · 행복 +10',   use: function(){ state.energy=Math.min(100,state.energy+30); state.happy=Math.min(100,state.happy+10); } },
   '꽃씨앗': { icon: '🌱', desc: '사용 시 배고픔 +30 · EXP +10',    use: function(){ state.hunger=Math.min(100,state.hunger+30); gainExp(10); } },
   '깃털':   { icon: '🪶', desc: '사용 시 행복 +25',                  use: function(){ state.happy=Math.min(100,state.happy+25); } }
 };

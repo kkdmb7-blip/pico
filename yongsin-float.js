@@ -1340,14 +1340,21 @@
   } else {
     // 외부 도메인 (memox 등): Supabase에서 펫 상태 조회
     var uid = null;
+    var altUid = null; // 구형 kakao_xxx 형식 (pico 저장 호환)
     try {
       var ku = JSON.parse(localStorage.getItem('fortuna_kakao_user') || '{}');
       uid = ku.id || (ku.kakao_id ? 'kakao_' + ku.kakao_id : null);
+      // UUID + kakao_id 둘 다 있으면 kakao_xxx 형식도 시도 (구형 pico 저장 호환)
+      if (ku.id && ku.kakao_id) altUid = 'kakao_' + ku.kakao_id;
     } catch(e) {}
     if (!uid) return;
 
     function fetchAndApply(onNew) {
-      fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state&select=content&order=created_at.desc&limit=1', {
+      // uid(UUID) + altUid(kakao_xxx) 둘 다 조회해서 구형/신형 저장 모두 대응
+      var uidFilter = (altUid && altUid !== uid)
+        ? 'user_id=in.(' + uid + ',' + altUid + ')'
+        : 'user_id=eq.' + encodeURIComponent(uid);
+      fetch(SB_URL + '/rest/v1/reports?' + uidFilter + '&report_type=eq.pet_state&select=content&order=created_at.desc&limit=1', {
         headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
       }).then(function(r) { return r.json(); }).then(function(rows) {
         if (!rows || !rows[0] || !rows[0].content || !rows[0].content[0]) return;
