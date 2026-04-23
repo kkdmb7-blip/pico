@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#f5efe4">
 <title>이름 점수 확인 - 포르투나</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2702,5 +2702,17 @@ loadSajuData();
 })();
 </script>
 <script src="yongsin-float.js"></script>
+<script>
+(function(){
+  document.addEventListener('copy',function(e){e.preventDefault();});
+  document.addEventListener('contextmenu',function(e){e.preventDefault();});
+  document.addEventListener('selectstart',function(e){if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault();});
+  document.addEventListener('dragstart',function(e){e.preventDefault();});
+})();
+</script>
+<style>
+body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+input,textarea,select{-webkit-user-select:text;user-select:text;}
+</style>
 </body>
 </html>

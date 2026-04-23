@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>개인정보처리방침 · 피코랩</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -148,5 +148,17 @@
     본 서비스에서 제공하는 모든 사주·점성·자미두수·기문둔갑·AI 운세 분석은 오락 및 참고 목적으로 제공되며, 의학·법률·재정적 판단의 근거로 사용되지 않습니다. 이용자의 결정은 이용자 본인의 판단과 책임에 따라 이루어져야 합니다.
   </div>
 </div>
+<script>
+(function(){
+  document.addEventListener('copy',function(e){e.preventDefault();});
+  document.addEventListener('contextmenu',function(e){e.preventDefault();});
+  document.addEventListener('selectstart',function(e){if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault();});
+  document.addEventListener('dragstart',function(e){e.preventDefault();});
+})();
+</script>
+<style>
+body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+input,textarea,select{-webkit-user-select:text;user-select:text;}
+</style>
 </body>
 </html>

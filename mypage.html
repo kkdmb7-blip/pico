@@ -361,5 +361,17 @@ function doLogout() {
 init();
 </script>
 <script src="yongsin-float.js"></script>
+<script>
+(function(){
+  document.addEventListener('copy',function(e){e.preventDefault();});
+  document.addEventListener('contextmenu',function(e){e.preventDefault();});
+  document.addEventListener('selectstart',function(e){if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault();});
+  document.addEventListener('dragstart',function(e){e.preventDefault();});
+})();
+</script>
+<style>
+body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+input,textarea,select{-webkit-user-select:text;user-select:text;}
+</style>
 </body>
 </html>

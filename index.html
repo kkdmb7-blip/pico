@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script>(function(){try{var t=new URLSearchParams(location.search).get('theme');if(t==='default'){try{localStorage.removeItem('pico_theme');}catch(e){}return;}if(t&&['obsidian','jade','wine','midnight'].indexOf(t)>=0){document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('pico_theme',t);}catch(e){}}else{try{var s=localStorage.getItem('pico_theme');if(s&&['obsidian','jade','wine','midnight'].indexOf(s)>=0)document.documentElement.setAttribute('data-theme',s);}catch(e){}}}catch(e){}})();</script>
 <title>PICO Lab · AI 운세 플랫폼</title>
 <meta name="description" content="사주·베딕·자미두수·기문둔갑·서양점성술을 AI로 해석하는 운세 플랫폼. 12종 AI 리포트와 궁합 분석, 전문가 상담까지 한곳에서.">
@@ -6474,5 +6474,17 @@ window.togglePushSubscription = async function() {
 })();
 </script>
 <script src="yongsin-float.js?v=2"></script>
+<script>
+(function(){
+  document.addEventListener('copy',function(e){e.preventDefault();});
+  document.addEventListener('contextmenu',function(e){e.preventDefault();});
+  document.addEventListener('selectstart',function(e){if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault();});
+  document.addEventListener('dragstart',function(e){e.preventDefault();});
+})();
+</script>
+<style>
+body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+input,textarea,select{-webkit-user-select:text;user-select:text;}
+</style>
 </body>
 </html>

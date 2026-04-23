@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>오늘의 행운 뽑기 · 포르투나</title>
 <meta property="og:title" content="오늘의 행운 뽑기 — 포르투나">
 <meta property="og:description" content="3개의 오브 중 하나를 골라 오늘의 행운을 받아보세요">
@@ -556,5 +556,17 @@ function shareLuck() {
 </script>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <script src="yongsin-float.js"></script>
+<script>
+(function(){
+  document.addEventListener('copy',function(e){e.preventDefault();});
+  document.addEventListener('contextmenu',function(e){e.preventDefault();});
+  document.addEventListener('selectstart',function(e){if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault();});
+  document.addEventListener('dragstart',function(e){e.preventDefault();});
+})();
+</script>
+<style>
+body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+input,textarea,select{-webkit-user-select:text;user-select:text;}
+</style>
 </body>
 </html>
