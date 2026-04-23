@@ -84,6 +84,7 @@
   var pet, bubble, wrapper;
   var currentPos = 0;
   var moveTimer, hideTimer, bubbleTimer, fortuneInterval;
+  var fortuneParts = null, fortunePartIdx = 0;
   var isHiding = false;
   var MOVE_TRANSITION = 'left 1.8s cubic-bezier(0.34,1.2,0.64,1), top 1.8s cubic-bezier(0.34,1.2,0.64,1)';
 
@@ -430,7 +431,14 @@
       }
     }
 
-    clearInterval(fortuneInterval);
+    // 운세 파트가 진행 중이면 다음 파트로
+    if (fortuneParts && fortunePartIdx < fortuneParts.length - 1) {
+      fortunePartIdx++;
+      showBubble(fortuneParts[fortunePartIdx], 0);
+      return;
+    }
+    fortuneParts = null; fortunePartIdx = 0;
+
     var mode = TAP_MODES[tapModeIdx % TAP_MODES.length]; tapModeIdx++;
     if (mode === 'fortune') {
       showBubble('운세 읽는 중... ✨', 0);
@@ -442,14 +450,9 @@
         if (data.keyword) parts.push('✦ ' + data.keyword);
         parts = parts.concat(sents);
         if (data.lucky) parts.push('🍀 ' + data.lucky);
-        var pi = 0;
-        showBubble(parts[pi], 0);
-        clearInterval(fortuneInterval);
-        fortuneInterval = setInterval(function() {
-          pi++;
-          if (pi >= parts.length || !isBubbleOpen()) { clearInterval(fortuneInterval); return; }
-          showBubble(parts[pi], 0);
-        }, 3500);
+        fortuneParts = parts;
+        fortunePartIdx = 0;
+        showBubble(parts[0], 0);
       });
     } else if (mode === 'ilji_msg')   { showIljiMsg();
     } else if (mode === 'pet_status') { showPetStatus();
