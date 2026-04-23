@@ -3723,11 +3723,14 @@ function renderCharVisual() {
       {name:'미디어·표현', score: calcFieldC({화:0.7, 목:0.2}, sikCntC*1.5, dayOhC==='화'?12:dayOhC==='목'?5:0), color:'#b84c1a', bg:'#f4a062'},
       {name:'의료·치유',  score: calcFieldC({수:0.4, 토:0.4}, inCntC*0.9 + sikCntC*0.4, dayOhC==='수'?10:dayOhC==='토'?8:0), color:'#1a6a30', bg:'#7ad4a0'}
     ];
-    // TOP-heavy 분포: ^1.8 거듭제곱으로 1위가 30~50% 범위에 자연스럽게 들어옴
-    const POW_C = 1.8;
-    const sumPowC = fieldsRawC.reduce(function(s,f){return s+Math.pow(Math.max(1,f.score), POW_C);}, 0) || 1;
-    const fieldsC = fieldsRawC.map(function(f){
-      const pw = Math.pow(Math.max(1,f.score), POW_C);
+    // TOP-heavy 분포: ^2.5 거듭제곱 + 1위만 1.25x raw 부스트 → 1위 임팩트 강화
+    const POW_C = 2.5, TOP_BOOST_C = 1.25;
+    const _sortedIdxC = fieldsRawC.map(function(f,i){return {i:i, s:f.score};}).sort(function(a,b){return b.s-a.s;});
+    const _topIdxC = _sortedIdxC[0].i;
+    const _adjScoresC = fieldsRawC.map(function(f,i){return i===_topIdxC ? f.score*TOP_BOOST_C : f.score;});
+    const sumPowC = _adjScoresC.reduce(function(s,sc){return s+Math.pow(Math.max(1,sc), POW_C);}, 0) || 1;
+    const fieldsC = fieldsRawC.map(function(f,i){
+      const pw = Math.pow(Math.max(1, _adjScoresC[i]), POW_C);
       return Object.assign({}, f, {pct: Math.max(2, Math.round(pw/sumPowC*100))});
     }).sort(function(a,b){return b.pct-a.pct;});
     const top3C = fieldsC.slice(0,3);
