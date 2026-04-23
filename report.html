@@ -3014,18 +3014,48 @@ function openChildModal() {
   document.body.style.overflow = 'hidden';
   initChildDateSelects();
   document.getElementById('childForm').style.display = 'block';
+
+  // 타입별 타이틀/서브카피
+  var titleEl = document.getElementById('childModalTitle');
+  var subEl = document.getElementById('childModalSub');
+  if (_type === 'child_career') {
+    titleEl.innerHTML = '<i class="pi pi-user"></i> 아이 정보 입력';
+    subEl.textContent = '우리 아이의 생년월일을 입력해주세요';
+  } else if (_type === 'guide') {
+    titleEl.innerHTML = '<i class="pi pi-user"></i> 가이드 받을 사람 정보';
+    subEl.textContent = '분석 대상의 생년월일을 입력해주세요';
+  } else {
+    titleEl.innerHTML = '<i class="pi pi-user"></i> ' + (_config && _config.title ? _config.title : '사주 정보 입력');
+    subEl.innerHTML = '분석할 사람의 생년월일을 선택하세요. 본인이면 <b>내 정보</b>를 누르세요.';
+  }
+
   document.getElementById('childHour').onchange = function() {
     var row = document.getElementById('childYajasiRow');
     var isNight = (this.value === '23');
     row.style.display = isNight ? 'block' : 'none';
     if (!isNight) document.getElementById('childYajasi').checked = false;
   };
+
+  // 캐시 우선순위: 직전 입력(타입별 sessionStorage) → 본인(localStorage pico_profile)
   document.getElementById('childName').value = '';
   document.getElementById('childYear').value = '';
   document.getElementById('childMonth').value = '';
   document.getElementById('childDay').value = '';
   document.getElementById('childProfileSelect').value = '';
   _populateChildProfileSelect();
+
+  var cached = null;
+  try {
+    var cacheKey = (_type === 'child_career') ? 'pico_child_profile' : ('pico_report_profile_' + _type);
+    cached = JSON.parse(sessionStorage.getItem(cacheKey));
+  } catch(e) {}
+  if (cached && cached.year) {
+    _fillChildFields(_normalizeChildProfile(cached));
+  } else if (_type !== 'child_career') {
+    var mine = null;
+    try { mine = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
+    if (mine && mine.year) _fillChildFields(_normalizeChildProfile(mine));
+  }
 }
 
 function closeChildModal() {
@@ -3064,16 +3094,28 @@ function submitChild() {
   if (!month) { alert('태어난 월을 선택해주세요'); return; }
   if (!day)   { alert('태어난 일을 선택해주세요'); return; }
 
-  var childProfile = { name: name, year: year, month: month, day: day, hour: hour, minute: minute, gender: _childGender };
-  sessionStorage.setItem('pico_child_profile', JSON.stringify(childProfile));
+  var profile = { name: name, year: year, month: month, day: day, hour: hour, minute: minute, gender: _childGender };
+
+  // 타입별 캐시 (새로고침 시 자동복원)
   try {
-    var list = JSON.parse(localStorage.getItem('pico_child_profiles')) || [];
-    list = list.filter(function(c) { return !(c.name === name && c.year === year && c.month === month && c.day === day); });
-    list.unshift(childProfile);
-    if (list.length > 5) list = list.slice(0, 5);
-    localStorage.setItem('pico_child_profiles', JSON.stringify(list));
+    var cacheKey = (_type === 'child_career') ? 'pico_child_profile' : ('pico_report_profile_' + _type);
+    sessionStorage.setItem(cacheKey, JSON.stringify(profile));
   } catch(e) {}
-  location.reload();
+
+  // child_career는 별도 최근목록도 유지
+  if (_type === 'child_career') {
+    try {
+      var list = JSON.parse(localStorage.getItem('pico_child_profiles')) || [];
+      list = list.filter(function(c) { return !(c.name === name && c.year === year && c.month === month && c.day === day); });
+      list.unshift(profile);
+      if (list.length > 5) list = list.slice(0, 5);
+      localStorage.setItem('pico_child_profiles', JSON.stringify(list));
+    } catch(e) {}
+  }
+
+  _profile = profile;
+  closeChildModal();
+  proceedAfterProfile();
 }
 
 // ── 오행 시각화 + DB 미리보기 카드 (전 타입 공통) ──
@@ -4065,20 +4107,22 @@ function renderIntro() {
   document.getElementById('introTitle').textContent = _config.title;
   document.getElementById('introDesc').textContent = d.subtitle;
 
-  // guide/child_career 타입: 분석 대상 표시 (다른 사람이므로 누구인지 확인용)
-  if ((_type === 'guide' || _type === 'child_career') && _profile) {
+  // 분석 대상 표시 (입력한 프로필 확인 + 수정 진입점)
+  if (_profile && _profile.year) {
     let subjEl = document.getElementById('introSubject');
     if (!subjEl) {
       subjEl = document.createElement('div');
       subjEl.id = 'introSubject';
-      subjEl.style.cssText = 'margin:14px auto 4px;padding:10px 14px;background:rgba(212,175,90,0.14);border:1px solid rgba(154,122,38,0.28);border-radius:10px;font-size:13px;color:#8a6b20;text-align:center;max-width:380px;';
+      subjEl.style.cssText = 'margin:14px auto 4px;padding:10px 14px;background:rgba(212,175,90,0.14);border:1px solid rgba(154,122,38,0.28);border-radius:10px;font-size:13px;color:#8a6b20;text-align:center;max-width:380px;cursor:pointer;';
+      subjEl.title = '클릭해서 다른 사람 사주로 변경';
+      subjEl.onclick = function() { openChildModal(); };
       document.querySelector('.intro-header').appendChild(subjEl);
     }
     const hourTxt = (_profile.hour === 'unknown' || _profile.hour === undefined || _profile.hour === null || _profile.hour === '') ? '시 모름' : (_profile.hour + '시' + (_profile.minute ? ' ' + _profile.minute + '분' : ''));
     const genTxt = (_profile.gender === 'F' || _profile.gender === 'female') ? (_type==='child_career'?'여아':'여성') : (_type==='child_career'?'남아':'남성');
     const relTxt = _profile.relation ? ' · <span style="color:#7a2418;font-weight:700;">' + _profile.relation + '</span>' : '';
     const subjLabel = _type === 'child_career' ? '분석 대상 (아이)' : '분석 대상';
-    subjEl.innerHTML = '<span style="font-size:11px;color:var(--muted);">' + subjLabel + '</span><br><span style="font-size:14px;font-weight:700;color:var(--ink);">' + (_profile.name || '이 사람') + '</span>' + relTxt + '<br><span style="font-size:12px;color:var(--text2);">' + _profile.year + '년 ' + _profile.month + '월 ' + _profile.day + '일 · ' + hourTxt + ' · ' + genTxt + '</span>';
+    subjEl.innerHTML = '<span style="font-size:11px;color:var(--muted);">' + subjLabel + ' <span style="opacity:0.6;">(클릭해서 변경)</span></span><br><span style="font-size:14px;font-weight:700;color:var(--ink);">' + (_profile.name || '이 사람') + '</span>' + relTxt + '<br><span style="font-size:12px;color:var(--text2);">' + _profile.year + '년 ' + _profile.month + '월 ' + _profile.day + '일 · ' + hourTxt + ' · ' + genTxt + '</span>';
   }
 
   // 설명문
