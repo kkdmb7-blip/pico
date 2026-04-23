@@ -376,7 +376,7 @@
 </div>
 
 <script>
-const TODAY_KEY = 'pico_luck_' + new Date().toISOString().slice(0,10);
+const TODAY_KEY = 'pico_luck_' + new Date(Date.now() + 9*3600000).toISOString().slice(0,10);
 
 // 오브별 오행 매핑 (클릭한 오브가 힌트만 될 뿐 결과는 date+user seed로 고정)
 const ORB_ELEMENTS = ['fire','water','wood']; // data-idx 순서
@@ -416,10 +416,10 @@ function seedRand(seed) {
   return x - Math.floor(x);
 }
 function dateSeed() {
-  const d = new Date();
+  const d = new Date(Date.now() + 9*3600000); // KST 기준
   let user = '';
   try { const u = JSON.parse(localStorage.getItem('pico_user')); if (u && u.id) user = u.id; } catch(e) {}
-  const key = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
+  const key = d.getUTCFullYear()*10000 + (d.getUTCMonth()+1)*100 + d.getUTCDate();
   let h = key;
   for (let i=0;i<user.length;i++) h = (h*31 + user.charCodeAt(i)) % 2147483647;
   return h;
@@ -429,9 +429,9 @@ function pickFrom(arr, seed) {
 }
 
 function formatDateKo() {
-  const d = new Date();
+  const d = new Date(Date.now() + 9*3600000); // KST
   const days = ['일','월','화','수','목','금','토'];
-  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+  return `${d.getUTCFullYear()}년 ${d.getUTCMonth()+1}월 ${d.getUTCDate()}일 (${days[d.getUTCDay()]})`;
 }
 
 document.getElementById('gameDate').textContent = formatDateKo();
