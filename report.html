@@ -4681,49 +4681,49 @@ function renderCharVisual() {
       ? (tenG['정관'] ? '정관 작용' : tenG['편관'] ? '편관 작용' : '관성 미약')
       : (tenG['정재'] ? '정재 작용' : tenG['편재'] ? '편재 작용' : '재성 미약');
     const dayStemSM = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
-    const SOULMATE_TYPE = {甲:'내 뜻을 존중하는 안정형',乙:'유연하고 감성이 풍부한 이',丙:'활발하고 솔직한 에너지',丁:'섬세하고 따뜻한 내면',戊:'묵직하고 신뢰 가는 사람',己:'차분하고 현실적인 사람',庚:'원칙과 추진력이 강한 이',辛:'세련되고 감각 있는 사람',壬:'자유롭고 깊이 있는 이',癸:'감수성 풍부한 이상주의자'};
+    const SOULMATE_TYPE = {甲:'내 방향을 믿어주는 파트너',乙:'함께 유연하게 흐를 수 있는 사람',丙:'나의 열정을 증폭시켜주는 사람',丁:'섬세하게 나를 감싸주는 사람',戊:'묵직하게 옆에 있어주는 파트너',己:'현실적으로 나를 잡아주는 사람',庚:'명확하고 원칙 있는 파트너',辛:'감각적이고 세련된 에너지의 사람',壬:'자유 안에서 깊이를 주는 파트너',癸:'감수성으로 연결되는 이상주의자'};
+    const SOULMATE_HOOK = {甲:'결정권을 존중해주는 파트너여야 에너지가 맞습니다',乙:'서로 맞춰가는 유연성이 관계의 핵심이 됩니다',丙:'같은 열정을 나눌 수 있는 파트너여야 오래 갑니다',丁:'감정적 교감이 깊어야 관계가 지속됩니다',戊:'말없이도 함께 있을 수 있는 안정감이 필요합니다',己:'현실적 기반을 함께 쌓을 수 있는 사람이어야 합니다',庚:'원칙과 신뢰가 바탕이 되는 관계여야 흔들리지 않습니다',辛:'미적 감각과 섬세함을 공유할 수 있는 사람이 맞습니다',壬:'서로의 자유를 존중하는 구조여야 관계가 숨쉽니다',癸:'감정적 깊이와 이상을 공유하는 파트너여야 합니다'};
     const smType = SOULMATE_TYPE[dayStemSM] || '나와 에너지가 맞는 사람';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="display:flex;gap:8px;">'
-      + '<div style="flex:1;background:rgba(122,58,74,0.09);border:1.5px solid rgba(122,58,74,0.28);border-radius:14px;padding:12px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#7a3a4a;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">파트너 별</div>'
-      + '<div style="font-size:20px;font-weight:900;color:#7a3a4a;line-height:1;">' + partnerStar + '</div>'
-      + '<div style="font-size:10px;color:#7a3a4a;opacity:0.6;margin-top:3px;">' + partnerVal + '</div>'
+    const smHook = SOULMATE_HOOK[dayStemSM] || '파트너 별과 일간의 관계에서 이상형 에너지가 드러납니다';
+    const badgeDataSM = [partnerStar+' '+partnerVal, _singang||null, _ilju||null].filter(Boolean);
+    visualHtml = '<div style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="background:linear-gradient(140deg,rgba(122,58,74,0.13),rgba(122,58,74,0.04));border:1.5px solid rgba(122,58,74,0.32);border-radius:18px;padding:20px 18px;position:relative;overflow:hidden;">'
+      + '<div style="position:absolute;right:-12px;top:-12px;width:70px;height:70px;border-radius:50%;background:rgba(122,58,74,0.08);"></div>'
+      + '<div style="font-size:9px;font-weight:800;color:#7a3a4a;opacity:0.5;letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">IDEAL PARTNER</div>'
+      + '<div style="font-size:20px;font-weight:900;color:#7a3a4a;line-height:1.3;margin-bottom:10px;">' + smType + '</div>'
+      + '<div style="height:1px;background:linear-gradient(to right,rgba(122,58,74,0.3),transparent);margin-bottom:10px;"></div>'
+      + '<div style="font-size:11.5px;color:#5a2030;opacity:0.72;line-height:1.6;">' + smHook + '</div>'
       + '</div>'
-      + '<div style="flex:2;background:rgba(122,58,74,0.05);border:1px solid rgba(122,58,74,0.16);border-radius:14px;padding:12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#7a3a4a;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">이상형 유형</div>'
-      + '<div style="font-size:11px;font-weight:700;color:#5a2030;line-height:1.5;">' + smType + '</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      + badgeDataSM.map(b=>'<div style="background:rgba(122,58,74,0.08);border:1px solid rgba(122,58,74,0.22);border-radius:10px;padding:7px 12px;font-size:10px;font-weight:700;color:#7a3a4a;">'+b+'</div>').join('')
       + '</div>'
-      + '</div>'
-      + '<div style="background:rgba(122,58,74,0.04);border:1px solid rgba(122,58,74,0.13);border-radius:12px;padding:10px 12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#7a3a4a;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">사주 강약</div>'
-      + '<div style="font-size:12px;font-weight:700;color:#5a2030;">' + (_singang||'미확인') + ' — 관계 에너지 구조</div>'
-      + '</div>'
-      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'saju_poem') {
     const napeumPoem = _napeumData?.일주납음?.납음 || '';
     const napeumOhPoem = _napeumData?.일주납음?.오행 || '';
     const napeumImgPoem = _napeumData?.일주납음?.이미지 || '자연의 언어';
-    const poemColMap = {목:'#3a5a38',화:'#6a3028',토:'#6a5030',금:'#3a4a5a',수:'#2a3a5a'};
-    const poemCol = poemColMap[napeumOhPoem] || '#4a3a6a';
-    const poemBgRgb = napeumOhPoem==='목'?'58,90,56':napeumOhPoem==='화'?'106,48,40':napeumOhPoem==='토'?'106,80,48':napeumOhPoem==='금'?'58,74,90':'42,58,90';
     const STEM_NATURE = {甲:'거대한 나무',乙:'들풀과 넝쿨',丙:'태양',丁:'촛불',戊:'높은 산',己:'들판',庚:'강한 바위',辛:'다듬은 보석',壬:'대하(大河)',癸:'안개와 이슬'};
+    const STEM_POEM_HOOK = {甲:'우직하게 뻗어오른 나무처럼 — 이 사주의 이야기는 성장과 방향에 관한 것입니다',乙:'바람에 흔들려도 끊어지지 않는 풀처럼 — 이 사주의 시는 유연함과 생존에 관한 것입니다',丙:'모든 것을 비추는 태양처럼 — 이 사주의 이야기는 빛과 소진에 관한 것입니다',丁:'어둠 속 흔들리는 촛불처럼 — 이 사주의 시는 섬세함과 온기에 관한 것입니다',戊:'움직이지 않는 산처럼 — 이 사주의 이야기는 존재와 무게에 관한 것입니다',己:'모든 것을 품는 대지처럼 — 이 사주의 시는 포용과 기다림에 관한 것입니다',庚:'단단한 바위처럼 — 이 사주의 이야기는 의지와 마찰에 관한 것입니다',辛:'다듬어진 보석처럼 — 이 사주의 시는 정제됨과 예민함에 관한 것입니다',壬:'쉬지 않고 흐르는 강처럼 — 이 사주의 이야기는 흐름과 방향에 관한 것입니다',癸:'안개처럼 조용히 스며드는 — 이 사주의 시는 감수성과 신비에 관한 것입니다'};
     const dayStemPoem = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
     const stemNature = STEM_NATURE[dayStemPoem] || '자연의 기운';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="display:flex;gap:8px;">'
-      + '<div style="flex:1;background:rgba(' + poemBgRgb + ',0.09);border:1.5px solid rgba(' + poemBgRgb + ',0.32);border-radius:14px;padding:12px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:' + poemCol + ';opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">일간의 자연</div>'
-      + '<div style="font-size:14px;font-weight:900;color:' + poemCol + ';line-height:1.3;">' + stemNature + '</div>'
+    const stemPoemHook = STEM_POEM_HOOK[dayStemPoem] || '사주의 언어를 시적 언어로 번역합니다';
+    const poemColMap = {목:'#3a5a38',화:'#6a3028',토:'#6a5030',금:'#3a4a5a',수:'#2a3a5a'};
+    const poemRgbMap = {목:'58,90,56',화:'106,48,40',토:'106,80,48',금:'58,74,90',수:'42,58,90'};
+    const poemCol = poemColMap[napeumOhPoem] || '#4a3a6a';
+    const poemRgb = poemRgbMap[napeumOhPoem] || '74,58,106';
+    const badgeDataPoem = [napeumPoem||null, stemNature||null, _ilju||null].filter(Boolean);
+    visualHtml = '<div style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="background:linear-gradient(140deg,rgba('+poemRgb+',0.13),rgba('+poemRgb+',0.04));border:1.5px solid rgba('+poemRgb+',0.32);border-radius:18px;padding:20px 18px;position:relative;overflow:hidden;">'
+      + '<div style="position:absolute;right:-12px;top:-12px;width:70px;height:70px;border-radius:50%;background:rgba('+poemRgb+',0.08);"></div>'
+      + '<div style="font-size:9px;font-weight:800;color:'+poemCol+';opacity:0.5;letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">POEM ESSENCE</div>'
+      + '<div style="font-size:22px;font-weight:900;color:'+poemCol+';line-height:1.25;margin-bottom:10px;">' + stemNature + '</div>'
+      + '<div style="height:1px;background:linear-gradient(to right,rgba('+poemRgb+',0.3),transparent);margin-bottom:10px;"></div>'
+      + '<div style="font-size:11.5px;color:'+poemCol+';opacity:0.72;line-height:1.6;">' + stemPoemHook + '</div>'
       + '</div>'
-      + '<div style="flex:2;background:rgba(74,58,106,0.05);border:1px solid rgba(74,58,106,0.16);border-radius:14px;padding:12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#4a3a6a;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">시의 배경 — 납음</div>'
-      + '<div style="font-size:11px;font-weight:700;color:#3a2a50;line-height:1.5;">' + (napeumPoem||'?') + (napeumImgPoem ? ' · ' + napeumImgPoem : '') + '</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      + badgeDataPoem.map(b=>'<div style="background:rgba('+poemRgb+',0.08);border:1px solid rgba('+poemRgb+',0.22);border-radius:10px;padding:7px 12px;font-size:10px;font-weight:700;color:'+poemCol+';">'+b+'</div>').join('')
       + '</div>'
-      + '</div>'
-      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'life_mission') {
@@ -4731,131 +4731,161 @@ function renderCharVisual() {
     const missionYsV = _yongsin || _sdFull?.yongshin?.primary || '미확인';
     const missionSgV = _singang || _sdFull?.strength_level_5 || '미확인';
     const MISSION_MAP = {'정관격':'질서·책임·완성','편관격':'극복·도전·혁신','정재격':'현실·안정·축적','편재격':'유연·확장·가능성','정인격':'학습·성장·전달','편인격':'직관·탐구·독립','식신격':'창조·표현·나눔','상관격':'자유·혁신·예술','비겁격':'자립·협력·정체성'};
+    const MISSION_HOOK_MAP = {'정관격':'질서를 세우고 책임을 완수하는 것 — 이것이 이번 생의 구조적 방향입니다','편관격':'한계를 돌파하고 혁신을 이끄는 도전이 이번 생의 미션입니다','정재격':'현실을 탄탄히 쌓아 안정을 완성하는 것이 이번 생의 과제입니다','편재격':'유연하게 확장하며 가능성을 여는 것이 이번 생의 방향입니다','정인격':'배우고 성장하며 그것을 전달하는 것이 이번 생의 미션입니다','편인격':'직관적 탐구와 독립적 사유가 이번 생의 핵심 방향입니다','식신격':'창조하고 표현하며 나누는 것 — 이번 생의 미션입니다','상관격':'자유롭게 혁신하며 예술적으로 세상을 바꾸는 것이 미션입니다','비겁격':'자립하고 협력하며 자신의 정체성을 완성하는 것입니다'};
     const missionKey = Object.keys(MISSION_MAP).find(k => (missionGkV||'').includes(k)) || null;
     const missionKw = missionKey ? MISSION_MAP[missionKey] : '나만의 방향으로';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="display:flex;gap:8px;">'
-      + '<div style="flex:1;background:rgba(58,90,72,0.09);border:1.5px solid rgba(58,90,72,0.28);border-radius:14px;padding:12px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#3a5a48;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">격국</div>'
-      + '<div style="font-size:13px;font-weight:900;color:#3a5a48;line-height:1.3;">' + missionGkV + '</div>'
+    const missionHook = missionKey ? MISSION_HOOK_MAP[missionKey] : '격국과 용신이 교차하는 지점에서 이번 생의 미션이 드러납니다';
+    const badgeDataMM = [missionGkV!=='미확인'?missionGkV:null, missionYsV!=='미확인'?('용신 '+missionYsV):null, missionSgV!=='미확인'?missionSgV:null].filter(Boolean);
+    visualHtml = '<div style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="background:linear-gradient(140deg,rgba(58,90,72,0.13),rgba(58,90,72,0.04));border:1.5px solid rgba(58,90,72,0.32);border-radius:18px;padding:20px 18px;position:relative;overflow:hidden;">'
+      + '<div style="position:absolute;right:-12px;top:-12px;width:70px;height:70px;border-radius:50%;background:rgba(58,90,72,0.08);"></div>'
+      + '<div style="font-size:9px;font-weight:800;color:#3a5a48;opacity:0.5;letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">LIFE MISSION</div>'
+      + '<div style="font-size:22px;font-weight:900;color:#3a5a48;line-height:1.25;margin-bottom:10px;">' + missionKw + '</div>'
+      + '<div style="height:1px;background:linear-gradient(to right,rgba(58,90,72,0.3),transparent);margin-bottom:10px;"></div>'
+      + '<div style="font-size:11.5px;color:#263d30;opacity:0.72;line-height:1.6;">' + missionHook + '</div>'
       + '</div>'
-      + '<div style="flex:2;background:rgba(58,90,72,0.05);border:1px solid rgba(58,90,72,0.16);border-radius:14px;padding:12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#3a5a48;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">미션 키워드</div>'
-      + '<div style="font-size:12px;font-weight:900;color:#263d30;line-height:1.4;">' + missionKw + '</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      + badgeDataMM.map(b=>'<div style="background:rgba(58,90,72,0.08);border:1px solid rgba(58,90,72,0.22);border-radius:10px;padding:7px 12px;font-size:10px;font-weight:700;color:#3a5a48;">'+b+'</div>').join('')
       + '</div>'
-      + '</div>'
-      + '<div style="background:rgba(58,90,72,0.04);border:1px solid rgba(58,90,72,0.13);border-radius:12px;padding:10px 12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#3a5a48;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">용신 · 에너지 방향</div>'
-      + '<div style="font-size:12px;font-weight:700;color:#263d30;">' + missionYsV + ' — ' + missionSgV + '</div>'
-      + '</div>'
-      + miniBubbleBlock
       + '</div>';
 
   } else if (_type === 'villain') {
     const dayStemV = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
     const VILLAIN_TYPE = {甲:'완고한 독재자형',乙:'교묘한 회피형',丙:'충동적 폭발형',丁:'집착형 감정 빌런',戊:'무표정 압박형',己:'소극적 방해형',庚:'냉혹한 원칙주의',辛:'예민한 날세우기형',壬:'종잡을 수 없는 변덕형',癸:'수동공격형 빌런'};
+    const VILLAIN_HOOK = {甲:'권위를 빼앗길 때 이 기질이 가장 강하게 폭발합니다',乙:'원하는 것을 직접 요구하지 못해 돌아가는 방식이 문제를 만듭니다',丙:'감정이 폭발하고 나서 수습하는 패턴을 반복합니다',丁:'과도한 감정 이입이 집착으로 이어지는 구조입니다',戊:'무감각해 보이는 태도가 주변을 압박합니다',己:'과도한 걱정이 소극적 방해로 표현됩니다',庚:'원칙이 무기가 되어 주변을 차갑게 만듭니다',辛:'감각적 예민함이 상처 주기와 받기 양쪽으로 작용합니다',壬:'예측 불가능함이 주변의 신뢰를 흔듭니다',癸:'감정 기복 안의 수동적 공격이 관계를 서서히 소진시킵니다'};
     const villainType = VILLAIN_TYPE[dayStemV] || '복합형 빌런';
+    const villainHook = VILLAIN_HOOK[dayStemV] || '특정 상황에서 이 기질이 표면으로 올라옵니다';
     const kisinEl = _sdFull?.yongshin?.kisu || '';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="display:flex;gap:8px;">'
-      + '<div style="flex:1;background:rgba(90,58,42,0.09);border:1.5px solid rgba(90,58,42,0.28);border-radius:14px;padding:12px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#5a3a2a;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">빌런 유형</div>'
-      + '<div style="font-size:12px;font-weight:900;color:#5a3a2a;line-height:1.3;">' + villainType + '</div>'
+    const badgeData = [kisinEl?('기신 '+kisinEl):null, _singang||null, _ilju||null].filter(Boolean);
+    visualHtml = '<div style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="background:linear-gradient(140deg,rgba(90,58,42,0.13),rgba(90,58,42,0.04));border:1.5px solid rgba(90,58,42,0.32);border-radius:18px;padding:20px 18px;position:relative;overflow:hidden;">'
+      + '<div style="position:absolute;right:-12px;top:-12px;width:70px;height:70px;border-radius:50%;background:rgba(90,58,42,0.08);"></div>'
+      + '<div style="font-size:9px;font-weight:800;color:#5a3a2a;opacity:0.5;letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">VILLAIN TYPE</div>'
+      + '<div style="font-size:22px;font-weight:900;color:#5a3a2a;line-height:1.25;margin-bottom:10px;">' + villainType + '</div>'
+      + '<div style="height:1px;background:linear-gradient(to right,rgba(90,58,42,0.3),transparent);margin-bottom:10px;"></div>'
+      + '<div style="font-size:11.5px;color:#3a1a0a;opacity:0.72;line-height:1.6;">' + villainHook + '</div>'
       + '</div>'
-      + '<div style="flex:2;background:rgba(90,58,42,0.05);border:1px solid rgba(90,58,42,0.16);border-radius:14px;padding:12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#5a3a2a;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">기신 에너지</div>'
-      + '<div style="font-size:11px;font-weight:700;color:#3a1a0a;line-height:1.5;">' + (kisinEl||_singang||'미확인') + ' — 억제 필요 에너지</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      + badgeData.map(b=>'<div style="background:rgba(90,58,42,0.08);border:1px solid rgba(90,58,42,0.22);border-radius:10px;padding:7px 12px;font-size:10px;font-weight:700;color:#5a3a2a;">'+b+'</div>').join('')
       + '</div>'
-      + '</div>'
-      + miniBubbleBlock + '</div>';
+      + '</div>';
 
   } else if (_type === 'nemesis') {
     const dayStemN = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
     const NEMESIS_TYPE = {甲:'나를 통제하려는 사람',乙:'유리한 쪽으로 흐르는 사람',丙:'지나치게 밀어붙이는 사람',丁:'감정으로 조종하는 사람',戊:'무감각하게 압박하는 사람',己:'소극적으로 방해하는 사람',庚:'원칙을 무기로 쓰는 사람',辛:'예민하게 상처주는 사람',壬:'종잡을 수 없는 사람',癸:'감정 기복이 심한 사람'};
+    const NEMESIS_HOOK = {甲:'내 방향과 결정을 끊임없이 의심하게 만드는 유형입니다',乙:'상황에 따라 태도가 달라져 신뢰하기 어렵습니다',丙:'에너지를 강요하듯 밀어붙여 압도당하는 느낌을 줍니다',丁:'감정적 요구가 많아 나를 감정 쓰레기통으로 씁니다',戊:'반응 없는 벽 앞에 서 있는 것 같은 고갈감을 줍니다',己:'직접적이지 않은 방해가 에너지를 서서히 소진시킵니다',庚:'원칙과 규칙으로 나를 몰아붙이는 방식이 지칩니다',辛:'작은 말 한마디가 날카롭게 상처를 남깁니다',壬:'어떻게 반응할지 몰라 항상 긴장 상태가 됩니다',癸:'감정의 파도에 휩쓸려 나도 함께 지쳐버립니다'};
     const nemesisType = NEMESIS_TYPE[dayStemN] || '에너지 충돌형';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="background:rgba(74,74,42,0.09);border:1.5px solid rgba(74,74,42,0.28);border-radius:14px;padding:12px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#4a4a2a;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">나를 소진시키는 유형</div>'
-      + '<div style="font-size:13px;font-weight:900;color:#4a4a2a;line-height:1.3;">' + nemesisType + '</div>'
+    const nemesisHook = NEMESIS_HOOK[dayStemN] || '이 유형을 만나면 에너지가 급격히 소진됩니다';
+    const kisinElN = _sdFull?.yongshin?.kisu || '';
+    const badgeDataN = [kisinElN?('기신 '+kisinElN):null, _singang||null, _ilju||null].filter(Boolean);
+    visualHtml = '<div style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="background:linear-gradient(140deg,rgba(74,74,42,0.13),rgba(74,74,42,0.04));border:1.5px solid rgba(74,74,42,0.32);border-radius:18px;padding:20px 18px;position:relative;overflow:hidden;">'
+      + '<div style="position:absolute;right:-12px;top:-12px;width:70px;height:70px;border-radius:50%;background:rgba(74,74,42,0.08);"></div>'
+      + '<div style="font-size:9px;font-weight:800;color:#4a4a2a;opacity:0.5;letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">NEMESIS TYPE</div>'
+      + '<div style="font-size:20px;font-weight:900;color:#4a4a2a;line-height:1.3;margin-bottom:10px;">' + nemesisType + '</div>'
+      + '<div style="height:1px;background:linear-gradient(to right,rgba(74,74,42,0.3),transparent);margin-bottom:10px;"></div>'
+      + '<div style="font-size:11.5px;color:#2a2a0a;opacity:0.72;line-height:1.6;">' + nemesisHook + '</div>'
       + '</div>'
-      + '<div style="background:rgba(74,74,42,0.05);border:1px solid rgba(74,74,42,0.16);border-radius:12px;padding:10px 12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#4a4a2a;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">기신 에너지 구조</div>'
-      + '<div style="font-size:12px;font-weight:700;color:#2a2a0a;">' + (_singang||'미확인') + ' · ' + (_geokguk||'미확인') + '</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      + badgeDataN.map(b=>'<div style="background:rgba(74,74,42,0.08);border:1px solid rgba(74,74,42,0.22);border-radius:10px;padding:7px 12px;font-size:10px;font-weight:700;color:#4a4a2a;">'+b+'</div>').join('')
       + '</div>'
-      + miniBubbleBlock + '</div>';
+      + '</div>';
 
   } else if (_type === 'love_history') {
     const partnerStarLH = _profile?.gender === 'F' ? '관성' : '재성';
     const dayStemLH = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
     const LH_PATTERN = {甲:'끌려도 결국 통제 갈등',乙:'맞춰주다 지쳐서 떠남',丙:'강렬하게 시작, 빠르게 식음',丁:'감정 과몰입으로 집착',戊:'무뚝뚝해서 오해 누적',己:'걱정하다 질리게 만듦',庚:'원칙 고집으로 마찰',辛:'예민해서 사소한 것에 상처',壬:'자유 추구로 결속력 약화',癸:'감정 기복으로 상대 지침'};
+    const LH_HOOK = {甲:'강한 사람에게 끌리지만 결국 권력 다툼으로 끝납니다',乙:'상대에게 맞춰주다 나를 잃는 패턴이 반복됩니다',丙:'처음의 열정은 누구보다 강하지만 관계가 빨리 식습니다',丁:'감정이입이 너무 깊어 집착이 되는 경향이 있습니다',戊:'표현 방식이 서툴러 오해가 쌓이는 패턴입니다',己:'과도한 걱정과 배려가 상대를 답답하게 만듭니다',庚:'원칙과 기준이 명확해 관계에서 충돌이 잦습니다',辛:'작은 것에도 상처받고 또 상처 주는 구조입니다',壬:'자유를 원해 결속을 거부하다 관계가 흐릅니다',癸:'감정 기복이 상대를 지치게 만드는 패턴입니다'};
     const lhPattern = LH_PATTERN[dayStemLH] || '반복적 관계 패턴';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="display:flex;gap:8px;">'
-      + '<div style="flex:1;background:rgba(106,58,58,0.09);border:1.5px solid rgba(106,58,58,0.28);border-radius:14px;padding:12px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#6a3a3a;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">파트너 별</div>'
-      + '<div style="font-size:20px;font-weight:900;color:#6a3a3a;line-height:1;">' + partnerStarLH + '</div>'
+    const lhHook = LH_HOOK[dayStemLH] || '사주가 반복하도록 구조화된 연애 패턴입니다';
+    const tenGLH = _sdFull?.ten_gods_map || {};
+    const partnerVal = _profile?.gender === 'F'
+      ? (tenGLH['정관'] ? '정관 작용' : tenGLH['편관'] ? '편관 작용' : '관성 미약')
+      : (tenGLH['정재'] ? '정재 작용' : tenGLH['편재'] ? '편재 작용' : '재성 미약');
+    const badgeDataLH = [partnerStarLH+' '+partnerVal, _singang||null, _ilju||null].filter(Boolean);
+    visualHtml = '<div style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="background:linear-gradient(140deg,rgba(106,58,58,0.13),rgba(106,58,58,0.04));border:1.5px solid rgba(106,58,58,0.32);border-radius:18px;padding:20px 18px;position:relative;overflow:hidden;">'
+      + '<div style="position:absolute;right:-12px;top:-12px;width:70px;height:70px;border-radius:50%;background:rgba(106,58,58,0.08);"></div>'
+      + '<div style="font-size:9px;font-weight:800;color:#6a3a3a;opacity:0.5;letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">LOVE PATTERN</div>'
+      + '<div style="font-size:22px;font-weight:900;color:#6a3a3a;line-height:1.25;margin-bottom:10px;">' + lhPattern + '</div>'
+      + '<div style="height:1px;background:linear-gradient(to right,rgba(106,58,58,0.3),transparent);margin-bottom:10px;"></div>'
+      + '<div style="font-size:11.5px;color:#3a1a1a;opacity:0.72;line-height:1.6;">' + lhHook + '</div>'
       + '</div>'
-      + '<div style="flex:2;background:rgba(106,58,58,0.05);border:1px solid rgba(106,58,58,0.16);border-radius:14px;padding:12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#6a3a3a;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">흑역사 패턴</div>'
-      + '<div style="font-size:11px;font-weight:700;color:#3a1a1a;line-height:1.5;">' + lhPattern + '</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      + badgeDataLH.map(b=>'<div style="background:rgba(106,58,58,0.08);border:1px solid rgba(106,58,58,0.22);border-radius:10px;padding:7px 12px;font-size:10px;font-weight:700;color:#6a3a3a;">'+b+'</div>').join('')
       + '</div>'
-      + '</div>'
-      + miniBubbleBlock + '</div>';
+      + '</div>';
 
   } else if (_type === 'era') {
     const napeumEra = _napeumData?.일주납음?.납음 || '';
     const napeumImgEra = _napeumData?.일주납음?.이미지 || '';
     const dayStemEra = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
     const ERA_MAP = {甲:'삼국·고려 — 무사·선비의 시대',乙:'조선 중기 — 학문과 예술의 시대',丙:'삼국 — 전쟁과 개척의 시대',丁:'고려 말 — 변혁과 전환의 시대',戊:'고조선·고대 — 왕조 건설의 시대',己:'조선 후기 — 민중과 실학의 시대',庚:'근대 개화기 — 변혁과 도전의 시대',辛:'조선 — 예술·공예·세공의 시대',壬:'대항해·탐험의 시대',癸:'근현대 — 감수성·예술의 시대'};
+    const ERA_HOOK = {甲:'무예와 학문이 동시에 꽃피던 시대 — 이 사주의 에너지가 가장 빛났을 것입니다',乙:'붓과 먹, 조용한 사색의 시대 — 섬세한 이 기운이 그 시대와 공명합니다',丙:'불꽃처럼 타오르던 시대 — 이 사주의 열정 에너지가 그 시대에 속합니다',丁:'변혁의 소용돌이 속 조용한 촛불 같은 존재였을 것입니다',戊:'터를 닦고 나라를 세우던 시대의 에너지를 가지고 있습니다',己:'민중의 현실을 파고든 실학자 에너지가 이 사주에 있습니다',庚:'낡은 것을 부수고 새것을 세우던 개화기 에너지입니다',辛:'정교한 공예와 미적 감각이 빛나던 시대와 공명합니다',壬:'새로운 땅을 향해 나아가던 탐험가 에너지가 이 사주에 있습니다',癸:'감수성과 예술이 폭발하던 시대의 에너지를 품고 있습니다'};
     const eraType = ERA_MAP[dayStemEra] || '시대를 초월한 에너지';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="background:rgba(90,74,42,0.09);border:1.5px solid rgba(90,74,42,0.28);border-radius:14px;padding:12px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#5a4a2a;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">내가 태어났어야 할 시대</div>'
-      + '<div style="font-size:12px;font-weight:900;color:#5a4a2a;line-height:1.4;">' + eraType + '</div>'
+    const eraHook = ERA_HOOK[dayStemEra] || '납음의 기운이 특정 역사 시대와 깊이 공명합니다';
+    const badgeDataEra = [napeumEra||(null), _geokguk||null, _singang||null].filter(Boolean);
+    visualHtml = '<div style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="background:linear-gradient(140deg,rgba(90,74,42,0.13),rgba(90,74,42,0.04));border:1.5px solid rgba(90,74,42,0.32);border-radius:18px;padding:20px 18px;position:relative;overflow:hidden;">'
+      + '<div style="position:absolute;right:-12px;top:-12px;width:70px;height:70px;border-radius:50%;background:rgba(90,74,42,0.08);"></div>'
+      + '<div style="font-size:9px;font-weight:800;color:#5a4a2a;opacity:0.5;letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">YOUR ERA</div>'
+      + '<div style="font-size:18px;font-weight:900;color:#5a4a2a;line-height:1.3;margin-bottom:10px;">' + eraType + '</div>'
+      + '<div style="height:1px;background:linear-gradient(to right,rgba(90,74,42,0.3),transparent);margin-bottom:10px;"></div>'
+      + '<div style="font-size:11.5px;color:#3a2a0a;opacity:0.72;line-height:1.6;">' + eraHook + '</div>'
       + '</div>'
-      + '<div style="background:rgba(90,74,42,0.05);border:1px solid rgba(90,74,42,0.14);border-radius:12px;padding:10px 12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#5a4a2a;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">납음 — 시대의 기운</div>'
-      + '<div style="font-size:12px;font-weight:700;color:#3a2a0a;">' + (napeumEra||'미확인') + (napeumImgEra?' · '+napeumImgEra:'') + '</div>'
+      + (napeumImgEra?'<div style="background:rgba(90,74,42,0.07);border:1px solid rgba(90,74,42,0.18);border-radius:12px;padding:10px 14px;"><div style="font-size:9px;font-weight:700;color:#5a4a2a;opacity:0.55;margin-bottom:4px;letter-spacing:0.2px;">납음 이미지</div><div style="font-size:12px;font-weight:700;color:#3a2a0a;">' + (napeumEra||'') + ' · ' + napeumImgEra + '</div></div>':'')
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      + badgeDataEra.map(b=>'<div style="background:rgba(90,74,42,0.08);border:1px solid rgba(90,74,42,0.22);border-radius:10px;padding:7px 12px;font-size:10px;font-weight:700;color:#5a4a2a;">'+b+'</div>').join('')
       + '</div>'
-      + miniBubbleBlock + '</div>';
+      + '</div>';
 
   } else if (_type === 'hidden_talent') {
     const dayStemHT = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
     const HT_MAP = {甲:'리더십·전략 기획',乙:'섬세한 예술·치유',丙:'강연·퍼포먼스',丁:'상담·감정 코칭',戊:'부동산·자산 관리',己:'세밀한 분석·연구',庚:'협상·중재',辛:'미적 감각·디자인',壬:'직관·전략',癸:'감수성·창작'};
+    const HT_HOOK = {甲:'강점으로 알려진 추진력 이면에 더 정교한 전략 능력이 숨어 있습니다',乙:'드러난 유연함 뒤에 깊은 치유 능력이 잠들어 있습니다',丙:'표현력 너머에 사람을 움직이는 설득력이 아직 발현되지 않았습니다',丁:'감정 공감 능력이 심층 코칭 재능으로 이어질 수 있습니다',戊:'안정성 추구 이면에 자산 감각이 숨겨져 있습니다',己:'꼼꼼함이 데이터 분석·연구 능력으로 발현될 수 있습니다',庚:'결단력 이면에 탁월한 중재·협상 능력이 잠들어 있습니다',辛:'예민한 감각이 미적 디자인 재능으로 이어질 수 있습니다',壬:'넓은 시야 이면에 핵심을 꿰뚫는 직관이 숨어 있습니다',癸:'깊은 감수성이 아직 표현되지 않은 창작 재능을 품고 있습니다'};
     const htTalent = HT_MAP[dayStemHT] || '잠재된 특별한 능력';
+    const htHook = HT_HOOK[dayStemHT] || '아직 발현되지 않은 에너지가 사주 구조 안에 숨겨져 있습니다';
     const htYs = _yongsin || _sdFull?.yongshin?.primary || '미확인';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="display:flex;gap:8px;">'
-      + '<div style="flex:1;background:rgba(58,74,90,0.09);border:1.5px solid rgba(58,74,90,0.28);border-radius:14px;padding:12px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#3a4a5a;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">숨겨진 재능</div>'
-      + '<div style="font-size:12px;font-weight:900;color:#3a4a5a;line-height:1.3;">' + htTalent + '</div>'
+    const badgeDataHT = [htYs?('용신 '+htYs):null, _singang||null, _ilju||null].filter(Boolean);
+    visualHtml = '<div style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="background:linear-gradient(140deg,rgba(58,74,90,0.13),rgba(58,74,90,0.04));border:1.5px solid rgba(58,74,90,0.32);border-radius:18px;padding:20px 18px;position:relative;overflow:hidden;">'
+      + '<div style="position:absolute;right:-12px;top:-12px;width:70px;height:70px;border-radius:50%;background:rgba(58,74,90,0.08);"></div>'
+      + '<div style="font-size:9px;font-weight:800;color:#3a4a5a;opacity:0.5;letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">HIDDEN TALENT</div>'
+      + '<div style="font-size:22px;font-weight:900;color:#3a4a5a;line-height:1.25;margin-bottom:10px;">' + htTalent + '</div>'
+      + '<div style="height:1px;background:linear-gradient(to right,rgba(58,74,90,0.3),transparent);margin-bottom:10px;"></div>'
+      + '<div style="font-size:11.5px;color:#1a2a3a;opacity:0.72;line-height:1.6;">' + htHook + '</div>'
       + '</div>'
-      + '<div style="flex:2;background:rgba(58,74,90,0.05);border:1px solid rgba(58,74,90,0.16);border-radius:14px;padding:12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#3a4a5a;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">발현 에너지</div>'
-      + '<div style="font-size:11px;font-weight:700;color:#1a2a3a;line-height:1.5;">용신 ' + htYs + ' · ' + (_singang||'미확인') + '</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      + badgeDataHT.map(b=>'<div style="background:rgba(58,74,90,0.08);border:1px solid rgba(58,74,90,0.22);border-radius:10px;padding:7px 12px;font-size:10px;font-weight:700;color:#3a4a5a;">'+b+'</div>').join('')
       + '</div>'
-      + '</div>'
-      + miniBubbleBlock + '</div>';
+      + '</div>';
 
   } else if (_type === 'totem') {
     const ohEl = _sdFull?.five_pct;
     const maxEl = ohEl ? Object.entries(ohEl).sort((a,b)=>b[1]-a[1])[0]?.[0] : '';
     const TOTEM_MAP = {목:'나무늑대 — 무리를 이끄는 방향감각',화:'붉은 봉황 — 열정과 재생의 에너지',토:'황금 곰 — 대지의 안정과 수호',금:'백호 — 결단과 순결의 기운',수:'흑룡 — 깊이와 지혜의 에너지'};
+    const TOTEM_HOOK = {목:'숲을 읽고 길을 찾는 — 무리를 인도하는 야생의 본능이 이 사주에 있습니다',화:'죽고 나서 더 강하게 되살아나는 봉황의 에너지 — 이 사주의 본질입니다',토:'대지처럼 묵직하고 안전한 공간을 만드는 힘이 이 사주에 있습니다',금:'흰 호랑이의 결단력과 순백의 기운 — 이 사주가 가진 수호 에너지입니다',수:'깊은 곳에서 모든 것을 보는 용의 통찰 — 이 사주의 수호 에너지입니다'};
     const napeumOhT = _napeumData?.일주납음?.오행 || '';
     const totemEl = napeumOhT || maxEl || '';
     const totemAnimal = TOTEM_MAP[totemEl] || '사주 고유의 수호 에너지';
-    const TOTEM_COLOR = {목:'#2a4a28',화:'#6a2a18',토:'#5a4a18',금:'#3a4a5a',수:'#1a2a4a'};
-    const totemCol = TOTEM_COLOR[totemEl] || '#3a5a3a';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="background:rgba(58,90,58,0.09);border:1.5px solid rgba(58,90,58,0.28);border-radius:14px;padding:14px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#3a5a3a;opacity:0.7;margin-bottom:6px;letter-spacing:0.3px;">수호 동물</div>'
-      + '<div style="font-size:14px;font-weight:900;color:' + totemCol + ';line-height:1.4;">' + totemAnimal + '</div>'
+    const totemHook = TOTEM_HOOK[totemEl] || '오행과 납음이 교차하는 지점에서 이 사주 고유의 수호 동물이 드러납니다';
+    const TOTEM_COLOR = {목:'rgba(58,90,56',화:'rgba(106,48,40',토:'rgba(90,74,42',금:'rgba(58,74,90',수:'rgba(42,58,90'};
+    const totemRgb = (TOTEM_COLOR[totemEl] || 'rgba(58,90,58');
+    const totemText = {목:'#2a4a28',화:'#6a2a18',토:'#5a4a18',금:'#3a4a5a',수:'#1a2a4a'}[totemEl] || '#3a5a3a';
+    const napeumNameT = _napeumData?.일주납음?.납음 || '';
+    const badgeDataT = [totemEl?('오행 '+totemEl):null, napeumNameT||null, _singang||null].filter(Boolean);
+    visualHtml = '<div style="padding:16px 18px 12px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="background:linear-gradient(140deg,'+totemRgb+',0.13),'+totemRgb+',0.04));border:1.5px solid '+totemRgb+',0.32);border-radius:18px;padding:20px 18px;position:relative;overflow:hidden;">'
+      + '<div style="position:absolute;right:-12px;top:-12px;width:70px;height:70px;border-radius:50%;background:'+totemRgb+',0.08);"></div>'
+      + '<div style="font-size:9px;font-weight:800;color:'+totemText+';opacity:0.5;letter-spacing:0.35em;text-transform:uppercase;margin-bottom:10px;">TOTEM ANIMAL</div>'
+      + '<div style="font-size:18px;font-weight:900;color:'+totemText+';line-height:1.3;margin-bottom:10px;">' + totemAnimal + '</div>'
+      + '<div style="height:1px;background:linear-gradient(to right,'+totemRgb+',0.3),transparent);margin-bottom:10px;"></div>'
+      + '<div style="font-size:11.5px;color:'+totemText+';opacity:0.72;line-height:1.6;">' + totemHook + '</div>'
       + '</div>'
-      + '<div style="background:rgba(58,90,58,0.05);border:1px solid rgba(58,90,58,0.14);border-radius:12px;padding:10px 12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#3a5a3a;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">수호 오행</div>'
-      + '<div style="font-size:12px;font-weight:700;color:#1a3a1a;">' + (totemEl||'미확인') + ' — ' + (_singang||'미확인') + '</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      + badgeDataT.map(b=>'<div style="background:'+totemRgb+',0.08);border:1px solid '+totemRgb+',0.22);border-radius:10px;padding:7px 12px;font-size:10px;font-weight:700;color:'+totemText+';">'+b+'</div>').join('')
       + '</div>'
-      + miniBubbleBlock + '</div>';
+      + '</div>';
 
   } else {
     // 기타 폴백 — 오행 버블
@@ -5068,66 +5098,100 @@ function renderCharVisual() {
     blurRows.push({ label:'카르마 미션', text: '이번 생에 반드시 풀어야 할 과제와 실천 방향' });
 
   } else if (_type === 'soulmate') {
-    const partnerStarR = _profile?.gender === 'F' ? '관성(官星)' : '재성(財星)';
-    if (ipd?.연애패턴) openRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
-    openRows.push({ label:'파트너 별', text: partnerStarR + ' — 이상형 에너지 구조' });
-    blurRows.push({ label:'이상형 유형', text: '사주가 가리키는 운명적 파트너의 구체적 기질' });
-    blurRows.push({ label:'인연의 시기', text: '관성·재성이 활성화되는 대운·세운 타이밍' });
+    const partnerStarR2 = _profile?.gender === 'F' ? '관성(官星)' : '재성(財星)';
+    const dayStemSMR = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+    const SM_TYPE_R = {甲:'내 방향을 믿어주는 파트너',乙:'함께 유연하게 흐를 수 있는 사람',丙:'나의 열정을 증폭시켜주는 사람',丁:'섬세하게 나를 감싸주는 사람',戊:'묵직하게 옆에 있어주는 파트너',己:'현실적으로 나를 잡아주는 사람',庚:'명확하고 원칙 있는 파트너',辛:'감각적이고 세련된 에너지의 사람',壬:'자유 안에서 깊이를 주는 파트너',癸:'감수성으로 연결되는 이상주의자'};
+    const smTypeR = SM_TYPE_R[dayStemSMR] || '나와 에너지가 맞는 사람';
+    openRows.push({ label:'이상형 유형', text: smTypeR });
+    openRows.push({ label:'파트너 별', text: partnerStarR2 + ' — ' + (ipd?.연애패턴 || '이상형 에너지 구조') });
+    blurRows.push({ label:'끌리지만 힘든 유형', text: '사주 구조상 끌리면서도 결국 충돌하게 되는 파트너 유형' });
+    blurRows.push({ label:'인연이 오는 시기', text: partnerStarR2 + '이 활성화되는 대운·세운 교차 시기 분석' });
 
   } else if (_type === 'saju_poem') {
-    const napeumPR = _napeumData?.일주납음?.납음 || '';
-    if (napeumPR) openRows.push({ label:'납음 — 시의 배경', text: napeumPR });
-    if (ipd?.성격) openRows.push({ label:'일주의 언어', text: ipd.성격 });
-    blurRows.push({ label:'나를 표현하는 시', text: '이 사주를 관통하는 한 편의 시적 이야기' });
-    blurRows.push({ label:'지금 이 대운의 계절', text: '현재 대운 에너지를 시적 언어로 담은 구절' });
+    const napeumPR2 = _napeumData?.일주납음?.납음 || '';
+    const napeumImgPR = _napeumData?.일주납음?.이미지 || '';
+    const STEM_NAT_R = {甲:'거대한 나무',乙:'들풀과 넝쿨',丙:'태양',丁:'촛불',戊:'높은 산',己:'들판',庚:'강한 바위',辛:'다듬은 보석',壬:'대하(大河)',癸:'안개와 이슬'};
+    const dayStemPR = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+    const stemNatR = STEM_NAT_R[dayStemPR] || '자연의 기운';
+    openRows.push({ label:'일간의 자연', text: stemNatR + ' — 시의 핵심 이미지' });
+    if (napeumPR2) openRows.push({ label:'납음 · 시의 배경', text: napeumPR2 + (napeumImgPR ? ' · ' + napeumImgPR : '') });
+    blurRows.push({ label:'나를 관통하는 시 한 편', text: '일간·격국·납음·오행이 교차하는 이야기의 전체 흐름' });
+    blurRows.push({ label:'지금 이 대운의 계절', text: '현재 대운 에너지를 시적 언어와 자연 이미지로 표현' });
 
   } else if (_type === 'life_mission') {
-    const missionGkR = _geokguk || '미확인';
-    const missionYsR = _yongsin || '미확인';
-    openRows.push({ label:'격국 — 미션 구조', text: missionGkR });
-    openRows.push({ label:'용신 — 에너지 방향', text: missionYsR });
-    blurRows.push({ label:'이번 생 핵심 미션', text: '사주 전체가 가리키는 이번 생의 완성 과제' });
-    blurRows.push({ label:'내려놓아야 할 것', text: '기신과 과다 오행이 만드는 반복 패턴' });
+    const missionGkR2 = _geokguk || '미확인';
+    const missionYsR2 = _yongsin || '미확인';
+    const MM_MAP_R = {'정관격':'질서·책임·완성','편관격':'극복·도전·혁신','정재격':'현실·안정·축적','편재격':'유연·확장·가능성','정인격':'학습·성장·전달','편인격':'직관·탐구·독립','식신격':'창조·표현·나눔','상관격':'자유·혁신·예술','비겁격':'자립·협력·정체성'};
+    const missionKeyR = Object.keys(MM_MAP_R).find(k => (missionGkR2||'').includes(k)) || null;
+    const missionKwR = missionKeyR ? MM_MAP_R[missionKeyR] : '나만의 방향으로';
+    openRows.push({ label:'이번 생 미션 키워드', text: missionKwR });
+    openRows.push({ label:'격국 · 용신', text: missionGkR2 + ' × 용신 ' + missionYsR2 });
+    blurRows.push({ label:'이번 생 핵심 과제', text: '사주 전체 구조가 가리키는 이번 생의 완성 과제 전문' });
+    blurRows.push({ label:'내려놓아야 할 것', text: '기신·과다 오행이 만드는 반복 패턴과 극복 전략' });
 
   } else if (_type === 'villain') {
-    if (ipd?.성격) openRows.push({ label:'일주 기질', text: ipd.성격 });
-    if (ssd?.해석) openRows.push({ label:'강약 구조', text: '점수 ' + (ssd.종합점수||'?') + '/100 · ' + ssd.해석 });
-    blurRows.push({ label:'핵심 빌런 기질', text: '기신 오행이 만드는 나의 어두운 패턴 정체' });
-    blurRows.push({ label:'흑역사 트리거', text: '빌런 기질이 폭발하는 구체적 상황과 대응법' });
+    const dayStemVR = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+    const VT_MAP_R = {甲:'완고한 독재자형',乙:'교묘한 회피형',丙:'충동적 폭발형',丁:'집착형 감정 빌런',戊:'무표정 압박형',己:'소극적 방해형',庚:'냉혹한 원칙주의',辛:'예민한 날세우기형',壬:'종잡을 수 없는 변덕형',癸:'수동공격형 빌런'};
+    const villainTypeR = VT_MAP_R[dayStemVR] || '복합형 빌런';
+    const kisinElVR = _sdFull?.yongshin?.kisu || '미확인';
+    openRows.push({ label:'빌런 유형 진단', text: villainTypeR });
+    openRows.push({ label:'기신 에너지', text: kisinElVR + ' — 이 오행이 문제의 근원' });
+    blurRows.push({ label:villainTypeR + ' 발동 트리거', text: '이 기질이 터지는 구체적 상황 3가지와 그 원인' });
+    blurRows.push({ label:'빌런→영웅 전환 전략', text: '이 기질을 강점으로 뒤집는 구체적 실전 방법' });
 
   } else if (_type === 'nemesis') {
-    if (ipd?.성격) openRows.push({ label:'일주 기질', text: ipd.성격 });
-    if (gkd?.격특징) openRows.push({ label:'격국 특징', text: gkd.격특징 });
-    blurRows.push({ label:'소진 유형', text: '나를 가장 에너지 드레인시키는 사람의 구체적 기질' });
-    blurRows.push({ label:'에너지 보호 전략', text: '관계에서 소진을 막는 경계 설정법' });
+    const dayStemNR = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+    const NT_MAP_R = {甲:'나를 통제하려는 사람',乙:'유리한 쪽으로 흐르는 사람',丙:'지나치게 밀어붙이는 사람',丁:'감정으로 조종하는 사람',戊:'무감각하게 압박하는 사람',己:'소극적으로 방해하는 사람',庚:'원칙을 무기로 쓰는 사람',辛:'예민하게 상처주는 사람',壬:'종잡을 수 없는 사람',癸:'감정 기복이 심한 사람'};
+    const nemesisTypeR = NT_MAP_R[dayStemNR] || '에너지 충돌형';
+    const kisinElNR = _sdFull?.yongshin?.kisu || '미확인';
+    openRows.push({ label:'소진 관계 유형', text: nemesisTypeR });
+    openRows.push({ label:'기신 충돌 구조', text: kisinElNR + ' 기신 × ' + (_yongsin||'용신') + ' 용신 충돌' });
+    blurRows.push({ label:nemesisTypeR + '와의 충돌 메커니즘', text: '이 유형이 내 에너지를 소진시키는 사주 구조적 이유' });
+    blurRows.push({ label:'에너지 보호 경계 전략', text: '관계를 끊지 않고도 소진을 막는 실전 3가지' });
 
   } else if (_type === 'love_history') {
-    const partnerStarLH2 = _profile?.gender === 'F' ? '관성' : '재성';
-    openRows.push({ label:'파트너 별', text: partnerStarLH2 + ' — 연애 에너지 구조' });
-    if (ipd?.연애패턴) openRows.push({ label:'연애 패턴', text: ipd.연애패턴 });
-    blurRows.push({ label:'흑역사 핵심 패턴', text: '반복되는 연애 실패의 사주 구조적 원인' });
-    blurRows.push({ label:'패턴 탈출 전략', text: '이번엔 다르게 하기 위한 구체적 방법' });
+    const partnerStarLHR = _profile?.gender === 'F' ? '관성' : '재성';
+    const dayStemLHR = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+    const LH_PAT_R = {甲:'끌려도 결국 통제 갈등',乙:'맞춰주다 지쳐서 떠남',丙:'강렬하게 시작, 빠르게 식음',丁:'감정 과몰입으로 집착',戊:'무뚝뚝해서 오해 누적',己:'걱정하다 질리게 만듦',庚:'원칙 고집으로 마찰',辛:'예민해서 사소한 것에 상처',壬:'자유 추구로 결속력 약화',癸:'감정 기복으로 상대 지침'};
+    const lhPatternR = LH_PAT_R[dayStemLHR] || '반복적 관계 패턴';
+    openRows.push({ label:'연애 흑역사 패턴', text: lhPatternR });
+    openRows.push({ label:'파트너 별 · 연애 구조', text: partnerStarLHR + ' × ' + (_singang||'미확인') });
+    blurRows.push({ label:'왜 같은 유형에게 끌리는가', text: '기신 오행과 파트너 별 충돌 구조 — 끌림의 사주적 이유' });
+    blurRows.push({ label:'흑역사를 끊는 실전 전략', text: '패턴을 인식하고 이번엔 다르게 하는 3가지 방법' });
 
   } else if (_type === 'era') {
-    const napeumEraR = _napeumData?.일주납음?.납음 || '';
-    if (napeumEraR) openRows.push({ label:'납음 — 시대의 기운', text: napeumEraR });
-    if (ipd?.성격) openRows.push({ label:'일주 기질', text: ipd.성격 });
-    blurRows.push({ label:'내가 태어났어야 할 시대', text: '납음·일주·격국이 가리키는 시대와 역할' });
-    blurRows.push({ label:'현대 활용법', text: '그 시대 에너지를 현대에서 발휘하는 방법' });
+    const dayStemEraR = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+    const ERA_MAP_R = {甲:'삼국·고려 — 무사·선비의 시대',乙:'조선 중기 — 학문과 예술의 시대',丙:'삼국 — 전쟁과 개척의 시대',丁:'고려 말 — 변혁과 전환의 시대',戊:'고조선·고대 — 왕조 건설의 시대',己:'조선 후기 — 민중과 실학의 시대',庚:'근대 개화기 — 변혁과 도전의 시대',辛:'조선 — 예술·공예·세공의 시대',壬:'대항해·탐험의 시대',癸:'근현대 — 감수성·예술의 시대'};
+    const eraTypeR = ERA_MAP_R[dayStemEraR] || '시대를 초월한 에너지';
+    const napeumEraR2 = _napeumData?.일주납음?.납음 || '';
+    const napeumImgEraR = _napeumData?.일주납음?.이미지 || '';
+    openRows.push({ label:'당신의 시대', text: eraTypeR });
+    if (napeumEraR2) openRows.push({ label:'납음 · 시대 에너지', text: napeumEraR2 + (napeumImgEraR ? ' · ' + napeumImgEraR : '') });
+    blurRows.push({ label:'그 시대의 신분과 역할', text: '일주·격국·납음으로 본 그 시대에서의 삶의 방식' });
+    blurRows.push({ label:'현대에서 그 에너지 활용법', text: '시대 에너지를 지금 이 시대에서 가장 잘 쓰는 방법' });
 
   } else if (_type === 'hidden_talent') {
-    if (ipd?.성격) openRows.push({ label:'일주 기질', text: ipd.성격 });
-    const htYsR = _yongsin || '미확인';
-    openRows.push({ label:'용신 에너지', text: htYsR + ' — 발현 조건' });
-    blurRows.push({ label:'숨겨진 재능 분야', text: '희신 오행이 숨겨놓은 잠재 능력의 정체' });
-    blurRows.push({ label:'재능 폭발 조건', text: '어떤 환경과 시기에 이 재능이 터지는지' });
+    const dayStemHTR = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+    const HT_MAP_R = {甲:'리더십·전략 기획',乙:'섬세한 예술·치유',丙:'강연·퍼포먼스',丁:'상담·감정 코칭',戊:'부동산·자산 관리',己:'세밀한 분석·연구',庚:'협상·중재',辛:'미적 감각·디자인',壬:'직관·전략',癸:'감수성·창작'};
+    const htTalentR = HT_MAP_R[dayStemHTR] || '잠재된 특별한 능력';
+    const htYsR2 = _yongsin || '미확인';
+    openRows.push({ label:'숨겨진 재능 분야', text: htTalentR });
+    openRows.push({ label:'용신 · 발현 에너지', text: htYsR2 + ' × ' + (_singang||'미확인') });
+    blurRows.push({ label:htTalentR + ' — 왜 지금껏 몰랐나', text: '이 재능이 발현되지 않은 사주 구조적 이유' });
+    blurRows.push({ label:'재능이 폭발하는 시기와 조건', text: '이 능력이 가장 강하게 터지는 대운·환경 분석' });
 
   } else if (_type === 'totem') {
-    const napeumTotemR = _napeumData?.일주납음?.납음 || '';
-    if (napeumTotemR) openRows.push({ label:'납음 에너지', text: napeumTotemR });
-    if (ipd?.성격) openRows.push({ label:'일주 기질', text: ipd.성격 });
-    blurRows.push({ label:'나의 수호 동물', text: '오행·납음이 가리키는 수호 동물과 그 상징' });
-    blurRows.push({ label:'수호 동물 활용법', text: '수호 동물 에너지를 일상에서 강화하는 법' });
+    const ohElR = _sdFull?.five_pct;
+    const maxElR = ohElR ? Object.entries(ohElR).sort((a,b)=>b[1]-a[1])[0]?.[0] : '';
+    const TOTEM_MAP_R = {목:'나무늑대',화:'붉은 봉황',토:'황금 곰',금:'백호',수:'흑룡'};
+    const napeumOhTR = _napeumData?.일주납음?.오행 || '';
+    const totemElR = napeumOhTR || maxElR || '';
+    const totemAnimalR = TOTEM_MAP_R[totemElR] || '사주 수호 동물';
+    const napeumTotemR2 = _napeumData?.일주납음?.납음 || '';
+    openRows.push({ label:'수호 동물', text: totemAnimalR + (totemElR ? ' (' + totemElR + ' 오행)' : '') });
+    if (napeumTotemR2) openRows.push({ label:'납음 · 수호 에너지', text: napeumTotemR2 + ' — ' + (_singang||'미확인') });
+    blurRows.push({ label:totemAnimalR + '이 지켜주는 영역', text: '이 동물이 특별히 수호하는 삶의 영역과 에너지' });
+    blurRows.push({ label:'수호 동물 에너지 강화법', text: '색상·방위·행동으로 수호 에너지를 일상에서 활성화하는 법' });
 
   } else {
     if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
@@ -7216,8 +7280,13 @@ async function generateNemesisReport() {
   const fivePctStr = fivePctToKor(_sdFull?.five_pct);
   const tenGodsStr = _sdFull?.ten_gods_map ? Object.entries(_sdFull.ten_gods_map).map(([k,v])=>`${k}:${v}`).join(', ') : '미확인';
   const kisinEl = _sdFull?.yongshin?.kisu || '미확인';
+  const dayStemNg = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+  const NEMESIS_TYPE_G = {甲:'나를 통제하려는 사람',乙:'유리한 쪽으로 흐르는 사람',丙:'지나치게 밀어붙이는 사람',丁:'감정으로 조종하는 사람',戊:'무감각하게 압박하는 사람',己:'소극적으로 방해하는 사람',庚:'원칙을 무기로 쓰는 사람',辛:'예민하게 상처주는 사람',壬:'종잡을 수 없는 사람',癸:'감정 기복이 심한 사람'};
+  const nemesisTypeG = NEMESIS_TYPE_G[dayStemNg] || '에너지 충돌형';
 
   const promptA = `${profileStr}
+이 사주의 소진 관계 진단: "${nemesisTypeG}" (기신 ${kisinEl} × 일간 ${_ilju||''} 기반)
+
 사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})
 오행 분포: ${fivePctStr}
 신강도: ${_singang||'미확인'} / 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal} / 기신: ${kisinEl}
@@ -7266,6 +7335,9 @@ async function generateLoveHistoryReport() {
     ? '여성 사주입니다. 관성(정관·편관)이 남성·파트너를 상징합니다.'
     : '남성 사주입니다. 재성(정재·편재)이 여성·파트너를 상징합니다.';
   const kisinEl = _sdFull?.yongshin?.kisu || '미확인';
+  const dayStemLHg = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+  const LH_PAT_G = {甲:'끌려도 결국 통제 갈등',乙:'맞춰주다 지쳐서 떠남',丙:'강렬하게 시작, 빠르게 식음',丁:'감정 과몰입으로 집착',戊:'무뚝뚝해서 오해 누적',己:'걱정하다 질리게 만듦',庚:'원칙 고집으로 마찰',辛:'예민해서 사소한 것에 상처',壬:'자유 추구로 결속력 약화',癸:'감정 기복으로 상대 지침'};
+  const lhPatternG = LH_PAT_G[dayStemLHg] || '반복적 관계 패턴';
 
   const loveHistSys = `당신은 사주명리로 연애 패턴을 분석하는 전문가입니다.
 핵심 방식:
@@ -7276,6 +7348,8 @@ async function generateLoveHistoryReport() {
 - #헤더 금지, **볼드**는 핵심 키워드 3~5개`;
 
   const promptA = `${profileStr}
+이 사주의 연애 흑역사 패턴 진단: "${lhPatternG}" (일간 ${_ilju||''} 기반)
+
 사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})
 오행 분포: ${fivePctStr}
 신강도: ${_singang||'미확인'} / 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal} / 기신: ${kisinEl}
@@ -7373,8 +7447,13 @@ async function generateHiddenTalentReport() {
   const tenGodsStr = _sdFull?.ten_gods_map ? Object.entries(_sdFull.ten_gods_map).map(([k,v])=>`${k}:${v}`).join(', ') : '미확인';
   const napeumName = _napeumData?.일주납음?.납음 || '미확인';
   const napeumOh   = _napeumData?.일주납음?.오행 || '미확인';
+  const dayStemHTg = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
+  const HT_MAP_G = {甲:'리더십·전략 기획',乙:'섬세한 예술·치유',丙:'강연·퍼포먼스',丁:'상담·감정 코칭',戊:'부동산·자산 관리',己:'세밀한 분석·연구',庚:'협상·중재',辛:'미적 감각·디자인',壬:'직관·전략',癸:'감수성·창작'};
+  const htTalentG = HT_MAP_G[dayStemHTg] || '잠재된 특별한 능력';
 
   const promptA = `${profileStr}
+이 사주의 숨겨진 재능 진단: "${htTalentG}" (일간 ${_ilju||''} + 용신 ${ysFinal} 기반)
+
 사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})
 오행 분포: ${fivePctStr}
 신강도: ${_singang||'미확인'} / 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal}
