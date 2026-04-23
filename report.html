@@ -973,9 +973,9 @@ const TYPE_CONFIG = {
     desc: '납음 오행과 일주·신살이 가리키는 전생의 정체, 삶의 방식, 죽음, 이번 생에 풀어야 할 카르마 미션' },
   soulmate:     { title: '운명의 상대방 유형', orb: 400, emoji: '<i class="pi pi-heart"></i>', focus: '내 사주가 끌리는 사람 유형 — 이상형 사주 프로필, 관계 패턴, 나를 성장시키는 인연',
     desc: '관성·일주·십신 분포로 읽어낸 "내 사주가 진짜 끌리는 사람"의 프로필 — 이상형 유형, 반복되는 관계 패턴, 최적의 파트너 기질' },
-  saju_poem:    { title: '사주 한 줄 시', orb: 200, emoji: '<i class="pi pi-sparkle"></i>', focus: '이 사주를 시적 문장 한 줄로 압축 — SNS 공유용 감성 카드',
-    desc: '오행·일주·격국의 에너지를 시 한 줄로 압축합니다. 당신의 사주가 가진 아름다움과 방향을 가장 짧고 깊게 담아낸 문장' },
-  life_mission: { title: '이번 생 미션', orb: 400, emoji: '<i class="pi pi-star"></i>', focus: '이 사주가 이번 생에 해결해야 할 과제 — 자기계발+운세 교차 분석',
+  saju_poem:    { title: '사주 한 줄 시', orb: 200, emoji: '<i class="pi pi-book"></i>', focus: '이 사주를 시적 언어로 — 일간·납음·격국을 한 편의 이야기로 읽다',
+    desc: '오행·일주·격국의 에너지를 시적 언어로 풀어냅니다. 당신의 사주가 가진 아름다움과 방향을 감성 언어로 담아낸 리포트' },
+  life_mission: { title: '이번 생 미션', orb: 400, emoji: '<i class="pi pi-send"></i>', focus: '이 사주가 이번 생에 해결해야 할 과제 — 자기계발+운세 교차 분석',
     desc: '격국·용신·십신 구조로 읽어낸 이번 생의 핵심 과제 — 반드시 완수해야 할 미션, 방해 요소, 달성 로드맵' }
 };
 
@@ -1003,9 +1003,9 @@ const TYPE_COLORS = {
   classic:      { main:'#7a2418', soft:'rgba(122,36,24,0.13)',   border:'rgba(122,36,24,0.38)' },
   guide:        { main:'#d81b60', soft:'rgba(216,27,96,0.13)',   border:'rgba(216,27,96,0.38)' },
   pastlife:     { main:'#4a1d96', soft:'rgba(74,29,150,0.13)',   border:'rgba(74,29,150,0.38)' },
-  soulmate:     { main:'#c2185b', soft:'rgba(194,24,91,0.12)',   border:'rgba(194,24,91,0.38)' },
-  saju_poem:    { main:'#6a1b9a', soft:'rgba(106,27,154,0.12)', border:'rgba(106,27,154,0.38)' },
-  life_mission: { main:'#00695c', soft:'rgba(0,105,92,0.12)',   border:'rgba(0,105,92,0.38)' }
+  soulmate:     { main:'#7a3a4a', soft:'rgba(122,58,74,0.12)',   border:'rgba(122,58,74,0.32)' },
+  saju_poem:    { main:'#4a3a6a', soft:'rgba(74,58,106,0.12)',  border:'rgba(74,58,106,0.32)' },
+  life_mission: { main:'#3a5a48', soft:'rgba(58,90,72,0.12)',   border:'rgba(58,90,72,0.32)' }
 };
 
 function applyTypeTheme() {
@@ -4407,19 +4407,19 @@ function renderCharVisual() {
     const smType = SOULMATE_TYPE[dayStemSM] || '나와 에너지가 맞는 사람';
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
       + '<div style="display:flex;gap:8px;">'
-      + '<div style="flex:1;background:rgba(194,24,91,0.08);border:1.5px solid rgba(194,24,91,0.3);border-radius:14px;padding:12px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#c2185b;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">파트너 별</div>'
-      + '<div style="font-size:20px;font-weight:900;color:#c2185b;line-height:1;">' + partnerStar + '</div>'
-      + '<div style="font-size:10px;color:#c2185b;opacity:0.6;margin-top:3px;">' + partnerVal + '</div>'
+      + '<div style="flex:1;background:rgba(122,58,74,0.09);border:1.5px solid rgba(122,58,74,0.28);border-radius:14px;padding:12px;text-align:center;">'
+      + '<div style="font-size:10px;font-weight:700;color:#7a3a4a;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">파트너 별</div>'
+      + '<div style="font-size:20px;font-weight:900;color:#7a3a4a;line-height:1;">' + partnerStar + '</div>'
+      + '<div style="font-size:10px;color:#7a3a4a;opacity:0.6;margin-top:3px;">' + partnerVal + '</div>'
       + '</div>'
-      + '<div style="flex:2;background:rgba(194,24,91,0.05);border:1px solid rgba(194,24,91,0.18);border-radius:14px;padding:12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#c2185b;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">이상형 유형</div>'
-      + '<div style="font-size:11px;font-weight:700;color:#8b1a4a;line-height:1.5;">' + smType + '</div>'
+      + '<div style="flex:2;background:rgba(122,58,74,0.05);border:1px solid rgba(122,58,74,0.16);border-radius:14px;padding:12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#7a3a4a;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">이상형 유형</div>'
+      + '<div style="font-size:11px;font-weight:700;color:#5a2030;line-height:1.5;">' + smType + '</div>'
       + '</div>'
       + '</div>'
-      + '<div style="background:rgba(194,24,91,0.04);border:1px solid rgba(194,24,91,0.14);border-radius:12px;padding:10px 12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#c2185b;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">사주 강약</div>'
-      + '<div style="font-size:12px;font-weight:700;color:#8b1a4a;">' + (_singang||'미확인') + ' — 관계 에너지 구조</div>'
+      + '<div style="background:rgba(122,58,74,0.04);border:1px solid rgba(122,58,74,0.13);border-radius:12px;padding:10px 12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#7a3a4a;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">사주 강약</div>'
+      + '<div style="font-size:12px;font-weight:700;color:#5a2030;">' + (_singang||'미확인') + ' — 관계 에너지 구조</div>'
       + '</div>'
       + miniBubbleBlock
       + '</div>';
@@ -4428,21 +4428,21 @@ function renderCharVisual() {
     const napeumPoem = _napeumData?.일주납음?.납음 || '';
     const napeumOhPoem = _napeumData?.일주납음?.오행 || '';
     const napeumImgPoem = _napeumData?.일주납음?.이미지 || '자연의 언어';
-    const poemColMap = {목:'#2d6a4f',화:'#9b2335',토:'#7a5c2e',금:'#5a7a9b',수:'#1a3a5c'};
-    const poemCol = poemColMap[napeumOhPoem] || '#4a4a7a';
-    const poemBgRgb = napeumOhPoem==='목'?'45,106,79':napeumOhPoem==='화'?'155,35,53':napeumOhPoem==='토'?'122,92,46':napeumOhPoem==='금'?'90,122,155':'26,58,92';
+    const poemColMap = {목:'#3a5a38',화:'#6a3028',토:'#6a5030',금:'#3a4a5a',수:'#2a3a5a'};
+    const poemCol = poemColMap[napeumOhPoem] || '#4a3a6a';
+    const poemBgRgb = napeumOhPoem==='목'?'58,90,56':napeumOhPoem==='화'?'106,48,40':napeumOhPoem==='토'?'106,80,48':napeumOhPoem==='금'?'58,74,90':'42,58,90';
     const STEM_NATURE = {甲:'거대한 나무',乙:'들풀과 넝쿨',丙:'태양',丁:'촛불',戊:'높은 산',己:'들판',庚:'강한 바위',辛:'다듬은 보석',壬:'대하(大河)',癸:'안개와 이슬'};
     const dayStemPoem = (_sdFull?.summary?.pillars?.day||'')[0] || (_ilju||'')[0] || '';
     const stemNature = STEM_NATURE[dayStemPoem] || '자연의 기운';
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
       + '<div style="display:flex;gap:8px;">'
-      + '<div style="flex:1;background:rgba(' + poemBgRgb + ',0.08);border:1.5px solid ' + poemCol + ';border-radius:14px;padding:12px;text-align:center;">'
+      + '<div style="flex:1;background:rgba(' + poemBgRgb + ',0.09);border:1.5px solid rgba(' + poemBgRgb + ',0.32);border-radius:14px;padding:12px;text-align:center;">'
       + '<div style="font-size:10px;font-weight:700;color:' + poemCol + ';opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">일간의 자연</div>'
       + '<div style="font-size:14px;font-weight:900;color:' + poemCol + ';line-height:1.3;">' + stemNature + '</div>'
       + '</div>'
-      + '<div style="flex:2;background:rgba(106,27,154,0.05);border:1px solid rgba(106,27,154,0.18);border-radius:14px;padding:12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#6a1b9a;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">시의 배경 — 납음</div>'
-      + '<div style="font-size:11px;font-weight:700;color:#4a0a6a;line-height:1.5;">' + (napeumPoem||'?') + (napeumImgPoem ? ' · ' + napeumImgPoem : '') + '</div>'
+      + '<div style="flex:2;background:rgba(74,58,106,0.05);border:1px solid rgba(74,58,106,0.16);border-radius:14px;padding:12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#4a3a6a;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">시의 배경 — 납음</div>'
+      + '<div style="font-size:11px;font-weight:700;color:#3a2a50;line-height:1.5;">' + (napeumPoem||'?') + (napeumImgPoem ? ' · ' + napeumImgPoem : '') + '</div>'
       + '</div>'
       + '</div>'
       + miniBubbleBlock
@@ -4457,18 +4457,18 @@ function renderCharVisual() {
     const missionKw = missionKey ? MISSION_MAP[missionKey] : '나만의 방향으로';
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
       + '<div style="display:flex;gap:8px;">'
-      + '<div style="flex:1;background:rgba(0,105,92,0.08);border:1.5px solid rgba(0,105,92,0.3);border-radius:14px;padding:12px;text-align:center;">'
-      + '<div style="font-size:10px;font-weight:700;color:#00695c;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">격국</div>'
-      + '<div style="font-size:13px;font-weight:900;color:#00695c;line-height:1.3;">' + missionGkV + '</div>'
+      + '<div style="flex:1;background:rgba(58,90,72,0.09);border:1.5px solid rgba(58,90,72,0.28);border-radius:14px;padding:12px;text-align:center;">'
+      + '<div style="font-size:10px;font-weight:700;color:#3a5a48;opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">격국</div>'
+      + '<div style="font-size:13px;font-weight:900;color:#3a5a48;line-height:1.3;">' + missionGkV + '</div>'
       + '</div>'
-      + '<div style="flex:2;background:rgba(0,105,92,0.05);border:1px solid rgba(0,105,92,0.18);border-radius:14px;padding:12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#00695c;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">미션 키워드</div>'
-      + '<div style="font-size:12px;font-weight:900;color:#00463c;line-height:1.4;">' + missionKw + '</div>'
+      + '<div style="flex:2;background:rgba(58,90,72,0.05);border:1px solid rgba(58,90,72,0.16);border-radius:14px;padding:12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#3a5a48;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">미션 키워드</div>'
+      + '<div style="font-size:12px;font-weight:900;color:#263d30;line-height:1.4;">' + missionKw + '</div>'
       + '</div>'
       + '</div>'
-      + '<div style="background:rgba(0,105,92,0.04);border:1px solid rgba(0,105,92,0.14);border-radius:12px;padding:10px 12px;">'
-      + '<div style="font-size:9px;font-weight:700;color:#00695c;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">용신 · 에너지 방향</div>'
-      + '<div style="font-size:12px;font-weight:700;color:#00463c;">' + missionYsV + ' — ' + missionSgV + '</div>'
+      + '<div style="background:rgba(58,90,72,0.04);border:1px solid rgba(58,90,72,0.13);border-radius:12px;padding:10px 12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#3a5a48;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">용신 · 에너지 방향</div>'
+      + '<div style="font-size:12px;font-weight:700;color:#263d30;">' + missionYsV + ' — ' + missionSgV + '</div>'
       + '</div>'
       + miniBubbleBlock
       + '</div>';
