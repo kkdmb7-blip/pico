@@ -681,6 +681,33 @@
       showBubble('여기 있어요 👀', 2000);
     }, 1500);
     scheduleMove();
+    startIdleExpTicker();
+  }
+
+  // ── 화면 켜둔 시간만큼 EXP 소량 획득 (60초마다 +1) ──
+  function startIdleExpTicker() {
+    if (!IS_PICO) return;
+    setInterval(function() {
+      if (document.visibilityState !== 'visible') return;
+      var raw = getPetState();
+      var elem = getElement() || raw.element;
+      if (!elem) return;
+      if (!raw.all) raw.all = {};
+      if (!raw.all[elem]) raw.all[elem] = {};
+      var s = raw.all[elem];
+      s.exp = (s.exp || 0) + 1;
+      var needed = Math.pow(s.level || 1, 2) * 100;
+      if (s.exp >= needed) { s.exp -= needed; s.level = (s.level || 1) + 1; }
+      raw.element = elem;
+      try { localStorage.setItem(PET_KEY, JSON.stringify(raw)); } catch(e) {}
+      var lvEl = document.getElementById('yongsin-float-lv');
+      var fillEl = document.getElementById('yongsin-float-efill');
+      if (lvEl) lvEl.textContent = 'Lv.' + (s.level || 1);
+      if (fillEl) {
+        var pct = Math.min(100, Math.round(s.exp / needed * 100));
+        fillEl.style.width = pct + '%';
+      }
+    }, 60000);
   }
 
   // ── 실행 ──

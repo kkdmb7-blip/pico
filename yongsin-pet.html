@@ -1882,6 +1882,19 @@ render();
 renderMission();
 renderSlotTabs();
 
+// 화면 켜둔 시간만큼 EXP 소량 획득 (60초마다 +1)
+setInterval(function() {
+  if (document.visibilityState !== 'visible') return;
+  state.exp = (state.exp || 0) + 1;
+  var needed = Math.pow(state.level || 1, 2) * 100;
+  if (state.exp >= needed) {
+    state.exp -= needed;
+    state.level = (state.level || 1) + 1;
+  }
+  saveState();
+  render();
+}, 60000);
+
 // 서버에서 더 최신 데이터 로드 (현재 오행 레벨 기준 높은 쪽 우선)
 loadFromServer(function(serverData) {
   if (!serverData) return;

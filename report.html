@@ -13,6 +13,7 @@
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
+<script src="saju-formula.js"></script>
 <style>
 :root {
   --bg: #f4ede0;
@@ -3682,72 +3683,24 @@ function renderCharVisual() {
 
   } else if (_type === 'child_career') {
     // 바이럴 패턴: 시적 헤드라인 + 빅% 버블 + 8축 레이더 + 3카드 잠금
-    // 적천수(滴天髓) 천간론 기반 비유 — 명리학 정통 표현
-    const STEM_METAPHOR_C = {
-      갑:'뿌리 깊은 큰 나무', 을:'유연하게 자라는 풀잎',
-      병:'한낮의 태양',       정:'은은한 등촉',
-      무:'드넓은 산과 들',     기:'비옥한 정원의 흙',
-      경:'잘 벼린 강철검',     신:'정련된 옥(玉)',
-      임:'바다로 흐르는 큰 강', 계:'촉촉한 새벽 이슬'
-    };
+    // 점수 공식 단일 출처: saju-formula.js (SajuFormula 매트릭스 모듈)
+    const sfC = window.SajuFormula;
     const iljuStemC = (_ilju||'')[0];
-    const metaphorC = STEM_METAPHOR_C[iljuStemC] || '특별한 기운';
+    const metaphorC = (sfC && sfC.STEM_METAPHOR[iljuStemC]) || '특별한 기운';
     const nameKwC = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + _profile.name + '</span>님 안의' : '아이 안의';
 
-    // 사주 데이터: 오행 % + 십신 카운트 + 일간 오행
-    const ohScoreC = {목:0,화:0,토:0,금:0,수:0};
-    ohList.forEach(function(p){ ohScoreC[p[0]] = Number(p[1])||0; });
-    const tgmC = _sdFull?.ten_gods_map || {};
-    const tgValsC = Object.values(tgmC).filter(Boolean);
-    const sikCntC = tgValsC.filter(function(v){return v.includes('식신')||v.includes('상관');}).length;
-    const inCntC  = tgValsC.filter(function(v){return v.includes('정인')||v.includes('편인');}).length;
-    const gwanCntC= tgValsC.filter(function(v){return v.includes('정관')||v.includes('편관');}).length;
-    const jaeCntC = tgValsC.filter(function(v){return v.includes('정재')||v.includes('편재');}).length;
-    const bigeCntC= tgValsC.filter(function(v){return v.includes('비견')||v.includes('겁재');}).length;
-    const STEM2OH_C = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
-    const dayStemC = _sdFull?.summary?.pillars?.day?.stem || iljuStemC || '';
-    const dayOhC = STEM2OH_C[dayStemC] || '';
+    // 사주 컨텍스트: 오행% + 십신 카운트 + 일간 오행
+    const ctxC = sfC.fromSajuData(_sdFull, ohList);
 
-    // 진로 분야 7종 - 사주 명리 매핑 정확도 강화
-    function calcFieldC(ohW, sigW, dayBoost) {
-      let oh = 0; for (const k in ohW) oh += (ohScoreC[k]||0) * ohW[k];
-      const sig = sigW || 0;
-      return oh * 0.55 + sig * 5.5 + (dayBoost||0);
-    }
-    const fieldsRawC = [
-      {name:'연구·학문',  score: calcFieldC({수:0.7, 금:0.3}, inCntC*1.2 + sikCntC*0.3, dayOhC==='수'?14:dayOhC==='금'?6:0), color:'#1a5fa0', bg:'#6db4ff'},
-      {name:'예술·창작',  score: calcFieldC({목:0.5, 화:0.5}, sikCntC*1.4 + inCntC*0.3, dayOhC==='화'?14:dayOhC==='목'?10:0), color:'#c2236a', bg:'#f489c4'},
-      {name:'IT·공학',    score: calcFieldC({금:0.6, 수:0.4}, gwanCntC*0.8 + sikCntC*0.4, dayOhC==='금'?14:dayOhC==='수'?6:0), color:'#5a6a7a', bg:'#8aa0b8'},
-      {name:'경영·리더십', score: calcFieldC({목:0.4, 금:0.3, 화:0.2}, gwanCntC*1.0 + jaeCntC*0.8 + bigeCntC*0.5, dayOhC==='목'?10:dayOhC==='금'?6:0), color:'#7a4e00', bg:'#f4d860'},
-      {name:'교육·복지',  score: calcFieldC({토:0.5, 화:0.3}, inCntC*1.0 + sikCntC*0.5, dayOhC==='토'?14:dayOhC==='화'?6:0), color:'#3d7a3a', bg:'#7ad48f'},
-      {name:'미디어·표현', score: calcFieldC({화:0.7, 목:0.2}, sikCntC*1.5, dayOhC==='화'?12:dayOhC==='목'?5:0), color:'#b84c1a', bg:'#f4a062'},
-      {name:'의료·치유',  score: calcFieldC({수:0.4, 토:0.4}, inCntC*0.9 + sikCntC*0.4, dayOhC==='수'?10:dayOhC==='토'?8:0), color:'#1a6a30', bg:'#7ad4a0'}
-    ];
-    // TOP-heavy 분포: ^2.5 거듭제곱 + 1위만 1.25x raw 부스트 → 1위 임팩트 강화
-    const POW_C = 2.5, TOP_BOOST_C = 1.25;
-    const _sortedIdxC = fieldsRawC.map(function(f,i){return {i:i, s:f.score};}).sort(function(a,b){return b.s-a.s;});
-    const _topIdxC = _sortedIdxC[0].i;
-    const _adjScoresC = fieldsRawC.map(function(f,i){return i===_topIdxC ? f.score*TOP_BOOST_C : f.score;});
-    const sumPowC = _adjScoresC.reduce(function(s,sc){return s+Math.pow(Math.max(1,sc), POW_C);}, 0) || 1;
-    const fieldsC = fieldsRawC.map(function(f,i){
-      const pw = Math.pow(Math.max(1, _adjScoresC[i]), POW_C);
-      return Object.assign({}, f, {pct: Math.max(2, Math.round(pw/sumPowC*100))});
-    }).sort(function(a,b){return b.pct-a.pct;});
-    const top3C = fieldsC.slice(0,3);
+    // 진로 분야 점수 → TOP-heavy 분포 (^2.5 + 1위 1.25x)
+    const fieldsScoredC = sfC.scoreCareerFields(ctxC);
+    const fieldsC = sfC.distributeTopHeavy(fieldsScoredC, { pow: 2.5, topBoost: 1.25, minPct: 2 });
+    const top3C = fieldsC.slice(0, 3);
 
-    // 8축 재능 - 일간 오행 보정 추가
-    const axesC = [
-      {label:'언어',     v: ohScoreC.수*0.5 + ohScoreC.화*0.2 + inCntC*5 + (dayOhC==='수'?12:0)},
-      {label:'수리·논리', v: ohScoreC.금*0.6 + ohScoreC.수*0.3 + (dayOhC==='금'?12:0)},
-      {label:'대인관계', v: ohScoreC.화*0.5 + ohScoreC.토*0.3 + gwanCntC*4 + (dayOhC==='화'?10:0)},
-      {label:'자연친화', v: ohScoreC.목*0.6 + ohScoreC.토*0.3 + (dayOhC==='목'?12:dayOhC==='토'?6:0)},
-      {label:'음악',     v: ohScoreC.화*0.4 + ohScoreC.수*0.3 + sikCntC*4 + (dayOhC==='화'?8:0)},
-      {label:'공감',     v: ohScoreC.수*0.4 + ohScoreC.토*0.4 + inCntC*4 + (dayOhC==='수'?8:dayOhC==='토'?6:0)},
-      {label:'손재능',   v: ohScoreC.토*0.4 + ohScoreC.금*0.4 + sikCntC*3 + (dayOhC==='금'?8:0)},
-      {label:'신체운동', v: ohScoreC.목*0.3 + ohScoreC.화*0.25 + ohScoreC.금*0.35 + bigeCntC*4 + gwanCntC*3 + sikCntC*2 + (dayOhC==='금'?10:dayOhC==='목'?8:dayOhC==='화'?6:0)}
-    ];
-    const axMaxC = Math.max.apply(null, axesC.map(function(a){return a.v;})) || 1;
-    axesC.forEach(function(a){ a.norm = Math.max(0.22, Math.min(1, a.v/axMaxC)); });
+    // 8축 재능 점수 → 정규화 (레이더용)
+    const axesScoredC = sfC.scoreTalentAxes(ctxC);
+    const axesNormC = sfC.normalizeAxis(axesScoredC, { min: 0.22 });
+    const axesC = axesNormC.map(function(a){ return { label: a.label, v: a.score, norm: a.norm }; });
 
     const RC=120, RR=88;
     const radarPtsC = axesC.map(function(a,i){
