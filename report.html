@@ -3469,7 +3469,7 @@ function renderCharVisual() {
     // 기질 리포트: 일주 카드 + 강약/용신 (아이콘 대신 색상 라인)
     const iljuDisp = _ilju || '—';
     const iljuLen = (iljuDisp||'').length;
-    const iljuFontSize = iljuLen >= 2 ? 22 : 28;
+    const iljuFontSize = iljuLen >= 2 ? 26 : 32;
     const iljuOh = ohList[0]?.[0];
     const iljuCol = OH_COLOR[iljuOh] || '#7a4e00';
     const iljuBg  = OH_BG[iljuOh]  || 'rgba(120,80,20,0.08)';
@@ -3477,10 +3477,9 @@ function renderCharVisual() {
     const yBg2 = OH_BG[yE] || 'rgba(120,80,20,0.08)';
     visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
       + '<div style="display:flex;align-items:stretch;gap:11px;">'
-      + '<div style="width:100px;height:100px;border-radius:22px;background:radial-gradient(circle at 30% 25%,' + iljuBg + ',' + iljuCol + '18);border:2.5px solid ' + iljuCol + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 20px ' + iljuCol + '35,inset 0 2px 6px rgba(255,255,255,0.4);position:relative;">'
-      + '<div style="position:absolute;top:-7px;right:-7px;background:' + iljuCol + ';color:#fff;font-size:8px;font-weight:900;padding:2px 7px;border-radius:8px;letter-spacing:0.5px;box-shadow:0 2px 6px ' + iljuCol + '70;">ILJU</div>'
-      + '<div style="font-size:' + iljuFontSize + 'px;font-weight:900;color:' + iljuCol + ';line-height:1;letter-spacing:-0.5px;">' + iljuDisp + '</div>'
-      + '<div style="font-size:9px;color:' + iljuCol + ';margin-top:6px;opacity:0.75;font-weight:800;letter-spacing:1px;">일주</div>'
+      + '<div style="width:100px;height:100px;border-radius:18px;background:' + iljuBg + ';border:1.8px solid ' + iljuCol + ';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">'
+      + '<div style="font-size:9px;color:' + iljuCol + ';opacity:0.7;font-weight:700;letter-spacing:1px;margin-bottom:3px;">일주</div>'
+      + '<div style="font-size:' + iljuFontSize + 'px;font-weight:900;color:' + iljuCol + ';line-height:1.1;letter-spacing:-0.5px;">' + iljuDisp + '</div>'
       + '</div>'
       + '<div style="flex:1;display:flex;flex-direction:column;gap:7px;">'
       + '<div style="background:linear-gradient(135deg,rgba(40,120,80,0.12),rgba(40,120,80,0.02));border-radius:11px;padding:10px 12px 10px 14px;border:1.3px solid rgba(40,120,80,0.3);border-left:4px solid #1a6030;">'
