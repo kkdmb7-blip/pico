@@ -430,25 +430,25 @@ nav {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
-  padding: 15px 24px;
-  border: 1px solid rgba(154,122,38,0.28);
+  padding: 16px 24px;
+  border: none;
   border-radius: 14px;
-  background: rgba(212,175,90,0.14);
-  color: #8a6b20;
-  font-size: 14.5px;
+  background: linear-gradient(135deg, #7a2418 0%, #9a4a1a 50%, #7a5a10 100%);
+  color: #fdf7e0;
+  font-size: 15px;
   font-weight: 800;
   font-family: var(--fn);
   cursor: pointer;
-  letter-spacing: -0.2px;
-  box-shadow: var(--shadow-soft);
-  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 18px rgba(122,36,24,0.28), inset 0 1px 0 rgba(255,240,200,0.18);
+  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
   position: relative;
   z-index: 1;
 }
-.btn-consult svg { flex-shrink: 0; }
-.btn-consult:hover { background: rgba(212,175,90,0.22); }
+.btn-consult svg { flex-shrink: 0; opacity: 0.9; }
+.btn-consult:hover { filter: brightness(1.08); box-shadow: 0 6px 22px rgba(122,36,24,0.35), inset 0 1px 0 rgba(255,240,200,0.22); }
 .btn-consult:active {
   transform: scale(0.97);
   box-shadow: var(--shadow-soft);
@@ -472,17 +472,17 @@ nav {
   color: var(--muted);
 }
 .btn-memox {
-  background: linear-gradient(135deg,#7b5ea7,#a07fd4);
-  border: none;
-  color: #fff;
+  background: rgba(123,94,167,0.13);
+  border: 1px solid rgba(123,94,167,0.30);
+  color: #7b5ea7;
   text-decoration: none;
-  box-shadow: 0 2px 12px rgba(123,94,167,0.25);
+  box-shadow: none;
 }
 .btn-share {
-  background: linear-gradient(135deg,#c9a84c,#b89048);
-  border: none;
-  color: #1a120a;
-  box-shadow: 0 2px 12px rgba(184,144,72,0.25);
+  background: rgba(254,229,0,0.40);
+  border: 1px solid rgba(254,229,0,0.60);
+  color: #7a6030;
+  box-shadow: none;
 }
 .orb-note {
   font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px;
@@ -3084,8 +3084,34 @@ function buildAccuracyLayerBlock() {
     return;
   }
 
-  // 그 외 22개 리포트: 항상 입력 모달부터 (만세력 포맷)
-  // 캐시: 직전에 같은 타입으로 입력한 프로필이 있으면 우선 채워서 노출 (수정/확정 가능)
+  // 새로고침 복원: sessionStorage에 프로필 캐시가 있으면 기존 리포트 DB 조회 후 복원
+  const _rfCacheKey = (_type === 'child_career') ? 'pico_child_profile' : ('pico_report_profile_' + _type);
+  const _rfCached = sessionStorage.getItem(_rfCacheKey);
+  if (_rfCached) {
+    try {
+      _profile = JSON.parse(_rfCached);
+      const _rfSb = getSb();
+      if (_rfSb) {
+        const { data: _rfData } = await _rfSb.from('reports')
+          .select('content, created_at')
+          .eq('user_id', _user.id)
+          .eq('report_type', _type)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (_rfData && Array.isArray(_rfData.content) && _rfData.content.length > 1) {
+          renderReport(_rfData.content.slice(0, -1), _rfData.created_at);
+          return;
+        }
+      }
+    } catch(e) {}
+    // DB 리포트 없음: 모달 없이 intro 바로 표시
+    document.getElementById('btnGenerate').style.display = 'none';
+    proceedAfterProfile();
+    return;
+  }
+
+  // 그 외 22개 리포트: 입력 모달부터
   document.getElementById('btnGenerate').style.display = 'none';
   openChildModal();
   renderIntro();
