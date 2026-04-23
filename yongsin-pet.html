@@ -1188,7 +1188,7 @@ function loadState() {
 
   try {
     var ys = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached');
-    if (!slotElements.slot1 && ys) {
+    if (!_pref && ys) {
       var _valid = ['wood','fire','earth','metal','water'];
       if (_valid.indexOf(ys) !== -1) {
         slotElements.slot1 = ys; state.element = ys;
