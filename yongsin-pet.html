@@ -1213,6 +1213,24 @@ function saveState() {
   _syncTimer = setTimeout(syncToServer, 1000);
 }
 
+var _EL_KOR = { wood:'목', fire:'화', earth:'토', metal:'금', water:'수' };
+async function syncPetElementToMemox(el) {
+  var uid = getCurrentUserId();
+  if (!uid || !el || !_EL_KOR[el]) return;
+  try {
+    var r = await fetch(SB_URL + '/rest/v1/chat_users?kakao_id=eq.' + encodeURIComponent(uid) + '&select=id&limit=1', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var users = await r.json();
+    if (!Array.isArray(users) || !users[0]) return;
+    await fetch(SB_URL + '/rest/v1/user_context?user_id=eq.' + encodeURIComponent(users[0].id), {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ saju_yongshin_primary: _EL_KOR[el] })
+    });
+  } catch(e) {}
+}
+
 function selectElement(el) {
   // 다른 슬롯에서 이미 사용 중인 원소 방지
   var otherSlot = activeSlot === 'slot1' ? 'slot2' : 'slot1';
@@ -1221,7 +1239,10 @@ function selectElement(el) {
     return;
   }
   // 사용자 직접 선택 → 별도 키에 영구 저장 (서버 동기화에 절대 덮어씌워지지 않음)
-  if (activeSlot === 'slot1') { try { localStorage.setItem('yongsin_pet_pref', el); } catch(e) {} }
+  if (activeSlot === 'slot1') {
+    try { localStorage.setItem('yongsin_pet_pref', el); } catch(e) {}
+    syncPetElementToMemox(el); // memox Supabase 동기화
+  }
   // 현재 오행 상태 저장
   if (state.element) {
     state.lastVisit = Date.now();
