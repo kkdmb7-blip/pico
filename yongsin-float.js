@@ -83,7 +83,7 @@
 
   var pet, bubble, wrapper;
   var currentPos = 0;
-  var moveTimer, hideTimer, bubbleTimer, fortuneInterval;
+  var moveTimer, hideTimer, bubbleTimer;
   var fortuneParts = null, fortunePartIdx = 0;
   var isHiding = false;
   var MOVE_TRANSITION = 'left 1.8s cubic-bezier(0.34,1.2,0.64,1), top 1.8s cubic-bezier(0.34,1.2,0.64,1)';
