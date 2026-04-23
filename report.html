@@ -971,6 +971,42 @@ const TYPE_CONFIG = {
     desc: '부모·배우자·친구·동료가 이 사람을 어떻게 대하면 좋을지 — 일간·십신·격국 데이터로 관계 매뉴얼 정리' }
 };
 
+const TYPE_COLORS = {
+  character:    { main:'#0e8f8a', soft:'rgba(14,143,138,0.14)',  border:'rgba(14,143,138,0.38)' },
+  money:        { main:'#b8860b', soft:'rgba(184,134,11,0.14)',  border:'rgba(184,134,11,0.38)' },
+  love:         { main:'#c2185b', soft:'rgba(194,24,91,0.13)',   border:'rgba(194,24,91,0.35)' },
+  daeun:        { main:'#6a3aa0', soft:'rgba(106,58,160,0.13)',  border:'rgba(106,58,160,0.38)' },
+  year:         { main:'#2e7d60', soft:'rgba(46,125,96,0.13)',   border:'rgba(46,125,96,0.35)' },
+  month:        { main:'#4a6b8a', soft:'rgba(74,107,138,0.13)',  border:'rgba(74,107,138,0.35)' },
+  yongsin:      { main:'#1e8e3e', soft:'rgba(30,142,62,0.14)',   border:'rgba(30,142,62,0.38)' },
+  vedic_full:   { main:'#d84315', soft:'rgba(216,67,21,0.12)',   border:'rgba(216,67,21,0.35)' },
+  astro_full:   { main:'#1a5fa0', soft:'rgba(26,95,160,0.12)',   border:'rgba(26,95,160,0.35)' },
+  ziwei_full:   { main:'#7a2a9a', soft:'rgba(122,42,154,0.13)',  border:'rgba(122,42,154,0.38)' },
+  triple:       { main:'#5e35b1', soft:'rgba(94,53,177,0.13)',   border:'rgba(94,53,177,0.38)' },
+  career_deep:  { main:'#00695c', soft:'rgba(0,105,92,0.13)',    border:'rgba(0,105,92,0.38)' },
+  child_career: { main:'#1976d2', soft:'rgba(25,118,210,0.13)',  border:'rgba(25,118,210,0.38)' },
+  summary:      { main:'#37474f', soft:'rgba(55,71,79,0.13)',    border:'rgba(55,71,79,0.35)' },
+  balance:      { main:'#ef6c00', soft:'rgba(239,108,0,0.13)',   border:'rgba(239,108,0,0.38)' },
+  sinsal:       { main:'#8e24aa', soft:'rgba(142,36,170,0.13)',  border:'rgba(142,36,170,0.35)' },
+  health:       { main:'#2e7d32', soft:'rgba(46,125,50,0.13)',   border:'rgba(46,125,50,0.35)' },
+  family:       { main:'#8d6e63', soft:'rgba(141,110,99,0.13)',  border:'rgba(141,110,99,0.38)' },
+  timing:       { main:'#455a64', soft:'rgba(69,90,100,0.13)',   border:'rgba(69,90,100,0.35)' },
+  wealth_timing:{ main:'#a67500', soft:'rgba(166,117,0,0.13)',   border:'rgba(166,117,0,0.38)' },
+  classic:      { main:'#7a2418', soft:'rgba(122,36,24,0.13)',   border:'rgba(122,36,24,0.38)' },
+  guide:        { main:'#d81b60', soft:'rgba(216,27,96,0.13)',   border:'rgba(216,27,96,0.38)' }
+};
+
+function applyTypeTheme() {
+  if (!_type) return;
+  const c = TYPE_COLORS[_type]; if (!c) return;
+  const badge = document.getElementById('reportBadge');
+  if (badge) badge.style.cssText = 'display:inline-block;background:' + c.soft + ';border:1px solid ' + c.border + ';color:' + c.main + ';font-size:11px;font-weight:800;letter-spacing:0.1em;padding:4px 12px;border-radius:20px;margin-bottom:12px;';
+  const header = document.querySelector('#stateReport .report-header');
+  if (header) header.style.borderLeft = '4px solid ' + c.main;
+  const title = document.getElementById('reportTitle');
+  if (title) title.style.color = c.main;
+}
+
 const TYPE_SECTIONS = {
   character: [
     { name: '핵심 기질 요약',           chars: 300 },
@@ -2098,6 +2134,7 @@ function showState(state) {
   document.getElementById('statePersonality').style.display = state === 'personality' ? 'block' : 'none';
   document.getElementById('stateDetail').style.display      = state === 'detail'      ? 'block' : 'none';
   document.getElementById('stateReport').style.display      = state === 'report'      ? 'block' : 'none';
+  if (state === 'report') { try { applyTypeTheme(); } catch(e){} }
 }
 function hideDetail() { showState('intro'); }
 
