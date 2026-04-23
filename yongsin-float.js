@@ -24,7 +24,8 @@
   var _overrideState = null;
 
   function getTodayStr() {
-    return new Date().toISOString().slice(0, 10);
+    // UTC+9 한국시간 기준 (pet.html의 todayStr()과 동일 방식)
+    return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
   }
 
   function getPetState() {
@@ -625,11 +626,17 @@
     setDream({ forDate: forDate, text: generateDreamText(), shown: false });
   }
   // 아침에 꿈 소비 + 보상 (+5 EXP, +3 happy). 반환: 꿈 텍스트 or null.
+  // 꿈이 아직 없어도 오늘자로 즉시 생성 (낮에만 접속하는 사용자 배려)
   function consumeDreamIfReady() {
     if (isSleepHour()) return null;
+    var today = getTodayStr();
     var d = getDream();
+    // 꿈이 없거나 오래됐으면 오늘자로 즉시 생성 (첫 방문 느낌으로)
+    if (!d || d.forDate !== today) {
+      setDream({ forDate: today, text: generateDreamText(), shown: false });
+      d = getDream();
+    }
     if (!d || d.shown) return null;
-    if (d.forDate !== getTodayStr()) return null;
     d.shown = true; setDream(d);
     try {
       var raw = getPetState();
@@ -808,7 +815,7 @@
     var sObj2 = getStreak();
     if (sObj2.count) lines.push('🔥 연속 출석: ' + sObj2.count + '/7일' + (sObj2.boxReady ? ' 🎁' : ''));
     if (state.activeTitle) lines.push('👑 칭호: ' + state.activeTitle);
-    lines.push('💡 화면 켜두면 EXP 조금씩 올라요');
+    lines.push('💡 꾹 눌러서 쓰다듬어 줄 수 있어요');
     showBubble(lines.join('\n'), 5500);
   }
 
@@ -1273,7 +1280,7 @@
       if (document.visibilityState !== 'visible') return;
       if (isBubbleOpen()) return;
       // 수면 중엔 말 걸지 않음 (자는 연출만 유지)
-      if (isSleepHour()) { setSleepVisual(true); return; }
+      if (isSleepHour()) { setSleepVisual(true); maybeFriendVisit(); return; }
       setSleepVisual(false);
       // 친구 고치 방문 이벤트 먼저 시도 (하루 1회)
       if (maybeFriendVisit()) return;

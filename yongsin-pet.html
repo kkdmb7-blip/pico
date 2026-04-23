@@ -2036,11 +2036,11 @@ function openFeedPicker() {
 
 // ── 가방/아이템 ──
 var ITEMS_DEF = {
-  '약초':   { icon: '🌿', desc: '상처난 마음을 치유' },
-  '별조각': { icon: '✨', desc: '밤하늘의 반짝임' },
-  '구슬':   { icon: '🔮', desc: '맑은 기운의 응축' },
-  '꽃씨앗': { icon: '🌱', desc: '새 생명을 품은 씨앗' },
-  '깃털':   { icon: '🪶', desc: '바람을 닮은 가벼움' }
+  '약초':   { icon: '🌿', desc: '사용 시 행복 +15 · 배고픔 +10',  use: function(){ state.happy=Math.min(100,state.happy+15); state.hunger=Math.min(100,state.hunger+10); } },
+  '별조각': { icon: '✨', desc: '사용 시 EXP +30',                  use: function(){ gainExp(30); } },
+  '구슬':   { icon: '🔮', desc: '사용 시 에너지 +30 · 행복 +10',   use: function(){ state.energy=Math.min(100,state.energy+30); state.happy=Math.min(100,state.happy+10); } },
+  '꽃씨앗': { icon: '🌱', desc: '사용 시 배고픔 +30 · EXP +10',    use: function(){ state.hunger=Math.min(100,state.hunger+30); gainExp(10); } },
+  '깃털':   { icon: '🪶', desc: '사용 시 행복 +25',                  use: function(){ state.happy=Math.min(100,state.happy+25); } }
 };
 function grantRandomItem() {
   var keys = Object.keys(ITEMS_DEF);
@@ -2063,7 +2063,10 @@ function openInventory() {
     rows += '<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid rgba(138,106,21,0.18);border-radius:12px;margin-bottom:8px;background:' + (n>0?'#fff':'rgba(255,255,255,0.4)') + ';opacity:' + (n>0?'1':'0.55') + ';">'
       + '<div style="font-size:22px;">' + it.icon + '</div>'
       + '<div style="flex:1;"><div style="font-size:14px;font-weight:700;color:#3a2a1a;">' + k + '</div><div style="font-size:11px;color:var(--muted);">' + it.desc + '</div></div>'
-      + '<div style="font-size:13px;font-weight:800;color:var(--gold);">×' + n + '</div>'
+      + '<div style="display:flex;align-items:center;gap:6px;">'
+      + '<span style="font-size:13px;font-weight:800;color:var(--gold);">×' + n + '</span>'
+      + (n > 0 ? '<button class="inv-use-btn" data-item="' + k + '" style="padding:4px 10px;border:none;border-radius:8px;background:var(--gold);color:#fff;font-size:11px;font-weight:700;cursor:pointer;">사용</button>' : '')
+      + '</div>'
       + '</div>';
   });
   m.innerHTML = '<div style="background:#f9f1de;border-radius:20px;padding:22px 20px;max-width:360px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">'
@@ -2074,7 +2077,16 @@ function openInventory() {
     + '</div>';
   document.body.appendChild(m);
   m.addEventListener('click', function(e) {
-    if (e.target === m || e.target.id === 'invClose') { m.style.display = 'none'; m.remove(); }
+    if (e.target === m || e.target.id === 'invClose') { m.remove(); return; }
+    var btn = e.target.closest('.inv-use-btn');
+    if (!btn) return;
+    var k = btn.getAttribute('data-item');
+    if (!state.items || !state.items[k] || state.items[k] <= 0) return;
+    ITEMS_DEF[k].use();
+    state.items[k]--;
+    saveState(); render();
+    m.remove();
+    showToast(ITEMS_DEF[k].icon + ' ' + k + ' 사용했어요!');
   });
 }
 
