@@ -434,25 +434,30 @@
     // 운세 파트가 진행 중이면 다음 파트로
     if (fortuneParts && fortunePartIdx < fortuneParts.length - 1) {
       fortunePartIdx++;
-      showBubble(fortuneParts[fortunePartIdx], 0);
+      showBubble(fortuneParts[fortunePartIdx], 5000);
       return;
     }
     fortuneParts = null; fortunePartIdx = 0;
 
     var mode = TAP_MODES[tapModeIdx % TAP_MODES.length]; tapModeIdx++;
     if (mode === 'fortune') {
-      showBubble('운세 읽는 중... ✨', 0);
+      showBubble('운세 읽는 중... ✨', 5000);
       fetchTodayAdvice(function(data) {
-        if (!data || !data.advice) { showBubble('오늘도 용신 기운을 잘 활용해요! 🌟', 0); return; }
+        if (!data || !data.advice) { showBubble('오늘도 용신 기운을 잘 활용해요! 🌟', 5000); return; }
         var sents = String(data.advice).split(/(?<=[.!?])\s+/).map(function(s){return s.trim();}).filter(Boolean);
         if (!sents.length) sents = [String(data.advice).trim()];
         var parts = [];
-        if (data.keyword) parts.push('✦ ' + data.keyword);
+        // 키워드는 첫 문장과 합쳐서 표시 (짧게 홀로 뜨지 않게)
+        if (data.keyword && sents.length) {
+          sents[0] = '✦ ' + data.keyword + '\n' + sents[0];
+        } else if (data.keyword) {
+          sents.push('✦ ' + data.keyword);
+        }
         parts = parts.concat(sents);
         if (data.lucky) parts.push('🍀 ' + data.lucky);
         fortuneParts = parts;
         fortunePartIdx = 0;
-        showBubble(parts[0], 0);
+        showBubble(parts[0], 5000);
       });
     } else if (mode === 'ilji_msg')   { showIljiMsg();
     } else if (mode === 'pet_status') { showPetStatus();
