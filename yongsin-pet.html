@@ -750,7 +750,7 @@ nav {
       <span class="btn-icon">🍚</span>먹이 주기
       <span class="btn-desc">밥·간식·영약 선택</span>
     </button>
-    <button class="action-btn btn-play"  onclick="doAction('play')">
+    <button class="action-btn btn-play" id="playBtn" onclick="doAction('play')">
       <span class="btn-icon"><i class="pi pi-bolt"></i></span>운세 보기
       <span class="btn-desc" id="playBtnDesc">하루 1회 · AI 맞춤조언</span>
     </button>
@@ -1926,6 +1926,17 @@ function renderMission() {
       btn.style.opacity = '';
     }
   });
+
+  // 운세 보기 버튼 — 오늘 이미 사용 시 비활성화
+  var playBtn = document.getElementById('playBtn');
+  var playDesc = document.getElementById('playBtnDesc');
+  if (playBtn && playDesc) {
+    var playDone = (state.dailyMission || {}).playDate === todayStr();
+    playBtn.disabled = playDone;
+    playBtn.style.opacity = playDone ? '0.45' : '';
+    playBtn.style.cursor = playDone ? 'not-allowed' : '';
+    playDesc.textContent = playDone ? '오늘 완료 ✓' : '하루 1회 · AI 맞춤조언';
+  }
 }
 
 function doMissionNav(id, url) {
