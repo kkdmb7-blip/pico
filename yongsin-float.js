@@ -404,7 +404,7 @@
   // 활동 신호 집계
   function collectActivitySignals() {
     var today = getTodayStr();
-    var sig = { pageCount: 0, visitedSaju: false, visitedChat: false, visitedReport: false, score: null };
+    var sig = { pageCount: 0, visitedSaju: false, visitedReport: false, score: null };
     try {
       var raw = localStorage.getItem('yongsin_visit_today');
       if (raw) {

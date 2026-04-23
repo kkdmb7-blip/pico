@@ -1422,6 +1422,7 @@ function render() {
 function renderDiary() {
   var list;
   try { list = JSON.parse(localStorage.getItem('yongsin_diary') || '[]'); } catch(e) { list = []; }
+  if (!Array.isArray(list)) list = [];
   var box = document.getElementById('diaryList');
   if (!box) return;
   if (!list.length) {
