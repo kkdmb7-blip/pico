@@ -968,7 +968,9 @@ const TYPE_CONFIG = {
   classic:    { title: '고전 명리 해석', orb: 600, emoji: '<i class="pi pi-book"></i>', focus: '적천수·자평진전·납음·조후 고전 원문 기반 해석',
     desc: '적천수 일간론·자평진전 격국론·납음·조후 고전 심층 해석' },
   guide:      { title: '이 사람 사용설명서', orb: 500, emoji: '<i class="pi pi-people"></i>', focus: '이 사주를 가진 사람을 대하는 법, 대화 스타일, 배려 포인트, 피해야 할 말·행동',
-    desc: '부모·배우자·친구·동료가 이 사람을 어떻게 대하면 좋을지 — 일간·십신·격국 데이터로 관계 매뉴얼 정리' }
+    desc: '부모·배우자·친구·동료가 이 사람을 어떻게 대하면 좋을지 — 일간·십신·격국 데이터로 관계 매뉴얼 정리' },
+  pastlife:   { title: '전생 분석', orb: 400, emoji: '<i class="pi pi-eye"></i>', focus: '납음·일주·신살·격국 기반 전생 정체·삶·카르마·이번 생 미션',
+    desc: '납음 오행과 일주·신살이 가리키는 전생의 정체, 삶의 방식, 죽음, 이번 생에 풀어야 할 카르마 미션' }
 };
 
 const TYPE_COLORS = {
@@ -993,7 +995,8 @@ const TYPE_COLORS = {
   timing:       { main:'#455a64', soft:'rgba(69,90,100,0.13)',   border:'rgba(69,90,100,0.35)' },
   wealth_timing:{ main:'#a67500', soft:'rgba(166,117,0,0.13)',   border:'rgba(166,117,0,0.38)' },
   classic:      { main:'#7a2418', soft:'rgba(122,36,24,0.13)',   border:'rgba(122,36,24,0.38)' },
-  guide:        { main:'#d81b60', soft:'rgba(216,27,96,0.13)',   border:'rgba(216,27,96,0.38)' }
+  guide:        { main:'#d81b60', soft:'rgba(216,27,96,0.13)',   border:'rgba(216,27,96,0.38)' },
+  pastlife:     { main:'#4a1d96', soft:'rgba(74,29,150,0.13)',   border:'rgba(74,29,150,0.38)' }
 };
 
 function applyTypeTheme() {
@@ -1151,6 +1154,13 @@ const TYPE_SECTIONS = {
     { name: '스트레스 받을 때·화났을 때 대처법',     chars: 500 },
     { name: '신뢰를 얻고 마음을 여는 방법',          chars: 500 },
     { name: '절대 피해야 할 말과 행동',              chars: 400 }
+  ],
+  pastlife: [
+    { name: '전생의 정체 — 누구였는가',              chars: 450 },
+    { name: '전생의 삶과 최후',                      chars: 500 },
+    { name: '이번 생에 가져온 재능과 상처',           chars: 450 },
+    { name: '전생 인연과 반복되는 관계 패턴',         chars: 450 },
+    { name: '이번 생 카르마 미션',                   chars: 400 }
   ]
 };
 
@@ -1955,6 +1965,40 @@ const TYPE_DETAIL = {
       '이 사람이 스트레스를 받거나 분노할 때 어떻게 반응하는지, 건드리면 폭발하는 지점은 어디인지, 어떻게 풀어줘야 빨리 회복되는지 대처법.',
       '이 사람의 신뢰를 얻는 방법, 시간을 들여야 할 부분, 빠르게 가까워지는 포인트, 감동하는 지점을 사주 구조 근거와 함께 제시합니다.',
       '관계를 깨뜨리는 특정 언행, 이 사람이 절대 못 참는 패턴, 장기적으로 쌓이면 터지는 지뢰 — 사주가 말해주는 절대 금기 리스트.'
+    ]
+  },
+  pastlife: {
+    emoji: '<i class="pi pi-eye"></i>',
+    subtitle: '납음·일주·신살이 말해주는 전생의 기억',
+    desc: '납음 오행(納音五行)과 일주(60갑자), 신살, 격국 데이터를 근거로 — 전생에서 누구였는지, 어떻게 살았는지, 이번 생에 무엇을 풀어야 하는지 읽어냅니다.',
+    recommend: [
+      '설명하기 어렵지만 반복되는 패턴이 궁금한 분',
+      '타고난 재능의 기원이 궁금한 분',
+      '인간관계에서 반복되는 끌림·거부감의 이유를 알고 싶은 분',
+      '이번 생의 목적과 방향이 궁금한 분'
+    ],
+    sectionDesc: [
+      '납음 오행과 일주가 가리키는 전생의 신분·시대·직업',
+      '전생에서 어떻게 살고 어떻게 마감했는지',
+      '전생에서 이번 생으로 넘어온 재능과 상처',
+      '반복되는 관계 패턴과 전생 인연',
+      '이번 생에 반드시 풀어야 할 카르마 미션'
+    ],
+    preview: '납음(納音) 오행은 60갑자 각각에 부여된 고유한 에너지로, 전생의 기운을 가장 직접적으로 읽어낼 수 있는 데이터입니다. 일주(60갑자) 특성과 신살 패턴을 교차해 — 전생의 시대 배경, 삶의 방식, 남겨진 카르마, 이번 생 미션까지 스토리텔링 방식으로 풀어냅니다.',
+    faq: [
+      { q: '전생이 실제로 존재하나요?', a: '전생 분석은 납음·일주·신살 등 사주 데이터를 근거로 한 상징적 해석입니다. 실증적 사실이 아닌, 반복되는 패턴과 삶의 방향을 이해하는 도구로 활용하세요.' },
+      { q: '납음(納音)이 뭔가요?', a: '60갑자 각각에 배속된 오행 에너지입니다. 예를 들어 甲子·乙丑은 "해중금(海中金)"으로 금(金)의 납음을 가집니다. 전생의 기운을 읽는 고전 명리의 핵심 도구입니다.' },
+      { q: '내 사주로 보면 되나요?', a: '네, 내 사주로 생성하면 됩니다. 타인의 전생이 궁금하면 그 사람의 생년월일시를 입력하세요.' },
+      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 실시간으로 분석하며 약 1~2분 소요됩니다. 생성 후 영구 저장됩니다.' }
+    ],
+    engines: ['사주'],
+    keyQuestions: ['나는 전생에 누구였는가?', '전생에서 무엇을 이루지 못했는가?', '이번 생에 가져온 재능과 상처는?', '이번 생의 카르마 미션은 무엇인가?'],
+    sectionDetail: [
+      '납음 오행과 일주(60갑자) 특성으로 전생의 시대·문화권·신분·직업을 스토리텔링 방식으로 읽어냅니다.',
+      '전생의 삶의 방식, 주로 느낀 감정, 반복된 선택 패턴, 마지막을 어떻게 맞았는지 신강도와 신살 데이터 기반으로.',
+      '이번 생에 설명하기 어렵지만 타고난 것들 — 재능, 두려움, 습관, 끌림 — 의 전생 기원을 납음·오행 분포로 읽어냅니다.',
+      '전생 인연이 이번 생에서 반복되는 방식. 왜 특정 유형에 끌리거나 거부감을 느끼는지, 십신·원진살·암합 데이터 기반.',
+      '이 사주가 이번 생에 완성해야 할 카르마 과제. 용신과 격국이 가리키는 방향, 실천 미션 3가지.'
     ]
   }
 };
@@ -2784,6 +2828,7 @@ function buildAccuracyLayerBlock() {
     wealth_timing:['재물운','대운세운교차','세운확장분석','운세종합점수','대운트렌드','대운분리분석','격국검증','세운상호작용','세운월별'],
     classic:    ['적천수일간론','자평진전분석','납음분석','조후용신분석','격국세분','통근분석','일주론','조후','천간합충','지장간분석','암합암충'],
     guide:      ['일주론','십신궁위','격국세분','특수패턴','사주균형','십성분포','귀인','원진살','귀문관살','특수신살','강약수치'],
+    pastlife:   ['납음분석','일주론','특수패턴','신살종합','암합암충','강약수치','지장간분석','적천수일간론'],
   };
   const detailSet = new Set(DETAIL_MAP[_type] || []);
 
@@ -4158,6 +4203,38 @@ function renderCharVisual() {
       + (fallbackBadges.length?'<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;">' + fallbackBadges.join('') + '</div>':'')
       + '</div>';
 
+  } else if (_type === 'pastlife') {
+    // 전생 분석: 납음 오행 + 일주 + 미스터리 카드 3장
+    const napeum = _napeumData;
+    const napeumEl = napeum?.납음오행 || napeum?.오행 || '';
+    const napeumName = napeum?.납음명 || napeum?.납음 || '';
+    const napeumCol = OH_COLOR[napeumEl] || '#4a1d96';
+    const napeumBg = OH_BG[napeumEl] || 'rgba(74,29,150,0.10)';
+    const PAST_HINTS = {목:'숲과 초원의 시대 — 농경·예술·성직',화:'전쟁과 불꽃의 시대 — 장수·무인·지도자',토:'황토 대지의 시대 — 농부·상인·건축가',금:'쇠와 규율의 시대 — 관료·장인·군인',수:'물과 지혜의 시대 — 학자·무속·예언가'};
+    const hint = PAST_HINTS[napeumEl] || '베일에 싸인 전생';
+    const pillarsP = _sdFull?.summary?.pillars || {};
+    const dayStemP = (pillarsP.day||'')[0] || (_ilju||'')[0] || '';
+    const KARMA_MAP = {甲:'성장을 완성하지 못한 나무',乙:'환경에 굴복한 덩굴',丙:'너무 뜨겁게 타오른 불꽃',丁:'꺼지지 않은 작은 촛불',戊:'무너진 성벽',己:'채워지지 않은 대지',庚:'녹슬지 않으려 버틴 쇠',辛:'다듬어지지 못한 보석',壬:'방향을 잃은 강물',癸:'땅속에 갇힌 샘물'};
+    const karma = KARMA_MAP[dayStemP] || '아직 풀리지 않은 이야기';
+    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="display:flex;gap:8px;">'
+      + '<div style="flex:1;background:' + napeumBg + ';border:1.5px solid ' + napeumCol + ';border-radius:14px;padding:12px;text-align:center;">'
+      + '<div style="font-size:10px;font-weight:700;color:' + napeumCol + ';opacity:0.7;margin-bottom:4px;letter-spacing:0.3px;">납음 오행</div>'
+      + '<div style="font-size:26px;font-weight:900;color:' + napeumCol + ';line-height:1;">' + (napeumEl||'?') + '</div>'
+      + (napeumName?'<div style="font-size:9px;color:'+napeumCol+';opacity:0.7;margin-top:3px;">'+napeumName+'</div>':'')
+      + '</div>'
+      + '<div style="flex:2;background:rgba(74,29,150,0.07);border:1px solid rgba(74,29,150,0.2);border-radius:14px;padding:12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#4a1d96;opacity:0.6;margin-bottom:5px;letter-spacing:0.3px;">전생 힌트</div>'
+      + '<div style="font-size:11px;font-weight:700;color:#3a1070;line-height:1.5;">' + hint + '</div>'
+      + '</div>'
+      + '</div>'
+      + '<div style="background:rgba(74,29,150,0.05);border:1px solid rgba(74,29,150,0.15);border-radius:12px;padding:10px 12px;">'
+      + '<div style="font-size:9px;font-weight:700;color:#4a1d96;opacity:0.6;margin-bottom:4px;letter-spacing:0.3px;">전생 카르마 키워드</div>'
+      + '<div style="font-size:12px;font-weight:700;color:#3a1070;">' + karma + '</div>'
+      + '</div>'
+      + miniBubbleBlock
+      + '</div>';
+
   } else {
     // 기타 폴백 — 오행 버블
     visualHtml = '<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">' + bubblesHtml + '</div>';
@@ -4359,6 +4436,13 @@ function renderCharVisual() {
     if (ipd?.직업적성) openRows.push({ label:'직업 적성', text: ipd.직업적성 });
     blurRows.push({ label:'커리어 대운', text: '현재 대운에서 직업·창업에 최적인 방향과 타이밍' });
     blurRows.push({ label:'적합 사업 방향', text: '격국과 용신을 살린 창업 아이디어와 성공 구조' });
+
+  } else if (_type === 'pastlife') {
+    const napeumEl = _napeumData?.납음오행 || _napeumData?.오행 || '';
+    if (napeumEl)      openRows.push({ label:'납음 오행', text: napeumEl + ' — 전생 기운의 핵심 원소' });
+    if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
+    blurRows.push({ label:'전생 정체', text: '납음과 일주가 가리키는 전생의 신분·직업·시대' });
+    blurRows.push({ label:'카르마 미션', text: '이번 생에 반드시 풀어야 할 과제와 실천 방향' });
 
   } else {
     if (ipd?.성격)     openRows.push({ label:'일주 성격', text: ipd.성격 });
@@ -4734,6 +4818,7 @@ async function generateReport() {
   if (_type === 'wealth_timing'){ await generateWealthTimingReport(); return; }
   if (_type === 'classic')      { await generateClassicReport();     return; }
   if (_type === 'guide')        { await generateGuideReport();       return; }
+  if (_type === 'pastlife')     { await generatePastlifeReport();    return; }
   // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
@@ -6118,6 +6203,74 @@ async function generateGuideReport() {
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
+// ── 전생 분석 ──
+async function generatePastlifeReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const pillars = _sdFull?.summary?.pillars || {};
+  const napeum = _napeumData;
+  const napeumStr = napeum ? `납음: ${napeum.납음명||napeum.납음||''} (${napeum.납음오행||napeum.오행||''}오행) — ${napeum.문장||napeum.해석||''}` : '납음 미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const pillarStr = `사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})`;
+
+  const sysPrompt = `당신은 사주 명리학 기반 전생·카르마 분석가입니다.
+납음(納音) 오행, 일주(60갑자), 신살, 격국 데이터를 근거로 전생을 스토리텔링 방식으로 분석합니다.
+
+핵심 규칙:
+- 반드시 사주 데이터(납음·일주·신살·격국)를 근거로 작성 — 근거 없는 상상 금지
+- 스토리텔링 형식: 딱딱한 분석이 아니라 살아있는 이야기처럼
+- **볼드**는 핵심 키워드에만 3~5개
+- #헤더 금지, 표 금지
+- 섹션 제목 쓰지 마세요 (카드 헤더에 이미 표시됨)
+- 확정적 단정("~였다") 대신 "~을 암시합니다", "~의 흔적이 남아있습니다" 등 암시적 표현 사용
+- 분석 범위를 벗어난 구체적 날짜·지명 단정 금지`;
+
+  const promptA = `${profileStr}
+${pillarStr}
+${napeumStr}
+격국: ${_geokguk||'미확인'} / 신강약: ${_singang||'미확인'}
+${sb2}
+${buildAccuracyLayerBlock()}
+
+섹션 구성:
+1. 전생의 정체 — 누구였는가
+납음 오행(${napeum?.납음오행||napeum?.오행||'미확인'})과 일주(${_ilju||''})가 가리키는 전생의 신분·직업·시대 배경. 어느 시대, 어느 문화권, 어떤 역할이었는지를 납음의 오행 기운과 일주 60갑자 특성으로 읽어낸다. 약 450자.
+
+2. 전생의 삶과 최후
+그 전생에서 어떤 삶을 살았는지 — 어떤 방식으로 살고, 어떤 감정을 많이 느꼈으며, 마지막을 어떻게 맞았는지. 신강도(${_singang||'미확인'})와 격국(${_geokguk||'미확인'}), 신살 데이터를 근거로. 약 500자.
+
+3. 이번 생에 가져온 재능과 상처
+전생에서 이번 생으로 넘어온 것들 — 설명하기 어렵지만 타고난 재능, 이유 없이 반복되는 두려움, 익숙한데 처음 보는 것들. 납음 오행과 일주·오행 분포 기반. 약 450자.
+
+총 1300~1500자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+
+  await streamToSections(promptA, [0,1,2], '전생 분석', ysFinal, '', false);
+
+  const promptB = `${profileStr}
+${pillarStr}
+${napeumStr}
+${sb2}
+${buildAccuracyLayerBlock()}
+
+섹션 구성:
+4. 전생 인연과 반복되는 관계 패턴
+전생에서 해결되지 않은 인연이 이번 생에 어떤 형태로 반복되는지. 끌리면서도 힘든 사람, 이유 없이 불편한 사람 유형의 패턴. 십신 분포(특히 관성·인성·비겁)와 원진살·암합 데이터 기반. 약 450자.
+
+5. 이번 생 카르마 미션
+이 사주가 이번 생에 반드시 풀어야 할 과제 — 전생에서 완성하지 못한 것, 이번에 처음 도전하는 것, 마무리해야 할 것. 용신(${ysFinal})과 격국이 가리키는 방향, 지금 당장 실천할 수 있는 미션 3가지. 약 400자.
+
+총 800~1000자. 섹션 번호(4. 5.) 붙여 작성.`;
+
+  await streamToSections(promptB, [3,4], '전생 분석', ysFinal, '', true);
+
+  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display='flex'; showConsultBanner();
+}
+
 // ── 인생 타이밍 가이드 ──
 async function generateTimingReport() {
   if (!await setupSectionsAndDeductOrb()) return;
@@ -6411,7 +6564,8 @@ function showConsultBanner() {
     family:        { title: '가족 관계 코칭이 필요하다면', desc: '부모·형제·자녀 관계 역학을\n<em>전문 상담사</em>가 1:1로 풀어드립니다.' },
     timing:        { title: '중요 선택의 타이밍을 잡고 싶다면', desc: '이사·이직·결혼 등 시기 판단을\n<em>전문 상담사</em>가 맞춤 설계해 드립니다.' },
     wealth_timing: { title: '재물 타이밍, 실행 전략이 필요하다면', desc: '투자·계약·사업 개시 시점을\n<em>전문 상담사</em>가 구체적으로 코칭합니다.' },
-    classic:       { title: '고전 명리 해석을 현대에 적용하려면', desc: '적천수·궁통보감 관점을\n<em>전문 상담사</em>가 실생활 언어로 풀어드립니다.' }
+    classic:       { title: '고전 명리 해석을 현대에 적용하려면', desc: '적천수·궁통보감 관점을\n<em>전문 상담사</em>가 실생활 언어로 풀어드립니다.' },
+    pastlife:      { title: '전생 카르마, 이번 생에 어떻게 풀어야 할지', desc: 'AI가 읽어낸 카르마 미션을 바탕으로\n<em>전문 상담사</em>가 현실적인 실천 방향을 안내합니다.' }
   };
   const t = bannerTexts[_type] || { title: '리포트 내용이 궁금하신가요?', desc: 'AI 분석을 바탕으로 <em>전문 상담사</em>가 더 깊은 해석과<br>실질적인 조언을 1:1로 안내해 드립니다.' };
   document.getElementById('consultTitle').textContent = t.title;
@@ -6482,7 +6636,9 @@ function showRelatedReports() {
     wealth_timing:[{t:'money',icon:'<i class="pi pi-coin"></i>',title:'재물운',desc:'재물 타이밍의 구조적 배경'},
                    {t:'daeun',icon:'<i class="pi pi-wave"></i>',title:'대운 흐름',desc:'재물 타이밍의 큰 흐름'}],
     classic:      [{t:'character',icon:'<i class="pi pi-star"></i>',title:'기질 분석',desc:'고전 개념을 현대 기질로'},
-                   {t:'yongsin',icon:'<i class="pi pi-compass"></i>',title:'용신 활용',desc:'고전 용신을 일상에'}]
+                   {t:'yongsin',icon:'<i class="pi pi-compass"></i>',title:'용신 활용',desc:'고전 용신을 일상에'}],
+    pastlife:     [{t:'character',icon:'<i class="pi pi-star"></i>',title:'기질 분석',desc:'전생에서 이어진 본질 기질'},
+                   {t:'sinsal',icon:'<i class="pi pi-scroll"></i>',title:'신살 총정리',desc:'카르마와 연결된 신살의 의미'}]
   };
   try {
     const wrap = document.getElementById('relatedReportsWrap');
