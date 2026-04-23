@@ -701,33 +701,112 @@
     });
   }
 
-  // ── 드래그 (500ms 길게 누르기) ──
+  // ── 쓰다듬기 하트 파티클 ──
+  function spawnHeart() {
+    if (!pet) return;
+    var rect = pet.getBoundingClientRect();
+    var h = document.createElement('div');
+    h.textContent = '💕';
+    var offX = (Math.random() - 0.5) * 40;
+    h.style.cssText = [
+      'position:fixed',
+      'left:' + (rect.left + rect.width/2 + offX) + 'px',
+      'top:' + (rect.top + rect.height/2) + 'px',
+      'font-size:22px',
+      'pointer-events:none',
+      'z-index:99999',
+      'animation:heart-rise 1.2s ease-out forwards',
+    ].join(';');
+    document.body.appendChild(h);
+    setTimeout(function(){ try{h.remove();}catch(e){} }, 1300);
+  }
+  // 하트 애니메이션 CSS (최초 1회)
+  (function(){
+    if (document.getElementById('yongsin-heart-style')) return;
+    var st = document.createElement('style');
+    st.id = 'yongsin-heart-style';
+    st.textContent = '@keyframes heart-rise { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.4);} 30%{opacity:1;transform:translate(-50%,-80%) scale(1);} 100%{opacity:0;transform:translate(-50%,-180%) scale(1.2);} }';
+    document.head.appendChild(st);
+  })();
+
+  // ── 쓰다듬기 + 드래그 (길게 누르기) ──
+  // 500ms 홀드 = 쓰다듬기 시작 (하트·happy·bond+)
+  // 쓰다듬는 중 8px 이상 이동 = 드래그 모드로 전환
   function setupDrag() {
-    var longPressTimer = null, dragging = false;
-    var dragOffX = 0, dragOffY = 0, didDrag = false;
+    var longPressTimer = null, petting = false, dragging = false;
+    var dragOffX = 0, dragOffY = 0, didDrag = false, didPet = false;
     var startX = 0, startY = 0, activePointerId = null;
+    var petInterval = null, petStartTime = 0;
     var s = ELEM_STYLE[getElement()] || ELEM_STYLE.water;
+
+    function startPetting(e) {
+      petting = true; didPet = true; petStartTime = Date.now();
+      try { pet.setPointerCapture(activePointerId); } catch(ev) {}
+      clearTimeout(moveTimer);
+      pet.style.transform = 'scale(1.1)';
+      pet.style.boxShadow = '0 0 32px #ff9ec7, 0 6px 20px rgba(255,110,160,0.4)';
+      showBubble(getPetName() + '가(이) 좋아해요 💕', 1500);
+      try { navigator.vibrate && navigator.vibrate([30,40,30]); } catch(ev) {}
+      spawnHeart();
+      petInterval = setInterval(spawnHeart, 400);
+    }
+
+    function stopPettingAndApply() {
+      if (!petting) return;
+      clearInterval(petInterval); petInterval = null;
+      petting = false;
+      var secs = Math.floor((Date.now() - petStartTime) / 1000);
+      var gain = Math.min(10, Math.max(1, secs));
+      // 상태 갱신 (happy + bond + exp 소량)
+      var raw = getPetState();
+      var elem = getElement() || raw.element;
+      if (elem) {
+        if (!raw.all) raw.all = {};
+        if (!raw.all[elem]) raw.all[elem] = {};
+        var st = raw.all[elem];
+        st.happy = Math.min(100, (st.happy || 20) + gain * 2);
+        st.exp = (st.exp || 0) + gain;
+        st.bond = (st.bond || 0) + Math.floor(gain / 3);
+        var needed = Math.pow(st.level || 1, 2) * 100;
+        if (st.exp >= needed) { st.exp -= needed; st.level = (st.level || 1) + 1; }
+        raw.element = elem;
+        try { localStorage.setItem(PET_KEY, JSON.stringify(raw)); } catch(ev) {}
+        var fillEl = document.getElementById('yongsin-float-efill');
+        if (fillEl) fillEl.style.width = Math.min(100, Math.round(st.exp / needed * 100)) + '%';
+        var lvEl = document.getElementById('yongsin-float-lv');
+        if (lvEl) lvEl.textContent = 'Lv.' + (st.level || 1);
+      }
+      pet.style.transform = '';
+      pet.style.boxShadow = '0 0 12px ' + s.glow + ', 0 3px 10px rgba(0,0,0,0.15)';
+      showBubble('쓰다듬어줘서 고마워요 💕 (+' + gain + ' EXP)', 2000);
+    }
 
     pet.addEventListener('pointerdown', function(e) {
       if (e.button && e.button !== 0) return;
-      startX = e.clientX; startY = e.clientY; didDrag = false; activePointerId = e.pointerId;
+      startX = e.clientX; startY = e.clientY;
+      didDrag = false; didPet = false; activePointerId = e.pointerId;
       longPressTimer = setTimeout(function() {
-        longPressTimer = null; dragging = true;
-        try { pet.setPointerCapture(activePointerId); } catch(ev) {}
-        clearTimeout(moveTimer);
+        longPressTimer = null;
+        startPetting(e);
+      }, 500);
+    });
+
+    pet.addEventListener('pointermove', function(e) {
+      var moved = Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8;
+      if (longPressTimer && moved) {
+        clearTimeout(longPressTimer); longPressTimer = null;
+      }
+      // 쓰다듬기 중 크게 이동 → 드래그 모드로 전환
+      if (petting && moved && !dragging) {
+        clearInterval(petInterval); petInterval = null;
+        petting = false;
+        dragging = true;
         wrapper.style.transition = 'none'; wrapper.style.willChange = 'left, top';
         pet.style.transform = 'scale(1.25)';
         pet.style.boxShadow = '0 0 28px ' + s.glow + ', 0 8px 24px rgba(0,0,0,0.3)';
         var rect = wrapper.getBoundingClientRect();
         dragOffX = e.clientX - rect.left; dragOffY = e.clientY - rect.top;
         showBubble('잡았어요! 🫴', 1200);
-        try { navigator.vibrate && navigator.vibrate(50); } catch(ev) {}
-      }, 500);
-    });
-
-    pet.addEventListener('pointermove', function(e) {
-      if (longPressTimer && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) {
-        clearTimeout(longPressTimer); longPressTimer = null;
       }
       if (!dragging) return;
       e.preventDefault(); didDrag = true;
@@ -738,23 +817,26 @@
       wrapper.style.left = x + 'px'; wrapper.style.top = y + 'px';
     }, { passive: false });
 
-    function endDrag(e) {
+    function endInteraction(e) {
       if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-      if (!dragging) return;
-      dragging = false;
-      try { pet.releasePointerCapture(activePointerId); } catch(ev) {}
-      wrapper.style.transition = MOVE_TRANSITION; wrapper.style.willChange = '';
-      pet.style.transform = '';
-      pet.style.boxShadow = '0 0 12px ' + s.glow + ', 0 3px 10px rgba(0,0,0,0.15)';
-      showBubble('여기 놔둘게요 😊', 1500);
-      scheduleMove();
-      if (didDrag) {
+      if (petting) { stopPettingAndApply(); scheduleMove(); }
+      if (dragging) {
+        dragging = false;
+        try { pet.releasePointerCapture(activePointerId); } catch(ev) {}
+        wrapper.style.transition = MOVE_TRANSITION; wrapper.style.willChange = '';
+        pet.style.transform = '';
+        pet.style.boxShadow = '0 0 12px ' + s.glow + ', 0 3px 10px rgba(0,0,0,0.15)';
+        showBubble('여기 놔둘게요 😊', 1500);
+        scheduleMove();
+      }
+      // 쓰다듬/드래그 있었으면 click 이벤트 취소
+      if (didDrag || didPet) {
         var stopClick = function(ev) { ev.stopImmediatePropagation(); pet.removeEventListener('click', stopClick, true); };
         pet.addEventListener('click', stopClick, true);
       }
     }
-    pet.addEventListener('pointerup', endDrag);
-    pet.addEventListener('pointercancel', endDrag);
+    pet.addEventListener('pointerup', endInteraction);
+    pet.addEventListener('pointercancel', endInteraction);
   }
 
   function setupContextMenu() {
