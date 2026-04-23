@@ -367,6 +367,11 @@
   function getPetName() {
     return (getActiveState().petName) || '고치';
   }
+  function getPetFullName() {
+    var s = getActiveState();
+    var nm = s.petName || '고치';
+    return s.activeTitle ? (s.activeTitle + ' ' + nm) : nm;
+  }
   // 일간 오행 → 펫 성격 말투
   var PERSONA_BY_DAYSTEM = {
     wood:  { tone: '쭉쭉 자라요!', tip: '오늘도 성장하는 하루예요 🌿' },
@@ -628,6 +633,9 @@
     if (days) lines.push('🗓️ 함께한 지 ' + days + '일째');
     var tier = getBondTier();
     lines.push('💞 친밀도: ' + tier.label + ' (' + (state.bond||0) + ')');
+    var sObj2 = getStreak();
+    if (sObj2.count) lines.push('🔥 연속 출석: ' + sObj2.count + '/7일' + (sObj2.boxReady ? ' 🎁' : ''));
+    if (state.activeTitle) lines.push('👑 칭호: ' + state.activeTitle);
     lines.push('💡 화면 켜두면 EXP 조금씩 올라요');
     showBubble(lines.join('\n'), 5500);
   }
@@ -694,6 +702,9 @@
       return;
     }
     fortuneParts = null; fortunePartIdx = 0;
+
+    // 선물 상자 준비 됐으면 최우선 오픈
+    if (getStreak().boxReady) { openStreakBox(); return; }
 
     var mode = TAP_MODES[tapModeIdx % TAP_MODES.length]; tapModeIdx++;
     if (mode === 'fortune') {

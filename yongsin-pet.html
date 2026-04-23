@@ -802,6 +802,8 @@ nav {
     <div class="info-row"><span>탄생일</span><span class="info-val" id="infoBirth">—</span></div>
     <div class="info-row"><span>함께한 날</span><span class="info-val" id="infoDays">—</span></div>
     <div class="info-row"><span>친밀도</span><span class="info-val" id="infoBond">—</span></div>
+    <div class="info-row"><span>연속 출석</span><span class="info-val" id="infoStreak">—</span></div>
+    <div class="info-row"><span>칭호</span><span class="info-val" id="infoTitle" style="cursor:pointer;text-decoration:underline dotted;">—</span></div>
   </div>
 
   <!-- 펫 다이어리 -->
@@ -1415,9 +1417,36 @@ function render() {
   var b = state.bond || 0;
   var bLabel = b < 3 ? '낯선' : b < 10 ? '친근한' : b < 30 ? '친한' : b < 100 ? '절친' : '평생친구';
   document.getElementById('infoBond').textContent = bLabel + ' (' + b + ')';
+  // 연속 출석
+  var sObj = {}; try { sObj = JSON.parse(localStorage.getItem('yongsin_streak') || '{}') || {}; } catch(e) {}
+  var sCount = sObj.count || 0;
+  var streakTxt = sCount ? (sCount + ' / 7일' + (sObj.boxReady ? ' 🎁' : '')) : '—';
+  document.getElementById('infoStreak').textContent = streakTxt;
+  // 칭호
+  var titles = Array.isArray(state.titles) ? state.titles : [];
+  var titleTxt = state.activeTitle ? (state.activeTitle + ' (보유 ' + titles.length + ')') : (titles.length ? '(보유 ' + titles.length + ' · 탭하여 선택)' : '—');
+  document.getElementById('infoTitle').textContent = titleTxt;
   // 다이어리 렌더
   renderDiary();
 }
+
+// 칭호 클릭 → 보유 칭호 중 선택/해제
+document.addEventListener('DOMContentLoaded', function() {
+  var el = document.getElementById('infoTitle');
+  if (el) el.addEventListener('click', function() {
+    var titles = Array.isArray(state.titles) ? state.titles : [];
+    if (!titles.length) { alert('보유한 칭호가 없어요. 7일 연속 출석 후 선물상자를 열어보세요 🎁'); return; }
+    var options = titles.slice(); options.push('(칭호 해제)');
+    var txt = options.map(function(t, i) { return (i+1) + '. ' + t; }).join('\n');
+    var choice = prompt('칭호 선택 (번호 입력):\n' + txt, '1');
+    if (choice === null) return;
+    var idx = parseInt(choice, 10) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= options.length) return;
+    state.activeTitle = (idx === options.length - 1) ? null : options[idx];
+    saveState();
+    render();
+  });
+});
 
 function renderDiary() {
   var list;
