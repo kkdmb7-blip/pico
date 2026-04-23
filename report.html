@@ -7326,7 +7326,7 @@ async function playReportTTS() {
     const res = await fetch('https://fortuna.kkdmb7.workers.dev/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.slice(0, 4800) }),
+      body: JSON.stringify({ text: text.slice(0, 1500) }),
     });
     const data = await res.json();
     if (!res.ok || !data.audioContent) throw new Error(data.error || 'TTS 실패');
