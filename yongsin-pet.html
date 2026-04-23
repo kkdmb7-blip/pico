@@ -1757,7 +1757,7 @@ async function fetchAdvice() {
   try {
     var profile = {};
     try { profile = JSON.parse(localStorage.getItem('pico_profile') || '{}'); } catch(e) {}
-    var yongsin = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached') || '';
+    var yongsin = state.element || localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached') || '';
 
     // 오늘 일진 조회 (KST 기준)
     var today = new Date(Date.now() + 9*3600000);
