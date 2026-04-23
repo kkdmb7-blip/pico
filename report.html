@@ -2365,7 +2365,7 @@ function buildSajuBlock() {
   const pillars = sd?.summary?.pillars || {};
   return `【사주 원국】
 일주: ${_ilju||'미확인'}  성별: ${_profile?.gender==='F'?'여성':'남성'}
-사주: 연주 ${pillars.year?(pillars.year.stem||'')+(pillars.year.branch||''):'?'} / 월주 ${pillars.month?(pillars.month.stem||'')+(pillars.month.branch||''):'?'} / 일주 ${pillars.day?(pillars.day.stem||'')+(pillars.day.branch||''):'?'} / 시주 ${pillars.hour?(pillars.hour.stem||'')+(pillars.hour.branch||''):'?'}
+사주: 연주 ${pillars.year||'?'} / 월주 ${pillars.month||'?'} / 일주 ${pillars.day||'?'} / 시주 ${pillars.hour||'?'}
 신강신약: ${_singang||sd?.strength_level_5||'미확인'} (${sd?.strength_score||''}점)
 격국: ${_geokguk||sd?.geokguk?.geok_kor||'미확인'}
 용신: ${_yongsin||sd?.yongshin?.primary||'미확인'}
@@ -4032,8 +4032,8 @@ function renderCharVisual() {
     const STEM2OH = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수',甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수'};
     const pillarKeys = ['year','month','day','hour'], pillarLabels = ['년주','월주','일주','시주'];
     const pillarHtml = pillarKeys.map(function(k,i) {
-      const p = pillarsC[k] || {};
-      const st = p.stem||'?', br = p.branch||'?';
+      const p = pillarsC[k] || '';
+      const st = (p[0]||'?'), br = (p[1]||'?');
       const oh = STEM2OH[st]||'';
       const col = OH_COLOR[oh]||'#7a4e00';
       return '<div style="flex:1;text-align:center;padding:10px 4px;background:rgba(120,80,20,0.05);border-radius:12px;border:1px solid rgba(120,80,20,0.12);"><div style="font-size:9px;font-weight:700;color:rgba(60,40,10,0.4);margin-bottom:4px;">' + pillarLabels[i] + '</div><div style="font-size:22px;font-weight:900;color:' + col + ';line-height:1.2;">' + st + '</div><div style="font-size:18px;font-weight:700;color:rgba(60,40,10,0.55);">' + br + '</div></div>';
