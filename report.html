@@ -3681,28 +3681,119 @@ function renderCharVisual() {
       + '</div>';
 
   } else if (_type === 'child_career') {
-    // 아이 진로: 재능 오행 TOP2 + 진로 방향 키워드 (동화풍 별 뱃지)
-    const OH_TALENT = {목:['예술·창작','리더십','스포츠'],화:['발표·표현','연예·공연','마케팅'],토:['교육·복지','꼼꼼한 관리','요리·서비스'],금:['이공계·분석','법·금융','엔지니어링'],수:['연구·철학','IT·프로그래밍','외교·언어']};
-    const OH_CHILD_ICON = {목:'🌱',화:'🎨',토:'🏡',금:'⚙️',수:'📚'};
-    const topEl = ohList[0]?.[0], secEl = ohList[1]?.[0];
-    const topPct = Math.round(Number(ohList[0]?.[1]||0));
-    const secPct = Math.round(Number(ohList[1]?.[1]||0));
-    const t1 = OH_TALENT[topEl]||[], t2 = OH_TALENT[secEl]||[];
-    const talents = [...t1.slice(0,2), ...t2.slice(0,1)];
-    const talentBadges = talents.map((t,i) =>
-      '<div style="padding:7px 13px;border-radius:20px;font-size:12px;font-weight:800;background:linear-gradient(135deg,' + (OH_BG[i<2?topEl:secEl]||'rgba(120,80,20,0.1)') + ',rgba(255,255,255,0.4));border:1.2px solid ' + (OH_BORDER[i<2?topEl:secEl]||'rgba(120,80,20,0.2)') + ';color:' + (OH_COLOR[i<2?topEl:secEl]||'#3a2000') + ';display:inline-flex;align-items:center;gap:5px;box-shadow:0 2px 6px ' + (OH_COLOR[i<2?topEl:secEl]||'#7a4e00') + '18;"><span style="font-size:10px;">✨</span>' + t + '</div>'
-    ).join('');
-    const topCol = OH_COLOR[topEl]||'#7a4e00', secCol = OH_COLOR[secEl]||'#7a4e00';
-    visualHtml = '<div style="padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px;">'
-      + '<div style="text-align:center;font-size:11px;font-weight:800;color:rgba(60,40,10,0.55);letter-spacing:1px;">🌟 아이의 타고난 재능 오행</div>'
-      + '<div style="display:flex;gap:8px;">'
-      + (topEl ? '<div style="flex:1.4;background:radial-gradient(circle at 30% 25%,' + (OH_BG[topEl]||'rgba(120,80,20,0.2)') + ',' + topCol + '15);border-radius:16px;padding:14px 8px;border:2.5px solid ' + topCol + ';text-align:center;box-shadow:0 6px 18px ' + topCol + '35,inset 0 2px 6px rgba(255,255,255,0.45);position:relative;"><div style="position:absolute;top:-7px;right:-7px;background:' + topCol + ';color:#fff;font-size:8px;font-weight:900;padding:2px 7px;border-radius:8px;letter-spacing:0.5px;box-shadow:0 2px 6px ' + topCol + '70;">TOP</div><div style="font-size:22px;margin-bottom:2px;filter:drop-shadow(0 2px 3px ' + topCol + '40);">' + (OH_CHILD_ICON[topEl]||'✨') + '</div><div style="font-size:10px;font-weight:800;color:' + topCol + ';opacity:0.75;letter-spacing:0.5px;">주 재능</div><div style="font-size:38px;font-weight:900;color:' + topCol + ';line-height:1;text-shadow:0 2px 6px ' + topCol + '30;">' + topEl + '</div><div style="font-size:11px;color:' + topCol + ';margin-top:4px;font-weight:700;">' + topPct + '%</div></div>' : '')
-      + (secEl ? '<div style="flex:1;background:radial-gradient(circle at 30% 25%,' + (OH_BG[secEl]||'rgba(120,80,20,0.15)') + ',' + secCol + '10);border-radius:16px;padding:14px 8px;border:1.8px solid ' + (OH_BORDER[secEl]||'rgba(120,80,20,0.3)') + ';text-align:center;box-shadow:0 4px 12px ' + secCol + '25,inset 0 1px 4px rgba(255,255,255,0.35);"><div style="font-size:18px;margin-bottom:2px;filter:drop-shadow(0 1px 2px ' + secCol + '35);">' + (OH_CHILD_ICON[secEl]||'✦') + '</div><div style="font-size:10px;font-weight:800;color:' + secCol + ';opacity:0.7;letter-spacing:0.5px;">보조 재능</div><div style="font-size:28px;font-weight:900;color:' + secCol + ';line-height:1;">' + secEl + '</div><div style="font-size:10px;color:' + secCol + ';margin-top:4px;font-weight:700;">' + secPct + '%</div></div>' : '')
+    // 바이럴 패턴: 시적 헤드라인 + 빅% 버블 + 8축 레이더 + 3카드 잠금
+    const STEM_METAPHOR_C = {
+      갑:'뿌리 깊은 큰 나무', 을:'유연하게 자라는 풀잎',
+      병:'한낮의 태양', 정:'은은한 촛불',
+      무:'드넓은 들판', 기:'비옥한 흙',
+      경:'은빛 조각칼', 신:'정교한 보석',
+      임:'큰 강물', 계:'맑은 이슬'
+    };
+    const iljuStemC = (_ilju||'')[0];
+    const metaphorC = STEM_METAPHOR_C[iljuStemC] || '특별한 기운';
+    const nameKwC = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + _profile.name + '</span>님 안의' : '아이 안의';
+
+    // 진로 분야 점수 (오행 + 십신)
+    const ohScoreC = {목:0,화:0,토:0,금:0,수:0};
+    ohList.forEach(function(p){ ohScoreC[p[0]] = Number(p[1])||0; });
+    const tgmC = _sdFull?.ten_gods_map || {};
+    const tgValsC = Object.values(tgmC).filter(Boolean);
+    const sikCntC = tgValsC.filter(function(v){return v.includes('식신')||v.includes('상관');}).length;
+    const inCntC  = tgValsC.filter(function(v){return v.includes('정인')||v.includes('편인');}).length;
+    const gwanCntC= tgValsC.filter(function(v){return v.includes('정관')||v.includes('편관');}).length;
+
+    const fieldsC = [
+      {name:'연구·학문', score: ohScoreC.수*0.7 + ohScoreC.금*0.5 + inCntC*5,  color:'#1a5fa0', bg:'#6db4ff'},
+      {name:'예술·창작', score: ohScoreC.목*0.6 + ohScoreC.화*0.6 + sikCntC*5, color:'#c2236a', bg:'#f489c4'},
+      {name:'IT·공학',   score: ohScoreC.금*0.6 + ohScoreC.수*0.5,             color:'#5a6a7a', bg:'#8aa0b8'},
+      {name:'경영·리더십', score: ohScoreC.목*0.5 + ohScoreC.금*0.4 + gwanCntC*5, color:'#7a4e00', bg:'#f4d860'},
+      {name:'교육·복지', score: ohScoreC.토*0.6 + ohScoreC.화*0.4 + inCntC*4,  color:'#3d7a3a', bg:'#7ad48f'},
+      {name:'미디어·표현', score: ohScoreC.화*0.7 + ohScoreC.목*0.3 + sikCntC*4, color:'#b84c1a', bg:'#f4a062'},
+      {name:'의료·치유', score: ohScoreC.수*0.5 + ohScoreC.토*0.4 + inCntC*3,  color:'#1a6a30', bg:'#7ad4a0'}
+    ].sort(function(a,b){return b.score-a.score;});
+    const maxFC = fieldsC[0].score || 1;
+    const top3C = fieldsC.slice(0,3).map(function(f,i){
+      const pct = i===0 ? Math.min(94, Math.max(76, Math.round(72 + maxFC*0.5)))
+                : i===1 ? Math.round(38 + (f.score/maxFC)*22)
+                : Math.round(22 + (f.score/maxFC)*15);
+      return Object.assign({}, f, {pct:pct});
+    });
+
+    // 8축 레이더 데이터
+    const axesC = [
+      {label:'언어',     v: ohScoreC.수*0.6 + ohScoreC.화*0.2 + inCntC*6},
+      {label:'수리·논리', v: ohScoreC.금*0.7 + ohScoreC.수*0.3},
+      {label:'대인관계', v: ohScoreC.화*0.5 + ohScoreC.토*0.3 + gwanCntC*3},
+      {label:'자연친화', v: ohScoreC.목*0.7 + ohScoreC.토*0.3},
+      {label:'음악',     v: ohScoreC.화*0.4 + ohScoreC.수*0.4 + sikCntC*4},
+      {label:'공감',     v: ohScoreC.수*0.5 + ohScoreC.토*0.5 + inCntC*3},
+      {label:'손재능',   v: ohScoreC.토*0.4 + ohScoreC.금*0.4 + sikCntC*3},
+      {label:'신체운동', v: ohScoreC.목*0.4 + ohScoreC.화*0.4}
+    ];
+    const axMaxC = Math.max.apply(null, axesC.map(function(a){return a.v;})) || 1;
+    axesC.forEach(function(a){ a.norm = Math.max(0.28, Math.min(1, a.v/axMaxC)); });
+
+    const RC=120, RR=88;
+    const radarPtsC = axesC.map(function(a,i){
+      const ang = (Math.PI*2 * i/8) - Math.PI/2;
+      const r = RR*a.norm;
+      return [RC + Math.cos(ang)*r, RC + Math.sin(ang)*r];
+    });
+    const radarPolyC = radarPtsC.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
+    const gridSvgC = [0.25,0.5,0.75,1].map(function(s){
+      const pts = axesC.map(function(_,i){
+        const ang = (Math.PI*2*i/8) - Math.PI/2;
+        return (RC + Math.cos(ang)*RR*s).toFixed(1) + ',' + (RC + Math.sin(ang)*RR*s).toFixed(1);
+      }).join(' ');
+      return '<polygon points="'+pts+'" fill="none" stroke="rgba(212,184,108,0.22)" stroke-width="1"/>';
+    }).join('');
+    const axisLinesC = axesC.map(function(_,i){
+      const ang = (Math.PI*2*i/8) - Math.PI/2;
+      return '<line x1="'+RC+'" y1="'+RC+'" x2="'+(RC + Math.cos(ang)*RR).toFixed(1)+'" y2="'+(RC + Math.sin(ang)*RR).toFixed(1)+'" stroke="rgba(212,184,108,0.18)" stroke-width="1"/>';
+    }).join('');
+    const axisLabelsC = axesC.map(function(a,i){
+      const ang = (Math.PI*2*i/8) - Math.PI/2;
+      const lx = RC + Math.cos(ang)*(RR+18);
+      const ly = RC + Math.sin(ang)*(RR+18);
+      return '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="800" fill="#fdf7e0">'+a.label+'</text>';
+    }).join('');
+    const radarSvgC = '<svg viewBox="0 0 240 240" style="width:100%;max-width:260px;height:auto;display:block;margin:0 auto;">'
+      + '<defs><linearGradient id="radGradC" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a07fd4" stop-opacity="0.75"/><stop offset="100%" stop-color="#3d7a3a" stop-opacity="0.75"/></linearGradient></defs>'
+      + gridSvgC + axisLinesC
+      + '<polygon points="'+radarPolyC+'" fill="url(#radGradC)" stroke="#f4d860" stroke-width="2.5"/>'
+      + axisLabelsC
+      + '</svg>';
+
+    const bigC = top3C[0], midC = top3C[1], smlC = top3C[2];
+    const bubblesViralC = '<div style="position:relative;width:100%;height:170px;display:flex;align-items:center;justify-content:center;">'
+      + '<div style="position:absolute;left:6%;top:55%;width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+smlC.bg+'cc,'+smlC.color+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 14px '+smlC.color+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+smlC.name+'</div><div style="font-size:14px;font-weight:900;filter:blur(3.5px);user-select:none;">'+smlC.pct+'%</div></div>'
+      + '<div style="width:138px;height:138px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b8,#f4d860);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(244,216,96,0.6),inset 0 3px 8px rgba(255,255,255,0.55);position:relative;z-index:2;"><div style="font-size:11px;font-weight:800;color:#5a3a00;letter-spacing:-0.2px;">'+bigC.name+'</div><div style="font-size:36px;font-weight:900;color:#3a2400;line-height:1;filter:blur(7px);user-select:none;">'+bigC.pct+'%</div><div style="font-size:9px;color:#5a3a00;margin-top:3px;font-weight:700;opacity:0.78;">타고난 적성</div></div>'
+      + '<div style="position:absolute;right:5%;top:18%;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+midC.bg+'dd,'+midC.color+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 16px '+midC.color+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+midC.name+'</div><div style="font-size:18px;font-weight:900;filter:blur(4.5px);user-select:none;">'+midC.pct+'%</div></div>'
+      + '</div>';
+
+    const giftedPctC = Math.max(3, Math.min(15, Math.round(20 - maxFC*0.18)));
+    const lockCardsC = [
+      {label:'타고난 적성', value:top3C[0].name + ' 영재형'},
+      {label:'상위 영재 가능성', value:'상위 ' + giftedPctC + '%'},
+      {label:'추천 직업 분야', value:top3C[1].name}
+    ];
+    const lockHtmlC = lockCardsC.map(function(c){
+      return '<div style="flex:1;background:linear-gradient(160deg,#0e1830,#1a2848);border:1.5px solid rgba(212,184,108,0.45);border-radius:14px;padding:14px 6px 16px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,0.35),0 0 24px rgba(212,184,108,0.12);position:relative;overflow:hidden;">'
+        + '<div style="font-size:9px;font-weight:800;color:#d4b870;letter-spacing:0.3px;margin-bottom:8px;opacity:0.9;">'+c.label+'</div>'
+        + '<div style="font-size:13px;font-weight:900;color:#fdf7e0;filter:blur(7px);user-select:none;line-height:1.3;">'+c.value+'</div>'
+        + '<div style="position:absolute;bottom:5px;right:7px;font-size:10px;color:#d4b870;opacity:0.65;">🔒</div>'
+        + '</div>';
+    }).join('');
+
+    visualHtml = '<div style="padding:14px 14px 12px;display:flex;flex-direction:column;gap:14px;">'
+      + '<div style="text-align:center;font-size:13px;font-weight:700;color:#3a2a10;letter-spacing:-0.3px;line-height:1.55;">' + nameKwC + ' <b style="color:#b89048;">' + metaphorC + '</b> 같은 재능이 보여요</div>'
+      + bubblesViralC
+      + '<div style="background:linear-gradient(160deg,#0e1830,#1a2848);border-radius:18px;padding:18px 8px 14px;border:1.5px solid rgba(212,184,108,0.32);box-shadow:0 6px 22px rgba(0,0,0,0.28),0 0 30px rgba(212,184,108,0.1);">'
+      + '<div style="text-align:center;font-size:11px;font-weight:800;color:#d4b870;letter-spacing:1.5px;margin-bottom:6px;">8가지 재능 지표</div>'
+      + radarSvgC
       + '</div>'
-      + '<div style="background:linear-gradient(135deg,rgba(210,160,60,0.1),rgba(120,80,20,0.03));border-radius:13px;padding:12px 14px;border:1.2px solid rgba(200,150,50,0.22);">'
-      + '<div style="font-size:10px;font-weight:800;color:rgba(140,90,20,0.7);margin-bottom:8px;letter-spacing:0.5px;">🎯 적합한 진로 방향</div>'
-      + '<div style="display:flex;flex-wrap:wrap;gap:6px;">' + talentBadges + '</div>'
-      + '</div>'
+      + '<div style="display:flex;gap:7px;">' + lockHtmlC + '</div>'
+      + '<div style="text-align:center;font-size:11px;color:rgba(60,40,10,0.55);font-weight:700;letter-spacing:0.3px;">🔒 리포트를 받으면 모든 답이 공개돼요</div>'
       + '</div>';
 
   } else if (_type === 'family') {
@@ -3865,6 +3956,53 @@ function renderCharVisual() {
   } else {
     // 기타 폴백 — 오행 버블
     visualHtml = '<div style="position:relative;width:300px;height:220px;margin:16px auto 4px;overflow:visible;">' + bubblesHtml + '</div>';
+  }
+
+  // ── 바이럴 후크: 3카드 잠금 그리드 (선택 타입에 추가) ──
+  const VIRAL_LOCK_MAP = {
+    character: [
+      {label:'핵심 기질',  value:(_ilju||'갑인')+' 일주형 인격'},
+      {label:'숨은 약점',  value:'완벽주의 함정'},
+      {label:'성공 키워드', value:'기준·완성도'}
+    ],
+    money: [
+      {label:'재물 그릇',     value:'중상위 그릇'},
+      {label:'돈이 모이는 방향', value:'전문 기술·자격형'},
+      {label:'최적 직군',     value:'분석·연구형 직업'}
+    ],
+    love: [
+      {label:'연애 스타일', value:'깊은 몰입형'},
+      {label:'이상형',     value:(_ilju||'')[0]+' 일간 보완형'},
+      {label:'인연 시기',   value:'관성 활성 대운'}
+    ],
+    year: [
+      {label:'2026 핵심 키워드', value:'전환과 도약'},
+      {label:'주의 월',         value:'7월·11월 변곡'},
+      {label:'기회 분야',        value:'재물·관계 동시'}
+    ],
+    summary: [
+      {label:'사주 한 줄', value:(_ilju||'갑인')+' '+(_geokguk||'정격')},
+      {label:'타고난 강점', value:ohList[0]?.[0]+' 오행 우세'},
+      {label:'평생 화두',  value:'균형과 성장'}
+    ],
+    daeun: [
+      {label:'현재 대운 등급', value:'A급 흐름'},
+      {label:'다음 전환 시기', value:'5년 이내 변동'},
+      {label:'대운 활용 전략', value:'용신 ' + (yE||'-') + ' 보강'}
+    ]
+  };
+  const viralLockType = ['character','money','love','year','summary','daeun'].indexOf(_type) >= 0 ? _type : null;
+  if (viralLockType) {
+    const _vlc = VIRAL_LOCK_MAP[viralLockType];
+    const _vlHtml = _vlc.map(function(c){
+      return '<div style="flex:1;background:linear-gradient(160deg,#0e1830,#1a2848);border:1.5px solid rgba(212,184,108,0.45);border-radius:14px;padding:13px 6px 15px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,0.35),0 0 22px rgba(212,184,108,0.12);position:relative;overflow:hidden;">'
+        + '<div style="font-size:9px;font-weight:800;color:#d4b870;letter-spacing:0.3px;margin-bottom:7px;opacity:0.9;">'+c.label+'</div>'
+        + '<div style="font-size:13px;font-weight:900;color:#fdf7e0;filter:blur(7px);user-select:none;line-height:1.3;">'+c.value+'</div>'
+        + '<div style="position:absolute;bottom:5px;right:7px;font-size:10px;color:#d4b870;opacity:0.65;">🔒</div>'
+        + '</div>';
+    }).join('');
+    visualHtml += '<div style="padding:6px 14px 4px;display:flex;gap:7px;">' + _vlHtml + '</div>'
+      + '<div style="text-align:center;font-size:11px;color:rgba(60,40,10,0.55);font-weight:700;letter-spacing:0.3px;padding-bottom:8px;">🔒 리포트를 받으면 모든 답이 공개돼요</div>';
   }
 
   // ── 실제 DB 데이터 항목 ──
