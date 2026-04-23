@@ -375,7 +375,8 @@
       '🍖 ' + ((state.hunger||0) < 30 ? '배고파요 😢' : (state.hunger||0) > 75 ? '배불러요 😊' : '보통이에요'),
       '😊 ' + ((state.happy||0) < 30 ? '심심해요 🥺' : (state.happy||0) > 75 ? '너무 행복해요 🥰' : '괜찮아요'),
       '⚡ ' + ((state.energy||0) < 30 ? '피곤해요 😴' : (state.energy||0) > 75 ? '에너지 넘쳐요 💪' : '적당해요'),
-    ].join('\n'), 0);
+      '💡 화면 켜두면 EXP 조금씩 올라요',
+    ].join('\n'), 5000);
   }
 
   function showYongsinTip() {
