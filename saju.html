@@ -664,10 +664,12 @@ async function fetchSaju() {
     renderCareerTeaser(data);
     document.getElementById('sajuShareBtnWrap').style.display = 'flex';
     document.getElementById('sajuReportHook').style.display = 'block';
-    // 용신 pico_yongsin 저장 (사주 분석 결과 → float/pet 기본 원소로 활용)
+    // 용신 pico_yongsin 저장 — 본인 프로필과 일치할 때만 저장
     try {
       if (data.yongshin && data.yongshin.primary) {
-        localStorage.setItem('pico_yongsin', data.yongshin.primary); // 'metal','fire' 등 영문 키
+        var _myP = JSON.parse(localStorage.getItem('pico_profile') || '{}');
+        var _isMe = _myP.year == pYear && _myP.month == pMonth && _myP.day == pDay;
+        if (_isMe) localStorage.setItem('pico_yongsin', data.yongshin.primary);
       }
     } catch(e2) {}
     // 용신 펫 EXP 연동 (사주 분석 완료 시 +50, 하루 1번)
