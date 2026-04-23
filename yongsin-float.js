@@ -500,6 +500,103 @@
     showBubble(lines.join('\n'), 7000);
   }
 
+  // ── 수면/꿈 시스템 ──
+  // 23:00~06:00 = 수면. 이때 접속하면 "자는 중" + 꿈 예약.
+  // 다음날 아침 첫 방문에서 꿈 이야기 + 보상(+5 EXP, +3 happy).
+  var DREAM_KEY = 'yongsin_dream';
+  var SLEEP_START = 23;
+  var SLEEP_END = 6;
+  function isSleepHour() {
+    var h = new Date().getHours();
+    return (h >= SLEEP_START || h < SLEEP_END);
+  }
+  // 꿈이 향할 아침 날짜 (밤이면 내일, 새벽이면 오늘)
+  function dreamForDate() {
+    var d = new Date();
+    if (d.getHours() >= SLEEP_START) d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10);
+  }
+  function getDream() {
+    try { return JSON.parse(localStorage.getItem(DREAM_KEY) || 'null'); } catch(e) { return null; }
+  }
+  function setDream(v) {
+    try { localStorage.setItem(DREAM_KEY, JSON.stringify(v)); } catch(e) {}
+  }
+  var DREAM_BY_ELEM = {
+    wood:  ['푸른 숲에서 뛰어다녔어요 🌿','새싹이 쭉쭉 자라는 꿈을 꿨어요 🌱','나무 위 바람에 흔들렸어요 🍃','대나무 숲에서 비를 맞았어요 🎋'],
+    fire:  ['붉은 노을 위를 날았어요','작은 불씨가 별이 되는 걸 봤어요 ✦','따뜻한 모닥불 옆에서 꾸벅꾸벅','용이 되어 하늘을 가로질렀어요'],
+    earth: ['황금빛 들판을 걸었어요 🌾','산 정상에서 해를 맞이했어요 ⛰️','따뜻한 흙 속에서 편히 쉬었어요','돌탑을 하나씩 쌓았어요 🗿'],
+    metal: ['은빛 달 아래 춤을 췄어요 🌙','맑은 종소리가 울리는 꿈 🔔','반짝이는 보석을 모았어요 💎','서리 내린 숲길을 걸었어요 ❄️'],
+    water: ['잔잔한 호수 위를 떠다녔어요 💧','비가 내리는 정원에서 놀았어요 🌧️','깊은 바다 속을 헤엄쳤어요 🌊','별이 반짝이는 강을 따라갔어요']
+  };
+  var DREAM_GENERIC = [
+    '별을 세다가 잠들었어요 ✨',
+    '구름 위에서 뒹굴었어요 ☁️',
+    '우리가 함께 산책하는 꿈을 꿨어요 💕',
+    '작은 문을 열고 신기한 곳에 갔어요 🚪',
+    '노래를 부르며 하늘을 날았어요 🎵',
+    '어릴 적 사주 속 풍경이 보였어요 📜'
+  ];
+  function generateDreamText() {
+    var el = getElement() || 'water';
+    var pool = (DREAM_BY_ELEM[el] || []).concat(DREAM_GENERIC);
+    var tier = getBondTier();
+    if (tier && tier.tier >= 3) pool.push('꿈 속에서도 ' + (getOwnerName() || '당신') + '이 옆에 있었어요 💖');
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  // 수면 시간이면 꿈 예약
+  function prepareDreamIfNight() {
+    if (!isSleepHour()) return;
+    var forDate = dreamForDate();
+    var cur = getDream();
+    if (cur && cur.forDate === forDate) return;
+    setDream({ forDate: forDate, text: generateDreamText(), shown: false });
+  }
+  // 아침에 꿈 소비 + 보상 (+5 EXP, +3 happy). 반환: 꿈 텍스트 or null.
+  function consumeDreamIfReady() {
+    if (isSleepHour()) return null;
+    var d = getDream();
+    if (!d || d.shown) return null;
+    if (d.forDate !== getTodayStr()) return null;
+    d.shown = true; setDream(d);
+    try {
+      var raw = getPetState();
+      var elem = getElement() || raw.element;
+      if (elem) {
+        if (!raw.all) raw.all = {};
+        if (!raw.all[elem]) raw.all[elem] = {};
+        var st = raw.all[elem];
+        st.exp = (st.exp || 0) + 5;
+        st.happy = Math.min(100, (st.happy || 0) + 3);
+        raw.element = elem;
+        localStorage.setItem(PET_KEY, JSON.stringify(raw));
+      }
+    } catch(e) {}
+    return d.text;
+  }
+  // 자는 중 시각 표시 (💤 아이콘)
+  function setSleepVisual(on) {
+    if (!pet) return;
+    var z = document.getElementById('yongsin-zzz');
+    if (on) {
+      if (!z) {
+        if (!document.getElementById('yz-style')) {
+          var st = document.createElement('style');
+          st.id = 'yz-style';
+          st.textContent = '@keyframes yz-float{0%,100%{transform:translateY(0) scale(1);opacity:.7}50%{transform:translateY(-5px) scale(1.15);opacity:1}}';
+          document.head.appendChild(st);
+        }
+        z = document.createElement('div');
+        z.id = 'yongsin-zzz';
+        z.textContent = '💤';
+        z.style.cssText = 'position:absolute;top:-12px;right:-6px;font-size:18px;pointer-events:none;animation:yz-float 2.8s ease-in-out infinite;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2));';
+        pet.appendChild(z);
+      }
+    } else if (z) {
+      z.remove();
+    }
+  }
+
   // ── 연속 출석 & 선물 상자 ──
   var STREAK_KEY = 'yongsin_streak';          // { count, lastDate, boxReady }
   var STREAK_GOAL = 7;
@@ -669,6 +766,21 @@
     pet.style.animation = 'pet-found 0.6s ease';
     setTimeout(function() { pet.style.animation = 'pet-idle 2.5s ease-in-out infinite'; }, 700);
     spawnParticles();
+
+    // 수면 시간이면 꿈 예약 + 자는 중 메시지 (모든 탭 액션보다 우선)
+    if (isSleepHour()) {
+      prepareDreamIfNight();
+      setSleepVisual(true);
+      var _nm = getPetName();
+      var _pool = [
+        '쿨쿨... ' + _nm + '가(이) 자는 중이에요 💤',
+        _nm + ': "음냐음냐..." 💤',
+        '지금은 꿈나라 여행 중이에요 🌙',
+        '조용히 자고 있어요.\n내일 아침에 꿈 얘기 들려줄게요 🌛'
+      ];
+      showBubble(_pool[Math.floor(Math.random() * _pool.length)], 3500);
+      return;
+    }
 
     // EXP 지급 (picolab에서만, 오늘 처음)
     if (IS_PICO && found !== today) {
@@ -1032,6 +1144,19 @@
     maybeWriteDiary();
     setTimeout(function() {
       wrapper.style.opacity = '1'; wrapper.style.transform = 'scale(1)';
+      // 수면 중이면 꿈 예약 후 자는 연출 (다른 인사 생략)
+      if (isSleepHour()) {
+        prepareDreamIfNight();
+        setSleepVisual(true);
+        showBubble(getPetName() + '가(이) 자는 중이에요 💤', 3500);
+        return;
+      }
+      // 아침 첫 방문에 어젯밤 꿈이 있으면 먼저 들려주기
+      var dreamText = consumeDreamIfReady();
+      if (dreamText) {
+        showBubble('🌙 어젯밤 꿈을 꿨어요\n' + getPetName() + ': "' + dreamText + '"\n(+5 EXP · +3 기분)', 5500);
+        return;
+      }
       var anni = getAnniversaryMsg();
       var petNm = getPetName();
       var tier = getBondTier();
@@ -1054,6 +1179,9 @@
     setInterval(function() {
       if (document.visibilityState !== 'visible') return;
       if (isBubbleOpen()) return;
+      // 수면 중엔 말 걸지 않음 (자는 연출만 유지)
+      if (isSleepHour()) { setSleepVisual(true); return; }
+      setSleepVisual(false);
       if (Math.random() > 0.2) return;
       var pool = [
         timeGreet(),
