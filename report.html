@@ -2961,17 +2961,12 @@ function _populateChildProfileSelect() {
   var sel = document.getElementById('childProfileSelect');
   if (!sel) return;
   while (sel.options.length > 1) sel.remove(1);
-  var seen = {};
+  // 명시적으로 저장한 pico_profiles만 노출 (자동 캐시인 pico_child_profiles는 제외)
   try {
     var profiles = JSON.parse(localStorage.getItem('pico_profiles')) || [];
-    var children = JSON.parse(localStorage.getItem('pico_child_profiles')) || [];
-    var combined = children.concat(profiles);
-    combined.forEach(function(p) {
+    profiles.forEach(function(p) {
       var n = _normalizeChildProfile(p);
       if (!n || !n.year) return;
-      var k = (p.name||'') + '|' + n.year + '|' + n.month + '|' + n.day;
-      if (seen[k]) return;
-      seen[k] = 1;
       var o = document.createElement('option');
       o.value = JSON.stringify(p);
       var gLabel = (n.gender === 'M') ? '남' : '여';
