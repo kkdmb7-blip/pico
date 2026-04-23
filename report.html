@@ -3693,7 +3693,7 @@ function renderCharVisual() {
     const metaphorC = STEM_METAPHOR_C[iljuStemC] || '특별한 기운';
     const nameKwC = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + _profile.name + '</span>님 안의' : '아이 안의';
 
-    // 진로 분야 점수 (오행 + 십신)
+    // 사주 데이터: 오행 % + 십신 카운트 + 일간 오행
     const ohScoreC = {목:0,화:0,토:0,금:0,수:0};
     ohList.forEach(function(p){ ohScoreC[p[0]] = Number(p[1])||0; });
     const tgmC = _sdFull?.ten_gods_map || {};
@@ -3701,37 +3701,44 @@ function renderCharVisual() {
     const sikCntC = tgValsC.filter(function(v){return v.includes('식신')||v.includes('상관');}).length;
     const inCntC  = tgValsC.filter(function(v){return v.includes('정인')||v.includes('편인');}).length;
     const gwanCntC= tgValsC.filter(function(v){return v.includes('정관')||v.includes('편관');}).length;
+    const jaeCntC = tgValsC.filter(function(v){return v.includes('정재')||v.includes('편재');}).length;
+    const STEM2OH_C = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
+    const dayStemC = _sdFull?.summary?.pillars?.day?.stem || iljuStemC || '';
+    const dayOhC = STEM2OH_C[dayStemC] || '';
 
-    const fieldsC = [
-      {name:'연구·학문', score: ohScoreC.수*0.7 + ohScoreC.금*0.5 + inCntC*5,  color:'#1a5fa0', bg:'#6db4ff'},
-      {name:'예술·창작', score: ohScoreC.목*0.6 + ohScoreC.화*0.6 + sikCntC*5, color:'#c2236a', bg:'#f489c4'},
-      {name:'IT·공학',   score: ohScoreC.금*0.6 + ohScoreC.수*0.5,             color:'#5a6a7a', bg:'#8aa0b8'},
-      {name:'경영·리더십', score: ohScoreC.목*0.5 + ohScoreC.금*0.4 + gwanCntC*5, color:'#7a4e00', bg:'#f4d860'},
-      {name:'교육·복지', score: ohScoreC.토*0.6 + ohScoreC.화*0.4 + inCntC*4,  color:'#3d7a3a', bg:'#7ad48f'},
-      {name:'미디어·표현', score: ohScoreC.화*0.7 + ohScoreC.목*0.3 + sikCntC*4, color:'#b84c1a', bg:'#f4a062'},
-      {name:'의료·치유', score: ohScoreC.수*0.5 + ohScoreC.토*0.4 + inCntC*3,  color:'#1a6a30', bg:'#7ad4a0'}
-    ].sort(function(a,b){return b.score-a.score;});
-    const maxFC = fieldsC[0].score || 1;
-    const top3C = fieldsC.slice(0,3).map(function(f,i){
-      const pct = i===0 ? Math.min(94, Math.max(76, Math.round(72 + maxFC*0.5)))
-                : i===1 ? Math.round(38 + (f.score/maxFC)*22)
-                : Math.round(22 + (f.score/maxFC)*15);
-      return Object.assign({}, f, {pct:pct});
-    });
+    // 진로 분야 7종 - 사주 명리 매핑 정확도 강화
+    function calcFieldC(ohW, sigW, dayBoost) {
+      let oh = 0; for (const k in ohW) oh += (ohScoreC[k]||0) * ohW[k];
+      const sig = sigW || 0;
+      return oh * 0.55 + sig * 5.5 + (dayBoost||0);
+    }
+    const fieldsRawC = [
+      {name:'연구·학문',  score: calcFieldC({수:0.7, 금:0.3}, inCntC*1.2 + sikCntC*0.3, dayOhC==='수'?14:dayOhC==='금'?6:0), color:'#1a5fa0', bg:'#6db4ff'},
+      {name:'예술·창작',  score: calcFieldC({목:0.5, 화:0.5}, sikCntC*1.4 + inCntC*0.3, dayOhC==='화'?14:dayOhC==='목'?10:0), color:'#c2236a', bg:'#f489c4'},
+      {name:'IT·공학',    score: calcFieldC({금:0.6, 수:0.4}, gwanCntC*0.8 + sikCntC*0.4, dayOhC==='금'?14:dayOhC==='수'?6:0), color:'#5a6a7a', bg:'#8aa0b8'},
+      {name:'경영·리더십', score: calcFieldC({목:0.4, 금:0.3, 화:0.2}, gwanCntC*1.0 + jaeCntC*0.8, dayOhC==='목'?10:dayOhC==='금'?6:0), color:'#7a4e00', bg:'#f4d860'},
+      {name:'교육·복지',  score: calcFieldC({토:0.5, 화:0.3}, inCntC*1.0 + sikCntC*0.5, dayOhC==='토'?14:dayOhC==='화'?6:0), color:'#3d7a3a', bg:'#7ad48f'},
+      {name:'미디어·표현', score: calcFieldC({화:0.7, 목:0.2}, sikCntC*1.5, dayOhC==='화'?12:dayOhC==='목'?5:0), color:'#b84c1a', bg:'#f4a062'},
+      {name:'의료·치유',  score: calcFieldC({수:0.4, 토:0.4}, inCntC*0.9 + sikCntC*0.4, dayOhC==='수'?10:dayOhC==='토'?8:0), color:'#1a6a30', bg:'#7ad4a0'}
+    ];
+    const sumRawC = fieldsRawC.reduce(function(s,f){return s+Math.max(1,f.score);}, 0) || 1;
+    const fieldsC = fieldsRawC.map(function(f){return Object.assign({}, f, {pct: Math.max(3, Math.round(f.score/sumRawC*100))});})
+                              .sort(function(a,b){return b.pct-a.pct;});
+    const top3C = fieldsC.slice(0,3);
 
-    // 8축 레이더 데이터
+    // 8축 재능 - 일간 오행 보정 추가
     const axesC = [
-      {label:'언어',     v: ohScoreC.수*0.6 + ohScoreC.화*0.2 + inCntC*6},
-      {label:'수리·논리', v: ohScoreC.금*0.7 + ohScoreC.수*0.3},
-      {label:'대인관계', v: ohScoreC.화*0.5 + ohScoreC.토*0.3 + gwanCntC*3},
-      {label:'자연친화', v: ohScoreC.목*0.7 + ohScoreC.토*0.3},
-      {label:'음악',     v: ohScoreC.화*0.4 + ohScoreC.수*0.4 + sikCntC*4},
-      {label:'공감',     v: ohScoreC.수*0.5 + ohScoreC.토*0.5 + inCntC*3},
-      {label:'손재능',   v: ohScoreC.토*0.4 + ohScoreC.금*0.4 + sikCntC*3},
-      {label:'신체운동', v: ohScoreC.목*0.4 + ohScoreC.화*0.4}
+      {label:'언어',     v: ohScoreC.수*0.5 + ohScoreC.화*0.2 + inCntC*5 + (dayOhC==='수'?12:0)},
+      {label:'수리·논리', v: ohScoreC.금*0.6 + ohScoreC.수*0.3 + (dayOhC==='금'?12:0)},
+      {label:'대인관계', v: ohScoreC.화*0.5 + ohScoreC.토*0.3 + gwanCntC*4 + (dayOhC==='화'?10:0)},
+      {label:'자연친화', v: ohScoreC.목*0.6 + ohScoreC.토*0.3 + (dayOhC==='목'?12:dayOhC==='토'?6:0)},
+      {label:'음악',     v: ohScoreC.화*0.4 + ohScoreC.수*0.3 + sikCntC*4 + (dayOhC==='화'?8:0)},
+      {label:'공감',     v: ohScoreC.수*0.4 + ohScoreC.토*0.4 + inCntC*4 + (dayOhC==='수'?8:dayOhC==='토'?6:0)},
+      {label:'손재능',   v: ohScoreC.토*0.4 + ohScoreC.금*0.4 + sikCntC*3 + (dayOhC==='금'?8:0)},
+      {label:'신체운동', v: ohScoreC.목*0.4 + ohScoreC.화*0.4 + (dayOhC==='목'?10:dayOhC==='화'?6:0)}
     ];
     const axMaxC = Math.max.apply(null, axesC.map(function(a){return a.v;})) || 1;
-    axesC.forEach(function(a){ a.norm = Math.max(0.28, Math.min(1, a.v/axMaxC)); });
+    axesC.forEach(function(a){ a.norm = Math.max(0.22, Math.min(1, a.v/axMaxC)); });
 
     const RC=120, RR=88;
     const radarPtsC = axesC.map(function(a,i){
@@ -3751,24 +3758,29 @@ function renderCharVisual() {
       const ang = (Math.PI*2*i/8) - Math.PI/2;
       return '<line x1="'+RC+'" y1="'+RC+'" x2="'+(RC + Math.cos(ang)*RR).toFixed(1)+'" y2="'+(RC + Math.sin(ang)*RR).toFixed(1)+'" stroke="rgba(212,184,108,0.18)" stroke-width="1"/>';
     }).join('');
+    // 라벨 위치 + text-anchor 동적으로 (좌/우 잘림 방지)
     const axisLabelsC = axesC.map(function(a,i){
       const ang = (Math.PI*2*i/8) - Math.PI/2;
-      const lx = RC + Math.cos(ang)*(RR+18);
-      const ly = RC + Math.sin(ang)*(RR+18);
-      return '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" dominant-baseline="middle" font-size="10" font-weight="800" fill="#fdf7e0">'+a.label+'</text>';
+      const lx = RC + Math.cos(ang)*(RR+16);
+      const ly = RC + Math.sin(ang)*(RR+16);
+      const cosV = Math.cos(ang);
+      const anchor = cosV > 0.3 ? 'start' : cosV < -0.3 ? 'end' : 'middle';
+      return '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anchor+'" dominant-baseline="middle" font-size="10.5" font-weight="800" fill="#7a5210">'+a.label+'</text>';
     }).join('');
-    const radarSvgC = '<svg viewBox="0 0 240 240" style="width:100%;max-width:260px;height:auto;display:block;margin:0 auto;">'
-      + '<defs><linearGradient id="radGradC" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a07fd4" stop-opacity="0.75"/><stop offset="100%" stop-color="#3d7a3a" stop-opacity="0.75"/></linearGradient></defs>'
+    // viewBox 확장 (좌우 라벨 잘림 방지: 폭 240 → 320)
+    const radarSvgC = '<svg viewBox="-40 -8 320 256" style="width:100%;max-width:300px;height:auto;display:block;margin:0 auto;">'
+      + '<defs><linearGradient id="radGradC" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a07fd4" stop-opacity="0.7"/><stop offset="100%" stop-color="#3d7a3a" stop-opacity="0.7"/></linearGradient></defs>'
       + gridSvgC + axisLinesC
-      + '<polygon points="'+radarPolyC+'" fill="url(#radGradC)" stroke="#f4d860" stroke-width="2.5"/>'
+      + '<polygon points="'+radarPolyC+'" fill="url(#radGradC)" stroke="#b89048" stroke-width="2.5"/>'
       + axisLabelsC
       + '</svg>';
 
     const bigC = top3C[0], midC = top3C[1], smlC = top3C[2];
+    // 빅 원만 블러 (사용자 요청), 좌·우 작은 원은 진짜 % 노출
     const bubblesViralC = '<div style="position:relative;width:100%;height:170px;display:flex;align-items:center;justify-content:center;">'
-      + '<div style="position:absolute;left:6%;top:55%;width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+smlC.bg+'cc,'+smlC.color+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 14px '+smlC.color+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+smlC.name+'</div><div style="font-size:14px;font-weight:900;filter:blur(3.5px);user-select:none;">'+smlC.pct+'%</div></div>'
-      + '<div style="width:138px;height:138px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b8,#f4d860);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(244,216,96,0.6),inset 0 3px 8px rgba(255,255,255,0.55);position:relative;z-index:2;"><div style="font-size:11px;font-weight:800;color:#5a3a00;letter-spacing:-0.2px;">'+bigC.name+'</div><div style="font-size:36px;font-weight:900;color:#3a2400;line-height:1;filter:blur(7px);user-select:none;">'+bigC.pct+'%</div><div style="font-size:9px;color:#5a3a00;margin-top:3px;font-weight:700;opacity:0.78;">타고난 적성</div></div>'
-      + '<div style="position:absolute;right:5%;top:18%;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+midC.bg+'dd,'+midC.color+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 16px '+midC.color+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+midC.name+'</div><div style="font-size:18px;font-weight:900;filter:blur(4.5px);user-select:none;">'+midC.pct+'%</div></div>'
+      + '<div style="position:absolute;left:6%;top:55%;width:66px;height:66px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+smlC.bg+'cc,'+smlC.color+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 14px '+smlC.color+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+smlC.name+'</div><div style="font-size:18px;font-weight:900;line-height:1;margin-top:2px;">'+smlC.pct+'%</div></div>'
+      + '<div style="width:138px;height:138px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff5b8,#f4d860);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(244,216,96,0.6),inset 0 3px 8px rgba(255,255,255,0.55);position:relative;z-index:2;"><div style="font-size:11px;font-weight:800;color:#5a3a00;letter-spacing:-0.2px;">'+bigC.name+'</div><div style="font-size:36px;font-weight:900;color:#3a2400;line-height:1;filter:blur(7px);user-select:none;">'+bigC.pct+'%</div><div style="font-size:9px;color:#5a3a00;margin-top:3px;font-weight:700;opacity:0.78;">🔒 잠금</div></div>'
+      + '<div style="position:absolute;right:5%;top:18%;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 35% 30%,'+midC.bg+'dd,'+midC.color+');display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 16px '+midC.color+'66;color:#fff;"><div style="font-size:9px;font-weight:800;opacity:0.95;letter-spacing:-0.3px;">'+midC.name+'</div><div style="font-size:22px;font-weight:900;line-height:1;margin-top:2px;">'+midC.pct+'%</div></div>'
       + '</div>';
 
     // 실제 child_career 섹션과 일치하는 라벨 (TYPE_SECTIONS.child_career 기반)
@@ -3785,15 +3797,12 @@ function renderCharVisual() {
         + '</div>';
     }).join('');
 
-    // 레이더도 파스텔 카드로
-    const radarSvgPastel = radarSvgC.replace(/fill="#fdf7e0"/g, 'fill="#7a5210"').replace(/stroke="rgba\(212,184,108,0.22\)"/g, 'stroke="rgba(180,130,50,0.28)"').replace(/stroke="rgba\(212,184,108,0.18\)"/g, 'stroke="rgba(180,130,50,0.22)"');
-
     visualHtml = '<div style="padding:14px 14px 12px;display:flex;flex-direction:column;gap:14px;">'
       + '<div style="text-align:center;font-size:13px;font-weight:700;color:#3a2a10;letter-spacing:-0.3px;line-height:1.55;">' + nameKwC + ' <b style="color:#b89048;">' + metaphorC + '</b> 같은 재능이 보여요</div>'
       + bubblesViralC
-      + '<div style="background:linear-gradient(160deg,#fbf3da,#f0e2bc);border-radius:18px;padding:18px 8px 14px;border:1.5px solid rgba(180,130,50,0.3);box-shadow:0 4px 14px rgba(180,130,50,0.15),inset 0 1px 0 rgba(255,255,255,0.5);">'
+      + '<div style="background:linear-gradient(160deg,#fbf3da,#f0e2bc);border-radius:18px;padding:18px 4px 14px;border:1.5px solid rgba(180,130,50,0.3);box-shadow:0 4px 14px rgba(180,130,50,0.15),inset 0 1px 0 rgba(255,255,255,0.5);">'
       + '<div style="text-align:center;font-size:11px;font-weight:900;color:#8a6620;letter-spacing:1.2px;margin-bottom:6px;">8가지 재능 지표</div>'
-      + radarSvgPastel
+      + radarSvgC
       + '</div>'
       + '<div style="display:flex;gap:7px;">' + lockHtmlC + '</div>'
       + '<div style="text-align:center;font-size:11px;color:#8a6620;font-weight:800;letter-spacing:0.3px;background:linear-gradient(135deg,rgba(244,216,96,0.22),rgba(180,130,50,0.08));padding:9px 12px;border-radius:10px;border:1px dashed rgba(180,130,50,0.35);">🔒 리포트를 받으면 모든 답이 즉시 공개돼요</div>'
