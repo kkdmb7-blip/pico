@@ -1349,41 +1349,55 @@
     } catch(e) {}
     if (!uid) return;
 
+    function applyPetState(rows, onNew) {
+      if (!rows || !rows[0] || !rows[0].content || !rows[0].content[0]) return false;
+      try {
+        var raw = JSON.parse(rows[0].content[0]);
+        var elem = raw.element;
+        if (!elem) return false;
+        var stats = (raw.all && raw.all[elem]) ? raw.all[elem] : raw;
+        var newState = Object.assign({ element: elem }, stats);
+        var prevElem = _overrideState ? _overrideState.element : null;
+        _overrideState = newState;
+        if (onNew) { onNew(); }
+        else if (prevElem !== elem) {
+          // 원소 변경 (wrapper 있으면 재생성, 없으면 새로 생성)
+          clearTimeout(moveTimer);
+          if (bubble && bubble.parentNode) bubble.parentNode.removeChild(bubble);
+          if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+          var eggBtn = document.getElementById('yongsin-egg-btn');
+          if (eggBtn && eggBtn.parentNode) eggBtn.parentNode.removeChild(eggBtn);
+          pet = null; bubble = null; wrapper = null;
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+          } else {
+            setTimeout(init, 300);
+          }
+        } else if (wrapper) {
+          // 같은 원소 → 레벨/에너지 바만 갱신
+          var lvEl = document.getElementById('yongsin-float-lv');
+          var fillEl = document.getElementById('yongsin-float-efill');
+          if (lvEl) lvEl.textContent = 'Lv.' + (newState.level || 1);
+          if (fillEl) fillEl.style.width = Math.round(newState.energy || 0) + '%';
+        }
+        return true;
+      } catch(e) { return false; }
+    }
+
     function fetchAndApply(onNew) {
-      // uid(UUID) + altUid(kakao_xxx) 둘 다 조회해서 구형/신형 저장 모두 대응
-      var uidFilter = (altUid && altUid !== uid)
-        ? 'user_id=in.(' + uid + ',' + altUid + ')'
-        : 'user_id=eq.' + encodeURIComponent(uid);
-      fetch(SB_URL + '/rest/v1/reports?' + uidFilter + '&report_type=eq.pet_state&select=content&order=created_at.desc&limit=1', {
+      // UUID로 먼저 조회, 없으면 kakao_xxx 형식으로 폴백 (in() 필터는 UUID 타입 컬럼에서 타입 오류 가능)
+      fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state&select=content&order=created_at.desc&limit=1', {
         headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
       }).then(function(r) { return r.json(); }).then(function(rows) {
-        if (!rows || !rows[0] || !rows[0].content || !rows[0].content[0]) return;
-        try {
-          var raw = JSON.parse(rows[0].content[0]);
-          var elem = raw.element;
-          if (!elem) return;
-          var stats = (raw.all && raw.all[elem]) ? raw.all[elem] : raw;
-          var newState = Object.assign({ element: elem }, stats);
-          // 원소가 바뀌었으면 펫 재생성
-          var prevElem = _overrideState ? _overrideState.element : null;
-          _overrideState = newState;
-          if (onNew) { onNew(); }
-          else if (prevElem && prevElem !== elem && wrapper) {
-            // 원소 변경 → 기존 펫 제거 후 재생성
-            clearTimeout(moveTimer);
-            if (bubble && bubble.parentNode) bubble.parentNode.removeChild(bubble);
-            if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
-            pet = null; bubble = null; wrapper = null;
-            init();
-          } else if (wrapper) {
-            // 같은 원소 → 레벨/에너지 바만 갱신
-            var lvEl = document.getElementById('yongsin-float-lv');
-            var fillEl = document.getElementById('yongsin-float-efill');
-            if (lvEl) lvEl.textContent = 'Lv.' + (newState.level || 1);
-            if (fillEl) fillEl.style.width = Math.round(newState.energy || 0) + '%';
-          }
-        } catch(e) {}
-      }).catch(function() {});
+        if (applyPetState(rows, onNew)) return;
+        // UUID로 못 찾으면 kakao_xxx 형식 폴백
+        if (!altUid || altUid === uid) { if (onNew) onNew(); return; }
+        fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(altUid) + '&report_type=eq.pet_state&select=content&order=created_at.desc&limit=1', {
+          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+        }).then(function(r2) { return r2.json(); }).then(function(rows2) {
+          if (!applyPetState(rows2, onNew) && onNew) onNew();
+        }).catch(function() { if (onNew) onNew(); });
+      }).catch(function() { if (onNew) onNew(); });
     }
 
     // 용신 미각성 유저용 알 버튼

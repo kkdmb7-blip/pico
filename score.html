@@ -806,11 +806,15 @@ function shareScoreKakao() {
   if (isMobile && navigator.share) {
     navigator.share({ title: 'FORTUNA 운세점수', text: text, url: pageUrl }).catch(function(){});
   } else if (window.Kakao && Kakao.Share) {
-    if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
+    if (!Kakao.isInitialized()) { try { Kakao.init('25432f8a37e0ac51a5e10cbcba8ae413'); } catch(e) {} }
     Kakao.Share.sendDefault({
-      objectType: 'text',
-      text: text,
-      link: { mobileWebUrl: pageUrl, webUrl: pageUrl },
+      objectType: 'feed',
+      content: {
+        title: 'FORTUNA 운세점수',
+        description: text,
+        imageUrl: 'https://picolab.kr/img/goddess-app.png',
+        link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+      },
       buttons: [{ title: '무료로 확인하기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
     });
   } else {

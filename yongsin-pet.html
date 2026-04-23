@@ -1268,6 +1268,9 @@ function selectElement(el) {
   var newElState = allStates[el] ? _applyOfflineTime(Object.assign({}, allStates[el])) : fresh;
   Object.assign(state, getDefaultState(), newElState, { element: el });
   saveState();
+  // 원소 변경은 타이머 기다리지 않고 즉시 Supabase 동기화 (이탈 전 소실 방지)
+  clearTimeout(_syncTimer);
+  syncToServer();
   render();
   renderSlotTabs();
 }

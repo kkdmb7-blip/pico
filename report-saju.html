@@ -497,7 +497,7 @@ select option { background:var(--surface2); color:var(--text); }
 <script>
 // ── 상수 ──────────────────────────────────────────────────────────
 var KAKAO_REST_KEY = '51b4f87ad9cfd6312c176ad34eb62025';
-var KAKAO_JS_KEY   = '2543c896dead8185e2edfa0976396f25';
+var KAKAO_JS_KEY   = '25432f8a37e0ac51a5e10cbcba8ae413';
 var WORKER_BASE    = 'https://fortuna.kkdmb7.workers.dev';
 var SB_URL         = 'https://ymghmfkqctckxxysxkvy.supabase.co';
 var SB_KEY         = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
@@ -915,18 +915,26 @@ function markdownToHtml(md) {
 
 // ── 카카오 공유 ──────────────────────────────────────────────────
 function shareKakao() {
+  var ilju = (_workerData && _workerData.일주) || '';
+  var pageUrl = 'https://picolab.kr/report-saju.html';
+  var shareText = '✨ ' + ilju + ' 일주 나만의 사주 리포트\n\nFORTUNA에서 AI 심층 사주 분석을 받아보세요!';
+  if (navigator.share) {
+    navigator.share({ title: 'FORTUNA 사주 리포트', text: shareText, url: pageUrl }).catch(function(){});
+    return;
+  }
   if (!window.Kakao || !window.Kakao.isInitialized()) {
     showToast('카카오 초기화 중입니다. 잠시 후 다시 시도해주세요.');
     return;
   }
-  var ilju = (_workerData && _workerData.일주) || '';
   Kakao.Share.sendDefault({
-    objectType: 'text',
-    text: '✨ ' + ilju + ' 일주 나만의 사주 리포트\n\nFORTUNA에서 AI 심층 사주 분석을 받아보세요!',
-    link: {
-      mobileWebUrl: 'https://picolab.kr/report-saju.html',
-      webUrl: 'https://picolab.kr/report-saju.html',
+    objectType: 'feed',
+    content: {
+      title: 'FORTUNA 사주 리포트',
+      description: shareText,
+      imageUrl: 'https://picolab.kr/img/goddess-app.png',
+      link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
     },
+    buttons: [{ title: '사주 리포트 보러가기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
   });
 }
 
