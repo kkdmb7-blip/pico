@@ -479,10 +479,10 @@ nav {
   box-shadow: 0 2px 12px rgba(0,0,0,0.07);
 }
 .btn-share {
-  background: #fff;
-  border: 1.5px solid rgba(80,55,30,0.15);
-  color: #1a120a;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  background: #fee500;
+  border: none;
+  color: #3c1e1e;
+  box-shadow: 0 2px 12px rgba(254,229,0,0.25);
 }
 .orb-note {
   font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px;
@@ -6655,7 +6655,7 @@ function showRelatedReports() {
     let html = '';
     items.forEach(function(it) {
       const url = 'report.html?type=' + encodeURIComponent(it.t);
-      html += '<a href="'+url+'" style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,55,30,0.12);border-radius:12px;padding:11px 13px;text-decoration:none;color:#241a10;transition:background 0.15s;">'
+      html += '<a href="'+url+'" style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border-soft);border-radius:12px;padding:11px 13px;text-decoration:none;color:#241a10;transition:background 0.15s;">'
         + '<div style="font-size:24px;flex-shrink:0;color:#8a6a15;">'+it.icon+'</div>'
         + '<div style="flex:1;min-width:0;">'
           + '<div style="font-size:13px;font-weight:700;line-height:1.35;">'+it.title+'</div>'
@@ -6823,9 +6823,13 @@ function shareKakao() {
   if (window.Kakao && Kakao.Share) {
     if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
     Kakao.Share.sendDefault({
-      objectType: 'text',
-      text: title + '\n\n' + body,
-      link: { mobileWebUrl: url, webUrl: url },
+      objectType: 'feed',
+      content: {
+        title: title,
+        description: body,
+        imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
+        link: { mobileWebUrl: url, webUrl: url }
+      },
       buttons: [{ title: '전체 리포트 보기', link: { mobileWebUrl: url, webUrl: url } }]
     });
     return;
