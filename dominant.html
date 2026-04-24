@@ -656,28 +656,28 @@ function _drawDominantCard(cb) {
   ctx.fillStyle=icg; ctx.fillRect(cx-300,cy-300,600,600);
   ctx.font='240px serif';
   ctx.fillText(info.emoji,cx,cy+84);
-  y+=480;
+  y+=540;
 
   // DOMINANT PLANET 배지
   ctx.font='600 22px sans-serif';
   ctx.fillStyle=pHex;
   ctx.fillText('·  D O M I N A N T   P L A N E T  ·',W/2,y);
-  y+=52;
+  y+=110;
 
   // 행성 한글명 (초대형)
   ctx.font='800 120px "Noto Serif KR",serif';
   ctx.fillStyle=pHex; ctx.fillText(info.name,W/2,y);
-  y+=48;
+  y+=65;
 
   // 행성 영문명
   ctx.font='500 36px serif';
   ctx.fillStyle='rgba(74,58,42,0.55)'; ctx.fillText(info.en.toUpperCase(),W/2,y);
-  y+=62;
+  y+=58;
 
   // 키워드 라인
   ctx.font='600 30px "Noto Sans KR",sans-serif';
   ctx.fillStyle=pHex; ctx.fillText('✦  '+info.keyword+'  ✦',W/2,y);
-  y+=64;
+  y+=50;
 
   // 구분선
   var ln2=ctx.createLinearGradient(W/2-240,0,W/2+240,0);
@@ -685,7 +685,7 @@ function _drawDominantCard(cb) {
   ctx.strokeStyle=ln2; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-240,y); ctx.lineTo(W/2+240,y); ctx.stroke();
 
   // 설명 (2~3줄 wrap)
-  y+=60;
+  y+=52;
   ctx.font='400 28px "Noto Sans KR",sans-serif';
   ctx.fillStyle='rgba(74,58,42,0.82)';
   var desc=info.desc||'';
@@ -697,7 +697,7 @@ function _drawDominantCard(cb) {
   }
   if (line) lines.push(line);
   lines.slice(0,3).forEach(function(l,i){ ctx.fillText(l,W/2,y+i*44); });
-  y+=lines.slice(0,3).length*44+40;
+  y+=lines.slice(0,3).length*44+50;
 
   // 특징 5개 칩
   ctx.textAlign='left';
