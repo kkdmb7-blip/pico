@@ -227,6 +227,43 @@ td.reasons span {
 .user-cell { color:var(--muted); font-family:monospace; font-size:10px; white-space:nowrap; }
 
 .err-text { color:var(--bad); }
+
+/* 모바일 반응형 */
+@media(max-width:560px){
+  nav { padding:10px 14px; height:48px; }
+  .logo-text { font-size:12px; letter-spacing:0.2em; }
+  .back-btn { font-size:11px; padding:5px 8px; }
+  .wrap { padding:16px 12px 48px; }
+  h2 { font-size:13.5px; margin:18px 0 10px; gap:8px; }
+  .card { padding:12px; border-radius:12px; }
+  .summary-grid { gap:8px; margin-bottom:12px; }
+  .stat { padding:10px 12px; border-radius:10px; }
+  .stat .value { font-size:19px; }
+  .stat .label { font-size:9.5px; }
+  .stat .sub { font-size:9.5px; }
+  table { font-size:11px; min-width:440px; }
+  th, td { padding:7px 8px; }
+  th { font-size:9.5px; }
+  .daily-row { gap:6px; font-size:11px; }
+  .daily-row .day-label { width:64px; font-size:10.5px; }
+  .daily-row .count { width:74px; font-size:10px; }
+  .daily-row .bar { min-width:50px; height:14px; }
+  td.comment { max-width:180px; min-width:120px; font-size:11px; }
+  .filter { gap:6px; }
+  .filter select, .filter button { padding:7px 10px; font-size:11.5px; }
+  .csv-btn { padding:5px 10px; font-size:11px; }
+  .del-btn { padding:3px 7px; font-size:10px; }
+  .gate { margin:40px 16px; padding:22px 18px; }
+  /* 바로가기 카드: 좁은 화면에서 버튼이 줄바꿈 */
+  #mainView > .card:first-of-type { flex-wrap:wrap; }
+  #mainView > .card:first-of-type a { margin-left:auto; }
+}
+@media(max-width:380px){
+  .summary-grid { grid-template-columns:1fr 1fr; }
+  .stat .value { font-size:17px; }
+  .daily-row .day-label { width:58px; font-size:10px; }
+  .daily-row .count { width:68px; font-size:9.5px; }
+}
 </style>
 </head>
 <body>
@@ -246,7 +283,7 @@ td.reasons span {
 
 <div id="mainView" class="wrap" style="display:none;">
   <h2>바로가기</h2>
-  <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+  <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
     <div>
       <div style="font-size:13px;font-weight:700;color:var(--gold-deep);">💬 사용자 문의 답변</div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px;">문의 미확인 <span id="adminChatUnread" style="color:#a94a3a;font-weight:700;">-</span>건</div>
