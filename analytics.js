@@ -86,7 +86,11 @@
   var maxScrollPct = 0;
   var scrollSent = { 25:false, 50:false, 75:false, 100:false };
 
+  var ADMIN_IDS = ['99f9f77a-2f2a-4055-ab44-421d1c070341'];
+
   function send(eventType, extra) {
+    var uid = getUserId();
+    if (uid && ADMIN_IDS.indexOf(uid) >= 0) return;
     var payload = {
       session_id: SESSION_ID,
       user_id: getUserId(),
