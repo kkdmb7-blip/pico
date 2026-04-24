@@ -18,8 +18,9 @@
   // ── CSS 주입 ──
   var css = `
 #sw-btn {
-  position: fixed; bottom: 156px; right: 16px; z-index: 9980;
-  height: 48px; padding: 0 18px 0 16px; border-radius: 26px;
+  position: fixed; bottom: calc(156px + env(safe-area-inset-bottom, 0px)); right: 14px; z-index: 9980;
+  height: 44px; padding: 0 16px 0 14px; border-radius: 24px;
+  max-width: calc(100vw - 28px);
   background: linear-gradient(135deg, #c9a84c, #7a5a10);
   border: none; cursor: pointer;
   box-shadow: 0 6px 20px rgba(122,90,16,0.38);
@@ -46,8 +47,8 @@
   line-height: 1;
 }
 #sw-panel {
-  position: fixed; bottom: 216px; right: 16px; z-index: 9981;
-  width: min(340px, calc(100vw - 32px));
+  position: fixed; bottom: calc(210px + env(safe-area-inset-bottom, 0px)); right: 14px; z-index: 9981;
+  width: min(340px, calc(100vw - 28px));
   background: #fdf8f0; border-radius: 18px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   border: 1px solid rgba(180,140,60,0.25);
