@@ -230,6 +230,11 @@
   .btn-vedic-ai:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(74,50,128,.35);}
   .btn-vedic-ai:disabled{opacity:.5;cursor:default;transform:none;}
   .vedic-ai-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(30,20,50,0.95);color:#c4a8f0;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;opacity:0;}
+
+  /* VEDIC TOOLTIP */
+  .vt{border-bottom:1px dashed var(--gold);cursor:help;position:relative;display:inline;}
+  .vt-bubble{display:none;position:fixed;z-index:8000;max-width:240px;background:rgba(26,18,10,0.95);color:#f5ede0;font-size:12px;line-height:1.6;padding:9px 13px;border-radius:10px;border:1px solid rgba(154,122,38,0.45);box-shadow:0 4px 20px rgba(0,0,0,0.35);pointer-events:none;word-break:keep-all;}
+  .vt-bubble::before{content:'';position:absolute;top:-5px;left:14px;width:9px;height:9px;background:rgba(26,18,10,0.95);border-left:1px solid rgba(154,122,38,0.45);border-top:1px solid rgba(154,122,38,0.45);transform:rotate(45deg);}
 </style>
   <link rel="stylesheet" href="pico-icons.css">
 <script src="analytics.js" defer></script>
@@ -1076,6 +1081,97 @@ function getVedicSb() {
   return _vedicSbClient;
 }
 
+// ── 베딕 용어 툴팁 ───────────────────────────────────────────
+const VT = {
+  '라시':'인도 점성술의 12별자리. 서양 점성술의 사인(Sign)과 같지만 약 23도 차이나는 사이드리얼 계산을 사용합니다.',
+  '라그나':'상승궁. 태어난 순간 동쪽 지평선에 떠오르던 별자리로, 외적 인상과 삶의 출발점을 나타냅니다.',
+  '낙샤트라':'달이 지나는 27개의 별자리 구역. 달의 하루하루 위치를 나타내며 타고난 감정 패턴과 카르마 과제를 보여줍니다.',
+  '파다':'낙샤트라를 4등분한 구간(각 3°20′). 1~4파다로 나뉘며 나바암샤 차트와 연결됩니다.',
+  '다샤':'행성이 지배하는 시간 주기. 비므쇼타리 체계 기준 120년을 9개 행성이 나눠 지배합니다.',
+  '마하다샤':'대주기(大週期). 한 행성이 수년~수십 년을 지배하는 큰 운세 사이클입니다.',
+  '안타르다샤':'소주기(小週期). 마하다샤 안에서 세부 행성이 약 수개월~수년간 지배하는 하위 주기입니다.',
+  '산디':'다샤 전환기. 한 주기가 끝나고 다음 주기가 시작되는 약 6개월의 불안정 구간입니다.',
+  '요가':'두 개 이상의 행성이 특정 조합을 이룰 때 나타나는 특수 패턴. 길(吉)·흉(凶)·혼합 효과를 냅니다.',
+  '도샤':'결함 또는 불균형. 특정 행성 배치가 삶의 특정 영역에 긴장을 유발하는 상태입니다.',
+  '망글릭':'화성이 1·4·7·8·12하우스에 위치할 때 나타나는 도샤. 결혼·관계에 영향을 줄 수 있습니다.',
+  '우파야':'처방 또는 해결책. 약한 행성을 강화하기 위한 인도 전통 방법(만트라·보석·요일 등)입니다.',
+  '아트마카라카':'영혼의 행성. 출생 차트에서 가장 높은 도수를 가진 행성으로 이번 생의 영적 목적을 나타냅니다.',
+  '카라캄샤':'아트마카라카가 나바암샤(D9) 차트에서 위치한 별자리. 영혼이 이번 생에서 실현하려는 영역을 보여줍니다.',
+  '사데 사티':'토성이 달 라시 앞뒤 별자리를 통과하는 약 7.5년의 주기. 인생 구조조정기로 책임·인내가 요구됩니다.',
+  '나바암샤':'D9 차트. 출생 차트를 9등분한 세부 차트로 결혼·영적 성숙·삶의 후반을 봅니다.',
+  '아슈타카바르가':'행성 강도 점수 체계. 각 행성이 특정 별자리에서 얼마나 좋은 에너지를 받는지 0~8점으로 나타냅니다.',
+  '빈두':'아슈타카바르가의 점수 단위. 높을수록(5이상) 그 별자리에서 행성이 강하게 작동합니다.',
+  '트랜짓':'현재 하늘의 행성 위치가 출생 차트에 미치는 영향. 지금 어떤 에너지가 활성화되는지 보여줍니다.',
+  '하우스':'삶의 12영역(자아·재물·형제·가정·자녀·건강·결혼·변화·철학·직업·사회·영성 등)을 나타내는 구획입니다.',
+  '비므쇼타리':'120년을 주기로 하는 다샤 체계. 달의 낙샤트라 위치에 따라 첫 번째 행성과 기간이 결정됩니다.',
+  '사이드리얼':'항성(실제 별자리) 기준 계산법. 서양 점성술의 열대(춘분점 기준)와 약 23도 차이가 납니다.',
+};
+
+// 툴팁 버블 싱글턴
+const _vtBubble = (function(){
+  const el = document.createElement('div');
+  el.className = 'vt-bubble';
+  document.body.appendChild(el);
+  return el;
+})();
+
+function vtShow(term, anchorEl) {
+  const tip = VT[term];
+  if (!tip) return;
+  _vtBubble.textContent = tip;
+  _vtBubble.style.display = 'block';
+  const r = anchorEl.getBoundingClientRect();
+  let top = r.bottom + 8;
+  let left = r.left;
+  if (left + 250 > window.innerWidth) left = window.innerWidth - 254;
+  if (top + 100 > window.innerHeight) top = r.top - _vtBubble.offsetHeight - 8;
+  _vtBubble.style.top = top + 'px';
+  _vtBubble.style.left = left + 'px';
+}
+function vtHide() { _vtBubble.style.display = 'none'; }
+
+document.addEventListener('mouseover', function(e) {
+  const t = e.target.closest('.vt');
+  if (t) vtShow(t.dataset.term, t); else vtHide();
+});
+document.addEventListener('click', function(e) {
+  const t = e.target.closest('.vt');
+  if (t) {
+    if (_vtBubble.style.display === 'block') vtHide();
+    else vtShow(t.dataset.term, t);
+    e.stopPropagation();
+  } else { vtHide(); }
+});
+document.addEventListener('scroll', vtHide, true);
+
+// HTML에서 베딕 용어를 자동으로 .vt 스팬으로 감싸는 함수
+function applyVedicTooltips(rootEl) {
+  if (!rootEl) return;
+  const terms = Object.keys(VT).sort((a,b) => b.length - a.length);
+  const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  let node;
+  while ((node = walker.nextNode())) nodes.push(node);
+  nodes.forEach(function(n) {
+    if (['SCRIPT','STYLE'].includes(n.parentNode.tagName)) return;
+    if (n.parentNode.classList && n.parentNode.classList.contains('vt')) return;
+    let text = n.textContent;
+    let replaced = false;
+    terms.forEach(function(term) {
+      if (text.includes(term) && !replaced) {
+        const idx = text.indexOf(term);
+        const span = document.createElement('span');
+        span.innerHTML =
+          text.slice(0, idx) +
+          '<span class="vt" data-term="' + term + '">' + term + '</span>' +
+          text.slice(idx + term.length);
+        n.parentNode.replaceChild(span, n);
+        replaced = true;
+      }
+    });
+  });
+}
+
 function renderBlockText(elId, rawText) {
   var el = document.getElementById(elId);
   if (!el || !rawText) return;
@@ -1343,6 +1439,8 @@ async function loadVedic(year, month, day, hour, gender) {
     }
 
     window._vedicData = d;
+    // 모든 섹션 렌더 후 베딕 용어 툴팁 일괄 적용
+    setTimeout(function(){ applyVedicTooltips(document.querySelector('main')); }, 50);
     setVisible('card-ai', true);
     var wrap = document.getElementById('vedicShareBtnWrap');
     wrap.style.display = 'flex';
