@@ -258,6 +258,18 @@ td.reasons span {
   #mainView > .card:first-of-type { flex-wrap:wrap; }
   #mainView > .card:first-of-type a { margin-left:auto; }
 }
+/* 분석 섹션 전용 */
+@media(min-width:560px){
+  #anEntryExitGrid { grid-template-columns:1fr 1fr !important; }
+}
+.an-bar-row { display:flex; align-items:center; gap:10px; font-size:11.5px; padding:5px 0; border-bottom:1px solid rgba(60,40,20,0.08); }
+.an-bar-row:last-child { border-bottom:none; }
+.an-bar-row .label { flex:1; min-width:0; color:var(--text2); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.an-bar-row .bar { width:100px; height:8px; background:var(--surface2); border-radius:999px; overflow:hidden; flex-shrink:0; }
+.an-bar-row .bar > div { height:100%; background:linear-gradient(90deg,var(--gold-deep),var(--gold)); }
+.an-bar-row .num { width:64px; text-align:right; font-variant-numeric:lining-nums; color:var(--gold-deep); font-weight:700; font-size:11px; flex-shrink:0; }
+.an-bar-row .sub { color:var(--muted); font-size:10px; flex-shrink:0; }
+
 @media(max-width:380px){
   .summary-grid { grid-template-columns:1fr 1fr; }
   .stat .value { font-size:17px; }
@@ -298,6 +310,28 @@ td.reasons span {
     <div class="stat"><div class="label">리포트</div><div class="value" id="stReports">-</div><div class="sub">오늘 생성된 리포트</div></div>
     <div class="stat"><div class="label">채팅 메시지</div><div class="value" id="stMessages">-</div><div class="sub">오늘 주고받은 메시지</div></div>
   </div>
+
+  <h2>
+    <span>사용자 행동 분석 <span id="anDays" style="font-size:11px;color:var(--muted);font-weight:400;"></span></span>
+    <select id="anRange" style="padding:5px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--border-soft);color:var(--text);font-size:11.5px;font-family:inherit;">
+      <option value="1">최근 1일</option>
+      <option value="7" selected>최근 7일</option>
+      <option value="14">최근 14일</option>
+      <option value="30">최근 30일</option>
+    </select>
+  </h2>
+  <div id="anSummary" class="summary-grid"></div>
+  <h2 style="font-size:13px;">인기 페이지 (뷰 기준)</h2>
+  <div id="anPages" class="card"><div class="loading">불러오는 중...</div></div>
+  <h2 style="font-size:13px;">진입 페이지 · 이탈 페이지</h2>
+  <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px;" id="anEntryExitGrid">
+    <div class="card" id="anEntries"><div class="loading">진입 페이지 불러오는 중...</div></div>
+    <div class="card" id="anExits"><div class="loading">이탈 페이지 불러오는 중...</div></div>
+  </div>
+  <h2 style="font-size:13px;">페이지 전환 Top 20 (A → B)</h2>
+  <div id="anTransitions" class="card"><div class="loading">불러오는 중...</div></div>
+  <h2 style="font-size:13px;">일별 방문 추이</h2>
+  <div id="anDaily" class="card"><div class="loading">불러오는 중...</div></div>
 
   <h2>AI 피드백 대시보드</h2>
 
@@ -541,6 +575,109 @@ async function boot() {
   loadDaily();
   loadRecent();
   loadChatUnread();
+  loadAnalytics();
+}
+
+async function loadAnalytics() {
+  const days = parseInt(qs('anRange').value || '7', 10);
+  qs('anDays').textContent = '· 최근 ' + days + '일';
+  qs('anPages').innerHTML = '<div class="loading">불러오는 중...</div>';
+  qs('anEntries').innerHTML = '<div class="loading">진입 페이지 불러오는 중...</div>';
+  qs('anExits').innerHTML = '<div class="loading">이탈 페이지 불러오는 중...</div>';
+  qs('anTransitions').innerHTML = '<div class="loading">불러오는 중...</div>';
+  qs('anDaily').innerHTML = '<div class="loading">불러오는 중...</div>';
+  qs('anSummary').innerHTML = '';
+  try {
+    const [sum, fun] = await Promise.all([
+      fetchJson(`/admin/analytics-summary?days=${days}`),
+      fetchJson(`/admin/analytics-funnel?days=${days}`)
+    ]);
+    // 요약
+    qs('anSummary').innerHTML = `
+      <div class="stat"><div class="label">총 페이지뷰</div><div class="value">${(sum.total_views||0).toLocaleString()}</div></div>
+      <div class="stat"><div class="label">세션 수</div><div class="value">${(sum.total_sessions||0).toLocaleString()}</div></div>
+      <div class="stat"><div class="label">이탈률</div><div class="value" style="color:var(--bad);">${sum.bounce_rate||0}%</div><div class="sub">1페이지만 본 세션</div></div>
+      <div class="stat"><div class="label">페이지/세션</div><div class="value">${sum.total_sessions ? (sum.total_views / sum.total_sessions).toFixed(1) : '0'}</div></div>
+    `;
+    // 인기 페이지
+    if (!sum.pages || !sum.pages.length) {
+      qs('anPages').innerHTML = '<div class="empty">데이터 없음 (아직 수집 전이거나 스키마 미적용)</div>';
+    } else {
+      const maxV = Math.max(1, ...sum.pages.map(p => p.views));
+      qs('anPages').innerHTML = sum.pages.slice(0, 20).map(p => {
+        const pct = (p.views / maxV) * 100;
+        const dur = p.avg_duration_ms ? (p.avg_duration_ms/1000).toFixed(1) + '초' : '-';
+        return `<div class="an-bar-row">
+          <span class="label">${escapeHtml(p.page)}</span>
+          <span class="bar"><div style="width:${pct}%;"></div></span>
+          <span class="num">${p.views.toLocaleString()}</span>
+          <span class="sub">${p.sessions.toLocaleString()}세션 · ${dur}</span>
+        </div>`;
+      }).join('');
+    }
+    // 진입
+    if (!sum.entries || !sum.entries.length) {
+      qs('anEntries').innerHTML = '<div class="empty">진입 데이터 없음</div>';
+    } else {
+      const maxE = Math.max(1, ...sum.entries.map(e => e.count));
+      qs('anEntries').innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--gold-deep);margin-bottom:8px;">진입 페이지 (유입)</div>' + sum.entries.slice(0,10).map(e => {
+        const pct = (e.count / maxE) * 100;
+        return `<div class="an-bar-row">
+          <span class="label">${escapeHtml(e.page)}</span>
+          <span class="bar"><div style="width:${pct}%;background:linear-gradient(90deg,#4a7a3a,#6a9a5a);"></div></span>
+          <span class="num">${e.count.toLocaleString()}</span>
+        </div>`;
+      }).join('');
+    }
+    // 이탈
+    if (!fun.exits || !fun.exits.length) {
+      qs('anExits').innerHTML = '<div class="empty">이탈 데이터 없음</div>';
+    } else {
+      const maxX = Math.max(1, ...fun.exits.map(e => e.count));
+      qs('anExits').innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--bad);margin-bottom:8px;">이탈 페이지 (세션 끝)</div>' + fun.exits.slice(0,10).map(e => {
+        const pct = (e.count / maxX) * 100;
+        return `<div class="an-bar-row">
+          <span class="label">${escapeHtml(e.page)}</span>
+          <span class="bar"><div style="width:${pct}%;background:linear-gradient(90deg,#a94a3a,#c76a5a);"></div></span>
+          <span class="num">${e.count.toLocaleString()}</span>
+        </div>`;
+      }).join('');
+    }
+    // 전환
+    if (!fun.transitions || !fun.transitions.length) {
+      qs('anTransitions').innerHTML = '<div class="empty">전환 데이터 없음</div>';
+    } else {
+      const maxT = Math.max(1, ...fun.transitions.map(t => t.count));
+      qs('anTransitions').innerHTML = fun.transitions.slice(0,20).map(t => {
+        const pct = (t.count / maxT) * 100;
+        return `<div class="an-bar-row">
+          <span class="label">${escapeHtml(t.from)} <span style="color:var(--muted);">→</span> ${escapeHtml(t.to)}</span>
+          <span class="bar"><div style="width:${pct}%;"></div></span>
+          <span class="num">${t.count.toLocaleString()}</span>
+        </div>`;
+      }).join('');
+    }
+    // 일별
+    if (!sum.daily || !sum.daily.length) {
+      qs('anDaily').innerHTML = '<div class="empty">추이 데이터 없음</div>';
+    } else {
+      const maxD = Math.max(1, ...sum.daily.map(d => d.views));
+      qs('anDaily').innerHTML = sum.daily.map(d => {
+        const pct = (d.views / maxD) * 100;
+        return `<div class="daily-row">
+          <div class="day-label">${d.day}</div>
+          <div class="bar"><div class="bar-up" style="width:${pct}%;"></div></div>
+          <div class="count">${d.views.toLocaleString()}뷰 · ${d.sessions.toLocaleString()}세션</div>
+        </div>`;
+      }).join('');
+    }
+  } catch(e) {
+    qs('anPages').innerHTML = `<div class="empty err-text">오류: ${e.message}</div>`;
+    qs('anEntries').innerHTML = '';
+    qs('anExits').innerHTML = '';
+    qs('anTransitions').innerHTML = '';
+    qs('anDaily').innerHTML = '';
+  }
 }
 
 async function loadChatUnread() {
@@ -609,7 +746,7 @@ qs('gateSubmit').addEventListener('click', async () => {
     localStorage.setItem(LS_KEY, adminUuid);
     qs('gateView').style.display = 'none';
     qs('mainView').style.display = 'block';
-    loadToday(); loadStats(); loadDaily(); loadRecent();
+    loadToday(); loadStats(); loadDaily(); loadRecent(); loadAnalytics();
   } catch(e) {
     qs('gateError').textContent = '인증 실패: ' + e.message;
     adminUuid = '';
@@ -618,6 +755,7 @@ qs('gateSubmit').addEventListener('click', async () => {
 qs('adminUuid')?.addEventListener('keydown', e => { if (e.key === 'Enter') qs('gateSubmit').click(); });
 qs('fltApply').addEventListener('click', loadRecent);
 qs('csvBtn').addEventListener('click', exportCsv);
+qs('anRange').addEventListener('change', loadAnalytics);
 
 boot();
 </script>
