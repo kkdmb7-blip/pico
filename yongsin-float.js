@@ -191,6 +191,7 @@
     var delay = 8000 + Math.random() * 12000;
     moveTimer = setTimeout(function() {
       if (isBubbleOpen()) { scheduleMove(); return; }
+      if (getActiveState().sleeping) { scheduleMove(); return; }
       var pos = pickNextPos();
       moveTo(pos);
       if (pos.hide) showBubble('...', 1500);
@@ -1327,6 +1328,7 @@
 
   // ── 실행 ──
   if (window.location.pathname.indexOf('yongsin-pet') !== -1) return;
+  if (window.location.pathname.indexOf('report.html') !== -1) return;
 
   if (IS_PICO) {
     // picolab: localStorage에서 직접 읽기
