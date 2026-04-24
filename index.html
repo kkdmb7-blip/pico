@@ -3823,19 +3823,23 @@ async function requestGunghapAI() {
   // ── 자동 저장 ──
   try {
     var _g = function(id){ var e=document.getElementById(id); return e?e.innerHTML:''; };
-    await fetch(WORKER_BASE + '/analysis-history', {
+    var _saveRes = await fetch(WORKER_BASE + '/analysis-history', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         user_id: user.id, type: 'gunghap',
         title: myName + ' ❤ ' + pNameDisp + ' 궁합',
         result: {
-          personA: { name:myName, ilju:iljuA, ohaeng:ohaengA, strength:strA, yongsin:myYS },
-          personB: { name:pNameDisp, ilju:iljuB, ohaeng:ohaengB, strength:strB, yongsin:pYS },
+          personA: { name:myName, ilju:iljuA, ohaeng:ohaengA, strength:strA, yongsin:myYS, birthYear: myBirthYear },
+          personB: { name:pNameDisp, ilju:iljuB, ohaeng:ohaengB, strength:strB, yongsin:pYS, birthYear: pBirthYear },
           score: score.total,
-          sections: { db1:_g('chunk-db1'), db2:_g('chunk-db2'), db3:_g('chunk-db3'), ai1:_g('chunk-ai1'), ai2:_g('chunk-ai2'), db4:_g('chunk-db4') }
+          sections: { db1:_g('chunk-db1'), db2:_g('chunk-db2'), db3:_g('chunk-db3'), ai1:_g('chunk-ai1'), idealmatch:_g('chunk-idealmatch'), ij:_g('chunk-ij'), cg:_g('chunk-cg'), ai2:_g('chunk-ai2'), db4:_g('chunk-db4') }
         }
       })
     });
+    try {
+      var _saveJson = await _saveRes.json();
+      if (_saveJson && _saveJson.id) window._ghLastSavedId = _saveJson.id;
+    } catch(e){}
     var savedMsg = document.createElement('div');
     savedMsg.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:rgba(0,0,0,0.45);margin-top:8px;';
     savedMsg.innerHTML = '<i class="pi pi-check"></i> 자동 저장됨 · 지난 분석에서 다시 볼 수 있어요';
@@ -4306,9 +4310,36 @@ function shareGunghapKakao() {
 
   var myName = window._ghLastMyName || '나';
   var pName  = window._ghLastPName  || '상대방';
-  var score  = calcGunghapScore(window._ghLastMySaju, window._ghLastPSaju);
-  var pageUrl = 'https://picolab.kr';
-  var text = '❤ FORTUNA 궁합 결과\n' + myName + ' ❤ ' + pName + '\n' + score.total + '점 · ' + score.comment + '\n\n나도 확인해봐 👇\n' + pageUrl;
+  var score  = (window._ghLastMySaju && window._ghLastMySaju._sharedView && window._ghLastKnownScore)
+    ? window._ghLastKnownScore
+    : calcGunghapScore(window._ghLastMySaju, window._ghLastPSaju);
+  var savedId = window._ghLastSavedId || '';
+  var pageUrl = savedId
+    ? 'https://picolab.kr/?g=' + encodeURIComponent(savedId)
+    : 'https://picolab.kr';
+
+  // 전체 AI 분석 본문 수집 (공유 링크로 이미 자동 복원되지만 채팅창에서도 바로 읽도록 포함)
+  var fullText = '';
+  try {
+    var aiEl = document.getElementById('ghResultAI');
+    if (aiEl && aiEl.style.display !== 'none') {
+      var chunks = aiEl.querySelectorAll('.ai-chunk');
+      var parts = [];
+      chunks.forEach(function(el) {
+        var t = (el.innerText || '').trim();
+        if (t.length > 8) parts.push(t);
+      });
+      if (parts.length) fullText = parts.join('\n\n───────────────\n\n');
+    }
+  } catch(e) {}
+
+  var shortText = '❤ FORTUNA 궁합 결과\n' + myName + ' ❤ ' + pName + '\n' + score.total + '점 · ' + score.comment;
+  var linkHint = savedId
+    ? '\n\n🔗 링크를 누르면 전체 분석을 바로 볼 수 있어요\n' + pageUrl
+    : '\n\n나도 확인해봐 👇\n' + pageUrl;
+  var text = fullText
+    ? shortText + '\n\n───────────────\n\n' + fullText + linkHint
+    : shortText + linkHint;
 
   function resetBtn() {
     if (btn) { btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="#3c1e1e"><path d="M12 2C6.48 2 2 5.92 2 10.8c0 3.07 1.7 5.78 4.32 7.46L5.5 22l4.27-2.14C10.47 20.28 11.22 20.4 12 20.4c5.52 0 10-3.92 10-8.8C22 5.92 17.52 2 12 2z"/></svg> 카카오톡 공유'; btn.disabled = false; }
@@ -4319,12 +4350,12 @@ function shareGunghapKakao() {
     cv.toBlob(function(blob) {
       resetBtn();
       var file = new File([blob], 'fortuna_gunghap.png', { type: 'image/png' });
-      // 모바일: navigator.share로 이미지 직접 공유
+      // 모바일: navigator.share로 이미지 직접 공유 (본문 전체 포함)
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         if (navigator.clipboard) navigator.clipboard.writeText(pageUrl).catch(function(){});
         navigator.share({ files: [file], text: text }).catch(function(){});
       } else if (navigator.share) {
-        navigator.share({ title: 'FORTUNA 궁합', text: text }).catch(function(){});
+        navigator.share({ title: 'FORTUNA 궁합', text: text, url: pageUrl }).catch(function(){});
       } else {
         // PC: 카카오 SDK 공유 + 이미지 다운로드
         var a = document.createElement('a');
@@ -4337,15 +4368,15 @@ function shareGunghapKakao() {
             objectType: 'feed',
             content: {
               title: '❤ FORTUNA 궁합 · ' + myName + ' ❤ ' + pName,
-              description: score2.total + '점 · ' + score2.comment + '\n두 사람의 인연을 확인해보세요!',
+              description: score2.total + '점 · ' + score2.comment + (savedId ? '\n링크를 누르면 AI 분석 전체를 볼 수 있어요!' : '\n두 사람의 인연을 확인해보세요!'),
               imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
               link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
             },
-            buttons: [{ title: '나도 궁합 보기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+            buttons: [{ title: savedId ? '전체 궁합 보기' : '나도 궁합 보기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
           });
         } else {
           if (navigator.clipboard) navigator.clipboard.writeText(text);
-          _showToast('이미지 저장됨 · 링크가 클립보드에 복사됐어요');
+          _showToast('이미지 저장됨 · 전체 내용이 클립보드에 복사됐어요');
         }
       }
     }, 'image/png');
@@ -4759,6 +4790,111 @@ function checkAuth() {
   if (window.location.hash === '#gunghap') {
     history.replaceState({}, '', window.location.pathname);
     setTimeout(function() { openGunghapModal(); }, 300);
+  }
+  // 공유 링크: ?g=<id> → 저장된 궁합 결과 자동 복원
+  var _ghShared = params.get('g');
+  if (_ghShared) {
+    history.replaceState({}, '', window.location.pathname);
+    setTimeout(function() { openSharedGunghap(_ghShared); }, 300);
+  }
+}
+
+// ── 공유받은 궁합 결과 불러오기 ──
+async function openSharedGunghap(sharedId) {
+  try {
+    var res = await fetch('https://fortuna.kkdmb7.workers.dev/analysis-history-detail?id=' + encodeURIComponent(sharedId));
+    if (!res.ok) { _showToast('공유받은 궁합 결과를 찾지 못했어요'); return; }
+    var row = await res.json();
+    if (!row || row.type !== 'gunghap' || !row.result) { _showToast('유효하지 않은 링크예요'); return; }
+
+    var result = row.result;
+    var personA = result.personA || {};
+    var personB = result.personB || {};
+    var sections = result.sections || {};
+    var scoreTotal = result.score != null ? result.score : 0;
+
+    // 공유 버튼에서 재사용할 최소 정보 세팅 (재공유 대비)
+    window._ghLastMyName = personA.name || '나';
+    window._ghLastPName  = personB.name || '상대방';
+    window._ghLastSavedId = sharedId;
+    window._ghLastKnownScore = { total: scoreTotal, comment: (scoreTotal >= 80 ? '천생연분' : scoreTotal >= 60 ? '좋은 궁합' : scoreTotal >= 40 ? '노력하면 빛나는 인연' : '서로 다른 방향') };
+    // calcGunghapScore 호출 방지용 최소 스켈레톤 (재공유 시 저장된 score 사용)
+    window._ghLastMySaju = { pillars: {day: personA.ilju||''}, dayEl: personA.ohaeng, strength: personA.strength, _yongsin: personA.yongsin, zodiac: '', _sharedView: true };
+    window._ghLastPSaju  = { pillars: {day: personB.ilju||''}, dayEl: personB.ohaeng, strength: personB.strength, _yongsin: personB.yongsin, zodiac: '', _sharedView: true };
+
+    // 결과 모달 직접 표시 (새 계산 없이)
+    var overlay = document.getElementById('gunghapResultOverlay');
+    if (!overlay) { _showToast('궁합 모달 초기화 실패'); return; }
+    var namesEl = document.getElementById('ghResultNames');
+    var scoreEl = document.getElementById('ghResScore');
+    var barEl   = document.getElementById('ghResBar');
+    var commentEl = document.getElementById('ghResComment');
+    var cardsEl = document.getElementById('ghResultCards');
+    var detailEl = document.getElementById('ghResDetail');
+    var aiEl = document.getElementById('ghResultAI');
+
+    if (namesEl) namesEl.innerHTML = (personA.name || '나') + ' <i class="pi pi-heart" style="color:#c24a8a"></i> ' + (personB.name || '상대방');
+    if (scoreEl) scoreEl.textContent = scoreTotal;
+    var commentMap = scoreTotal >= 80 ? '천생연분' : scoreTotal >= 60 ? '좋은 궁합' : scoreTotal >= 40 ? '노력하면 빛나는 인연' : '서로 다른 방향';
+    if (commentEl) commentEl.textContent = commentMap;
+    if (barEl) { barEl.style.width = '0%'; setTimeout(function(){ barEl.style.width = scoreTotal + '%'; }, 100); }
+    if (cardsEl) cardsEl.innerHTML = ''
+      + '<div style="background:rgba(139,36,71,0.06);border:1px solid rgba(139,36,71,0.2);border-radius:10px;padding:10px;text-align:center;">'
+      +   '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:3px;">' + (personA.name || '나') + '</div>'
+      +   '<div style="font-size:14px;font-weight:700;color:#8b2447;">' + (personA.ilju || '?') + '</div>'
+      +   '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-top:2px;">' + (personA.ohaeng || '?') + ' · ' + (personA.strength || '?') + '</div>'
+      + '</div>'
+      + '<div style="background:rgba(139,36,71,0.06);border:1px solid rgba(139,36,71,0.2);border-radius:10px;padding:10px;text-align:center;">'
+      +   '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:3px;">' + (personB.name || '상대방') + '</div>'
+      +   '<div style="font-size:14px;font-weight:700;color:#8b2447;">' + (personB.ilju || '?') + '</div>'
+      +   '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-top:2px;">' + (personB.ohaeng || '?') + ' · ' + (personB.strength || '?') + '</div>'
+      + '</div>';
+    if (detailEl) detailEl.innerHTML = '';
+
+    // AI 본문 전체 복원
+    if (aiEl) {
+      var secOrder = ['db1','cg','ij','idealmatch','db2','db3','ai1','ai2','db4'];
+      var html = '';
+      secOrder.forEach(function(k) {
+        var s = sections[k];
+        if (s && s.trim().length > 20) html += '<div class="ai-chunk">' + s + '</div>';
+      });
+      if (html) {
+        aiEl.innerHTML = html;
+        aiEl.style.display = 'block';
+      } else {
+        aiEl.innerHTML = '';
+        aiEl.style.display = 'none';
+      }
+    }
+
+    // "나도 해보기" 배너 삽입
+    try {
+      var modal = overlay.querySelector('.saju-modal');
+      if (modal && !document.getElementById('sharedGhBanner')) {
+        var banner = document.createElement('div');
+        banner.id = 'sharedGhBanner';
+        banner.style.cssText = 'margin:12px 0 0;padding:14px 16px;background:rgba(138,106,21,0.10);border:1px solid rgba(138,106,21,0.30);border-radius:12px;text-align:center;';
+        banner.innerHTML =
+          '<div style="font-size:12.5px;color:#6a4f0c;margin-bottom:10px;line-height:1.6;">✨ 지인이 공유해준 궁합 분석이에요<br>나와 상대방의 궁합도 직접 확인해보세요</div>' +
+          '<button id="btnTryGunghap" style="display:inline-block;padding:10px 26px;font-size:12px;letter-spacing:0.12em;background:rgba(122,36,24,0.10);color:#7a2418;border:1px solid rgba(122,36,24,0.30);border-radius:22px;cursor:pointer;font-family:\'Noto Serif KR\',sans-serif;">나도 해보기 →</button>';
+        // AI 아래, 공유 버튼 위에 삽입
+        var aiWrap = document.getElementById('ghResultAI');
+        if (aiWrap && aiWrap.parentNode) aiWrap.parentNode.insertBefore(banner, aiWrap.nextSibling);
+        else modal.appendChild(banner);
+        var tryBtn = document.getElementById('btnTryGunghap');
+        if (tryBtn) tryBtn.onclick = function() {
+          if (document.getElementById('sharedGhBanner')) document.getElementById('sharedGhBanner').remove();
+          closeGunghapResult();
+          setTimeout(function() { openGunghapModal(); }, 200);
+        };
+      }
+    } catch(e) {}
+
+    overlay.style.display = 'flex';
+    history.replaceState({ modal: 'gunghapResult' }, '');
+  } catch(e) {
+    _showToast('공유받은 궁합 결과 로드 실패');
   }
 }
 

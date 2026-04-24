@@ -3339,6 +3339,43 @@ function buildAccuracyLayerBlock() {
   return (detailSentences ? '\n【사주 정밀분석 (서버 계산 완료, 아래 문장을 그대로 활용)】' + detailSentences : '') + compressed + buildInterpretGuideBlock();
 }
 
+// ── 공유 수신자용: "나도 해보기" 배너 ──
+function injectSharedReportBanner() {
+  try {
+    if (document.getElementById('sharedReportBanner')) return;
+    const reportArea = document.getElementById('stateReport');
+    if (!reportArea) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'sharedReportBanner';
+    wrap.style.cssText = 'max-width:720px;margin:16px auto 20px;padding:16px 18px;background:rgba(138,106,21,0.10);border:1px solid rgba(138,106,21,0.30);border-radius:14px;text-align:center;font-family:\'Gowun Batang\',\'Noto Serif KR\',serif;';
+    wrap.innerHTML =
+      '<div style="font-size:13px;color:#6a4f0c;margin-bottom:10px;line-height:1.6;">✨ 지인이 공유해준 AI 리포트예요<br>당신에게 맞는 리포트도 만들어보세요</div>' +
+      '<button id="btnTryForMe" style="display:inline-block;padding:10px 28px;font-size:12px;letter-spacing:0.14em;background:rgba(122,36,24,0.10);color:#7a2418;border:1px solid rgba(122,36,24,0.30);border-radius:24px;cursor:pointer;">나도 해보기 →</button>';
+    reportArea.insertBefore(wrap, reportArea.firstChild);
+    const btn = document.getElementById('btnTryForMe');
+    if (btn) btn.onclick = function() { location.href = 'index.html'; };
+  } catch(e) {}
+}
+
+// ── 공유 링크로 온 리포트 로드 ──
+async function loadSharedReportById(reportId) {
+  try {
+    const sb = getSb();
+    if (!sb) return false;
+    const { data } = await sb.from('reports')
+      .select('content, created_at, report_type')
+      .eq('id', reportId)
+      .maybeSingle();
+    if (!data || !Array.isArray(data.content)) return false;
+    if (data.report_type && _type && data.report_type !== _type) return false;
+    // content 마지막 요소는 profileKey 문자열이므로 섹션 텍스트만 사용
+    const sections = data.content.slice(0, -1);
+    renderReport(sections, data.created_at);
+    injectSharedReportBanner();
+    return true;
+  } catch(e) { return false; }
+}
+
 // ── 초기화 ──
 (async function init() {
   try { localStorage.setItem('pico_report_viewed', '1'); } catch(e) {}
@@ -3348,6 +3385,15 @@ function buildAccuracyLayerBlock() {
   if (!_config) { setLoading('잘못된 접근', '리포트 타입이 올바르지 않아요'); return; }
 
   document.getElementById('navTitle').textContent = _config.title;
+
+  // 공유 링크 (?r=<id>): 로그인 없이 공유받은 리포트 전체 표시
+  const _sharedId = params.get('r');
+  if (_sharedId) {
+    try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+    const ok = await loadSharedReportById(_sharedId);
+    if (ok) return;
+    // 실패 시 일반 흐름 fallback
+  }
 
   // 로그인 확인 — 공유링크로 들어온 미로그인 방문자는 안내 화면 노출
   try { _user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
@@ -6954,7 +7000,7 @@ async function generateGuideReport() {
   const promptB = `${subjectStr}\n\n${sb2}${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n오행 분포: ${fivePctStr}\n신강도: ${_singang||'미확인'} / 용신: ${ysFinal}\n십신 분포: ${tenGodsStr}\n\n섹션 구성:\n4. 신뢰를 얻고 마음을 여는 방법 — 이 사람이 마음을 여는 데 시간이 얼마나 걸리는지, 어떤 행동·태도가 신뢰를 쌓는지. 인성·재성·관성의 강약 기반. 구체적 행동 팁 3~4가지. 약 500자.\n5. 절대 피해야 할 말과 행동 — 이 사람을 가장 빠르게 멀어지게 하는 말·행동. 자존심·콤플렉스·가치관과 충돌하는 영역을 격국·십신·원진살 기반으로. 구체 예문 포함. 약 400자.\n\n총 800~1000자. 섹션 번호(4. 5.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
   await streamToSections(promptB, [3,4], '이 사람 사용설명서', ysFinal, '', true);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data){ _reportId = data.id; showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8186,32 +8232,61 @@ async function playReportTTS() {
   }
 }
 
+// ── 공유용 URL (guide 타입은 ?r=<id> 로 전체 내용 자동 복원) ──
+function buildShareReportUrl() {
+  try {
+    if (_type === 'guide' && _reportId) {
+      const base = location.origin + location.pathname;
+      return base + '?type=guide&r=' + encodeURIComponent(_reportId);
+    }
+  } catch(e) {}
+  return location.href;
+}
+
 // ── 공유 (모바일: navigator.share / 데스크탑: Kakao SDK / 폴백: 클립보드) ──
 function shareKakao() {
-  const url = location.href;
+  const url = buildShareReportUrl();
   const reportTitle = _config?.title || 'AI 운세 리포트';
   const userName = _profile?.name ? ` · ${_profile.name}님` : '';
   const title = '✨ ' + reportTitle + userName;
 
   const summary = buildShareSummary();
+  const isSharedGuide = (_type === 'guide' && _reportId);
+
+  // guide 타입 공유: 본문 전체 텍스트 포함 (모바일/클립보드), Kakao Feed는 요약만
+  let fullBody = '';
+  if (isSharedGuide) {
+    const bodies = Array.from(document.querySelectorAll('#sectionsWrap .section-body'))
+      .map(el => (el.innerText || '').trim()).filter(t => t.length > 0);
+    if (bodies.length) {
+      fullBody = bodies.map((t, i) => `【${i+1}】\n${t}`).join('\n\n');
+    }
+  }
+
   const body = summary
-    ? summary + '\n\n📜 전체 리포트 보기 ↓'
+    ? summary + (isSharedGuide ? '\n\n📜 링크를 누르면 전체 리포트를 바로 볼 수 있어요 ↓' : '\n\n📜 전체 리포트 보기 ↓')
     : 'FORTUNA가 AI로 분석한 나만의 운세 리포트예요.\n전체 내용은 링크에서 확인하세요.';
+
+  const longText = isSharedGuide && fullBody
+    ? title + '\n\n' + body + '\n\n───────────────\n\n' + fullBody + '\n\n🔗 ' + url
+    : title + '\n\n' + body + '\n' + url;
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   if (isMobile && navigator.share) {
-    navigator.share({ title, text: title + '\n\n' + body, url }).catch(function(){});
+    navigator.share({ title, text: longText, url }).catch(function(){});
     return;
   }
 
   if (window.Kakao && Kakao.Share) {
     if (!Kakao.isInitialized()) { try { Kakao.init('25432f8a37e0ac51a5e10cbcba8ae413'); } catch(e) {} }
+    // Kakao Feed description은 ~200자 제한이 있어 요약만 전송
+    const kakaoDesc = (body.length > 190) ? body.slice(0, 188) + '…' : body;
     Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
         title: title,
-        description: body,
+        description: kakaoDesc,
         imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
         link: { mobileWebUrl: url, webUrl: url }
       },
@@ -8221,8 +8296,8 @@ function shareKakao() {
   }
 
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(title + '\n\n' + body + '\n' + url)
-      .then(() => alert('📋 요약이 클립보드에 복사됐어요! 카카오톡에 붙여넣어 주세요'));
+    navigator.clipboard.writeText(longText)
+      .then(() => alert('📋 ' + (isSharedGuide ? '전체 리포트가' : '요약이') + ' 클립보드에 복사됐어요! 카카오톡에 붙여넣어 주세요'));
   }
 }
 </script>
