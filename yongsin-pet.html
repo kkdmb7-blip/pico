@@ -1147,59 +1147,59 @@ function _applyOfflineTime(s) {
 
 // localStorage에서 불러오기
 function loadState() {
-  // 사용자가 직접 선택한 원소 (최우선 — 서버/자동 로직이 절대 덮어쓰지 못함)
-  var _pref; try { _pref = localStorage.getItem('yongsin_pet_pref'); } catch(e) {}
+  var _VALID = ['wood','fire','earth','metal','water'];
+  var _EL_MAP = { '목':'wood', '화':'fire', '토':'earth', '금':'metal', '수':'water' };
 
+  // 1) 프로필(사주) 용신을 최우선 판독
+  var profEl = null;
+  try {
+    var ys = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached') || '';
+    if (ys) {
+      if (_VALID.indexOf(ys) !== -1) profEl = ys;
+      else for (var k in _EL_MAP) if (ys.indexOf(k) !== -1) { profEl = _EL_MAP[k]; break; }
+    }
+  } catch(e) {}
+
+  // 2) 저장된 레벨/허기 등 상태 불러오기 (슬롯1 원소는 아직 결정 전)
   try {
     var saved = JSON.parse(localStorage.getItem('yongsin_pet'));
     if (saved) {
       if (saved.all) {
         allStates = saved.all || {};
-        slotElements.slot1 = _pref || saved.element  || null;
         slotElements.slot2 = saved.element2 || null;
-        // activeSlot 기준 원소 로드
-        var el = slotElements[activeSlot] || slotElements.slot1;
-        state.element = el;
-        if (el && allStates[el]) {
-          Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[el])));
-          state.element = el;
-        }
       } else if (saved.element) {
-        // 구형 포맷 → 마이그레이션
+        // 구형 포맷 마이그레이션
         var elState = Object.assign({}, saved);
-        slotElements.slot1 = _pref || saved.element;
-        state.element = slotElements.slot1;
         delete elState.element;
-        allStates[state.element] = elState;
-        Object.assign(state, _applyOfflineTime(Object.assign({}, elState)));
+        allStates[saved.element] = elState;
       }
     }
   } catch(e) {}
 
-  // _pref 있으면 상태도 해당 원소로 보정
-  if (_pref && slotElements.slot1 !== _pref) {
-    slotElements.slot1 = _pref;
-    state.element = _pref;
-    if (allStates[_pref]) {
-      Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[_pref])));
-      state.element = _pref;
+  if (profEl) {
+    // 3a) 프로필 용신이 있으면 무조건 slot1로 고정, 과거 수동 pref도 덮어쓰기
+    slotElements.slot1 = profEl;
+    state.element = profEl;
+    try { localStorage.setItem('yongsin_pet_pref', profEl); } catch(e) {}
+    if (allStates[profEl]) {
+      Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[profEl])));
+      state.element = profEl;
+    }
+    setTimeout(function() { saveState(); syncToServer(); syncPetElementToMemox(profEl); }, 500);
+  } else {
+    // 3b) 프로필 용신이 없을 때만 예전 저장 상태로 폴백
+    var _pref; try { _pref = localStorage.getItem('yongsin_pet_pref'); } catch(e) {}
+    try {
+      var saved2 = JSON.parse(localStorage.getItem('yongsin_pet'));
+      slotElements.slot1 = _pref || (saved2 && saved2.element) || null;
+    } catch(e) {}
+    var el2 = slotElements[activeSlot] || slotElements.slot1;
+    state.element = el2;
+    if (el2 && allStates[el2]) {
+      Object.assign(state, _applyOfflineTime(Object.assign({}, allStates[el2])));
+      state.element = el2;
     }
   }
-
-  try {
-    var ys = localStorage.getItem('pico_yongsin') || localStorage.getItem('_yongsin_cached');
-    if (!_pref && ys) {
-      var _valid = ['wood','fire','earth','metal','water'];
-      if (_valid.indexOf(ys) !== -1) {
-        slotElements.slot1 = ys; state.element = ys;
-      } else {
-        var map = { '목': 'wood', '화': 'fire', '토': 'earth', '금': 'metal', '수': 'water' };
-        for (var k in map) if (ys.includes(k)) { slotElements.slot1 = map[k]; state.element = map[k]; break; }
-      }
-      // 원소가 결정됐으면 즉시 Supabase 동기화 (memox float 즉시 반영)
-      setTimeout(function() { saveState(); syncToServer(); }, 500);
-    }
-  } catch(e) {}
 }
 
 var _syncTimer;

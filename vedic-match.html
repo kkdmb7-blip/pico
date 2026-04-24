@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>베딕 궁합 · 36굿 쿤달리 밀란 · FORTUNA</title>
+<meta name="theme-color" content="#f5efe4">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --bg:#f4ede0; --surface:#f9f1de; --surface2:#e8dcc0;
+    --border:#c9bc9d; --border-soft:rgba(80,55,30,0.10);
+    --accent:#7a2418; --accent2:#2a1f1a;
+    --text:#1a120a; --text2:#4a3a2a; --muted:#7a6850;
+    --gold:#9a7a26; --gold-deep:#7a5e1c; --ink:#241a10;
+    --orb:#5f8cb5; --orb-bg:rgba(122,196,255,0.12); --orb-border:rgba(95,140,181,0.30);
+    --male:#3d6eb4; --female:#b4449c;
+    --radius:16px;
+    --shadow-soft:0 1px 2px rgba(60,40,20,0.05), 0 4px 16px rgba(60,40,20,0.04);
+    --shadow-lift:0 2px 4px rgba(60,40,20,0.06), 0 10px 28px rgba(60,40,20,0.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.25;}
+  #starCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
+  .star{position:absolute;background:var(--gold);border-radius:50%;opacity:0;animation:twinkle var(--dur,3s) ease-in-out infinite;animation-delay:var(--delay,0s);}
+  @keyframes twinkle{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:var(--max-op,.7);transform:scale(1)}}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:100;background:rgba(252,247,234,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+  .logo img{height:40px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(60,30,10,0.35)) brightness(0.78);}
+  .logo-text{font-family:'Noto Serif KR',serif;font-weight:700;font-size:15px;letter-spacing:2px;color:var(--accent);}
+  .nav-btn{padding:8px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,var(--accent),#5a1810);color:#fcf7ea;border:none;font-family:inherit;text-decoration:none;transition:all .2s;white-space:nowrap;}
+  .nav-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift);}
+
+  /* MAIN */
+  .main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:40px 20px 80px;}
+  .page-title{font-family:'Noto Serif KR',serif;font-size:clamp(26px,5vw,40px);font-weight:700;text-align:center;margin-bottom:6px;letter-spacing:-.5px;}
+  .page-title em{font-style:normal;color:var(--accent);}
+  .page-sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:32px;}
+
+  /* FORM */
+  .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow-soft);}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .person-box{padding:16px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface2);}
+  .person-box.male{border-color:rgba(61,110,180,0.4);background:rgba(61,110,180,0.05);}
+  .person-box.female{border-color:rgba(180,68,156,0.4);background:rgba(180,68,156,0.05);}
+  .person-label{font-size:12px;font-weight:700;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+  .person-label.male{color:var(--male);}
+  .person-label.female{color:var(--female);}
+  .field{margin-bottom:10px;}
+  .field label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600;}
+  .field input,.field select{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:#fcf7ea;color:var(--text);font-family:inherit;font-size:13px;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--accent);}
+  .date-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+  .hour-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .btn-submit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:15px 0;border-radius:14px;background:linear-gradient(135deg,var(--accent),#5a1810);color:#fcf7ea;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:700;transition:all .2s;}
+  .btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(122,36,24,.28);}
+  .btn-submit:disabled{opacity:.5;cursor:default;transform:none;}
+
+  /* STATUS */
+  .status-msg{text-align:center;padding:32px 24px;color:var(--muted);font-size:15px;display:none;}
+  .status-msg.visible{display:block;}
+  .status-msg.err{color:#b02a1a;}
+  .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* SECTION CARD */
+  .section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;display:none;box-shadow:var(--shadow-soft);}
+  .section-card.visible{display:block;}
+  .section-label{font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:16px;}
+
+  /* TOTAL SCORE */
+  .score-hero{text-align:center;padding:8px 0;}
+  .score-pair{display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap;}
+  .person-pill{padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;border:1.5px solid;min-width:150px;}
+  .person-pill.male{background:rgba(61,110,180,0.07);border-color:rgba(61,110,180,0.35);color:var(--male);}
+  .person-pill.female{background:rgba(180,68,156,0.07);border-color:rgba(180,68,156,0.35);color:var(--female);}
+  .person-pill-name{font-size:14px;margin-bottom:2px;}
+  .person-pill-sub{font-size:10px;opacity:0.85;font-weight:600;}
+  .pair-sep{font-size:22px;color:var(--accent);}
+  .total-score{font-family:'Cinzel',serif;font-size:68px;font-weight:700;color:var(--accent);line-height:1;margin:8px 0 4px;}
+  .total-score small{font-size:28px;color:var(--muted);font-weight:500;}
+  .total-level{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--gold-deep);margin-bottom:16px;}
+  .gauge-wrap{max-width:360px;margin:0 auto;}
+  .gauge-bar{height:14px;background:rgba(80,55,30,0.12);border-radius:8px;overflow:hidden;position:relative;border:1px solid var(--border);}
+  .gauge-fill{height:100%;background:linear-gradient(90deg,#d4a94e 0%,#b08531 60%,#7a5e1c 100%);border-radius:8px;transition:width 0.8s cubic-bezier(.2,.8,.2,1);}
+  .gauge-ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px;}
+
+  /* KOOT TABLE */
+  .koot-table{width:100%;border-collapse:collapse;}
+  .koot-table th{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;padding:10px;border-bottom:1px solid var(--border);}
+  .koot-table td{padding:11px 10px;font-size:13px;border-bottom:1px solid rgba(80,55,30,0.10);vertical-align:middle;}
+  .koot-table tr:last-child td{border-bottom:none;}
+  .koot-name{font-weight:700;font-family:'Noto Serif KR',serif;}
+  .koot-area{font-size:11px;color:var(--muted);}
+  .koot-score{font-family:'Cinzel',serif;font-weight:700;font-size:14px;text-align:center;white-space:nowrap;}
+  .koot-score.full{color:#067d2c;}
+  .koot-score.mid{color:#b55400;}
+  .koot-score.low{color:#b01a1a;}
+  .koot-desc{font-size:12px;color:var(--text2);line-height:1.55;}
+
+  /* DOSHA */
+  .dosha-list{display:flex;flex-direction:column;gap:10px;}
+  .dosha-row{padding:12px 16px;border-radius:10px;display:flex;align-items:flex-start;gap:12px;border:1px solid;}
+  .dosha-row.warn{background:rgba(255,109,0,.07);border-color:rgba(255,109,0,.30);}
+  .dosha-row.crit{background:rgba(255,23,68,.07);border-color:rgba(255,23,68,.30);}
+  .dosha-row.safe{background:rgba(0,200,83,.07);border-color:rgba(0,200,83,.28);}
+  .dosha-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+  .dosha-badge.warn{background:rgba(255,109,0,.14);color:#b55400;border:1px solid rgba(255,109,0,.30);}
+  .dosha-badge.crit{background:rgba(255,23,68,.14);color:#b01a1a;border:1px solid rgba(255,23,68,.30);}
+  .dosha-badge.safe{background:rgba(0,200,83,.14);color:#067d2c;border:1px solid rgba(0,200,83,.28);}
+  .dosha-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
+  .dosha-desc{font-size:12px;color:var(--muted);line-height:1.55;}
+
+  /* DETAIL */
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .detail-col{padding:14px;border-radius:10px;border:1.5px solid;}
+  .detail-col.male{background:rgba(61,110,180,0.05);border-color:rgba(61,110,180,0.30);}
+  .detail-col.female{background:rgba(180,68,156,0.05);border-color:rgba(180,68,156,0.30);}
+  .detail-title{font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:10px;}
+  .detail-title.male{color:var(--male);}
+  .detail-title.female{color:var(--female);}
+  .detail-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(80,55,30,0.08);}
+  .detail-row:last-child{border-bottom:none;}
+  .detail-row span:first-child{color:var(--muted);}
+  .detail-row span:last-child{font-weight:700;}
+
+  /* AI */
+  .ai-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border-soft);}
+  .ai-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  .ai-section-title{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+  .ai-section-body{font-size:14px;color:var(--text);line-height:1.85;}
+  .ai-section-body strong{color:var(--gold-deep);}
+  .ai-sec-loading{font-size:13px;color:var(--muted);padding:6px 0;}
+  .btn-match-ai{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 0;border-radius:14px;background:linear-gradient(135deg,#4a3280,#7b56c8);color:#fff;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;transition:all .2s;}
+  .btn-match-ai:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(74,50,128,.35);}
+  .btn-match-ai:disabled{opacity:.5;cursor:default;transform:none;}
+  .match-ai-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(30,20,50,0.95);color:#c4a8f0;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;opacity:0;}
+
+  @media(max-width:600px){
+    .form-grid{grid-template-columns:1fr;}
+    .detail-grid{grid-template-columns:1fr;}
+    .koot-table td,.koot-table th{padding:8px 5px;font-size:11px;}
+    .koot-desc{font-size:11px;}
+    .total-score{font-size:54px;}
+    .total-score small{font-size:22px;}
+  }
+</style>
+  <link rel="stylesheet" href="pico-icons.css">
+</head>
+<body>
+<div id="starCanvas"></div>
+
+<nav>
+  <a href="/" class="logo"><img src="img/goddess/goddess.png" alt="FORTUNA"><span class="logo-text">FORTUNA</span></a>
+  <a href="vedic.html" class="nav-btn">내 베딕 차트</a>
+</nav>
+
+<div id="profile-bar-root"></div>
+<script src="profile-bar.js"></script>
+
+<main class="main">
+  <h1 class="page-title">베딕 <em>궁합</em></h1>
+  <p class="page-sub">36굿 아쉬타쿠타 쿤달리 밀란 · 8가지 기준 정밀 궁합</p>
+
+  <!-- 입력 폼 -->
+  <div class="form-card" id="form-card">
+    <div class="form-grid">
+      <div class="person-box male">
+        <div class="person-label male"><i class="pi pi-person"></i> 남성 정보</div>
+        <div class="field">
+          <label>이름</label>
+          <input type="text" id="m-name" placeholder="남성" maxlength="10">
+        </div>
+        <div class="field">
+          <label>생년월일 (양력)</label>
+          <div class="date-row">
+            <input type="number" id="m-year" placeholder="1990" min="1900" max="2030">
+            <input type="number" id="m-month" placeholder="월" min="1" max="12">
+            <input type="number" id="m-day" placeholder="일" min="1" max="31">
+          </div>
+        </div>
+        <div class="field">
+          <label>출생 시각</label>
+          <div class="hour-row">
+            <input type="number" id="m-hour" placeholder="시 (0-23)" min="0" max="23">
+            <input type="number" id="m-min" placeholder="분 (0-59)" min="0" max="59" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="person-box female">
+        <div class="person-label female"><i class="pi pi-heart"></i> 여성 정보</div>
+        <div class="field">
+          <label>이름</label>
+          <input type="text" id="f-name" placeholder="여성" maxlength="10">
+        </div>
+        <div class="field">
+          <label>생년월일 (양력)</label>
+          <div class="date-row">
+            <input type="number" id="f-year" placeholder="1990" min="1900" max="2030">
+            <input type="number" id="f-month" placeholder="월" min="1" max="12">
+            <input type="number" id="f-day" placeholder="일" min="1" max="31">
+          </div>
+        </div>
+        <div class="field">
+          <label>출생 시각</label>
+          <div class="hour-row">
+            <input type="number" id="f-hour" placeholder="시 (0-23)" min="0" max="23">
+            <input type="number" id="f-min" placeholder="분 (0-59)" min="0" max="59" value="0">
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-submit" id="btn-submit" onclick="calcMatch()">
+      <i class="pi pi-sparkle"></i> 궁합 계산하기
+    </button>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6;">
+      출생 시각이 정확할수록 낙샤트라 계산이 정밀해집니다. 시간 미상 시 12:00으로 계산됩니다.
+    </div>
+  </div>
+
+  <div class="status-msg" id="status"></div>
+
+  <!-- 총점 -->
+  <div class="section-card" id="card-total">
+    <div class="section-label">36굿 총점 (Ashtakoot Guna Milan)</div>
+    <div class="score-hero">
+      <div class="score-pair">
+        <div class="person-pill male">
+          <div class="person-pill-name" id="hero-m-name">남성</div>
+          <div class="person-pill-sub" id="hero-m-sub">-</div>
+        </div>
+        <div class="pair-sep"><i class="pi pi-heart"></i></div>
+        <div class="person-pill female">
+          <div class="person-pill-name" id="hero-f-name">여성</div>
+          <div class="person-pill-sub" id="hero-f-sub">-</div>
+        </div>
+      </div>
+      <div class="total-score" id="total-score">-<small>/36</small></div>
+      <div class="total-level" id="total-level">-</div>
+      <div class="gauge-wrap">
+        <div class="gauge-bar"><div class="gauge-fill" id="gauge-fill" style="width:0%"></div></div>
+        <div class="gauge-ticks"><span>0</span><span>18 (최저 통과)</span><span>36</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8쿠타 -->
+  <div class="section-card" id="card-koots">
+    <div class="section-label">8쿠타 세부 점수</div>
+    <table class="koot-table">
+      <thead>
+        <tr><th>쿠타</th><th>영역</th><th>점수</th><th>풀이</th></tr>
+      </thead>
+      <tbody id="koot-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- 도샤 -->
+  <div class="section-card" id="card-dosha">
+    <div class="section-label">도샤 · 주의 포인트</div>
+    <div class="dosha-list" id="dosha-list"></div>
+  </div>
+
+  <!-- 상세 -->
+  <div class="section-card" id="card-detail">
+    <div class="section-label">개인 베딕 정보</div>
+    <div class="detail-grid">
+      <div class="detail-col male">
+        <div class="detail-title male"><i class="pi pi-person"></i> 남성</div>
+        <div id="detail-m"></div>
+      </div>
+      <div class="detail-col female">
+        <div class="detail-title female"><i class="pi pi-heart"></i> 여성</div>
+        <div id="detail-f"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI -->
+  <div class="section-card" id="card-ai">
+    <div class="section-label">AI 심층 분석 · 쿤달리 밀란</div>
+    <div id="match-ai-body" style="display:none;">
+      <div class="ai-section">
+        <div class="ai-section-title">① 궁합 총평 · 36굿의 의미</div>
+        <div class="ai-sec-loading" id="ai-lod-1" style="display:none;"><span class="spinner"></span> 분석 중…</div>
+        <div class="ai-section-body" id="ai-txt-1" style="display:none;"></div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-section-title">② 본능·감정 호환 (요니·나디·타라)</div>
+        <div class="ai-sec-loading" id="ai-lod-2" style="display:none;"><span class="spinner"></span> 분석 중…</div>
+        <div class="ai-section-body" id="ai-txt-2" style="display:none;"></div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-section-title">③ 가치관·행성 궁합 (바르나·그라하 마이트리·가나)</div>
+        <div class="ai-sec-loading" id="ai-lod-3" style="display:none;"><span class="spinner"></span> 분석 중…</div>
+        <div class="ai-section-body" id="ai-txt-3" style="display:none;"></div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-section-title">④ 결혼 생활 예측 (바샤·바쿠트·도샤)</div>
+        <div class="ai-sec-loading" id="ai-lod-4" style="display:none;"><span class="spinner"></span> 분석 중…</div>
+        <div class="ai-section-body" id="ai-txt-4" style="display:none;"></div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-section-title">⑤ 관계 성장 실천법</div>
+        <div class="ai-sec-loading" id="ai-lod-5" style="display:none;"><span class="spinner"></span> 분석 중…</div>
+        <div class="ai-section-body" id="ai-txt-5" style="display:none;"></div>
+      </div>
+    </div>
+    <div id="match-ai-err" style="display:none;padding:10px 0;color:#b02a1a;font-size:13px;text-align:center;"></div>
+    <button class="btn-match-ai" id="match-ai-btn" onclick="requestMatchAI()">
+      <i class="pi pi-sparkle"></i> AI 궁합 심층 분석 <span style="font-size:12px;opacity:0.75;margin-left:4px;">300 Orb</span>
+    </button>
+  </div>
+  <div class="match-ai-toast" id="match-ai-toast"></div>
+
+  <!-- 하단 링크 -->
+  <div id="matchShareBtnWrap" style="display:none;padding:0 20px 36px;flex-direction:column;gap:10px;max-width:440px;margin:0 auto;">
+    <button id="matchKakaoBtn" onclick="shareMatchKakao()" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(200,160,50,0.13),rgba(180,130,30,0.07));border:1px solid rgba(200,160,50,0.38);border-radius:14px;text-align:center;cursor:pointer;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(200,160,50,0.72)';this.style.background='linear-gradient(135deg,rgba(200,160,50,0.22),rgba(180,130,30,0.14))'" onmouseout="this.style.borderColor='rgba(200,160,50,0.38)';this.style.background='linear-gradient(135deg,rgba(200,160,50,0.13),rgba(180,130,30,0.07))'">
+      <div style="font-size:15px;font-weight:700;color:#9a6e10;margin-bottom:4px;"><i class="pi pi-chat"></i> 카카오톡 공유 →</div>
+      <div style="font-size:11px;color:rgba(154,110,16,0.65);">베딕 궁합 결과를 친구에게 보내기</div>
+    </button>
+    <a href="https://kkdmb7-blip.github.io/memox/?mode=vedic" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(140,90,210,0.13),rgba(110,70,180,0.07));border:1px solid rgba(140,90,210,0.38);border-radius:14px;text-decoration:none;text-align:center;box-sizing:border-box;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(140,90,210,0.72)';this.style.background='linear-gradient(135deg,rgba(140,90,210,0.22),rgba(110,70,180,0.14))'" onmouseout="this.style.borderColor='rgba(140,90,210,0.38)';this.style.background='linear-gradient(135deg,rgba(140,90,210,0.13),rgba(110,70,180,0.07))'">
+      <div style="font-size:15px;font-weight:700;color:#7a3fc0;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 베딕 상담 →</div>
+      <div style="font-size:11px;color:rgba(122,63,192,0.65);">대화로 풀어보는 두 사람의 카르마</div>
+    </a>
+    <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(60,120,200,0.13),rgba(40,100,180,0.07));border:1px solid rgba(60,120,200,0.38);border-radius:14px;text-decoration:none;text-align:center;box-sizing:border-box;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(60,120,200,0.72)';this.style.background='linear-gradient(135deg,rgba(60,120,200,0.22),rgba(40,100,180,0.14))'" onmouseout="this.style.borderColor='rgba(60,120,200,0.38)';this.style.background='linear-gradient(135deg,rgba(60,120,200,0.13),rgba(40,100,180,0.07))'">
+      <div style="font-size:15px;font-weight:700;color:#1a5fa0;margin-bottom:4px;"><i class="pi pi-person"></i> 전문 상담사 연결 →</div>
+      <div style="font-size:11px;color:rgba(26,95,160,0.65);">베딕 궁합 전문가와 1:1 깊은 상담</div>
+    </a>
+  </div>
+</main>
+
+<script>
+// ── 상수 ──────────────────────────────────────────────────
+var VEDIC_ORB   = 300;
+var VEDIC_SB_URL  = 'https://ymghmfkqctckxxysxkvy.supabase.co';
+var VEDIC_SB_KEY  = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
+var VEDIC_CHAT    = 'https://fortuna-silk.vercel.app/api/chat';
+var MATCH_API     = 'https://fortuna.kkdmb7.workers.dev/vedic-match';
+var KAKAO_JS_KEY  = '2543c896dead8185e2edfa0976396f25';
+
+var _matchSbClient = null;
+function getMatchSb() {
+  if (!_matchSbClient) _matchSbClient = supabase.createClient(VEDIC_SB_URL, VEDIC_SB_KEY);
+  return _matchSbClient;
+}
+
+function setVisible(id, v) {
+  var el = document.getElementById(id);
+  if (el) el.classList.toggle('visible', v);
+}
+
+function showMatchToast(msg) {
+  var t = document.getElementById('match-ai-toast');
+  if (!t) return;
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._tid); t._tid = setTimeout(function(){ t.style.opacity = '0'; }, 2800);
+}
+
+function renderMd(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+// ── 궁합 계산 ─────────────────────────────────────────────
+async function calcMatch() {
+  var mName  = document.getElementById('m-name').value.trim() || '남성';
+  var mYear  = parseInt(document.getElementById('m-year').value);
+  var mMonth = parseInt(document.getElementById('m-month').value);
+  var mDay   = parseInt(document.getElementById('m-day').value);
+  var mHourRaw = document.getElementById('m-hour').value;
+  var mHour  = mHourRaw !== '' ? parseInt(mHourRaw) : 12;
+  var mMin   = parseInt(document.getElementById('m-min').value) || 0;
+
+  var fName  = document.getElementById('f-name').value.trim() || '여성';
+  var fYear  = parseInt(document.getElementById('f-year').value);
+  var fMonth = parseInt(document.getElementById('f-month').value);
+  var fDay   = parseInt(document.getElementById('f-day').value);
+  var fHourRaw = document.getElementById('f-hour').value;
+  var fHour  = fHourRaw !== '' ? parseInt(fHourRaw) : 12;
+  var fMin   = parseInt(document.getElementById('f-min').value) || 0;
+
+  var status = document.getElementById('status');
+  status.className = 'status-msg';
+
+  if (!mYear || !mMonth || !mDay || !fYear || !fMonth || !fDay) {
+    status.className = 'status-msg visible err';
+    status.textContent = '남녀 모두 생년월일을 입력해주세요.';
+    return;
+  }
+
+  var btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  status.className = 'status-msg visible';
+  status.innerHTML = '<span class="spinner"></span>36굿 쿤달리 밀란 계산 중…';
+
+  // 기본 출생지 = 서울 (개인 프로필 lat/lon이 있으면 반영 가능하나 2명 분리 입력이라 서울 고정)
+  var LAT = 37.5665, LON = 126.9780, TZ = 9;
+
+  var sp = new URLSearchParams({
+    m_year: mYear, m_month: mMonth, m_day: mDay, m_hour: mHour, m_min: mMin, m_tz: TZ, m_lat: LAT, m_lon: LON,
+    f_year: fYear, f_month: fMonth, f_day: fDay, f_hour: fHour, f_min: fMin, f_tz: TZ, f_lat: LAT, f_lon: LON
+  });
+
+  try {
+    var res = await fetch(MATCH_API + '?' + sp.toString());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var d = await res.json();
+    if (d.error) throw new Error(d.error);
+
+    d._mName = mName; d._fName = fName;
+    d._mBirth = mYear + '.' + String(mMonth).padStart(2,'0') + '.' + String(mDay).padStart(2,'0');
+    d._fBirth = fYear + '.' + String(fMonth).padStart(2,'0') + '.' + String(fDay).padStart(2,'0');
+
+    window._matchData = d;
+    status.className = 'status-msg';
+
+    renderTotal(d);
+    renderKoots(d);
+    renderDosha(d);
+    renderDetail(d);
+
+    setVisible('card-total', true);
+    setVisible('card-koots', true);
+    setVisible('card-dosha', true);
+    setVisible('card-detail', true);
+    setVisible('card-ai', true);
+
+    var wrap = document.getElementById('matchShareBtnWrap');
+    wrap.style.display = 'flex';
+
+    btn.disabled = false;
+  } catch(e) {
+    status.className = 'status-msg visible err';
+    status.textContent = '계산 오류: ' + e.message;
+    btn.disabled = false;
+  }
+}
+
+// ── 렌더 ──────────────────────────────────────────────────
+function renderTotal(d) {
+  document.getElementById('hero-m-name').textContent = d._mName;
+  document.getElementById('hero-m-sub').textContent  = d.male.nakshatra + ' · ' + d.male.moonSign;
+  document.getElementById('hero-f-name').textContent = d._fName;
+  document.getElementById('hero-f-sub').textContent  = d.female.nakshatra + ' · ' + d.female.moonSign;
+
+  document.getElementById('total-score').innerHTML = d.total + '<small>/36</small>';
+  document.getElementById('total-level').textContent = d.level || '';
+
+  var pct = Math.max(2, Math.round(d.total / 36 * 100));
+  setTimeout(function(){ document.getElementById('gauge-fill').style.width = pct + '%'; }, 50);
+}
+
+function scoreClass(got, max) {
+  var r = got / max;
+  if (r >= 0.7) return 'full';
+  if (r >= 0.4) return 'mid';
+  return 'low';
+}
+
+function renderKoots(d) {
+  var tbody = document.getElementById('koot-tbody');
+  tbody.innerHTML = '';
+  (d.koots || []).forEach(function(k){
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><div class="koot-name">' + k.name + '</div><div class="koot-area">' + (k.key || '') + '</div></td>' +
+      '<td class="koot-area">' + (k.area || '') + '</td>' +
+      '<td class="koot-score ' + scoreClass(k.score, k.max) + '">' + k.score + '/' + k.max + '</td>' +
+      '<td class="koot-desc">' + (k.desc || '') + '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function renderDosha(d) {
+  var list = document.getElementById('dosha-list');
+  list.innerHTML = '';
+  var doshas = d.doshas || [];
+  if (doshas.length === 0) {
+    list.innerHTML =
+      '<div class="dosha-row safe">' +
+        '<span class="dosha-badge safe">안전</span>' +
+        '<div><div class="dosha-name">주요 도샤 없음</div>' +
+        '<div class="dosha-desc">나디·바쿠트·망글릭 주요 도샤가 발견되지 않았습니다. 균형 잡힌 관계의 바탕입니다.</div></div>' +
+      '</div>';
+    return;
+  }
+  doshas.forEach(function(dosh){
+    var lv = dosh.level || 'warn';
+    var row = document.createElement('div');
+    row.className = 'dosha-row ' + lv;
+    row.innerHTML =
+      '<span class="dosha-badge ' + lv + '">' + (lv === 'crit' ? '치명' : lv === 'safe' ? '안전' : '주의') + '</span>' +
+      '<div><div class="dosha-name">' + dosh.name + '</div>' +
+      '<div class="dosha-desc">' + (dosh.desc || '') + '</div></div>';
+    list.appendChild(row);
+  });
+}
+
+function renderDetail(d) {
+  function side(p) {
+    return '' +
+      '<div class="detail-row"><span>낙샤트라</span><span>' + (p.nakshatra || '-') + (p.pada ? ' · 파다 ' + p.pada : '') + '</span></div>' +
+      '<div class="detail-row"><span>달 라시</span><span>' + (p.moonSign || '-') + '</span></div>' +
+      '<div class="detail-row"><span>바르나</span><span>' + (p.varna || '-') + '</span></div>' +
+      '<div class="detail-row"><span>바샤</span><span>' + (p.vashya || '-') + '</span></div>' +
+      '<div class="detail-row"><span>요니</span><span>' + (p.yoni || '-') + '</span></div>' +
+      '<div class="detail-row"><span>가나</span><span>' + (p.gana || '-') + '</span></div>' +
+      '<div class="detail-row"><span>나디</span><span>' + (p.nadi || '-') + '</span></div>' +
+      '<div class="detail-row"><span>라시 주인</span><span>' + (p.signLord || '-') + '</span></div>';
+  }
+  document.getElementById('detail-m').innerHTML = side(d.male || {});
+  document.getElementById('detail-f').innerHTML = side(d.female || {});
+}
+
+// ── AI 심층 분석 ──────────────────────────────────────────
+var MATCH_SECTIONS = [
+  { title:'궁합 총평', desc:'36굿 총점의 의미, 통과 기준(18점) 대비 현재 점수의 위치, 전반적 관계 상징. 확정적 예언 금지. 약 300자.' },
+  { title:'본능·감정 호환', desc:'요니(본능·성적 친화), 나디(건강·유전적 기질), 타라(별자리 거리)로 본 본능·감정 차원의 조화. 점수가 낮은 쿠타는 어떤 식으로 나타나는지. 약 350자.' },
+  { title:'가치관·행성 궁합', desc:'바르나(자아·계급), 그라하 마이트리(달 주인 행성 우정), 가나(기질: 데바/마누샤/락샤사)로 본 성격과 가치관 결. 차이점이 어떻게 드러날 수 있는지. 약 350자.' },
+  { title:'결혼 생활 예측', desc:'바샤(지배·영향력), 바쿠트(부부생활·번영) + 드러난 도샤(특히 나디/바쿠트/망글릭)가 일상·재물·가족에 주는 영향. 약 350자.' },
+  { title:'관계 성장 실천법', desc:'해당 궁합 구성에 맞는 관계 운영 팁 3가지. 낮은 쿠타·도샤에 대한 우파야(보석·만트라·요일·보시) 관점 조언 포함. 약 300자.' },
+];
+
+var MATCH_SYS = '당신은 베딕 점성술(조티샤) 궁합 전문 상담사입니다. 36굿 아쉬타쿠타 쿤달리 밀란을 해설합니다.\n\n절대 규칙:\n- #헤더 금지, 표 금지\n- **볼드**는 핵심 키워드에만 3~5개\n- 톤: 따뜻하고 정확한 친구 같은 전문가\n- 섹션 제목 반복 금지 (카드 헤더에 이미 표시됨)\n- 확정적 예언(~할 것이다, ~반드시 헤어진다, ~이혼한다) 금지. 경향·가능성·주의점으로 서술\n- 산스크리트 용어는 괄호 안에 한국어 병기\n- 본문 안 소항목은 가) 나) 다) 형식\n- 점수가 낮다고 관계를 부정하거나, 점수가 높다고 문제없다고 단정하지 말 것\n\n최우선 규칙: 컨텍스트에 "100% 확정 사실" 블록이 있으면, 해당 점수·낙샤트라·라시·도샤 존재/부재를 절대 변경·부정·생략하지 말 것. 그 위에 해석·맥락·경향만 덧붙일 것.';
+
+function buildMatchAIContext(d) {
+  var facts = d.matchBlock || '';
+  var extra = [
+    '',
+    '=== 두 사람 정보 ===',
+    '남성(' + d._mName + '): ' + d._mBirth + ' 출생, 낙샤트라 ' + d.male.nakshatra + (d.male.pada ? ' 파다 ' + d.male.pada : '') + ', 달 라시 ' + d.male.moonSign,
+    '여성(' + d._fName + '): ' + d._fBirth + ' 출생, 낙샤트라 ' + d.female.nakshatra + (d.female.pada ? ' 파다 ' + d.female.pada : '') + ', 달 라시 ' + d.female.moonSign,
+  ].join('\n');
+  return (facts + '\n' + extra).trim();
+}
+
+async function callMatchSection(userId, ctx, secIdx) {
+  var sec = MATCH_SECTIONS[secIdx];
+  var prompt = ctx + '\n\n[작성 지시] 섹션 "' + sec.title + '"만 작성하세요. 다른 섹션 절대 쓰지 마세요.\n' + sec.desc;
+  var ctrl = new AbortController();
+  var tid = setTimeout(function(){ ctrl.abort(); }, 45000);
+  try {
+    var res = await fetch(VEDIC_CHAT, {
+      signal: ctrl.signal,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        skip_orb: true,
+        system_prompt: MATCH_SYS,
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 700
+      })
+    });
+    clearTimeout(tid);
+    if (!res.ok) throw new Error('API ' + res.status);
+    var data = await res.json();
+    return (data && (data.reply || data.content || data.text || '')).trim();
+  } catch(e) {
+    clearTimeout(tid);
+    throw e;
+  }
+}
+
+async function requestMatchAI() {
+  var d = window._matchData;
+  if (!d) return;
+
+  var user = null;
+  try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+  if (!user || !user.id) {
+    var err0 = document.getElementById('match-ai-err');
+    err0.textContent = '카카오 로그인 후 이용할 수 있어요.';
+    err0.style.display = 'block';
+    return;
+  }
+
+  var btn  = document.getElementById('match-ai-btn');
+  var errEl = document.getElementById('match-ai-err');
+  var body = document.getElementById('match-ai-body');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+
+  // Orb 잔액 확인
+  try {
+    var sb = getMatchSb();
+    var orbRes = await sb.from('orb_balance').select('balance').eq('user_id', user.id).maybeSingle();
+    var bal = (orbRes.data && orbRes.data.balance != null) ? orbRes.data.balance : 0;
+    if (bal < VEDIC_ORB) {
+      errEl.textContent = 'Orb가 부족해요. 현재 잔액: ' + bal.toLocaleString() + ' Orb (필요: ' + VEDIC_ORB + ')';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      return;
+    }
+  } catch(e) { /* 잔액 확인 실패 시 진행 */ }
+
+  // Orb 차감
+  try {
+    var deductRes = await fetch(VEDIC_CHAT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: user.id,
+        orb_override: VEDIC_ORB,
+        system_prompt: '베딕 궁합 준비 엔진. "READY"만 반환.',
+        messages: [{ role: 'user', content: '준비' }]
+      })
+    });
+    var deductData = await deductRes.json();
+    if (deductData && deductData.error === 'orb_insufficient') {
+      errEl.textContent = 'Orb가 부족해요. 현재 잔액: ' + (deductData.orb_balance || 0).toLocaleString() + ' Orb';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      return;
+    }
+  } catch(e) {}
+
+  btn.style.display = 'none';
+  body.style.display = 'block';
+  for (var i = 1; i <= 5; i++) {
+    document.getElementById('ai-lod-' + i).style.display = 'block';
+    document.getElementById('ai-txt-' + i).style.display = 'none';
+    document.getElementById('ai-txt-' + i).innerHTML = '';
+  }
+
+  var ctx = buildMatchAIContext(d);
+  var allTexts = [];
+
+  for (var si = 0; si < 5; si++) {
+    try {
+      var text = await callMatchSection(user.id, ctx, si);
+      allTexts.push(text);
+      var lodEl = document.getElementById('ai-lod-' + (si+1));
+      var txtEl = document.getElementById('ai-txt-' + (si+1));
+      lodEl.style.display = 'none';
+      txtEl.innerHTML = renderMd(text);
+      txtEl.style.display = 'block';
+    } catch(e) {
+      var lodEl2 = document.getElementById('ai-lod-' + (si+1));
+      var txtEl2 = document.getElementById('ai-txt-' + (si+1));
+      lodEl2.style.display = 'none';
+      txtEl2.innerHTML = '<span style="color:#b02a1a;">분석 실패 — 다시 시도해주세요</span>';
+      txtEl2.style.display = 'block';
+      allTexts.push('');
+    }
+  }
+
+  // Supabase reports 저장
+  try {
+    var matchKey = d._mBirth + '_' + d._fBirth + '_' + d.total;
+    var sb2 = getMatchSb();
+    await sb2.from('reports').insert({
+      user_id: user.id,
+      report_type: 'vedic_match_ai',
+      content: allTexts.concat([matchKey, d._mName + '·' + d._fName + ' ' + d.total + '/36']),
+      orb_spent: VEDIC_ORB,
+      created_at: new Date().toISOString()
+    });
+    showMatchToast('✦ 궁합 분석이 저장되었습니다. 마이페이지에서 다시 볼 수 있어요.');
+  } catch(e) {}
+}
+
+// ── 카카오 공유 ───────────────────────────────────────────
+function shareMatchKakao() {
+  var d = window._matchData;
+  if (!d) return;
+  var pageUrl = 'https://picolab.kr/vedic-match.html?utm_source=share&utm_medium=kakao';
+  var title = 'FORTUNA 베딕 궁합 · ' + d.total + '/36';
+  var desc = d._mName + ' ♥ ' + d._fName + ' — ' + (d.level || '');
+  var shareText = '✦ FORTUNA 베딕 궁합\n' + desc + '\n\n나도 확인해봐 👇 ' + pageUrl;
+
+  if (navigator.share) {
+    navigator.share({ title: title, text: shareText, url: pageUrl }).catch(function(){});
+    return;
+  }
+  if (window.Kakao && Kakao.Share) {
+    if (!Kakao.isInitialized()) { try { Kakao.init(KAKAO_JS_KEY); } catch(e) {} }
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: title,
+        description: desc,
+        imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
+        link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+      },
+      buttons: [{ title: '내 궁합 보러가기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+    });
+    return;
+  }
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(shareText);
+    showMatchToast('📋 링크가 복사됐어요!');
+  }
+}
+
+// ── STARS ─────────────────────────────────────────────────
+(function() {
+  var canvas = document.getElementById('starCanvas');
+  for (var i = 0; i < 50; i++) {
+    var s = document.createElement('div');
+    s.className = 'star';
+    var sz = Math.random() * 2 + 1;
+    s.style.cssText = [
+      'width:' + sz + 'px','height:' + sz + 'px',
+      'left:' + (Math.random()*100) + '%','top:' + (Math.random()*100) + '%',
+      '--dur:' + (2+Math.random()*4) + 's','--delay:' + (Math.random()*5) + 's',
+      '--max-op:' + (0.3+Math.random()*0.5)
+    ].join(';');
+    canvas.appendChild(s);
+  }
+})();
+
+// ── INIT: 내 프로필 자동 채움 ─────────────────────────────
+(function() {
+  try {
+    var prof = JSON.parse(localStorage.getItem('pico_profile') || 'null');
+    if (prof && prof.year && prof.month && prof.day) {
+      var useFemale = prof.gender === 'female';
+      var prefix = useFemale ? 'f-' : 'm-';
+      if (prof.name) document.getElementById(prefix + 'name').value = prof.name;
+      document.getElementById(prefix + 'year').value = prof.year;
+      document.getElementById(prefix + 'month').value = prof.month;
+      document.getElementById(prefix + 'day').value = prof.day;
+      if (prof.hour != null && prof.hour !== 'unknown') {
+        document.getElementById(prefix + 'hour').value = prof.hour;
+      }
+    }
+  } catch(e) {}
+
+  // URL 파라미터에서 자동 입력 (?my=year,month,day,hour,gender)
+  var p = new URLSearchParams(location.search);
+  var my = p.get('my');
+  if (my) {
+    var parts = my.split(',');
+    if (parts.length >= 3) {
+      var g = parts[4] || 'male';
+      var prefix2 = g === 'female' ? 'f-' : 'm-';
+      document.getElementById(prefix2 + 'year').value  = parts[0];
+      document.getElementById(prefix2 + 'month').value = parts[1];
+      document.getElementById(prefix2 + 'day').value   = parts[2];
+      if (parts[3] && parts[3] !== 'unknown') document.getElementById(prefix2 + 'hour').value = parts[3];
+    }
+  }
+})();
+</script>
+<script src="yongsin-float.js"></script>
+<script>
+(function(){
+  document.addEventListener('copy',function(e){e.preventDefault();});
+  document.addEventListener('contextmenu',function(e){e.preventDefault();});
+  document.addEventListener('selectstart',function(e){if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault();});
+  document.addEventListener('dragstart',function(e){e.preventDefault();});
+})();
+</script>
+<style>
+body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+input,textarea,select{-webkit-user-select:text;user-select:text;}
+</style>
+</body>
+</html>
