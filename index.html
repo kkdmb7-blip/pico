@@ -1757,7 +1757,8 @@
       </div>
       <div style="font-size:10px;color:rgba(107,107,133,0.6);text-align:right;">直使門 기준<br>일간 오행 맞춤</div>
     </div>
-    <div id="qimenWeeklyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px;"></div>
+    <div id="qimenChartRow" style="margin:0 -4px 6px;"></div>
+    <div id="qimenWeeklyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px;"></div>
     <div id="qimenWeeklyDetail" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;display:none;font-size:13px;"></div>
     <p style="margin-top:10px;margin-bottom:0;text-align:center;font-size:10px;color:rgba(107,107,133,0.5);">탭하면 상세 보기 · 기문둔갑 페이지에서 전체 포국 확인</p>
   </div>
@@ -6069,35 +6070,97 @@ function updateMypageTab() {
       weekData.push({door:door,grade:grade,kw:kw,icon:DOOR_ICON[door]||'<i class="pi pi-crystal"></i>',dt:dt,data:data});
     }
 
+    // ── 비비드 색상 ──
+    var GRADE_SCORE = {'대길':5,'길':4,'평':3,'흉':2,'대흉':1};
+    var GRADE_VIVID = {'대길':'#34d399','길':'#60a5fa','평':'#a78bfa','흉':'#fb923c','대흉':'#f87171'};
+
+    // ── SVG 흐름 차트 ──
+    var chartEl = document.getElementById('qimenChartRow');
+    if(chartEl){
+      var VW=100, VH=54;
+      var xOf=function(i){return (1/14+i/7)*VW;};
+      var yOf=function(s){return VH-((s-1)/4)*(VH-16)-8;};
+      var pts=weekData.map(function(d,i){
+        var s=d?(GRADE_SCORE[d.grade]||3):3;
+        return {x:xOf(i),y:yOf(s),s:s,d:d};
+      });
+      var path='M'+pts[0].x+','+pts[0].y;
+      for(var ci=0;ci<pts.length-1;ci++){
+        var dx=(pts[ci+1].x-pts[ci].x)*0.38;
+        path+=' C'+(pts[ci].x+dx)+','+pts[ci].y+' '+(pts[ci+1].x-dx)+','+pts[ci+1].y+' '+pts[ci+1].x+','+pts[ci+1].y;
+      }
+      var fillPath=path+' L'+pts[pts.length-1].x+','+VH+' L'+pts[0].x+','+VH+' Z';
+      var svg='<svg viewBox="0 0 100 54" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:58px;display:block;">';
+      svg+='<defs>';
+      svg+='<linearGradient id="qwFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(167,139,250,0.28)"/><stop offset="100%" stop-color="rgba(167,139,250,0)"/></linearGradient>';
+      svg+='<filter id="qwGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+      svg+='</defs>';
+      svg+='<path d="'+fillPath+'" fill="url(#qwFill)"/>';
+      svg+='<path d="'+path+'" fill="none" stroke="rgba(167,139,250,0.55)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>';
+      pts.forEach(function(p,i){
+        var color=p.d?(GRADE_VIVID[p.d.grade]||'#a78bfa'):'#5a4a7a';
+        var isT=(i===3);
+        if(isT){
+          svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="5.5" fill="'+color+'" opacity="0.18" filter="url(#qwGlow)"/>';
+          svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="'+color+'" filter="url(#qwGlow)"/>';
+          svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="1.1" fill="#fff"/>';
+        } else {
+          svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="1.7" fill="'+color+'" opacity="0.8"/>';
+        }
+      });
+      svg+='</svg>';
+      chartEl.innerHTML=svg;
+    }
+
+    // ── 카드 렌더링 ──
     weekData.forEach(function(item,idx){
       var card=document.createElement('div');
       var dt=dates[idx];
-      card.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.3s;';
+      var isToday=dt.isToday;
+      var dayColor=dt.day==='토'?'#fb923c':dt.day==='일'?'#f87171':(isToday?'var(--text)':'var(--muted)');
       if(!item){
-        var dayColor0=dt.day==='토'?'#b45309':dt.day==='일'?'#b91c1c':'var(--muted)';
-        card.innerHTML='<div style="font-size:13px;font-weight:600;color:'+dayColor0+';">'+dt.day+'</div><div style="font-size:12px;margin-top:4px;">'+dt.m+'/'+dt.d+'</div><div style="font-size:11px;color:var(--muted);margin-top:6px;">—</div>';
+        card.style.cssText='position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 3px;text-align:center;height:112px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;';
+        card.innerHTML='<div style="font-size:12px;font-weight:600;color:'+dayColor+'">'+dt.day+'</div>'+
+          '<div style="font-size:10px;color:var(--muted)">'+dt.m+'/'+dt.d+'</div>'+
+          '<div style="font-size:10px;color:var(--muted);margin-top:8px;">—</div>';
       } else {
-        var gc=GRADE_COLOR[item.grade]||'#5a4a7a';
-        var dayColor=dt.day==='토'?'#b45309':dt.day==='일'?'#b91c1c':'var(--muted)';
-        card.innerHTML='<div style="font-size:13px;letter-spacing:0.05em;color:'+dayColor+';font-weight:600;">'+dt.day+'</div>'+
-          '<div style="font-size:12px;margin-top:3px;color:var(--text2);">'+dt.m+'/'+dt.d+'</div>'+
-          '<div style="margin-top:8px;font-size:12px;font-weight:600;color:'+gc+';letter-spacing:0.03em;">'+item.grade+'</div>'+
-          '<div style="margin-top:3px;font-size:9px;color:var(--muted);letter-spacing:0.08em;">'+doorNameMap[item.door]+'門</div>';
+        var gc=GRADE_VIVID[item.grade]||'#a78bfa';
+        var barPct=((GRADE_SCORE[item.grade]||3)-1)/4*52+12;
+        card.style.cssText='position:relative;overflow:hidden;background:var(--surface);border:1px solid '+(isToday?gc:'var(--border)')+';border-radius:12px;padding:10px 3px 8px;text-align:center;cursor:pointer;transition:all 0.25s;height:112px;box-sizing:border-box;'+(isToday?'box-shadow:0 0 20px '+gc+'35;':'');
+        card.innerHTML=
+          '<div style="position:absolute;bottom:0;left:0;right:0;height:'+barPct+'%;background:'+gc+';opacity:0.14;transition:height 0.5s ease,opacity 0.25s;border-radius:0 0 12px 12px;"></div>'+
+          '<div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px;">'+
+            '<div style="font-size:12px;font-weight:'+(isToday?'800':'600')+';color:'+dayColor+';">'+dt.day+'</div>'+
+            '<div style="font-size:10px;color:var(--muted)">'+dt.m+'/'+dt.d+'</div>'+
+            '<div style="font-size:18px;color:'+gc+';line-height:1;margin-top:5px;">'+item.icon+'</div>'+
+            '<div style="font-size:10px;font-weight:700;color:'+gc+';margin-top:3px;letter-spacing:0.02em;">'+item.grade+'</div>'+
+            '<div style="font-size:7.5px;color:var(--muted);letter-spacing:0.06em;">'+doorNameMap[item.door]+'門</div>'+
+          '</div>';
         card.onclick=(function(it,cardEl){return function(){
-          // 선택 스타일: 모든 카드 초기화 후 현재만 활성화
-          Array.from(grid.children).forEach(function(c){c.style.borderColor='var(--border)';c.style.boxShadow='';c.style.background='var(--surface)';});
-          cardEl.style.borderColor='var(--accent)';cardEl.style.boxShadow='0 0 14px rgba(123,94,167,0.35)';cardEl.style.background='rgba(123,94,167,0.12)';
+          Array.from(grid.children).forEach(function(c){
+            c.style.borderColor='var(--border)';c.style.boxShadow='';
+            var f=c.querySelector('[style*="position:absolute"]');if(f)f.style.opacity='0.14';
+          });
+          var sg=GRADE_VIVID[it.grade]||'#a78bfa';
+          cardEl.style.borderColor=sg;cardEl.style.boxShadow='0 0 20px '+sg+'48';
+          var f=cardEl.querySelector('[style*="position:absolute"]');if(f)f.style.opacity='0.25';
           detail.style.display='block';
-          detail.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
-            '<div><div style="font-size:10px;color:#5a4a7a;letter-spacing:0.12em;font-weight:600;margin-bottom:3px;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
-            '<div style="font-size:10px;color:var(--muted);letter-spacing:0.03em;">'+doorNameMap[it.door]+'門 · 일가 포국</div></div>'+
-            '<div style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;color:'+(GRADE_COLOR[it.grade]||'#5a4a7a')+';background:rgba(0,0,0,0.05);border:1px solid'+(GRADE_COLOR[it.grade]||'#5a4a7a')+'25;letter-spacing:0.05em;">'+it.grade+'</div>'+
-          '</div>'+
-          '<div style="font-size:14px;font-weight:300;color:#1a120a;line-height:1.7;letter-spacing:-0.01em;">'+it.kw+'</div>'+
-          '<div style="margin-top:12px;text-align:right;"><a href="#" onclick="event.preventDefault();goQimenDetail()" style="font-size:10px;color:#5a4a7a;text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
+          detail.innerHTML=
+            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
+              '<div>'+
+                '<div style="font-size:10px;color:#5a4a7a;letter-spacing:0.12em;font-weight:600;margin-bottom:3px;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
+                '<div style="font-size:10px;color:var(--muted);letter-spacing:0.03em;">'+doorNameMap[it.door]+'門 · 일가 포국</div>'+
+              '</div>'+
+              '<div style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;color:'+sg+';background:'+sg+'1a;border:1px solid '+sg+'45;letter-spacing:0.05em;">'+it.grade+'</div>'+
+            '</div>'+
+            '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">'+
+              '<div style="font-size:24px;color:'+sg+';">'+it.icon+'</div>'+
+              '<div style="font-size:14px;color:#1a120a;line-height:1.7;letter-spacing:-0.01em;">'+it.kw+'</div>'+
+            '</div>'+
+            '<div style="text-align:right;"><a href="#" onclick="event.preventDefault();goQimenDetail()" style="font-size:10px;color:#5a4a7a;text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
         };})(item,card);
       }
-      card.addEventListener('mouseenter',function(){this.style.transform='translateY(-3px)';});
+      card.addEventListener('mouseenter',function(){this.style.transform='translateY(-2px)';});
       card.addEventListener('mouseleave',function(){this.style.transform='';});
       grid.appendChild(card);
     });
