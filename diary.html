@@ -213,7 +213,7 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(244,237,224,0.92); bac
       <div class="card-title">한 줄 메모 (선택)</div>
       <div class="card-sub">오늘 기억하고 싶은 것</div>
       <textarea class="memo-area" id="memoInput" placeholder="오늘 있었던 일을 자유롭게 써봐..." maxlength="200"></textarea>
-      <button class="btn-primary" onclick="submitDiary(false)">저장하고 AI 피드백 받기 <i class="pi pi-sparkle"></i></button>
+      <button class="btn-primary" onclick="submitDiary(false)" data-event="diary_save">저장하고 AI 피드백 받기 <i class="pi pi-sparkle"></i></button>
       <button class="btn-ghost"   onclick="showStep(2)">← 이전</button>
       <button class="btn-ghost"   onclick="submitDiary(true)">건너뛰기</button>
     </div>

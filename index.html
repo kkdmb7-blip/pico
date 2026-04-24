@@ -1157,7 +1157,7 @@
     <img src="img/goddess/goddess.png" alt="FORTUNA"><span class="logo-text">FORTUNA</span>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
-    <button class="btn-kakao" id="btnKakao" onclick="kakaoLogin()">
+    <button class="btn-kakao" id="btnKakao" onclick="kakaoLogin()" data-event="kakao_login">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1C4.134 1 1 3.582 1 6.757c0 1.904 1.178 3.584 2.98 4.624L3.2 14.2a.25.25 0 00.363.28l3.49-2.29c.31.03.622.047.947.047 3.866 0 7-2.582 7-5.48C15 3.582 11.866 1 8 1z" fill="#191919"/></svg>
       카카오로 시작하기
     </button>
@@ -1276,7 +1276,7 @@
         <button class="saju-gender-btn" id="heroGenderF" onclick="selectHeroGender('F')">여성 ♀</button>
       </div>
     </div>
-    <button class="saju-submit-btn" onclick="goScoreHero()">내 운세 바로 확인하기 <i class="pi pi-sparkle"></i></button>
+    <button class="saju-submit-btn" onclick="goScoreHero()" data-event="hero_submit">내 운세 바로 확인하기 <i class="pi pi-sparkle"></i></button>
   </div>
 </section>
 
@@ -2875,12 +2875,12 @@
   height:60px;z-index:200;
   padding-bottom:env(safe-area-inset-bottom);
 ">
-  <button onclick="switchTab('home')" id="tnHome" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#5a4830;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+  <button onclick="switchTab('home')" id="tnHome" data-event="nav_홈" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#5a4830;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
     </svg>홈
   </button>
-  <button onclick="switchTab('report')" id="tnReport" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#5a4830;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+  <button onclick="switchTab('report')" id="tnReport" data-event="nav_리포트" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#5a4830;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
       <polyline points="14 2 14 8 20 8"/>
@@ -2888,14 +2888,14 @@
       <line x1="9" y1="17" x2="13" y2="17"/>
     </svg>리포트
   </button>
-  <button onclick="switchTab('consult')" id="tnConsult" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#5a4830;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
+  <button onclick="switchTab('consult')" id="tnConsult" data-event="nav_상담" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#5a4830;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="11" r="5"/>
       <path d="M12 16v2M10 20h4"/>
       <path d="M8.5 8.5L7 7M15.5 8.5L17 7M12 6V4"/>
     </svg>상담
   </button>
-  <button onclick="switchTab('mypage')" id="tnMypage" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#5a4830;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;position:relative;">
+  <button onclick="switchTab('mypage')" id="tnMypage" data-event="nav_마이페이지" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#5a4830;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;position:relative;">
     <span style="position:relative;display:inline-flex;">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>

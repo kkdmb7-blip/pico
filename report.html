@@ -637,7 +637,7 @@ function navBack() {
       <div id="introSections"></div>
     </div>
 
-    <button class="btn-intro-gen" id="btnGenerate">
+    <button class="btn-intro-gen" id="btnGenerate" data-event="report_generate">
       <i class="pi pi-sparkle"></i> 리포트 생성하기
       <span class="btn-intro-gen-sub" id="introOrbCost"></span>
     </button>
@@ -808,7 +808,7 @@ function navBack() {
           <button class="saju-gender-btn" type="button" id="childGenderF" onclick="selectChildGender('F')">여성 ♀</button>
         </div>
       </div>
-      <button class="saju-submit-btn" id="btnChildSubmit" type="button" onclick="submitChild()">이 정보로 분석하기 <i class="pi pi-sparkle"></i></button>
+      <button class="saju-submit-btn" id="btnChildSubmit" type="button" onclick="submitChild()" data-event="report_child_submit">이 정보로 분석하기 <i class="pi pi-sparkle"></i></button>
       <button type="button" class="modal-btn modal-btn-cancel" style="margin-top:8px;width:100%;padding:12px;background:none;border:1px solid var(--border-soft);border-radius:10px;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Noto Serif KR',serif;" onclick="location.href='index.html?tab=report'">돌아가기</button>
     </div>
   </div>

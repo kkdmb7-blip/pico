@@ -415,7 +415,7 @@ select.input option{background:#fff;color:var(--text);}
         <option>강릉</option><option>거제</option><option>경주</option><option>고양</option><option>광명</option><option>광주</option><option>구미</option><option>군산</option><option>김해</option><option>남양주</option><option>대구</option><option>대전</option><option>목포</option><option>부산</option><option>부천</option><option>사천</option><option>서울</option><option>성남</option><option>수원</option><option>순천</option><option>시흥</option><option>아산</option><option>안산</option><option>안성</option><option>안양</option><option>양산</option><option>여수</option><option>오산</option><option>용인</option><option>원주</option><option>의정부</option><option>이천</option><option>인천</option><option>전주</option><option>제주</option><option>진주</option><option>창원</option><option>천안</option><option>청주</option><option>춘천</option><option>통영</option><option>평택</option><option>포항</option><option>하남</option><option>화성</option><option>울산</option>
       </select>
     </div>
-    <button class="calc-btn" id="calcBtn" onclick="calcDominant()">내 도미넌트 행성 확인하기</button>
+    <button class="calc-btn" id="calcBtn" onclick="calcDominant()" data-event="dominant_calc">내 도미넌트 행성 확인하기</button>
   </div>
 
   <div class="result" id="result">
@@ -445,8 +445,8 @@ select.input option{background:#fff;color:var(--text);}
     <div class="share-card">
       <div class="share-label">친구에게 공유하기</div>
       <div class="share-btns">
-        <button class="share-btn kakao" onclick="shareKakao()"><svg viewBox="0 0 24 24" fill="#6b4c00"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.74 1.72 5.15 4.34 6.58-.18.67-.67 2.48-.77 2.86-.12.48.18.47.37.34.15-.1 2.38-1.62 3.34-2.27.89.13 1.8.19 2.72.19 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>카카오로 공유</button>
-        <button class="share-btn" onclick="copyLink()"><i class="pi pi-link"></i> 링크 복사</button>
+        <button class="share-btn kakao" onclick="shareKakao()" data-event="share_kakao_dominant"><svg viewBox="0 0 24 24" fill="#6b4c00"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.74 1.72 5.15 4.34 6.58-.18.67-.67 2.48-.77 2.86-.12.48.18.47.37.34.15-.1 2.38-1.62 3.34-2.27.89.13 1.8.19 2.72.19 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>카카오로 공유</button>
+        <button class="share-btn" onclick="copyLink()" data-event="share_link_dominant"><i class="pi pi-link"></i> 링크 복사</button>
       </div>
     </div>
     <div class="upsell-card">
