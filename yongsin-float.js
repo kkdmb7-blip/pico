@@ -690,36 +690,42 @@
     return false;
   }
 
-  // ── 사용자 프로필 출생일 기반 개인화 ──
-  // localStorage.pico_profile {name, year, month, day, hour, gender}
-  function getUserProfile() {
-    try { return JSON.parse(localStorage.getItem('pico_profile') || 'null'); }
-    catch(e) { return null; }
+  // ── 용신 출생일(원소별) 추적 ──
+  // raw.all[elem].birthTs (Date.now() ms). yongsin-pet.html의 부화와 공유.
+  // 플로팅에서 먼저 마주친 경우도 오늘로 기록.
+  function ensureBornAt() {
+    try {
+      var raw = getPetState();
+      var elem = getElement() || raw.element;
+      if (!elem) return null;
+      if (!raw.all) raw.all = {};
+      if (!raw.all[elem]) raw.all[elem] = {};
+      var s = raw.all[elem];
+      if (!s.birthTs) {
+        s.birthTs = Date.now();
+        raw.element = elem;
+        localStorage.setItem(PET_KEY, JSON.stringify(raw));
+      }
+      return s.birthTs;
+    } catch(e) { return null; }
   }
-  function getUserAgeDays() {
-    var p = getUserProfile();
-    if (!p || !p.year || !p.month || !p.day) return -1;
-    var bd = new Date(Number(p.year), Number(p.month) - 1, Number(p.day));
-    if (isNaN(bd.getTime())) return -1;
-    var now = new Date();
-    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var diff = Math.floor((today - bd) / 86400000);
-    return diff >= 0 ? diff : -1;
+  function getPetAgeDays() {
+    var ts = ensureBornAt();
+    if (!ts) return 0;
+    return Math.max(0, Math.floor((Date.now() - ts) / 86400000));
   }
-  function userAgeGreet() {
-    var d = getUserAgeDays();
-    if (d < 0) return null;
-    var p = getUserProfile();
-    var who = (p && p.name) ? p.name + '님' : '당신';
-    if (d === 0)      return who + '이(가) 오늘 세상에 나왔어요 🐣';
-    if (d === 1)      return who + '이(가) 세상에 나온 지 하루 됐어요';
-    if (d === 100)    return who + '이(가) 세상에 나온 지 100일 🌸';
-    if (d === 365)    return who + '이(가) 세상에 나온 지 1년 💖';
-    if (d === 1000)   return who + '이(가) 세상에 나온 지 1000일 ✨';
-    if (d === 10000)  return who + '이(가) 세상에 나온 지 1만일 🎉';
-    if (d > 0 && d % 1000 === 0) return who + '이(가) 세상에 나온 지 ' + d.toLocaleString() + '일 ✨';
-    if (d > 0 && d % 365 === 0)  return who + '이(가) 세상에 나온 지 ' + (d/365) + '년이 되었어요 🌿';
-    return who + '이(가) 세상에 나온 지 ' + d.toLocaleString() + '일 되었어요';
+  // 출생일 기반 말풍선 (이정표 + 일반)
+  function ageGreet() {
+    var d = getPetAgeDays();
+    var nm = getPetName();
+    if (d === 0) return nm + '가(이) 오늘 세상에 나왔어요 🐣';
+    if (d === 1) return nm + '와(과) 함께한 지 하루 됐어요';
+    if (d === 7)   return '우리가 만난 지 일주일 ✨';
+    if (d === 30)  return nm + '와(과) 함께한 지 한 달 🎉';
+    if (d === 100) return '벌써 100일째예요, ' + nm + '와(과) 🌸';
+    if (d === 365) return nm + '와(과) 1주년이에요 💖';
+    if (d > 0 && d % 100 === 0) return nm + '와(과) 함께한 지 ' + d + '일 ✨';
+    return nm + '가(이) 세상에 나온 지 ' + d + '일째예요';
   }
   function startSleepVisualPoll() {
     setInterval(function() {
@@ -1325,6 +1331,7 @@
     startProactiveGreeter();
     startSleepVisualPoll();
     setSleepVisual(isSleepingNow());
+    ensureBornAt();
   }
 
   // ── 주기적으로 먼저 말 걸기 (10분마다 20% 확률) ──
@@ -1345,15 +1352,12 @@
         '오늘도 화이팅 ✨',
         '잘 하고 있어요',
         '잠깐 쉬어가요 🌿',
+        ageGreet(),
       ];
-      var uAge = userAgeGreet();
-      if (uAge) {
-        pool.push(uAge);
-        var ud = getUserAgeDays();
-        if (ud === 100 || ud === 365 || ud === 1000 || ud === 10000 ||
-            (ud > 0 && (ud % 1000 === 0 || ud % 365 === 0))) {
-          pool.push(uAge, uAge);
-        }
+      // 이정표(7/30/100/365/100의 배수)는 가중치 ↑
+      var days = getPetAgeDays();
+      if (days === 7 || days === 30 || days === 100 || days === 365 || (days > 0 && days % 100 === 0)) {
+        pool.push(ageGreet(), ageGreet());
       }
       var persona = getPersona();
       if (persona) pool.push(persona.tip);
