@@ -228,6 +228,15 @@
         var err = await r.text();
         throw new Error('저장 실패 (' + r.status + ')');
       }
+      // 운영자에게 텔레그램 알림 (실패해도 무시)
+      try {
+        var uname = '';
+        try { var u = JSON.parse(localStorage.getItem('pico_user') || 'null'); if (u && u.name) uname = u.name; } catch(_) {}
+        fetch('https://fortuna.kkdmb7.workers.dev/notify-support', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: uname, user_id: uid, content: text })
+        }).catch(function(){});
+      } catch(_) {}
       // 서버 반영 후 전체 재로드
       await loadMessages();
     } catch (e) {
