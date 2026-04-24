@@ -6767,6 +6767,10 @@ async function generateMoneyReport() {
   });
   const sb2 = buildSajuBlock(), vb = buildVedicBlock(), db = buildDaeunBlock(), profileStr = buildProfileStr();
   const ysFinal = _sdFull?.yongshin?.primary || _yongsin || '미확인';
+  const _nowY = new Date().getFullYear();
+  const _bigLuckArr = (_sdFull?.big_luck_analysis) || [];
+  const _curDaeunObj = _bigLuckArr.find(d => { const r=(d.year_range||'').split(/[–\-~]/); return _nowY>=parseInt(r[0])&&_nowY<=parseInt(r[1]); }) || _bigLuckArr[0];
+  const _curDaeunStr = _curDaeunObj ? `${_curDaeunObj.pillar_kor||_curDaeunObj.ganjee||''}(${_curDaeunObj.year_range||''})` : (_daeun||'미확인');
   let wealthFrame = { wealth_type:'미확인', primary_path:'미확인', income_style:'미확인', risk_factors:[], writing_guidelines:[] };
   try {
     const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
@@ -6822,7 +6826,7 @@ ${buildYongsinBlock(['직업','피해야할것'])}
 ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
-4. 재물 대운·세운 흐름 — 현재 대운 ${_daeun||'미확인'}에서 재물 흐름 분석. 베딕 다샤 ${_vedicData?.dasha||'미확인'}와 교차. 언제 기회가 오고 언제 조심해야 하는지 구체적 시기 포함.
+4. 재물 대운·세운 흐름 — 현재 대운 ${_curDaeunStr}에서 재물 흐름 분석. 베딕 다샤 ${_vedicData?.dasha||'미확인'}와 교차. 언제 기회가 오고 언제 조심해야 하는지 구체적 시기 포함.
 5. 재물을 키우는 실천 전략 — 이 일주에 맞는 창업·커리어·투자 조언을 반드시 반영. 지금 당장 실행 가능한 구체적 전략 3가지. 이 사주 구조에 맞는 재테크/투자/사업 방식, 절대 피해야 할 패턴.
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
