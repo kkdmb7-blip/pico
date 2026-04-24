@@ -825,48 +825,22 @@ async function loadChatUnread() {
 }
 
 async function loadToday() {
-  const client = getSb();
-  if (!client) return;
   const now = new Date();
   const kst = new Date(now.getTime() + 9*3600000);
   const today = kst.toISOString().slice(0,10);
   qs('todayDate').textContent = today + ' (KST)';
-  const startKst = today + 'T00:00:00+09:00';
-  const endKst = today + 'T23:59:59+09:00';
-
   try {
-    const { data, error } = await client.from('orb_transactions')
-      .select('user_id,type')
-      .neq('type','daily_refill')
-      .gte('created_at', startKst).lte('created_at', endKst);
-    if (error) throw error;
-    const uniq = new Set((data||[]).map(r => r.user_id));
-    qs('stVisitors').textContent = uniq.size.toLocaleString();
-  } catch(e) { qs('stVisitors').textContent = '-'; }
-
-  try {
-    const { count, error } = await client.from('chat_users')
-      .select('*', { count:'exact', head:true })
-      .gte('created_at', startKst).lte('created_at', endKst);
-    if (error) throw error;
-    qs('stNewUsers').textContent = (count||0).toLocaleString();
-  } catch(e) { qs('stNewUsers').textContent = '-'; }
-
-  try {
-    const { count, error } = await client.from('reports')
-      .select('*', { count:'exact', head:true })
-      .gte('created_at', startKst).lte('created_at', endKst);
-    if (error) throw error;
-    qs('stReports').textContent = (count||0).toLocaleString();
-  } catch(e) { qs('stReports').textContent = '-'; }
-
-  try {
-    const { count, error } = await client.from('chat_messages')
-      .select('*', { count:'exact', head:true })
-      .gte('created_at', startKst).lte('created_at', endKst);
-    if (error) throw error;
-    qs('stMessages').textContent = (count||0).toLocaleString();
-  } catch(e) { qs('stMessages').textContent = '-'; }
+    const s = await fetchJson('/admin/today-stats');
+    qs('stVisitors').textContent = (s.active_users||0).toLocaleString();
+    qs('stNewUsers').textContent = (s.new_users||0).toLocaleString();
+    qs('stReports').textContent = (s.reports||0).toLocaleString();
+    qs('stMessages').textContent = (s.messages||0).toLocaleString();
+  } catch(e) {
+    qs('stVisitors').textContent = '-';
+    qs('stNewUsers').textContent = '-';
+    qs('stReports').textContent = '-';
+    qs('stMessages').textContent = '-';
+  }
 }
 
 qs('gateSubmit').addEventListener('click', async () => {
