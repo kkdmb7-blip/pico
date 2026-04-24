@@ -87,14 +87,15 @@ select.input option{background:#fff;color:var(--text);}
 
 .calc-btn{
   width:100%;
-  background:linear-gradient(135deg, #8a2c1e, #6d1f15);
-  border:none;border-radius:12px;padding:15px;
-  color:#fdf3e6;font-family:var(--fn);font-size:15px;font-weight:700;
+  background:rgba(122,36,24,0.1);
+  border:1px solid rgba(122,36,24,0.3);
+  border-radius:12px;padding:14px;
+  color:#7a2418;font-family:var(--fn);font-size:14px;font-weight:700;
   cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;
-  box-shadow:0 2px 8px rgba(122,36,24,0.22);
 }
-.calc-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(122,36,24,0.3);}
-.calc-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+.calc-btn:hover{background:rgba(122,36,24,0.16);border-color:rgba(122,36,24,0.45);}
+.calc-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.calc-btn .loading{border:2px solid rgba(122,36,24,0.2);border-top-color:#7a2418;}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -195,21 +196,21 @@ select.input option{background:#fff;color:var(--text);}
 .share-btn svg{width:14px;height:14px;flex-shrink:0;}
 
 .upsell-card{
-  background:linear-gradient(135deg, rgba(212,175,55,0.12), rgba(122,36,24,0.06));
-  border:1px solid rgba(154,122,38,0.35);
+  background:var(--surface);
+  border:1px solid var(--border-soft);
   border-radius:16px;padding:24px 20px;text-align:center;
   box-shadow:var(--shadow-soft);
 }
 .upsell-text{font-size:13px;color:var(--text2);line-height:1.85;margin-bottom:16px;}
 .upsell-btn{
   display:inline-block;
-  background:linear-gradient(135deg, #8a2c1e, #6d1f15);
-  border-radius:50px;padding:12px 30px;
-  color:#fdf3e6;font-family:var(--fn);font-size:13.5px;font-weight:700;
-  text-decoration:none;transition:all 0.2s;letter-spacing:0.02em;
-  box-shadow:0 2px 8px rgba(122,36,24,0.22);
+  background:rgba(122,36,24,0.1);
+  border:1px solid rgba(122,36,24,0.3);
+  border-radius:50px;padding:11px 26px;
+  color:#7a2418;font-family:var(--fn);font-size:13px;font-weight:700;
+  cursor:pointer;text-decoration:none;transition:all 0.2s;letter-spacing:0.02em;
 }
-.upsell-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(122,36,24,0.3);}
+.upsell-btn:hover{background:rgba(122,36,24,0.16);border-color:rgba(122,36,24,0.45);}
 
 .toast{
   position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
@@ -266,10 +267,7 @@ select.input option{background:#fff;color:var(--text);}
           <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
           <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
         </select>
-        <select id="calcMin" class="input" style="flex:1;">
-          <option value="0">0분</option><option value="10">10분</option><option value="20">20분</option>
-          <option value="30">30분</option><option value="40">40분</option><option value="50">50분</option>
-        </select>
+        <select id="calcMin" class="input" style="flex:1;"></select>
       </div>
     </div>
     <div class="field">
@@ -344,6 +342,11 @@ var currentDominant = null;
   for (var m = 1; m <= 12; m++) {
     var o2 = document.createElement('option'); o2.value = m; o2.textContent = m + '월';
     mEl.appendChild(o2);
+  }
+  var minEl = document.getElementById('calcMin');
+  for (var mn = 0; mn < 60; mn++) {
+    var oMn = document.createElement('option'); oMn.value = mn; oMn.textContent = mn + '분';
+    minEl.appendChild(oMn);
   }
   function updateDays() {
     var y2 = parseInt(yEl.value)||1990, m2 = parseInt(mEl.value)||1;
