@@ -2926,6 +2926,7 @@ let _ohaeng = null;
 let _vedicData = null;
 let _personality = {};
 let _sdFull = null;
+let _curDaeunBL = null;
 let _rptFull = null;
 let _ziweiData = null;
 let _astroData = null;
@@ -3226,7 +3227,7 @@ async function loadAllData(withZiwei, withAstro) {
   if (withAstro)  promises.push(fetch(`${WORKER_BASE}/astro?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&lat=37.5&lng=127.0`, {signal:loadCtrl.signal}));
   const results = await Promise.allSettled(promises);
   clearTimeout(loadTid);
-  try { if (results[0].status==='fulfilled'&&results[0].value.ok) _sdFull = await results[0].value.json(); } catch(e){}
+  try { if (results[0].status==='fulfilled'&&results[0].value.ok) { _sdFull = await results[0].value.json(); _curDaeunBL = _computeCurDaeun(_sdFull); } } catch(e){}
   try {
     if (results[1].status==='fulfilled'&&results[1].value.ok) {
       _rptFull = await results[1].value.json();
@@ -3438,14 +3439,21 @@ function buildVedicPrecisionBlock(opts) {
   }
   return parts.join('\n\n');
 }
+function _computeCurDaeun(sd) {
+  const nowY = new Date(Date.now() + 9*3600000).getUTCFullYear();
+  const bl = (sd && sd.big_luck_analysis) || [];
+  const cur = bl.find(d => { const r=(d.year_range||'').split(/[–\-~]/); return nowY>=parseInt(r[0])&&nowY<=parseInt(r[1]); }) || bl[0];
+  return cur ? `${cur.pillar_kor||cur.ganjee||''}(${cur.year_range||''})` : null;
+}
 function buildDaeunBlock() {
-  if (!_daeunList) return `현재 대운: ${_daeun||'미확인'}`;
-  const now = new Date().getFullYear();
+  if (!_daeunList) return `현재 대운: ${_curDaeunBL||_daeun||'미확인'}`;
+  const now = new Date(Date.now() + 9*3600000).getUTCFullYear();
   const cur = _daeunList.find(d=>{const r=(d.year_range||'').split(/[–\-]/);return now>=parseInt(r[0])&&now<=parseInt(r[1]);})||_daeunList[0];
   const past = _daeunList.filter(d=>{const r=(d.year_range||'').split(/[–\-]/);return parseInt(r[1])<now;});
   const future = _daeunList.filter(d=>{const r=(d.year_range||'').split(/[–\-]/);return parseInt(r[0])>now;});
+  const curLabel = _curDaeunBL || (cur ? `${cur.ganjee||''}(${cur.year_range||''})` : (_daeun||'미확인'));
   return `【대운 흐름】
-현재 대운: ${_daeun||'미확인'}
+현재 대운: ${curLabel}
 과거 대운: ${past.map(d=>`${d.ganjee}(${d.year_range})`).join(' → ')||'없음'}
 미래 대운: ${future.slice(0,3).map(d=>`${d.ganjee}(${d.year_range})`).join(' → ')||'없음'}
 전체: ${JSON.stringify(_daeunList.slice(0,8))}`;
@@ -6584,7 +6592,7 @@ async function generateCharacterReport() {
         }),
         fetch(`https://fortuna.kkdmb7.workers.dev/saju-report?year=${p.year}&month=${p.month}&day=${p.day}&hour=${hour}&minute=${minute}&gender=${gender}&current_year=${new Date().getFullYear()}&current_month=${new Date().getMonth()+1}&current_day=${new Date().getDate()}`)
       ]);
-      if (sdRes.ok) { sd = await sdRes.json(); _sdFull = sd; }
+      if (sdRes.ok) { sd = await sdRes.json(); _sdFull = sd; _curDaeunBL = _computeCurDaeun(_sdFull); }
       if (rptRes.ok) { rpt = await rptRes.json(); _rptFull = rpt; }
     } catch(e) { console.warn('[character] 데이터 로드 실패:', e); }
   }
@@ -6910,7 +6918,7 @@ ${buildAdviceBlock(['대인관계/부부'])}
 ${buildAccuracyLayerBlock()}
 
 섹션 구성:
-4. 인연 시기 분석 — 현재 대운 ${_daeun||'미확인'}에서 관성이 활성화되는 시기, 베딕 다샤 ${_vedicData?.dasha||'미확인'} 기간의 연애 에너지, 올해 ${_sewun||''}년 인연 기운.
+4. 인연 시기 분석 — 현재 대운 ${_curDaeunBL||_daeun||'미확인'}에서 관성이 활성화되는 시기, 베딕 다샤 ${_vedicData?.dasha||'미확인'} 기간의 연애 에너지, 올해 ${_sewun||''}년 인연 기운.
 5. 지금 연애에서 해야 할 것 — 이 일주의 대인관계/부부 조언을 반드시 반영. 현재 시기 연애 전략, 만남을 위한 구체적 행동 3가지, 절대 피해야 할 연애 패턴.
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
@@ -6982,7 +6990,7 @@ ${zb}
 ${buildAccuracyLayerBlock()}
 
 섹션 구성:
-1. 현재 대운 핵심 요약 — 대운 ${_daeun||'미확인'}, 지금 어떤 조류 위에 있는지, 이 대운의 핵심 키워드와 에너지를 압축.
+1. 현재 대운 핵심 요약 — 대운 ${_curDaeunBL||_daeun||'미확인'}, 지금 어떤 조류 위에 있는지, 이 대운의 핵심 키워드와 에너지를 압축.
 2. 대운 천간·지지 심층 분석 — 대운 천간이 일간에 미치는 십신 작용 상세, 대운 지지와 원국 지지의 합충형파 분석, 천간이 지지를 생하는지 극하는지.
 3. 이 대운의 재물·직업·관계 흐름 — 각 영역별로 이 대운이 가져오는 구체적 변화와 흐름, 자미두수 대한과 교차 분석.
 
@@ -7194,7 +7202,7 @@ ${buildAccuracyLayerBlock()}
 
 ${sb2}
 ${vb}
-이달: ${monthStr} / 월건: ${monthPillarStr} / 대운: ${_daeun||'미확인'} / 세운: ${_sewun||'미확인'}
+이달: ${monthStr} / 월건: ${monthPillarStr} / 대운: ${_curDaeunBL||_daeun||'미확인'} / 세운: ${_sewun||'미확인'}
 ${monthlyIljuBlock}
 ${buildAccuracyLayerBlock()}
 
@@ -7294,7 +7302,7 @@ ${buildAccuracyLayerBlock()}
 
 섹션 구성:
 4. 직업·환경 구성 — 용신 오행에 맞는 직업군과 업종, 일하기 좋은 환경과 공간 구성 방법, 피해야 할 환경.
-5. 일주별 맞춤 실천 전략 — 이 일주의 창업·커리어·투자·대인관계 조언을 종합해 지금 바로 실행할 수 있는 구체적 전략 3가지. 연령대와 현재 대운 ${_daeun||'미확인'}을 반영.
+5. 일주별 맞춤 실천 전략 — 이 일주의 창업·커리어·투자·대인관계 조언을 종합해 지금 바로 실행할 수 있는 구체적 전략 3가지. 연령대와 현재 대운 ${_curDaeunBL||_daeun||'미확인'}을 반영.
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '용신 생활 가이드', ysFinal, wg, true);
@@ -7362,7 +7370,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 섹션 구성:
 1. 낙샤트라 핵심 기질 — 낙샤트라 ${_vedicData?.nakshatra||'미확인'}의 신화적 상징·기질과 사주 일주 ${_ilju||''}가 공통으로 가리키는 기질 핵심. 두 시스템이 교차하는 가장 강한 패턴.
 2. 라시·어센던트 심층 분석 — 라시(월궁) ${_vedicData?.rashi||'미확인'}와 어센던트 ${_vedicData?.ascendant||'미확인'}가 드러내는 감정 패턴·관계 방식·외적 성향. 사주 일지·신강신약과 교차.
-3. 다샤로 보는 현재 운기 — 현재 다샤 ${_vedicData?.dasha||'미확인'}, 안타르다샤 ${_vedicData?.antardasha||'미확인'}가 활성화하는 삶의 영역. 다음 다샤 전환까지 3년 흐름. 사주 대운 ${_daeun||'미확인'}과 교차.
+3. 다샤로 보는 현재 운기 — 현재 다샤 ${_vedicData?.dasha||'미확인'}, 안타르다샤 ${_vedicData?.antardasha||'미확인'}가 활성화하는 삶의 영역. 다음 다샤 전환까지 3년 흐름. 사주 대운 ${_curDaeunBL||_daeun||'미확인'}과 교차.
 
 총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt2A, [0,1,2], '베딕·사주 통합 분석', ysFinal, '', false);
@@ -7833,7 +7841,7 @@ ${buildAdviceBlock(['대인관계/부부'])}
 ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
-4. 현재 대한·유년 운기 — 현재 대한(大限)이 어느 궁에 해당하고 주성이 무엇인지, 지금 유년(流年)의 에너지를 사주 대운 ${_daeun||'미확인'}과 교차 분석. 지금 이 시기의 핵심 흐름.
+4. 현재 대한·유년 운기 — 현재 대한(大限)이 어느 궁에 해당하고 주성이 무엇인지, 지금 유년(流年)의 에너지를 사주 대운 ${_curDaeunBL||_daeun||'미확인'}과 교차 분석. 지금 이 시기의 핵심 흐름.
 5. 부처·교우궁과 관계 전략 — 부처궁 주성으로 본 배우자 기질과 관계 패턴, 교우궁으로 본 인간관계 구조. 사주 관성·일지와 교차해 지금 관계 전략 제시.
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
@@ -7893,7 +7901,7 @@ ${buildAdviceBlock()}
 ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
-4. 현재 운기 3시스템 교차 — 사주 대운 ${_daeun||'미확인'}+세운, 베딕 다샤+안타르다샤, 자미두수 대한+유년이 지금 이 시기에 대해 동시에 가리키는 흐름. 기회의 영역과 주의 포인트.
+4. 현재 운기 3시스템 교차 — 사주 대운 ${_curDaeunBL||_daeun||'미확인'}+세운, 베딕 다샤+안타르다샤, 자미두수 대한+유년이 지금 이 시기에 대해 동시에 가리키는 흐름. 기회의 영역과 주의 포인트.
 5. 통합 실천 전략 — 4개 시스템이 공통으로 권고하는 지금 해야 할 것 3가지와 절대 피해야 할 것. 각 시스템이 고유하게 제안하는 실천법도 포함.
 
 총 700~1000자. 섹션 번호(4. 5.) 붙여 작성.`;
@@ -7956,7 +7964,7 @@ ${buildYongsinBlock(['직업','피해야할것'])}
 ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
-4. 지금 대운의 커리어 흐름 — 현재 대운 ${_daeun||'미확인'}이 관록에 어떤 십신으로 작용하는지, 올해 세운이 직업·사업에 미치는 영향. 지금이 전진할 시기인지 내실을 다질 시기인지.
+4. 지금 대운의 커리어 흐름 — 현재 대운 ${_curDaeunBL||_daeun||'미확인'}이 관록에 어떤 십신으로 작용하는지, 올해 세운이 직업·사업에 미치는 영향. 지금이 전진할 시기인지 내실을 다질 시기인지.
 5. 직업·창업·성장 맞춤 전략 — 이 사주·자미두수·베딕 구조에 가장 맞는 직업군·업종, 지금 당장 실행할 커리어 액션 3가지, 이 사주에서 절대 피해야 할 직업 패턴.
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
@@ -8015,7 +8023,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
    이 사주의 아이에게 맞는 학습 방식(암기형/창의형/실습형 등), 피해야 할 교육 환경, 집중력이 올라가는 조건. 용신(${ysFinal}) 오행을 활용한 공부 환경 팁 포함.
 
 4. 진로 개화 시기 (대운) (350~450자)
-   현재 대운 ${_daeun||'미확인'}과 향후 대운 흐름에서 언제 재능이 꽃피는 시기인지. 어느 나이대에 어떤 분야가 강해지는지 구체적 흐름.
+   현재 대운 ${_curDaeunBL||_daeun||'미확인'}과 향후 대운 흐름에서 언제 재능이 꽃피는 시기인지. 어느 나이대에 어떤 분야가 강해지는지 구체적 흐름.
 
 5. 부모가 지금 해줄 수 있는 것 (350~450자)
    지금 이 아이에게 가장 필요한 환경과 지원 방식 3가지. 억지로 시키면 역효과인 것, 자연스럽게 성장하는 방향. 용신 오행 기반 실천 팁(색상·활동·취미) 포함.
@@ -8104,7 +8112,7 @@ async function generateHealthReport() {
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
   const fivePctStr = fivePctToKor(_sdFull?.five_pct);
-  const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock()}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n오행↔장기 매핑: 목(간·담·눈·근육), 화(심장·소장·혀·혈관), 토(비위·위장·입·살), 금(폐·대장·코·피부), 수(신장·방광·귀·뼈)\n\n섹션 구성:\n1. 체질 구조와 오행 건강 지도 — 오행 분포(${fivePctStr})와 신강/신약(${_singang||'미확인'})으로 본 체질 유형. 강한 오행이 지배하는 장기(과잉 주의)와 약한 오행이 취약한 장기(보강 필요)를 구체적으로 매핑.\n2. 취약 장기와 건강 주의 시기 — 오행 부족/과잉이 만드는 구체적 건강 위험과 증상. 현재 대운 ${_daeun||'미확인'}과 올해 세운이 건강에 미치는 영향. 특히 조심할 계절과 시기.\n3. 체질 맞춤 건강 관리법 — 용신 오행(${ysFinal}) 기반 보강 음식·운동·생활습관. 부족 오행 보완 식단. 계절별 주의사항. 지금 당장 실천할 건강 전략 3가지.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+  const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock()}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n오행↔장기 매핑: 목(간·담·눈·근육), 화(심장·소장·혀·혈관), 토(비위·위장·입·살), 금(폐·대장·코·피부), 수(신장·방광·귀·뼈)\n\n섹션 구성:\n1. 체질 구조와 오행 건강 지도 — 오행 분포(${fivePctStr})와 신강/신약(${_singang||'미확인'})으로 본 체질 유형. 강한 오행이 지배하는 장기(과잉 주의)와 약한 오행이 취약한 장기(보강 필요)를 구체적으로 매핑.\n2. 취약 장기와 건강 주의 시기 — 오행 부족/과잉이 만드는 구체적 건강 위험과 증상. 현재 대운 ${_curDaeunBL||_daeun||'미확인'}과 올해 세운이 건강에 미치는 영향. 특히 조심할 계절과 시기.\n3. 체질 맞춤 건강 관리법 — 용신 오행(${ysFinal}) 기반 보강 음식·운동·생활습관. 부족 오행 보완 식단. 계절별 주의사항. 지금 당장 실천할 건강 전략 3가지.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt, [0,1,2], '건강·체질 분석', ysFinal, '', true);
   try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
@@ -8269,7 +8277,7 @@ ${genderNote}
 
 섹션 구성:
 4. 가장 오래 함께할 수 있는 관계 패턴 — 나를 보완하는 에너지 조합. 용신 오행을 가진 상대가 가져오는 안정감. 장기적으로 성장을 함께할 수 있는 관계의 구체적 특성. 약 400자.
-5. 인연이 오는 시기와 조건 — ${partnerStar}이 활성화되는 대운과 세운 교차점. 현재 대운 ${_daeun||'미확인'} 기준 지금 이 시기가 인연 에너지가 강한지 약한지. 만남의 조건이 갖춰지는 구체적 시기대와 주의사항. 약 400자.
+5. 인연이 오는 시기와 조건 — ${partnerStar}이 활성화되는 대운과 세운 교차점. 현재 대운 ${_curDaeunBL||_daeun||'미확인'} 기준 지금 이 시기가 인연 에너지가 강한지 약한지. 만남의 조건이 갖춰지는 구체적 시기대와 주의사항. 약 400자.
 
 총 700~900자. 섹션 번호(4. 5.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(soulmatePromptB, [3,4], '운명의 상대방 분석', ysFinal, '', true);
@@ -8325,14 +8333,14 @@ ${_geokguk||'이 격국'}의 구조를 하나의 이야기 구도로. 격국의 
 
   const poemPromptB = `${profileStr}
 납음: ${napeumName2}(${napeumOh2}) — ${napeumImg2}
-현재 대운: ${_daeun||'미확인'} / 올해 세운: ${_sewun||'미확인'}
+현재 대운: ${_curDaeunBL||_daeun||'미확인'} / 올해 세운: ${_sewun||'미확인'}
 
 섹션 구성:
 4. 납음의 시어 — 삶의 질감과 운명의 색깔
 납음 "${napeumName2}"의 이름 자체를 시어(詩語)로. 이 납음이 암시하는 삶의 질감, 지배적 감정, 운명의 색깔을 시적으로 묘사. 납음 이미지("${napeumImg2}")에서 출발해 이 사람의 운명적 분위기를 그린다. 약 350자.
 
 5. 지금 이 계절 — 현재 대운의 시
-현재 대운 ${_daeun||'미확인'}의 에너지를 계절·날씨·시간대로 표현. 봄비·한여름 햇살·가을바람·겨울 호수 중 어느 것에 가까운지. 이 시기 이 사람에게 전하고 싶은 시 한 연. 약 300자.
+현재 대운 ${_curDaeunBL||_daeun||'미확인'}의 에너지를 계절·날씨·시간대로 표현. 봄비·한여름 햇살·가을바람·겨울 호수 중 어느 것에 가까운지. 이 시기 이 사람에게 전하고 싶은 시 한 연. 약 300자.
 
 총 600~700자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(poemPromptB, [3,4], '사주 시 창작', '', '', true, poemSys);
@@ -8392,12 +8400,12 @@ ${sb2}${buildAccuracyLayerBlock()}
 
 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal} / 신강도: ${_singang||'미확인'}
 십신 분포: ${tenGodsStr3}
-현재 대운: ${_daeun||'미확인'} / 올해 세운: ${_sewun||'미확인'}
+현재 대운: ${_curDaeunBL||_daeun||'미확인'} / 올해 세운: ${_sewun||'미확인'}
 ${shinsalStr3}
 
 섹션 구성:
 4. 미션을 방해하는 패턴 — 과다한 십신이나 기신 오행이 만드는 행동 패턴. 이 사람이 습관적으로 빠지는 방해 패턴(집착/회피/과잉반응 등)을 사주 구조로 설명하고, 이를 인식하고 전환하는 방법. 신살이 있다면 신살의 역할도 포함. 약 450자.
-5. 지금 당장 미션을 실천하는 3가지 방법 — 현재 대운(${_daeun||'미확인'})과 세운(${_sewun||'미확인'}) 에너지를 고려한 실천 가능한 3가지 액션. 추상적 방향이 아닌 "이번 달, 올해, 앞으로 3년 안에" 할 수 있는 구체적인 것. 약 400자.
+5. 지금 당장 미션을 실천하는 3가지 방법 — 현재 대운(${_curDaeunBL||_daeun||'미확인'})과 세운(${_sewun||'미확인'}) 에너지를 고려한 실천 가능한 3가지 액션. 추상적 방향이 아닌 "이번 달, 올해, 앞으로 3년 안에" 할 수 있는 구체적인 것. 약 400자.
 
 총 800~1000자. 섹션 번호(4. 5.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(missionPromptB, [3,4], '이번 생 미션 분석', ysFinal, '', true);
@@ -8616,7 +8624,7 @@ async function generateEraReport() {
 
 섹션 구성:
 4. 현대에서 그 시대 에너지 활용법 — 그 시대의 에너지를 현대에서 가장 잘 발휘할 수 있는 분야·역할·환경. 어떤 직업·활동·관계에서 이 사주가 가장 빛나는지. 약 400자.
-5. 이번 생에 완성할 시대적 과제 — 그 시대에서 못다 한 것을 이번 생에서 어떻게 완성하는가. 현재 대운 ${_daeun||'미확인'}과 연결해서. 약 350자.
+5. 이번 생에 완성할 시대적 과제 — 그 시대에서 못다 한 것을 이번 생에서 어떻게 완성하는가. 현재 대운 ${_curDaeunBL||_daeun||'미확인'}과 연결해서. 약 350자.
 
 총 700~800자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '시대 에너지 분석', ysFinal, '', true, eraSys);
@@ -8666,7 +8674,7 @@ ${sb2}${buildAccuracyLayerBlock()}
 
   const promptB = `${profileStr}
 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal} / 신강도: ${_singang||'미확인'}
-현재 대운: ${_daeun||'미확인'} / 올해 세운: ${_sewun||'미확인'}
+현재 대운: ${_curDaeunBL||_daeun||'미확인'} / 올해 세운: ${_sewun||'미확인'}
 
 섹션 구성:
 4. 재능이 폭발하는 조건과 환경 — 어떤 대운·세운·환경에서 이 숨겨진 능력이 가장 강하게 발현되는지. 지금 이 시기가 그 조건을 얼마나 충족하는지. 약 400자.
@@ -8747,7 +8755,7 @@ async function generateTimingReport() {
   const db = buildDaeunBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
-  const prompt2A = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['이직/커리어','투자/재테크'])}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 현재 인생 국면 진단 — 현재 대운 ${_daeun||'미확인'}의 위치에서 이 사주가 어떤 국면(성장기/수확기/전환기/정비기)에 있는지 진단. 대운 천간·지지가 일간에 어떤 십신으로 작용하는지. 지금이 공격적으로 나갈 때인지, 내실을 다질 때인지.\n2. 향후 3년 핵심 타이밍 — 올해~내후년까지 세운이 이 사주에 미치는 영향. 각 해의 핵심 에너지와 기회/주의 포인트. 가장 중요한 해와 이유.\n3. 대운 전환기 분석 — 다음 대운 전환까지 남은 시간과 전환 시 예상되는 에너지 변화. 전환 전 준비해야 할 것. 이전 대운에서 현재 대운으로 바뀔 때의 패턴 참고.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+  const prompt2A = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['이직/커리어','투자/재테크'])}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 현재 인생 국면 진단 — 현재 대운 ${_curDaeunBL||_daeun||'미확인'}의 위치에서 이 사주가 어떤 국면(성장기/수확기/전환기/정비기)에 있는지 진단. 대운 천간·지지가 일간에 어떤 십신으로 작용하는지. 지금이 공격적으로 나갈 때인지, 내실을 다질 때인지.\n2. 향후 3년 핵심 타이밍 — 올해~내후년까지 세운이 이 사주에 미치는 영향. 각 해의 핵심 에너지와 기회/주의 포인트. 가장 중요한 해와 이유.\n3. 대운 전환기 분석 — 다음 대운 전환까지 남은 시간과 전환 시 예상되는 에너지 변화. 전환 전 준비해야 할 것. 이전 대운에서 현재 대운으로 바뀔 때의 패턴 참고.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt2A, [0,1,2], '인생 타이밍 분석', ysFinal, '', false);
   const prompt2B = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['창업/비즈니스','대인관계/부부'])}\n${buildYongsinBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 올해 월별 타이밍 포인트 — 올해 12개월 중 에너지가 강한 달, 주의할 달, 결정에 좋은 달을 구체적으로. 월별 천간·지지와 일간의 관계 기반.\n5. 타이밍 활용 실전 전략 — 이직·전직 최적 시기, 투자·계약 적기, 연애·결혼 유리한 시기, 건강 주의 시기를 종합. 지금 당장 타이밍에 맞춰 실행할 액션 3가지.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '인생 타이밍 분석', ysFinal, '', true);
@@ -8765,7 +8773,7 @@ async function generateWealthTimingReport() {
   const db = buildDaeunBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
-  const prompt2A = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['투자/재테크','창업/비즈니스'])}\n${buildYongsinBlock(['직업'])}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 재물 에너지 구조 핵심 — 재성(정재·편재)의 위치와 강약, 식상생재 흐름 유무, 비겁이 재를 뺏는 구조인지. 이 사주의 돈이 들어오는 경로와 나가는 경로.\n2. 대운별 재물 흐름 — 과거 대운~현재 대운~다음 대운에서 재물 에너지가 어떻게 변하는지. 재성이 강해지는 대운, 약해지는 대운. 지금 대운 ${_daeun||'미확인'}의 재물 에너지.\n3. 올해 재물 타이밍 — 올해 세운 ${_sewun||''}이 재성에 미치는 영향. 돈이 들어오는 시기, 큰 지출 주의 시기. 투자·계약에 유리한 시점.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성. 구체적 금액 예측 절대 금지.`;
+  const prompt2A = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['투자/재테크','창업/비즈니스'])}\n${buildYongsinBlock(['직업'])}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 재물 에너지 구조 핵심 — 재성(정재·편재)의 위치와 강약, 식상생재 흐름 유무, 비겁이 재를 뺏는 구조인지. 이 사주의 돈이 들어오는 경로와 나가는 경로.\n2. 대운별 재물 흐름 — 과거 대운~현재 대운~다음 대운에서 재물 에너지가 어떻게 변하는지. 재성이 강해지는 대운, 약해지는 대운. 지금 대운 ${_curDaeunBL||_daeun||'미확인'}의 재물 에너지.\n3. 올해 재물 타이밍 — 올해 세운 ${_sewun||''}이 재성에 미치는 영향. 돈이 들어오는 시기, 큰 지출 주의 시기. 투자·계약에 유리한 시점.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성. 구체적 금액 예측 절대 금지.`;
   await streamToSections(prompt2A, [0,1,2], '재물 타이밍 분석', ysFinal, '', false);
   const prompt2B = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['투자/재테크'])}\n${buildYongsinBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 월별 재물 포인트 — 올해 12개월 중 재물 에너지가 활성화되는 달, 지출 주의 달, 투자 적기를 구체적으로. 월별 재성·식상 활성도 기반.\n5. 재물 극대화 실천 전략 — 이 사주 구조에 맞는 재물 전략(저축형/투자형/사업형). 용신(${ysFinal}) 기반 재물 개운법. 지금 당장 실행할 재물 액션 3가지와 절대 피해야 할 재물 패턴.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성. 구체적 금액·종목 예측 절대 금지.`;
   await streamToSections(prompt2B, [3,4], '재물 타이밍 분석', ysFinal, '', true);
@@ -8831,7 +8839,8 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 - 섹션 제목 쓰지 마세요 (카드 헤더에 이미 표시됨)
 - 본문 안에서 소항목 번호 쓸 때는 가), 나), 다) 형식 사용 (1. 2. 3. 사용 금지)
 - 분석 범위를 벗어난 미래 시점(다음 달, 내년 등) 예측·대비·언급 절대 금지
-- 【사주 정밀분석】 블록이 포함된 경우, 그 안의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 수치·판정·결론을 절대 변경하지 마세요.${wg || ''}`);
+- 【사주 정밀분석】 블록이 포함된 경우, 그 안의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 수치·판정·결론을 절대 변경하지 마세요.
+- 프롬프트에 명시된 연도·기간·퍼센트 수치를 그대로 인용하세요. 새로운 연도나 기간을 만들어내거나 추측하지 마세요.${wg || ''}`);
 
   for (let i = 0; i < secIndices.length; i++) {
     const secIdx = secIndices[i];
@@ -8869,6 +8878,7 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
     const data = await res.json();
     let text = (data.reply || '').trim();
     text = cleanSectionText(text);
+    text = sanitizeAIText(text);
     text = stripDuplicateTitle(text, secName);
     if (sloadEl) sloadEl.style.display = 'none';
     const body = document.getElementById(`sbody-${secIdx}`);
@@ -8898,6 +8908,26 @@ window.__retrySingleSection = function(secIdx) {
   runSingleSection(secIdx, p.secName, p.secChars, p.sectionPrompt, p.sysPrompt);
 };
 
+// ── Layer 3: AI 생성 텍스트 사후 검증·치환 ──
+function sanitizeAIText(text) {
+  if (!text) return text;
+  // 유효한 대운 year_range 목록 (사주-test 계산값 + saju-report DB값 병합)
+  const validRanges = new Set();
+  (_sdFull && _sdFull.big_luck_analysis || []).forEach(d => { if (d.year_range) { validRanges.add(d.year_range.replace(/[–~]/g,'-')); } });
+  (_daeunList || []).forEach(d => { if (d.year_range) { validRanges.add(d.year_range.replace(/[–~]/g,'-')); } });
+  if (!validRanges.size) return text;
+  // 현재 대운 year_range
+  const curLabel = _curDaeunBL || _daeun || '';
+  const curRangeMatch = curLabel.match(/(\d{4})[–\-~](\d{4})/);
+  const curRange = curRangeMatch ? curRangeMatch[0].replace(/[–~]/g,'-') : null;
+  if (!curRange) return text;
+  // YYYY-YYYY 패턴 중 유효하지 않은 것만 현재 대운 범위로 치환
+  return text.replace(/(\d{4})\s*[–\-~]\s*(\d{4})/g, (match, y1, y2) => {
+    const norm = y1 + '-' + y2;
+    if (validRanges.has(norm)) return match;
+    return curRange;
+  });
+}
 function cleanSectionText(s) {
   // 1) ===N=== 구분자 잔여물 제거
   s = s.replace(/={3}\d+={3}/g, '');
