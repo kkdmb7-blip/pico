@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>사주 16유형 진단 · FORTUNA</title>
+<meta name="theme-color" content="#f4ede0">
+<meta property="og:title" content="사주 16유형 진단 — FORTUNA">
+<meta property="og:description" content="MBTI로는 안 보이던 진짜 당신의 유형. 생년월일로 1분에 확인하는 사주 16유형.">
+<meta property="og:image" content="https://picolab.kr/img/goddess/goddess-app.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="pico-icons.css">
+<style>
+:root{
+  --bg:#f4ede0;
+  --surface:#f9f1de;
+  --surface2:#e8dcc0;
+  --ink:#241a10;
+  --text:#1a120a;
+  --text2:#4a3a2a;
+  --muted:#5a4830;
+  --accent:#7a2418;
+  --gold:#8a6a15;
+  --gold-deep:#6a4f0c;
+  --border-soft:rgba(60,40,20,0.22);
+  --border-hair:rgba(60,40,20,0.12);
+  --shadow-soft:0 1px 3px rgba(60,40,20,0.08), 0 6px 20px rgba(60,40,20,0.07);
+  --shadow-lift:0 3px 8px rgba(60,40,20,0.12), 0 14px 36px rgba(60,40,20,0.14);
+  --type:#6b4aa8;
+  --type-rgb:107,74,168;
+  --fn:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);}
+body{color:var(--text);font-family:var(--fn);min-height:100vh;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+p{word-break:keep-all;overflow-wrap:break-word;}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:0 20px;height:56px;display:flex;justify-content:space-between;align-items:center;
+  background:rgba(244,237,224,0.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border-hair);
+}
+.nav-brand{display:flex;align-items:center;gap:8px;text-decoration:none;}
+.nav-brand img{height:40px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(60,30,10,0.35)) brightness(0.78);}
+.nav-brand span{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;letter-spacing:2px;color:var(--ink);}
+.nav-back{font-size:13px;color:var(--muted);text-decoration:none;background:none;border:none;cursor:pointer;font-family:var(--fn);}
+.nav-back:hover{color:var(--ink);}
+
+.wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:80px 20px 80px;}
+
+.hero{text-align:center;margin-bottom:36px;}
+.hero-badge{
+  display:inline-block;font-size:10px;letter-spacing:0.3em;color:var(--gold-deep);
+  background:rgba(138,106,21,0.1);border:1px solid rgba(138,106,21,0.28);
+  border-radius:16px;padding:5px 14px;margin-bottom:16px;text-transform:uppercase;font-weight:700;
+}
+.hero-title{
+  font-family:'Noto Serif KR',serif;font-size:26px;font-weight:500;
+  line-height:1.5;margin-bottom:10px;color:var(--ink);letter-spacing:-0.01em;
+}
+.hero-sub{font-size:13px;color:var(--muted);line-height:1.85;}
+
+.form-card{
+  background:var(--surface);
+  border:1px solid var(--border-soft);
+  border-radius:16px;padding:24px 20px;margin-bottom:18px;
+  box-shadow:var(--shadow-soft);
+}
+.field{margin-bottom:16px;}
+.field:last-of-type{margin-bottom:18px;}
+.label{display:block;font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:0.04em;font-weight:600;}
+.label .hint{font-size:10.5px;color:var(--muted);font-weight:400;letter-spacing:0;}
+.input{
+  width:100%;
+  background:#fff;
+  border:1px solid var(--border-soft);
+  border-radius:11px;padding:12px 14px;
+  color:var(--text);font-family:var(--fn);font-size:14px;
+  outline:none;transition:border-color 0.2s, background 0.2s;
+  -webkit-appearance:none;appearance:none;
+}
+.input:focus{border-color:var(--gold);background:#fffdf6;}
+select.input{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%235a4830' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+}
+select.input option{background:#fff;color:var(--text);}
+
+.gender-row{display:flex;gap:10px;}
+.gender-btn{
+  flex:1;padding:11px;text-align:center;
+  background:rgba(138,106,21,0.06);border:1px solid var(--border-soft);
+  border-radius:11px;font-size:13px;color:var(--muted);font-family:var(--fn);
+  cursor:pointer;transition:all 0.2s;font-weight:600;
+}
+.gender-btn.active{background:rgba(138,106,21,0.18);border-color:rgba(138,106,21,0.45);color:var(--gold-deep);}
+
+.calc-btn{
+  width:100%;
+  background:rgba(138,106,21,0.12);
+  border:1px solid rgba(138,106,21,0.3);
+  border-radius:12px;padding:14px;
+  color:#6a4f0c;font-family:var(--fn);font-size:14px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;
+}
+.calc-btn:hover{background:rgba(138,106,21,0.2);border-color:rgba(138,106,21,0.45);}
+.calc-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.calc-btn .loading{border:2px solid rgba(138,106,21,0.25);border-top-color:#6a4f0c;}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes twinkle{0%,100%{opacity:0.3}50%{opacity:1}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes glowPulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
+.loading{
+  display:inline-block;width:13px;height:13px;
+  border:2px solid rgba(253,243,230,0.3);border-top-color:#fdf3e6;
+  border-radius:50%;animation:spin 0.8s linear infinite;
+  vertical-align:middle;margin-right:6px;
+}
+
+.result{display:none;animation:fadeUp 0.6s ease;margin-top:20px;}
+
+/* ═══════ 결과 히어로 ═══════ */
+.result-hero{
+  position:relative;overflow:hidden;
+  border-radius:22px;padding:44px 24px 34px;text-align:center;margin-bottom:14px;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 18%, rgba(var(--type-rgb),0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(var(--type-rgb),0.11) 0%, transparent 70%),
+    linear-gradient(180deg, #fffaf0 0%, var(--surface) 100%);
+  border:1px solid rgba(var(--type-rgb),0.35);
+  box-shadow:0 10px 36px rgba(var(--type-rgb),0.15), 0 2px 8px rgba(60,40,20,0.08);
+  transition:border-color 0.5s, box-shadow 0.5s;
+}
+.result-hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(var(--type-rgb),0.55) 1.2px, transparent 1.8px),
+    radial-gradient(circle at 88% 14%, rgba(var(--type-rgb),0.45) 1px, transparent 1.5px),
+    radial-gradient(circle at 18% 78%, rgba(var(--type-rgb),0.4) 0.8px, transparent 1.2px),
+    radial-gradient(circle at 92% 64%, rgba(var(--type-rgb),0.55) 1.1px, transparent 1.6px),
+    radial-gradient(circle at 48% 8%, rgba(var(--type-rgb),0.35) 0.8px, transparent 1.3px);
+}
+.hanja-box{
+  position:relative;z-index:1;
+  display:inline-block;margin:0 auto 18px;
+  padding:20px 28px;border-radius:20px;
+  background:linear-gradient(135deg, rgba(var(--type-rgb),0.14), rgba(var(--type-rgb),0.04));
+  border:1.5px solid rgba(var(--type-rgb),0.42);
+  box-shadow:0 4px 20px rgba(var(--type-rgb),0.2), inset 0 1px 0 rgba(255,255,255,0.4);
+  animation:floatY 5s ease-in-out infinite;
+}
+.hanja-char{
+  font-family:'Noto Serif KR',serif;font-weight:600;
+  font-size:72px;line-height:1;letter-spacing:10px;
+  background:linear-gradient(135deg, var(--type) 0%, rgba(var(--type-rgb),0.7) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  text-shadow:0 2px 14px rgba(var(--type-rgb),0.25);
+}
+.result-pill{
+  position:relative;z-index:1;
+  display:inline-block;font-size:10.5px;letter-spacing:0.28em;
+  color:var(--type);
+  background:linear-gradient(135deg, rgba(var(--type-rgb),0.22), rgba(var(--type-rgb),0.1));
+  border:1px solid rgba(var(--type-rgb),0.45);
+  border-radius:18px;padding:6px 16px;margin-bottom:14px;font-weight:700;text-transform:uppercase;
+}
+.result-code{
+  position:relative;z-index:1;
+  display:inline-block;margin-bottom:14px;
+  font-family:'Noto Serif KR',serif;font-weight:700;font-size:13px;
+  color:var(--muted);letter-spacing:0.35em;
+}
+.result-title{
+  position:relative;z-index:1;
+  font-family:'Noto Serif KR',serif;font-size:36px;font-weight:700;
+  color:var(--type);
+  letter-spacing:-0.01em;margin-bottom:6px;line-height:1.25;
+  text-shadow:0 2px 12px rgba(var(--type-rgb),0.2);
+}
+.result-subtitle{
+  position:relative;z-index:1;
+  font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:18px;
+  letter-spacing:-0.003em;
+}
+.rarity-badge{
+  position:relative;z-index:1;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 16px;border-radius:100px;
+  background:rgba(var(--type-rgb),0.1);
+  border:1px solid rgba(var(--type-rgb),0.35);
+  font-size:11.5px;font-weight:700;color:var(--type);letter-spacing:0.05em;
+}
+.rarity-badge::before{
+  content:'✦';font-size:10px;color:var(--type);animation:twinkle 2.4s ease-in-out infinite;
+}
+.result-divider{
+  position:relative;z-index:1;
+  border:none;height:1px;margin:22px auto;max-width:60px;
+  background:linear-gradient(90deg, transparent, rgba(var(--type-rgb),0.5), transparent);
+}
+.result-desc{
+  position:relative;z-index:1;
+  font-size:14px;line-height:1.95;color:var(--text);text-align:left;letter-spacing:-0.005em;
+}
+
+/* ═══════ 4축 카드 ═══════ */
+.axes-card{
+  background:var(--surface);border:1px solid var(--border-soft);
+  border-radius:16px;padding:22px 20px;margin-bottom:14px;
+  box-shadow:var(--shadow-soft);
+}
+.axes-title{
+  text-align:center;font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;
+  color:var(--ink);margin-bottom:16px;letter-spacing:0.03em;
+}
+.axes-title::before,.axes-title::after{
+  content:'✦';display:inline-block;margin:0 10px;opacity:0.5;font-size:11px;color:var(--type);
+}
+.axes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.axis-item{
+  padding:12px 14px;border-radius:12px;
+  background:rgba(var(--type-rgb),0.05);
+  border:1px solid rgba(var(--type-rgb),0.18);
+  text-align:center;
+}
+.axis-label{font-size:10.5px;color:var(--muted);letter-spacing:0.18em;margin-bottom:4px;font-weight:600;}
+.axis-value{font-family:'Noto Serif KR',serif;font-size:17px;color:var(--type);font-weight:700;margin-bottom:2px;}
+.axis-ko{font-size:11px;color:var(--text2);}
+
+/* ═══════ 강점/약점 카드 ═══════ */
+.strength-weak-card{
+  background:var(--surface);border:1px solid var(--border-soft);
+  border-radius:16px;padding:22px 20px;margin-bottom:14px;
+  box-shadow:var(--shadow-soft);
+}
+.sw-row{margin-bottom:16px;}
+.sw-row:last-child{margin-bottom:0;}
+.sw-label{
+  font-size:12px;color:var(--muted);margin-bottom:10px;letter-spacing:0.1em;font-weight:600;
+  display:flex;align-items:center;gap:6px;
+}
+.sw-dot{display:inline-block;width:7px;height:7px;border-radius:50%;}
+.sw-dot.strength{background:#1e8e3e;}
+.sw-dot.weak{background:#a84666;}
+.sw-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.sw-chip{
+  padding:7px 14px;border-radius:100px;font-size:12.5px;font-weight:600;letter-spacing:-0.005em;
+}
+.sw-chip.strength{
+  background:rgba(30,142,62,0.1);color:#1e8e3e;border:1px solid rgba(30,142,62,0.28);
+}
+.sw-chip.weak{
+  background:rgba(168,70,102,0.1);color:#a84666;border:1px solid rgba(168,70,102,0.28);
+}
+
+/* ═══════ 궁합/상극 카드 ═══════ */
+.match-card{
+  background:var(--surface);border:1px solid var(--border-soft);
+  border-radius:16px;padding:22px 20px;margin-bottom:14px;
+  box-shadow:var(--shadow-soft);
+}
+.match-row{margin-bottom:14px;}
+.match-row:last-child{margin-bottom:0;}
+.match-label{
+  font-size:12px;color:var(--muted);margin-bottom:10px;letter-spacing:0.08em;font-weight:600;
+}
+.match-targets{display:flex;gap:10px;}
+.match-target{
+  flex:1;padding:12px 10px;border-radius:12px;text-align:center;
+  background:rgba(var(--type-rgb),0.05);
+  border:1px solid rgba(var(--type-rgb),0.18);
+}
+.match-hanja{
+  font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;
+  color:var(--type);letter-spacing:4px;margin-bottom:3px;line-height:1;
+}
+.match-name{font-size:11.5px;color:var(--text2);font-weight:600;}
+.match-target.bad{
+  background:rgba(168,70,102,0.06);
+  border-color:rgba(168,70,102,0.22);
+}
+.match-target.bad .match-hanja{color:#a84666;}
+
+/* ═══════ 공유 / 업셀 카드 ═══════ */
+.share-card{
+  background:var(--surface);border:1px solid var(--border-soft);
+  border-radius:16px;padding:20px;margin-bottom:14px;
+  box-shadow:var(--shadow-soft);
+}
+.share-label{
+  font-size:11px;color:var(--muted);letter-spacing:0.1em;
+  margin-bottom:12px;text-align:center;font-weight:600;
+}
+.share-btns{display:flex;flex-direction:column;gap:9px;}
+.share-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;padding:12px;
+  background:rgba(212,175,90,0.14);border:1px solid rgba(154,122,38,0.28);
+  border-radius:22px;color:#8a6b20;
+  font-family:var(--fn);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;
+}
+.share-btn:hover{background:rgba(212,175,90,0.24);}
+.share-btn.kakao{
+  background:rgba(254,229,0,0.35);
+  border:1px solid rgba(254,229,0,0.55);
+  color:#6b4c00;
+}
+.share-btn.kakao:hover{background:rgba(254,229,0,0.5);border-color:rgba(254,229,0,0.75);}
+.share-btn svg{width:14px;height:14px;flex-shrink:0;}
+
+.upsell-card{
+  background:var(--surface);
+  border:1px solid var(--border-soft);
+  border-radius:16px;padding:24px 20px;text-align:center;
+  box-shadow:var(--shadow-soft);
+}
+.upsell-text{font-size:13px;color:var(--text2);line-height:1.85;margin-bottom:16px;}
+.upsell-btn{
+  display:inline-block;
+  background:rgba(122,36,24,0.1);
+  border:1px solid rgba(122,36,24,0.3);
+  border-radius:50px;padding:11px 26px;
+  color:#7a2418;font-family:var(--fn);font-size:13px;font-weight:700;
+  cursor:pointer;text-decoration:none;transition:all 0.2s;letter-spacing:0.02em;
+}
+.upsell-btn:hover{background:rgba(122,36,24,0.16);border-color:rgba(122,36,24,0.45);}
+
+.toast{
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fdf3e6;
+  border-radius:50px;padding:11px 24px;font-size:13px;
+  z-index:9999;opacity:0;transition:opacity 0.3s;
+  box-shadow:var(--shadow-lift);white-space:nowrap;pointer-events:none;
+}
+
+@media (max-width:480px){
+  .hero-title{font-size:23px;}
+  .hanja-char{font-size:58px;letter-spacing:8px;}
+  .result-title{font-size:28px;}
+  .hanja-box{padding:16px 22px;}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<nav>
+  <a href="/" class="nav-brand">
+    <img src="img/goddess/goddess.png" alt="FORTUNA">
+    <span>FORTUNA</span>
+  </a>
+  <button class="nav-back" onclick="history.back()">← 뒤로</button>
+</nav>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-badge">무료 · 사주 16유형 진단</div>
+    <h1 class="hero-title">MBTI로는 안 보이던<br>진짜 내 유형은?</h1>
+    <p class="hero-sub">사주 16유형은 생년월일과 태어난 시간으로<br>당신의 본질을 한 단어로 보여줘요</p>
+  </div>
+
+  <div class="form-card">
+    <div class="field">
+      <label class="label">생년월일 *</label>
+      <div style="display:flex;gap:8px;">
+        <select id="calcYear" class="input" style="flex:1.3;"></select>
+        <select id="calcMonth" class="input" style="flex:1;"></select>
+        <select id="calcDay" class="input" style="flex:1;"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">출생 시간 <span class="hint">(모르면 시 모름 선택)</span></label>
+      <div style="display:flex;gap:8px;">
+        <select id="calcHour" class="input" style="flex:1.2;">
+          <option value="unknown">시 모름</option>
+          <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
+          <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
+          <option value="6">6시</option><option value="7">7시</option><option value="8">8시</option>
+          <option value="9">9시</option><option value="10">10시</option><option value="11">11시</option>
+          <option value="12">12시</option><option value="13">13시</option><option value="14">14시</option>
+          <option value="15">15시</option><option value="16">16시</option><option value="17">17시</option>
+          <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
+          <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
+        </select>
+        <select id="calcMin" class="input" style="flex:1;"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">성별 *</label>
+      <div class="gender-row">
+        <div class="gender-btn active" data-gender="M" onclick="pickGender('M')">남자</div>
+        <div class="gender-btn" data-gender="F" onclick="pickGender('F')">여자</div>
+      </div>
+    </div>
+    <button class="calc-btn" id="calcBtn" onclick="calcMbti()">내 사주 16유형 확인하기</button>
+  </div>
+
+  <div class="result" id="result">
+    <div class="result-hero" id="resultHero">
+      <div class="hanja-box">
+        <div class="hanja-char" id="resultHanja"></div>
+      </div>
+      <div class="result-pill">SAJU 16 TYPES</div>
+      <div class="result-code" id="resultCode"></div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-subtitle" id="resultSubtitle"></div>
+      <div class="rarity-badge" id="rarityBadge"></div>
+      <hr class="result-divider">
+      <div class="result-desc" id="resultDesc"></div>
+    </div>
+
+    <div class="axes-card">
+      <div class="axes-title">당신을 구성하는 4축</div>
+      <div class="axes-grid">
+        <div class="axis-item"><div class="axis-label">온도</div><div class="axis-value" id="ax1"></div><div class="axis-ko" id="ax1ko"></div></div>
+        <div class="axis-item"><div class="axis-label">방향</div><div class="axis-value" id="ax2"></div><div class="axis-ko" id="ax2ko"></div></div>
+        <div class="axis-item"><div class="axis-label">음양</div><div class="axis-value" id="ax3"></div><div class="axis-ko" id="ax3ko"></div></div>
+        <div class="axis-item"><div class="axis-label">기운</div><div class="axis-value" id="ax4"></div><div class="axis-ko" id="ax4ko"></div></div>
+      </div>
+    </div>
+
+    <div class="strength-weak-card">
+      <div class="sw-row">
+        <div class="sw-label"><span class="sw-dot strength"></span>타고난 강점</div>
+        <div class="sw-chips" id="strengthChips"></div>
+      </div>
+      <div class="sw-row">
+        <div class="sw-label"><span class="sw-dot weak"></span>주의할 그림자</div>
+        <div class="sw-chips" id="weakChips"></div>
+      </div>
+    </div>
+
+    <div class="match-card">
+      <div class="match-row">
+        <div class="match-label">✦ 잘 맞는 유형</div>
+        <div class="match-targets" id="matchTargets"></div>
+      </div>
+      <div class="match-row">
+        <div class="match-label">✦ 조심해야 할 유형</div>
+        <div class="match-targets" id="conflictTargets"></div>
+      </div>
+    </div>
+
+    <div class="share-card">
+      <div class="share-label">친구에게 공유하기</div>
+      <div class="share-btns">
+        <button class="share-btn kakao" onclick="shareKakao()"><svg viewBox="0 0 24 24" fill="#6b4c00"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.74 1.72 5.15 4.34 6.58-.18.67-.67 2.48-.77 2.86-.12.48.18.47.37.34.15-.1 2.38-1.62 3.34-2.27.89.13 1.8.19 2.72.19 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>카카오로 공유</button>
+        <button class="share-btn" onclick="copyLink()"><i class="pi pi-link"></i> 링크 복사</button>
+      </div>
+    </div>
+
+    <div class="upsell-card">
+      <p class="upsell-text">16유형은 시작일 뿐이에요.<br>격국·용신·십신까지 내 사주의 깊이를 알아보세요.</p>
+      <a href="/report.html?type=character" class="upsell-btn">타고난 기질 리포트 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Share Modal ── -->
+<div id="mbtiShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(40,28,16,0.55);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
+  <div style="background:#fcf7ea;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 32px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -10px 40px rgba(60,40,20,0.18);">
+    <button onclick="closeMbtiShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(74,58,42,0.6);font-size:22px;cursor:pointer;line-height:1;">✕</button>
+    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.7);font-family:var(--fn);">공유할 카드 미리보기</div>
+    <div id="mbtiPreviewArea" style="text-align:center;min-height:180px;margin-bottom:16px;"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onclick="doMbtiShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:rgba(254,229,0,0.35);color:#6b4c00;border:1px solid rgba(254,229,0,0.55);border-radius:14px;font-size:15px;font-weight:700;font-family:var(--fn);cursor:pointer;width:100%;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#6b4c00"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.74 1.72 5.15 4.34 6.58-.18.67-.67 2.48-.77 2.86-.12.48.18.47.37.34.15-.1 2.38-1.62 3.34-2.27.89.13 1.8.19 2.72.19 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>카카오톡 · 친구에게 공유</button>
+      <button onclick="downloadMbtiCard()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(138,106,21,0.12);color:#6a4f0c;border:1px solid rgba(138,106,21,0.3);border-radius:14px;font-size:14px;font-family:var(--fn);cursor:pointer;width:100%;font-weight:600;">이미지 다운로드</button>
+      <button onclick="closeMbtiShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(80,55,30,0.08);color:rgba(74,58,42,0.8);border:none;border-radius:14px;font-size:14px;font-family:var(--fn);cursor:pointer;width:100%;">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var KAKAO_JS_KEY = '25432f8a37e0ac51a5e10cbcba8ae413';
+var currentGender = 'M';
+var currentType = null;
+
+// ══════════════════════════════════════════════
+// 16유형 데이터
+// ══════════════════════════════════════════════
+var TYPES = {
+  'FWDP':{hanja:'陽光',title:'태양의 지도자',subtitle:'사람을 모으는 중심',rarity:4.2,color:'#c87a1e',rgb:'200,122,30',
+    desc:'불과 나무의 에너지가 폭발적으로 흐르는 양간의 강자. 어디에 있든 자연스럽게 무리의 중심이 돼요. 시작하면 끝을 봐야 하는 기질로, 주변을 밝히는 만큼 그늘도 짙어요.',
+    strength:['리더십','추진력','에너지'],weak:['독단','번아웃','고집'],
+    match:['OWNC','OMNP'],conflict:['FWDP','OMNC']},
+  'FWDC':{hanja:'野花',title:'들꽃의 시인',subtitle:'감성 가득한 순수한 사람',rarity:7.8,color:'#c85a6e',rgb:'200,90,110',
+    desc:'따뜻한 감정과 확장적 상상력이 넘치지만 지속력이 약한 타입. 사람과 아름다움에 쉽게 끌리고, 쉽게 상처받아요. 머물 수 있는 정원을 찾는 게 숙제예요.',
+    strength:['감수성','친화력','영감'],weak:['지구력부족','쉬운감정','결정장애'],
+    match:['OMDP','OMNC'],conflict:['FMDP','FMNP']},
+  'FWNP':{hanja:'朱雀',title:'붉은 주작',subtitle:'무대를 장악하는 예술가',rarity:3.6,color:'#a83a2a',rgb:'168,58,42',
+    desc:'음간의 정제된 불꽃이 강한 기운으로 뭉쳐 폭발적 카리스마를 내뿜어요. 예술·무대·창작 영역에서 타의 추종을 불허하죠. 번쩍이다 식을 수 있으니 호흡 조절이 필요해요.',
+    strength:['카리스마','창의력','순발력'],weak:['변덕','질투','과민'],
+    match:['OMDC','OWNC'],conflict:['FWNP','OMNP']},
+  'FWNC':{hanja:'夕彩',title:'석양의 예술가',subtitle:'섬세한 미감의 내면형 창작자',rarity:8.1,color:'#a85a3a',rgb:'168,90,58',
+    desc:'음간의 부드러운 화기가 신약하게 흐르는 예민한 예술가. 세밀한 감정·색·소리·빛을 포착하고, 외부보다 내면의 세계가 풍부해요. 혼자의 시간에서 가장 잘 자라요.',
+    strength:['미감','디테일','통찰'],weak:['위축','우울기','과도한자기비판'],
+    match:['FMDP','OMDP'],conflict:['FMDC','FMNP']},
+  'FMDP':{hanja:'火山',title:'화산의 장군',subtitle:'정의감 강한 저돌형 리더',rarity:5.3,color:'#8a3a1a',rgb:'138,58,26',
+    desc:'양간의 불이 금의 단단함을 만나 뜨겁게 뭉친 정의의 추진력. 무엇이든 정면돌파하고 규율을 세워요. 큰 성과를 내지만 주변을 압도할 수 있어 부드러움을 배워야 해요.',
+    strength:['정의감','추진력','리더십'],weak:['권위주의','폭발성','완고함'],
+    match:['OWDC','OWNC'],conflict:['FWDC','FMDP']},
+  'FMDC':{hanja:'鍛冶',title:'대장간 장인',subtitle:'집요한 기술자·완벽주의 장인',rarity:6.9,color:'#8a5a2a',rgb:'138,90,42',
+    desc:'불과 금이 맞닿아 날을 세우는 장인형. 오랜 시간 한 우물을 파며 결과물의 완벽도를 높여요. 겉은 조용하지만 기준은 최고 수준. 타인에겐 관대해지는 게 과제.',
+    strength:['집요함','완성도','신뢰'],weak:['자기착취','비판의식','융통성부족'],
+    match:['OWNP','OMDP'],conflict:['FWDC','OWDC']},
+  'FMNP':{hanja:'赤珠',title:'붉은 구슬',subtitle:'날카로운 통찰의 전략가',rarity:4.8,color:'#a8466b',rgb:'168,70,107',
+    desc:'음간의 불이 금의 구조 안에서 압축된 고밀도 전략가. 겉은 차분해 보이지만 승부사의 감각을 지녔어요. 결정적 순간에만 칼을 꺼내는 타입이에요.',
+    strength:['통찰','전략','결단'],weak:['냉소','음모적사고','의심'],
+    match:['OWDC','OWNC'],conflict:['FWNP','FMNP']},
+  'FMNC':{hanja:'丹火',title:'단심의 수행자',subtitle:'조용한 깊이의 수련형',rarity:7.2,color:'#7a2a3a',rgb:'122,42,58',
+    desc:'음간의 화와 금이 약한 흐름으로 수렴한 수행자형. 겉은 부드럽지만 내면의 원칙은 단단해요. 한번 결심하면 오래가고, 조용히 완성하는 사람.',
+    strength:['인내','절제','원칙'],weak:['자기억압','폐쇄성','감정소통부재'],
+    match:['OWDP','FWDP'],conflict:['FWDC','OWDC']},
+  'OWDP':{hanja:'大海',title:'파도의 탐험가',subtitle:'넓게 흐르는 여행자·모험가',rarity:3.9,color:'#2a7aa8',rgb:'42,122,168',
+    desc:'물과 나무의 확장력이 양간의 힘으로 폭발하는 탐험형. 한 자리에 머물지 못하고 늘 다음 장소를 찾아요. 아이디어가 넘치고 사람을 끌어모아요.',
+    strength:['적응력','호기심','연결력'],weak:['정착실패','산만함','진득함부족'],
+    match:['FMNC','FMDC'],conflict:['OMNP','OMDP']},
+  'OWDC':{hanja:'流水',title:'강물의 철학자',subtitle:'유연한 사색가·지식인',rarity:8.4,color:'#3a6a9a',rgb:'58,106,154',
+    desc:'양간의 수·목이 신약한 기운으로 흐르는 사색형 지식인. 책·언어·이야기·구조에 끌려요. 깊이 있는 대화를 사랑하고 혼자 있는 시간이 충전기예요.',
+    strength:['통찰력','학습력','언어감각'],weak:['행동력부족','우유부단','과도한분석'],
+    match:['FMDP','FMNP'],conflict:['FMDC','OWDP']},
+  'OWNP':{hanja:'玄雨',title:'푸른 예언자',subtitle:'직관·영감으로 미래를 읽는 자',rarity:2.4,color:'#4a3aa8',rgb:'74,58,168',
+    desc:'음간의 물과 나무가 강한 기운으로 모인 드문 직관형. 남이 못 보는 흐름을 먼저 감지해요. 스스로는 흘러가는 꿈처럼 보이지만 예측은 맞아요.',
+    strength:['직관','영감','미래감각'],weak:['현실감부족','고립감','피로누적'],
+    match:['FMDC','FMDP'],conflict:['FWDP','OWDP']},
+  'OWNC':{hanja:'霧歌',title:'안개의 가수',subtitle:'몽환적 감성의 내면 시인',rarity:6.1,color:'#5a6a8a',rgb:'90,106,138',
+    desc:'음간의 수·목이 약하게 피어나는 몽환형. 음악·시·필름·빛에 남보다 깊게 반응해요. 현실 기준이 약해 보일 수 있지만, 그 감수성이 곧 재능이에요.',
+    strength:['감수성','미감','치유력'],weak:['현실회피','우울','경계약함'],
+    match:['FWDP','FMDP'],conflict:['FMDP','FMDC']},
+  'OMDP':{hanja:'北極',title:'북극성 사령관',subtitle:'냉철한 지휘관·시스템 구축자',rarity:4.5,color:'#1a4a7a',rgb:'26,74,122',
+    desc:'양간의 물·금이 강하게 뭉친 시스템 엔지니어형. 감정보다 구조·절차·원리를 먼저 봐요. 조직을 설계하고 운영하는 데 탁월하지만 온기가 부족할 수 있어요.',
+    strength:['논리','체계','의사결정'],weak:['냉담','완고','감정표현부재'],
+    match:['FWNC','FMDC'],conflict:['OWDP','FWDC']},
+  'OMDC':{hanja:'氷學',title:'얼음의 학자',subtitle:'논리·분석의 조용한 설계자',rarity:7.5,color:'#3a6a8a',rgb:'58,106,138',
+    desc:'양간의 금·수가 신약하게 흐르는 학자형. 세밀한 분석·연구·기록에 잘 맞아요. 외향적 에너지가 부족하지만 깊은 한 분야에서 대가가 될 수 있는 타입이에요.',
+    strength:['분석력','정밀함','지식축적'],weak:['사회적피로','표현부족','실행지연'],
+    match:['FWNP','FMNP'],conflict:['FWDP','OWDP']},
+  'OMNP':{hanja:'孤王',title:'고독한 왕',subtitle:'존재감 자체가 무게인 사람',rarity:2.1,color:'#3a2a5a',rgb:'58,42,90',
+    desc:'음간의 금과 물이 강하게 응축된 극희귀형. 말이 적어도 주변이 그 의견을 기다려요. 혼자 있어도 세계를 가진 듯한 존재감. 외로움과 권위가 함께 와요.',
+    strength:['권위','깊이','고집불변'],weak:['고립','독선','관계단절'],
+    match:['FWDP','FWNP'],conflict:['OWDP','FWDP']},
+  'OMNC':{hanja:'靜月',title:'고요한 달',subtitle:'은은한 빛을 내는 완성형 내면',rarity:9.2,color:'#3a4a6a',rgb:'58,74,106',
+    desc:'음간의 금과 물이 약한 기운으로 고요히 흐르는 달빛형. 큰 성과보다 은은한 지속력이 무기예요. 곁에 있기만 해도 평온해지는 사람. 스스로는 조금 더 빛나도 괜찮아요.',
+    strength:['안정감','배려','조용한지속력'],weak:['자기표현부족','수동성','낮은자존감'],
+    match:['FWDP','FWNP'],conflict:['FMDP','FWNP']}
+};
+
+// 코드 → 축 이름 매핑
+var AXIS_MAP = {
+  F:{name:'火(화)',ko:'열정·확장'}, O:{name:'水(수)',ko:'냉정·수렴'},
+  W:{name:'木(목)',ko:'유연·성장'}, M:{name:'金(금)',ko:'단단·구조'},
+  D:{name:'陽(양)',ko:'직진·외향'}, N:{name:'陰(음)',ko:'굴곡·내향'},
+  P:{name:'强(강)',ko:'추진·돌파'}, C:{name:'弱(약)',ko:'수용·섬세'}
+};
+
+// ══════════════════════════════════════════════
+// 판정 로직
+// ══════════════════════════════════════════════
+function classifyMbti(sd) {
+  var five = sd.five_pct || sd.five_count || {};
+  var wood = Number(five.wood)||0, fire = Number(five.fire)||0, earth = Number(five.earth)||0, metal = Number(five.metal)||0, water = Number(five.water)||0;
+
+  // 축1 F/O: 불+나무 vs 금+물
+  var hot = fire * 1.2 + wood;
+  var cool = water * 1.2 + metal;
+  var f1 = hot >= cool ? 'F' : 'O';
+
+  // 축2 W/M: 나무+물(유연) vs 금+흙(단단)
+  var flex = wood + water;
+  var solid = metal + earth;
+  var f2 = flex >= solid ? 'W' : 'M';
+
+  // 축3 D/N: 일간 양음
+  var dayPillar = (sd.summary && sd.summary.pillars && sd.summary.pillars.day) || '';
+  var dayStem = dayPillar.charAt(0);
+  var yangStems = ['甲','丙','戊','庚','壬','갑','병','무','경','임'];
+  var f3 = yangStems.indexOf(dayStem) >= 0 ? 'D' : 'N';
+
+  // 축4 P/C: 신강/신약
+  var strength = sd.strength_level_5 || '';
+  var isStrong = strength.indexOf('강') >= 0 || strength.indexOf('왕') >= 0;
+  var f4 = isStrong ? 'P' : 'C';
+
+  return f1 + f2 + f3 + f4;
+}
+
+// ══════════════════════════════════════════════
+// UI
+// ══════════════════════════════════════════════
+(function initSelects() {
+  var now = new Date();
+  var yEl = document.getElementById('calcYear');
+  for (var y = now.getFullYear(); y >= 1930; y--) {
+    var o = document.createElement('option'); o.value = y; o.textContent = y + '년';
+    yEl.appendChild(o);
+  }
+  yEl.value = 1990;
+  var mEl = document.getElementById('calcMonth');
+  for (var m = 1; m <= 12; m++) {
+    var o2 = document.createElement('option'); o2.value = m; o2.textContent = m + '월';
+    mEl.appendChild(o2);
+  }
+  var minEl = document.getElementById('calcMin');
+  for (var mn = 0; mn < 60; mn++) {
+    var oMn = document.createElement('option'); oMn.value = mn; oMn.textContent = mn + '분';
+    minEl.appendChild(oMn);
+  }
+  function updateDays() {
+    var y2 = parseInt(yEl.value)||1990, m2 = parseInt(mEl.value)||1;
+    var maxD = new Date(y2, m2, 0).getDate();
+    var dEl = document.getElementById('calcDay');
+    var cur = parseInt(dEl.value)||1;
+    dEl.innerHTML = '';
+    for (var d = 1; d <= maxD; d++) {
+      var o3 = document.createElement('option'); o3.value = d; o3.textContent = d + '일';
+      dEl.appendChild(o3);
+    }
+    dEl.value = Math.min(cur, maxD);
+  }
+  yEl.addEventListener('change', updateDays);
+  mEl.addEventListener('change', updateDays);
+  updateDays();
+
+  // 저장된 프로필 자동채움
+  try {
+    var raw = localStorage.getItem('pico_profile');
+    if (raw) {
+      var p = JSON.parse(raw);
+      if (p.year) yEl.value = p.year;
+      if (p.month) mEl.value = p.month;
+      if (p.hour !== undefined && p.hour !== null) document.getElementById('calcHour').value = String(p.hour);
+      if (p.minute !== undefined && p.minute !== null) document.getElementById('calcMin').value = String(p.minute);
+      if (p.gender) pickGender(p.gender);
+      updateDays();
+      if (p.day) document.getElementById('calcDay').value = p.day;
+    }
+  } catch(e) {}
+})();
+
+function pickGender(g) {
+  currentGender = g;
+  document.querySelectorAll('.gender-btn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-gender') === g);
+  });
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(function(){ t.style.opacity = '0'; }, 2800);
+}
+
+async function calcMbti() {
+  var year = parseInt(document.getElementById('calcYear').value);
+  var month = parseInt(document.getElementById('calcMonth').value);
+  var day = parseInt(document.getElementById('calcDay').value);
+  if (!year || !month || !day) { showToast('생년월일을 입력해주세요'); return; }
+  var hourVal = document.getElementById('calcHour').value;
+  var minVal = parseInt(document.getElementById('calcMin').value) || 0;
+  var hour = hourVal === 'unknown' ? 12 : parseInt(hourVal);
+  var iso = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0') + 'T' + String(hour).padStart(2,'0') + ':' + String(minVal).padStart(2,'0') + ':00';
+
+  var btn = document.getElementById('calcBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="loading"></span>분석 중...';
+  try {
+    var res = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ birth: iso, gender: currentGender, calendar: 'solar' })
+    });
+    var sd = await res.json();
+    if (!sd || !sd.summary) { showToast('사주 계산 오류'); btn.disabled=false; btn.textContent='내 사주 16유형 확인하기'; return; }
+
+    var code = classifyMbti(sd);
+    currentType = code;
+    var info = TYPES[code] || TYPES['OMNC'];
+
+    renderResult(code, info);
+
+    try {
+      localStorage.setItem('pico_profile', JSON.stringify({
+        name:(JSON.parse(localStorage.getItem('pico_profile')||'{}').name)||'',
+        year:year, month:month, day:day,
+        hour:(hourVal==='unknown'?'unknown':hour), minute:minVal, gender:currentGender
+      }));
+    } catch(e) {}
+
+    document.getElementById('result').style.display = 'block';
+    setTimeout(function(){ document.getElementById('result').scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
+  } catch(e) {
+    console.error(e);
+    showToast('오류가 발생했어요. 다시 시도해주세요');
+  }
+  btn.disabled = false; btn.textContent = '내 사주 16유형 확인하기';
+}
+
+function renderResult(code, info) {
+  document.documentElement.style.setProperty('--type', info.color);
+  document.documentElement.style.setProperty('--type-rgb', info.rgb);
+
+  document.getElementById('resultHanja').textContent = info.hanja;
+  document.getElementById('resultCode').textContent = code.split('').join(' · ');
+  document.getElementById('resultTitle').textContent = info.title;
+  document.getElementById('resultSubtitle').textContent = info.subtitle;
+  document.getElementById('rarityBadge').innerHTML = '한국인 중 상위 ' + info.rarity + '% 유형';
+  document.getElementById('resultDesc').textContent = info.desc;
+
+  // 4축
+  var f1 = code.charAt(0), f2 = code.charAt(1), f3 = code.charAt(2), f4 = code.charAt(3);
+  document.getElementById('ax1').textContent = AXIS_MAP[f1].name;
+  document.getElementById('ax1ko').textContent = AXIS_MAP[f1].ko;
+  document.getElementById('ax2').textContent = AXIS_MAP[f2].name;
+  document.getElementById('ax2ko').textContent = AXIS_MAP[f2].ko;
+  document.getElementById('ax3').textContent = AXIS_MAP[f3].name;
+  document.getElementById('ax3ko').textContent = AXIS_MAP[f3].ko;
+  document.getElementById('ax4').textContent = AXIS_MAP[f4].name;
+  document.getElementById('ax4ko').textContent = AXIS_MAP[f4].ko;
+
+  // 강점/약점 칩
+  var sc = document.getElementById('strengthChips'); sc.innerHTML = '';
+  (info.strength || []).forEach(function(s){
+    sc.innerHTML += '<div class="sw-chip strength">' + s + '</div>';
+  });
+  var wc = document.getElementById('weakChips'); wc.innerHTML = '';
+  (info.weak || []).forEach(function(w){
+    wc.innerHTML += '<div class="sw-chip weak">' + w + '</div>';
+  });
+
+  // 궁합·상극
+  var mt = document.getElementById('matchTargets'); mt.innerHTML = '';
+  (info.match || []).forEach(function(mc){
+    var m = TYPES[mc]; if (!m) return;
+    mt.innerHTML += '<div class="match-target"><div class="match-hanja">'+m.hanja+'</div><div class="match-name">'+m.title+'</div></div>';
+  });
+  var ct = document.getElementById('conflictTargets'); ct.innerHTML = '';
+  (info.conflict || []).forEach(function(cc){
+    var c = TYPES[cc]; if (!c) return;
+    ct.innerHTML += '<div class="match-target bad"><div class="match-hanja">'+c.hanja+'</div><div class="match-name">'+c.title+'</div></div>';
+  });
+}
+
+// ══════════════════════════════════════════════
+// 공유 카드 캔버스
+// ══════════════════════════════════════════════
+function _drawMbtiCard(cb) {
+  if (!currentType) { cb(null); return; }
+  var info = TYPES[currentType]; if (!info) { cb(null); return; }
+  var W=1080, H=1920;
+  var canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
+  var ctx=canvas.getContext('2d');
+  var tHex=info.color, tRgb=info.rgb;
+
+  function fRR(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);} ctx.fill(); }
+  function sRR(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);} ctx.stroke(); }
+
+  // 배경
+  var bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#fdf8ec'); bg.addColorStop(0.5,'#f7efde'); bg.addColorStop(1,'#f0e6d0');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+  var glow=ctx.createRadialGradient(W/2,560,0,W/2,560,700);
+  glow.addColorStop(0,'rgba('+tRgb+',0.3)'); glow.addColorStop(0.5,'rgba('+tRgb+',0.1)'); glow.addColorStop(1,'transparent');
+  ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+  var glow2=ctx.createRadialGradient(W/2,H-320,0,W/2,H-320,520);
+  glow2.addColorStop(0,'rgba('+tRgb+',0.14)'); glow2.addColorStop(1,'transparent');
+  ctx.fillStyle=glow2; ctx.fillRect(0,0,W,H);
+
+  // 별자리 점들
+  [[6,10],[16,6],[28,14],[42,4],[58,10],[72,6],[86,12],[94,5],
+   [4,28],[20,34],[36,26],[50,30],[66,24],[82,32],[96,28],
+   [10,92],[24,88],[38,94],[54,90],[70,94],[86,88],[96,93]].forEach(function(s,i){
+    var sz=1.2+(i%3)*0.6;
+    ctx.beginPath(); ctx.arc(s[0]/100*W,s[1]/100*H,sz,0,Math.PI*2);
+    ctx.fillStyle='rgba('+tRgb+','+(0.25+(i%4)*0.12)+')'; ctx.fill();
+  });
+
+  ctx.textAlign='center';
+
+  // 브랜드 헤더
+  var y=118;
+  ctx.font='500 28px sans-serif';
+  ctx.fillStyle='rgba(122,76,24,0.75)'; ctx.fillText('F O R T U N A',W/2,y);
+  y+=46;
+  ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(74,58,42,0.45)';
+  ctx.fillText('사주 16유형 진단',W/2,y);
+
+  // 구분 라인
+  y+=46;
+  var ln=ctx.createLinearGradient(W/2-320,0,W/2+320,0);
+  ln.addColorStop(0,'transparent'); ln.addColorStop(0.5,'rgba('+tRgb+',0.4)'); ln.addColorStop(1,'transparent');
+  ctx.strokeStyle=ln; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(W/2-320,y); ctx.lineTo(W/2+320,y); ctx.stroke();
+
+  // 한자 박스
+  y+=80;
+  var boxW=520, boxH=340, boxX=(W-boxW)/2, boxY=y;
+  var boxBg=ctx.createLinearGradient(boxX,boxY,boxX,boxY+boxH);
+  boxBg.addColorStop(0,'rgba('+tRgb+',0.14)'); boxBg.addColorStop(1,'rgba('+tRgb+',0.04)');
+  ctx.fillStyle=boxBg; fRR(boxX,boxY,boxW,boxH,32);
+  ctx.strokeStyle='rgba('+tRgb+',0.42)'; ctx.lineWidth=2; sRR(boxX,boxY,boxW,boxH,32);
+  // 한자 (초대형 2자)
+  ctx.font='600 210px "Noto Serif KR",serif';
+  ctx.fillStyle=tHex;
+  ctx.fillText(info.hanja, W/2, boxY + boxH/2 + 75);
+  y+=boxH+40;
+
+  // SAJU 16 TYPES 배지
+  ctx.font='600 22px sans-serif';
+  ctx.fillStyle=tHex;
+  ctx.fillText('·  S A J U   1 6   T Y P E S  ·',W/2,y);
+  y+=42;
+
+  // 코드 4자리
+  ctx.font='500 26px "Noto Serif KR",serif';
+  ctx.fillStyle='rgba(74,58,42,0.55)';
+  ctx.fillText(currentType.split('').join(' · '),W/2,y);
+  y+=70;
+
+  // 한글 타이틀 (대형)
+  ctx.font='800 84px "Noto Serif KR",serif';
+  ctx.fillStyle=tHex; ctx.fillText(info.title,W/2,y);
+  y+=42;
+
+  // 서브타이틀
+  ctx.font='400 28px "Noto Sans KR",sans-serif';
+  ctx.fillStyle='rgba(74,58,42,0.72)'; ctx.fillText(info.subtitle,W/2,y);
+  y+=54;
+
+  // 희귀도 배지
+  var rtxt = '한국인 중 상위 ' + info.rarity + '% 유형';
+  ctx.font='700 26px "Noto Sans KR",sans-serif';
+  var rw = ctx.measureText(rtxt).width + 60;
+  var rx = (W-rw)/2, ry = y;
+  ctx.fillStyle='rgba('+tRgb+',0.1)'; fRR(rx, ry-30, rw, 48, 24);
+  ctx.strokeStyle='rgba('+tRgb+',0.4)'; ctx.lineWidth=1.5; sRR(rx, ry-30, rw, 48, 24);
+  ctx.fillStyle=tHex; ctx.fillText('✦  '+rtxt+'  ✦',W/2,y);
+  y+=74;
+
+  // 구분선
+  var ln2=ctx.createLinearGradient(W/2-240,0,W/2+240,0);
+  ln2.addColorStop(0,'transparent'); ln2.addColorStop(0.5,'rgba('+tRgb+',0.3)'); ln2.addColorStop(1,'transparent');
+  ctx.strokeStyle=ln2; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-240,y); ctx.lineTo(W/2+240,y); ctx.stroke();
+
+  // 설명
+  y+=56;
+  ctx.font='400 28px "Noto Sans KR",sans-serif';
+  ctx.fillStyle='rgba(74,58,42,0.82)';
+  var desc = info.desc || '';
+  var maxW = W-160, line='', lines=[];
+  for (var i=0;i<desc.length;i++){
+    var t=line+desc[i];
+    if (ctx.measureText(t).width>maxW && line.length>0){ lines.push(line); line=desc[i]; }
+    else { line=t; }
+  }
+  if (line) lines.push(line);
+  lines.slice(0,3).forEach(function(l,idx){ ctx.fillText(l,W/2,y+idx*46); });
+  y += lines.slice(0,3).length*46 + 40;
+
+  // 강점/약점 칩
+  ctx.textAlign='left';
+  var label1 = '강점';
+  ctx.font='700 26px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(30,142,62,0.9)';
+  ctx.fillText('● ' + label1, 80, y);
+  y+=40;
+  var chipX=80;
+  (info.strength||[]).forEach(function(s){
+    ctx.font='700 24px "Noto Sans KR",sans-serif';
+    var cw = ctx.measureText(s).width + 40;
+    ctx.fillStyle='rgba(30,142,62,0.12)'; fRR(chipX, y, cw, 46, 23);
+    ctx.strokeStyle='rgba(30,142,62,0.35)'; ctx.lineWidth=1.2; sRR(chipX, y, cw, 46, 23);
+    ctx.fillStyle='#1e8e3e'; ctx.textAlign='center';
+    ctx.fillText(s, chipX + cw/2, y + 32);
+    ctx.textAlign='left';
+    chipX += cw + 10;
+  });
+  y+=66;
+
+  ctx.fillStyle='rgba(168,70,102,0.9)';
+  ctx.font='700 26px "Noto Sans KR",sans-serif';
+  ctx.fillText('● 그림자', 80, y);
+  y+=40;
+  chipX=80;
+  (info.weak||[]).forEach(function(s){
+    ctx.font='700 24px "Noto Sans KR",sans-serif';
+    var cw = ctx.measureText(s).width + 40;
+    ctx.fillStyle='rgba(168,70,102,0.12)'; fRR(chipX, y, cw, 46, 23);
+    ctx.strokeStyle='rgba(168,70,102,0.35)'; ctx.lineWidth=1.2; sRR(chipX, y, cw, 46, 23);
+    ctx.fillStyle='#a84666'; ctx.textAlign='center';
+    ctx.fillText(s, chipX + cw/2, y + 32);
+    ctx.textAlign='left';
+    chipX += cw + 10;
+  });
+  ctx.textAlign='center';
+
+  // 푸터
+  var fy=H-150;
+  var fl=ctx.createLinearGradient(W/2-260,0,W/2+260,0);
+  fl.addColorStop(0,'transparent'); fl.addColorStop(0.5,'rgba('+tRgb+',0.3)'); fl.addColorStop(1,'transparent');
+  ctx.strokeStyle=fl; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-260,fy); ctx.lineTo(W/2+260,fy); ctx.stroke();
+  ctx.font='600 28px sans-serif';
+  ctx.fillStyle='rgba(122,76,24,0.78)'; ctx.fillText('picolab.kr',W/2,fy+50);
+  ctx.font='400 22px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(74,58,42,0.42)';
+  ctx.fillText('나도 내 사주 16유형 찾기 →',W/2,fy+84);
+
+  cb(canvas);
+}
+
+// ══════════════════════════════════════════════
+// 공유 흐름
+// ══════════════════════════════════════════════
+function shareKakao() {
+  if (!currentType) return;
+  var modal = document.getElementById('mbtiShareModal');
+  var preview = document.getElementById('mbtiPreviewArea');
+  preview.innerHTML = '<div style="color:rgba(74,58,42,0.7);padding:40px 0;">카드 생성 중...</div>';
+  modal.style.display = 'flex';
+  _drawMbtiCard(function(canvas){
+    if (!canvas) { preview.innerHTML='<div style="color:#b02a1a;padding:20px;">카드 생성 실패</div>'; return; }
+    window._mbtiCanvas = canvas;
+    var img = new Image(); img.src = canvas.toDataURL('image/png');
+    img.style.cssText = 'width:100%;border-radius:12px;display:block;';
+    preview.innerHTML = ''; preview.appendChild(img);
+  });
+}
+
+async function doMbtiShare() {
+  var canvas = window._mbtiCanvas; if (!canvas) return;
+  var info = TYPES[currentType] || {};
+  var pageUrl = 'https://picolab.kr/mbti-saju.html?utm_source=share&utm_medium=kakao';
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  showToast('카드 업로드 중...');
+  var uploadedUrl = null;
+  try {
+    var dataUrl = canvas.toDataURL('image/png');
+    var up = await fetch('https://fortuna.kkdmb7.workers.dev/upload-share-card', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ imageBase64: dataUrl, filename: 'mbti_' + currentType })
+    });
+    var upData = await up.json();
+    if (upData && upData.url) uploadedUrl = upData.url;
+  } catch(e) { console.warn('upload fail', e); }
+
+  function sendKakaoFeed(imgUrl) {
+    if (!window.Kakao || !Kakao.Share) return false;
+    if (!Kakao.isInitialized()) { try { Kakao.init(KAKAO_JS_KEY); } catch(e) {} }
+    try {
+      Kakao.Share.sendDefault({
+        objectType:'feed',
+        content:{
+          title:'내 사주 16유형 — ' + info.hanja + ' ' + info.title,
+          description: '"' + info.subtitle + '" · 상위 ' + info.rarity + '% 유형\n' + (info.desc||'').slice(0,50),
+          imageUrl: imgUrl,
+          link:{ mobileWebUrl: pageUrl, webUrl: pageUrl }
+        },
+        buttons:[{ title:'내 사주 유형 찾기', link:{ mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+      });
+      return true;
+    } catch(e) { return false; }
+  }
+
+  if (uploadedUrl && sendKakaoFeed(uploadedUrl)) return;
+
+  canvas.toBlob(function(blob){
+    if (!blob) { showToast('이미지 생성 실패'); return; }
+    var file = new File([blob],'fortuna_mbti.png',{type:'image/png'});
+    if (isMobile && navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+      navigator.share({ files:[file], title:'내 사주 16유형 — '+info.title, text: info.subtitle+'\n'+pageUrl }).catch(function(){});
+    } else if (sendKakaoFeed('https://picolab.kr/img/goddess/goddess-app.png')) {
+    } else {
+      try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); showToast('링크가 복사됐어요'); } catch(e) {}
+    }
+  },'image/png');
+}
+
+function downloadMbtiCard() {
+  var canvas = window._mbtiCanvas; if (!canvas) return;
+  var a = document.createElement('a');
+  a.download = 'fortuna_mbti_' + (currentType||'card') + '.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+function closeMbtiShareModal() {
+  document.getElementById('mbtiShareModal').style.display = 'none';
+}
+
+function copyLink() {
+  if (!currentType) return;
+  var info = TYPES[currentType];
+  var pageUrl = 'https://picolab.kr/mbti-saju.html';
+  var text = '내 사주 16유형은 ' + info.hanja + ' ' + info.title + ' ✦\n"' + info.subtitle + '" · 상위 ' + info.rarity + '% 유형\n\n내 유형 확인하기 👇\n' + pageUrl;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text)
+      .then(function(){ showToast('복사됐어요! 카카오톡에 붙여넣기 하세요.'); })
+      .catch(function(){ fallbackCopy(text); });
+  } else { fallbackCopy(text); }
+}
+
+function fallbackCopy(text) {
+  var el = document.createElement('textarea');
+  el.value = text; document.body.appendChild(el); el.select();
+  try { document.execCommand('copy'); showToast('복사됐어요!'); } catch(e) {}
+  document.body.removeChild(el);
+}
+</script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
+<script src="yongsin-float.js" defer></script>
+</body>
+</html>
