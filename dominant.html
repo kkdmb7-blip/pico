@@ -137,7 +137,7 @@ select.input option{background:#fff;color:var(--text);}
 
 /* 오빗 링 + 글로잉 행성 */
 .result-orbit{
-  position:relative;width:170px;height:170px;margin:0 auto 20px;
+  position:relative;width:180px;height:180px;margin:0 auto 32px;
   display:flex;align-items:center;justify-content:center;
 }
 .result-orbit-ring{
@@ -168,9 +168,10 @@ select.input option{background:#fff;color:var(--text);}
   transition:background 0.5s;
 }
 .result-icon{
-  font-size:78px;position:relative;z-index:1;line-height:1;
+  font-size:68px;position:relative;z-index:1;line-height:1;
   filter:drop-shadow(0 4px 14px rgba(var(--planet-rgb),0.5));
   animation:float 4.5s ease-in-out infinite;
+  display:inline-block;
 }
 
 @keyframes rotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
@@ -329,7 +330,9 @@ select.input option{background:#fff;color:var(--text);}
 @media (max-width:480px){
   .hero-title{font-size:23px;}
   .result-planet{font-size:30px;}
+  .result-orbit{width:160px;height:160px;margin-bottom:28px;}
   .result-icon{font-size:56px;}
+  .result-icon-wrap{width:92px;height:92px;}
 }
 </style>
 </head>
