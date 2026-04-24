@@ -416,6 +416,8 @@ async function calcMatch() {
     d._mName = mName; d._fName = fName;
     d._mBirth = mYear + '.' + String(mMonth).padStart(2,'0') + '.' + String(mDay).padStart(2,'0');
     d._fBirth = fYear + '.' + String(fMonth).padStart(2,'0') + '.' + String(fDay).padStart(2,'0');
+    d._mParts = { y:mYear, mo:mMonth, d:mDay, h:mHour, mi:mMin };
+    d._fParts = { y:fYear, mo:fMonth, d:fDay, h:fHour, mi:fMin };
 
     window._matchData = d;
     status.className = 'status-msg';
@@ -658,20 +660,33 @@ async function requestMatchAI() {
   try {
     var matchKey = d._mBirth + '_' + d._fBirth + '_' + d.total;
     var sb2 = getMatchSb();
-    await sb2.from('reports').insert({
+    var ins = await sb2.from('reports').insert({
       user_id: user.id,
       report_type: 'vedic_match_ai',
       content: allTexts.concat([matchKey, d._mName + '·' + d._fName + ' ' + d.total + '/36']),
       orb_spent: VEDIC_ORB,
       created_at: new Date().toISOString()
-    });
+    }).select('id').single();
+    if (ins && ins.data && ins.data.id) d._reportId = ins.data.id;
     showMatchToast('✦ 궁합 분석이 저장되었습니다. 마이페이지에서 다시 볼 수 있어요.');
   } catch(e) {}
 }
 
 // ── 카카오 공유 ───────────────────────────────────────────
+function buildMatchShareUrl(d) {
+  // 링크 열면 자동 재계산 + AI 본문(있으면) 자동 로드
+  // format: m=year-month-day-hour-min-name  (f 동일)
+  var p = new URLSearchParams();
+  var mp = d._mParts, fp = d._fParts;
+  if (mp) p.set('m', [mp.y,mp.mo,mp.d,mp.h,mp.mi,(d._mName||'남성')].join('-'));
+  if (fp) p.set('f', [fp.y,fp.mo,fp.d,fp.h,fp.mi,(d._fName||'여성')].join('-'));
+  if (d._reportId) p.set('r', d._reportId);
+  p.set('utm_source', 'share'); p.set('utm_medium', 'kakao');
+  return 'https://picolab.kr/vedic-match.html?' + p.toString();
+}
+
 function buildMatchShareText(d) {
-  var pageUrl = 'https://picolab.kr/vedic-match.html?utm_source=share&utm_medium=kakao';
+  var pageUrl = buildMatchShareUrl(d);
   var lines = [];
   lines.push('✦ FORTUNA 베딕 궁합');
   lines.push(d._mName + ' ♥ ' + d._fName);
@@ -846,7 +861,7 @@ function _populateMatchSelect(elId, kind) {
     }
   }
 
-  // URL 파라미터에서 자동 입력 (?my=year,month,day,hour,gender)
+  // URL 파라미터에서 자동 입력 (?my=year,month,day,hour,gender) — 단일 프로필용(하위호환)
   var p = new URLSearchParams(location.search);
   var my = p.get('my');
   if (my) {
@@ -860,7 +875,87 @@ function _populateMatchSelect(elId, kind) {
       if (parts[3] && parts[3] !== 'unknown') document.getElementById(prefix2 + 'hour').value = parts[3];
     }
   }
+
+  // ── 공유 링크 수신 모드 (?m=y-mo-d-h-mi-name&f=...&r=reportId) ──
+  var mShare = p.get('m'), fShare = p.get('f');
+  if (mShare && fShare) {
+    var mParts = mShare.split('-'), fParts = fShare.split('-');
+    if (mParts.length >= 5 && fParts.length >= 5) {
+      document.getElementById('m-year').value  = mParts[0];
+      document.getElementById('m-month').value = mParts[1];
+      document.getElementById('m-day').value   = mParts[2];
+      document.getElementById('m-hour').value  = mParts[3];
+      document.getElementById('m-min').value   = mParts[4];
+      if (mParts[5]) document.getElementById('m-name').value = decodeURIComponent(mParts.slice(5).join('-'));
+
+      document.getElementById('f-year').value  = fParts[0];
+      document.getElementById('f-month').value = fParts[1];
+      document.getElementById('f-day').value   = fParts[2];
+      document.getElementById('f-hour').value  = fParts[3];
+      document.getElementById('f-min').value   = fParts[4];
+      if (fParts[5]) document.getElementById('f-name').value = decodeURIComponent(fParts.slice(5).join('-'));
+
+      var rId = p.get('r');
+
+      // 자동 계산 후 AI(있으면) 로드 + '나도 해보기' CTA 주입
+      (async function(){
+        await calcMatch();
+        // 공유된 궁합 표시임을 상단에 알리고 CTA 표시
+        injectSharedBanner();
+        if (rId) {
+          await loadSharedAIReport(rId);
+        }
+      })();
+    }
+  }
 })();
+
+// ── 공유 수신: 상단 안내 배너 + '나도 해보기' 버튼 ───────────
+function injectSharedBanner() {
+  if (document.getElementById('sharedBanner')) return;
+  var formCard = document.getElementById('form-card');
+  if (!formCard) return;
+  var banner = document.createElement('div');
+  banner.id = 'sharedBanner';
+  banner.style.cssText = 'background:rgba(138,106,21,0.10);border:1px solid rgba(138,106,21,0.32);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;';
+  banner.innerHTML =
+    '<div style="font-size:13px;color:#6a4f0c;line-height:1.55;flex:1;min-width:200px;">' +
+      '<strong style="font-size:14px;">✦ 공유받은 궁합 결과예요</strong><br>' +
+      '<span style="font-size:12px;color:var(--muted);">두 사람의 정보로 자동 계산된 결과입니다. 내 정보로 새로 해보고 싶다면 아래 버튼을 누르세요.</span>' +
+    '</div>' +
+    '<button id="btnTryMine" style="padding:10px 18px;border-radius:10px;background:rgba(122,36,24,0.10);border:1px solid rgba(122,36,24,0.32);color:var(--accent);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">나도 해보기</button>';
+  formCard.parentNode.insertBefore(banner, formCard);
+  document.getElementById('btnTryMine').addEventListener('click', function(){
+    location.href = 'vedic-match.html';
+  });
+}
+
+async function loadSharedAIReport(reportId) {
+  try {
+    var sb = getMatchSb();
+    var res = await sb.from('reports').select('content,report_type').eq('id', reportId).maybeSingle();
+    if (!res.data || res.data.report_type !== 'vedic_match_ai') return;
+    var content = res.data.content || [];
+    // content: [sec1, sec2, sec3, sec4, sec5, matchKey, summary]
+    var secs = content.slice(0, 5);
+    if (!secs.some(function(t){ return t && t.trim(); })) return;
+
+    var body = document.getElementById('match-ai-body');
+    var btn  = document.getElementById('match-ai-btn');
+    if (btn) btn.style.display = 'none';
+    if (body) body.style.display = 'block';
+    for (var i = 0; i < 5; i++) {
+      var lod = document.getElementById('ai-lod-' + (i+1));
+      var txt = document.getElementById('ai-txt-' + (i+1));
+      if (lod) lod.style.display = 'none';
+      if (txt) {
+        txt.innerHTML = renderMd(secs[i] || '');
+        txt.style.display = 'block';
+      }
+    }
+    if (window._matchData) window._matchData._aiTexts = secs;
+  } catch(e) {}
+}
 </script>
 <script src="yongsin-float.js"></script>
 <script>
