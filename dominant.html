@@ -108,61 +108,167 @@ select.input option{background:#fff;color:var(--text);}
 
 .result{display:none;animation:fadeUp 0.6s ease;margin-top:20px;}
 
+/* ═══════ 공유 유도 화려 결과 히어로 ═══════ */
 .result-hero{
-  background:var(--surface);
-  border:1px solid var(--border-soft);
-  border-top:3px solid var(--planet);
-  border-radius:16px;padding:30px 24px;text-align:center;margin-bottom:14px;
-  box-shadow:var(--shadow-soft);
-  transition:border-top-color 0.5s;
+  position:relative;overflow:hidden;
+  border-radius:22px;padding:48px 26px 36px;text-align:center;margin-bottom:16px;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 20%, rgba(var(--planet-rgb),0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(var(--planet-rgb),0.1) 0%, transparent 70%),
+    linear-gradient(180deg, #fffaf0 0%, var(--surface) 100%);
+  border:1px solid rgba(var(--planet-rgb),0.35);
+  box-shadow:
+    0 10px 36px rgba(var(--planet-rgb),0.15),
+    0 2px 8px rgba(60,40,20,0.08);
+  transition:border-color 0.5s, box-shadow 0.5s;
 }
-.result-icon{font-size:64px;margin-bottom:6px;display:block;line-height:1;}
+/* 배경 별자리 점 패턴 */
+.result-hero::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(circle at 8% 22%, rgba(var(--planet-rgb),0.55) 1.2px, transparent 1.8px),
+    radial-gradient(circle at 88% 14%, rgba(var(--planet-rgb),0.45) 1px, transparent 1.5px),
+    radial-gradient(circle at 18% 78%, rgba(var(--planet-rgb),0.4) 0.8px, transparent 1.2px),
+    radial-gradient(circle at 92% 64%, rgba(var(--planet-rgb),0.55) 1.1px, transparent 1.6px),
+    radial-gradient(circle at 48% 8%, rgba(var(--planet-rgb),0.35) 0.8px, transparent 1.3px),
+    radial-gradient(circle at 72% 88%, rgba(var(--planet-rgb),0.5) 1px, transparent 1.5px),
+    radial-gradient(circle at 30% 12%, rgba(var(--planet-rgb),0.4) 0.7px, transparent 1.2px);
+}
+
+/* 오빗 링 + 글로잉 행성 */
+.result-orbit{
+  position:relative;width:170px;height:170px;margin:0 auto 20px;
+  display:flex;align-items:center;justify-content:center;
+}
+.result-orbit-ring{
+  position:absolute;inset:0;border:1px solid rgba(var(--planet-rgb),0.35);
+  border-radius:50%;animation:rotate 22s linear infinite;
+  transition:border-color 0.5s;
+}
+.result-orbit-ring::after{
+  content:'';position:absolute;top:-4px;left:50%;transform:translateX(-50%);
+  width:7px;height:7px;background:var(--planet);border-radius:50%;
+  box-shadow:0 0 10px rgba(var(--planet-rgb),0.9), 0 0 20px rgba(var(--planet-rgb),0.5);
+  transition:background 0.5s;
+}
+.result-orbit-ring-2{
+  position:absolute;inset:22px;border:1px dashed rgba(var(--planet-rgb),0.25);
+  border-radius:50%;animation:rotate 14s linear infinite reverse;
+  transition:border-color 0.5s;
+}
+.result-icon-wrap{
+  position:relative;width:110px;height:110px;
+  display:flex;align-items:center;justify-content:center;
+}
+.result-icon-glow{
+  position:absolute;inset:-12px;
+  background:radial-gradient(circle, rgba(var(--planet-rgb),0.55) 0%, transparent 70%);
+  filter:blur(14px);
+  animation:glow-pulse 3.2s ease-in-out infinite;
+  transition:background 0.5s;
+}
+.result-icon{
+  font-size:78px;position:relative;z-index:1;line-height:1;
+  filter:drop-shadow(0 4px 14px rgba(var(--planet-rgb),0.5));
+  animation:float 4.5s ease-in-out infinite;
+}
+
+@keyframes rotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes glow-pulse{0%,100%{opacity:0.65;transform:scale(1)}50%{opacity:1;transform:scale(1.18)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes twinkle{0%,100%{opacity:0.3}50%{opacity:1}}
+
 .result-pill{
-  display:inline-block;font-size:10.5px;letter-spacing:0.22em;
-  color:var(--planet);background:rgba(var(--planet-rgb),0.1);
-  border:1px solid rgba(var(--planet-rgb),0.3);
-  border-radius:16px;padding:5px 14px;margin-bottom:14px;font-weight:700;text-transform:uppercase;
+  position:relative;z-index:1;
+  display:inline-block;font-size:10.5px;letter-spacing:0.28em;
+  color:var(--planet);
+  background:linear-gradient(135deg, rgba(var(--planet-rgb),0.22), rgba(var(--planet-rgb),0.1));
+  border:1px solid rgba(var(--planet-rgb),0.45);
+  border-radius:18px;padding:6px 16px;margin-bottom:16px;font-weight:700;text-transform:uppercase;
+  box-shadow:0 2px 8px rgba(var(--planet-rgb),0.15);
   transition:all 0.5s;
 }
 .result-planet{
-  font-family:'Noto Serif KR',serif;font-size:34px;font-weight:600;
-  color:var(--planet);letter-spacing:0.03em;margin-bottom:2px;line-height:1.2;
-  transition:color 0.5s;
+  position:relative;z-index:1;
+  font-family:'Noto Serif KR',serif;font-size:42px;font-weight:700;
+  background:linear-gradient(135deg, var(--planet) 0%, rgba(var(--planet-rgb),0.72) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  letter-spacing:0.04em;margin-bottom:4px;line-height:1.15;
+  text-shadow:0 2px 12px rgba(var(--planet-rgb),0.25);
+  transition:all 0.5s;
 }
 .result-planet-en{
-  font-size:12px;color:var(--muted);letter-spacing:0.2em;
-  margin-bottom:18px;font-weight:500;
+  position:relative;z-index:1;
+  font-family:'Noto Serif KR',serif;font-size:11px;
+  color:var(--muted);letter-spacing:0.42em;
+  margin-bottom:14px;font-weight:500;text-transform:uppercase;
 }
-.result-divider{border:none;border-top:1px solid var(--border-hair);margin:18px 0;}
-.result-desc{font-size:14px;line-height:1.95;color:var(--text);text-align:left;letter-spacing:-0.005em;}
+.result-keyword{
+  position:relative;z-index:1;
+  display:inline-block;margin-bottom:6px;
+  font-size:13px;color:var(--planet);font-weight:600;
+  letter-spacing:0.05em;
+  transition:color 0.5s;
+}
+.result-keyword::before,.result-keyword::after{
+  content:'✦';display:inline-block;margin:0 10px;opacity:0.6;font-size:11px;
+  animation:twinkle 2.4s ease-in-out infinite;
+}
+.result-divider{
+  position:relative;z-index:1;
+  border:none;height:1px;margin:22px auto;max-width:60px;
+  background:linear-gradient(90deg, transparent, rgba(var(--planet-rgb),0.5), transparent);
+}
+.result-desc{
+  position:relative;z-index:1;
+  font-size:14px;line-height:1.95;color:var(--text);text-align:left;letter-spacing:-0.005em;
+}
 
+/* ═══════ 특징 카드 ═══════ */
 .traits-card{
   background:var(--surface);border:1px solid var(--border-soft);
-  border-radius:16px;padding:22px 20px;margin-bottom:14px;
+  border-radius:16px;padding:24px 20px 20px;margin-bottom:14px;
   box-shadow:var(--shadow-soft);
 }
-.traits-header-title{
-  font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;
-  color:var(--planet);margin-bottom:3px;transition:color 0.5s;
+.traits-header{
+  text-align:center;padding-bottom:16px;margin-bottom:18px;
+  border-bottom:1px solid var(--border-hair);
 }
-.traits-keyword{
-  font-size:11px;color:var(--muted);letter-spacing:0.12em;
-  margin-bottom:18px;font-weight:600;
+.traits-header-title{
+  font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;
+  color:var(--planet);margin-bottom:4px;transition:color 0.5s;
+}
+.traits-header-title::before,.traits-header-title::after{
+  content:'✦';display:inline-block;margin:0 10px;opacity:0.55;font-size:12px;
 }
 .trait-item{
-  text-align:left;margin-bottom:12px;padding:12px 14px;
-  background:#fbf5e7;border-left:3px solid var(--planet);
-  border-radius:0 10px 10px 0;transition:border-color 0.5s;
+  position:relative;text-align:left;margin-bottom:10px;padding:14px 16px 14px 44px;
+  background:linear-gradient(135deg, rgba(var(--planet-rgb),0.08), rgba(var(--planet-rgb),0.02));
+  border:1px solid rgba(var(--planet-rgb),0.18);
+  border-radius:12px;transition:all 0.3s;
+}
+.trait-item::before{
+  content:attr(data-idx);
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--planet);color:#fff;font-size:11px;font-weight:700;
+  box-shadow:0 2px 6px rgba(var(--planet-rgb),0.4);
+  transition:background 0.5s;
 }
 .trait-item:last-child{margin-bottom:0;}
+.trait-item:hover{transform:translateX(2px);border-color:rgba(var(--planet-rgb),0.35);}
 .trait-title{
-  font-size:13px;font-weight:700;color:var(--planet);
+  font-size:13.5px;font-weight:700;color:var(--planet);
   margin-bottom:4px;transition:color 0.5s;letter-spacing:-0.01em;
 }
 .trait-desc{font-size:13px;color:var(--text2);line-height:1.75;}
 .traits-cta{
-  border-radius:12px;padding:14px;font-size:12.5px;color:var(--muted);
+  border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--text2);
   line-height:1.75;text-align:center;margin-top:14px;transition:all 0.5s;
+  background:rgba(var(--planet-rgb),0.06);
+  border:1px solid rgba(var(--planet-rgb),0.18);
 }
 
 .share-card{
@@ -282,16 +388,25 @@ select.input option{background:#fff;color:var(--text);}
 
   <div class="result" id="result">
     <div class="result-hero" id="resultHero">
-      <span class="result-icon" id="resultIcon"></span>
-      <div class="result-pill" id="resultPill">도미넌트 행성</div>
+      <div class="result-orbit">
+        <div class="result-orbit-ring"></div>
+        <div class="result-orbit-ring-2"></div>
+        <div class="result-icon-wrap">
+          <div class="result-icon-glow"></div>
+          <span class="result-icon" id="resultIcon"></span>
+        </div>
+      </div>
+      <div class="result-pill" id="resultPill">DOMINANT PLANET</div>
       <div class="result-planet" id="resultPlanet"></div>
       <div class="result-planet-en" id="resultPlanetEn"></div>
+      <div class="result-keyword" id="resultKeyword"></div>
       <hr class="result-divider">
       <div class="result-desc" id="resultDesc"></div>
     </div>
     <div class="traits-card">
-      <div class="traits-header-title" id="traitsTitle"></div>
-      <div class="traits-keyword" id="traitsKeyword"></div>
+      <div class="traits-header">
+        <div class="traits-header-title" id="traitsTitle"></div>
+      </div>
       <div id="traitsList"></div>
       <div class="traits-cta" id="traitsCta"></div>
     </div>
@@ -496,25 +611,17 @@ async function calcDominant() {
     document.documentElement.style.setProperty('--planet-rgb', info.rgb);
 
     document.getElementById('resultIcon').textContent = info.emoji;
-    document.getElementById('resultPill').style.color = info.color;
-    document.getElementById('resultPill').style.borderColor = 'rgba(' + info.rgb + ',0.3)';
-    document.getElementById('resultPill').style.background = 'rgba(' + info.rgb + ',0.1)';
+    document.getElementById('resultPill').textContent = 'DOMINANT PLANET';
     document.getElementById('resultPlanet').textContent = info.name;
-    document.getElementById('resultPlanet').style.color = info.color;
     document.getElementById('resultPlanetEn').textContent = info.en;
+    document.getElementById('resultKeyword').textContent = info.keyword;
     document.getElementById('resultDesc').textContent = info.desc;
-    document.getElementById('resultHero').style.borderTopColor = info.color;
     document.getElementById('traitsTitle').textContent = info.name + '(' + info.en + ') 도미넌트의 특징';
-    document.getElementById('traitsTitle').style.color = info.color;
-    document.getElementById('traitsKeyword').textContent = info.keyword;
     var list = document.getElementById('traitsList'); list.innerHTML = '';
-    (info.traits || []).forEach(function(t) {
-      list.innerHTML += '<div class="trait-item" style="border-left-color:' + info.color + '"><div class="trait-title" style="color:' + info.color + '">' + t[0] + '</div><div class="trait-desc">' + t[1] + '</div></div>';
+    (info.traits || []).forEach(function(t, i) {
+      list.innerHTML += '<div class="trait-item" data-idx="' + (i+1) + '"><div class="trait-title">' + t[0] + '</div><div class="trait-desc">' + t[1] + '</div></div>';
     });
-    var cta = document.getElementById('traitsCta');
-    cta.textContent = info.cta;
-    cta.style.background = 'rgba(' + info.rgb + ',0.07)';
-    cta.style.border = '1px solid rgba(' + info.rgb + ',0.22)';
+    document.getElementById('traitsCta').textContent = info.cta;
 
     document.getElementById('result').style.display = 'block';
     setTimeout(function(){ document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
