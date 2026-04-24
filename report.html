@@ -996,7 +996,37 @@ const TYPE_CONFIG = {
   hidden_talent:{ title: '내 사주의 숨겨진 재능', orb: 200, emoji: '<i class="pi pi-sparkle"></i>', focus: '희신·용신·잠재 오행이 숨겨놓은 아직 발현되지 않은 능력',
     desc: '표면에 드러나지 않았지만 사주 구조 깊숙이 숨겨진 잠재 재능 — 희신 오행과 잠재 십신이 가리키는 아직 꽃피지 않은 능력' },
   totem:        { title: '나의 사주 수호 동물', orb: 200, emoji: '<i class="pi pi-globe"></i>', focus: '오행·일주·납음 기반 토템 동물과 수호 에너지의 의미',
-    desc: '오행·일주·납음이 가리키는 나의 수호 동물과 그 에너지의 의미 — 나를 보호하고 이끄는 자연의 기운' }
+    desc: '오행·일주·납음이 가리키는 나의 수호 동물과 그 에너지의 의미 — 나를 보호하고 이끄는 자연의 기운' },
+  vedic_nakshatra:{ title:'나의 낙샤트라 정체', orb:300, emoji:'<i class="pi pi-moon"></i>', focus:'27낙샤트라의 신화·상징·기질로 본 나의 영혼 별자리',
+    desc:'고대 인도 천문학이 말하는 나의 영혼 별자리 — 27낙샤트라 중 하나가 가리키는 기질·신화·운명 패턴의 뿌리' },
+  vedic_pada:{ title:'낙샤트라 파다 4세분', orb:300, emoji:'<i class="pi pi-compass"></i>', focus:'같은 낙샤트라도 파다(1~4)마다 달라지는 성향 세분 분석',
+    desc:'낙샤트라를 4등분한 "파다"로 보는 초정밀 기질 분석 — 같은 별자리 속 숨겨진 4가지 얼굴 중 나는 어느 쪽인가' },
+  vedic_dasha_life:{ title:'120년 다샤 인생 지도', orb:600, emoji:'<i class="pi pi-map"></i>', focus:'빔쇼타리 다샤 120년 전체 로드맵과 각 행성기의 테마',
+    desc:'태어나서 120세까지 흐르는 9행성 빔쇼타리 다샤 전체 — 과거·현재·미래의 행성기 로드맵과 각 시기의 삶 테마' },
+  vedic_yoga:{ title:'내 차트의 요가 발견', orb:500, emoji:'<i class="pi pi-diamond"></i>', focus:'라자/다나/판차마하푸루샤/구루찬달 등 요가 조합 심층 분석',
+    desc:'내 출생 차트에 숨겨진 강력한 요가(Yoga) 조합들 — 라자요가·다나요가·판차마하푸루샤가 말하는 타고난 축복' },
+  vedic_atmakaraka:{ title:'영혼의 행성 Atmakaraka', orb:400, emoji:'<i class="pi pi-star-fill"></i>', focus:'Jaimini 점성술의 영혼 행성(Atmakaraka)이 가리키는 이번 생의 핵심 주제',
+    desc:'출생시 경도 최고 행성 = 내 영혼이 가장 갈망하는 주제. Jaimini 시스템의 핵심인 Atmakaraka로 읽는 영혼의 숙제' },
+  vedic_karakamsha:{ title:'카라캄샤 영적 사명', orb:500, emoji:'<i class="pi pi-send"></i>', focus:'Navamsa(D9) 속 Atmakaraka 위치로 읽는 해탈·영적 완성의 방향',
+    desc:'Atmakaraka가 D9 나바암샤에서 어느 별자리에 있는가 — 이번 생 영적 완성과 해탈의 길을 가리키는 Karakamsha' },
+  vedic_sadesati:{ title:'사데사티 토성 7.5년 진단', orb:400, emoji:'<i class="pi pi-exclamation-triangle"></i>', focus:'토성이 달 별자리 앞·위·뒤 3하우스를 지나는 7.5년 시련기 분석',
+    desc:'토성이 달 별자리 주변 3하우스를 통과하는 7.5년 — 현재 내가 사데사티의 어느 단계에 있는지, 핵심 테마와 대응법' },
+  vedic_sandhi:{ title:'다샤 전환기 경보', orb:400, emoji:'<i class="pi pi-clock"></i>', focus:'마하·안타르 다샤 Sandhi(전환기) 구간의 에너지 혼란과 준비 전략',
+    desc:'다샤가 다음 행성기로 넘어가는 Sandhi 전환기 — 에너지가 흔들리는 구간의 정확한 시기와 무엇을 준비해야 하는가' },
+  vedic_ashtakavarga:{ title:'아쉬타카바르가 삶의 강약', orb:500, emoji:'<i class="pi pi-chart-bar"></i>', focus:'7행성의 베네픽 점수(0~56점)로 보는 삶의 각 영역 강약',
+    desc:'7행성이 각 별자리에서 받는 베네픽 점수로 삶의 영역별 강약을 수치로 진단 — 내 차트에서 강한 영역과 약한 영역' },
+  vedic_navamsa:{ title:'나바암샤 D9 결혼·운명', orb:500, emoji:'<i class="pi pi-users"></i>', focus:'D9 나바암샤 차트로 보는 결혼 상대·영적 성숙·잠재 운명',
+    desc:'출생 차트를 9등분한 "D9 나바암샤" — 결혼·배우자 유형·영적 성숙도·잠재 운명을 보는 베딕의 핵심 보조 차트' },
+  vedic_moon:{ title:'라시(월궁) 감정의 근원', orb:300, emoji:'<i class="pi pi-moon"></i>', focus:'달 별자리(라시)로 보는 내면 감정 구조와 무의식 패턴',
+    desc:'베딕에서 감정·어머니·내면을 관장하는 달이 있는 별자리 = 라시. 무의식 반응 패턴과 정서적 충족 조건' },
+  vedic_ascendant:{ title:'라그나 페르소나', orb:300, emoji:'<i class="pi pi-user"></i>', focus:'상승궁(라그나)로 본 외적 페르소나·몸·세상이 보는 나',
+    desc:'태어난 순간 동쪽 지평선에 떠오르던 별자리 = 라그나. 세상이 처음 보는 나의 얼굴과 몸, 본능적 반응 스타일' },
+  vedic_remedy:{ title:'행성별 개운(Upaya)', orb:400, emoji:'<i class="pi pi-heart"></i>', focus:'약하거나 어려운 행성을 강화하는 베딕 전통 개운법(만트라·색상·요일·봉사)',
+    desc:'내 차트에서 약한 행성을 찾아 전통 베딕 개운법(만트라·색상·요일·자선·보석)을 맞춤 처방 — 2500년 수행의 지혜' },
+  vedic_gemstone:{ title:'나의 행성 보석', orb:300, emoji:'<i class="pi pi-crown"></i>', focus:'Atmakaraka와 이로운 행성이 가리키는 베딕 전통 보석 처방',
+    desc:'영혼의 행성 Atmakaraka와 이로운 행성에 대응하는 9가지 베딕 보석 중 — 나에게 맞는 보석과 착용법' },
+  vedic_muhurta:{ title:'7일 길시 캘린더', orb:200, emoji:'<i class="pi pi-calendar-plus"></i>', focus:'이번주 7일 각 날의 Tithi·Nakshatra·Muhurta 길흉 시간대',
+    desc:'오늘부터 7일간 매일의 Tithi(월상)·Nakshatra·행동별 길시를 베딕 전통 Muhurta 시스템으로 안내' }
 };
 
 const TYPE_COLORS = {
@@ -1031,7 +1061,22 @@ const TYPE_COLORS = {
   love_history: { main:'#6a3a3a', soft:'rgba(106,58,58,0.12)', border:'rgba(106,58,58,0.30)' },
   era:          { main:'#5a4a2a', soft:'rgba(90,74,42,0.12)',   border:'rgba(90,74,42,0.30)' },
   hidden_talent:{ main:'#3a4a5a', soft:'rgba(58,74,90,0.12)',   border:'rgba(58,74,90,0.30)' },
-  totem:        { main:'#3a5a3a', soft:'rgba(58,90,58,0.12)',   border:'rgba(58,90,58,0.30)' }
+  totem:        { main:'#3a5a3a', soft:'rgba(58,90,58,0.12)',   border:'rgba(58,90,58,0.30)' },
+  vedic_nakshatra:   { main:'#8a3a6a', soft:'rgba(138,58,106,0.12)', border:'rgba(138,58,106,0.32)' },
+  vedic_pada:        { main:'#3a6a8a', soft:'rgba(58,106,138,0.12)', border:'rgba(58,106,138,0.32)' },
+  vedic_dasha_life:  { main:'#6a3a8a', soft:'rgba(106,58,138,0.12)', border:'rgba(106,58,138,0.32)' },
+  vedic_yoga:        { main:'#a67500', soft:'rgba(166,117,0,0.12)',  border:'rgba(166,117,0,0.32)' },
+  vedic_atmakaraka:  { main:'#5a3a8a', soft:'rgba(90,58,138,0.12)',  border:'rgba(90,58,138,0.32)' },
+  vedic_karakamsha:  { main:'#3a5a8a', soft:'rgba(58,90,138,0.12)',  border:'rgba(58,90,138,0.32)' },
+  vedic_sadesati:    { main:'#4a4a5a', soft:'rgba(74,74,90,0.12)',   border:'rgba(74,74,90,0.32)' },
+  vedic_sandhi:      { main:'#8a5a3a', soft:'rgba(138,90,58,0.12)',  border:'rgba(138,90,58,0.32)' },
+  vedic_ashtakavarga:{ main:'#2e7d60', soft:'rgba(46,125,96,0.12)',  border:'rgba(46,125,96,0.32)' },
+  vedic_navamsa:     { main:'#b85050', soft:'rgba(184,80,80,0.12)',  border:'rgba(184,80,80,0.32)' },
+  vedic_moon:        { main:'#5a6a8a', soft:'rgba(90,106,138,0.12)', border:'rgba(90,106,138,0.32)' },
+  vedic_ascendant:   { main:'#8a6a3a', soft:'rgba(138,106,58,0.12)', border:'rgba(138,106,58,0.32)' },
+  vedic_remedy:      { main:'#3a8a6a', soft:'rgba(58,138,106,0.12)', border:'rgba(58,138,106,0.32)' },
+  vedic_gemstone:    { main:'#6a4a9a', soft:'rgba(106,74,154,0.12)', border:'rgba(106,74,154,0.32)' },
+  vedic_muhurta:     { main:'#4a7a8a', soft:'rgba(74,122,138,0.12)', border:'rgba(74,122,138,0.32)' }
 };
 
 function applyTypeTheme() {
@@ -1259,6 +1304,111 @@ const TYPE_SECTIONS = {
     { name:'수호 동물이 지켜주는 영역', chars: 400 },
     { name:'수호 동물과 나의 관계', chars: 400 },
     { name:'수호 동물 에너지 활용법', chars: 350 }
+  ],
+  vedic_nakshatra: [
+    { name:'나의 낙샤트라 한 줄 정체', chars: 300 },
+    { name:'낙샤트라 신화와 상징', chars: 500 },
+    { name:'낙샤트라가 가리키는 기질과 재능', chars: 500 },
+    { name:'반복되는 삶의 패턴과 약점', chars: 450 },
+    { name:'낙샤트라 에너지를 살리는 실천법', chars: 350 }
+  ],
+  vedic_pada: [
+    { name:'나의 낙샤트라+파다 정밀 프로필', chars: 300 },
+    { name:'같은 낙샤트라 속 4가지 얼굴', chars: 500 },
+    { name:'파다로 보는 세분된 성향', chars: 500 },
+    { name:'D9에서 드러나는 숨은 성향', chars: 450 },
+    { name:'이 파다를 살리는 방향', chars: 350 }
+  ],
+  vedic_dasha_life: [
+    { name:'120년 다샤 인생 지도 개요', chars: 300 },
+    { name:'이미 지나온 다샤와 그 영향', chars: 500 },
+    { name:'현재 다샤 — 지금 무엇이 활성되는가', chars: 500 },
+    { name:'다음 다샤 — 3년·10년·20년 전망', chars: 500 },
+    { name:'다샤 흐름을 탄 인생 전략', chars: 400 }
+  ],
+  vedic_yoga: [
+    { name:'내 차트의 요가 핵심 요약', chars: 300 },
+    { name:'라자요가 — 권력·명예의 조합', chars: 500 },
+    { name:'다나요가 — 부와 풍요의 조합', chars: 500 },
+    { name:'특수 요가 (판차마하푸루샤·구루찬달 등)', chars: 450 },
+    { name:'요가를 발현시키는 실천 전략', chars: 350 }
+  ],
+  vedic_atmakaraka: [
+    { name:'영혼의 행성 Atmakaraka 선언', chars: 300 },
+    { name:'이 행성이 가리키는 영혼의 숙제', chars: 500 },
+    { name:'현재 삶에서 드러나는 Atmakaraka', chars: 500 },
+    { name:'피하려 할수록 더 만나는 주제', chars: 450 },
+    { name:'Atmakaraka를 끌어안는 법', chars: 350 }
+  ],
+  vedic_karakamsha: [
+    { name:'Karakamsha 영적 사명 선언', chars: 300 },
+    { name:'D9 속 Atmakaraka 별자리 의미', chars: 500 },
+    { name:'이번 생 해탈의 방향', chars: 500 },
+    { name:'영적 성숙을 막는 패턴', chars: 450 },
+    { name:'Karakamsha를 따르는 실천', chars: 350 }
+  ],
+  vedic_sadesati: [
+    { name:'사데사티 현재 단계 진단', chars: 300 },
+    { name:'이 단계의 핵심 테마와 시련', chars: 500 },
+    { name:'전체 7.5년 흐름과 시작·종료', chars: 500 },
+    { name:'사데사티가 말하는 내면 성숙 과제', chars: 450 },
+    { name:'토성 에너지를 다루는 전통 대응법', chars: 350 }
+  ],
+  vedic_sandhi: [
+    { name:'현재 다샤 전환기 상태', chars: 300 },
+    { name:'마하다샤 종료·다음 행성기 진단', chars: 500 },
+    { name:'안타르다샤 전환의 단기 테마', chars: 500 },
+    { name:'Sandhi 구간에 흔들리는 영역', chars: 450 },
+    { name:'전환기를 매끄럽게 넘기는 전략', chars: 350 }
+  ],
+  vedic_ashtakavarga: [
+    { name:'아쉬타카바르가 총점과 핵심 요약', chars: 300 },
+    { name:'행성별 점수 — 강한 축복과 약한 과제', chars: 500 },
+    { name:'삶의 영역별 강약 진단', chars: 500 },
+    { name:'약점 영역을 올리는 전략', chars: 450 },
+    { name:'강점 영역을 극대화하는 법', chars: 350 }
+  ],
+  vedic_navamsa: [
+    { name:'D9 나바암샤 차트 핵심', chars: 300 },
+    { name:'금성 D9 — 결혼 상대와 관계 특성', chars: 500 },
+    { name:'목성 D9 — 영적 성숙과 지혜', chars: 500 },
+    { name:'D1 vs D9 차이 — 겉과 속', chars: 450 },
+    { name:'D9가 가리키는 운명의 방향', chars: 350 }
+  ],
+  vedic_moon: [
+    { name:'나의 라시(월궁) 핵심', chars: 300 },
+    { name:'라시가 말하는 무의식 감정 패턴', chars: 500 },
+    { name:'정서적 충족의 조건과 집착', chars: 500 },
+    { name:'어머니·가족과의 에너지 구조', chars: 450 },
+    { name:'감정을 건강하게 다루는 법', chars: 350 }
+  ],
+  vedic_ascendant: [
+    { name:'나의 라그나(상승궁) 핵심', chars: 300 },
+    { name:'세상이 처음 보는 나의 얼굴', chars: 500 },
+    { name:'라그나의 몸·체질·본능', chars: 500 },
+    { name:'라그나 로드 행성이 가리키는 방향', chars: 450 },
+    { name:'라그나 페르소나를 살리는 법', chars: 350 }
+  ],
+  vedic_remedy: [
+    { name:'나에게 가장 시급한 행성 처방', chars: 300 },
+    { name:'약한 행성 3가지와 영향', chars: 500 },
+    { name:'행성별 만트라·색상·요일 처방', chars: 500 },
+    { name:'자선·봉사로 풀어내는 업(業)', chars: 450 },
+    { name:'7일 실천 루틴', chars: 350 }
+  ],
+  vedic_gemstone: [
+    { name:'나에게 맞는 주 보석', chars: 300 },
+    { name:'Atmakaraka 행성과 대응 보석', chars: 500 },
+    { name:'이로운 보석 2순위·3순위', chars: 500 },
+    { name:'피해야 할 보석과 이유', chars: 450 },
+    { name:'보석 착용·정화·관리법', chars: 350 }
+  ],
+  vedic_muhurta: [
+    { name:'이번주 에너지 전체 개관', chars: 300 },
+    { name:'요일별 길시·흉시 캘린더', chars: 500 },
+    { name:'행동별(계약·여행·면접) 최적 타이밍', chars: 500 },
+    { name:'이번주 특이 Tithi·Nakshatra 주의', chars: 400 },
+    { name:'이번주 한 줄 행동 지침', chars: 300 }
   ]
 };
 
@@ -2404,6 +2554,351 @@ const TYPE_DETAIL = {
       '이 수호 동물과 이 사람의 관계. 동물의 에너지를 이미 삶에서 어떤 방식으로 쓰고 있는지, 더 의식적으로 연결하는 법.',
       '수호 동물 에너지를 일상에서 활용하는 구체적 방법. 색상·방위·행동·환경에서 수호 동물 에너지를 강화하는 3가지 방법.'
     ]
+  },
+  vedic_nakshatra: {
+    emoji:'<i class="pi pi-moon"></i>',
+    subtitle:'고대 인도가 말하는 나의 영혼 별자리',
+    desc:'달의 27정거(낙샤트라)는 베딕 점성술의 뿌리입니다. 태어난 순간 달이 있던 낙샤트라가 당신의 기질·신화·영혼 주제를 결정합니다.',
+    recommend:['사주만으로 설명 안 되는 부분이 궁금한 분','인도 점성술 기반 정밀 분석을 원하는 분','영혼의 주제와 신화적 뿌리가 궁금한 분','다른 리포트에서 채워지지 않은 깊이를 찾는 분'],
+    sectionDesc:['낙샤트라 이름과 한 줄 정체','낙샤트라의 신화와 상징적 의미','타고난 기질·재능·직관력','반복되는 인생 패턴과 약점','이 낙샤트라 에너지를 살리는 법'],
+    preview:'27낙샤트라는 각각 고유한 신화·지배 행성·동물·나무·색상을 가집니다. 예를 들어 아쉬위니는 쌍둥이 치유신, 로히니는 달의 사랑받는 아내. 당신의 낙샤트라는 어느 이야기입니까?',
+    faq:[
+      {q:'사주와 무엇이 다른가요?', a:'사주는 태양+달력 기반, 낙샤트라는 달 위치 기반입니다. 사주가 "구조"라면 낙샤트라는 "영혼의 색깔"을 보여줍니다.'},
+      {q:'정확한 출생 시간이 필요한가요?', a:'달은 하루에 약 12~14도 이동하므로 정확한 시간이 있을수록 정밀합니다. 모르면 정오 기준 근사 분석이 가능합니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간 분석하며 1~2분 소요됩니다.'},
+      {q:'가족·친구 사주로 봐도 되나요?', a:'네, 타인의 생년월일시로도 가능합니다.'}
+    ],
+    engines:['베딕','사주'],
+    keyQuestions:['나의 낙샤트라는?','낙샤트라가 가리키는 신화와 기질은?','반복되는 삶의 패턴은?','이 에너지를 어떻게 살리는가?'],
+    sectionDetail:[
+      '낙샤트라 이름과 지배 행성·상징을 한 줄로. "당신은 ~의 사람입니다" 형식의 선언.',
+      '그 낙샤트라의 신화(아쉬위니=치유의 쌍둥이, 로히니=달의 사랑, 크리티카=불의 칼 등)와 상징 동물/나무/색상의 의미.',
+      '낙샤트라가 부여한 타고난 기질·재능·직관력. 사주 일주와 교차해 두 시스템이 같이 가리키는 핵심 기질.',
+      '이 낙샤트라에서 반복되는 삶의 패턴과 약점. 유사한 낙샤트라 사람들이 공통으로 겪는 과제.',
+      '낙샤트라 지배 행성의 에너지를 살리는 일상 실천 — 색상·요일·행동·만트라 중 2~3가지.'
+    ]
+  },
+  vedic_pada: {
+    emoji:'<i class="pi pi-compass"></i>',
+    subtitle:'같은 별자리 속 네 가지 얼굴',
+    desc:'27낙샤트라는 각각 4개의 파다(1~4)로 나뉩니다. 같은 낙샤트라여도 파다마다 지배 리시·원소·D9 별자리가 달라 전혀 다른 성향이 나옵니다.',
+    recommend:['이미 낙샤트라를 알지만 더 깊이 들어가고 싶은 분','나바암샤(D9) 기반 초정밀 분석을 원하는 분','같은 낙샤트라 사람과 나를 구별하고 싶은 분'],
+    sectionDesc:['나의 낙샤트라+파다 프로필','같은 낙샤트라 속 4가지 얼굴','나의 파다만의 세분된 성향','D9에서 드러나는 숨은 성향','파다 에너지 실천 방향'],
+    preview:'예를 들어 같은 푸나르바수 낙샤트라라도 파다1(양자리 D9)은 불같은 탐험가, 파다4(게자리 D9)는 깊은 감수성의 보호자입니다. 파다는 낙샤트라 분석의 정점입니다.',
+    faq:[
+      {q:'파다가 왜 중요한가요?', a:'파다는 D9 나바암샤와 연결돼 영혼의 세밀한 색조를 가리킵니다. 낙샤트라만으로 놓친 차이를 채워줍니다.'},
+      {q:'시간을 몰라도 되나요?', a:'달은 파다를 약 1시간에 하나씩 지나므로 출생 시간이 중요합니다. 가능한 정확한 시간을 입력하세요.'},
+      {q:'낙샤트라 리포트와 뭐가 달라요?', a:'낙샤트라가 "별자리"라면 파다는 그 안의 "사분면"입니다. 훨씬 세밀한 개인차를 봅니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕'],
+    keyQuestions:['나의 파다는 몇인가?','파다가 가리키는 세분 성향은?','같은 낙샤트라 사람들과 나의 차이는?','D9에서 드러나는 숨은 면은?'],
+    sectionDetail:[
+      '낙샤트라와 파다 번호, 파다가 대응하는 D9 별자리를 한 줄 선언. "당신은 ~낙샤트라의 파다 ~번, D9 ~별자리 사람입니다."',
+      '같은 낙샤트라의 4개 파다가 각각 어떤 얼굴을 가지는지 전체 개관. 파다1~4의 키워드.',
+      '나의 파다만이 가진 세분 성향과 기질. D9 별자리의 지배 행성과 원소로 보강.',
+      'D9가 드러내는 결혼·영적 주제·내면 성향. 겉(D1)과 안(D9)의 차이.',
+      '이 파다 에너지를 살리는 방향 — 직업·관계·일상 선택에 반영할 3가지.'
+    ]
+  },
+  vedic_dasha_life: {
+    emoji:'<i class="pi pi-map"></i>',
+    subtitle:'태어나서 120세까지의 행성기 로드맵',
+    desc:'빔쇼타리 다샤는 태어난 낙샤트라에 따라 9개 행성이 총 120년에 걸쳐 순서대로 활성화되는 시스템입니다. 나의 전체 인생을 다샤 지도 하나로 조망합니다.',
+    recommend:['지금 이 대운이 언제 끝나는지 궁금한 분','미래 10~20년의 큰 흐름을 보고 싶은 분','다샤 전체 지도를 통해 장기 계획을 세우고 싶은 분'],
+    sectionDesc:['120년 다샤 인생 지도 개요','이미 지나온 다샤와 그 영향','현재 다샤 — 지금 무엇이 활성되는가','다음 다샤 — 3·10·20년 전망','다샤를 탄 인생 전략'],
+    preview:'태양기 6년, 달기 10년, 화성기 7년… 순서가 태어난 낙샤트라마다 다릅니다. 9행성이 각자의 시간을 선물처럼 풀어놓는 것이 빔쇼타리 다샤입니다.',
+    faq:[
+      {q:'다샤와 사주 대운은 뭐가 다른가요?', a:'사주 대운은 10년 단위 60갑자 순환, 다샤는 9행성이 각 다른 길이로 흐릅니다. 두 시스템은 서로를 보완합니다.'},
+      {q:'안타르다샤도 포함되나요?', a:'이 리포트는 마하다샤(큰 행성기) 전체 흐름에 집중하고 현재 안타르다샤는 보조 언급합니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'},
+      {q:'예측이 맞나요?', a:'다샤는 행성기의 "테마"를 가리킵니다. 정확한 사건 예언이 아닌, 시기별 활성 에너지 참고용으로 쓰세요.'}
+    ],
+    engines:['베딕','사주'],
+    keyQuestions:['내 다샤 순서는?','이미 지나온 행성기의 영향은?','현재 다샤에서 활성되는 주제는?','앞으로 20년의 큰 흐름은?'],
+    sectionDetail:[
+      '빔쇼타리 다샤 9행성 순서, 각 길이(6~20년), 이 사주의 출발 행성기와 현재까지 흐름 개관.',
+      '이미 지나온 마하다샤들이 이 사람 인생에 남긴 흔적. 어릴 때 어떤 행성기를 보냈고 어떤 기질이 형성됐는지.',
+      '현재 마하다샤 행성의 의미와 이 시기에 활성화되는 삶의 주제. 안타르다샤 조합으로 세부 색조.',
+      '다음 마하다샤와 그 이후 — 3년·10년·20년 단위로 무엇이 일어날 가능성이 높은지. 각 행성기의 테마.',
+      '다샤 흐름을 탄 장기 전략. 지금 심을 씨앗, 다음 행성기에 거둘 과실, 피해야 할 충동.'
+    ]
+  },
+  vedic_yoga: {
+    emoji:'<i class="pi pi-diamond"></i>',
+    subtitle:'차트에 숨겨진 축복의 조합',
+    desc:'베딕에서 "요가"는 행성들의 특정 조합이 만드는 강력한 축복·재앙 패턴입니다. 라자요가(권력)·다나요가(부)·판차마하푸루샤(위대한 인물) 등 수백 가지 요가 중 내 차트에 있는 것들을 찾아냅니다.',
+    recommend:['타고난 축복을 확인하고 싶은 분','내 차트의 숨겨진 힘이 궁금한 분','요가 기반 정밀 분석을 원하는 분'],
+    sectionDesc:['요가 핵심 요약','라자요가 — 권력·명예','다나요가 — 부와 풍요','특수 요가 (판차마하푸루샤 등)','요가를 발현시키는 전략'],
+    preview:'행성이 제자리(스와크셰트라)에 앉거나, 두 행성이 상호 교환(파리바르타나)하거나, 케마드루마·가자케사리 같은 특수 조합 — 이 모두가 요가입니다.',
+    faq:[
+      {q:'요가가 있다고 다 이루나요?', a:'요가는 "축복의 씨앗"입니다. 그 행성이 활성되는 다샤 시기에 결실이 옵니다. 시기가 중요합니다.'},
+      {q:'나쁜 요가도 있나요?', a:'네, 구루찬달·케마드루마 등 주의해야 할 요가도 있습니다. 이 리포트는 주요 긍정 요가에 집중합니다.'},
+      {q:'요가가 없는 사람도 있나요?', a:'거의 모든 차트에 크고 작은 요가가 있습니다. 강도와 발현 시기 차이일 뿐입니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕'],
+    keyQuestions:['내 차트에 어떤 요가가 있나?','라자요가/다나요가의 강도는?','언제 발현되는가?','요가를 활성화하는 법은?'],
+    sectionDetail:[
+      '내 차트에서 감지된 주요 요가들의 목록과 핵심 메시지 3줄 요약.',
+      '라자요가 — 케드라와 트리코나 하우스 로드의 결합이 만드는 권력·명예·사회적 성취 잠재력.',
+      '다나요가 — 2·5·9·11하우스 로드 조합이 만드는 재물·풍요 축복.',
+      '판차마하푸루샤(루챠카·바드라·함사·말라비야·샤샤), 구루찬달, 가자케사리 등 특수 요가 진단.',
+      '요가를 발현시키는 법 — 해당 행성의 다샤 시기, 강화 개운법, 구체적 생활 습관 3가지.'
+    ]
+  },
+  vedic_atmakaraka: {
+    emoji:'<i class="pi pi-star-fill"></i>',
+    subtitle:'영혼이 가장 갈망하는 주제',
+    desc:'Jaimini 점성술에서 출생 당시 경도(도수)가 가장 높은 행성 = Atmakaraka(영혼의 행성). 이 행성이 이번 생에 영혼이 가장 깊이 탐구하고 싶어하는 주제를 가리킵니다.',
+    recommend:['이번 생의 영혼 주제가 궁금한 분','Jaimini 시스템 기반 정밀 분석을 원하는 분','반복적으로 마주치는 주제의 뿌리가 궁금한 분'],
+    sectionDesc:['Atmakaraka 행성 선언','이 행성이 가리키는 영혼의 숙제','현재 삶에서 드러나는 모습','피하려 할수록 더 만나는 주제','Atmakaraka를 끌어안는 법'],
+    preview:'Atmakaraka는 단순한 "강한 행성"이 아닙니다. 영혼이 스스로 선택해서 온 주제입니다. 태양이면 자아·권위, 달이면 감정·사랑, 토성이면 책임·한계 — 피할 수 없고 피해서도 안 되는 주제.',
+    faq:[
+      {q:'Atmakaraka가 약하면 나쁜가요?', a:'아닙니다. 영혼의 주제이지 강도의 문제가 아닙니다. 약할수록 더 큰 숙제일 수 있습니다.'},
+      {q:'Karakamsha와 어떻게 다른가요?', a:'Atmakaraka는 "어떤 행성이 영혼 주제인가", Karakamsha는 "그 행성이 D9에서 어디 있는가"입니다. 쌍으로 봅니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'},
+      {q:'시간을 모르면요?', a:'Atmakaraka는 행성 도수 기반이라 시간 정확도가 중요합니다. 대략적인 시간도 분석은 가능합니다.'}
+    ],
+    engines:['베딕','사주'],
+    keyQuestions:['내 Atmakaraka 행성은?','이 행성이 가리키는 영혼 주제는?','어떻게 이미 삶에서 드러나는가?','끌어안으려면 무엇을 해야 하는가?'],
+    sectionDetail:[
+      'Atmakaraka 행성 이름과 별자리·도수를 한 줄로. "당신의 영혼은 ~행성입니다" 선언.',
+      '이 행성이 가리키는 영혼의 숙제. 태양=자아/권위, 달=정서/양육, 화성=의지/용기, 수성=지성, 목성=지혜, 금성=사랑·예술, 토성=책임·한계, 라후=집착, 케투=해방.',
+      '이 주제가 현재 삶에서 어떤 방식으로 드러나고 있는지. 반복되는 관계·직업·감정 패턴으로.',
+      '피하려 할수록 더 큰 강도로 돌아오는 이유. 영혼 주제는 회피가 아니라 통합이 열쇠.',
+      'Atmakaraka를 끌어안는 구체적 실천 — 그 행성이 상징하는 자질을 삶에 들이는 3가지 방법.'
+    ]
+  },
+  vedic_karakamsha: {
+    emoji:'<i class="pi pi-send"></i>',
+    subtitle:'D9가 가리키는 해탈의 방향',
+    desc:'Atmakaraka가 나바암샤(D9) 차트에서 어느 별자리에 있는가 = Karakamsha. Jaimini 점성술이 이번 생 영적 완성과 해탈의 방향을 읽는 핵심 지표입니다.',
+    recommend:['영적 성장의 방향을 찾는 분','이번 생의 깊은 의미를 탐구하는 분','명상·구도·수행에 관심이 있는 분'],
+    sectionDesc:['Karakamsha 선언','D9 별자리가 가리키는 의미','이번 생 해탈의 방향','영적 성숙을 막는 패턴','Karakamsha를 따르는 실천'],
+    preview:'Karakamsha 별자리의 성질·지배 행성·7번째 하우스는 영혼이 이번 생에 향해야 할 방향을 가리킵니다. 예를 들어 사자자리면 창조·표현, 물고기자리면 해탈·봉사.',
+    faq:[
+      {q:'종교가 없어도 의미가 있나요?', a:'네, Karakamsha는 특정 종교가 아닌 "영혼이 향하는 방향"입니다. 꼭 명상·요가가 아니어도 삶 전반에 적용됩니다.'},
+      {q:'Atmakaraka 리포트와 뭐가 다른가요?', a:'Atmakaraka가 "영혼의 주제"라면 Karakamsha는 "그 주제의 해탈 방향"입니다. 짝으로 보면 완성됩니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'},
+      {q:'지금 바로 따라야 하나요?', o:'A: 참고 방향입니다. 강요가 아닌 "영혼이 편하게 가는 길"로 이해하세요.', a:'참고 방향입니다. 강요가 아닌 영혼이 편하게 가는 길로 이해하세요.'}
+    ],
+    engines:['베딕'],
+    keyQuestions:['내 Karakamsha 별자리는?','해탈과 영적 성숙의 방향은?','무엇이 이 길을 막는가?','어떻게 따라야 하는가?'],
+    sectionDetail:[
+      'Karakamsha 별자리 선언과 의미. "당신의 영혼은 D9의 ~별자리에서 완성을 기다립니다."',
+      'D9 별자리의 성질·지배 행성·원소가 가리키는 영적 주제. 이 별자리에 있는 다른 행성도 함께 해석.',
+      '이번 생 해탈·영적 성숙의 구체적 방향. 직업·관계·수행·봉사 중 어느 영역에서 풀리는지.',
+      '영적 성숙을 막는 내면 패턴. 회피·집착·두려움의 구체적 형태와 원인.',
+      'Karakamsha를 따르는 구체적 실천 — 일상·관계·수행에 반영할 3가지.'
+    ]
+  },
+  vedic_sadesati: {
+    emoji:'<i class="pi pi-exclamation-triangle"></i>',
+    subtitle:'토성 7.5년 시련기 진단',
+    desc:'토성(Saturn)이 달 별자리의 12·1·2번째 하우스를 통과하는 7.5년을 Sade Sati라 부릅니다. 인도 전통에서 가장 중요한 시험기 — 지금 내가 어느 단계에 있는지 진단합니다.',
+    recommend:['요즘 힘든 시기가 길게 느껴지는 분','토성의 영향이 궁금한 분','사데사티 진입·종료 시점을 알고 싶은 분'],
+    sectionDesc:['사데사티 현재 단계','이 단계의 시련과 테마','전체 7.5년 흐름','내면 성숙 과제','전통 대응법'],
+    preview:'사데사티는 1단계(12하우스, 상실·정리), 2단계(1하우스, 자아 시험 — 최강), 3단계(2하우스, 재정·가족 시련)로 나뉩니다. 각 2.5년, 총 7.5년.',
+    faq:[
+      {q:'사데사티는 나쁜 시기인가요?', a:'꼭 나쁜 것만은 아닙니다. 쌓인 업(業)을 정리하는 과정 — 성장의 시련입니다. 회피보다 통합이 열쇠.'},
+      {q:'지금 사데사티가 아니면 어떻게 되나요?', a:'비활성이어도 토성 트랜짓 상태를 진단하고 언제 진입할지 안내합니다.'},
+      {q:'돌파할 방법이 있나요?', a:'토성 개운법(검은색 기부, 토요일 봉사, 하누만 만트라 등) 전통 대응법을 안내합니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕','사주'],
+    keyQuestions:['현재 사데사티 단계는?','핵심 시험 주제는?','시작과 종료 시점은?','어떻게 대응하는가?'],
+    sectionDetail:[
+      '현재 사데사티 활성 여부와 정확한 단계(1·2·3단계 또는 비활성). 토성 위치와 달로부터 몇 번째 하우스.',
+      '현재 단계의 핵심 시련 테마와 흔한 증상. 이 시기에 반복적으로 만나는 도전.',
+      '전체 7.5년 흐름 — 시작일, 각 단계 전환, 종료일. 이미 지나온 구간과 남은 구간.',
+      '사데사티가 부여하는 내면 성숙 과제. 무엇을 내려놓고 무엇을 깊게 하라는 요청인가.',
+      '토성 에너지를 다루는 전통 베딕 대응법 — 자선·만트라·요일 수행 등 구체적 3가지.'
+    ]
+  },
+  vedic_sandhi: {
+    emoji:'<i class="pi pi-clock"></i>',
+    subtitle:'다샤가 흔들리는 전환 구간',
+    desc:'마하다샤와 안타르다샤의 끝자락·시작자락은 "Sandhi(연결부)"라 불리며, 에너지가 불안정해지는 전환 구간입니다. 현재 내가 Sandhi에 있는지 진단합니다.',
+    recommend:['최근 이유 없이 흔들리는 분','다샤 전환 시기가 궁금한 분','큰 결정을 앞두고 타이밍을 보고 싶은 분'],
+    sectionDesc:['현재 전환기 상태','마하다샤 종료·다음 행성기','안타르다샤 전환의 단기 테마','Sandhi에 흔들리는 영역','매끄럽게 넘기는 전략'],
+    preview:'Sandhi 구간은 보통 마하다샤 마지막·첫 6개월에서 특히 강하게 나타납니다. 방향 상실·정리 욕구·새 시작 불안이 동시에 오는 시기.',
+    faq:[
+      {q:'Sandhi는 나쁜 시기인가요?', a:'나쁜 것이 아니라 "전환"입니다. 과거 행성기 정리 + 새 행성기 준비가 동시에 일어나는 집중 구간.'},
+      {q:'지금 Sandhi가 아니면요?', a:'다음 전환이 언제인지, 그때 무엇을 준비할지 미리 안내합니다.'},
+      {q:'큰 결정을 해도 되나요?', a:'Sandhi 구간엔 장기 계약·결혼·큰 투자 같은 확정적 결정은 한 번 더 숙고하라는 전통 권고가 있습니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕','사주'],
+    keyQuestions:['현재 Sandhi인가?','마하다샤 종료 시점은?','안타르다샤의 단기 테마는?','이 구간의 전략은?'],
+    sectionDetail:[
+      '현재 마하다샤 잔여 개월, 안타르다샤 잔여 개월, Sandhi 활성 여부를 정확한 숫자로.',
+      '마하다샤 종료 시점과 다음 행성기 테마. 과거 행성기가 남긴 과제와 다음 행성기가 요구하는 준비.',
+      '안타르다샤 전환이 만드는 단기 테마의 변화. 3~12개월 단위로 무엇이 바뀌는가.',
+      'Sandhi에 특히 흔들리는 삶의 영역(재물·관계·건강·커리어 중). 그 이유를 행성 교차로 설명.',
+      'Sandhi를 매끄럽게 넘기는 3가지 전략 — 결정 보류 원칙, 심신 관리, 준비 행동.'
+    ]
+  },
+  vedic_ashtakavarga: {
+    emoji:'<i class="pi pi-chart-bar"></i>',
+    subtitle:'행성이 별자리마다 받는 베네픽 점수',
+    desc:'Ashtakavarga는 7행성 각각이 12별자리에서 받는 베네픽 점수(0~56)를 계산해 삶의 영역별 강약을 수치화하는 베딕 정밀 기법입니다.',
+    recommend:['내 삶의 강·약 영역을 수치로 알고 싶은 분','직업·결혼·재물 영역별 강도가 궁금한 분','정량적 베딕 분석을 원하는 분'],
+    sectionDesc:['아쉬타카바르가 총점 요약','행성별 점수 — 축복과 과제','삶의 영역별 강약','약점 영역을 올리는 전략','강점 극대화 전략'],
+    preview:'한 별자리가 30점 이상이면 매우 강함, 25~30 보통, 20 미만 약함. 7행성 총합으로 그 하우스(=삶의 영역)가 얼마나 축복받는지가 드러납니다.',
+    faq:[
+      {q:'점수가 낮으면 어떻게 되나요?', a:'"약하다"지 "나쁘다"가 아닙니다. 그 영역은 더 의식적 노력과 개운법이 필요합니다.'},
+      {q:'100점 만점인가요?', a:'각 행성은 0~8점을 12별자리에 분배, 총합은 337점(전체 기준점). 별자리당 30+이면 매우 강함.'},
+      {q:'다른 분석과 연결되나요?', a:'네, 이 점수는 라그나·달 별자리·다샤와 교차해 언제 그 영역이 활성되는지 판단합니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕'],
+    keyQuestions:['내 아쉬타카바르가 총점과 분포는?','강한 영역과 약한 영역은?','약점은 어떻게 올리나?','강점은 어떻게 극대화하나?'],
+    sectionDetail:[
+      '7행성의 총점(SAV)과 전체 강도 요약. 강한 별자리 상위 3, 약한 별자리 하위 3을 수치로.',
+      '행성별 점수 해석 — 태양(자아/권위), 달(감정/어머니), 화성(의지), 수성(지성), 목성(확장), 금성(사랑), 토성(책임). 각 행성의 총점 의미.',
+      '삶의 영역별 강약 — 1하우스(몸/자아), 7하우스(결혼), 10하우스(커리어), 11하우스(수입) 등 주요 하우스의 아쉬타카바르가 점수 해석.',
+      '약한 하우스·행성의 개운 전략. 점수가 낮다는 것이 무엇을 의미하고 어떻게 보완하는가.',
+      '강한 영역을 극대화하는 법. 점수가 높은 영역은 상대적 노력으로 큰 결실 — 구체적 활용 전략.'
+    ]
+  },
+  vedic_navamsa: {
+    emoji:'<i class="pi pi-users"></i>',
+    subtitle:'D9가 보여주는 결혼과 영적 운명',
+    desc:'나바암샤(Navamsa, D9)는 출생 차트(D1)를 9등분한 보조 차트로, 결혼·배우자 유형·영적 성숙·잠재 운명을 보는 베딕의 핵심 차트입니다.',
+    recommend:['결혼·배우자 에너지가 궁금한 분','내 차트의 깊은 층이 궁금한 분','D1만으로 해석이 부족하게 느껴진 분'],
+    sectionDesc:['D9 나바암샤 차트 핵심','금성 D9 — 결혼과 관계','목성 D9 — 지혜와 성숙','D1 vs D9 — 겉과 속','D9가 가리키는 운명의 방향'],
+    preview:'D1은 "태어날 때의 모습", D9는 "성장하며 드러나는 본질"이라 말합니다. 특히 결혼 후·30대 이후 에너지는 D9에서 더 잘 보입니다.',
+    faq:[
+      {q:'D9가 왜 결혼 차트인가요?', o:'7하우스(결혼)의 3배 = 9 위치라 결혼·파트너십 에너지가 압축됩니다.', a:'7하우스(결혼)의 9번째 = D9 위치라 결혼·파트너십 에너지가 압축됩니다.'},
+      {q:'D1과 D9가 다르면 뭐가 맞나요?', a:'둘 다 맞습니다. D1은 어린 시절·외형, D9는 성숙기·내면. 함께 봐야 완성.'},
+      {q:'결혼 안 한 사람도 의미가 있나요?', a:'네, D9는 결혼만이 아니라 영적 성숙·성인기 본질을 봅니다. 결혼 여부와 무관하게 의미가 있습니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕'],
+    keyQuestions:['D9 라그나와 주요 행성 위치는?','금성 D9가 가리키는 결혼 패턴은?','D1과 D9의 차이는?','D9가 말하는 운명은?'],
+    sectionDetail:[
+      'D9 라그나와 핵심 행성 위치 개관. "D9의 나는 ~한 사람."',
+      '금성의 D9 별자리로 보는 결혼 상대 유형·관계 에너지·애정 표현 방식.',
+      '목성의 D9 별자리로 보는 지혜·종교·영적 성숙의 특성.',
+      'D1(겉)과 D9(속)의 대조 — 어린 시절 이후 드러나는 숨은 면, 결혼·30대 이후 전환.',
+      'D9가 가리키는 이번 생 운명의 방향과 성숙 과제. 구체적 실천 조언.'
+    ]
+  },
+  vedic_moon: {
+    emoji:'<i class="pi pi-moon"></i>',
+    subtitle:'감정과 무의식의 뿌리',
+    desc:'베딕에서 달(Moon)은 감정·어머니·무의식·정서 안정을 관장합니다. 달이 있는 별자리(라시) = 내 감정의 뿌리 색깔.',
+    recommend:['감정 기복이 심한 이유가 궁금한 분','무의식 패턴을 이해하고 싶은 분','정서적 충족의 조건을 찾는 분'],
+    sectionDesc:['나의 라시(월궁) 핵심','무의식 감정 패턴','정서적 충족 조건과 집착','어머니·가족 에너지','감정을 다루는 법'],
+    preview:'서양 점성술의 "달 별자리"와 비슷하지만 베딕은 사이더리얼(실제 별자리 기반)이라 많은 경우 한 별자리 전으로 이동합니다. 베딕 라시가 "진짜 내 감정 원형"입니다.',
+    faq:[
+      {q:'서양 달 별자리와 다를 수 있나요?', a:'네, 베딕은 사이더리얼이라 약 23도 차이가 납니다. 서양=양자리, 베딕=물고기 인 경우가 많습니다.'},
+      {q:'감정 기복도 라시 탓인가요?', a:'달 라시의 성질(카디날/픽스드/뮤터블, 원소)이 감정 반응 속도·지속성을 좌우합니다.'},
+      {q:'어머니 관계도 보나요?', a:'네, 베딕에서 달 = 어머니. 달 라시와 주변 행성이 어머니 에너지를 보여줍니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕','사주'],
+    keyQuestions:['내 라시는?','무의식 감정 패턴은?','정서적 충족 조건은?','감정을 다루는 법은?'],
+    sectionDetail:[
+      '라시 이름과 지배 행성·원소·양식. "감정의 원형은 ~별자리입니다."',
+      '라시가 가리키는 무의식 감정 패턴. 스트레스 반응, 회복 방식, 정서 언어.',
+      '이 라시가 정서적으로 충족되는 조건과 자주 빠지는 집착 패턴.',
+      '어머니·가족·뿌리와의 에너지 구조. 달 주변 행성이 있다면 그 영향도.',
+      '이 라시 감정을 건강하게 다루는 3가지 실천 — 환경·사람·행동 측면.'
+    ]
+  },
+  vedic_ascendant: {
+    emoji:'<i class="pi pi-user"></i>',
+    subtitle:'세상이 처음 보는 나의 얼굴',
+    desc:'라그나(Ascendant, 상승궁)는 태어난 순간 동쪽 지평선에 떠오르던 별자리입니다. 당신의 몸·외모·본능적 반응·세상이 처음 인식하는 당신을 결정합니다.',
+    recommend:['첫인상을 이해하고 싶은 분','몸·체질의 뿌리가 궁금한 분','라그나 기반 정밀 분석을 원하는 분'],
+    sectionDesc:['나의 라그나 핵심','세상이 처음 보는 얼굴','라그나의 몸·체질·본능','라그나 로드 행성','페르소나 살리는 법'],
+    preview:'라그나는 12별자리 중 하나 — 각각 외모 유형, 체질, 반응 속도가 다릅니다. 양자리 라그나는 빠른 반응, 황소자리는 느긋, 물병자리는 독특 등.',
+    faq:[
+      {q:'라그나가 정확한 시간에 의존하나요?', a:'네, 라그나는 약 2시간마다 바뀝니다. 정확한 출생 시간이 중요합니다.'},
+      {q:'사주 일간과 비슷한가요?', a:'비슷한 개념이지만 다릅니다. 사주 일간=태어난 날, 라그나=태어난 시간(동쪽 지평선).'},
+      {q:'태양·달과 라그나가 다른가요?', a:'네, 셋 다 다른 층을 봅니다. 라그나=겉, 달=속, 태양=자아.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕'],
+    keyQuestions:['내 라그나는?','세상이 처음 보는 얼굴은?','몸·체질의 특성은?','페르소나 살리는 법은?'],
+    sectionDetail:[
+      '라그나 별자리·지배 행성을 한 줄 선언. "당신의 라그나는 ~입니다."',
+      '이 라그나가 만드는 외적 인상·첫 이미지·타인이 가장 먼저 느끼는 특성.',
+      '라그나 별자리가 가리키는 체질·몸 특성·본능적 반응 스타일.',
+      '라그나 로드(지배 행성)의 위치가 삶의 전반에 미치는 영향. 이 행성이 강한가 약한가.',
+      '이 라그나 페르소나를 살리는 3가지 — 외적 표현·직업·관계에서의 활용법.'
+    ]
+  },
+  vedic_remedy: {
+    emoji:'<i class="pi pi-heart"></i>',
+    subtitle:'2500년 수행의 지혜',
+    desc:'베딕 점성술은 약한 행성을 강화하는 전통 개운법(Upaya)을 가집니다. 만트라·색상·요일·자선·보석 — 차트에서 도움이 필요한 행성에 맞춤 처방합니다.',
+    recommend:['차트의 약점을 보완하고 싶은 분','전통 개운법을 체계적으로 실천하고 싶은 분','자신에게 맞는 만트라·색상을 찾고 싶은 분'],
+    sectionDesc:['시급한 행성 처방','약한 행성 3가지','만트라·색상·요일 처방','자선·봉사로 풀기','7일 실천 루틴'],
+    preview:'베딕 개운은 "보석=비쌈"이 아닙니다. 요일 색상 입기, 해당 행성 자선, 특정 음식 절제 — 일상에서 누구나 시작할 수 있는 실천들이 많습니다.',
+    faq:[
+      {q:'정말 효과가 있나요?', a:'개운법은 "기계적 마법"이 아닌 "의식적 정렬"입니다. 해당 행성 에너지에 의도적으로 다가가는 수행입니다.'},
+      {q:'종교적인가요?', a:'만트라 일부는 힌두 전통에서 왔지만 종교 없이도 에너지 수행으로 실천할 수 있습니다.'},
+      {q:'오래 해야 하나요?', a:'최소 40일(베딕 전통)을 권장합니다. 이 리포트는 7일 시작 루틴을 제시합니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕'],
+    keyQuestions:['가장 시급한 행성은?','약한 행성 3가지는?','구체적 처방은?','7일 루틴은?'],
+    sectionDetail:[
+      '차트에서 가장 시급한 개운이 필요한 행성 1순위 선언과 이유.',
+      '약한 행성 3가지와 각각이 만드는 삶의 영향. 왜 이 행성들이 도움이 필요한지.',
+      '각 행성별 전통 처방 — 만트라(간단한 비자 만트라), 색상(요일 옷), 요일(특정 요일 실천), 방위.',
+      '자선·봉사로 풀어내는 법. 각 행성이 상징하는 대상(토성=노동자, 화성=군인, 달=어머니)에 대한 나눔.',
+      '7일 시작 루틴 — 요일별 구체적 행동 목록. 오늘부터 실천 가능한 것들.'
+    ]
+  },
+  vedic_gemstone: {
+    emoji:'<i class="pi pi-crown"></i>',
+    subtitle:'베딕 전통 9보석(나바라트나) 처방',
+    desc:'베딕은 9행성 각각에 고유한 보석을 대응시킵니다. Atmakaraka와 이로운 행성을 강화하는 주 보석과, 피해야 할 보석을 차트 기반으로 처방합니다.',
+    recommend:['나에게 맞는 보석이 궁금한 분','전통적 보석 처방을 원하는 분','에너지 정렬 아이템을 찾는 분'],
+    sectionDesc:['주 보석','Atmakaraka 보석','2·3순위 보석','피해야 할 보석','착용·정화·관리법'],
+    preview:'나바라트나 9보석 = 루비(태양), 진주(달), 레드코랄(화성), 에메랄드(수성), 옐로사파이어(목성), 다이아몬드(금성), 블루사파이어(토성), 헤소나이트(라후), 캣츠아이(케투). 모두가 모두에게 좋은 건 아닙니다.',
+    faq:[
+      {q:'보석이 비싸지 않나요?', a:'고급 보석이 이상적이지만 시작은 작고 품질 확인된 것으로 충분합니다. 가격보다 순도·진정성.'},
+      {q:'모조품/합성도 효과가 있나요?', a:'베딕 전통은 천연 광물의 구조적 에너지를 중시합니다. 가능하면 천연을 권장.'},
+      {q:'아무 보석이나 끼면 안 되나요?', a:'안 됩니다. 차트에 맞지 않는 보석(특히 블루사파이어)은 오히려 불균형을 만든다고 봅니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕'],
+    keyQuestions:['나의 주 보석은?','Atmakaraka 행성 보석은?','피해야 할 보석은?','착용·관리법은?'],
+    sectionDetail:[
+      '가장 강력히 권장되는 주 보석 1개 선언과 해당 행성. 착용 이유.',
+      'Atmakaraka 행성 대응 보석과 그 에너지. 영혼 주제 강화 역할.',
+      '2·3순위로 도움이 되는 보석들. 상황·목적에 따라 선택 가능한 옵션.',
+      '이 차트에서 피해야 할 보석과 이유. 함부로 착용하면 오히려 불균형을 만드는 행성.',
+      '보석 착용법 — 요일·손가락·금속 세팅·정화(우유·갠지스 물) 의식·착용 시작 날짜.'
+    ]
+  },
+  vedic_muhurta: {
+    emoji:'<i class="pi pi-calendar-plus"></i>',
+    subtitle:'이번주 매일의 길시·흉시',
+    desc:'Muhurta는 베딕의 "타이밍 과학". 오늘부터 7일간 각 날의 Tithi·Nakshatra·Yoga·Karana를 계산해 행동별 최적 시간을 안내합니다.',
+    recommend:['중요한 결정·계약·여행 타이밍이 필요한 분','이번주 전반적 에너지 흐름이 궁금한 분','베딕 길시 캘린더를 개인 맞춤으로 받고 싶은 분'],
+    sectionDesc:['이번주 에너지 개관','요일별 길시·흉시','행동별 최적 타이밍','특이 Tithi·Nakshatra 주의','한 줄 행동 지침'],
+    preview:'같은 날이라도 Nakshatra가 바뀌면 에너지가 달라집니다. 예를 들어 Pushya 낙샤트라는 거의 모든 일에 길한 최고 낙샤트라, Magha는 조상 의식에 길하지만 일반 시작엔 주의.',
+    faq:[
+      {q:'오늘만 보는 건가요?', a:'아니요, 오늘부터 7일간의 일별 에너지를 안내합니다.'},
+      {q:'정확한 시간대까지 보나요?', a:'Muhurta는 30분 단위 세분까지 가능하나 이 리포트는 일 단위 + 주요 시간대를 다룹니다.'},
+      {q:'내 차트 맞춤인가요?', a:'네, 내 달 낙샤트라 기준으로 특히 좋은 날과 피할 날을 구별합니다.'},
+      {q:'리포트는 얼마나 걸리나요?', a:'AI가 실시간으로 분석하며 1~2분 소요됩니다.'}
+    ],
+    engines:['베딕'],
+    keyQuestions:['이번주 에너지 흐름은?','요일별 길시는?','행동별 최적 타이밍은?','피해야 할 때는?'],
+    sectionDetail:[
+      '이번주 전반적 에너지 개관 — 주초·주중·주말의 흐름과 한 줄 주제.',
+      '요일별 지배 행성·Nakshatra·Tithi 기반 길시·흉시. 7일 각각 2~3줄씩.',
+      '행동별 최적 타이밍 — 중요 결정/계약/여행/면접/새 시작 각각 언제가 좋은지.',
+      '이번주 특히 주의할 Tithi(아마바샤·차투르티)·Nakshatra·Yoga. 있다면 정확히 지적.',
+      '이번주 관통하는 한 줄 행동 지침. 무엇을 하고 무엇을 미뤄야 하는가.'
+    ]
   }
 };
 
@@ -2786,9 +3281,18 @@ async function loadAllData(withZiwei, withAstro) {
   try {
     if (results[2].status==='fulfilled'&&results[2].value.ok) {
       const vd = await results[2].value.json();
-      _vedicData = { nakshatra:vd.nakshatra||null, rashi:vd.moonSign||null, ascendant:vd.ascendant||null,
+      _vedicData = { nakshatra:vd.nakshatra||null, rashi:vd.moonSign||null, sunSign:vd.sunSign||null, ascendant:vd.ascendant||null,
+        nakshatraPada:vd.nakshatraPada||null,
         dasha:vd.currentDasha?`${vd.currentDasha.planet||''} (${vd.currentDasha.end?new Date(vd.currentDasha.end).getFullYear()+'년까지':''})`:null,
-        antardasha:vd.antardasha?(vd.antardasha.planet||null):null, planets:vd.planets||null };
+        antardasha:vd.antardasha?(vd.antardasha.planet||null):null,
+        currentDasha:vd.currentDasha||null,
+        planets:vd.planets||null, navamsa:vd.navamsa||null,
+        ashtakavarga:vd.ashtakavarga||null, yogas:vd.yogas||null, muhurta:vd.muhurta||null,
+        atmakaraka:vd.atmakaraka||null, karakamsha:vd.karakamsha||null,
+        sadeSati:vd.sadeSati||null, dashaSandhi:vd.dashaSandhi||null,
+        nakshatraBlock:vd.nakshatraBlock||'', planetBlock:vd.planetBlock||'', dashaBlock:vd.dashaBlock||'',
+        yogaBlock:vd.yogaBlock||'', housePlanetBlock:vd.housePlanetBlock||'', navamsaBlock:vd.navamsaBlock||'',
+        ashtakaBlock:vd.ashtakaBlock||'', dusthanaBlock:vd.dusthanaBlock||'', transitBlock:vd.transitBlock||'' };
     }
   } catch(e){}
   const zIdx = withZiwei ? 3 : -1;
@@ -2829,9 +3333,61 @@ function buildSajuBlock() {
 function buildVedicBlock() {
   if (!_vedicData) return '';
   return `【베딕 점성술】
-낙샤트라: ${_vedicData.nakshatra||'미확인'}  라시(월궁): ${_vedicData.rashi||'미확인'}
-어센던트: ${_vedicData.ascendant||'미확인'}
+낙샤트라: ${_vedicData.nakshatra||'미확인'}${_vedicData.nakshatraPada?` (파다 ${_vedicData.nakshatraPada})`:''}  라시(월궁): ${_vedicData.rashi||'미확인'}
+어센던트: ${_vedicData.ascendant||'미확인'}  태양: ${_vedicData.sunSign||'미확인'}
 현재 다샤: ${_vedicData.dasha||'미확인'}  안타르다샤: ${_vedicData.antardasha||'미확인'}`;
+}
+
+function buildVedicPrecisionBlock(opts) {
+  if (!_vedicData) return '';
+  const o = opts || {};
+  const parts = [];
+  if (o.nakshatra && _vedicData.nakshatraBlock) parts.push(_vedicData.nakshatraBlock);
+  if (o.planet && _vedicData.planetBlock) parts.push(_vedicData.planetBlock);
+  if (o.dasha && _vedicData.dashaBlock) parts.push(_vedicData.dashaBlock);
+  if (o.yoga && _vedicData.yogaBlock) parts.push(_vedicData.yogaBlock);
+  if (o.housePlanet && _vedicData.housePlanetBlock) parts.push(_vedicData.housePlanetBlock);
+  if (o.navamsa && _vedicData.navamsaBlock) parts.push(_vedicData.navamsaBlock);
+  if (o.ashtaka && _vedicData.ashtakaBlock) parts.push(_vedicData.ashtakaBlock);
+  if (o.dusthana && _vedicData.dusthanaBlock) parts.push(_vedicData.dusthanaBlock);
+  if (o.transit && _vedicData.transitBlock) parts.push(_vedicData.transitBlock);
+  if (o.atmakaraka && _vedicData.atmakaraka) {
+    const a = _vedicData.atmakaraka;
+    parts.push(`【Atmakaraka 영혼의 행성】\n${a.name} (${a.sign||''} ${a.deg||''}도) — 이 행성이 영혼이 이번 생에서 가장 원하는 주제를 관장.`);
+  }
+  if (o.karakamsha && _vedicData.karakamsha) {
+    parts.push(`【Karakamsha 영적 사명】\n나바암샤(D9) 속 ${_vedicData.karakamsha.sign} — 이번 생 영적 목적·해탈 방향의 핵심 지표.`);
+  }
+  if (o.sadeSati && _vedicData.sadeSati) {
+    const s = _vedicData.sadeSati;
+    if (s.active) parts.push(`【Sade Sati 토성 7.5년】\n현재 ${s.phaseLabel||''} 진행 중 (토성 ${s.saturnSign}, 달로부터 ${s.houseFromMoon}번째 하우스). 시작:${s.startDate||''} 종료:${s.endDate||''}`);
+    else if (s.special) parts.push(`【Sade Sati 토성 트랜짓】\n${s.special} (토성 ${s.saturnSign}, 달로부터 ${s.houseFromMoon}번째 하우스)`);
+    else parts.push(`【Sade Sati】 현재 비활성 — 토성 ${s.saturnSign}, 달로부터 ${s.houseFromMoon}번째 하우스.`);
+  }
+  if (o.dashaSandhi && _vedicData.dashaSandhi) {
+    const d = _vedicData.dashaSandhi;
+    let s = `【다샤 전환(Sandhi) 경보】\n마하다샤 ${d.mahaPlanet} 잔여 ${d.mahaRemainMonths}개월 (종료 ${d.mahaEnd}, 다음 ${d.nextMaha})`;
+    if (d.antarPlanet) s += `\n안타르다샤 ${d.antarPlanet} 잔여 ${d.antarRemainMonths}개월 (종료 ${d.antarEnd}, 다음 ${d.nextAntar})`;
+    if (d.mahaSandhi)  s += '\n※ 마하다샤 전환기 진입 중';
+    if (d.antarSandhi) s += '\n※ 안타르다샤 전환기 진입 중';
+    parts.push(s);
+  }
+  if (o.ashtakavarga && _vedicData.ashtakavarga) {
+    parts.push(`【Ashtakavarga 삶의 영역별 강약】\n${Object.entries(_vedicData.ashtakavarga).map(([k,v])=>`${k}:${v}점`).join(' / ')}\n(각 행성 0~56점. 25+ 강/20~25 중/20 미만 약)`);
+  }
+  if (o.navamsa && _vedicData.navamsa) {
+    parts.push(`【Navamsa D9 결혼·영적 차트】\n${Object.entries(_vedicData.navamsa).map(([k,v])=>`${k}:${v}`).join(' / ')}`);
+  }
+  if (o.muhurta && Array.isArray(_vedicData.muhurta) && _vedicData.muhurta.length) {
+    parts.push(`【Muhurta 이번주 길흉시】\n${_vedicData.muhurta.slice(0,7).map(m=>`${m.date||''} ${m.tithi||''} ${m.nakshatra||''} ${m.quality||''}`).join('\n')}`);
+  }
+  if (o.yogas && Array.isArray(_vedicData.yogas) && _vedicData.yogas.length) {
+    parts.push(`【요가(Yogas) 전체】\n${_vedicData.yogas.map(y=>`${y.name||''}: ${y.type||''} ${y.deep?'— '+y.deep:''}`).join('\n')}`);
+  }
+  if (o.planets && Array.isArray(_vedicData.planets)) {
+    parts.push(`【9행성 배치】\n${_vedicData.planets.map(p=>`${p.name||''}: ${p.sign||''} ${p.deg||p.degree||''}도 ${p.house?'H'+p.house:''}${p.retro||p.retrograde?' 역행':''}`).join('\n')}`);
+  }
+  return parts.join('\n\n');
 }
 function buildDaeunBlock() {
   if (!_daeunList) return `현재 대운: ${_daeun||'미확인'}`;
@@ -5623,6 +6179,21 @@ async function generateReport() {
   if (_type === 'era')           { await generateEraReport();          return; }
   if (_type === 'hidden_talent') { await generateHiddenTalentReport(); return; }
   if (_type === 'totem')         { await generateTotemReport();        return; }
+  if (_type === 'vedic_nakshatra')    { await generateVedicNakshatraReport();    return; }
+  if (_type === 'vedic_pada')         { await generateVedicPadaReport();         return; }
+  if (_type === 'vedic_dasha_life')   { await generateVedicDashaLifeReport();    return; }
+  if (_type === 'vedic_yoga')         { await generateVedicYogaReport();         return; }
+  if (_type === 'vedic_atmakaraka')   { await generateVedicAtmakarakaReport();   return; }
+  if (_type === 'vedic_karakamsha')   { await generateVedicKarakamshaReport();   return; }
+  if (_type === 'vedic_sadesati')     { await generateVedicSadesatiReport();     return; }
+  if (_type === 'vedic_sandhi')       { await generateVedicSandhiReport();       return; }
+  if (_type === 'vedic_ashtakavarga') { await generateVedicAshtakavargaReport(); return; }
+  if (_type === 'vedic_navamsa')      { await generateVedicNavamsaReport();      return; }
+  if (_type === 'vedic_moon')         { await generateVedicMoonReport();         return; }
+  if (_type === 'vedic_ascendant')    { await generateVedicAscendantReport();    return; }
+  if (_type === 'vedic_remedy')       { await generateVedicRemedyReport();       return; }
+  if (_type === 'vedic_gemstone')     { await generateVedicGemstoneReport();     return; }
+  if (_type === 'vedic_muhurta')      { await generateVedicMuhurtaReport();      return; }
   // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
@@ -6597,6 +7168,357 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
+}
+
+// ── 베딕 정밀 리포트 공통 헬퍼 ──
+async function generateVedicPrecisionReport(cfg) {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const vb = buildVedicBlock();
+  const db = buildDaeunBlock();
+  const vp = buildVedicPrecisionBlock(cfg.precisionOpts || {});
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const sections = TYPE_SECTIONS[_type] || [];
+  const theoryName = cfg.theoryName || '베딕 정밀 분석';
+
+  const secA = cfg.promptsA.map((p, i) => `${i+1}. ${sections[i]?.name||''} — ${p}`).join('\n');
+  const prompt2A = `${profileStr}
+
+${sb2}
+${vb}
+${vp}
+${buildAdviceBlock(cfg.advice2A)}
+${buildYongsinBlock(cfg.yongsin2A||['직업','피해야할것'])}${buildAccuracyLayerBlock()}
+
+섹션 구성:
+${secA}
+
+총 700~1100자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+  await streamToSections(prompt2A, [0,1,2], theoryName, ysFinal, '', false);
+
+  const secB = cfg.promptsB.map((p, i) => `${i+4}. ${sections[i+3]?.name||''} — ${p}`).join('\n');
+  const prompt2B = `${profileStr}
+
+${sb2}
+${vb}
+${vp}
+${db}
+올해 세운: ${_sewun||'미확인'}
+${buildAdviceBlock(cfg.advice2B)}
+${buildYongsinBlock(cfg.yongsin2B)}${buildAccuracyLayerBlock()}
+
+섹션 구성:
+${secB}
+
+총 500~800자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(prompt2B, [3,4], theoryName, ysFinal, '', true);
+  try {
+    const sb = getSb();
+    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
+  } catch(e){}
+  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
+}
+
+// 1. 낙샤트라 정체
+async function generateVedicNakshatraReport() {
+  const nak = _vedicData?.nakshatra || '미확인';
+  return generateVedicPrecisionReport({
+    precisionOpts: { nakshatra: true, planets: true },
+    theoryName: '낙샤트라 정밀 분석',
+    promptsA: [
+      `낙샤트라 ${nak}의 지배 행성·상징 동물/나무/색상을 "당신은 ~의 사람입니다" 형식으로 한 줄 선언. 사주 일주 ${_ilju||''}와 공통으로 가리키는 영혼의 색깔.`,
+      `낙샤트라 ${nak}의 신화(아쉬위니=치유 쌍둥이, 로히니=달의 사랑, 크리티카=불의 칼 등 27개 중 해당)와 상징의 의미를 스토리텔링으로.`,
+      `낙샤트라가 부여한 타고난 기질·재능·직관력. 사주 일간·격국과 교차해 두 시스템이 같이 가리키는 핵심 기질 3가지.`
+    ],
+    promptsB: [
+      `이 낙샤트라에서 반복되는 삶의 패턴과 약점. 같은 낙샤트라 사람들이 공통으로 겪는 시험 — 기신 오행과 교차.`,
+      `낙샤트라 지배 행성 에너지를 살리는 일상 실천 — 요일·색상·만트라·행동 중 2~3가지.`
+    ],
+    advice2A: ['이직/커리어'],
+    advice2B: ['창업/비즈니스','대인관계/부부'],
+    yongsin2B: ['색상','방위']
+  });
+}
+
+// 2. 파다
+async function generateVedicPadaReport() {
+  const nak = _vedicData?.nakshatra || '미확인';
+  const pada = _vedicData?.nakshatraPada || '미확인';
+  return generateVedicPrecisionReport({
+    precisionOpts: { nakshatra: true, navamsa: true },
+    theoryName: '낙샤트라 파다 세분 분석',
+    promptsA: [
+      `낙샤트라 ${nak} 파다 ${pada} 선언. 이 파다가 대응하는 D9 별자리와 의미. "당신은 ${nak} 파다 ${pada} — D9 ~별자리의 사람입니다."`,
+      `같은 ${nak} 낙샤트라의 파다1~4가 각각 어떤 얼굴을 가지는지 전체 개관. 4가지 얼굴 중 왜 이 파다가 가장 ~한 성향인가.`,
+      `이 파다만이 가진 세분 성향. D9 별자리의 지배 행성·원소로 기질을 세밀하게 묘사.`
+    ],
+    promptsB: [
+      `D9가 드러내는 결혼·영적 주제·30대 이후 본질. 겉(D1)과 안(D9)의 차이가 이 사람에게 어떻게 나타나는지.`,
+      `이 파다 에너지를 살리는 방향 — 직업 선택·관계 선택·일상 실천에 반영할 3가지.`
+    ],
+    advice2A: ['이직/커리어'],
+    advice2B: ['대인관계/부부']
+  });
+}
+
+// 3. 120년 다샤 로드맵
+async function generateVedicDashaLifeReport() {
+  return generateVedicPrecisionReport({
+    precisionOpts: { dasha: true },
+    theoryName: '120년 빔쇼타리 다샤 분석',
+    promptsA: [
+      `빔쇼타리 9행성 순서와 각 길이(6~20년). 이 사주의 출발 행성기와 지금까지 인생 흐름 개관.`,
+      `이미 지나온 마하다샤들이 남긴 흔적. 어린 시절·청소년기·청년기 어떤 행성기를 보냈고 어떤 기질이 형성됐는지.`,
+      `현재 마하다샤 ${_vedicData?.dasha||'미확인'} + 안타르다샤 ${_vedicData?.antardasha||'미확인'}가 활성화하는 삶의 주제와 에너지.`
+    ],
+    promptsB: [
+      `다음 마하다샤와 그 이후 — 3년·10년·20년 단위로 무엇이 일어날 가능성이 높은지. 각 행성기의 테마 요약.`,
+      `다샤 흐름을 탄 장기 전략. 지금 심을 씨앗, 다음 행성기에 거둘 과실, 피해야 할 충동 각 1가지씩.`
+    ],
+    advice2A: ['이직/커리어','투자/재테크'],
+    advice2B: ['창업/비즈니스','대인관계/부부']
+  });
+}
+
+// 4. 요가
+async function generateVedicYogaReport() {
+  return generateVedicPrecisionReport({
+    precisionOpts: { yoga: true, yogas: true, planets: true },
+    theoryName: '베딕 요가(Yoga) 조합 분석',
+    promptsA: [
+      `이 차트에서 감지된 주요 요가 3~5개를 나열하고 한 줄씩 핵심 메시지.`,
+      `라자요가(케드라-트리코나 로드 결합)가 만드는 권력·명예·사회적 성취 잠재력. 사주 격국·관록궁과 교차.`,
+      `다나요가(2·5·9·11하우스 로드 조합)가 만드는 재물·풍요 축복. 사주 재성 구조와 교차.`
+    ],
+    promptsB: [
+      `특수 요가 — 판차마하푸루샤(루챠카·바드라·함사·말라비야·샤샤), 가자케사리, 네차바하가 등 해당되는 것.`,
+      `요가를 발현시키는 법 — 해당 행성의 다샤 시기·강화 개운법·구체적 생활 습관 3가지.`
+    ],
+    advice2A: ['창업/비즈니스','이직/커리어'],
+    advice2B: ['투자/재테크']
+  });
+}
+
+// 5. Atmakaraka
+async function generateVedicAtmakarakaReport() {
+  const ak = _vedicData?.atmakaraka;
+  const akName = ak?.name || '미확인';
+  return generateVedicPrecisionReport({
+    precisionOpts: { atmakaraka: true, planet: true },
+    theoryName: 'Atmakaraka 영혼의 행성 분석',
+    promptsA: [
+      `Atmakaraka 행성 ${akName} 선언 — "당신의 영혼은 ${akName}입니다." 별자리·도수와 함께.`,
+      `${akName}이 가리키는 영혼의 숙제: 태양=자아/권위, 달=정서/양육, 화성=의지/용기, 수성=지성/소통, 목성=지혜/확장, 금성=사랑/예술, 토성=책임/한계, 라후=집착/탐욕, 케투=해방/고독. 해당 행성 주제를 깊이.`,
+      `이 주제가 현재 삶에서 어떤 방식으로 드러나고 있는지. 반복되는 관계·직업·감정 패턴 — 사주 기신·과다 십신과 교차.`
+    ],
+    promptsB: [
+      `피하려 할수록 더 큰 강도로 돌아오는 이유. 영혼 주제는 회피가 아니라 통합이 열쇠라는 Jaimini 원리.`,
+      `Atmakaraka를 끌어안는 3가지 실천 — 그 행성이 상징하는 자질을 삶에 들이는 구체적 방법.`
+    ],
+    advice2A: ['이직/커리어'],
+    advice2B: ['대인관계/부부']
+  });
+}
+
+// 6. Karakamsha
+async function generateVedicKarakamshaReport() {
+  const kk = _vedicData?.karakamsha;
+  const akName = _vedicData?.atmakaraka?.name || '미확인';
+  return generateVedicPrecisionReport({
+    precisionOpts: { karakamsha: true, atmakaraka: true, navamsa: true },
+    theoryName: 'Karakamsha 영적 사명 분석',
+    promptsA: [
+      `Karakamsha 선언: Atmakaraka ${akName}이 D9에서 ${kk?.sign||'미확인'}에 위치. "당신의 영혼은 D9 ${kk?.sign||''}에서 완성을 기다립니다."`,
+      `D9 ${kk?.sign||''} 별자리의 성질·지배 행성·원소가 가리키는 영적 주제. 사자자리=창조/표현, 물고기자리=해탈/봉사 등.`,
+      `이번 생 해탈·영적 성숙의 구체적 방향. 직업·관계·수행·봉사 중 어느 영역에서 풀리는지.`
+    ],
+    promptsB: [
+      `영적 성숙을 막는 내면 패턴. 회피·집착·두려움의 구체적 형태와 원인 — 사주 기신 오행과 교차.`,
+      `Karakamsha를 따르는 3가지 실천 — 일상·관계·수행에 반영할 구체적 방법.`
+    ],
+    advice2A: ['대인관계/부부'],
+    advice2B: ['이직/커리어']
+  });
+}
+
+// 7. 사데사티
+async function generateVedicSadesatiReport() {
+  return generateVedicPrecisionReport({
+    precisionOpts: { sadeSati: true, planet: true },
+    theoryName: 'Sade Sati 토성 7.5년 분석',
+    promptsA: [
+      `현재 사데사티 활성 여부와 정확한 단계(1·2·3단계 또는 비활성). 토성 위치와 달로부터 몇 번째 하우스를 숫자로.`,
+      `현재 단계의 핵심 시련 테마와 흔한 증상. 1단계=12하우스(상실/정리), 2단계=1하우스(자아 시험·최강), 3단계=2하우스(재정/가족). 이 사람이 지금 어느 단계인지에 맞춰 구체적으로.`,
+      `전체 7.5년 흐름 — 시작일, 각 단계 전환, 종료일. 이미 지나온 구간과 남은 구간을 연도로.`
+    ],
+    promptsB: [
+      `사데사티가 부여하는 내면 성숙 과제. 무엇을 내려놓고 무엇을 깊게 하라는 요청인가 — 사주 용신과 교차.`,
+      `토성 에너지를 다루는 전통 베딕 대응법 — 검은색/남색 기부, 토요일 봉사·단식, 하누만 만트라 등 3가지.`
+    ],
+    advice2A: ['이직/커리어'],
+    advice2B: ['투자/재테크','대인관계/부부']
+  });
+}
+
+// 8. 다샤 전환기
+async function generateVedicSandhiReport() {
+  return generateVedicPrecisionReport({
+    precisionOpts: { dashaSandhi: true, dasha: true },
+    theoryName: '다샤 Sandhi 전환기 분석',
+    promptsA: [
+      `현재 마하다샤 잔여 개월·안타르다샤 잔여 개월·Sandhi 활성 여부를 숫자로 정리.`,
+      `마하다샤 종료 시점과 다음 행성기 테마. 과거 행성기가 남긴 과제와 다음 행성기가 요구하는 준비.`,
+      `안타르다샤 전환이 만드는 단기 테마의 변화. 3~12개월 단위로 무엇이 바뀌는가.`
+    ],
+    promptsB: [
+      `Sandhi에 특히 흔들리는 삶의 영역(재물·관계·건강·커리어). 행성 교차로 이유 설명.`,
+      `Sandhi를 매끄럽게 넘기는 3가지 전략 — 결정 보류 원칙, 심신 관리, 준비 행동.`
+    ],
+    advice2A: ['이직/커리어'],
+    advice2B: ['창업/비즈니스','투자/재테크']
+  });
+}
+
+// 9. Ashtakavarga
+async function generateVedicAshtakavargaReport() {
+  return generateVedicPrecisionReport({
+    precisionOpts: { ashtakavarga: true, ashtaka: true },
+    theoryName: 'Ashtakavarga 삶의 영역별 강약 분석',
+    promptsA: [
+      `7행성의 SAV 총점과 전체 강도 요약. 강한 별자리 상위 3, 약한 별자리 하위 3을 수치로.`,
+      `행성별 점수 해석 — 태양(자아/권위), 달(감정/어머니), 화성(의지), 수성(지성), 목성(확장), 금성(사랑), 토성(책임). 각 행성의 BAV 점수 의미.`,
+      `삶의 영역별 강약 — 1하우스(몸/자아), 7하우스(결혼), 10하우스(커리어), 11하우스(수입) 등 주요 하우스의 점수 해석.`
+    ],
+    promptsB: [
+      `약한 하우스·행성의 개운 전략. 점수 낮음이 무엇을 의미하고 어떻게 보완하는가 — 사주 용신과 교차.`,
+      `강한 영역을 극대화하는 법. 점수 높은 영역은 상대적 노력으로 큰 결실 — 구체적 활용 전략 3가지.`
+    ],
+    advice2A: ['창업/비즈니스','이직/커리어'],
+    advice2B: ['투자/재테크']
+  });
+}
+
+// 10. Navamsa
+async function generateVedicNavamsaReport() {
+  return generateVedicPrecisionReport({
+    precisionOpts: { navamsa: true },
+    theoryName: 'Navamsa D9 결혼·운명 분석',
+    promptsA: [
+      `D9 라그나와 핵심 행성 위치 개관. "D9의 나는 ~한 사람"으로 정리.`,
+      `금성의 D9 별자리로 보는 결혼 상대 유형·관계 에너지·애정 표현 방식.`,
+      `목성의 D9 별자리로 보는 지혜·종교·영적 성숙의 특성.`
+    ],
+    promptsB: [
+      `D1(겉)과 D9(속)의 대조 — 어린 시절 이후 드러나는 숨은 면, 결혼·30대 이후 전환.`,
+      `D9가 가리키는 이번 생 운명 방향과 성숙 과제. 구체적 실천 조언 3가지.`
+    ],
+    advice2A: ['대인관계/부부'],
+    advice2B: ['이직/커리어']
+  });
+}
+
+// 11. 월궁(라시) 심층
+async function generateVedicMoonReport() {
+  const rashi = _vedicData?.rashi || '미확인';
+  return generateVedicPrecisionReport({
+    precisionOpts: { planet: true },
+    theoryName: 'Moon 라시(월궁) 심층 분석',
+    promptsA: [
+      `라시 ${rashi} 선언과 지배 행성·원소·양식. "감정의 원형은 ${rashi}입니다."`,
+      `${rashi}가 가리키는 무의식 감정 패턴. 스트레스 반응·회복 방식·정서 언어.`,
+      `${rashi}가 정서적으로 충족되는 조건과 자주 빠지는 집착 패턴 — 사주 십신과 교차.`
+    ],
+    promptsB: [
+      `어머니·가족·뿌리와의 에너지 구조. 달 주변 행성이 있다면 그 영향도.`,
+      `${rashi} 감정을 건강하게 다루는 3가지 — 환경·사람·행동 측면.`
+    ],
+    advice2A: ['대인관계/부부'],
+    advice2B: ['창업/비즈니스']
+  });
+}
+
+// 12. 라그나
+async function generateVedicAscendantReport() {
+  const asc = _vedicData?.ascendant || '미확인';
+  return generateVedicPrecisionReport({
+    precisionOpts: { planet: true },
+    theoryName: '라그나(상승궁) 페르소나 분석',
+    promptsA: [
+      `라그나 ${asc} 선언과 지배 행성. "당신의 라그나는 ${asc}입니다."`,
+      `${asc} 라그나가 만드는 외적 인상·첫 이미지·타인이 가장 먼저 느끼는 특성.`,
+      `${asc}의 체질·몸 특성·본능적 반응 스타일 — 사주 일간·오행과 교차.`
+    ],
+    promptsB: [
+      `라그나 로드(지배 행성)의 위치가 삶 전반에 미치는 영향. 이 행성이 강한가 약한가.`,
+      `${asc} 페르소나를 살리는 3가지 — 외적 표현·직업·관계에서의 활용법.`
+    ],
+    advice2A: ['이직/커리어'],
+    advice2B: ['대인관계/부부']
+  });
+}
+
+// 13. 행성 개운(Upaya)
+async function generateVedicRemedyReport() {
+  return generateVedicPrecisionReport({
+    precisionOpts: { planet: true, ashtakavarga: true, dusthana: true },
+    theoryName: 'Upaya 행성 개운법 처방',
+    promptsA: [
+      `차트에서 가장 시급한 개운이 필요한 행성 1순위와 그 이유.`,
+      `약한 행성 3가지와 각각이 만드는 삶의 영향. 왜 이 행성들이 도움이 필요한지.`,
+      `각 행성별 전통 처방 — 비자 만트라(옴 수르야 나마하 등), 요일 색상, 요일 행동, 방위.`
+    ],
+    promptsB: [
+      `자선·봉사로 풀어내는 법. 각 행성이 상징하는 대상(토성=노동자, 화성=군인, 달=어머니)에 대한 나눔.`,
+      `7일 시작 루틴 — 요일별 구체적 행동 목록. 오늘부터 실천 가능한 것들.`
+    ],
+    advice2A: ['대인관계/부부'],
+    advice2B: ['이직/커리어']
+  });
+}
+
+// 14. 보석
+async function generateVedicGemstoneReport() {
+  const akName = _vedicData?.atmakaraka?.name || '미확인';
+  return generateVedicPrecisionReport({
+    precisionOpts: { atmakaraka: true, planet: true },
+    theoryName: '베딕 나바라트나 보석 처방',
+    promptsA: [
+      `가장 강력히 권장되는 주 보석 1개 선언과 해당 행성·이유. 나바라트나 9보석 중 선택.`,
+      `Atmakaraka 행성 ${akName}에 대응하는 보석과 그 에너지. 영혼 주제 강화 역할.`,
+      `2·3순위로 도움이 되는 보석들. 상황·목적(재물·건강·관계)에 따라 선택 가능한 옵션.`
+    ],
+    promptsB: [
+      `이 차트에서 피해야 할 보석과 이유. 함부로 착용하면 불균형 만드는 행성(특히 블루사파이어).`,
+      `보석 착용법 — 요일·손가락·금속 세팅·정화(우유·갠지스 물) 의식·착용 시작 날짜.`
+    ],
+    advice2A: [],
+    advice2B: ['투자/재테크']
+  });
+}
+
+// 15. 이번주 길시 (Muhurta)
+async function generateVedicMuhurtaReport() {
+  return generateVedicPrecisionReport({
+    precisionOpts: { muhurta: true, transit: true },
+    theoryName: 'Muhurta 이번주 길시 캘린더',
+    promptsA: [
+      `이번주 전반적 에너지 개관 — 주초·주중·주말의 흐름과 한 줄 주제.`,
+      `요일별 지배 행성·Nakshatra·Tithi 기반 길시·흉시. 7일 각각 2~3줄씩 정확한 날짜와 함께.`,
+      `행동별 최적 타이밍 — 중요 결정/계약/여행/면접/새 시작 각각 언제가 좋은지 요일·시간대로.`
+    ],
+    promptsB: [
+      `이번주 특히 주의할 Tithi(아마바샤·차투르티)·Nakshatra·Yoga. 있다면 정확히 지적.`,
+      `이번주 관통하는 한 줄 행동 지침. 무엇을 하고 무엇을 미뤄야 하는가.`
+    ],
+    advice2A: ['창업/비즈니스','이직/커리어','투자/재테크'],
+    advice2B: ['대인관계/부부']
+  });
 }
 
 // ── 서양 점성술 심층 분석 ──
@@ -7897,7 +8819,22 @@ function showConsultBanner() {
     love_history: { title: '연애 흑역사, 이번엔 다르게 하고 싶다면', desc: 'AI가 분석한 패턴을 바탕으로\n<em>전문 상담사</em>가 현실적인 변화 전략을 안내합니다.' },
     era:          { title: '내 시대 에너지, 현대에서 활용하고 싶다면', desc: '그 시대의 에너지를 현대에 적용하는 법\n<em>전문 상담사</em>가 구체적으로 안내합니다.' },
     hidden_talent:{ title: '숨겨진 재능, 어떻게 꺼내야 할지 모르겠다면', desc: 'AI가 찾아낸 재능을 바탕으로\n<em>전문 상담사</em>가 실천 방향을 안내합니다.' },
-    totem:        { title: '수호 동물 에너지, 더 깊이 알고 싶다면', desc: '수호 동물의 에너지를 삶에 적용하는 법\n<em>전문 상담사</em>가 구체적으로 안내합니다.' }
+    totem:        { title: '수호 동물 에너지, 더 깊이 알고 싶다면', desc: '수호 동물의 에너지를 삶에 적용하는 법\n<em>전문 상담사</em>가 구체적으로 안내합니다.' },
+    vedic_nakshatra:    { title:'낙샤트라 해석, 더 깊이 듣고 싶다면', desc:'AI가 읽은 낙샤트라 기질을 바탕으로\n<em>전문 상담사</em>가 신화·다샤·실천까지 1:1로 풀어드립니다.' },
+    vedic_pada:         { title:'파다 세분 분석, 맞춤 상담을 원한다면', desc:'같은 낙샤트라 속 4얼굴 중 내 파다의 의미를\n<em>전문 상담사</em>가 D9까지 연결해 안내합니다.' },
+    vedic_dasha_life:   { title:'다샤 인생 지도, 장기 전략이 필요하다면', desc:'120년 다샤 흐름과 각 행성기 테마를\n<em>전문 상담사</em>가 1:1 맞춤 전략으로 풀어드립니다.' },
+    vedic_yoga:         { title:'요가 조합, 발현 전략이 필요하다면', desc:'라자·다나·판차마하푸루샤 요가를\n<em>전문 상담사</em>가 활성 시기·개운법까지 안내합니다.' },
+    vedic_atmakaraka:   { title:'영혼의 행성, 더 깊이 이해하려면', desc:'Atmakaraka 주제를 Jaimini 관점에서\n<em>전문 상담사</em>가 삶에 통합하는 법까지 풀어드립니다.' },
+    vedic_karakamsha:   { title:'영적 사명, 방향이 더 필요하다면', desc:'Karakamsha가 가리키는 해탈 방향을\n<em>전문 상담사</em>가 실천 언어로 바꿔 안내합니다.' },
+    vedic_sadesati:     { title:'사데사티 대응 전략이 필요하다면', desc:'현재 단계와 시련 테마를\n<em>전문 상담사</em>가 전통 대응법과 함께 1:1로 안내합니다.' },
+    vedic_sandhi:       { title:'다샤 전환기, 큰 결정 앞둔다면', desc:'Sandhi 구간의 흔들림과 기회를\n<em>전문 상담사</em>가 행동 전략으로 풀어드립니다.' },
+    vedic_ashtakavarga: { title:'삶의 영역별 강약, 실전 전략이 필요하다면', desc:'Ashtakavarga 점수 해석과 약점 보강을\n<em>전문 상담사</em>가 맞춤 설계합니다.' },
+    vedic_navamsa:      { title:'D9 결혼·운명, 더 깊이 알고 싶다면', desc:'나바암샤가 가리키는 결혼·영적 성숙을\n<em>전문 상담사</em>가 1:1로 풀어드립니다.' },
+    vedic_moon:         { title:'감정의 근원, 실전 상담이 필요하다면', desc:'라시(월궁) 분석을 바탕으로\n<em>전문 상담사</em>가 정서 안정 전략을 안내합니다.' },
+    vedic_ascendant:    { title:'라그나 페르소나, 활용법이 궁금하다면', desc:'외적 페르소나를 삶에 살리는 법을\n<em>전문 상담사</em>가 구체적 언어로 풀어드립니다.' },
+    vedic_remedy:       { title:'개운 실천, 맞춤 설계가 필요하다면', desc:'AI가 찾은 약한 행성 개운법을\n<em>전문 상담사</em>가 40일 루틴으로 설계합니다.' },
+    vedic_gemstone:     { title:'보석 처방, 실전 착용법이 필요하다면', desc:'나바라트나 보석 선택과 정화·착용법을\n<em>전문 상담사</em>가 1:1로 안내합니다.' },
+    vedic_muhurta:      { title:'이번주 길시, 결정의 타이밍이 필요하다면', desc:'계약·여행·새 시작의 최적 시간을\n<em>전문 상담사</em>가 개인 차트 맞춤으로 풀어드립니다.' }
   };
   const t = bannerTexts[_type] || { title: '리포트 내용이 궁금하신가요?', desc: 'AI 분석을 바탕으로 <em>전문 상담사</em>가 더 깊은 해석과<br>실질적인 조언을 1:1로 안내해 드립니다.' };
   document.getElementById('consultTitle').textContent = t.title;
