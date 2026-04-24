@@ -643,30 +643,54 @@ function shareKakao() {
   });
 }
 
-function doDominantShare() {
+async function doDominantShare() {
   var canvas = window._dominantCanvas; if (!canvas) return;
   var info = PI[currentDominant] || {};
   var pageUrl = 'https://picolab.kr/dominant.html?utm_source=share&utm_medium=kakao';
   var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  // 업로드 진행 토스트
+  showToast('카드 업로드 중...');
+  var uploadedUrl = null;
+  try {
+    var dataUrl = canvas.toDataURL('image/png');
+    var up = await fetch('https://fortuna.kkdmb7.workers.dev/upload-share-card', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ imageBase64: dataUrl, filename: 'dominant_' + currentDominant })
+    });
+    var upData = await up.json();
+    if (upData && upData.url) uploadedUrl = upData.url;
+  } catch(e) { console.warn('upload fail', e); }
+
+  function sendKakaoFeed(imgUrl) {
+    if (!window.Kakao || !Kakao.Share) return false;
+    if (!Kakao.isInitialized()) { try { Kakao.init(KAKAO_JS_KEY); } catch(e) {} }
+    try {
+      Kakao.Share.sendDefault({
+        objectType:'feed',
+        content:{
+          title:'내 도미넌트 행성 — ' + info.name + ' ' + info.emoji,
+          description: info.keyword + '\n' + (info.desc||'').slice(0,60),
+          imageUrl: imgUrl,
+          link:{ mobileWebUrl: pageUrl, webUrl: pageUrl }
+        },
+        buttons:[{ title:'내 핵심 행성 찾기', link:{ mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+      });
+      return true;
+    } catch(e) { return false; }
+  }
+
+  // 1순위: 업로드 성공 → 카카오 feed (이미지+링크 한 카드)
+  if (uploadedUrl && sendKakaoFeed(uploadedUrl)) return;
+
+  // 2순위 (모바일): 네이티브 파일 공유
   canvas.toBlob(function(blob){
-    if(!blob){ showToast('이미지 생성 실패'); return; }
+    if (!blob) { showToast('이미지 생성 실패'); return; }
     var file = new File([blob],'fortuna_dominant.png',{type:'image/png'});
     if (isMobile && navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
-      navigator.share({ files:[file], title:'내 도미넌트 행성 — '+info.name, text:info.keyword }).catch(function(){});
-    } else if (isMobile && navigator.share) {
-      navigator.share({ title:'FORTUNA 도미넌트 행성', text:info.keyword+' — '+info.name, url: pageUrl }).catch(function(){});
-    } else if (window.Kakao && Kakao.Share) {
-      if (!Kakao.isInitialized()) { try { Kakao.init(KAKAO_JS_KEY); } catch(e) {} }
-      Kakao.Share.sendDefault({
-        objectType: 'feed',
-        content: {
-          title: '내 도미넌트 행성 — ' + info.name + ' ' + info.emoji,
-          description: info.keyword,
-          imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
-          link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
-        },
-        buttons: [{ title: '내 핵심 행성 찾기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
-      });
+      navigator.share({ files:[file], title:'내 도미넌트 행성 — '+info.name, text: info.keyword+'\n'+pageUrl }).catch(function(){});
+    } else if (sendKakaoFeed('https://picolab.kr/img/goddess/goddess-app.png')) {
+      // 카카오 폴백 (기본 이미지)
     } else {
       try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); showToast('링크가 복사됐어요'); } catch(e) {}
     }
