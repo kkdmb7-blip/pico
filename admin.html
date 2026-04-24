@@ -333,6 +333,28 @@ td.reasons span {
   <h2 style="font-size:13px;">일별 방문 추이</h2>
   <div id="anDaily" class="card"><div class="loading">불러오는 중...</div></div>
 
+  <h2 style="font-size:13px;">디바이스 · 언어 · UTM</h2>
+  <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px;" id="anDevGrid">
+    <div class="card" id="anDevices"><div class="loading">불러오는 중...</div></div>
+    <div class="card" id="anLanguages"><div class="loading">언어 분포 불러오는 중...</div></div>
+    <div class="card" id="anUtm"><div class="loading">UTM 불러오는 중...</div></div>
+  </div>
+  <h2 style="font-size:13px;">시간대 · 요일 접속 분포 (KST)</h2>
+  <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px;" id="anTimeGrid">
+    <div class="card" id="anHourly"><div class="loading">시간대 불러오는 중...</div></div>
+    <div class="card" id="anWeekday"><div class="loading">요일 불러오는 중...</div></div>
+  </div>
+  <h2 style="font-size:13px;">페이지별 평균 체류 · 스크롤 깊이</h2>
+  <div id="anScroll" class="card"><div class="loading">불러오는 중...</div></div>
+  <h2 style="font-size:13px;">클릭 이벤트 Top</h2>
+  <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px;">
+    <div class="card" id="anClickNames"><div class="loading">클릭 이름 불러오는 중...</div></div>
+    <div class="card" id="anClickTexts"><div class="loading">클릭 텍스트 불러오는 중...</div></div>
+    <div class="card" id="anClickHrefs"><div class="loading">외부 링크 불러오는 중...</div></div>
+  </div>
+  <h2 style="font-size:13px;">JS 에러 모니터링</h2>
+  <div id="anErrors" class="card"><div class="loading">불러오는 중...</div></div>
+
   <h2>AI 피드백 대시보드</h2>
 
   <div id="summaryGrid" class="summary-grid"></div>
@@ -587,10 +609,16 @@ async function loadAnalytics() {
   qs('anTransitions').innerHTML = '<div class="loading">불러오는 중...</div>';
   qs('anDaily').innerHTML = '<div class="loading">불러오는 중...</div>';
   qs('anSummary').innerHTML = '';
+  const devIds = ['anDevices','anLanguages','anUtm','anHourly','anWeekday','anScroll','anClickNames','anClickTexts','anClickHrefs','anErrors'];
+  devIds.forEach(id => { const el = qs(id); if (el) el.innerHTML = '<div class="loading">불러오는 중...</div>'; });
   try {
-    const [sum, fun] = await Promise.all([
+    const [sum, fun, dev, clk, scr, err] = await Promise.all([
       fetchJson(`/admin/analytics-summary?days=${days}`),
-      fetchJson(`/admin/analytics-funnel?days=${days}`)
+      fetchJson(`/admin/analytics-funnel?days=${days}`),
+      fetchJson(`/admin/analytics-devices?days=${days}`).catch(_ => ({})),
+      fetchJson(`/admin/analytics-clicks?days=${days}`).catch(_ => ({})),
+      fetchJson(`/admin/analytics-scroll?days=${days}`).catch(_ => ({})),
+      fetchJson(`/admin/analytics-errors?days=${days}`).catch(_ => ({}))
     ]);
     // 요약
     qs('anSummary').innerHTML = `
@@ -671,12 +699,116 @@ async function loadAnalytics() {
         </div>`;
       }).join('');
     }
+    // 막대 헬퍼
+    const renderBars = (rows, labelKey, countKey, color) => {
+      if (!rows || !rows.length) return '<div class="empty">데이터 없음</div>';
+      const maxV = Math.max(1, ...rows.map(r => r[countKey]));
+      const colorStyle = color ? `background:${color};` : '';
+      return rows.map(r => {
+        const pct = (r[countKey] / maxV) * 100;
+        return `<div class="an-bar-row">
+          <span class="label">${escapeHtml(String(r[labelKey] ?? '-'))}</span>
+          <span class="bar"><div style="width:${pct}%;${colorStyle}"></div></span>
+          <span class="num">${(r[countKey]||0).toLocaleString()}</span>
+        </div>`;
+      }).join('');
+    };
+    // 디바이스
+    qs('anDevices').innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--gold-deep);margin-bottom:8px;">디바이스 (세션)</div>' +
+      renderBars(dev.devices || [], 'device', 'sessions', 'linear-gradient(90deg,#6a89a7,#8aa9c7)');
+    // 언어
+    qs('anLanguages').innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--gold-deep);margin-bottom:8px;">언어 Top (세션)</div>' +
+      renderBars(dev.languages || [], 'language', 'sessions', 'linear-gradient(90deg,#9a7fa7,#b89fd4)');
+    // UTM
+    const utmBlock = (title, arr, key, color) => {
+      if (!arr || !arr.length) return `<div style="font-size:11px;font-weight:700;margin:8px 0;">${title}</div><div class="empty" style="font-size:11px;">없음</div>`;
+      return `<div style="font-size:11px;font-weight:700;margin:8px 0;">${title}</div>` + renderBars(arr, key, 'sessions', color);
+    };
+    qs('anUtm').innerHTML =
+      utmBlock('UTM Source', dev.utm_sources, 'source', 'linear-gradient(90deg,#4a7a5a,#6a9a7a)') +
+      utmBlock('UTM Medium', dev.utm_mediums, 'medium', 'linear-gradient(90deg,#7a5a3a,#9a7a5a)') +
+      utmBlock('UTM Campaign', dev.utm_campaigns, 'campaign', 'linear-gradient(90deg,#a94a3a,#c76a5a)');
+    // 시간대
+    if (dev.hourly && dev.hourly.length) {
+      const maxH = Math.max(1, ...dev.hourly.map(h => h.sessions));
+      qs('anHourly').innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--gold-deep);margin-bottom:8px;">시간대별 (0~23시)</div>' +
+        dev.hourly.map(h => {
+          const pct = (h.sessions / maxH) * 100;
+          return `<div class="an-bar-row">
+            <span class="label" style="flex:0 0 44px;">${String(h.hour).padStart(2,'0')}시</span>
+            <span class="bar" style="flex:1;width:auto;"><div style="width:${pct}%;background:linear-gradient(90deg,#c79a3a,#e5b85a);"></div></span>
+            <span class="num">${h.sessions.toLocaleString()}</span>
+          </div>`;
+        }).join('');
+    } else {
+      qs('anHourly').innerHTML = '<div class="empty">시간대 데이터 없음</div>';
+    }
+    // 요일
+    if (dev.weekday && dev.weekday.length) {
+      const dowNames = ['일','월','화','수','목','금','토'];
+      const maxW = Math.max(1, ...dev.weekday.map(w => w.sessions));
+      qs('anWeekday').innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--gold-deep);margin-bottom:8px;">요일별</div>' +
+        dev.weekday.map(w => {
+          const pct = (w.sessions / maxW) * 100;
+          return `<div class="an-bar-row">
+            <span class="label" style="flex:0 0 44px;">${dowNames[w.dow]}</span>
+            <span class="bar" style="flex:1;width:auto;"><div style="width:${pct}%;background:linear-gradient(90deg,#6a89a7,#9ab9d7);"></div></span>
+            <span class="num">${w.sessions.toLocaleString()}</span>
+          </div>`;
+        }).join('');
+    } else {
+      qs('anWeekday').innerHTML = '<div class="empty">요일 데이터 없음</div>';
+    }
+    // 스크롤 · 체류
+    if (scr.pages && scr.pages.length) {
+      qs('anScroll').innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--gold-deep);margin-bottom:8px;">이탈 기준 · 평균 스크롤/체류</div>' +
+        scr.pages.slice(0, 20).map(p => {
+          const sp = p.avg_scroll_pct == null ? '-' : p.avg_scroll_pct + '%';
+          const dur = p.avg_duration_ms ? (p.avg_duration_ms/1000).toFixed(1) + '초' : '-';
+          const vis = p.avg_visible_ms ? (p.avg_visible_ms/1000).toFixed(1) + '초' : '-';
+          const barPct = p.avg_scroll_pct == null ? 0 : p.avg_scroll_pct;
+          return `<div class="an-bar-row">
+            <span class="label">${escapeHtml(p.page)}</span>
+            <span class="bar"><div style="width:${barPct}%;background:linear-gradient(90deg,#4a7a3a,#8aba6a);"></div></span>
+            <span class="num">${sp}</span>
+            <span class="sub">체류${dur} · 가시${vis}</span>
+          </div>`;
+        }).join('');
+    } else {
+      qs('anScroll').innerHTML = '<div class="empty">스크롤 데이터 없음</div>';
+    }
+    // 클릭 Top
+    qs('anClickNames').innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--gold-deep);margin-bottom:8px;">클릭 이벤트 이름 Top</div>' +
+      renderBars((clk.top_names||[]).slice(0,15), 'name', 'count', 'linear-gradient(90deg,#7b5ea7,#a07fd4)');
+    qs('anClickTexts').innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--gold-deep);margin-bottom:8px;">클릭한 버튼 텍스트 Top</div>' +
+      renderBars((clk.top_texts||[]).slice(0,15), 'text', 'count', 'linear-gradient(90deg,#c79a3a,#e5b85a)');
+    qs('anClickHrefs').innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--gold-deep);margin-bottom:8px;">링크 클릭 Top</div>' +
+      renderBars((clk.top_hrefs||[]).slice(0,15), 'href', 'count', 'linear-gradient(90deg,#3a7a8a,#5aaacc)');
+    // 에러
+    if (!err.errors || !err.errors.length) {
+      qs('anErrors').innerHTML = '<div class="empty">JS 에러 없음 ✓</div>';
+    } else {
+      qs('anErrors').innerHTML =
+        `<div style="font-size:11px;font-weight:700;color:var(--bad);margin-bottom:8px;">발생 에러 Top (${(err.total||0).toLocaleString()}건)</div>` +
+        err.errors.slice(0, 20).map(e => {
+          const pages = (e.pages || []).join(', ');
+          return `<div style="padding:8px 0;border-bottom:1px solid rgba(60,40,20,0.08);font-size:11px;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="color:var(--bad);font-weight:700;">${escapeHtml(e.name || 'error')}</span>
+              <span style="color:var(--muted);">${e.count}회 · ${e.sessions}세션</span>
+            </div>
+            <div style="margin-top:4px;color:var(--text);word-break:break-all;">${escapeHtml(e.msg || '')}</div>
+            <div style="margin-top:3px;color:var(--muted);font-size:10px;">${escapeHtml(e.src || '')} · ${escapeHtml(pages)}</div>
+          </div>`;
+        }).join('');
+    }
   } catch(e) {
     qs('anPages').innerHTML = `<div class="empty err-text">오류: ${e.message}</div>`;
     qs('anEntries').innerHTML = '';
     qs('anExits').innerHTML = '';
     qs('anTransitions').innerHTML = '';
     qs('anDaily').innerHTML = '';
+    devIds.forEach(id => { const el = qs(id); if (el) el.innerHTML = ''; });
   }
 }
 
