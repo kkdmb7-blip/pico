@@ -18,34 +18,48 @@
   // ── CSS 주입 ──
   var css = `
 #sw-btn {
-  position: fixed; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); right: 14px; z-index: 9980;
-  height: 44px; padding: 0 16px 0 14px; border-radius: 24px;
-  max-width: calc(100vw - 28px);
+  position: fixed; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); right: 16px; z-index: 9980;
+  width: 54px; height: 54px; border-radius: 50%;
   background: linear-gradient(135deg, #c9a84c, #7a5a10);
   border: none; cursor: pointer;
-  box-shadow: 0 6px 20px rgba(122,90,16,0.38);
-  display: flex; align-items: center; justify-content: center; gap: 7px;
-  color: #fff; font-family: 'Noto Sans KR','Pretendard Variable',Pretendard,sans-serif;
-  font-size: 13px; font-weight: 700; letter-spacing: 0.01em;
+  box-shadow: 0 4px 16px rgba(122,90,16,0.32);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff9e0; font-size: 22px; line-height: 1;
   transition: transform 0.15s, box-shadow 0.2s;
   animation: sw-pulse 2.4s ease-in-out infinite;
-  white-space: nowrap;
 }
-#sw-btn .sw-btn-ico { font-size: 15px; line-height: 1; color: #fff9e0; }
 @keyframes sw-pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(122,90,16,0.38), 0 0 0 0 rgba(201,168,76,0.55); }
-  50% { transform: scale(1.04); box-shadow: 0 8px 24px rgba(122,90,16,0.45), 0 0 0 12px rgba(201,168,76,0); }
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(122,90,16,0.32), 0 0 0 0 rgba(201,168,76,0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(122,90,16,0.4), 0 0 0 10px rgba(201,168,76,0); }
 }
-#sw-btn:hover { animation-play-state: paused; transform: scale(1.06); }
+#sw-btn:hover { animation-play-state: paused; transform: scale(1.08); }
 #sw-btn.sw-open { animation: none; }
 #sw-badge {
-  position: absolute; top: -6px; right: -6px;
+  position: absolute; top: -4px; right: -4px;
   background: #e53935; color: #fff; font-size: 10px; font-weight: 700;
-  min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px;
+  min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px;
   display: none; align-items: center; justify-content: center;
-  border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  line-height: 1;
+  border: 2px solid #fff; line-height: 1;
 }
+#sw-tooltip {
+  position: fixed; z-index: 9980;
+  background: rgba(26,18,10,0.94); color: #fcf7ea;
+  padding: 9px 13px; border-radius: 12px;
+  font-size: 12.5px; font-weight: 500;
+  font-family: 'Noto Sans KR','Pretendard Variable',Pretendard,sans-serif;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  transform: translateY(6px);
+  white-space: nowrap;
+}
+#sw-tooltip.show { opacity: 1; transform: translateY(0); }
+#sw-tooltip::after {
+  content: ''; position: absolute; bottom: -6px; right: 22px;
+  border-width: 6px 6px 0 6px; border-style: solid;
+  border-color: rgba(26,18,10,0.94) transparent transparent transparent;
+}
+#sw-tooltip b { color: #f5d07c; }
 #sw-panel {
   position: fixed; bottom: calc(130px + env(safe-area-inset-bottom, 0px)); right: 14px; z-index: 9981;
   width: min(340px, calc(100vw - 28px));
@@ -97,8 +111,13 @@
     var btn = document.createElement('button');
     btn.id = 'sw-btn';
     btn.setAttribute('aria-label', '문의하기');
-    btn.innerHTML = '<span class="sw-btn-ico">✦</span><span>무엇이든 물어보세요</span><div id="sw-badge"></div>';
+    btn.innerHTML = '✦<div id="sw-badge"></div>';
     btn.onclick = toggle;
+
+    var tip = document.createElement('div');
+    tip.id = 'sw-tooltip';
+    tip.innerHTML = '<b>✦</b> 무엇이든 물어보세요';
+    document.body.appendChild(tip);
 
     var panel = document.createElement('div');
     panel.id = 'sw-panel';
@@ -230,6 +249,7 @@
     if (p) p.style.display = 'flex';
     var b = document.getElementById('sw-btn');
     if (b) b.classList.add('sw-open');
+    hideTooltipForever();
     var uid = getUserId();
     if (!uid) {
       var el = document.getElementById('sw-msgs');
@@ -263,11 +283,28 @@
   function adjustPosition() {
     var btn = document.getElementById('sw-btn');
     var panel = document.getElementById('sw-panel');
+    var tip = document.getElementById('sw-tooltip');
     var hasEgg = !!document.getElementById('yongsin-egg-btn');
     var btnBottom = hasEgg ? 156 : 76;
     var panelBottom = hasEgg ? 210 : 130;
     if (btn) btn.style.bottom = 'calc(' + btnBottom + 'px + env(safe-area-inset-bottom, 0px))';
     if (panel) panel.style.bottom = 'calc(' + panelBottom + 'px + env(safe-area-inset-bottom, 0px))';
+    if (tip) tip.style.bottom = 'calc(' + (btnBottom + 64) + 'px + env(safe-area-inset-bottom, 0px))';
+    if (tip) tip.style.right = '16px';
+  }
+
+  // ── 툴팁 표시 (처음 열람·주기적 상기) ──
+  var _tipShown = false;
+  function showTooltip() {
+    if (_open) return;
+    var tip = document.getElementById('sw-tooltip');
+    if (!tip) return;
+    tip.classList.add('show');
+    setTimeout(function () { tip.classList.remove('show'); }, 3000);
+  }
+  function hideTooltipForever() {
+    var tip = document.getElementById('sw-tooltip');
+    if (tip) { tip.classList.remove('show'); tip.style.display = 'none'; }
   }
 
   // ── 초기화 ──
@@ -280,6 +317,15 @@
       loadMessages(); // 배지 업데이트용 초기 로드
       setInterval(function () { if (!_open) loadMessages(); }, 60000);
     }
+    // 첫 진입 3초 뒤 말풍선 잠깐 표시, 하루 1회로 제한
+    try {
+      var last = +(localStorage.getItem('sw_tip_last') || 0);
+      if (Date.now() - last > 24 * 3600 * 1000) {
+        setTimeout(function () {
+          if (!_open) { showTooltip(); localStorage.setItem('sw_tip_last', String(Date.now())); }
+        }, 3000);
+      }
+    } catch (e) {}
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
