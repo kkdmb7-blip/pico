@@ -212,6 +212,13 @@
   .sandhi-badge{display:inline-block;margin-left:6px;padding:2px 8px;font-size:10.5px;font-weight:700;color:#b55400;background:rgba(255,109,0,.14);border:1px solid rgba(255,109,0,.30);border-radius:6px;letter-spacing:.2px;vertical-align:middle;}
   .sandhi-note{margin-top:6px;padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.55;color:#7a3a00;background:rgba(255,109,0,.06);border:1px solid rgba(255,109,0,.22);}
 
+  /* BLOCK TEXT */
+  .block-text-body{font-size:13.5px;color:var(--text);line-height:1.85;}
+  .block-text-body .block-line{padding:8px 0;border-bottom:1px solid var(--border-soft);}
+  .block-text-body .block-line:last-child{border-bottom:none;}
+  .block-line-label{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;margin-bottom:3px;}
+  .block-line-val{font-size:13.5px;color:var(--text);line-height:1.75;}
+
   /* AI ANALYSIS */
   .ai-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border-soft);}
   .ai-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
@@ -320,6 +327,24 @@
   <div class="section-card" id="card-sadesati">
     <div class="section-label">사데 사티 (Sade Sati) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 토성 7.5년 대주기 현재 위치</span></div>
     <div id="sadesati-body"></div>
+  </div>
+
+  <!-- 하우스별 행성 의미 -->
+  <div class="section-card" id="card-house-planets">
+    <div class="section-label">하우스별 행성 배치 의미 <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 삶의 각 영역에 행성이 미치는 영향</span></div>
+    <div id="house-planets-body" class="block-text-body"></div>
+  </div>
+
+  <!-- D9 나바암샤 심화 -->
+  <div class="section-card" id="card-navamsa-block">
+    <div class="section-label">D9 나바암샤 심화 <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 결혼·영적 성숙·삶의 후반 실현</span></div>
+    <div id="navamsa-block-body" class="block-text-body"></div>
+  </div>
+
+  <!-- 트랜짓 분석 -->
+  <div class="section-card" id="card-transit">
+    <div class="section-label">트랜짓 분석 <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 현재 행성 위치가 출생 차트에 미치는 영향</span></div>
+    <div id="transit-body" class="block-text-body"></div>
   </div>
 
   <!-- AI 심층 분석 -->
@@ -1051,6 +1076,33 @@ function getVedicSb() {
   return _vedicSbClient;
 }
 
+function renderBlockText(elId, rawText) {
+  var el = document.getElementById(elId);
+  if (!el || !rawText) return;
+  var lines = rawText.split('\n');
+  var html = '';
+  lines.forEach(function(line) {
+    var trimmed = line.trim();
+    if (!trimmed) return;
+    if (/^\[.+\]$/.test(trimmed)) {
+      html += '<div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;margin:14px 0 6px;padding-top:10px;border-top:1px solid var(--border-soft);">' + trimmed.slice(1,-1) + '</div>';
+    } else if (/^[•·]/.test(trimmed)) {
+      var content = trimmed.replace(/^[•·]\s*/,'');
+      var colonIdx = content.indexOf(': ');
+      if (colonIdx > 0) {
+        var label = content.slice(0, colonIdx);
+        var val = content.slice(colonIdx + 2);
+        html += '<div class="block-line"><div class="block-line-label">' + label + '</div><div class="block-line-val">' + val + '</div></div>';
+      } else {
+        html += '<div class="block-line"><div class="block-line-val">' + content + '</div></div>';
+      }
+    } else {
+      html += '<div style="font-size:13px;color:var(--text2);line-height:1.7;padding:4px 0;">' + trimmed + '</div>';
+    }
+  });
+  el.innerHTML = html;
+}
+
 function showVedicToast(msg) {
   var t = document.getElementById('vedic-ai-toast');
   if (!t) return;
@@ -1276,6 +1328,19 @@ async function loadVedic(year, month, day, hour, gender) {
     setVisible('card-atmakaraka', true);
     renderSadeSati(d);
     setVisible('card-sadesati', true);
+
+    if (d.housePlanetBlock) {
+      renderBlockText('house-planets-body', d.housePlanetBlock);
+      setVisible('card-house-planets', true);
+    }
+    if (d.navamsaBlock) {
+      renderBlockText('navamsa-block-body', d.navamsaBlock);
+      setVisible('card-navamsa-block', true);
+    }
+    if (d.transitBlock) {
+      renderBlockText('transit-body', d.transitBlock);
+      setVisible('card-transit', true);
+    }
 
     window._vedicData = d;
     setVisible('card-ai', true);
