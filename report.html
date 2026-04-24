@@ -3993,7 +3993,7 @@ async function loadSharedReportById(reportId) {
     return;
   }
 
-  // 새로고침 복원: sessionStorage에 프로필 캐시가 있으면 기존 리포트 DB 조회 후 복원
+  // 새로고침 복원: sessionStorage에 프로필 캐시가 있으면 기존 리포트 DB 조회 후 인트로에 "이어보기" 배너 노출
   const _rfCacheKey = (_type === 'child_career') ? 'pico_child_profile' : ('pico_report_profile_' + _type);
   const _rfCached = sessionStorage.getItem(_rfCacheKey);
   if (_rfCached) {
@@ -4009,12 +4009,10 @@ async function loadSharedReportById(reportId) {
           .limit(1)
           .maybeSingle();
         if (_rfData && Array.isArray(_rfData.content) && _rfData.content.length > 1) {
-          renderReport(_rfData.content.slice(0, -1), _rfData.created_at);
-          return;
+          window._cachedReport = _rfData;
         }
       }
     } catch(e) {}
-    // DB 리포트 없음: 모달 없이 intro 바로 표시
     document.getElementById('btnGenerate').style.display = 'none';
     proceedAfterProfile();
     return;
@@ -6042,6 +6040,45 @@ function renderIntro() {
   document.getElementById('introEmoji').innerHTML = d.emoji;
   document.getElementById('introTitle').textContent = _config.title;
   document.getElementById('introDesc').textContent = d.subtitle;
+
+  // ── 이전 리포트 이어보기 배너 (현재 프로필과 일치하는 캐시만 노출) ──
+  try {
+    const prev = window._cachedReport;
+    let resumeEl = document.getElementById('introResumeBanner');
+    const savedKey = (prev && Array.isArray(prev.content) && prev.content.length > 0) ? prev.content[prev.content.length - 1] : null;
+    const curKey = (typeof getProfileKey === 'function') ? getProfileKey() : null;
+    const match = savedKey && curKey && savedKey === curKey;
+    if (prev && Array.isArray(prev.content) && prev.content.length > 1 && match) {
+      if (!resumeEl) {
+        resumeEl = document.createElement('div');
+        resumeEl.id = 'introResumeBanner';
+        const intro = document.getElementById('stateIntro');
+        intro.insertBefore(resumeEl, intro.firstChild);
+      }
+      const dt = prev.created_at ? new Date(prev.created_at) : null;
+      const dtTxt = dt ? (dt.getFullYear() + '.' + String(dt.getMonth()+1).padStart(2,'0') + '.' + String(dt.getDate()).padStart(2,'0')) : '';
+      const whoTxt = (_profile && _profile.name) ? _profile.name + '님' : '';
+      resumeEl.style.cssText = 'margin:0 auto 18px;padding:14px 16px;max-width:420px;background:linear-gradient(135deg,rgba(212,175,55,0.14),rgba(123,94,167,0.10));border:1px solid rgba(212,175,55,0.42);border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;';
+      resumeEl.innerHTML =
+        '<div style="flex:1;min-width:0;text-align:left;">' +
+          '<div style="font-size:10px;font-weight:800;color:var(--gold);letter-spacing:2px;margin-bottom:4px;">✦ 이전 리포트</div>' +
+          '<div style="font-size:13px;color:var(--text);font-weight:700;line-height:1.4;">' +
+            (whoTxt ? whoTxt + '의 ' : '') + '저장된 리포트가 있어요' +
+          '</div>' +
+          (dtTxt ? '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + dtTxt + ' 생성</div>' : '') +
+        '</div>' +
+        '<button id="introResumeBtn" style="flex-shrink:0;background:linear-gradient(135deg,#d4af37,#b89048);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;letter-spacing:0.3px;box-shadow:0 4px 12px rgba(184,144,72,0.35);">이어보기 →</button>';
+      const btn = document.getElementById('introResumeBtn');
+      if (btn) btn.onclick = function() {
+        const c = window._cachedReport;
+        if (c && Array.isArray(c.content)) {
+          renderReport(c.content.slice(0, -1), c.created_at);
+        }
+      };
+    } else if (resumeEl) {
+      resumeEl.remove();
+    }
+  } catch(e) {}
 
   // 분석 대상 표시 (입력한 프로필 확인 + 수정 진입점) — 황금 글로우 카드
   if (_profile && _profile.year) {
