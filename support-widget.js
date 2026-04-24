@@ -19,18 +19,18 @@
   var css = `
 #sw-btn {
   position: fixed; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); right: 16px; z-index: 9980;
-  width: 54px; height: 54px; border-radius: 50%;
+  width: 46px; height: 46px; border-radius: 50%;
   background: linear-gradient(135deg, #c9a84c, #7a5a10);
   border: none; cursor: pointer;
-  box-shadow: 0 4px 16px rgba(122,90,16,0.32);
+  box-shadow: 0 4px 14px rgba(122,90,16,0.3);
   display: flex; align-items: center; justify-content: center;
-  color: #fff9e0; font-size: 22px; line-height: 1;
+  color: #fff9e0; font-size: 19px; line-height: 1;
   transition: transform 0.15s, box-shadow 0.2s;
   animation: sw-pulse 2.4s ease-in-out infinite;
 }
 @keyframes sw-pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(122,90,16,0.32), 0 0 0 0 rgba(201,168,76,0.5); }
-  50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(122,90,16,0.4), 0 0 0 10px rgba(201,168,76,0); }
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 14px rgba(122,90,16,0.3), 0 0 0 0 rgba(201,168,76,0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 6px 18px rgba(122,90,16,0.38), 0 0 0 9px rgba(201,168,76,0); }
 }
 #sw-btn:hover { animation-play-state: paused; transform: scale(1.08); }
 #sw-btn.sw-open { animation: none; }
