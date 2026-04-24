@@ -138,6 +138,39 @@
     .interp-tab{padding:6px 9px;font-size:11px;}
   }
 
+  /* MANGLIK */
+  .manglik-hero{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:12px;border:1.5px solid;margin-bottom:12px;}
+  .manglik-hero.none{background:rgba(0,200,83,.06);border-color:rgba(0,200,83,.30);}
+  .manglik-hero.mild{background:rgba(255,109,0,.06);border-color:rgba(255,109,0,.30);}
+  .manglik-hero.full{background:rgba(255,23,68,.06);border-color:rgba(255,23,68,.30);}
+  .manglik-badge{font-size:13px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;flex-shrink:0;}
+  .manglik-badge.none{background:rgba(0,200,83,.14);color:#067d2c;border:1px solid rgba(0,200,83,.28);}
+  .manglik-badge.mild{background:rgba(255,109,0,.14);color:#b55400;border:1px solid rgba(255,109,0,.30);}
+  .manglik-badge.full{background:rgba(255,23,68,.14);color:#b01a1a;border:1px solid rgba(255,23,68,.30);}
+  .manglik-text{font-size:13px;color:var(--text);line-height:1.6;}
+  .manglik-text b{color:var(--gold-deep);}
+  .manglik-detail{padding:12px 16px;border-radius:10px;background:var(--surface2);font-size:12.5px;line-height:1.75;color:var(--text2);margin-bottom:8px;}
+  .manglik-detail ul{margin:6px 0 0 18px;}
+  .manglik-detail li{margin:3px 0;}
+  .manglik-cancel{padding:10px 14px;border-radius:8px;background:rgba(0,150,136,.06);border:1px solid rgba(0,150,136,.25);font-size:12.5px;color:#00695c;line-height:1.6;}
+  .manglik-cancel b{color:#004d40;}
+
+  /* UPAYA */
+  .upaya-intro{font-size:12.5px;color:var(--muted);line-height:1.65;padding:8px 0 14px;}
+  .upaya-list{display:flex;flex-direction:column;gap:12px;}
+  .upaya-card{padding:14px 16px;border-radius:12px;background:var(--surface2);border:1.5px solid var(--border);}
+  .upaya-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border-soft);}
+  .upaya-planet{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:700;color:var(--gold-deep);}
+  .upaya-why{font-size:11px;color:var(--muted);margin-left:auto;background:rgba(122,36,24,.07);padding:3px 8px;border-radius:6px;border:1px solid rgba(122,36,24,.18);}
+  .upaya-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;}
+  .upaya-item{display:flex;flex-direction:column;gap:3px;padding:8px 10px;border-radius:8px;background:rgba(252,247,234,0.6);}
+  .upaya-key{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.3px;text-transform:uppercase;}
+  .upaya-val{font-size:12.5px;color:var(--text);font-weight:600;}
+  .upaya-val.mantra{font-size:11.5px;font-weight:500;line-height:1.55;}
+  @media(max-width:600px){
+    .upaya-grid{grid-template-columns:1fr 1fr;}
+  }
+
   /* AI ANALYSIS */
   .ai-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border-soft);}
   .ai-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
@@ -221,6 +254,18 @@
     <div id="panel-moon"  class="interp-panel active"></div>
     <div id="panel-nak"   class="interp-panel"></div>
     <div id="panel-dasha" class="interp-panel"></div>
+  </div>
+
+  <!-- MANGLIK DOSHA -->
+  <div class="section-card" id="card-manglik">
+    <div class="section-label">망글릭 도샤 (Manglik Dosha) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 화성의 결혼·관계 영향 체크</span></div>
+    <div id="manglik-body"></div>
+  </div>
+
+  <!-- UPAYA (REMEDIES) -->
+  <div class="section-card" id="card-upaya">
+    <div class="section-label">우파야 (Upaya · 전통 처방) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 약한 행성을 강화하는 인도 전통 처방</span></div>
+    <div id="upaya-body"></div>
   </div>
 
   <!-- AI 심층 분석 -->
@@ -651,6 +696,174 @@ function renderInterp(d) {
       '</div>' : '');
 }
 
+// ── MANGLIK DOSHA ─────────────────────────────────────────
+// 화성이 1/4/7/8/12하우스(라그나 기준) → Manglik
+// 자사인(양자리·전갈자리) 또는 고양(염소자리)·목성 동궁/충 시 도샤 완화
+var MANGLIK_HOUSES = [1, 4, 7, 8, 12];
+var MANGLIK_HOUSE_DESC = {
+  1: '1하우스(자아) — 배우자와 힘겨루기·강한 성격이 결혼에 긴장을 줄 수 있어요.',
+  4: '4하우스(가정) — 가정 내 평화와 부동산·어머니 관련 영역에 영향.',
+  7: '7하우스(결혼) — 가장 강한 Manglik 배치. 파트너십·결혼에 직접 영향.',
+  8: '8하우스(변화) — 배우자 건강·결혼 후 급변·비밀스러운 문제 주의.',
+  12: '12하우스(상실) — 해외 거주·침실 트러블·은밀한 지출에 주의.'
+};
+
+function analyzeManglik(d) {
+  var mars = (d.planets || []).find(function(p){ return p.name === '화성'; });
+  if (!mars) return null;
+  var jup = (d.planets || []).find(function(p){ return p.name === '목성'; });
+  var sat = (d.planets || []).find(function(p){ return p.name === '토성'; });
+
+  var isManglikLagna = MANGLIK_HOUSES.indexOf(mars.house) >= 0;
+
+  // 달 라시 기준 하우스 (chandra kundali) — 달 라시가 1하우스
+  var moonSignIdx = -1, marsSignIdx = -1;
+  var RASHI_LIST = ['양자리','황소자리','쌍둥이자리','게자리','사자자리','처녀자리','천칭자리','전갈자리','사수자리','염소자리','물병자리','물고기자리'];
+  moonSignIdx = RASHI_LIST.indexOf(d.moonSign);
+  marsSignIdx = RASHI_LIST.indexOf(mars.sign);
+  var houseFromMoon = (moonSignIdx >= 0 && marsSignIdx >= 0) ? ((marsSignIdx - moonSignIdx + 12) % 12) + 1 : null;
+  var isManglikMoon = houseFromMoon != null && MANGLIK_HOUSES.indexOf(houseFromMoon) >= 0;
+
+  // 완화 조건
+  var cancel = [];
+  if (mars.sign === '양자리' || mars.sign === '전갈자리') cancel.push('화성이 <b>자사인(' + mars.sign + ')</b>에 위치 — 화성의 기운이 자연스러워 도샤가 크게 완화됩니다.');
+  if (mars.sign === '염소자리') cancel.push('화성이 <b>고양(염소자리)</b>에 위치 — 최상의 힘을 발휘해 도샤가 거의 무력화됩니다.');
+  if (jup && jup.house === mars.house) cancel.push('<b>목성이 화성과 동궁</b>(' + mars.sign + ') — 목성의 자비가 화성의 공격성을 중화시켜요.');
+  // 목성과 화성이 7하우스 거리에 있으면 '충(aspect)' 완화
+  if (jup && Math.abs(((jup.house - mars.house + 12) % 12) - 6) === 0) cancel.push('<b>목성이 화성을 충(7하우스 거리)</b>하고 있어 도샤가 완화됩니다.');
+  if (mars.house === 2 || mars.house === 12) {
+    if (sat && (sat.house === 2 || sat.house === 12)) cancel.push('토성이 같은 영역에 있어 화성의 부정적 영향이 상쇄돼요.');
+  }
+
+  var severity = 'none';
+  var label = '망글릭 아님';
+  var heroText = '화성은 ' + mars.house + '하우스(' + mars.sign + ')에 위치합니다. <b>망글릭 도샤가 해당되지 않아요.</b>';
+  if (isManglikLagna || isManglikMoon) {
+    if (cancel.length >= 2) { severity = 'mild'; label = '완화된 망글릭'; }
+    else if (cancel.length === 1) { severity = 'mild'; label = '완화된 망글릭'; }
+    else { severity = 'full'; label = '망글릭'; }
+    heroText = '화성이 <b>' + mars.house + '하우스' + (isManglikMoon ? ' / 달 기준 ' + houseFromMoon + '하우스' : '') + '(' + mars.sign + ')</b>에 위치해 망글릭 도샤가 형성돼요. ';
+    heroText += severity === 'mild'
+      ? '다행히 완화 조건이 있어 <b>부드럽게 발현</b>됩니다.'
+      : '<b>결혼·파트너십</b>에 주의가 필요한 배치예요.';
+  }
+
+  return {
+    isManglik: isManglikLagna || isManglikMoon,
+    fromLagna: isManglikLagna,
+    fromMoon:  isManglikMoon,
+    houseLagna: mars.house,
+    houseMoon:  houseFromMoon,
+    sign: mars.sign,
+    severity: severity,
+    label: label,
+    heroText: heroText,
+    desc: MANGLIK_HOUSE_DESC[mars.house] || ('화성이 ' + mars.house + '하우스에 위치합니다.'),
+    cancellations: cancel
+  };
+}
+
+function renderManglik(d) {
+  var m = analyzeManglik(d);
+  var body = document.getElementById('manglik-body');
+  if (!m) { body.innerHTML = '<div class="manglik-detail">화성 위치를 파악할 수 없어요.</div>'; return; }
+
+  var html = '';
+  html += '<div class="manglik-hero ' + m.severity + '">' +
+    '<div class="manglik-badge ' + m.severity + '">' + m.label + '</div>' +
+    '<div class="manglik-text">' + m.heroText + '</div>' +
+  '</div>';
+
+  html += '<div class="manglik-detail">' +
+    '<div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;">화성 배치 해석</div>' +
+    m.desc +
+    '<ul>' +
+      '<li>라그나 기준: <b>' + m.houseLagna + '하우스</b> (' + m.sign + ')</li>' +
+      (m.houseMoon ? '<li>달 라시 기준: <b>' + m.houseMoon + '하우스</b></li>' : '') +
+    '</ul>' +
+  '</div>';
+
+  if (m.cancellations.length > 0) {
+    html += '<div class="manglik-cancel">' +
+      '<b>완화 조건</b>' +
+      '<ul style="margin:6px 0 0 18px;">' +
+        m.cancellations.map(function(c){ return '<li>' + c + '</li>'; }).join('') +
+      '</ul>' +
+    '</div>';
+  } else if (m.isManglik) {
+    html += '<div class="manglik-cancel" style="background:rgba(255,23,68,.04);border-color:rgba(255,23,68,.20);color:#8a1a1a;">' +
+      '<b>참고</b> · 완화 조건이 없으므로 결혼 전 전통적 우파야(아래 참고)를 고려해보세요. 두 사람 모두 Manglik인 경우 서로 상쇄되는 것으로 봅니다.' +
+    '</div>';
+  }
+  body.innerHTML = html;
+}
+
+// ── UPAYA (전통 처방) ─────────────────────────────────────
+var UPAYA_DB = {
+  '태양': { gem:'루비 (Manikya)', color:'오렌지·금색', day:'일요일', metal:'구리·금', mantra:'ॐ सूर्याय नमः · 옴 수리야야 나마하', charity:'밀·붉은 천·구리 보시', affirm:'자신감·리더십·권위 강화' },
+  '달':   { gem:'진주 (Moti)', color:'흰색·은색', day:'월요일', metal:'은', mantra:'ॐ चन्द्राय नमः · 옴 찬드라야 나마하', charity:'우유·쌀·은 보시', affirm:'감정 안정·직관·모성 에너지' },
+  '화성': { gem:'적산호 (Moonga)', color:'붉은색', day:'화요일', metal:'구리', mantra:'ॐ अं अंगारकाय नमः · 옴 앙 앙가라카야 나마하', charity:'붉은 렌즈콩·토지·무기 보시', affirm:'용기·실행력·추진력' },
+  '수성': { gem:'에메랄드 (Panna)', color:'초록색', day:'수요일', metal:'황동', mantra:'ॐ बुं बुधाय नमः · 옴 붐 부다야 나마하', charity:'녹두·책·초록 옷 보시', affirm:'소통·학습·지적 민첩성' },
+  '목성': { gem:'옐로우 사파이어 (Pukhraj)', color:'노란색·금색', day:'목요일', metal:'금', mantra:'ॐ बृं बृहस्पतये नमः · 옴 브림 브리하스파타예 나마하', charity:'강황·책·노란 음식 보시', affirm:'지혜·확장·윤리·스승 복' },
+  '금성': { gem:'다이아몬드 (Heera)', color:'흰색·분홍', day:'금요일', metal:'백금·은', mantra:'ॐ शुं शुक्राय नमः · 옴 슘 슈크라야 나마하', charity:'쌀·설탕·흰 옷 보시', affirm:'사랑·아름다움·조화' },
+  '토성': { gem:'블루 사파이어 (Neelam)', color:'검정·남색', day:'토요일', metal:'철', mantra:'ॐ शं शनैश्चराय नमः · 옴 샴 샤네이슈차라야 나마하', charity:'검은 참깨·기름·철 보시', affirm:'인내·책임·구조화' }
+};
+
+function analyzeUpaya(d) {
+  // 약한 행성 감지: Ashtakavarga 빈두 낮은 순 상위 3개 (3점 이하 우선, 없으면 하위 3)
+  var scores = [];
+  var planetsList = ['태양','달','화성','수성','목성','금성','토성'];
+  planetsList.forEach(function(name){
+    var av = d.ashtakavarga && d.ashtakavarga[name];
+    var p  = (d.planets || []).find(function(x){ return x.name === name; });
+    if (av == null || !p) return;
+    var reasons = [];
+    if (av <= 3) reasons.push('아슈타카바르가 ' + av + '점 (약함)');
+    // 추락 체크 (간단: 태양-천칭, 달-전갈, 화성-게, 수성-물고기, 목성-염소, 금성-처녀, 토성-양)
+    var DEB = { '태양':'천칭자리','달':'전갈자리','화성':'게자리','수성':'물고기자리','목성':'염소자리','금성':'처녀자리','토성':'양자리' };
+    if (DEB[name] === p.sign) reasons.push('추락(' + p.sign + ')');
+    // Dusthana 하우스 (6/8/12)
+    if ([6,8,12].indexOf(p.house) >= 0) reasons.push(p.house + '하우스(두스타나)');
+    var weight = (av <= 3 ? (4 - av) * 3 : 0) + (reasons.length * 2);
+    scores.push({ name: name, av: av, reasons: reasons, weight: weight, sign: p.sign, house: p.house });
+  });
+  // weight 높은 순 정렬, 0이면 av 낮은 순
+  scores.sort(function(a,b){ return b.weight - a.weight || a.av - b.av; });
+  var top = scores.slice(0, 3).filter(function(s){ return s.weight > 0 || s.av <= 4; });
+  if (top.length === 0) top = scores.slice(0, 2); // 모두 균형 잡힌 경우 상위 2개
+  return top;
+}
+
+function renderUpaya(d) {
+  var top = analyzeUpaya(d);
+  var body = document.getElementById('upaya-body');
+  var html = '<div class="upaya-intro">약한 위치에 있는 행성을 보강하는 것이 전통 베딕의 핵심 처방이에요. 개인 차트에서 가장 도움이 필요한 행성 ' + top.length + '개에 대한 우파야입니다. <b>보석 착용은 반드시 전문가 상담 후</b> 진행하세요.</div>';
+  html += '<div class="upaya-list">';
+  top.forEach(function(s){
+    var u = UPAYA_DB[s.name];
+    if (!u) return;
+    var why = s.reasons.length > 0 ? s.reasons.join(' · ') : '균형 조정';
+    html += '<div class="upaya-card">' +
+      '<div class="upaya-head">' +
+        '<div class="upaya-planet">' + s.name + '</div>' +
+        '<div style="font-size:12px;color:var(--muted);">' + s.sign + ' · ' + s.house + '하우스 · ' + s.av + '점</div>' +
+        '<div class="upaya-why">' + why + '</div>' +
+      '</div>' +
+      '<div class="upaya-grid">' +
+        '<div class="upaya-item"><div class="upaya-key">보석</div><div class="upaya-val">' + u.gem + '</div></div>' +
+        '<div class="upaya-item"><div class="upaya-key">색상</div><div class="upaya-val">' + u.color + '</div></div>' +
+        '<div class="upaya-item"><div class="upaya-key">요일</div><div class="upaya-val">' + u.day + '</div></div>' +
+        '<div class="upaya-item"><div class="upaya-key">금속</div><div class="upaya-val">' + u.metal + '</div></div>' +
+        '<div class="upaya-item" style="grid-column:1/-1"><div class="upaya-key">만트라</div><div class="upaya-val mantra">' + u.mantra + '</div></div>' +
+        '<div class="upaya-item" style="grid-column:1/-1"><div class="upaya-key">보시 (다나)</div><div class="upaya-val">' + u.charity + '</div></div>' +
+        '<div class="upaya-item" style="grid-column:1/-1"><div class="upaya-key">강화되는 영역</div><div class="upaya-val">' + u.affirm + '</div></div>' +
+      '</div>' +
+    '</div>';
+  });
+  html += '</div>';
+  body.innerHTML = html;
+}
+
 // ── AI 베딕 심층 분석 ──────────────────────────────────────
 var VEDIC_ORB   = 300;
 var VEDIC_SB_URL  = 'https://ymghmfkqctckxxysxkvy.supabase.co';
@@ -880,6 +1093,10 @@ async function loadVedic(year, month, day, hour, gender) {
     setVisible('card-yoga', true);
     renderInterp(d);
     setVisible('card-interp', true);
+    renderManglik(d);
+    setVisible('card-manglik', true);
+    renderUpaya(d);
+    setVisible('card-upaya', true);
 
     window._vedicData = d;
     setVisible('card-ai', true);
