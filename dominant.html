@@ -486,30 +486,200 @@ function showToast(msg) {
   setTimeout(function(){ t.style.opacity = '0'; }, 2800);
 }
 
+function _drawDominantCard(cb) {
+  if (!currentDominant) { cb(null); return; }
+  var info = PI[currentDominant];
+  var W=1080, H=1920;
+  var canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
+  var ctx=canvas.getContext('2d');
+  var pHex=info.color, pRgb=info.rgb;
+
+  function fRR(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);} ctx.fill(); }
+  function sRR(x,y,w,h,r){ ctx.beginPath(); if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);}else{ctx.rect(x,y,w,h);} ctx.stroke(); }
+
+  // 베이지 배경 + 행성색 라디얼 글로우
+  var bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#fdf8ec'); bg.addColorStop(0.5,'#f7efde'); bg.addColorStop(1,'#f0e6d0');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+  var glow=ctx.createRadialGradient(W/2,640,0,W/2,640,700);
+  glow.addColorStop(0,'rgba('+pRgb+',0.32)'); glow.addColorStop(0.5,'rgba('+pRgb+',0.12)'); glow.addColorStop(1,'transparent');
+  ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+  var glow2=ctx.createRadialGradient(W/2,H-320,0,W/2,H-320,520);
+  glow2.addColorStop(0,'rgba('+pRgb+',0.15)'); glow2.addColorStop(1,'transparent');
+  ctx.fillStyle=glow2; ctx.fillRect(0,0,W,H);
+
+  // 별자리 점들
+  [[6,10],[16,6],[28,14],[42,4],[58,10],[72,6],[86,12],[94,5],
+   [4,28],[20,34],[36,26],[50,30],[66,24],[82,32],[96,28],
+   [10,92],[24,88],[38,94],[54,90],[70,94],[86,88],[96,93]].forEach(function(s,i){
+    var sz=1.2+(i%3)*0.6;
+    ctx.beginPath(); ctx.arc(s[0]/100*W,s[1]/100*H,sz,0,Math.PI*2);
+    ctx.fillStyle='rgba('+pRgb+','+(0.25+(i%4)*0.12)+')'; ctx.fill();
+  });
+
+  ctx.textAlign='center';
+
+  // 브랜드 헤더
+  var y=120;
+  ctx.font='500 28px sans-serif';
+  ctx.fillStyle='rgba(122,76,24,0.75)'; ctx.fillText('F O R T U N A',W/2,y);
+  y+=46;
+  ctx.font='400 24px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(74,58,42,0.45)';
+  ctx.fillText('도미넌트 행성 무료 진단',W/2,y);
+
+  // 구분 라인
+  y+=46;
+  var ln=ctx.createLinearGradient(W/2-320,0,W/2+320,0);
+  ln.addColorStop(0,'transparent'); ln.addColorStop(0.5,'rgba('+pRgb+',0.4)'); ln.addColorStop(1,'transparent');
+  ctx.strokeStyle=ln; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(W/2-320,y); ctx.lineTo(W/2+320,y); ctx.stroke();
+
+  // 오빗 링 2개
+  y+=80;
+  var cx=W/2, cy=y+230;
+  ctx.strokeStyle='rgba('+pRgb+',0.35)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(cx,cy,250,0,Math.PI*2); ctx.stroke();
+  ctx.strokeStyle='rgba('+pRgb+',0.2)'; ctx.setLineDash([6,8]);
+  ctx.beginPath(); ctx.arc(cx,cy,200,0,Math.PI*2); ctx.stroke();
+  ctx.setLineDash([]);
+  // 링 위 포인트
+  ctx.beginPath(); ctx.arc(cx,cy-250,9,0,Math.PI*2);
+  ctx.fillStyle=pHex; ctx.fill();
+  // 중앙 행성 이모지 (글로우 배경)
+  var icg=ctx.createRadialGradient(cx,cy,0,cx,cy,180);
+  icg.addColorStop(0,'rgba('+pRgb+',0.55)'); icg.addColorStop(0.5,'rgba('+pRgb+',0.18)'); icg.addColorStop(1,'transparent');
+  ctx.fillStyle=icg; ctx.fillRect(cx-300,cy-300,600,600);
+  ctx.font='240px serif';
+  ctx.fillText(info.emoji,cx,cy+84);
+  y+=480;
+
+  // DOMINANT PLANET 배지
+  ctx.font='600 22px sans-serif';
+  ctx.fillStyle=pHex;
+  ctx.fillText('·  D O M I N A N T   P L A N E T  ·',W/2,y);
+  y+=52;
+
+  // 행성 한글명 (초대형)
+  ctx.font='800 120px "Noto Serif KR",serif';
+  ctx.fillStyle=pHex; ctx.fillText(info.name,W/2,y);
+  y+=48;
+
+  // 행성 영문명
+  ctx.font='500 36px serif';
+  ctx.fillStyle='rgba(74,58,42,0.55)'; ctx.fillText(info.en.toUpperCase(),W/2,y);
+  y+=62;
+
+  // 키워드 라인
+  ctx.font='600 30px "Noto Sans KR",sans-serif';
+  ctx.fillStyle=pHex; ctx.fillText('✦  '+info.keyword+'  ✦',W/2,y);
+  y+=64;
+
+  // 구분선
+  var ln2=ctx.createLinearGradient(W/2-240,0,W/2+240,0);
+  ln2.addColorStop(0,'transparent'); ln2.addColorStop(0.5,'rgba('+pRgb+',0.3)'); ln2.addColorStop(1,'transparent');
+  ctx.strokeStyle=ln2; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-240,y); ctx.lineTo(W/2+240,y); ctx.stroke();
+
+  // 설명 (2~3줄 wrap)
+  y+=60;
+  ctx.font='400 28px "Noto Sans KR",sans-serif';
+  ctx.fillStyle='rgba(74,58,42,0.82)';
+  var desc=info.desc||'';
+  var maxW=W-160, words=desc.split(''), line='', lines=[];
+  for (var i=0;i<words.length;i++){
+    var t=line+words[i];
+    if (ctx.measureText(t).width>maxW && line.length>0){ lines.push(line); line=words[i]; }
+    else { line=t; }
+  }
+  if (line) lines.push(line);
+  lines.slice(0,3).forEach(function(l,i){ ctx.fillText(l,W/2,y+i*44); });
+  y+=lines.slice(0,3).length*44+40;
+
+  // 특징 5개 칩
+  ctx.textAlign='left';
+  var traits=(info.traits||[]).slice(0,5);
+  var tX=80, tW=W-160, tH=64;
+  traits.forEach(function(t,i){
+    var ty=y+i*(tH+14);
+    ctx.fillStyle='rgba('+pRgb+',0.1)'; fRR(tX,ty,tW,tH,18);
+    ctx.strokeStyle='rgba('+pRgb+',0.3)'; ctx.lineWidth=1.2; sRR(tX,ty,tW,tH,18);
+    // 번호 배지
+    ctx.beginPath(); ctx.arc(tX+38,ty+tH/2,20,0,Math.PI*2);
+    ctx.fillStyle=pHex; ctx.fill();
+    ctx.textAlign='center'; ctx.font='700 22px sans-serif'; ctx.fillStyle='#fff';
+    ctx.fillText(String(i+1),tX+38,ty+tH/2+8);
+    // 키워드 제목
+    ctx.textAlign='left'; ctx.font='700 26px "Noto Sans KR",sans-serif'; ctx.fillStyle=pHex;
+    ctx.fillText(t[0],tX+78,ty+tH/2+10);
+  });
+  ctx.textAlign='center';
+
+  // 하단 푸터
+  var fy=H-150;
+  var fl=ctx.createLinearGradient(W/2-260,0,W/2+260,0);
+  fl.addColorStop(0,'transparent'); fl.addColorStop(0.5,'rgba('+pRgb+',0.3)'); fl.addColorStop(1,'transparent');
+  ctx.strokeStyle=fl; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-260,fy); ctx.lineTo(W/2+260,fy); ctx.stroke();
+  ctx.font='600 28px sans-serif';
+  ctx.fillStyle='rgba(122,76,24,0.75)'; ctx.fillText('picolab.kr',W/2,fy+50);
+  ctx.font='400 22px "Noto Sans KR",sans-serif'; ctx.fillStyle='rgba(74,58,42,0.42)';
+  ctx.fillText('나만의 핵심 행성 무료로 찾기 →',W/2,fy+84);
+
+  cb(canvas);
+}
+
 function shareKakao() {
   if (!currentDominant) return;
-  var info = PI[currentDominant];
-  var pageUrl = 'https://picolab.kr/dominant.html';
-  if (window.Kakao && Kakao.Share) {
-    if (!Kakao.isInitialized()) { try { Kakao.init(KAKAO_JS_KEY); } catch(e) {} }
-    Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: '내 도미넌트 행성 — ' + info.name + ' ' + info.emoji,
-        description: info.keyword,
-        imageUrl: 'https://picolab.kr/img/goddess-app.png',
-        link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
-      },
-      buttons: [{ title: '내 핵심 행성 찾기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
-    });
-    return;
-  }
-  if (navigator.share) {
-    var shareText = '내 도미넌트 행성은 ' + info.name + '(' + info.en + ')이에요 ' + info.emoji + '\n\n' + info.keyword + '\n\nFORTUNA에서 내 핵심 행성 찾기 →';
-    navigator.share({ title: 'FORTUNA 도미넌트 행성', text: shareText, url: pageUrl }).catch(function(){});
-    return;
-  }
-  copyLink();
+  var modal = document.getElementById('dominantShareModal');
+  var preview = document.getElementById('dominantPreviewArea');
+  preview.innerHTML = '<div style="color:rgba(74,58,42,0.7);padding:40px 0;">카드 생성 중...</div>';
+  modal.style.display = 'flex';
+  _drawDominantCard(function(canvas){
+    if (!canvas) { preview.innerHTML='<div style="color:#b02a1a;padding:20px;">카드 생성 실패</div>'; return; }
+    window._dominantCanvas = canvas;
+    var img = new Image(); img.src = canvas.toDataURL('image/png');
+    img.style.cssText = 'width:100%;border-radius:12px;display:block;';
+    preview.innerHTML = ''; preview.appendChild(img);
+  });
+}
+
+function doDominantShare() {
+  var canvas = window._dominantCanvas; if (!canvas) return;
+  var info = PI[currentDominant] || {};
+  var pageUrl = 'https://picolab.kr/dominant.html?utm_source=share&utm_medium=kakao';
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  canvas.toBlob(function(blob){
+    if(!blob){ showToast('이미지 생성 실패'); return; }
+    var file = new File([blob],'fortuna_dominant.png',{type:'image/png'});
+    if (isMobile && navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+      navigator.share({ files:[file], title:'내 도미넌트 행성 — '+info.name, text:info.keyword }).catch(function(){});
+    } else if (isMobile && navigator.share) {
+      navigator.share({ title:'FORTUNA 도미넌트 행성', text:info.keyword+' — '+info.name, url: pageUrl }).catch(function(){});
+    } else if (window.Kakao && Kakao.Share) {
+      if (!Kakao.isInitialized()) { try { Kakao.init(KAKAO_JS_KEY); } catch(e) {} }
+      Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: '내 도미넌트 행성 — ' + info.name + ' ' + info.emoji,
+          description: info.keyword,
+          imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
+          link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+        },
+        buttons: [{ title: '내 핵심 행성 찾기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+      });
+    } else {
+      try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); showToast('링크가 복사됐어요'); } catch(e) {}
+    }
+  },'image/png');
+}
+
+function downloadDominantCard() {
+  var canvas = window._dominantCanvas; if (!canvas) return;
+  var a = document.createElement('a');
+  a.download = 'fortuna_dominant_' + (currentDominant||'card') + '.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+function closeDominantShareModal() {
+  document.getElementById('dominantShareModal').style.display = 'none';
 }
 
 function goAstro() {
@@ -629,6 +799,18 @@ async function calcDominant() {
   btn.disabled = false; btn.textContent = '내 도미넌트 행성 확인하기';
 }
 </script>
+<div id="dominantShareModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(40,28,16,0.55);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;">
+  <div style="background:#fcf7ea;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 32px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 -10px 40px rgba(60,40,20,0.18);">
+    <button onclick="closeDominantShareModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(74,58,42,0.6);font-size:22px;cursor:pointer;line-height:1;">✕</button>
+    <div style="text-align:center;margin-bottom:14px;font-size:13px;color:rgba(74,58,42,0.7);font-family:var(--fn);">공유할 카드 미리보기</div>
+    <div id="dominantPreviewArea" style="text-align:center;min-height:180px;margin-bottom:16px;"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onclick="doDominantShare()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;background:rgba(254,229,0,0.35);color:#6b4c00;border:1px solid rgba(254,229,0,0.55);border-radius:14px;font-size:15px;font-weight:700;font-family:var(--fn);cursor:pointer;width:100%;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#6b4c00"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.74 1.72 5.15 4.34 6.58-.18.67-.67 2.48-.77 2.86-.12.48.18.47.37.34.15-.1 2.38-1.62 3.34-2.27.89.13 1.8.19 2.72.19 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>카카오톡 · 친구에게 공유</button>
+      <button onclick="downloadDominantCard()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(138,106,21,0.12);color:#6a4f0c;border:1px solid rgba(138,106,21,0.3);border-radius:14px;font-size:14px;font-family:var(--fn);cursor:pointer;width:100%;font-weight:600;">이미지 다운로드</button>
+      <button onclick="closeDominantShareModal()" style="display:flex;align-items:center;justify-content:center;padding:12px 0;background:rgba(80,55,30,0.08);color:rgba(74,58,42,0.8);border:none;border-radius:14px;font-size:14px;font-family:var(--fn);cursor:pointer;width:100%;">닫기</button>
+    </div>
+  </div>
+</div>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <script src="yongsin-float.js" defer></script>
 </body>
