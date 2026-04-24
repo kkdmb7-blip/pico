@@ -144,11 +144,11 @@
     if (!el) return;
     var greeting =
       '<div class="sw-msg admin" style="max-width:92%;">' +
-        '<b>안녕하세요 ✦ 포르투나 운영자예요.</b><br><br>' +
+        '<b style="color:#6a4f0c;">안녕하세요 ✦ 포르투나 운영자예요.</b><br><br>' +
         '아래 중 어떤 이야기든 편하게 남겨주세요 🙏<br>' +
-        '· <b>원하는 기능</b> · 추가했으면 하는 운세/도구<br>' +
-        '· <b>기능상 문제</b> · 오류, 멈춤, 결과 이상<br>' +
-        '· <b>요청사항</b> · 상담·충전·결제 관련 문의<br><br>' +
+        '· <b style="color:#8a6a15;">원하는 기능</b> · 추가했으면 하는 운세/도구<br>' +
+        '· <b style="color:#a94a3a;">기능상 문제</b> · 오류, 멈춤, 결과 이상<br>' +
+        '· <b style="color:#4a6a9a;">요청사항</b> · 상담·충전·결제 관련 문의<br><br>' +
         '확인하는 대로 바로 답장드릴게요.' +
       '</div>';
     if (!_messages.length) {
@@ -234,8 +234,8 @@
       var el = document.getElementById('sw-msgs');
       if (el) el.innerHTML =
         '<div class="sw-msg admin" style="max-width:92%;">' +
-          '<b>안녕하세요 ✦ 포르투나 운영자예요.</b><br><br>' +
-          '카카오 로그인 후 문의를 남겨주시면<br>확인하는 대로 바로 답장드릴게요 🙏' +
+          '<b style="color:#6a4f0c;">안녕하세요 ✦ 포르투나 운영자예요.</b><br><br>' +
+          '<b style="color:#a94a3a;">카카오 로그인</b> 후 문의를 남겨주시면<br>확인하는 대로 바로 답장드릴게요 🙏' +
         '</div>';
       return;
     }
