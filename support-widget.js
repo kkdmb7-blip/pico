@@ -24,7 +24,9 @@
   border: none; cursor: pointer;
   box-shadow: 0 4px 14px rgba(122,90,16,0.3);
   display: flex; align-items: center; justify-content: center;
-  color: #fff9e0; font-size: 19px; line-height: 1;
+  color: #fff9e0; font-size: 13.5px; font-weight: 700; letter-spacing: 0.02em;
+  font-family: 'Noto Sans KR','Pretendard Variable',Pretendard,sans-serif;
+  line-height: 1;
   transition: transform 0.15s, box-shadow 0.2s;
   animation: sw-pulse 2.4s ease-in-out infinite;
 }
@@ -111,7 +113,7 @@
     var btn = document.createElement('button');
     btn.id = 'sw-btn';
     btn.setAttribute('aria-label', '문의하기');
-    btn.innerHTML = '✦<div id="sw-badge"></div>';
+    btn.innerHTML = '문의<div id="sw-badge"></div>';
     btn.onclick = toggle;
 
     var tip = document.createElement('div');
