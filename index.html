@@ -1749,18 +1749,17 @@
 
 <!-- QIMEN WEEKLY -->
 <section style="display:none;padding:16px 16px;max-width:640px;margin:0 auto;position:relative;z-index:1;" id="qimenWeeklyWrap">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 20px 16px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;">
+    <div style="padding:18px 18px 14px;display:flex;align-items:flex-start;justify-content:space-between;">
       <div>
-        <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">奇門遁甲 · 일가 기반</div>
-        <h2 style="font-size:20px;font-weight:700;margin:0;color:var(--text);">이번 주 <span style="color:var(--gold);">기문 일운</span></h2>
+        <div style="font-size:9.5px;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;">奇門遁甲 · 일가 기반</div>
+        <h2 style="font-size:19px;font-weight:700;margin:0;color:var(--text);">이번 주 <span style="color:var(--gold);">기문 일운</span></h2>
       </div>
-      <div style="font-size:10px;color:rgba(107,107,133,0.6);text-align:right;">直使門 기준<br>일간 오행 맞춤</div>
+      <div id="qimenTodayChip" style="flex-shrink:0;"></div>
     </div>
-    <div id="qimenChartRow" style="margin:0 -4px 6px;"></div>
-    <div id="qimenWeeklyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px;"></div>
-    <div id="qimenWeeklyDetail" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;display:none;font-size:13px;"></div>
-    <p style="margin-top:10px;margin-bottom:0;text-align:center;font-size:10px;color:rgba(107,107,133,0.5);">탭하면 상세 보기 · 기문둔갑 페이지에서 전체 포국 확인</p>
+    <div id="qimenChartRow" style="padding:0 14px 14px;"></div>
+    <div id="qimenWeeklyDetail" style="margin:0 14px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:16px;display:none;"></div>
+    <div style="padding:0 0 13px;text-align:center;font-size:10px;color:rgba(107,107,133,0.38);">탭하면 상세 · 기문둔갑 페이지에서 전체 포국 확인</div>
   </div>
 </section>
 
@@ -6048,10 +6047,8 @@ function updateMypageTab() {
       results=await Promise.all(fetches);
     }catch(e){return;}
 
-    var grid=document.getElementById('qimenWeeklyGrid');
     var detail=document.getElementById('qimenWeeklyDetail');
-    if(!grid)return;
-    grid.innerHTML='';
+    if(!detail)return;
     var weekData=[];
 
     for(var i=0;i<7;i++){
@@ -6070,105 +6067,137 @@ function updateMypageTab() {
       weekData.push({door:door,grade:grade,kw:kw,icon:DOOR_ICON[door]||'<i class="pi pi-crystal"></i>',dt:dt,data:data});
     }
 
-    // ── 비비드 색상 ──
+    // ── 색상 ──
     var GRADE_SCORE = {'대길':5,'길':4,'평':3,'흉':2,'대흉':1};
     var GRADE_VIVID = {'대길':'#34d399','길':'#60a5fa','평':'#a78bfa','흉':'#fb923c','대흉':'#f87171'};
+    var GRADE_BG    = {'대길':'rgba(52,211,153,0.12)','길':'rgba(96,165,250,0.12)','평':'rgba(167,139,250,0.12)','흉':'rgba(251,146,60,0.12)','대흉':'rgba(248,113,113,0.12)'};
 
-    // ── SVG 흐름 차트 ──
-    var chartEl = document.getElementById('qimenChartRow');
-    if(chartEl){
-      var VW=100, VH=54;
-      var xOf=function(i){return (1/14+i/7)*VW;};
-      var yOf=function(s){return VH-((s-1)/4)*(VH-16)-8;};
-      var pts=weekData.map(function(d,i){
-        var s=d?(GRADE_SCORE[d.grade]||3):3;
-        return {x:xOf(i),y:yOf(s),s:s,d:d};
-      });
-      var path='M'+pts[0].x+','+pts[0].y;
-      for(var ci=0;ci<pts.length-1;ci++){
-        var dx=(pts[ci+1].x-pts[ci].x)*0.38;
-        path+=' C'+(pts[ci].x+dx)+','+pts[ci].y+' '+(pts[ci+1].x-dx)+','+pts[ci+1].y+' '+pts[ci+1].x+','+pts[ci+1].y;
-      }
-      var fillPath=path+' L'+pts[pts.length-1].x+','+VH+' L'+pts[0].x+','+VH+' Z';
-      var svg='<svg viewBox="0 0 100 54" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:58px;display:block;">';
-      svg+='<defs>';
-      svg+='<linearGradient id="qwFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(167,139,250,0.28)"/><stop offset="100%" stop-color="rgba(167,139,250,0)"/></linearGradient>';
-      svg+='<filter id="qwGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
-      svg+='</defs>';
-      svg+='<path d="'+fillPath+'" fill="url(#qwFill)"/>';
-      svg+='<path d="'+path+'" fill="none" stroke="rgba(167,139,250,0.55)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>';
-      pts.forEach(function(p,i){
-        var color=p.d?(GRADE_VIVID[p.d.grade]||'#a78bfa'):'#5a4a7a';
-        var isT=(i===3);
-        if(isT){
-          svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="5.5" fill="'+color+'" opacity="0.18" filter="url(#qwGlow)"/>';
-          svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="'+color+'" filter="url(#qwGlow)"/>';
-          svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="1.1" fill="#fff"/>';
-        } else {
-          svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="1.7" fill="'+color+'" opacity="0.8"/>';
-        }
-      });
-      svg+='</svg>';
-      chartEl.innerHTML=svg;
+    // ── 오늘 칩 ──
+    var todayData = weekData[3];
+    var chipEl = document.getElementById('qimenTodayChip');
+    if(chipEl && todayData){
+      var tc=GRADE_VIVID[todayData.grade]||'#a78bfa';
+      chipEl.innerHTML='<div style="text-align:right;">'+
+        '<div style="font-size:9px;color:var(--muted);letter-spacing:0.1em;margin-bottom:4px;">오늘</div>'+
+        '<div style="display:inline-flex;align-items:center;gap:5px;background:'+tc+'18;border:1px solid '+tc+'45;border-radius:20px;padding:4px 10px;">'+
+          '<span style="font-size:13px;color:'+tc+';">'+todayData.icon+'</span>'+
+          '<span style="font-size:11px;font-weight:700;color:'+tc+';">'+doorNameMap[todayData.door]+'門</span>'+
+          '<span style="font-size:10px;font-weight:700;color:'+tc+';">'+todayData.grade+'</span>'+
+        '</div>'+
+      '</div>';
     }
 
-    // ── 카드 렌더링 ──
-    weekData.forEach(function(item,idx){
-      var card=document.createElement('div');
-      var dt=dates[idx];
-      var isToday=dt.isToday;
-      var dayColor=dt.day==='토'?'#fb923c':dt.day==='일'?'#f87171':(isToday?'var(--text)':'var(--muted)');
-      if(!item){
-        card.style.cssText='position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 3px;text-align:center;height:112px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;';
-        card.innerHTML='<div style="font-size:12px;font-weight:600;color:'+dayColor+'">'+dt.day+'</div>'+
-          '<div style="font-size:10px;color:var(--muted)">'+dt.m+'/'+dt.d+'</div>'+
-          '<div style="font-size:10px;color:var(--muted);margin-top:8px;">—</div>';
-      } else {
-        var gc=GRADE_VIVID[item.grade]||'#a78bfa';
-        var barPct=((GRADE_SCORE[item.grade]||3)-1)/4*52+12;
-        card.style.cssText='position:relative;overflow:hidden;background:var(--surface);border:1px solid '+(isToday?gc:'var(--border)')+';border-radius:12px;padding:10px 3px 8px;text-align:center;cursor:pointer;transition:all 0.25s;height:112px;box-sizing:border-box;'+(isToday?'box-shadow:0 0 20px '+gc+'35;':'');
-        card.innerHTML=
-          '<div style="position:absolute;bottom:0;left:0;right:0;height:'+barPct+'%;background:'+gc+';opacity:0.14;transition:height 0.5s ease,opacity 0.25s;border-radius:0 0 12px 12px;"></div>'+
-          '<div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px;">'+
-            '<div style="font-size:12px;font-weight:'+(isToday?'800':'600')+';color:'+dayColor+';">'+dt.day+'</div>'+
-            '<div style="font-size:10px;color:var(--muted)">'+dt.m+'/'+dt.d+'</div>'+
-            '<div style="font-size:18px;color:'+gc+';line-height:1;margin-top:5px;">'+item.icon+'</div>'+
-            '<div style="font-size:10px;font-weight:700;color:'+gc+';margin-top:3px;letter-spacing:0.02em;">'+item.grade+'</div>'+
-            '<div style="font-size:7.5px;color:var(--muted);letter-spacing:0.06em;">'+doorNameMap[item.door]+'門</div>'+
-          '</div>';
-        card.onclick=(function(it,cardEl){return function(){
-          Array.from(grid.children).forEach(function(c){
-            c.style.borderColor='var(--border)';c.style.boxShadow='';
-            var f=c.querySelector('[style*="position:absolute"]');if(f)f.style.opacity='0.14';
-          });
-          var sg=GRADE_VIVID[it.grade]||'#a78bfa';
-          cardEl.style.borderColor=sg;cardEl.style.boxShadow='0 0 20px '+sg+'48';
-          var f=cardEl.querySelector('[style*="position:absolute"]');if(f)f.style.opacity='0.25';
-          detail.style.display='block';
-          detail.innerHTML=
-            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">'+
-              '<div>'+
-                '<div style="font-size:10px;color:#5a4a7a;letter-spacing:0.12em;font-weight:600;margin-bottom:3px;">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') 일운</div>'+
-                '<div style="font-size:10px;color:var(--muted);letter-spacing:0.03em;">'+doorNameMap[it.door]+'門 · 일가 포국</div>'+
-              '</div>'+
-              '<div style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;color:'+sg+';background:'+sg+'1a;border:1px solid '+sg+'45;letter-spacing:0.05em;">'+it.grade+'</div>'+
+    // ── 바 차트 + 컬럼 렌더링 ──
+    var chartEl = document.getElementById('qimenChartRow');
+    if(!chartEl) return;
+
+    // 선택 상태 관리
+    var selectedIdx = -1;
+    var colEls = [];
+
+    function selectCol(idx){
+      colEls.forEach(function(col, i){
+        var bar = col.querySelector('.qw-bar');
+        var label = col.querySelector('.qw-label');
+        if(!bar||!label) return;
+        if(i===idx){
+          var d=weekData[i]; if(!d)return;
+          var gc=GRADE_VIVID[d.grade]||'#a78bfa';
+          bar.style.opacity='1';
+          bar.style.boxShadow='0 0 16px '+gc+'55';
+          label.style.background=GRADE_BG[d.grade]||'rgba(167,139,250,0.1)';
+          label.style.borderRadius='0 0 10px 10px';
+        } else {
+          if(bar) { bar.style.opacity=weekData[i]?'0.6':'0.15'; bar.style.boxShadow=''; }
+          if(label) { label.style.background=''; label.style.borderRadius=''; }
+        }
+      });
+      selectedIdx=idx;
+      var it=weekData[idx];
+      if(!it){detail.style.display='none';return;}
+      var sg=GRADE_VIVID[it.grade]||'#a78bfa';
+      detail.style.display='block';
+      detail.innerHTML=
+        '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">'+
+          '<div style="width:44px;height:44px;border-radius:12px;background:'+sg+'18;border:1px solid '+sg+'35;display:flex;align-items:center;justify-content:center;font-size:22px;color:'+sg+';flex-shrink:0;">'+it.icon+'</div>'+
+          '<div style="flex:1;">'+
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">'+
+              '<span style="font-size:13px;font-weight:700;color:var(--text);">'+doorNameMap[it.door]+'門 ('+it.door+')</span>'+
+              '<span style="padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;color:'+sg+';background:'+sg+'1f;border:1px solid '+sg+'40;">'+it.grade+'</span>'+
             '</div>'+
-            '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">'+
-              '<div style="font-size:24px;color:'+sg+';">'+it.icon+'</div>'+
-              '<div style="font-size:14px;color:#1a120a;line-height:1.7;letter-spacing:-0.01em;">'+it.kw+'</div>'+
-            '</div>'+
-            '<div style="text-align:right;"><a href="#" onclick="event.preventDefault();goQimenDetail()" style="font-size:10px;color:#5a4a7a;text-decoration:none;letter-spacing:0.03em;">전체 포국 보기 →</a></div>';
-        };})(item,card);
+            '<div style="font-size:10px;color:var(--muted);">'+it.dt.m+'월 '+it.dt.d+'일 ('+it.dt.day+') · 일가 포국</div>'+
+          '</div>'+
+        '</div>'+
+        '<div style="font-size:14px;color:#1a120a;line-height:1.75;letter-spacing:-0.01em;padding:10px 12px;background:rgba(0,0,0,0.025);border-radius:10px;margin-bottom:10px;">'+it.kw+'</div>'+
+        '<div style="text-align:right;"><a href="#" onclick="event.preventDefault();goQimenDetail()" style="font-size:10px;color:'+sg+';text-decoration:none;font-weight:600;">전체 포국 보기 →</a></div>';
+    }
+
+    // 차트 컨테이너
+    var chartWrap = document.createElement('div');
+    chartWrap.style.cssText = 'background:rgba(0,0,0,0.028);border-radius:16px;padding:12px 8px 0;overflow:hidden;';
+
+    var barsRow = document.createElement('div');
+    barsRow.style.cssText = 'display:flex;align-items:flex-end;gap:5px;height:76px;';
+
+    var labelsRow = document.createElement('div');
+    labelsRow.style.cssText = 'display:flex;gap:5px;margin-top:0;';
+
+    weekData.forEach(function(item, idx){
+      var dt = dates[idx];
+      var isToday = dt.isToday;
+      var score = item?(GRADE_SCORE[item.grade]||3):0;
+      var color = item?(GRADE_VIVID[item.grade]||'#a78bfa'):'rgba(120,100,150,0.2)';
+      var barH = item ? (14 + Math.round(((score-1)/4)*54)) : 6;
+      var dayColor = dt.day==='토'?'#d97706':dt.day==='일'?'#dc2626':(isToday?'#1a120a':'rgba(90,74,90,0.5)');
+
+      // 바 컬럼
+      var barCol = document.createElement('div');
+      barCol.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:'+(item?'pointer':'default')+';';
+
+      if(isToday){
+        var todayTag = document.createElement('div');
+        todayTag.style.cssText = 'font-size:8px;font-weight:800;color:'+color+';letter-spacing:0.08em;margin-bottom:4px;opacity:0.9;';
+        todayTag.textContent = 'TODAY';
+        barCol.appendChild(todayTag);
       }
-      card.addEventListener('mouseenter',function(){this.style.transform='translateY(-2px)';});
-      card.addEventListener('mouseleave',function(){this.style.transform='';});
-      grid.appendChild(card);
+
+      var bar = document.createElement('div');
+      bar.className = 'qw-bar';
+      bar.style.cssText = 'width:100%;height:'+barH+'px;background:'+color+';border-radius:4px 4px 0 0;opacity:'+(item?(isToday?'1':'0.6'):'0.15')+';transition:opacity 0.2s,box-shadow 0.2s;'+(isToday?'box-shadow:0 0 16px '+color+'50;':'');
+      barCol.appendChild(bar);
+      barsRow.appendChild(barCol);
+
+      // 라벨 컬럼
+      var labelCol = document.createElement('div');
+      labelCol.className = 'qw-label';
+      labelCol.style.cssText = 'flex:1;text-align:center;padding:7px 2px 8px;cursor:'+(item?'pointer':'default')+';transition:background 0.2s;';
+      labelCol.innerHTML =
+        '<div style="font-size:11.5px;font-weight:'+(isToday?'800':'500')+';color:'+dayColor+';line-height:1.2;">'+dt.day+'</div>'+
+        '<div style="font-size:9px;color:var(--muted);margin-top:1px;">'+dt.m+'/'+dt.d+'</div>'+
+        (item?'<div style="margin-top:4px;display:inline-block;padding:1px 5px;background:'+color+'20;border:1px solid '+color+'45;border-radius:5px;font-size:8.5px;font-weight:700;color:'+color+';">'+item.grade+'</div>':'<div style="margin-top:4px;font-size:8px;color:var(--muted);">—</div>');
+
+      labelsRow.appendChild(labelCol);
+
+      // 컬럼 참조 저장 및 이벤트
+      var colRef = { bar: bar, label: labelCol };
+      colEls.push(colRef);
+
+      if(item){
+        var clickFn = (function(i){ return function(){ selectCol(i); }; })(idx);
+        barCol.addEventListener('click', clickFn);
+        labelCol.addEventListener('click', clickFn);
+      }
     });
+
+    chartWrap.appendChild(barsRow);
+    chartWrap.appendChild(labelsRow);
+    chartEl.innerHTML = '';
+    chartEl.appendChild(chartWrap);
 
     // 오늘 자동 선택
     var todayIdx=dates.findIndex(function(d){return d.isToday;});
     if(todayIdx>=0&&weekData[todayIdx]){
-      grid.children[todayIdx].click();
+      selectCol(todayIdx);
     }
 
     document.getElementById('qimenWeeklyWrap').style.display='block';
