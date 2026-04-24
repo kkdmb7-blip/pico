@@ -18,23 +18,35 @@
   // ── CSS 주입 ──
   var css = `
 #sw-btn {
-  position: fixed; bottom: 88px; left: 16px; z-index: 9980;
-  width: 52px; height: 52px; border-radius: 50%;
+  position: fixed; bottom: 156px; right: 16px; z-index: 9980;
+  height: 48px; padding: 0 18px 0 16px; border-radius: 26px;
   background: linear-gradient(135deg, #c9a84c, #7a5a10);
-  border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.22);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; transition: transform 0.15s;
+  border: none; cursor: pointer;
+  box-shadow: 0 6px 20px rgba(122,90,16,0.38);
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  color: #fff; font-family: 'Noto Sans KR','Pretendard Variable',Pretendard,sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.01em;
+  transition: transform 0.15s, box-shadow 0.2s;
+  animation: sw-pulse 2.4s ease-in-out infinite;
+  white-space: nowrap;
 }
-#sw-btn:hover { transform: scale(1.08); }
+#sw-btn .sw-btn-ico { font-size: 15px; line-height: 1; color: #fff9e0; }
+@keyframes sw-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(122,90,16,0.38), 0 0 0 0 rgba(201,168,76,0.55); }
+  50% { transform: scale(1.04); box-shadow: 0 8px 24px rgba(122,90,16,0.45), 0 0 0 12px rgba(201,168,76,0); }
+}
+#sw-btn:hover { animation-play-state: paused; transform: scale(1.06); }
+#sw-btn.sw-open { animation: none; }
 #sw-badge {
-  position: absolute; top: -4px; right: -4px;
+  position: absolute; top: -6px; right: -6px;
   background: #e53935; color: #fff; font-size: 10px; font-weight: 700;
-  width: 18px; height: 18px; border-radius: 50%;
+  min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px;
   display: none; align-items: center; justify-content: center;
-  border: 2px solid #fff;
+  border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  line-height: 1;
 }
 #sw-panel {
-  position: fixed; bottom: 152px; left: 16px; z-index: 9981;
+  position: fixed; bottom: 216px; right: 16px; z-index: 9981;
   width: min(340px, calc(100vw - 32px));
   background: #fdf8f0; border-radius: 18px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
@@ -83,7 +95,8 @@
   function buildUI() {
     var btn = document.createElement('button');
     btn.id = 'sw-btn';
-    btn.innerHTML = '💬<div id="sw-badge"></div>';
+    btn.setAttribute('aria-label', '문의하기');
+    btn.innerHTML = '<span class="sw-btn-ico">✦</span><span>무엇이든 물어보세요</span><div id="sw-badge"></div>';
     btn.onclick = toggle;
 
     var panel = document.createElement('div');
@@ -204,6 +217,8 @@
     _open = true;
     var p = document.getElementById('sw-panel');
     if (p) p.style.display = 'flex';
+    var b = document.getElementById('sw-btn');
+    if (b) b.classList.add('sw-open');
     var uid = getUserId();
     if (!uid) {
       var el = document.getElementById('sw-msgs');
@@ -219,6 +234,8 @@
     _open = false;
     var p = document.getElementById('sw-panel');
     if (p) p.style.display = 'none';
+    var b = document.getElementById('sw-btn');
+    if (b) b.classList.remove('sw-open');
     if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
   }
 
