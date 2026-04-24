@@ -212,6 +212,23 @@
   .sandhi-badge{display:inline-block;margin-left:6px;padding:2px 8px;font-size:10.5px;font-weight:700;color:#b55400;background:rgba(255,109,0,.14);border:1px solid rgba(255,109,0,.30);border-radius:6px;letter-spacing:.2px;vertical-align:middle;}
   .sandhi-note{margin-top:6px;padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.55;color:#7a3a00;background:rgba(255,109,0,.06);border:1px solid rgba(255,109,0,.22);}
 
+  /* GOCHAR TIMELINE */
+  .gochar-planet-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--border-soft);}
+  .gochar-planet-title:first-child{margin-top:0;padding-top:0;border-top:none;}
+  .gochar-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-soft);}
+  .gochar-row:last-child{border-bottom:none;}
+  .gochar-row.cur{background:rgba(154,122,38,0.06);border-radius:8px;padding:10px 12px;margin:0 -12px;}
+  .gochar-date{font-size:11px;color:var(--muted);min-width:120px;flex-shrink:0;padding-top:2px;line-height:1.5;}
+  .gochar-right{flex:1;}
+  .gochar-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .gochar-sign{font-family:'Noto Serif KR',serif;font-size:14px;font-weight:700;color:var(--text);}
+  .gochar-house{font-size:11px;color:var(--muted);}
+  .gochar-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;white-space:nowrap;}
+  .gochar-badge.길{background:rgba(0,200,83,.12);color:#067d2c;border:1px solid rgba(0,200,83,.25);}
+  .gochar-badge.흉{background:rgba(255,23,68,.12);color:#b01a1a;border:1px solid rgba(255,23,68,.25);}
+  .gochar-badge.보통{background:rgba(255,109,0,.10);color:#b55400;border:1px solid rgba(255,109,0,.22);}
+  .gochar-interp{font-size:12.5px;color:var(--text2);line-height:1.65;}
+
   /* BLOCK TEXT */
   .block-text-body{font-size:13.5px;color:var(--text);line-height:1.85;}
   .block-text-body .block-line{padding:8px 0;border-bottom:1px solid var(--border-soft);}
@@ -388,6 +405,12 @@
     </button>
   </div>
   <div class="vedic-ai-toast" id="vedic-ai-toast"></div>
+
+  <!-- 고차르 미래 예측 -->
+  <div class="section-card" id="card-gochar">
+    <div class="section-label">고차르 미래 흐름 <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 목성·토성 10년 트랜짓 예측 (달 라시 기준)</span></div>
+    <div id="gochar-body"></div>
+  </div>
 
   <!-- 리포트 훅 -->
   <div id="vedicReportHook" style="display:none;padding:0 20px 10px;max-width:440px;margin:0 auto;">
@@ -1172,6 +1195,28 @@ function applyVedicTooltips(rootEl) {
   });
 }
 
+function renderGochar(segments) {
+  var el = document.getElementById('gochar-body');
+  if (!el || !segments) return;
+  var KO = { jupiter: '목성 (Jupiter)', saturn: '토성 (Saturn)' };
+  var nowYM = new Date(Date.now() + 9*3600000).toISOString().slice(0, 7);
+  var html = '';
+  ['jupiter','saturn'].forEach(function(p) {
+    var segs = segments[p] || [];
+    html += '<div class="gochar-planet-title">' + KO[p] + '</div>';
+    segs.forEach(function(seg) {
+      var isCur = seg.startDate <= nowYM && nowYM <= seg.endDate;
+      html += '<div class="gochar-row' + (isCur ? ' cur' : '') + '">';
+      html += '<div class="gochar-date">' + seg.startDate.replace('-','년 ') + '월<br>' + seg.endDate.replace('-','년 ') + '월' + (isCur ? '<br><span style="font-size:10px;font-weight:700;color:var(--gold-deep);">현재</span>' : '') + '</div>';
+      html += '<div class="gochar-right">';
+      html += '<div class="gochar-head"><span class="gochar-sign">' + seg.sign + '</span><span class="gochar-house">달 기준 ' + seg.houseFromMoon + '하우스</span><span class="gochar-badge ' + seg.quality + '">' + seg.quality + '</span></div>';
+      html += '<div class="gochar-interp">' + seg.interp + '</div>';
+      html += '</div></div>';
+    });
+  });
+  el.innerHTML = html;
+}
+
 function renderBlockText(elId, rawText) {
   var el = document.getElementById(elId);
   if (!el || !rawText) return;
@@ -1436,6 +1481,10 @@ async function loadVedic(year, month, day, hour, gender) {
     if (d.transitBlock) {
       renderBlockText('transit-body', d.transitBlock);
       setVisible('card-transit', true);
+    }
+    if (d.gocharSegments) {
+      renderGochar(d.gocharSegments);
+      setVisible('card-gochar', true);
     }
 
     window._vedicData = d;
