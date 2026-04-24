@@ -609,9 +609,20 @@ nav {
 <script src="feedback-widget.js?v=3"></script>
 
 <nav>
-  <a onclick="location.href='index.html?tab=report'" class="nav-back">←</a>
+  <a onclick="navBack()" class="nav-back">←</a>
   <div class="nav-title" id="navTitle">리포트</div>
 </nav>
+<script>
+function navBack() {
+  try {
+    var rep = document.getElementById('stateReport');
+    if (rep && rep.style.display && rep.style.display !== 'none') {
+      if (typeof showState === 'function') { showState('intro'); return; }
+    }
+  } catch(e) {}
+  location.href = 'index.html?tab=report';
+}
+</script>
 
 <div class="wrap">
 
@@ -3078,9 +3089,26 @@ function showState(state) {
   document.getElementById('statePersonality').style.display = state === 'personality' ? 'block' : 'none';
   document.getElementById('stateDetail').style.display      = state === 'detail'      ? 'block' : 'none';
   document.getElementById('stateReport').style.display      = state === 'report'      ? 'block' : 'none';
-  if (state === 'report') { try { applyTypeTheme(); } catch(e){} }
+  if (state === 'report') {
+    try { applyTypeTheme(); } catch(e){}
+    // 브라우저/기기 뒤로가기 눌러도 index.html로 바로 빠지지 않고 인트로로 복귀
+    try {
+      if (!history.state || history.state.picoReport !== 'report') {
+        history.pushState({ picoReport: 'report' }, '');
+      }
+    } catch(e) {}
+  }
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
+window.addEventListener('popstate', function(ev) {
+  try {
+    var rep = document.getElementById('stateReport');
+    if (rep && rep.style.display && rep.style.display !== 'none') {
+      // 리포트 보기 중 뒤로가기 → 인트로로 복귀 (한 번 더 누르면 리포트 목록)
+      showState('intro');
+    }
+  } catch(e) {}
+});
 function hideDetail() { showState('intro'); }
 
 // ── 마크다운 인라인 렌더러 ──
