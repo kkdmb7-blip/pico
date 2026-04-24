@@ -651,6 +651,9 @@ async function requestMatchAI() {
     }
   }
 
+  // 공유용으로 _matchData에 AI 본문 보관
+  d._aiTexts = allTexts.slice();
+
   // Supabase reports 저장
   try {
     var matchKey = d._mBirth + '_' + d._fBirth + '_' + d.total;
@@ -696,6 +699,20 @@ function buildMatchShareText(d) {
   } else {
     lines.push('— 도샤: 주요 도샤 없음 —');
   }
+
+  // AI 심층 분석 본문이 있으면 전체 섹션 포함
+  if (d._aiTexts && d._aiTexts.some(function(t){ return t && t.trim(); })) {
+    var titles = ['① 궁합 총평','② 본능·감정 호환','③ 가치관·행성 궁합','④ 결혼 생활 예측','⑤ 관계 성장 실천법'];
+    lines.push('');
+    lines.push('═══ AI 심층 분석 ═══');
+    d._aiTexts.forEach(function(txt, i){
+      if (!txt || !txt.trim()) return;
+      lines.push('');
+      lines.push('【' + titles[i] + '】');
+      lines.push(txt.replace(/\*\*(.+?)\*\*/g,'$1').trim());
+    });
+  }
+
   lines.push('');
   lines.push('내 궁합 확인하기 👇');
   lines.push(pageUrl);
