@@ -667,16 +667,63 @@ async function requestMatchAI() {
 }
 
 // ── 카카오 공유 ───────────────────────────────────────────
+function buildMatchShareText(d) {
+  var pageUrl = 'https://picolab.kr/vedic-match.html?utm_source=share&utm_medium=kakao';
+  var lines = [];
+  lines.push('✦ FORTUNA 베딕 궁합');
+  lines.push(d._mName + ' ♥ ' + d._fName);
+  lines.push('');
+  lines.push('총점 ' + d.total + '/36 · ' + (d.level || ''));
+  lines.push('');
+  lines.push('— 개인 베딕 —');
+  lines.push('남 ' + d._mName + ': ' + d.male.moonSign + ' / ' + d.male.nakshatra + (d.male.pada ? ' 파다' + d.male.pada : ''));
+  lines.push('    가나 ' + (d.male.gana || '-') + ' · 나디 ' + (d.male.nadi || '-') + ' · 요니 ' + (d.male.yoni || '-'));
+  lines.push('여 ' + d._fName + ': ' + d.female.moonSign + ' / ' + d.female.nakshatra + (d.female.pada ? ' 파다' + d.female.pada : ''));
+  lines.push('    가나 ' + (d.female.gana || '-') + ' · 나디 ' + (d.female.nadi || '-') + ' · 요니 ' + (d.female.yoni || '-'));
+  lines.push('');
+  lines.push('— 8쿠타 —');
+  (d.koots || []).forEach(function(k){
+    lines.push('· ' + k.name + ' ' + k.score + '/' + k.max);
+  });
+  lines.push('');
+  var doshas = d.doshas || [];
+  if (doshas.length) {
+    lines.push('— 도샤 —');
+    doshas.forEach(function(ds){
+      var nm = (typeof ds === 'string') ? ds : ds.name;
+      lines.push('· ' + nm);
+    });
+  } else {
+    lines.push('— 도샤: 주요 도샤 없음 —');
+  }
+  lines.push('');
+  lines.push('내 궁합 확인하기 👇');
+  lines.push(pageUrl);
+  return { text: lines.join('\n'), url: pageUrl };
+}
+
+function buildKakaoDesc(d) {
+  var koot = (d.koots || []).map(function(k){ return k.name.replace(/\(.*\)/,'').trim() + ' ' + k.score; }).join(' · ');
+  var doshaLine;
+  var doshas = d.doshas || [];
+  if (doshas.length) {
+    doshaLine = '도샤: ' + doshas.map(function(x){ return typeof x === 'string' ? x : x.name.replace(/\(.*\)/,'').trim(); }).join(', ');
+  } else {
+    doshaLine = '주요 도샤 없음';
+  }
+  return '총점 ' + d.total + '/36 · ' + (d.level || '') + '\n' +
+         '남 ' + d.male.moonSign + '/' + d.male.nakshatra + ' · 여 ' + d.female.moonSign + '/' + d.female.nakshatra + '\n' +
+         koot + '\n' + doshaLine;
+}
+
 function shareMatchKakao() {
   var d = window._matchData;
   if (!d) return;
-  var pageUrl = 'https://picolab.kr/vedic-match.html?utm_source=share&utm_medium=kakao';
+  var built = buildMatchShareText(d);
   var title = 'FORTUNA 베딕 궁합 · ' + d.total + '/36';
-  var desc = d._mName + ' ♥ ' + d._fName + ' — ' + (d.level || '');
-  var shareText = '✦ FORTUNA 베딕 궁합\n' + desc + '\n\n나도 확인해봐 👇 ' + pageUrl;
 
   if (navigator.share) {
-    navigator.share({ title: title, text: shareText, url: pageUrl }).catch(function(){});
+    navigator.share({ title: title, text: built.text, url: built.url }).catch(function(){});
     return;
   }
   if (window.Kakao && Kakao.Share) {
@@ -684,18 +731,18 @@ function shareMatchKakao() {
     Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
-        title: title,
-        description: desc,
+        title: title + ' · ' + d._mName + ' ♥ ' + d._fName,
+        description: buildKakaoDesc(d),
         imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
-        link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+        link: { mobileWebUrl: built.url, webUrl: built.url }
       },
-      buttons: [{ title: '내 궁합 보러가기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+      buttons: [{ title: '내 궁합 보러가기', link: { mobileWebUrl: built.url, webUrl: built.url } }]
     });
     return;
   }
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(shareText);
-    showMatchToast('📋 링크가 복사됐어요!');
+    navigator.clipboard.writeText(built.text);
+    showMatchToast('📋 궁합 전체 결과가 복사됐어요!');
   }
 }
 
