@@ -142,11 +142,21 @@
   function renderMessages() {
     var el = document.getElementById('sw-msgs');
     if (!el) return;
+    var greeting =
+      '<div class="sw-msg admin" style="max-width:92%;">' +
+        '<b>안녕하세요 ✦ 포르투나 운영자예요.</b><br><br>' +
+        '아래 중 어떤 이야기든 편하게 남겨주세요 🙏<br>' +
+        '· <b>원하는 기능</b> · 추가했으면 하는 운세/도구<br>' +
+        '· <b>기능상 문제</b> · 오류, 멈춤, 결과 이상<br>' +
+        '· <b>요청사항</b> · 상담·충전·결제 관련 문의<br><br>' +
+        '확인하는 대로 바로 답장드릴게요.' +
+      '</div>';
     if (!_messages.length) {
-      el.innerHTML = '<div class="sw-empty">아직 메시지가 없어요.<br>궁금한 점을 편하게 물어보세요 🙏</div>';
+      el.innerHTML = greeting;
+      el.scrollTop = 0;
       return;
     }
-    el.innerHTML = _messages.map(function (m) {
+    el.innerHTML = greeting + _messages.map(function (m) {
       var d = new Date(m.created_at);
       var t = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
       var pending = m._pending ? ' style="opacity:0.6;"' : '';
@@ -222,7 +232,11 @@
     var uid = getUserId();
     if (!uid) {
       var el = document.getElementById('sw-msgs');
-      if (el) el.innerHTML = '<div class="sw-empty">카카오 로그인 후 이용할 수 있어요.</div>';
+      if (el) el.innerHTML =
+        '<div class="sw-msg admin" style="max-width:92%;">' +
+          '<b>안녕하세요 ✦ 포르투나 운영자예요.</b><br><br>' +
+          '카카오 로그인 후 문의를 남겨주시면<br>확인하는 대로 바로 답장드릴게요 🙏' +
+        '</div>';
       return;
     }
     loadMessages();
