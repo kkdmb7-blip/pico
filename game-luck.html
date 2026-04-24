@@ -289,6 +289,13 @@
     box-shadow: 0 2px 8px rgba(122,36,24,0.22);
   }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(122,36,24,0.35); }
+  .btn-kakao {
+    background: #fee500; color: #3c1e1e;
+    box-shadow: 0 2px 8px rgba(254,229,0,0.35);
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-kakao:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(254,229,0,0.45); }
+  .btn-kakao svg { width: 16px; height: 16px; flex-shrink: 0; }
   .btn-secondary {
     background: rgba(212,175,90,0.14); color: #8a6b20;
     border: 1px solid rgba(154,122,38,0.28);
@@ -368,7 +375,7 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="shareLuck()"><i class="pi pi-share"></i> 친구에게 공유</button>
+      <button class="btn btn-kakao" onclick="shareLuck()"><svg viewBox="0 0 24 24" fill="#3c1e1e"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.74 1.72 5.15 4.34 6.58-.18.67-.67 2.48-.77 2.86-.12.48.18.47.37.34.15-.1 2.38-1.62 3.34-2.27.89.13 1.8.19 2.72.19 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>카카오로 공유</button>
       <button class="btn btn-secondary" onclick="location.href='index.html'">홈으로</button>
     </div>
     <div class="tomorrow-note" id="tomorrowNote"></div>
@@ -534,11 +541,8 @@ function shareLuck() {
   const link = 'https://picolab.kr/game-luck.html';
   const text = title + '\n\n' + body;
 
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile && navigator.share) {
-    navigator.share({ title, text, url: link }).catch(()=>{});
-  } else if (window.Kakao && window.Kakao.Share) {
-    if (!Kakao.isInitialized()) Kakao.init('25432f8a37e0ac51a5e10cbcba8ae413');
+  if (window.Kakao && window.Kakao.Share) {
+    try { if (!Kakao.isInitialized()) Kakao.init('25432f8a37e0ac51a5e10cbcba8ae413'); } catch(e) {}
     Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
@@ -549,6 +553,8 @@ function shareLuck() {
       },
       buttons: [{ title: '행운 뽑으러 가기', link: { mobileWebUrl: link, webUrl: link } }]
     });
+  } else if (navigator.share) {
+    navigator.share({ title, text, url: link }).catch(()=>{});
   } else if (navigator.clipboard) {
     navigator.clipboard.writeText(text + '\n' + link).then(() => {
       alert('결과가 복사되었어요! 친구에게 붙여넣기 해보세요.');
