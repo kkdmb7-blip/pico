@@ -1216,21 +1216,219 @@
     });
   }catch(e){}
 })();</script>
-<div style="padding:16px 16px;">
-  <div class="memox-banner" onclick="window.location.href='https://kkdmb7-blip.github.io/memox/'" >
-    <div class="memox-banner-left">
-      <div class="memox-banner-title"><i class="pi pi-sparkle"></i> AI 사주 상담</div>
-      <div class="memox-banner-desc">사주+베딕+기문+자미두수 융합 실시간 채팅</div>
+<!-- HERO (비로그인 전용) -->
+<script>(function(){try{if(localStorage.getItem('pico_user')){document.write('<style>.hero,#heroInputWrap{display:none}</style>');}}catch(e){}})();</script>
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div style="font-size:11px;font-weight:700;letter-spacing:3px;color:var(--accent2);margin-bottom:20px;text-transform:uppercase;position:relative;">
+    5,000년 × AI × 실시간
+  </div>
+  <h1>
+    오늘 당신의 운은<br><em>어디를 향하고 있나요?</em>
+  </h1>
+  <p style="color:var(--muted);font-size:16px;margin-bottom:36px;line-height:1.7;position:relative;">
+    사주 · 서양점성술 · 베딕 · 자미두수 · 기문둔갑<br>
+    5개 엔진이 교차 분석해 오늘의 운세를 계산합니다
+  </p>
+  <div style="margin-top:0;font-size:12px;color:var(--muted);display:flex;gap:20px;justify-content:center;flex-wrap:wrap;position:relative;">
+    <span><i class="pi pi-star"></i> 사주 + 점성 + 베딕 통합</span>
+    <span><i class="pi pi-bolt"></i> 실시간 기문둔갑</span>
+    <span><i class="pi pi-crystal"></i> AI 1:1 해석</span>
+  </div>
+</section>
+
+<!-- 히어로 빠른 입력 -->
+<section style="padding:16px 16px;max-width:500px;margin:0 auto;position:relative;z-index:1;" id="heroInputWrap">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;">
+    <div class="saju-form-group">
+      <label>이름</label>
+      <input type="text" id="heroName" placeholder="이름을 입력해주세요" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:#1a120a;font-size:14px;outline:none;">
     </div>
-    <div class="memox-banner-btn">상담 시작 →</div>
+    <div class="saju-form-group">
+      <label>생년월일</label>
+      <div class="saju-date-row">
+        <select id="heroYear"><option value="">년</option></select>
+        <select id="heroMonth"><option value="">월</option></select>
+        <select id="heroDay"><option value="">일</option></select>
+      </div>
+    </div>
+    <div class="saju-form-group">
+      <label>태어난 시간</label>
+      <div style="display:flex;gap:8px;">
+        <select id="heroHour" style="flex:1.1;">
+          <option value="unknown">시 모름</option>
+          <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
+          <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
+          <option value="6">6시</option><option value="7">7시</option><option value="8">8시</option>
+          <option value="9">9시</option><option value="10">10시</option><option value="11">11시</option>
+          <option value="12" selected>12시</option><option value="13">13시</option><option value="14">14시</option>
+          <option value="15">15시</option><option value="16">16시</option><option value="17">17시</option>
+          <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
+          <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
+        </select>
+        <select id="heroMinute" style="flex:1;"></select>
+      </div>
+    </div>
+    <div class="saju-form-group">
+      <label>성별</label>
+      <div class="saju-gender-row">
+        <button class="saju-gender-btn active" id="heroGenderM" onclick="selectHeroGender('M')">남성 ♂</button>
+        <button class="saju-gender-btn" id="heroGenderF" onclick="selectHeroGender('F')">여성 ♀</button>
+      </div>
+    </div>
+    <button class="saju-submit-btn" onclick="goScoreHero()">내 운세 바로 확인하기 <i class="pi pi-sparkle"></i></button>
+  </div>
+</section>
+
+<!-- 사주 MBTI 16유형 (바이럴 히어로) -->
+<div style="padding:0 16px 16px;">
+  <div onclick="window.location.href='mbti-saju.html'" style="position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(212,175,55,0.13),rgba(123,94,167,0.10));border:1px solid rgba(212,175,55,0.35);border-radius:18px;padding:16px 18px;cursor:pointer;transition:all 0.2s;box-shadow:var(--shadow-soft);" onmouseover="this.style.borderColor='rgba(212,175,55,0.6)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='rgba(212,175,55,0.35)';this.style.transform=''">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.4);border-radius:14px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--gold);letter-spacing:1px;margin-bottom:8px;">NEW · 바이럴</div>
+        <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;line-height:1.3;">사주 MBTI 16유형</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;">4축 오행 판정으로 나오는 나의 한 글자 상징</div>
+      </div>
+      <div style="flex-shrink:0;width:72px;height:72px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.25),rgba(123,94,167,0.15));border:1px solid rgba(212,175,55,0.45);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900;color:var(--gold);font-family:'Noto Serif KR',serif;letter-spacing:-2px;">象</div>
+    </div>
+    <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:10px;color:var(--muted);letter-spacing:0.5px;">陽光 · 野花 · 朱雀 · 玄雨 · 孤王 …</div>
+      <div style="font-size:11px;color:var(--gold);font-weight:700;">무료 진단 →</div>
+    </div>
   </div>
 </div>
-<div style="text-align:center;padding:0 16px 14px;">
-  <span id="visitCountChip" style="display:inline-flex;align-items:center;gap:5px;background:rgba(212,175,55,0.10);border:1px solid rgba(212,175,55,0.22);border-radius:20px;padding:4px 14px;font-size:11px;color:var(--muted);opacity:0;transition:opacity 0.4s;">
-    <span style="color:var(--gold);font-size:10px;">✦</span>
-    <span id="visitCountText"></span>
-  </span>
-</div>
+
+<!-- TODAY COSMIC ENERGY -->
+<section id="todayCosmicWrap" style="padding:16px 16px;max-width:960px;margin:0 auto;position:relative;z-index:1;display:none;">
+  <div style="text-align:center;margin-bottom:24px;font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:#8b2a1e;letter-spacing:1px;">
+    <i class="pi pi-sparkle"></i> <span id="cosmicTitleName">당신의</span> 우주 에너지
+  </div>
+  <div id="cosmicGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;"></div>
+</section>
+<style>
+@media(max-width:600px){
+  #cosmicGrid { grid-template-columns: 1fr !important; }
+  #cosmicGrid > div { min-height:unset !important; }
+}
+</style>
+
+<!-- TODAY SCORE -->
+<section style="padding:16px 16px;max-width:640px;margin:0 auto;position:relative;z-index:1;" id="scoreSectionWrap">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 20px 16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div>
+        <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">5대 운세 교차 분석</div>
+        <h2 id="mainScoreTitle" style="font-size:20px;font-weight:700;margin:0;color:var(--text);"><span style="color:var(--gold);">오늘의 운세</span> 점수</h2>
+      </div>
+      <p id="scoreTodayDate" style="font-size:11px;color:var(--muted);margin:0;text-align:right;"></p>
+    </div>
+    <script>
+      (function(){
+        var d = new Date();
+        var days = ['일','월','화','수','목','금','토'];
+        document.getElementById('scoreTodayDate').textContent =
+          (d.getMonth()+1) + '/' + d.getDate() + ' (' + days[d.getDay()] + ')';
+      })();
+    </script>
+
+    <!-- 로그인 전 -->
+    <div id="scoreLoginPrompt" class="score-login-prompt"></div>
+
+    <!-- 로딩 -->
+    <div id="scoreLoadingRow" class="score-loading-row" style="display:none;">
+      <div class="score-loading-spinner"></div>
+      <span>운세 점수 계산 중…</span>
+    </div>
+
+    <!-- 결과 -->
+    <div id="scoreMiniResult" style="display:none;">
+      <div class="score-mini-grid" id="scoreMiniGrid" style="gap:8px;margin-bottom:8px;"></div>
+      <div id="scoreMiniDesc"></div>
+      <div class="score-summary-text" id="scoreSummaryText" style="margin-bottom:8px;font-size:12px;display:none;"></div>
+      <div class="score-bottom-row" style="margin-top:0;">
+        <div class="score-overall-chip">
+          <span>종합</span>
+          <span class="score-overall-num" id="scoreOverallNum">–</span>
+          <span style="font-size:12px;color:var(--muted);">점</span>
+          <a class="score-detail-btn" id="scoreDetailLink" href="score.html" style="margin-left:10px;">자세히 보기 →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECOMMENDED JOURNEY (프로필 있는 사용자용 추천 경로) -->
+<section id="picoJourneyWrap" style="display:none;padding:16px 16px;max-width:640px;margin:0 auto;position:relative;z-index:1;">
+  <div style="background:linear-gradient(135deg,rgba(123,94,167,0.06),rgba(212,175,55,0.04));border:1px solid rgba(123,94,167,0.22);border-radius:16px;padding:16px 16px 14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <div style="font-size:10px;letter-spacing:0.18em;color:rgba(123,94,167,0.85);font-weight:700;margin-bottom:3px;">RECOMMENDED PATH</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);">오늘 이렇게 활용해보세요</div>
+      </div>
+      <button id="picoJourneyDismiss" aria-label="숨기기" style="background:transparent;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:4px 6px;line-height:1;">×</button>
+    </div>
+    <div id="picoJourneySteps" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</section>
+<script>
+(function(){
+  // 디버그: ?resetjourney=1 로 진입하면 추천경로 상태 초기화 후 재표시
+  try {
+    if (new URLSearchParams(location.search).get('resetjourney') === '1') {
+      ['pico_saju_viewed','pico_report_viewed','pico_consult_viewed','pico_journey_dismissed'].forEach(function(k){
+        localStorage.removeItem(k);
+      });
+    }
+  } catch(e) {}
+  function getJourneyState(){
+    return {
+      step1: !!localStorage.getItem('pico_saju_viewed'),
+      step2: !!localStorage.getItem('pico_report_viewed'),
+      step3: !!localStorage.getItem('pico_consult_viewed')
+    };
+  }
+  function renderJourney(){
+    var wrap = document.getElementById('picoJourneyWrap');
+    if(!wrap) return;
+    var hasProfile = !!localStorage.getItem('pico_profile');
+    var dismissed = localStorage.getItem('pico_journey_dismissed') === '1';
+    if(!hasProfile || dismissed){ wrap.style.display='none'; return; }
+    var s = getJourneyState();
+    if(s.step1 && s.step2 && s.step3){ wrap.style.display='none'; return; }
+    var steps = [
+      {k:'step1', title:'내 사주 상세 분석', desc:'일주·격국·용신까지 내 타고난 구조 보기', href:'saju.html', flag:'pico_saju_viewed'},
+      {k:'step2', title:'AI 맞춤 리포트 생성', desc:'재물·연애·대운 등 깊이 있는 해석', href:'index.html?tab=report', flag:'pico_report_viewed'},
+      {k:'step3', title:'AI 상담사에게 질문', desc:'내 사주 기반 1:1 실시간 조언', href:'https://kkdmb7-blip.github.io/memox/', flag:'pico_consult_viewed', external:true}
+    ];
+    var html = '';
+    steps.forEach(function(st, i){
+      var done = s[st.k];
+      var num = i+1;
+      html += '<a href="'+st.href+'"'+(st.external?' target="_blank" rel="noopener"':'')+' onclick="try{localStorage.setItem(\''+st.flag+'\',\'1\');}catch(e){}"'
+        +' style="display:flex;align-items:center;gap:10px;background:'+(done?'rgba(123,94,167,0.06)':'rgba(255,255,255,0.55)')+';border:1px solid '+(done?'rgba(123,94,167,0.25)':'var(--border)')+';border-radius:12px;padding:10px 12px;text-decoration:none;color:var(--text);">'
+        +'<div style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:'+(done?'linear-gradient(135deg,#7b5ea7,#a07fd4)':'var(--surface2)')+';color:'+(done?'#fff':'var(--muted)')+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">'+(done?'✓':num)+'</div>'
+        +'<div style="flex:1;min-width:0;">'
+          +'<div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.35;'+(done?'text-decoration:line-through;opacity:0.65;':'')+'">'+st.title+'</div>'
+          +'<div style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:1px;">'+st.desc+'</div>'
+        +'</div>'
+        +'<div style="flex-shrink:0;color:var(--muted);font-size:14px;">›</div>'
+        +'</a>';
+    });
+    document.getElementById('picoJourneySteps').innerHTML = html;
+    wrap.style.display = 'block';
+  }
+  window._picoRenderJourney = renderJourney;
+  document.addEventListener('DOMContentLoaded', function(){
+    renderJourney();
+    var d = document.getElementById('picoJourneyDismiss');
+    if(d) d.addEventListener('click', function(){ try{localStorage.setItem('pico_journey_dismissed','1');}catch(e){} var w=document.getElementById('picoJourneyWrap'); if(w)w.style.display='none'; });
+  });
+})();
+</script>
+
+
+<div class="section-divider"></div>
+
 <style>
 @keyframes lifeShimmer {
   0% { transform: translateX(-100%); }
@@ -1492,7 +1690,6 @@
     document.getElementById('lifeDaysWrap').style.display = 'block';
   } catch(e) {}
 })();</script>
-<div class="section-divider"></div>
 <!-- 오늘의 행운 뽑기 + 도미넌트 행성 -->
 <div style="padding:16px 16px;display:flex;gap:10px;">
   <div onclick="window.location.href='game-luck.html'" style="flex:1;min-width:0;background:linear-gradient(135deg,#fdf4f1 0%,#f9e8e0 100%);border:1px solid var(--border-soft);border-radius:16px;padding:14px 14px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-shadow:var(--shadow-soft);" onmouseover="this.style.borderColor='rgba(140,74,48,0.5)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='var(--border-soft)';this.style.transform=''">
@@ -1510,24 +1707,6 @@
     <div style="font-size:11px;color:#9b6fe0;font-weight:600;margin-top:8px;">무료 확인 →</div>
   </div>
 </div>
-<!-- 사주 MBTI 16유형 (바이럴 히어로) -->
-<div style="padding:0 16px 16px;">
-  <div onclick="window.location.href='mbti-saju.html'" style="position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(212,175,55,0.13),rgba(123,94,167,0.10));border:1px solid rgba(212,175,55,0.35);border-radius:18px;padding:16px 18px;cursor:pointer;transition:all 0.2s;box-shadow:var(--shadow-soft);" onmouseover="this.style.borderColor='rgba(212,175,55,0.6)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='rgba(212,175,55,0.35)';this.style.transform=''">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
-      <div style="flex:1;min-width:0;">
-        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.4);border-radius:14px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--gold);letter-spacing:1px;margin-bottom:8px;">NEW · 바이럴</div>
-        <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;line-height:1.3;">사주 MBTI 16유형</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5;">4축 오행 판정으로 나오는 나의 한 글자 상징</div>
-      </div>
-      <div style="flex-shrink:0;width:72px;height:72px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.25),rgba(123,94,167,0.15));border:1px solid rgba(212,175,55,0.45);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900;color:var(--gold);font-family:'Noto Serif KR',serif;letter-spacing:-2px;">象</div>
-    </div>
-    <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:10px;color:var(--muted);letter-spacing:0.5px;">陽光 · 野花 · 朱雀 · 玄雨 · 孤王 …</div>
-      <div style="font-size:11px;color:var(--gold);font-weight:700;">무료 진단 →</div>
-    </div>
-  </div>
-</div>
-<div class="section-divider"></div>
 <!-- 오늘의 명언 카드 -->
 <div id="picoQuoteCardWrap" style="padding:16px 16px;display:none;"></div>
 <!-- 사주일기 CTA -->
@@ -1548,197 +1727,24 @@
     </div>
   </div>
 </div>
-<!-- HERO (비로그인 전용) -->
-<script>(function(){try{if(localStorage.getItem('pico_user')){document.write('<style>.hero,#heroInputWrap{display:none}</style>');}}catch(e){}})();</script>
-<section class="hero">
-  <div class="hero-glow"></div>
-  <div style="font-size:11px;font-weight:700;letter-spacing:3px;color:var(--accent2);margin-bottom:20px;text-transform:uppercase;position:relative;">
-    5,000년 × AI × 실시간
+
+<div class="section-divider"></div>
+
+<div style="padding:16px 16px;">
+  <div class="memox-banner" onclick="window.location.href='https://kkdmb7-blip.github.io/memox/'" >
+    <div class="memox-banner-left">
+      <div class="memox-banner-title"><i class="pi pi-sparkle"></i> AI 사주 상담</div>
+      <div class="memox-banner-desc">사주+베딕+기문+자미두수 융합 실시간 채팅</div>
+    </div>
+    <div class="memox-banner-btn">상담 시작 →</div>
   </div>
-  <h1>
-    오늘 당신의 운은<br><em>어디를 향하고 있나요?</em>
-  </h1>
-  <p style="color:var(--muted);font-size:16px;margin-bottom:36px;line-height:1.7;position:relative;">
-    사주 · 서양점성술 · 베딕 · 자미두수 · 기문둔갑<br>
-    5개 엔진이 교차 분석해 오늘의 운세를 계산합니다
-  </p>
-  <div style="margin-top:0;font-size:12px;color:var(--muted);display:flex;gap:20px;justify-content:center;flex-wrap:wrap;position:relative;">
-    <span><i class="pi pi-star"></i> 사주 + 점성 + 베딕 통합</span>
-    <span><i class="pi pi-bolt"></i> 실시간 기문둔갑</span>
-    <span><i class="pi pi-crystal"></i> AI 1:1 해석</span>
-  </div>
-</section>
-
-<!-- 히어로 빠른 입력 -->
-<section style="padding:16px 16px;max-width:500px;margin:0 auto;position:relative;z-index:1;" id="heroInputWrap">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;">
-    <div class="saju-form-group">
-      <label>이름</label>
-      <input type="text" id="heroName" placeholder="이름을 입력해주세요" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:#1a120a;font-size:14px;outline:none;">
-    </div>
-    <div class="saju-form-group">
-      <label>생년월일</label>
-      <div class="saju-date-row">
-        <select id="heroYear"><option value="">년</option></select>
-        <select id="heroMonth"><option value="">월</option></select>
-        <select id="heroDay"><option value="">일</option></select>
-      </div>
-    </div>
-    <div class="saju-form-group">
-      <label>태어난 시간</label>
-      <div style="display:flex;gap:8px;">
-        <select id="heroHour" style="flex:1.1;">
-          <option value="unknown">시 모름</option>
-          <option value="0">0시</option><option value="1">1시</option><option value="2">2시</option>
-          <option value="3">3시</option><option value="4">4시</option><option value="5">5시</option>
-          <option value="6">6시</option><option value="7">7시</option><option value="8">8시</option>
-          <option value="9">9시</option><option value="10">10시</option><option value="11">11시</option>
-          <option value="12" selected>12시</option><option value="13">13시</option><option value="14">14시</option>
-          <option value="15">15시</option><option value="16">16시</option><option value="17">17시</option>
-          <option value="18">18시</option><option value="19">19시</option><option value="20">20시</option>
-          <option value="21">21시</option><option value="22">22시</option><option value="23">23시</option>
-        </select>
-        <select id="heroMinute" style="flex:1;"></select>
-      </div>
-    </div>
-    <div class="saju-form-group">
-      <label>성별</label>
-      <div class="saju-gender-row">
-        <button class="saju-gender-btn active" id="heroGenderM" onclick="selectHeroGender('M')">남성 ♂</button>
-        <button class="saju-gender-btn" id="heroGenderF" onclick="selectHeroGender('F')">여성 ♀</button>
-      </div>
-    </div>
-    <button class="saju-submit-btn" onclick="goScoreHero()">내 운세 바로 확인하기 <i class="pi pi-sparkle"></i></button>
-  </div>
-</section>
-
-<!-- TODAY COSMIC ENERGY -->
-<section id="todayCosmicWrap" style="padding:16px 16px;max-width:960px;margin:0 auto;position:relative;z-index:1;display:none;">
-  <div style="text-align:center;margin-bottom:24px;font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:#8b2a1e;letter-spacing:1px;">
-    <i class="pi pi-sparkle"></i> <span id="cosmicTitleName">당신의</span> 우주 에너지
-  </div>
-  <div id="cosmicGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;"></div>
-</section>
-<style>
-@media(max-width:600px){
-  #cosmicGrid { grid-template-columns: 1fr !important; }
-  #cosmicGrid > div { min-height:unset !important; }
-}
-</style>
-
-<!-- TODAY SCORE -->
-<section style="padding:16px 16px;max-width:640px;margin:0 auto;position:relative;z-index:1;" id="scoreSectionWrap">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 20px 16px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div>
-        <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">5대 운세 교차 분석</div>
-        <h2 id="mainScoreTitle" style="font-size:20px;font-weight:700;margin:0;color:var(--text);"><span style="color:var(--gold);">오늘의 운세</span> 점수</h2>
-      </div>
-      <p id="scoreTodayDate" style="font-size:11px;color:var(--muted);margin:0;text-align:right;"></p>
-    </div>
-    <script>
-      (function(){
-        var d = new Date();
-        var days = ['일','월','화','수','목','금','토'];
-        document.getElementById('scoreTodayDate').textContent =
-          (d.getMonth()+1) + '/' + d.getDate() + ' (' + days[d.getDay()] + ')';
-      })();
-    </script>
-
-    <!-- 로그인 전 -->
-    <div id="scoreLoginPrompt" class="score-login-prompt"></div>
-
-    <!-- 로딩 -->
-    <div id="scoreLoadingRow" class="score-loading-row" style="display:none;">
-      <div class="score-loading-spinner"></div>
-      <span>운세 점수 계산 중…</span>
-    </div>
-
-    <!-- 결과 -->
-    <div id="scoreMiniResult" style="display:none;">
-      <div class="score-mini-grid" id="scoreMiniGrid" style="gap:8px;margin-bottom:8px;"></div>
-      <div id="scoreMiniDesc"></div>
-      <div class="score-summary-text" id="scoreSummaryText" style="margin-bottom:8px;font-size:12px;display:none;"></div>
-      <div class="score-bottom-row" style="margin-top:0;">
-        <div class="score-overall-chip">
-          <span>종합</span>
-          <span class="score-overall-num" id="scoreOverallNum">–</span>
-          <span style="font-size:12px;color:var(--muted);">점</span>
-          <a class="score-detail-btn" id="scoreDetailLink" href="score.html" style="margin-left:10px;">자세히 보기 →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- RECOMMENDED JOURNEY (프로필 있는 사용자용 추천 경로) -->
-<section id="picoJourneyWrap" style="display:none;padding:16px 16px;max-width:640px;margin:0 auto;position:relative;z-index:1;">
-  <div style="background:linear-gradient(135deg,rgba(123,94,167,0.06),rgba(212,175,55,0.04));border:1px solid rgba(123,94,167,0.22);border-radius:16px;padding:16px 16px 14px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div>
-        <div style="font-size:10px;letter-spacing:0.18em;color:rgba(123,94,167,0.85);font-weight:700;margin-bottom:3px;">RECOMMENDED PATH</div>
-        <div style="font-size:15px;font-weight:700;color:var(--text);">오늘 이렇게 활용해보세요</div>
-      </div>
-      <button id="picoJourneyDismiss" aria-label="숨기기" style="background:transparent;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:4px 6px;line-height:1;">×</button>
-    </div>
-    <div id="picoJourneySteps" style="display:flex;flex-direction:column;gap:8px;"></div>
-  </div>
-</section>
-<script>
-(function(){
-  // 디버그: ?resetjourney=1 로 진입하면 추천경로 상태 초기화 후 재표시
-  try {
-    if (new URLSearchParams(location.search).get('resetjourney') === '1') {
-      ['pico_saju_viewed','pico_report_viewed','pico_consult_viewed','pico_journey_dismissed'].forEach(function(k){
-        localStorage.removeItem(k);
-      });
-    }
-  } catch(e) {}
-  function getJourneyState(){
-    return {
-      step1: !!localStorage.getItem('pico_saju_viewed'),
-      step2: !!localStorage.getItem('pico_report_viewed'),
-      step3: !!localStorage.getItem('pico_consult_viewed')
-    };
-  }
-  function renderJourney(){
-    var wrap = document.getElementById('picoJourneyWrap');
-    if(!wrap) return;
-    var hasProfile = !!localStorage.getItem('pico_profile');
-    var dismissed = localStorage.getItem('pico_journey_dismissed') === '1';
-    if(!hasProfile || dismissed){ wrap.style.display='none'; return; }
-    var s = getJourneyState();
-    if(s.step1 && s.step2 && s.step3){ wrap.style.display='none'; return; }
-    var steps = [
-      {k:'step1', title:'내 사주 상세 분석', desc:'일주·격국·용신까지 내 타고난 구조 보기', href:'saju.html', flag:'pico_saju_viewed'},
-      {k:'step2', title:'AI 맞춤 리포트 생성', desc:'재물·연애·대운 등 깊이 있는 해석', href:'index.html?tab=report', flag:'pico_report_viewed'},
-      {k:'step3', title:'AI 상담사에게 질문', desc:'내 사주 기반 1:1 실시간 조언', href:'https://kkdmb7-blip.github.io/memox/', flag:'pico_consult_viewed', external:true}
-    ];
-    var html = '';
-    steps.forEach(function(st, i){
-      var done = s[st.k];
-      var num = i+1;
-      html += '<a href="'+st.href+'"'+(st.external?' target="_blank" rel="noopener"':'')+' onclick="try{localStorage.setItem(\''+st.flag+'\',\'1\');}catch(e){}"'
-        +' style="display:flex;align-items:center;gap:10px;background:'+(done?'rgba(123,94,167,0.06)':'rgba(255,255,255,0.55)')+';border:1px solid '+(done?'rgba(123,94,167,0.25)':'var(--border)')+';border-radius:12px;padding:10px 12px;text-decoration:none;color:var(--text);">'
-        +'<div style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:'+(done?'linear-gradient(135deg,#7b5ea7,#a07fd4)':'var(--surface2)')+';color:'+(done?'#fff':'var(--muted)')+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">'+(done?'✓':num)+'</div>'
-        +'<div style="flex:1;min-width:0;">'
-          +'<div style="font-size:13px;font-weight:700;color:var(--text);line-height:1.35;'+(done?'text-decoration:line-through;opacity:0.65;':'')+'">'+st.title+'</div>'
-          +'<div style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:1px;">'+st.desc+'</div>'
-        +'</div>'
-        +'<div style="flex-shrink:0;color:var(--muted);font-size:14px;">›</div>'
-        +'</a>';
-    });
-    document.getElementById('picoJourneySteps').innerHTML = html;
-    wrap.style.display = 'block';
-  }
-  window._picoRenderJourney = renderJourney;
-  document.addEventListener('DOMContentLoaded', function(){
-    renderJourney();
-    var d = document.getElementById('picoJourneyDismiss');
-    if(d) d.addEventListener('click', function(){ try{localStorage.setItem('pico_journey_dismissed','1');}catch(e){} var w=document.getElementById('picoJourneyWrap'); if(w)w.style.display='none'; });
-  });
-})();
-</script>
+</div>
+<div style="text-align:center;padding:0 16px 14px;">
+  <span id="visitCountChip" style="display:inline-flex;align-items:center;gap:5px;background:rgba(212,175,55,0.10);border:1px solid rgba(212,175,55,0.22);border-radius:20px;padding:4px 14px;font-size:11px;color:var(--muted);opacity:0;transition:opacity 0.4s;">
+    <span style="color:var(--gold);font-size:10px;">✦</span>
+    <span id="visitCountText"></span>
+  </span>
+</div>
 
 <div class="section-divider"></div>
 
@@ -1810,8 +1816,6 @@
 })();
 </script>
 
-<div class="section-divider"></div>
-
 <!-- QIMEN WEEKLY -->
 <section style="display:none;padding:16px 16px;max-width:640px;margin:0 auto;position:relative;z-index:1;" id="qimenWeeklyWrap">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 20px 16px;">
@@ -1827,8 +1831,6 @@
     <p style="margin-top:10px;margin-bottom:0;text-align:center;font-size:10px;color:rgba(107,107,133,0.5);">탭하면 상세 보기 · 기문둔갑 페이지에서 전체 포국 확인</p>
   </div>
 </section>
-
-<div class="section-divider"></div>
 
 <!-- NAME SCORE WIDGET -->
 <section style="padding:16px 16px;max-width:640px;margin:0 auto;position:relative;z-index:1;" id="nameScoreWrap">
