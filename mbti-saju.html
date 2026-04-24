@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="pico-icons.css">
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <style>
 :root{
   --bg:#f4ede0;
@@ -339,11 +340,121 @@ select.input option{background:#fff;color:var(--text);}
   box-shadow:var(--shadow-lift);white-space:nowrap;pointer-events:none;
 }
 
+/* ═══════ 이게 뭐야? intro card ═══════ */
+.method-card{
+  background:linear-gradient(135deg,rgba(212,175,55,0.07),rgba(123,94,167,0.06));
+  border:1px solid rgba(212,175,55,0.24);
+  border-radius:14px;padding:13px 16px;margin-bottom:18px;
+  box-shadow:var(--shadow-soft);
+}
+.method-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:10px;user-select:none;}
+.method-head-title{font-size:12.5px;color:var(--ink);font-weight:700;letter-spacing:0.02em;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.method-head-pill{background:rgba(212,175,55,0.18);border:1px solid rgba(212,175,55,0.35);border-radius:11px;padding:2px 9px;font-size:10px;color:var(--gold);font-weight:700;letter-spacing:0.02em;}
+.method-toggle{font-size:10px;color:var(--muted);transition:transform 0.25s;flex-shrink:0;}
+.method-card.open .method-toggle{transform:rotate(180deg);}
+.method-body{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed rgba(212,175,55,0.28);font-size:12.5px;color:var(--text2);line-height:1.8;}
+.method-card.open .method-body{display:block;animation:fadeUp 0.3s ease;}
+.method-body .mb-block{margin-bottom:10px;}
+.method-body .mb-block:last-child{margin-bottom:0;}
+.method-body .mb-label{font-size:11px;font-weight:700;letter-spacing:0.06em;margin-bottom:4px;}
+.method-body .mb-label.sci{color:#1e8e3e;}
+.method-body .mb-label.fun{color:#c85a2e;}
+.method-body .mb-mini{font-size:11.5px;color:var(--muted);margin-top:8px;padding:8px 10px;background:rgba(212,175,55,0.06);border-left:2px solid rgba(212,175,55,0.35);border-radius:4px;}
+
+/* ═══════ 판정 근거 evidence card ═══════ */
+.evidence-card{
+  background:var(--surface);border:1px solid var(--border-soft);
+  border-radius:16px;padding:20px;margin-bottom:14px;
+  box-shadow:var(--shadow-soft);
+}
+.evidence-title{font-size:12.5px;color:var(--muted);letter-spacing:0.1em;margin-bottom:14px;font-weight:700;text-align:center;}
+.evidence-title::before,.evidence-title::after{content:'◇';margin:0 8px;opacity:0.45;font-size:9px;}
+.ev-bars{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+.ev-row{display:flex;align-items:center;gap:10px;}
+.ev-el{width:34px;font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;color:var(--type);}
+.ev-bar{flex:1;height:9px;background:rgba(var(--type-rgb),0.08);border-radius:5px;overflow:hidden;}
+.ev-fill{height:100%;background:linear-gradient(90deg,var(--type),rgba(var(--type-rgb),0.55));border-radius:5px;transition:width 0.9s ease;}
+.ev-pct{width:42px;font-size:11.5px;color:var(--text2);text-align:right;font-weight:600;font-variant-numeric:tabular-nums;}
+.ev-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:12px;border-top:1px dashed var(--border-soft);}
+.ev-meta-item{font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;}
+.ev-meta-item strong{color:var(--type);font-family:'Noto Serif KR',serif;font-size:13.5px;font-weight:700;}
+
+/* ═══════ 바이럴 액션 카드 ═══════ */
+.viral-actions{
+  background:linear-gradient(135deg,rgba(var(--type-rgb),0.06),rgba(212,175,55,0.05));
+  border:1px solid rgba(var(--type-rgb),0.22);
+  border-radius:16px;padding:18px 16px 14px;margin-bottom:14px;
+}
+.va-title{font-size:12.5px;color:var(--muted);letter-spacing:0.1em;margin-bottom:12px;font-weight:700;text-align:center;}
+.va-title::before{content:'✦';margin-right:8px;color:var(--type);}
+.va-title::after{content:'✦';margin-left:8px;color:var(--type);}
+.va-grid{display:flex;flex-direction:column;gap:8px;}
+.va-btn{
+  display:flex;align-items:center;gap:12px;padding:12px 13px;
+  background:#fffaf0;border:1px solid var(--border-soft);border-radius:12px;
+  cursor:pointer;transition:all 0.2s;text-align:left;width:100%;text-decoration:none;color:inherit;
+}
+.va-btn:hover{border-color:rgba(var(--type-rgb),0.45);transform:translateY(-1px);box-shadow:0 4px 12px rgba(var(--type-rgb),0.08);}
+.va-btn-icon{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:rgba(var(--type-rgb),0.12);display:flex;align-items:center;justify-content:center;
+  font-family:'Noto Serif KR',serif;font-size:18px;font-weight:700;color:var(--type);
+}
+.va-btn-body{flex:1;min-width:0;}
+.va-btn-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;letter-spacing:-0.005em;}
+.va-btn-sub{font-size:11px;color:var(--muted);line-height:1.45;}
+.va-btn-arrow{color:var(--type);font-size:14px;flex-shrink:0;font-weight:700;}
+
+/* ═══════ 16유형 도감 ═══════ */
+.dex-section{
+  background:var(--surface);border:1px solid var(--border-soft);
+  border-radius:16px;padding:22px 18px;margin-bottom:14px;
+  box-shadow:var(--shadow-soft);
+}
+.dex-head{text-align:center;margin-bottom:16px;}
+.dex-title{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;color:var(--ink);letter-spacing:0.03em;margin-bottom:4px;}
+.dex-title::before,.dex-title::after{content:'✦';margin:0 8px;opacity:0.45;font-size:11px;color:var(--gold);}
+.dex-sub{font-size:11.5px;color:var(--muted);line-height:1.55;}
+.dex-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.dex-item{
+  padding:14px 6px 10px;border-radius:12px;
+  background:#fffaf0;border:1px solid var(--border-soft);
+  text-align:center;cursor:pointer;transition:all 0.2s;position:relative;
+}
+.dex-item:hover{border-color:var(--gold);transform:translateY(-1px);box-shadow:var(--shadow-soft);}
+.dex-item.active{
+  border-color:var(--type);background:linear-gradient(135deg,rgba(var(--type-rgb),0.14),rgba(var(--type-rgb),0.04));
+  box-shadow:0 4px 14px rgba(var(--type-rgb),0.22);
+}
+.dex-hanja{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:5px;}
+.dex-item.active .dex-hanja{color:var(--type);}
+.dex-code{font-size:9px;color:var(--muted);letter-spacing:0.1em;margin-bottom:3px;font-weight:600;}
+.dex-name{font-size:10.5px;color:var(--text2);line-height:1.3;font-weight:600;}
+.dex-rarity{position:absolute;top:5px;right:5px;font-size:9px;color:var(--muted);background:rgba(0,0,0,0.04);border-radius:8px;padding:1px 5px;font-weight:700;font-variant-numeric:tabular-nums;}
+.you-tag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--type);color:#fff;border-radius:10px;padding:2px 8px;font-size:9px;font-weight:700;letter-spacing:0.06em;z-index:2;white-space:nowrap;box-shadow:0 2px 6px rgba(var(--type-rgb),0.35);}
+
+/* 도감 모달 */
+.dex-modal{display:none;position:fixed;inset:0;z-index:9998;background:rgba(40,28,16,0.55);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;}
+.dex-modal.open{display:flex;}
+.dex-modal-body{
+  background:#fcf7ea;border-radius:20px;width:100%;max-width:420px;
+  padding:28px 24px 22px;max-height:82vh;overflow-y:auto;position:relative;
+  box-shadow:0 10px 40px rgba(60,40,20,0.22);
+}
+.dex-modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:rgba(74,58,42,0.6);font-size:22px;cursor:pointer;line-height:1;}
+.dex-modal-hanja{font-family:'Noto Serif KR',serif;font-size:56px;font-weight:700;text-align:center;letter-spacing:10px;line-height:1;margin-bottom:12px;}
+.dex-modal-code{font-size:10px;color:var(--muted);letter-spacing:0.32em;text-align:center;margin-bottom:6px;font-weight:600;}
+.dex-modal-title{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;text-align:center;margin-bottom:4px;}
+.dex-modal-sub{font-size:12.5px;color:var(--text2);text-align:center;margin-bottom:14px;}
+.dex-modal-rarity{text-align:center;margin-bottom:16px;font-size:11.5px;color:var(--muted);}
+.dex-modal-desc{font-size:12.5px;color:var(--text);line-height:1.85;padding:14px 16px;background:rgba(0,0,0,0.025);border-radius:12px;}
+
 @media (max-width:480px){
   .hero-title{font-size:23px;}
   .hanja-char{font-size:58px;letter-spacing:8px;}
   .result-title{font-size:28px;}
   .hanja-box{padding:16px 22px;}
+  .dex-grid{grid-template-columns:repeat(3,1fr);}
 }
 </style>
 </head>
@@ -362,6 +473,26 @@ select.input option{background:#fff;color:var(--text);}
     <div class="hero-badge">무료 · 사주 16유형 진단</div>
     <h1 class="hero-title">MBTI로는 안 보이던<br>진짜 내 유형은?</h1>
     <p class="hero-sub">사주 16유형은 생년월일과 태어난 시간으로<br>당신의 본질을 한 단어로 보여줘요</p>
+  </div>
+
+  <div class="method-card" id="methodCard">
+    <div class="method-head" onclick="document.getElementById('methodCard').classList.toggle('open')">
+      <div class="method-head-title">이게 뭐야? <span class="method-head-pill">근거 70 · 재미 30</span></div>
+      <div class="method-toggle">▼</div>
+    </div>
+    <div class="method-body">
+      <div class="mb-block">
+        <div class="mb-label sci">● 근거 있는 영역 (전통 명리학)</div>
+        · 오행 비율 (火·水·木·金·土 분포 계산)<br>
+        · 일간 음양 (甲丙戊庚壬 양 / 乙丁己辛癸 음)<br>
+        · 신강·신약 (일간 힘의 강약 판정)
+      </div>
+      <div class="mb-block">
+        <div class="mb-label fun">● 재미 영역 (창작 프레임)</div>
+        16유형 한자 라벨(陽光·野花·朱雀 등), 희귀도 %, 매칭/상극은 MBTI 스타일로 재해석한 구성이에요. 전통 명리학엔 "16유형" 개념이 없어요.
+      </div>
+      <div class="mb-mini">진짜 깊이 있는 분석이 궁금하면 결과 화면 맨 아래 "타고난 기질 리포트"로 — 격국·용신·십신까지 AI가 해석해줘요.</div>
+    </div>
   </div>
 
   <div class="form-card">
@@ -414,6 +545,15 @@ select.input option{background:#fff;color:var(--text);}
       <div class="result-desc" id="resultDesc"></div>
     </div>
 
+    <div class="evidence-card">
+      <div class="evidence-title">판정 근거 · 실제 오행 분포</div>
+      <div class="ev-bars" id="evBars"></div>
+      <div class="ev-meta">
+        <div class="ev-meta-item"><span>일간</span><strong id="evDayStem">—</strong></div>
+        <div class="ev-meta-item"><span>기운</span><strong id="evStrength">—</strong></div>
+      </div>
+    </div>
+
     <div class="axes-card">
       <div class="axes-title">당신을 구성하는 4축</div>
       <div class="axes-grid">
@@ -446,6 +586,36 @@ select.input option{background:#fff;color:var(--text);}
       </div>
     </div>
 
+    <div class="viral-actions">
+      <div class="va-title">이렇게 더 재밌게 써봐</div>
+      <div class="va-grid">
+        <button class="va-btn" onclick="resetForNewTest()">
+          <div class="va-btn-icon">人</div>
+          <div class="va-btn-body">
+            <div class="va-btn-title">친구·가족 생일로 돌려보기</div>
+            <div class="va-btn-sub">나 말고 주변 사람 유형도 테스트</div>
+          </div>
+          <div class="va-btn-arrow">↑</div>
+        </button>
+        <a class="va-btn" href="/index.html">
+          <div class="va-btn-icon">緣</div>
+          <div class="va-btn-body">
+            <div class="va-btn-title">연인과 궁합 깊이 분석</div>
+            <div class="va-btn-sub">오행·십신 기반 상세 궁합 (홈에서)</div>
+          </div>
+          <div class="va-btn-arrow">→</div>
+        </a>
+        <button class="va-btn" onclick="scrollToDex()">
+          <div class="va-btn-icon">圖</div>
+          <div class="va-btn-body">
+            <div class="va-btn-title">16유형 전체 도감 보기</div>
+            <div class="va-btn-sub">나보다 희귀한 유형은 몇 %일까?</div>
+          </div>
+          <div class="va-btn-arrow">↓</div>
+        </button>
+      </div>
+    </div>
+
     <div class="share-card">
       <div class="share-label">친구에게 공유하기</div>
       <div class="share-btns">
@@ -458,6 +628,26 @@ select.input option{background:#fff;color:var(--text);}
       <p class="upsell-text">16유형은 시작일 뿐이에요.<br>격국·용신·십신까지 내 사주의 깊이를 알아보세요.</p>
       <a href="/report.html?type=character" class="upsell-btn">타고난 기질 리포트 →</a>
     </div>
+  </div>
+
+  <div class="dex-section" id="dexSection">
+    <div class="dex-head">
+      <div class="dex-title">16유형 전체 도감</div>
+      <div class="dex-sub">희귀도 낮은 순 정렬 · 카드를 누르면 설명이 열려요</div>
+    </div>
+    <div class="dex-grid" id="dexGrid"></div>
+  </div>
+</div>
+
+<div class="dex-modal" id="dexModal" onclick="closeDexModal(event)">
+  <div class="dex-modal-body" onclick="event.stopPropagation()">
+    <button class="dex-modal-close" onclick="closeDexModal()">✕</button>
+    <div class="dex-modal-hanja" id="dmHanja"></div>
+    <div class="dex-modal-code" id="dmCode"></div>
+    <div class="dex-modal-title" id="dmTitle"></div>
+    <div class="dex-modal-sub" id="dmSub"></div>
+    <div class="dex-modal-rarity" id="dmRarity"></div>
+    <div class="dex-modal-desc" id="dmDesc"></div>
   </div>
 </div>
 
@@ -674,6 +864,7 @@ async function calcMbti() {
     });
     var sd = await res.json();
     if (!sd || !sd.summary) { showToast('사주 계산 오류'); btn.disabled=false; btn.textContent='내 사주 16유형 확인하기'; return; }
+    window._lastSd = sd;
 
     var code = classifyMbti(sd);
     currentType = code;
@@ -708,6 +899,9 @@ function renderResult(code, info) {
   document.getElementById('resultSubtitle').textContent = info.subtitle;
   document.getElementById('rarityBadge').innerHTML = '한국인 중 상위 ' + info.rarity + '% 유형';
   document.getElementById('resultDesc').textContent = info.desc;
+
+  renderEvidence(window._lastSd || {});
+  renderDex(code);
 
   // 4축
   var f1 = code.charAt(0), f2 = code.charAt(1), f3 = code.charAt(2), f4 = code.charAt(3);
@@ -810,33 +1004,33 @@ function _drawMbtiCard(cb) {
   ctx.font='600 22px sans-serif';
   ctx.fillStyle=tHex;
   ctx.fillText('·  S A J U   1 6   T Y P E S  ·',W/2,y);
-  y+=42;
+  y+=54;
 
   // 코드 4자리
   ctx.font='500 26px "Noto Serif KR",serif';
   ctx.fillStyle='rgba(74,58,42,0.55)';
   ctx.fillText(currentType.split('').join(' · '),W/2,y);
-  y+=70;
+  y+=108;
 
   // 한글 타이틀 (대형)
   ctx.font='800 84px "Noto Serif KR",serif';
   ctx.fillStyle=tHex; ctx.fillText(info.title,W/2,y);
-  y+=42;
+  y+=68;
 
   // 서브타이틀
   ctx.font='400 28px "Noto Sans KR",sans-serif';
   ctx.fillStyle='rgba(74,58,42,0.72)'; ctx.fillText(info.subtitle,W/2,y);
-  y+=54;
+  y+=76;
 
   // 희귀도 배지
   var rtxt = '한국인 중 상위 ' + info.rarity + '% 유형';
   ctx.font='700 26px "Noto Sans KR",sans-serif';
   var rw = ctx.measureText(rtxt).width + 60;
   var rx = (W-rw)/2, ry = y;
-  ctx.fillStyle='rgba('+tRgb+',0.1)'; fRR(rx, ry-30, rw, 48, 24);
-  ctx.strokeStyle='rgba('+tRgb+',0.4)'; ctx.lineWidth=1.5; sRR(rx, ry-30, rw, 48, 24);
+  ctx.fillStyle='rgba('+tRgb+',0.1)'; fRR(rx, ry-32, rw, 52, 26);
+  ctx.strokeStyle='rgba('+tRgb+',0.4)'; ctx.lineWidth=1.5; sRR(rx, ry-32, rw, 52, 26);
   ctx.fillStyle=tHex; ctx.fillText('✦  '+rtxt+'  ✦',W/2,y);
-  y+=74;
+  y+=82;
 
   // 구분선
   var ln2=ctx.createLinearGradient(W/2-240,0,W/2+240,0);
@@ -844,7 +1038,7 @@ function _drawMbtiCard(cb) {
   ctx.strokeStyle=ln2; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-240,y); ctx.lineTo(W/2+240,y); ctx.stroke();
 
   // 설명
-  y+=56;
+  y+=64;
   ctx.font='400 28px "Noto Sans KR",sans-serif';
   ctx.fillStyle='rgba(74,58,42,0.82)';
   var desc = info.desc || '';
@@ -856,7 +1050,7 @@ function _drawMbtiCard(cb) {
   }
   if (line) lines.push(line);
   lines.slice(0,3).forEach(function(l,idx){ ctx.fillText(l,W/2,y+idx*46); });
-  y += lines.slice(0,3).length*46 + 40;
+  y += lines.slice(0,3).length*46 + 50;
 
   // 강점/약점 칩
   ctx.textAlign='left';
@@ -875,7 +1069,7 @@ function _drawMbtiCard(cb) {
     ctx.textAlign='left';
     chipX += cw + 10;
   });
-  y+=66;
+  y+=88;
 
   ctx.fillStyle='rgba(168,70,102,0.9)';
   ctx.font='700 26px "Noto Sans KR",sans-serif';
@@ -916,32 +1110,34 @@ function shareKakao() {
   var preview = document.getElementById('mbtiPreviewArea');
   preview.innerHTML = '<div style="color:rgba(74,58,42,0.7);padding:40px 0;">카드 생성 중...</div>';
   modal.style.display = 'flex';
+  window._mbtiUploadedUrl = null;
+  window._mbtiUploading = false;
   _drawMbtiCard(function(canvas){
     if (!canvas) { preview.innerHTML='<div style="color:#b02a1a;padding:20px;">카드 생성 실패</div>'; return; }
     window._mbtiCanvas = canvas;
     var img = new Image(); img.src = canvas.toDataURL('image/png');
     img.style.cssText = 'width:100%;border-radius:12px;display:block;';
     preview.innerHTML = ''; preview.appendChild(img);
+    window._mbtiUploading = true;
+    try {
+      var dataUrl = canvas.toDataURL('image/png');
+      fetch('https://fortuna.kkdmb7.workers.dev/upload-share-card', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ imageBase64: dataUrl, filename: 'mbti_' + currentType })
+      }).then(function(r){ return r.json(); }).then(function(d){
+        if (d && d.url) window._mbtiUploadedUrl = d.url;
+        window._mbtiUploading = false;
+      }).catch(function(e){ console.warn('upload fail', e); window._mbtiUploading = false; });
+    } catch(e) { console.warn('upload init fail', e); window._mbtiUploading = false; }
   });
 }
 
-async function doMbtiShare() {
-  var canvas = window._mbtiCanvas; if (!canvas) return;
+function doMbtiShare() {
+  var canvas = window._mbtiCanvas; if (!canvas || !currentType) return;
   var info = TYPES[currentType] || {};
   var pageUrl = 'https://picolab.kr/mbti-saju.html?utm_source=share&utm_medium=kakao';
   var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-  showToast('카드 업로드 중...');
-  var uploadedUrl = null;
-  try {
-    var dataUrl = canvas.toDataURL('image/png');
-    var up = await fetch('https://fortuna.kkdmb7.workers.dev/upload-share-card', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ imageBase64: dataUrl, filename: 'mbti_' + currentType })
-    });
-    var upData = await up.json();
-    if (upData && upData.url) uploadedUrl = upData.url;
-  } catch(e) { console.warn('upload fail', e); }
+  var uploadedUrl = window._mbtiUploadedUrl;
 
   function sendKakaoFeed(imgUrl) {
     if (!window.Kakao || !Kakao.Share) return false;
@@ -958,21 +1154,34 @@ async function doMbtiShare() {
         buttons:[{ title:'내 사주 유형 찾기', link:{ mobileWebUrl: pageUrl, webUrl: pageUrl } }]
       });
       return true;
-    } catch(e) { return false; }
+    } catch(e) { console.warn('kakao send fail', e); return false; }
   }
 
-  if (uploadedUrl && sendKakaoFeed(uploadedUrl)) return;
-
-  canvas.toBlob(function(blob){
-    if (!blob) { showToast('이미지 생성 실패'); return; }
-    var file = new File([blob],'fortuna_mbti.png',{type:'image/png'});
-    if (isMobile && navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
-      navigator.share({ files:[file], title:'내 사주 16유형 — '+info.title, text: info.subtitle+'\n'+pageUrl }).catch(function(){});
-    } else if (sendKakaoFeed('https://picolab.kr/img/goddess/goddess-app.png')) {
-    } else {
+  if (isMobile && navigator.share) {
+    canvas.toBlob(function(blob){
+      if (blob) {
+        var file = new File([blob],'fortuna_mbti.png',{type:'image/png'});
+        if (navigator.canShare && navigator.canShare({files:[file]})) {
+          navigator.share({ files:[file], title:'내 사주 16유형 — '+info.title, text: info.subtitle+'\n'+pageUrl }).catch(function(){});
+          return;
+        }
+      }
+      if (uploadedUrl && sendKakaoFeed(uploadedUrl)) return;
+      if (sendKakaoFeed('https://picolab.kr/img/goddess/goddess-app.png')) return;
       try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); showToast('링크가 복사됐어요'); } catch(e) {}
-    }
-  },'image/png');
+    },'image/png');
+    return;
+  }
+
+  if (uploadedUrl) {
+    if (sendKakaoFeed(uploadedUrl)) return;
+  }
+  if (window._mbtiUploading) {
+    showToast('카드 업로드 중… 2초 후 다시 눌러주세요');
+    return;
+  }
+  if (sendKakaoFeed('https://picolab.kr/img/goddess/goddess-app.png')) return;
+  try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); showToast('링크가 복사됐어요'); } catch(e) {}
 }
 
 function downloadMbtiCard() {
@@ -1005,8 +1214,106 @@ function fallbackCopy(text) {
   try { document.execCommand('copy'); showToast('복사됐어요!'); } catch(e) {}
   document.body.removeChild(el);
 }
+
+// ══════════════════════════════════════════════
+// 판정 근거 · 도감 · 바이럴 액션
+// ══════════════════════════════════════════════
+function renderEvidence(sd) {
+  var five = (sd && (sd.five_pct || sd.five_count)) || {};
+  var elements = [
+    {key:'wood', han:'木'},
+    {key:'fire', han:'火'},
+    {key:'earth',han:'土'},
+    {key:'metal',han:'金'},
+    {key:'water',han:'水'}
+  ];
+  var values = elements.map(function(e){ return Number(five[e.key]) || 0; });
+  var max = Math.max.apply(null, values); if (max < 1) max = 100;
+  var html = '';
+  elements.forEach(function(e, i){
+    var v = values[i];
+    var pct = Math.round(v * 10) / 10;
+    var w = Math.max(3, (v/max)*100);
+    html += '<div class="ev-row"><div class="ev-el">'+e.han+'</div>'+
+      '<div class="ev-bar"><div class="ev-fill" style="width:'+w+'%"></div></div>'+
+      '<div class="ev-pct">'+pct+'%</div></div>';
+  });
+  var evBars = document.getElementById('evBars');
+  if (evBars) evBars.innerHTML = html;
+  var dayPillar = (sd && sd.summary && sd.summary.pillars && sd.summary.pillars.day) || '';
+  var evDay = document.getElementById('evDayStem');
+  if (evDay) evDay.textContent = dayPillar || '—';
+  var evStrength = document.getElementById('evStrength');
+  if (evStrength) evStrength.textContent = (sd && sd.strength_level_5) || '—';
+}
+
+function renderDex(activeCode) {
+  var codes = Object.keys(TYPES);
+  var entries = codes.map(function(c){
+    var t = TYPES[c];
+    return { code:c, hanja:t.hanja, title:t.title, rarity:t.rarity };
+  });
+  entries.sort(function(a,b){ return (a.rarity||99) - (b.rarity||99); });
+  var html = '';
+  entries.forEach(function(t){
+    var isMe = (t.code === activeCode);
+    var cls = isMe ? ' active' : '';
+    html += '<div class="dex-item'+cls+'" onclick="openDexModal(\''+t.code+'\')">'+
+      (isMe?'<div class="you-tag">YOU</div>':'')+
+      '<div class="dex-rarity">'+t.rarity+'%</div>'+
+      '<div class="dex-hanja">'+t.hanja+'</div>'+
+      '<div class="dex-code">'+t.code+'</div>'+
+      '<div class="dex-name">'+t.title+'</div>'+
+    '</div>';
+  });
+  var dex = document.getElementById('dexGrid');
+  if (dex) dex.innerHTML = html;
+}
+
+function openDexModal(code) {
+  var t = TYPES[code]; if (!t) return;
+  var root = document.documentElement;
+  root.style.setProperty('--type', t.color);
+  root.style.setProperty('--type-rgb', t.rgb);
+  var hanjaEl = document.getElementById('dmHanja');
+  hanjaEl.textContent = t.hanja;
+  hanjaEl.style.color = t.color;
+  document.getElementById('dmCode').textContent = code.split('').join(' · ');
+  var titleEl = document.getElementById('dmTitle');
+  titleEl.textContent = t.title;
+  titleEl.style.color = t.color;
+  document.getElementById('dmSub').textContent = t.subtitle;
+  document.getElementById('dmRarity').innerHTML = '한국인 중 상위 <strong style="color:'+t.color+';font-weight:700;">'+t.rarity+'%</strong> 유형';
+  document.getElementById('dmDesc').textContent = t.desc;
+  document.getElementById('dexModal').classList.add('open');
+}
+
+function closeDexModal(e) {
+  if (e && e.target && e.target.id !== 'dexModal') return;
+  document.getElementById('dexModal').classList.remove('open');
+  if (currentType && TYPES[currentType]) {
+    var info = TYPES[currentType];
+    document.documentElement.style.setProperty('--type', info.color);
+    document.documentElement.style.setProperty('--type-rgb', info.rgb);
+  }
+}
+
+function resetForNewTest() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(function(){
+    var ycal = document.getElementById('calcYear');
+    if (ycal) ycal.focus();
+  }, 600);
+}
+
+function scrollToDex() {
+  var el = document.getElementById('dexSection');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 초기 도감 렌더링 (결과 없어도 노출)
+try { renderDex(''); } catch(e) {}
 </script>
-<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <script src="yongsin-float.js" defer></script>
 </body>
 </html>
