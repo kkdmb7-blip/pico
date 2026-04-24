@@ -9022,7 +9022,7 @@ function showConsultBanner() {
   // 용신 펫 EXP 연동 (리포트 생성 완료 시 +100, 리포트 타입당 하루 1번)
   try {
     var _rps = JSON.parse(localStorage.getItem('yongsin_pet') || '{}');
-    var _rpd = new Date().toISOString().slice(0,10);
+    var _rpd = new Date(Date.now() + 9*3600000).toISOString().slice(0,10);
     var _rpk = '_reportExpDate_' + (_type || 'x');
     if (_rps.element && _rps[_rpk] !== _rpd) {
       _rps[_rpk] = _rpd;
