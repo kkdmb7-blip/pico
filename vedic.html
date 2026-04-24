@@ -171,6 +171,47 @@
     .upaya-grid{grid-template-columns:1fr 1fr;}
   }
 
+  /* ATMAKARAKA / KARAKAMSHA */
+  .ak-hero{display:flex;gap:14px;align-items:center;padding:18px 20px;border-radius:14px;background:linear-gradient(135deg,rgba(140,90,210,0.10),rgba(180,130,50,0.08));border:1.5px solid rgba(140,90,210,0.35);margin-bottom:12px;}
+  .ak-symbol{font-size:34px;line-height:1;color:var(--gold-deep);flex-shrink:0;}
+  .ak-title-row{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
+  .ak-planet{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--gold-deep);}
+  .ak-role{font-size:11.5px;font-weight:700;color:#4a3280;letter-spacing:.3px;padding:3px 8px;border-radius:6px;background:rgba(140,90,210,0.14);border:1px solid rgba(140,90,210,0.30);}
+  .ak-meta{font-size:12.5px;color:var(--muted);line-height:1.55;}
+  .ak-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .ak-box{padding:12px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);}
+  .ak-box-title{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px;}
+  .ak-box-val{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+  .ak-box-sub{font-size:12px;color:var(--text2);line-height:1.6;}
+  .ak-interp{padding:12px 14px;border-radius:10px;background:rgba(252,247,234,.55);border:1px solid var(--border-soft);font-size:13px;line-height:1.8;color:var(--text);margin-top:10px;}
+  .ak-interp b{color:var(--gold-deep);}
+  @media(max-width:600px){.ak-grid{grid-template-columns:1fr;}}
+
+  /* SADE SATI */
+  .sade-hero{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:12px;border:1.5px solid;margin-bottom:12px;}
+  .sade-hero.active{background:rgba(88,80,120,.08);border-color:rgba(88,80,120,.32);}
+  .sade-hero.special{background:rgba(255,109,0,.06);border-color:rgba(255,109,0,.30);}
+  .sade-hero.none{background:rgba(0,200,83,.05);border-color:rgba(0,200,83,.26);}
+  .sade-badge{font-size:13px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;flex-shrink:0;}
+  .sade-badge.active{background:rgba(88,80,120,.16);color:#3d2f66;border:1px solid rgba(88,80,120,.34);}
+  .sade-badge.special{background:rgba(255,109,0,.14);color:#b55400;border:1px solid rgba(255,109,0,.30);}
+  .sade-badge.none{background:rgba(0,200,83,.14);color:#067d2c;border:1px solid rgba(0,200,83,.28);}
+  .sade-text{font-size:13px;color:var(--text);line-height:1.6;}
+  .sade-text b{color:var(--gold-deep);}
+  .sade-timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+  .sade-phase{padding:10px 10px;border-radius:10px;text-align:center;border:1.5px solid var(--border);background:var(--surface2);}
+  .sade-phase.cur{background:linear-gradient(135deg,rgba(140,90,210,0.14),rgba(140,90,210,0.06));border-color:rgba(140,90,210,0.42);}
+  .sade-phase-num{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.3px;}
+  .sade-phase-name{font-family:'Noto Serif KR',serif;font-size:13px;font-weight:700;color:var(--text);margin-top:2px;}
+  .sade-phase-desc{font-size:10.5px;color:var(--text2);margin-top:3px;line-height:1.45;}
+  .sade-detail{padding:12px 14px;border-radius:10px;background:var(--surface2);font-size:12.5px;line-height:1.75;color:var(--text2);}
+  .sade-detail ul{margin:6px 0 0 18px;}
+  .sade-detail li{margin:3px 0;}
+
+  /* DASHA SANDHI 인라인 배지 */
+  .sandhi-badge{display:inline-block;margin-left:6px;padding:2px 8px;font-size:10.5px;font-weight:700;color:#b55400;background:rgba(255,109,0,.14);border:1px solid rgba(255,109,0,.30);border-radius:6px;letter-spacing:.2px;vertical-align:middle;}
+  .sandhi-note{margin-top:6px;padding:8px 12px;border-radius:8px;font-size:12px;line-height:1.55;color:#7a3a00;background:rgba(255,109,0,.06);border:1px solid rgba(255,109,0,.22);}
+
   /* AI ANALYSIS */
   .ai-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border-soft);}
   .ai-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
@@ -266,6 +307,18 @@
   <div class="section-card" id="card-upaya">
     <div class="section-label">우파야 (Upaya · 전통 처방) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 약한 행성을 강화하는 인도 전통 처방</span></div>
     <div id="upaya-body"></div>
+  </div>
+
+  <!-- ATMAKARAKA / KARAKAMSHA -->
+  <div class="section-card" id="card-atmakaraka">
+    <div class="section-label">아트마카라카 · 카라캄샤 <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 영혼의 행성과 이번 생의 영적 목적</span></div>
+    <div id="atmakaraka-body"></div>
+  </div>
+
+  <!-- SADE SATI -->
+  <div class="section-card" id="card-sadesati">
+    <div class="section-label">사데 사티 (Sade Sati) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400;letter-spacing:0">· 토성 7.5년 대주기 현재 위치</span></div>
+    <div id="sadesati-body"></div>
   </div>
 
   <!-- AI 심층 분석 -->
@@ -612,18 +665,25 @@ function renderDasha(d) {
   const wrap = document.getElementById('dasha-wrap');
   wrap.innerHTML = '';
 
+  const sandhi = d.dashaSandhi || null;
+
   // 마하다샤
   const maha = d.currentDasha;
   if (maha) {
     const mahaDiv = document.createElement('div');
     mahaDiv.className = 'dasha-row';
     const next = nextDasha(maha.planet);
+    const sandhiBadge = (sandhi && sandhi.mahaSandhi) ? '<span class="sandhi-badge">Sandhi 전환기</span>' : '';
+    const sandhiNote  = (sandhi && sandhi.mahaSandhi)
+      ? '<div class="sandhi-note">마하다샤 종료 <b>' + sandhi.mahaRemainMonths + '개월</b> 남음 (~6개월 이내). ' + sandhi.mahaPlanet + ' 에너지를 정리하고 <b>' + sandhi.nextMaha + '</b> 주기를 준비하는 전환 구간이에요. 큰 결단·장기 계약은 다음 다샤 초기로 미루는 편이 좋음.</div>'
+      : '';
     mahaDiv.innerHTML =
       '<div class="dasha-tag">마하다샤 (Mahadasha) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400">· 현재 운세 대주기</span></div>' +
-      '<div class="dasha-planet">' + maha.planet + ' 다샤</div>' +
+      '<div class="dasha-planet">' + maha.planet + ' 다샤' + sandhiBadge + '</div>' +
       '<div class="dasha-date">~ ' + maha.endDate + ' 종료</div>' +
       '<div class="dasha-remain">' + remainText(maha.endDate) + '</div>' +
-      (next ? '<div class="dasha-next">다음: ' + next.planet + ' 다샤 (' + next.years + '년) 예정</div>' : '');
+      (next ? '<div class="dasha-next">다음: ' + next.planet + ' 다샤 (' + next.years + '년) 예정</div>' : '') +
+      sandhiNote;
     wrap.appendChild(mahaDiv);
   }
 
@@ -632,11 +692,16 @@ function renderDasha(d) {
   if (antar) {
     const antarDiv = document.createElement('div');
     antarDiv.className = 'dasha-row';
+    const antarSandhiBadge = (sandhi && sandhi.antarSandhi) ? '<span class="sandhi-badge">Sandhi 전환기</span>' : '';
+    const antarSandhiNote  = (sandhi && sandhi.antarSandhi && sandhi.nextAntar)
+      ? '<div class="sandhi-note">안타르다샤 종료 <b>' + sandhi.antarRemainMonths + '개월</b> 남음. 단기 테마가 <b>' + sandhi.nextAntar + '</b> 으로 전환되는 구간 — 마무리와 인수인계의 시기.</div>'
+      : '';
     antarDiv.innerHTML =
       '<div class="dasha-tag">안타르다샤 (Antardasha) — 현재 하위 다샤</div>' +
-      '<div class="dasha-planet" style="font-size:18px;color:var(--accent)">' + antar.planet + '</div>' +
+      '<div class="dasha-planet" style="font-size:18px;color:var(--accent)">' + antar.planet + antarSandhiBadge + '</div>' +
       '<div class="dasha-date">' + antar.start + ' ~ ' + antar.end + '</div>' +
-      '<div class="dasha-remain">' + remainText(antar.end) + '</div>';
+      '<div class="dasha-remain">' + remainText(antar.end) + '</div>' +
+      antarSandhiNote;
     wrap.appendChild(antarDiv);
   }
 }
@@ -861,6 +926,115 @@ function renderUpaya(d) {
     '</div>';
   });
   html += '</div>';
+  body.innerHTML = html;
+}
+
+// ── ATMAKARAKA / KARAKAMSHA ──────────────────────────────
+var AK_INTERP = {
+  '태양': { role:'자아·권위·영적 중심', theme:'자아의 확립과 리더십의 완성. 아버지·권위와의 관계 정화가 이번 생의 과제. 공적 무대에서 자아를 표현하고 책임지는 경험이 영적 성장의 도구가 됨.' },
+  '달':   { role:'감정·양육·직관', theme:'감정의 정화와 모성/양육의 카르마. 대중·대지·물의 흐름과 깊이 연결. 마음을 다스리고 공감 능력을 통해 타인에게 안식을 주는 것이 영혼의 임무.' },
+  '화성': { role:'의지·실행·투쟁', theme:'용기와 절제 사이의 균형. 이번 생은 분노·충동을 정화하고 정의로운 행동·보호자의 역할로 전환하는 수행. 경쟁과 싸움이 영적 연마의 도구.' },
+  '수성': { role:'지성·언어·소통', theme:'말과 글, 지식의 쓰임에 대한 책임. 이번 생은 분별력을 통해 진실을 전달하고, 학문·교육·협상으로 세상에 기여. 가벼움과 진실 사이의 균형이 과제.' },
+  '목성': { role:'지혜·확장·스승', theme:'진리의 전수와 도덕적 지혜의 완성. 이번 생은 스승·법·철학을 통해 타인을 바른 길로 이끄는 역할. 지혜를 공유하며 자녀·제자의 성장을 돕는 것이 영적 축복.' },
+  '금성': { role:'사랑·예술·조화', theme:'관계와 아름다움의 완성. 이번 생은 사랑과 예술을 통해 영혼을 정화하고, 파트너십·여성성·창조적 표현에서 완성도를 쌓는 수행. 쾌락과 헌신의 균형이 과제.' },
+  '토성': { role:'책임·인내·구조', theme:'카르마의 청산과 겸손의 완성. 이번 생은 시간·노동·규율을 통해 과거 생의 빚을 갚고, 낮은 자·소외된 자와 함께하는 봉사가 영적 해방의 열쇠.' },
+};
+
+// 카라캄샤 라시별 영적 방향 (12 라시)
+var KK_INTERP = {
+  '양자리':   '전사·개척·리더의 길 — 이번 생은 처음을 여는 용기와 독립의 완성. 분노를 열정으로 승화시키는 수행.',
+  '황소자리': '안정·물질·감각의 길 — 자원 관리·장인정신·인내를 통해 지상의 가치를 완성하는 영혼.',
+  '쌍둥이자리': '소통·학습·중재자의 길 — 지식을 모으고 전하는 것이 영적 임무. 경계·언어·네트워크를 연결.',
+  '게자리':   '양육·가정·뿌리의 길 — 감정의 정화와 모성적 돌봄. 과거와의 화해와 안식처 만들기가 영적 과제.',
+  '사자자리': '권위·창조·표현의 길 — 자아의 찬란한 표현과 예술적 리더십. 자녀·후대에게 영감을 주는 역할.',
+  '처녀자리': '봉사·치유·분석의 길 — 작은 것의 완성과 실용적 지혜. 건강·치유·장인의 길로 영혼을 닦음.',
+  '천칭자리': '관계·정의·조화의 길 — 파트너십과 균형의 완성. 외교·법·예술을 통한 세계의 조화가 임무.',
+  '전갈자리': '변환·오컬트·심연의 길 — 죽음과 재생의 수행. 비밀의 지식·치유·심리학을 통한 영혼의 변성.',
+  '사수자리': '스승·철학·순례의 길 — 진리 탐구와 윤리의 완성. 법·종교·교육으로 세상을 밝히는 영혼.',
+  '염소자리': '책임·성취·구조의 길 — 사회적 질서와 장기 성취. 제도·공적 무대에서 영혼의 무게를 완성.',
+  '물병자리': '혁신·공동체·이상의 길 — 기존 틀을 넘어 인류적 비전 제시. 과학·네트워크·이상 실현이 임무.',
+  '물고기자리': '해탈·자비·영성의 길 — 경계를 녹이는 자비와 영적 귀환. 예술·봉사·명상으로 해탈에 접근.',
+};
+
+function renderAtmakaraka(d) {
+  var body = document.getElementById('atmakaraka-body');
+  var ak = d.atmakaraka;
+  var kk = d.karakamsha;
+  if (!ak) { body.innerHTML = '<div class="sade-detail">아트마카라카 정보를 계산할 수 없어요.</div>'; return; }
+  var akI = AK_INTERP[ak.name] || { role:'영혼의 주행성', theme:'이번 생의 영적 주인공 행성입니다.' };
+  var kkI = kk ? (KK_INTERP[kk.sign] || '해당 라시의 영적 방향을 탐구하세요.') : '';
+  var html = '';
+  html += '<div class="ak-hero">' +
+    '<div class="ak-symbol"><i class="pi pi-sun"></i></div>' +
+    '<div style="flex:1;min-width:0;">' +
+      '<div class="ak-title-row">' +
+        '<div class="ak-planet">' + ak.name + '</div>' +
+        '<div class="ak-role">Atmakaraka · ' + akI.role + '</div>' +
+      '</div>' +
+      '<div class="ak-meta">' + ak.sign + ' · ' + ak.deg + '° — 차트 내 7행성 중 가장 높은 도(度)에 위치해요. 이번 생 영적 주인공 행성입니다.</div>' +
+    '</div>' +
+  '</div>';
+  html += '<div class="ak-grid">' +
+    '<div class="ak-box"><div class="ak-box-title">Atmakaraka (AK)</div>' +
+      '<div class="ak-box-val">' + ak.name + ' · ' + ak.sign + '</div>' +
+      '<div class="ak-box-sub">영혼의 행성 · 가장 강력한 카르마 테마를 담고 있는 행성</div></div>' +
+    '<div class="ak-box"><div class="ak-box-title">Karakamsha (KK)</div>' +
+      '<div class="ak-box-val">' + (kk ? kk.sign : '-') + '</div>' +
+      '<div class="ak-box-sub">나바암샤(D9) 속 AK 위치 · 이번 생 영적 목적의 방향</div></div>' +
+  '</div>';
+  html += '<div class="ak-interp"><b>이번 생의 영적 주제</b> · ' + akI.theme + '</div>';
+  if (kk) html += '<div class="ak-interp"><b>영혼이 향하는 방향 (' + kk.sign + ')</b> · ' + kkI + '</div>';
+  body.innerHTML = html;
+}
+
+// ── SADE SATI ────────────────────────────────────────────
+function renderSadeSati(d) {
+  var body = document.getElementById('sadesati-body');
+  var s = d.sadeSati;
+  if (!s) { body.innerHTML = '<div class="sade-detail">사데 사티 정보를 계산할 수 없어요.</div>'; return; }
+
+  var sev = s.active ? 'active' : (s.special ? 'special' : 'none');
+  var label, heroText;
+  if (s.active) {
+    label = '사데 사티 진행 중';
+    heroText = '토성이 달 기준 <b>' + s.houseFromMoon + '하우스</b>에 위치해 인생 구조조정기의 <b>' + s.phaseLabel.split('(')[0].trim() + '</b>에 들어있어요.' + (s.startDate && s.endDate ? '<br>(' + s.startDate + ' ~ ' + s.endDate + ' · 약 7.5년)' : '');
+  } else if (s.special) {
+    label = '특수 토성 트랜짓';
+    heroText = s.special + '. 사데사티에 준하는 과제·정리 기간이에요.';
+  } else {
+    label = '사데 사티 비활성';
+    heroText = '현재 토성은 달 기준 <b>' + s.houseFromMoon + '하우스</b>로 사데사티 구간을 벗어나 있어요. 다음 사데사티까지 구조·책임을 다지는 휴식기.';
+  }
+
+  var html = '';
+  html += '<div class="sade-hero ' + sev + '">' +
+    '<div class="sade-badge ' + sev + '">' + label + '</div>' +
+    '<div class="sade-text">' + heroText + '</div>' +
+  '</div>';
+
+  if (s.active) {
+    var p1 = s.phase === 1 ? 'cur' : '';
+    var p2 = s.phase === 2 ? 'cur' : '';
+    var p3 = s.phase === 3 ? 'cur' : '';
+    html += '<div class="sade-timeline">' +
+      '<div class="sade-phase ' + p1 + '"><div class="sade-phase-num">1단계</div><div class="sade-phase-name">Aarohana</div><div class="sade-phase-desc">12하우스 · 정리·상실·내면화</div></div>' +
+      '<div class="sade-phase ' + p2 + '"><div class="sade-phase-num">2단계</div><div class="sade-phase-name">Shikhara</div><div class="sade-phase-desc">1하우스 · 정체성·건강 핵심기</div></div>' +
+      '<div class="sade-phase ' + p3 + '"><div class="sade-phase-num">3단계</div><div class="sade-phase-name">Avarohana</div><div class="sade-phase-desc">2하우스 · 재정·가정 마무리</div></div>' +
+    '</div>';
+  }
+
+  html += '<div class="sade-detail">' +
+    '<ul>' +
+      '<li>현재 토성 위치: <b>' + s.saturnSign + '</b></li>' +
+      '<li>출생 달 라시: <b>' + s.moonSign + '</b></li>' +
+      '<li>달 기준 하우스: <b>' + s.houseFromMoon + '하우스</b></li>' +
+      (s.startDate ? '<li>사데사티 시작: <b>' + s.startDate + '</b></li>' : '') +
+      (s.endDate   ? '<li>사데사티 종료: <b>' + s.endDate + '</b></li>' : '') +
+    '</ul>' +
+    '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border-soft);">' +
+      '사데 사티는 <b>책임·인내·본질 회귀</b>의 시기예요. 피하기보다 받아들이며 꾸준히 구조를 다지면, 이 7.5년이 끝난 뒤 단단한 토대가 남습니다. 중요한 투기·급격한 변화는 피하고, 건강·관계·재정을 점검하는 리세팅으로 활용하세요.' +
+    '</div>' +
+  '</div>';
   body.innerHTML = html;
 }
 
@@ -1097,6 +1271,10 @@ async function loadVedic(year, month, day, hour, gender) {
     setVisible('card-manglik', true);
     renderUpaya(d);
     setVisible('card-upaya', true);
+    renderAtmakaraka(d);
+    setVisible('card-atmakaraka', true);
+    renderSadeSati(d);
+    setVisible('card-sadesati', true);
 
     window._vedicData = d;
     setVisible('card-ai', true);
