@@ -552,6 +552,18 @@ async function doPay(pack) {
       await trySave();
       hideLoading();
       toast('✨ ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
+      // 운영자 텔레그램 알림 (실패해도 무시)
+      try {
+        var uname = '';
+        try { var u = JSON.parse(localStorage.getItem('pico_user') || 'null'); if (u && u.name) uname = u.name; } catch(_) {}
+        fetch('https://fortuna.kkdmb7.workers.dev/notify-payment', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: uname, user_id: currentUserId,
+            product: pack.id, amount: (pack.price || 0), orbs: totalOrb
+          })
+        }).catch(function(){});
+      } catch(_) {}
       setTimeout(function() { location.href = 'https://picolab.kr'; }, 2000);
     } catch(e) {
       hideLoading();
