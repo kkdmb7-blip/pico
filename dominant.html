@@ -85,6 +85,27 @@ select.input{
 }
 select.input option{background:#fff;color:var(--text);}
 
+.prof-row{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.prof-btn{
+  background:rgba(138,106,21,0.1);border:1px solid rgba(138,106,21,0.28);
+  color:#6a4f0c;border-radius:20px;padding:7px 14px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  font-family:var(--fn);white-space:nowrap;transition:all 0.15s;
+}
+.prof-btn:hover{background:rgba(138,106,21,0.2);border-color:rgba(138,106,21,0.45);}
+.prof-btn.new{background:rgba(122,36,24,0.08);border-color:rgba(122,36,24,0.28);color:#7a2418;}
+.prof-btn.new:hover{background:rgba(122,36,24,0.16);border-color:rgba(122,36,24,0.45);}
+.prof-select{
+  flex:1;min-width:120px;
+  background:#fff;border:1px solid rgba(138,106,21,0.28);
+  border-radius:20px;padding:7px 14px;
+  color:#6a4f0c;font-size:12px;font-weight:600;
+  outline:none;font-family:var(--fn);cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236a4f0c'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:26px;
+}
+
 .calc-btn{
   width:100%;
   background:rgba(138,106,21,0.12);
@@ -354,6 +375,13 @@ select.input option{background:#fff;color:var(--text);}
   </div>
 
   <div class="form-card">
+    <div class="prof-row">
+      <button class="prof-btn" onclick="fillDomFromMine()">내 정보</button>
+      <select class="prof-select" id="domProfileSelect" onchange="fillDomFromSaved(this.value)">
+        <option value="">저장된 프로필</option>
+      </select>
+      <button class="prof-btn new" onclick="clearDomForm()">새로 입력</button>
+    </div>
     <div class="field">
       <label class="label">생년월일 *</label>
       <div style="display:flex;gap:8px;">
@@ -481,7 +509,82 @@ var currentDominant = null;
   yEl.addEventListener('change', updateDays);
   mEl.addEventListener('change', updateDays);
   updateDays();
+  populateDomProfileSelect();
 })();
+
+function _normalizeDomProfile(p) {
+  if (!p) return null;
+  var year, month, day, hour = 'unknown', minute = 0;
+  if (p.birth_date) {
+    var parts = p.birth_date.split('-');
+    year = parseInt(parts[0]); month = parseInt(parts[1]); day = parseInt(parts[2]);
+  } else {
+    year = p.year; month = p.month; day = p.day;
+  }
+  if (p.birth_time && p.birth_time !== 'unknown') {
+    var tp = p.birth_time.split(':');
+    hour = String(parseInt(tp[0]));
+    minute = String(parseInt(tp[1]) || 0);
+  } else if (p.birth_time === 'unknown') {
+    hour = 'unknown'; minute = '0';
+  } else {
+    hour = (p.hour != null) ? String(p.hour) : 'unknown';
+    minute = (p.minute != null) ? String(p.minute) : '0';
+  }
+  return { name: p.name || '', year: year, month: month, day: day, hour: hour, minute: minute };
+}
+
+function populateDomProfileSelect() {
+  var sel = document.getElementById('domProfileSelect');
+  if (!sel) return;
+  while (sel.options.length > 1) sel.remove(1);
+  try {
+    var profiles = JSON.parse(localStorage.getItem('pico_profiles')) || [];
+    profiles.forEach(function(p) {
+      var n = _normalizeDomProfile(p);
+      if (!n) return;
+      var o = document.createElement('option');
+      o.value = JSON.stringify(p);
+      var dateStr = n.year ? n.year + '년 ' + n.month + '월 ' + n.day + '일' : '';
+      o.textContent = (p.name || '이름없음') + (dateStr ? ' · ' + dateStr : '');
+      sel.appendChild(o);
+    });
+  } catch(e) {}
+}
+
+function _fillDomFields(n) {
+  if (!n) { showToast('저장된 정보가 없어요'); return; }
+  if (n.year) document.getElementById('calcYear').value = n.year;
+  if (n.month) document.getElementById('calcMonth').value = n.month;
+  document.getElementById('calcYear').dispatchEvent(new Event('change'));
+  if (n.day) document.getElementById('calcDay').value = n.day;
+  document.getElementById('calcHour').value = n.hour || 'unknown';
+  document.getElementById('calcMin').value = n.minute || 0;
+}
+
+function fillDomFromMine() {
+  var p = null;
+  try { p = JSON.parse(localStorage.getItem('pico_profile') || 'null'); } catch(e) {}
+  if (!p) { showToast('저장된 내 정보가 없어요. 홈에서 먼저 설정하세요'); return; }
+  _fillDomFields(_normalizeDomProfile(p));
+  document.getElementById('domProfileSelect').value = '';
+}
+
+function fillDomFromSaved(json) {
+  if (!json) return;
+  try { _fillDomFields(_normalizeDomProfile(JSON.parse(json))); } catch(e) {}
+}
+
+function clearDomForm() {
+  document.getElementById('calcYear').value = 1990;
+  document.getElementById('calcMonth').value = 1;
+  document.getElementById('calcYear').dispatchEvent(new Event('change'));
+  document.getElementById('calcDay').value = 1;
+  document.getElementById('calcHour').value = 'unknown';
+  document.getElementById('calcMin').value = 0;
+  document.getElementById('calcPlace').value = '';
+  document.getElementById('domProfileSelect').value = '';
+}
 
 function showToast(msg) {
   var t = document.getElementById('toast');
