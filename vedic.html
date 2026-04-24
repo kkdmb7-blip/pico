@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#f5efe4">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <style>
   :root {
@@ -138,15 +139,16 @@
   }
 
   /* AI ANALYSIS */
-  .ai-section{margin-bottom:20px;}
-  .ai-section-title{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border-soft);}
+  .ai-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border-soft);}
+  .ai-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  .ai-section-title{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
   .ai-section-body{font-size:14px;color:var(--text);line-height:1.85;}
   .ai-section-body strong{color:var(--gold-deep);}
-  .ai-cursor{display:inline-block;width:2px;height:1em;background:var(--accent);margin-left:2px;animation:blink .7s step-end infinite;vertical-align:text-bottom;}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  .ai-sec-loading{font-size:13px;color:var(--muted);padding:6px 0;}
   .btn-vedic-ai{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 0;border-radius:14px;background:linear-gradient(135deg,#4a3280,#7b56c8);color:#fff;border:none;cursor:pointer;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;transition:all .2s;}
   .btn-vedic-ai:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(74,50,128,.35);}
   .btn-vedic-ai:disabled{opacity:.5;cursor:default;transform:none;}
+  .vedic-ai-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(30,20,50,0.95);color:#c4a8f0;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;opacity:0;}
 </style>
   <link rel="stylesheet" href="pico-icons.css">
 </head>
@@ -225,15 +227,38 @@
   <div class="section-card" id="card-ai">
     <div class="section-label">AI 심층 분석 · 베딕</div>
     <div id="vedic-ai-body" style="display:none;">
-      <div class="ai-section" id="ai-sec-1"><div class="ai-section-title">핵심 에너지 · 태양/달/상승궁 통합</div><div class="ai-section-body" id="ai-txt-1"></div></div>
-      <div class="ai-section" id="ai-sec-2"><div class="ai-section-title">낙샤트라 카르마 · 이번 생의 과제</div><div class="ai-section-body" id="ai-txt-2"></div></div>
-      <div class="ai-section" id="ai-sec-3"><div class="ai-section-title">다샤 흐름 · 지금 어떤 시기인가</div><div class="ai-section-body" id="ai-txt-3"></div></div>
-      <div class="ai-section" id="ai-sec-4"><div class="ai-section-title">행성 강약 · 삶의 영역 분석</div><div class="ai-section-body" id="ai-txt-4"></div></div>
-      <div class="ai-section" id="ai-sec-5"><div class="ai-section-title">실천 방향 · 요가와 카르마 조언</div><div class="ai-section-body" id="ai-txt-5"></div></div>
+      <div class="ai-section">
+        <div class="ai-section-title">① 핵심 에너지 · 태양/달/상승궁 통합</div>
+        <div class="ai-sec-loading" id="ai-lod-1" style="display:none;"><span class="spinner"></span> 분석 중…</div>
+        <div class="ai-section-body" id="ai-txt-1" style="display:none;"></div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-section-title">② 낙샤트라 카르마 · 이번 생의 과제</div>
+        <div class="ai-sec-loading" id="ai-lod-2" style="display:none;"><span class="spinner"></span> 분석 중…</div>
+        <div class="ai-section-body" id="ai-txt-2" style="display:none;"></div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-section-title">③ 다샤 흐름 · 지금 어떤 시기인가</div>
+        <div class="ai-sec-loading" id="ai-lod-3" style="display:none;"><span class="spinner"></span> 분석 중…</div>
+        <div class="ai-section-body" id="ai-txt-3" style="display:none;"></div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-section-title">④ 행성 강약 · 삶의 영역 분석</div>
+        <div class="ai-sec-loading" id="ai-lod-4" style="display:none;"><span class="spinner"></span> 분석 중…</div>
+        <div class="ai-section-body" id="ai-txt-4" style="display:none;"></div>
+      </div>
+      <div class="ai-section">
+        <div class="ai-section-title">⑤ 실천 방향 · 카르마 조언</div>
+        <div class="ai-sec-loading" id="ai-lod-5" style="display:none;"><span class="spinner"></span> 분석 중…</div>
+        <div class="ai-section-body" id="ai-txt-5" style="display:none;"></div>
+      </div>
     </div>
-    <div id="vedic-ai-loading" style="display:none;text-align:center;padding:20px;color:var(--muted);font-size:14px;"><span class="spinner"></span> 베딕 차트를 분석하는 중…</div>
-    <button class="btn-vedic-ai" id="vedic-ai-btn" onclick="requestVedicAI()"><i class="pi pi-sparkle"></i> AI 베딕 심층 분석</button>
+    <div id="vedic-ai-err" style="display:none;padding:10px 0;color:#b02a1a;font-size:13px;text-align:center;"></div>
+    <button class="btn-vedic-ai" id="vedic-ai-btn" onclick="requestVedicAI()">
+      <i class="pi pi-sparkle"></i> AI 베딕 심층 분석 <span style="font-size:12px;opacity:0.75;margin-left:4px;">300 Orb</span>
+    </button>
   </div>
+  <div class="vedic-ai-toast" id="vedic-ai-toast"></div>
 
   <!-- 리포트 훅 -->
   <div id="vedicReportHook" style="display:none;padding:0 20px 10px;max-width:440px;margin:0 auto;">
@@ -627,117 +652,189 @@ function renderInterp(d) {
 }
 
 // ── AI 베딕 심층 분석 ──────────────────────────────────────
-var VEDIC_SECTION_MARKERS = ['【1】','【2】','【3】','【4】','【5】'];
+var VEDIC_ORB   = 300;
+var VEDIC_SB_URL  = 'https://ymghmfkqctckxxysxkvy.supabase.co';
+var VEDIC_SB_KEY  = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
+var VEDIC_CHAT    = 'https://fortuna-silk.vercel.app/api/chat';
+var _vedicSbClient = null;
 
-async function requestVedicAI() {
-  var d = window._vedicData;
-  if (!d) return;
-  var btn = document.getElementById('vedic-ai-btn');
-  var loading = document.getElementById('vedic-ai-loading');
-  var body = document.getElementById('vedic-ai-body');
+function getVedicSb() {
+  if (!_vedicSbClient) _vedicSbClient = supabase.createClient(VEDIC_SB_URL, VEDIC_SB_KEY);
+  return _vedicSbClient;
+}
 
-  btn.style.display = 'none';
-  loading.style.display = 'block';
-  body.style.display = 'none';
+function showVedicToast(msg) {
+  var t = document.getElementById('vedic-ai-toast');
+  if (!t) return;
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._tid); t._tid = setTimeout(function(){ t.style.opacity = '0'; }, 2800);
+}
 
-  // 섹션 초기화
-  for (var i = 1; i <= 5; i++) document.getElementById('ai-txt-' + i).innerHTML = '';
+function renderVedicMd(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
 
-  var user = null;
-  try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+var VEDIC_SECTIONS = [
+  { title:'핵심 에너지', desc:'태양/달/상승궁 통합 — 이 영혼의 구조와 삶의 핵심 에너지. 세 행성이 가리키는 기질의 교차점. 약 300자.' },
+  { title:'낙샤트라 카르마', desc:'달이 놓인 낙샤트라(월 별자리)의 신화적 상징과 파다, 이번 생의 카르마 과제와 반복 패턴. 약 350자.' },
+  { title:'다샤 흐름', desc:'현재 마하다샤와 안타르다샤가 활성화하는 삶의 영역, 지금 어떤 에너지가 흐르고 있는지, 다음 전환까지의 흐름. 약 300자.' },
+  { title:'행성 강약', desc:'항진·자사인·추락 행성이 직업·관계·재물의 어느 영역에서 어떻게 작동하는가. 아슈타카바르가 빈두 높고 낮은 행성 포함. 약 280자.' },
+  { title:'실천 방향', desc:'요가 패턴·다샤 행성·낙샤트라 카르마에 맞는 구체적 실천 조언 3가지. 지금 당장 시작할 수 있는 것. 약 250자.' },
+];
 
+function buildVedicAIContext(d) {
   var yoga_summary = (d.yogas || []).map(function(y){ return y.name + '(' + y.effect + ')'; }).join(', ') || '없음';
   var dasha_planet = (d.currentDasha && d.currentDasha.planet) || '알 수 없음';
   var antar_planet = (d.antardasha && d.antardasha.planet) || '';
   var dasha_end    = (d.currentDasha && d.currentDasha.endDate) || '';
-
-  var userMsg = [
-    '=== 베딕 차트 정보 ===',
-    '태양 라시: ' + (d.sunSign || ''),
-    '달 라시: ' + (d.moonSign || ''),
-    '상승궁(라그나): ' + (d.ascendant || ''),
+  return [
+    '태양 라시: ' + (d.sunSign || '') + ' | 달 라시: ' + (d.moonSign || '') + ' | 상승궁(라그나): ' + (d.ascendant || ''),
     '',
-    (d.nakshatraBlock || '낙샤트라: ' + d.nakshatra),
+    (d.nakshatraBlock || ('낙샤트라: ' + d.nakshatra + ' 파다 ' + d.nakshatraPada)),
     '',
     '=== 행성 배치 및 강약 ===',
     (d.planetBlock || ''),
     '',
-    '=== 다샤 (운세 주기) ===',
-    '마하다샤: ' + dasha_planet + ' (~' + dasha_end + ' 종료)',
+    '=== 다샤 ===',
+    '마하다샤: ' + dasha_planet + (dasha_end ? ' (~' + dasha_end + ' 종료)' : ''),
     (antar_planet ? '안타르다샤: ' + antar_planet : ''),
     '',
-    '=== 요가 (특수 배치) ===',
+    '=== 요가 ===',
     yoga_summary,
-    '',
-    '=== 작성 지시 ===',
-    '다음 5개 섹션을 순서대로, 각 섹션 앞에 【1】【2】【3】【4】【5】 마커를 붙여 작성하세요.',
-    '【1】 핵심 에너지 (태양/달/상승궁 통합 — 이 사람의 영혼 구조) 250~350자',
-    '【2】 낙샤트라 카르마 (낙샤트라가 가리키는 이번 생의 과제와 패턴) 300~400자',
-    '【3】 다샤 흐름 (지금 어떤 행성의 에너지 속에 살고 있는가, 무엇이 열리고 닫히는가) 250~350자',
-    '【4】 행성 강약 (항진/추락 행성이 삶의 어느 영역에서 어떻게 작동하는가) 200~300자',
-    '【5】 실천 방향 (요가·카르마 패턴에 맞는 구체적 조언 3가지) 200~280자',
-  ].filter(Boolean).join('\n');
+  ].filter(function(x){ return x !== null && x !== undefined; }).join('\n');
+}
 
-  var systemPrompt = '당신은 베딕 점성술 전문 상담사입니다.\n절대 규칙:\n- #헤더 금지, 표 금지\n- **볼드**는 핵심 키워드에만 3~5개\n- 톤: 따뜻하고 정확한 친구 같은 전문가\n- 각 섹션은 【1】~【5】 마커로 시작\n- 사주나 타 점술 언급 금지\n- 확정적 예언(~할 것이다, ~반드시) 금지. 경향과 흐름으로 서술\n- 산스크리트 용어는 괄호 안에 한국어 병기';
+var VEDIC_SYS = '당신은 베딕 점성술 전문 상담사입니다.\n절대 규칙:\n- #헤더 금지, 표 금지\n- **볼드**는 핵심 키워드에만 3~5개\n- 톤: 따뜻하고 정확한 친구 같은 전문가\n- 섹션 제목 반복 금지 (카드 헤더에 이미 표시됨)\n- 확정적 예언(~할 것이다, ~반드시) 금지. 경향과 흐름으로 서술\n- 산스크리트 용어는 괄호 안에 한국어 병기\n- 본문 안 소항목은 가) 나) 다) 형식 사용';
 
+async function callVedicSection(userId, ctx, secIdx) {
+  var sec = VEDIC_SECTIONS[secIdx];
+  var prompt = ctx + '\n\n[작성 지시] 섹션 "' + sec.title + '"만 작성하세요. 다른 섹션 절대 쓰지 마세요.\n' + sec.desc;
+  var ctrl = new AbortController();
+  var tid = setTimeout(function(){ ctrl.abort(); }, 45000);
   try {
-    var res = await fetch('https://fortuna-silk.vercel.app/api/chat', {
+    var res = await fetch(VEDIC_CHAT, {
+      signal: ctrl.signal,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: user ? user.id : 'anonymous',
+        user_id: userId,
         skip_orb: true,
-        system_prompt: systemPrompt,
-        messages: [{ role: 'user', content: userMsg }],
-        max_tokens: 2500
+        system_prompt: VEDIC_SYS,
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 600
       })
     });
-
-    loading.style.display = 'none';
-    body.style.display = 'block';
-
+    clearTimeout(tid);
     if (!res.ok) throw new Error('API ' + res.status);
-
     var data = await res.json();
-    var fullText = (data && (data.reply || data.content || data.text)) || '';
-
-    // 섹션 파싱 및 렌더링
-    var sections = ['','','','',''];
-    var current = -1;
-    var lines = fullText.split('\n');
-    lines.forEach(function(line) {
-      var found = false;
-      for (var i = 0; i < 5; i++) {
-        if (line.indexOf('【' + (i+1) + '】') >= 0) {
-          current = i;
-          var after = line.replace('【' + (i+1) + '】', '').trim();
-          if (after) sections[i] += after + '\n';
-          found = true;
-          break;
-        }
-      }
-      if (!found && current >= 0) {
-        sections[current] += line + '\n';
-      }
-    });
-
-    // 렌더링
-    for (var si = 0; si < 5; si++) {
-      var txt = sections[si].trim();
-      if (txt) {
-        var el = document.getElementById('ai-txt-' + (si+1));
-        el.innerHTML = txt
-          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\n/g, '<br>');
-      }
-    }
-
+    return (data && (data.reply || data.content || data.text || '')).trim();
   } catch(e) {
-    loading.style.display = 'none';
-    body.style.display = 'block';
-    document.getElementById('ai-txt-1').textContent = '분석 중 오류가 발생했습니다: ' + e.message;
-    btn.style.display = 'flex';
+    clearTimeout(tid);
+    throw e;
   }
+}
+
+async function requestVedicAI() {
+  var d = window._vedicData;
+  if (!d) return;
+
+  var user = null;
+  try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+  if (!user || !user.id) {
+    document.getElementById('vedic-ai-err').textContent = '카카오 로그인 후 이용할 수 있어요.';
+    document.getElementById('vedic-ai-err').style.display = 'block';
+    return;
+  }
+
+  var btn = document.getElementById('vedic-ai-btn');
+  var errEl = document.getElementById('vedic-ai-err');
+  var body = document.getElementById('vedic-ai-body');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+
+  // Orb 잔액 확인
+  try {
+    var sb = getVedicSb();
+    var orbRes = await sb.from('orb_balance').select('balance').eq('user_id', user.id).maybeSingle();
+    var bal = (orbRes.data && orbRes.data.balance != null) ? orbRes.data.balance : 0;
+    if (bal < VEDIC_ORB) {
+      errEl.textContent = 'Orb가 부족해요. 현재 잔액: ' + bal.toLocaleString() + ' Orb (필요: ' + VEDIC_ORB + ')';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      return;
+    }
+  } catch(e) { /* 잔액 확인 실패 시 진행 */ }
+
+  // Orb 차감 (orb_override로 서버에서 차감)
+  try {
+    var deductRes = await fetch(VEDIC_CHAT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: user.id,
+        orb_override: VEDIC_ORB,
+        system_prompt: '베딕 분석 준비 엔진. "READY"만 반환.',
+        messages: [{ role: 'user', content: '준비' }]
+      })
+    });
+    var deductData = await deductRes.json();
+    if (deductData && deductData.error === 'orb_insufficient') {
+      errEl.textContent = 'Orb가 부족해요. 현재 잔액: ' + (deductData.orb_balance || 0).toLocaleString() + ' Orb';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      return;
+    }
+  } catch(e) { /* 차감 API 실패 시 진행 */ }
+
+  // 섹션 초기화 및 로딩 표시
+  btn.style.display = 'none';
+  body.style.display = 'block';
+  for (var i = 1; i <= 5; i++) {
+    document.getElementById('ai-lod-' + i).style.display = 'block';
+    document.getElementById('ai-txt-' + i).style.display = 'none';
+    document.getElementById('ai-txt-' + i).innerHTML = '';
+  }
+
+  var ctx = buildVedicAIContext(d);
+  var allTexts = [];
+
+  // 섹션별 순차 호출
+  for (var si = 0; si < 5; si++) {
+    try {
+      var text = await callVedicSection(user.id, ctx, si);
+      allTexts.push(text);
+      var lodEl = document.getElementById('ai-lod-' + (si+1));
+      var txtEl = document.getElementById('ai-txt-' + (si+1));
+      lodEl.style.display = 'none';
+      txtEl.innerHTML = renderVedicMd(text);
+      txtEl.style.display = 'block';
+    } catch(e) {
+      var lodEl2 = document.getElementById('ai-lod-' + (si+1));
+      var txtEl2 = document.getElementById('ai-txt-' + (si+1));
+      lodEl2.style.display = 'none';
+      txtEl2.innerHTML = '<span style="color:#b02a1a;">분석 실패 — 다시 시도해주세요</span>';
+      txtEl2.style.display = 'block';
+      allTexts.push('');
+    }
+  }
+
+  // Supabase reports 저장
+  try {
+    var prof = null;
+    try { prof = JSON.parse(localStorage.getItem('pico_profile')); } catch(e2) {}
+    var profKey = prof ? (prof.year + '-' + prof.month + '-' + prof.day + '-' + (prof.hour || 0) + '-' + (prof.gender || '')) : '';
+    var sb2 = getVedicSb();
+    await sb2.from('reports').insert({
+      user_id: user.id,
+      report_type: 'vedic_ai',
+      content: allTexts.concat([profKey]),
+      orb_spent: VEDIC_ORB,
+      created_at: new Date().toISOString()
+    });
+    showVedicToast('✦ 베딕 분석이 저장되었습니다. 마이페이지에서 다시 볼 수 있어요.');
+  } catch(e) {}
 }
 
 // ── FETCH ─────────────────────────────────────────────────
