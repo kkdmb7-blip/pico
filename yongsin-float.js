@@ -654,7 +654,7 @@
     } catch(e) {}
     return d.text;
   }
-  // 자는 중 시각 표시 (💤 아이콘)
+  // 자는 중 시각 표시 (zzzz 텍스트 애니메이션)
   function setSleepVisual(on) {
     if (!pet) return;
     var z = document.getElementById('yongsin-zzz');
@@ -663,18 +663,37 @@
         if (!document.getElementById('yz-style')) {
           var st = document.createElement('style');
           st.id = 'yz-style';
-          st.textContent = '@keyframes yz-float{0%,100%{transform:translateY(0) scale(1);opacity:.7}50%{transform:translateY(-5px) scale(1.15);opacity:1}}';
+          st.textContent =
+            '@keyframes yz-float{0%{transform:translate(0,0) scale(0.85);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translate(10px,-18px) scale(1.15);opacity:0}}' +
+            '#yongsin-zzz span{display:inline-block;animation:yz-float 2.4s ease-in-out infinite;font-family:"Noto Serif KR",serif;font-weight:700;color:#6a5acd;text-shadow:0 1px 2px rgba(255,255,255,0.9),0 0 4px rgba(106,90,205,0.4);}' +
+            '#yongsin-zzz span:nth-child(1){font-size:10px;animation-delay:0s}' +
+            '#yongsin-zzz span:nth-child(2){font-size:12px;animation-delay:0.6s}' +
+            '#yongsin-zzz span:nth-child(3){font-size:14px;animation-delay:1.2s}' +
+            '#yongsin-zzz span:nth-child(4){font-size:16px;animation-delay:1.8s}';
           document.head.appendChild(st);
         }
         z = document.createElement('div');
         z.id = 'yongsin-zzz';
-        z.textContent = '💤';
-        z.style.cssText = 'position:absolute;top:-12px;right:-6px;font-size:18px;pointer-events:none;animation:yz-float 2.8s ease-in-out infinite;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2));';
+        z.style.cssText = 'position:absolute;top:-18px;right:-10px;pointer-events:none;line-height:1;white-space:nowrap;';
+        z.innerHTML = '<span>z</span><span>z</span><span>z</span><span>Z</span>';
         pet.appendChild(z);
       }
     } else if (z) {
       z.remove();
     }
+  }
+
+  // 수면 상태(시간대 OR 수동 재우기) 반응형 체크
+  function isSleepingNow() {
+    try { if (getActiveState().sleeping) return true; } catch(e) {}
+    try { if (isSleepHour()) return true; } catch(e) {}
+    return false;
+  }
+  function startSleepVisualPoll() {
+    setInterval(function() {
+      if (!pet) return;
+      setSleepVisual(isSleepingNow());
+    }, 3000);
   }
 
   // ── 연속 출석 & 선물 상자 ──
@@ -1272,6 +1291,8 @@
     scheduleMove();
     startIdleExpTicker();
     startProactiveGreeter();
+    startSleepVisualPoll();
+    setSleepVisual(isSleepingNow());
   }
 
   // ── 주기적으로 먼저 말 걸기 (10분마다 20% 확률) ──
