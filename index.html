@@ -2106,36 +2106,26 @@
         <p>당신의 직관 신호</p>
         <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#6a4aa0;background:rgba(106,74,160,0.1);border:1px solid rgba(106,74,160,0.35);border-radius:8px;padding:4px 10px;">카드 뽑기</div>
       </div>
-      <div class="why-card why-card-full" style="flex-direction:column;align-items:stretch;gap:10px;">
+      <div class="why-card why-card-full" onclick="openGunghapModal()" style="cursor:pointer;">
         <div class="why-card-body">
-          <h3>궁합</h3>
-          <p>사주 오행·띠·계절 조화로 보는 두 사람의 인연</p>
+          <h3>궁합 · 사주 기반</h3>
+          <p>천간합·일지·오행·계절 조화를 <b>규칙 기반 즉시 점수화</b> + AI 심층 분석 (80 Orb)</p>
         </div>
-        <div style="display:flex;gap:8px;">
-          <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
-            <div onclick="openGunghapModal()" style="text-align:center;font-size:12px;font-weight:600;color:#8b2447;background:rgba(184,82,110,0.14);border:1px solid rgba(184,82,110,0.35);border-radius:8px;padding:7px 10px;cursor:pointer;">궁합 보기</div>
-            <div style="font-size:10.5px;color:var(--text2,#666);line-height:1.55;padding:0 2px;">
-              내 사주 프로필 + 상대 생년월일 입력.<br>
-              천간합·일지·오행·계절 조화를 <b>규칙 기반으로 즉시 점수화</b>.<br>
-              AI 심층 분석 포함 (80 Orb).
-            </div>
-          </div>
-          <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
-            <div onclick="location.href='/gunghap2.html'" style="text-align:center;font-size:12px;font-weight:700;color:#7a5800;background:rgba(138,106,21,0.12);border:1.5px solid rgba(138,106,21,0.55);border-radius:8px;padding:7px 10px;cursor:pointer;white-space:nowrap;">궁합 2.0 NEW</div>
-            <div style="font-size:10.5px;color:var(--text2,#666);line-height:1.55;padding:0 2px;">
-              두 사람 모두 직접 입력.<br>
-              <b>사주·서양점성·베딕 3엔진</b> AI 종합 분석.<br>
-              기본 무료 · 심층 분석 300 Orb.
-            </div>
-          </div>
+        <div class="why-card-link" style="background:rgba(184,82,110,0.14);border:1px solid rgba(184,82,110,0.35);border-radius:8px;padding:6px 12px;">궁합 보기</div>
+      </div>
+      <div class="why-card why-card-full" onclick="location.href='/gunghap2.html'" style="cursor:pointer;border-color:rgba(138,106,21,0.45);background:linear-gradient(135deg,var(--surface),rgba(138,106,21,0.06));">
+        <div class="why-card-body">
+          <h3 style="color:#7a5800;">궁합 2.0 NEW</h3>
+          <p>두 사람 모두 직접 입력 · <b>사주·서양점성·베딕 3엔진</b> AI 종합 분석 (기본 무료 / 심층 300 Orb)</p>
         </div>
-        <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px;">
-          <div onclick="location.href='/vedic-match.html'" style="text-align:center;font-size:12px;font-weight:700;color:#4a3280;background:linear-gradient(135deg,rgba(140,90,210,0.14),rgba(110,70,180,0.08));border:1.5px solid rgba(140,90,210,0.55);border-radius:8px;padding:8px 10px;cursor:pointer;white-space:nowrap;"><i class="pi pi-sparkle"></i> 베딕 궁합 · 36굿 쿤달리 밀란 NEW</div>
-          <div style="font-size:10.5px;color:var(--text2,#666);line-height:1.55;padding:0 2px;">
-            인도 전통 <b>아쉬타쿠타 쿤달리 밀란</b> 8쿠타 × 4.5점 = 36점 만점 정밀 궁합.<br>
-            낙샤트라·요니·가나·나디 + 도샤 체크. AI 심층 분석 300 Orb.
-          </div>
+        <div class="why-card-link" style="color:#7a5800;background:rgba(138,106,21,0.14);border:1.5px solid rgba(138,106,21,0.55);border-radius:8px;padding:6px 12px;">3엔진 분석</div>
+      </div>
+      <div class="why-card why-card-full" onclick="location.href='/vedic-match.html'" style="cursor:pointer;border-color:rgba(140,90,210,0.45);background:linear-gradient(135deg,var(--surface),rgba(140,90,210,0.06));">
+        <div class="why-card-body">
+          <h3 style="color:#4a3280;"><i class="pi pi-sparkle"></i> 베딕 궁합 NEW</h3>
+          <p>인도 전통 <b>36굿 쿤달리 밀란</b> · 8쿠타 × 4.5점 정밀 점수 + 낙샤트라·도샤 체크 (심층 300 Orb)</p>
         </div>
+        <div class="why-card-link" style="color:#4a3280;background:rgba(140,90,210,0.14);border:1.5px solid rgba(140,90,210,0.55);border-radius:8px;padding:6px 12px;">쿤달리 밀란</div>
       </div>
     </div>
     <p class="why-tagline">6가지가 모두 같은 방향을 가리킬 때,<br>그것이 진짜 운명입니다.</p>
