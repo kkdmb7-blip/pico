@@ -1231,6 +1231,49 @@
     <span id="visitCountText"></span>
   </span>
 </div>
+<div id="lifeDaysWrap" style="display:none;text-align:center;padding:0 16px 14px;">
+  <div style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(123,94,167,0.08));border:1px solid rgba(212,175,55,0.28);border-radius:14px;padding:10px 18px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gold);">LIFE DAYS</div>
+    <div id="lifeDaysText" style="font-size:14px;color:var(--text);font-weight:600;line-height:1.4;"></div>
+    <div id="lifeDaysSub" style="font-size:11px;color:var(--muted);"></div>
+  </div>
+</div>
+<script>(function(){
+  try {
+    var raw = localStorage.getItem('pico_profile');
+    if (!raw) return;
+    var p = JSON.parse(raw);
+    if (!p || !p.year || !p.month || !p.day) return;
+    var bd = new Date(Number(p.year), Number(p.month)-1, Number(p.day));
+    if (isNaN(bd.getTime())) return;
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var d = Math.floor((today - bd) / 86400000);
+    if (d < 0) return;
+    var who = p.name ? (p.name + '님') : '당신';
+    var main = who + '이 세상에 나온 지 ' + d.toLocaleString() + '일';
+    var sub = '';
+    if (d === 0) sub = '오늘 태어난 날 🐣';
+    else if (d === 100) sub = '100일 축하해요 🌸';
+    else if (d === 365) sub = '1년 되었어요 💖';
+    else if (d === 1000) sub = '1000일째 ✨';
+    else if (d === 10000) sub = '만일의 하루 🎉';
+    else if (d > 0 && d % 1000 === 0) sub = d.toLocaleString() + '일 이정표 ✨';
+    else if (d > 0 && d % 365 === 0) sub = (d/365) + '년째 되는 날 🌿';
+    else {
+      var yrs = (d / 365.25).toFixed(1);
+      sub = '약 ' + yrs + '년의 시간이 쌓였어요';
+    }
+    var wrap = document.getElementById('lifeDaysWrap');
+    var t = document.getElementById('lifeDaysText');
+    var s = document.getElementById('lifeDaysSub');
+    if (wrap && t && s) {
+      t.textContent = main;
+      s.textContent = sub;
+      wrap.style.display = 'block';
+    }
+  } catch(e) {}
+})();</script>
 <div class="section-divider"></div>
 <!-- 오늘의 행운 뽑기 + 도미넌트 행성 -->
 <div style="padding:16px 16px;display:flex;gap:10px;">
