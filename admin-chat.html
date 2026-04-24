@@ -189,12 +189,37 @@ async function sendReply() {
   if (!text) return;
   btn.disabled = true;
   input.value = '';
-  var r = await fetch(SB_URL + '/rest/v1/support_messages', {
-    method: 'POST', headers: Object.assign({}, HEADERS, {'Prefer':'return=minimal'}),
-    body: JSON.stringify({ user_id: currentUid, sender: 'admin', content: text, read: false })
-  });
-  btn.disabled = false;
-  if (r.ok) { await loadChat(currentUid, true); loadUsers(); }
+
+  // 낙관적 렌더: admin 메시지 즉시 표시
+  var el = document.getElementById('chat-msgs');
+  var now = new Date();
+  var t = (now.getMonth()+1)+'/'+now.getDate()+' '+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  if (el) {
+    var tmp = document.createElement('div');
+    tmp.className = 'cm admin';
+    tmp.style.opacity = '0.6';
+    tmp.innerHTML = escHtml(text) + '<time>' + t + ' ⏳</time>';
+    el.appendChild(tmp);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  try {
+    var r = await fetch(SB_URL + '/rest/v1/support_messages', {
+      method: 'POST', headers: Object.assign({}, HEADERS, {'Prefer':'return=representation'}),
+      body: JSON.stringify({ user_id: currentUid, sender: 'admin', content: text, read: false })
+    });
+    if (!r.ok) {
+      var errTxt = await r.text();
+      throw new Error('저장 실패 (' + r.status + '): ' + errTxt.slice(0,120));
+    }
+    await loadChat(currentUid, true);
+    loadUsers();
+  } catch(e) {
+    if (el && el.lastChild) el.removeChild(el.lastChild);
+    alert(e.message);
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 document.addEventListener('keydown', function(e) {

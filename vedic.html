@@ -697,9 +697,10 @@ function buildVedicAIContext(d) {
     '=== 행성 배치 및 강약 ===',
     (d.planetBlock || ''),
     '',
-    '=== 다샤 ===',
-    '마하다샤: ' + dasha_planet + (dasha_end ? ' (~' + dasha_end + ' 종료)' : ''),
-    (antar_planet ? '안타르다샤: ' + antar_planet : ''),
+    (d.dashaBlock || (
+      '=== 다샤 ===\n마하다샤: ' + dasha_planet + (dasha_end ? ' (~' + dasha_end + ' 종료)' : '') +
+      (antar_planet ? '\n안타르다샤: ' + antar_planet : '')
+    )),
     '',
     '=== 요가 ===',
     yoga_summary,

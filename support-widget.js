@@ -136,7 +136,9 @@
     el.innerHTML = _messages.map(function (m) {
       var d = new Date(m.created_at);
       var t = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
-      return '<div class="sw-msg ' + m.sender + '">' + escHtml(m.content) + '<time>' + t + '</time></div>';
+      var pending = m._pending ? ' style="opacity:0.6;"' : '';
+      var mark = m._pending ? ' <span style="font-size:10px;">⏳</span>' : '';
+      return '<div class="sw-msg ' + m.sender + '"' + pending + '>' + escHtml(m.content) + '<time>' + t + mark + '</time></div>';
     }).join('');
     el.scrollTop = el.scrollHeight;
   }
@@ -166,12 +168,31 @@
     if (!text) return;
     send.disabled = true;
     input.value = '';
-    var r = await fetch(SB_URL + '/rest/v1/support_messages', {
-      method: 'POST', headers: Object.assign({}, HEADERS, { 'Prefer': 'return=minimal' }),
-      body: JSON.stringify({ user_id: uid, sender: 'user', content: text, read: true })
-    });
-    send.disabled = false;
-    if (r.ok) loadMessages();
+
+    // 1) 낙관적 렌더: 내 메시지 즉시 표시
+    var tempMsg = { user_id: uid, sender: 'user', content: text, created_at: new Date().toISOString(), _pending: true };
+    _messages.push(tempMsg);
+    renderMessages();
+
+    try {
+      var r = await fetch(SB_URL + '/rest/v1/support_messages', {
+        method: 'POST', headers: Object.assign({}, HEADERS, { 'Prefer': 'return=representation' }),
+        body: JSON.stringify({ user_id: uid, sender: 'user', content: text, read: true })
+      });
+      if (!r.ok) {
+        var err = await r.text();
+        throw new Error('저장 실패 (' + r.status + ')');
+      }
+      // 서버 반영 후 전체 재로드
+      await loadMessages();
+    } catch (e) {
+      // 실패 시 임시 메시지 제거 + 알림
+      _messages = _messages.filter(function (m) { return m !== tempMsg; });
+      renderMessages();
+      alert('메시지 전송 실패: ' + e.message);
+    } finally {
+      send.disabled = false;
+    }
   }
 
   // ── 패널 열기/닫기 ──
