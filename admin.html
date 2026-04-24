@@ -245,6 +245,15 @@ td.reasons span {
 </div>
 
 <div id="mainView" class="wrap" style="display:none;">
+  <h2>바로가기</h2>
+  <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--gold-deep);">💬 사용자 문의 답변</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">문의 미확인 <span id="adminChatUnread" style="color:#a94a3a;font-weight:700;">-</span>건</div>
+    </div>
+    <a href="admin-chat.html" style="padding:10px 16px;background:var(--gold-deep);color:#fcf7ea;border-radius:10px;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:0.02em;white-space:nowrap;">답변하러 가기 →</a>
+  </div>
+
   <h2>오늘 현황 <span id="todayDate" style="font-size:12px;color:var(--muted);font-weight:400;"></span></h2>
   <div class="summary-grid">
     <div class="stat"><div class="label">활동 사용자</div><div class="value" id="stVisitors">-</div><div class="sub">오늘 Orb 활동 기준</div></div>
@@ -494,6 +503,19 @@ async function boot() {
   loadStats();
   loadDaily();
   loadRecent();
+  loadChatUnread();
+}
+
+async function loadChatUnread() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/support_messages?select=id&sender=eq.user&read=eq.false`, {
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+    });
+    if (!r.ok) return;
+    const rows = await r.json();
+    const el = qs('adminChatUnread');
+    if (el) el.textContent = Array.isArray(rows) ? rows.length : 0;
+  } catch(e) {}
 }
 
 async function loadToday() {

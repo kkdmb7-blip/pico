@@ -3,53 +3,83 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>관리자 채팅 · FORTUNA</title>
+<title>사용자 문의 · FORTUNA ADMIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg: #f4ede0;
+  --surface: #fcf7ea;
+  --surface2: #ede4cf;
+  --border-soft: rgba(60,40,20,0.22);
+  --text: #1a120a;
+  --text2: #4a3a2a;
+  --muted: #5a4830;
+  --gold: #8a6a15;
+  --gold-deep: #6a4f0c;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Noto Sans KR', sans-serif; background: #1a120a; color: #f0e8d0; height: 100dvh; display: flex; flex-direction: column; }
-#login-screen { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
-#login-screen h1 { font-size: 20px; color: #c9a84c; }
-#pw-input { padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(201,168,76,0.4); background: rgba(255,255,255,0.06); color: #f0e8d0; font-size: 15px; width: 260px; outline: none; }
-#pw-btn { padding: 12px 28px; background: linear-gradient(135deg,#c9a84c,#7a5a10); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); height: 100dvh; display: flex; flex-direction: column; }
+nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 20px; height:52px;
+  border-bottom:1px solid var(--border-soft);
+  background:rgba(244,237,224,0.92);
+  backdrop-filter:blur(12px);
+  flex-shrink:0;
+}
+.logo-text { font-family:'Cinzel','Noto Serif KR',serif; font-weight:600; font-size:14px; letter-spacing:0.22em; color:var(--gold-deep); }
+.back-btn { font-size:12px; color:var(--muted); text-decoration:none; background:none; border:none; cursor:pointer; padding:6px 10px; border-radius:8px; }
+.back-btn:hover { background:var(--surface2); color:var(--text); }
+
+#deny { flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; color:var(--muted); font-size:13px; }
+#deny a { color:var(--gold-deep); text-decoration:underline; }
+
 #main { flex: 1; display: none; overflow: hidden; flex-direction: row; }
 /* 좌: 사용자 목록 */
-#user-list { width: 260px; border-right: 1px solid rgba(201,168,76,0.15); display: flex; flex-direction: column; overflow: hidden; }
-#user-list h2 { padding: 16px; font-size: 13px; color: #c9a84c; border-bottom: 1px solid rgba(201,168,76,0.12); flex-shrink: 0; }
+#user-list { width: 280px; border-right: 1px solid var(--border-soft); display: flex; flex-direction: column; overflow: hidden; background:var(--surface); }
+#user-list h2 { padding: 14px 16px; font-size: 12px; color: var(--gold-deep); border-bottom: 1px solid var(--border-soft); flex-shrink: 0; display:flex; align-items:center; font-weight:700; letter-spacing:0.04em; }
 #users { flex: 1; overflow-y: auto; }
-.user-item { padding: 13px 16px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.12s; }
-.user-item:hover, .user-item.active { background: rgba(201,168,76,0.10); }
-.user-item .uid { font-size: 12px; color: #c9a84c; font-weight: 700; }
-.user-item .preview { font-size: 11px; color: rgba(240,232,208,0.55); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-item .meta { font-size: 10px; color: rgba(240,232,208,0.4); margin-top: 2px; display: flex; justify-content: space-between; }
-.unread-dot { display: inline-block; width: 8px; height: 8px; background: #e53935; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
+.user-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border-soft); transition: background 0.12s; }
+.user-item:hover, .user-item.active { background: var(--surface2); }
+.user-item .uid { font-size: 12px; color: var(--gold-deep); font-weight: 700; }
+.user-item .preview { font-size: 11px; color: var(--text2); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-item .meta { font-size: 10px; color: var(--muted); margin-top: 2px; display: flex; justify-content: space-between; }
+.unread-dot { display: inline-block; width: 8px; height: 8px; background: #c94a3a; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
 /* 우: 채팅 */
-#chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-#chat-head { padding: 14px 18px; border-bottom: 1px solid rgba(201,168,76,0.12); font-size: 13px; color: #c9a84c; font-weight: 700; flex-shrink: 0; }
+#chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background:var(--bg); }
+#chat-head { padding: 14px 18px; border-bottom: 1px solid var(--border-soft); font-size: 13px; color: var(--gold-deep); font-weight: 700; flex-shrink: 0; background:var(--surface); }
 #chat-msgs { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
 .cm { max-width: 75%; padding: 9px 13px; border-radius: 14px; font-size: 13px; line-height: 1.5; word-break: break-word; }
-.cm.user { align-self: flex-start; background: rgba(255,255,255,0.08); color: #f0e8d0; border-bottom-left-radius: 4px; }
-.cm.admin { align-self: flex-end; background: linear-gradient(135deg,#7a5a10,#c9a84c); color: #fff; border-bottom-right-radius: 4px; }
+.cm.user { align-self: flex-start; background: #fff; color: var(--text); border: 1px solid var(--border-soft); border-bottom-left-radius: 4px; }
+.cm.admin { align-self: flex-end; background: linear-gradient(135deg, var(--gold-deep), var(--gold)); color: #fff; border-bottom-right-radius: 4px; }
 .cm time { display: block; font-size: 10px; opacity: 0.6; margin-top: 4px; }
-#chat-foot { padding: 12px; border-top: 1px solid rgba(201,168,76,0.12); display: flex; gap: 8px; flex-shrink: 0; }
-#reply-input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,168,76,0.3); border-radius: 10px; padding: 10px 14px; color: #f0e8d0; font-size: 13px; font-family: inherit; resize: none; height: 42px; outline: none; }
-#reply-input:focus { border-color: #c9a84c; }
-#reply-btn { padding: 10px 16px; background: linear-gradient(135deg,#c9a84c,#7a5a10); color: #fff; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; }
+#chat-foot { padding: 12px; border-top: 1px solid var(--border-soft); display: flex; gap: 8px; flex-shrink: 0; background:var(--surface); }
+#reply-input { flex: 1; background: #fff; border: 1px solid var(--border-soft); border-radius: 10px; padding: 10px 14px; color: var(--text); font-size: 13px; font-family: inherit; resize: none; height: 42px; outline: none; }
+#reply-input:focus { border-color: var(--gold); }
+#reply-btn { padding: 10px 16px; background: var(--gold-deep); color: #fff; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; }
 #reply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-#no-select { flex: 1; display: flex; align-items: center; justify-content: center; color: rgba(240,232,208,0.3); font-size: 13px; }
-#refresh-btn { margin-left: auto; padding: 4px 12px; background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25); border-radius: 8px; color: #c9a84c; font-size: 12px; cursor: pointer; }
+#no-select { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; }
+#refresh-btn { margin-left: auto; padding: 4px 10px; background:var(--surface2); border: 1px solid var(--border-soft); border-radius: 8px; color: var(--gold-deep); font-size: 11px; cursor: pointer; font-family:inherit; }
+@media(max-width:640px){
+  #user-list { width: 140px; }
+  #user-list h2 span.title-txt { display:none; }
+}
 </style>
 </head>
 <body>
 
-<div id="login-screen">
-  <h1>✦ 관리자 로그인</h1>
-  <input type="password" id="pw-input" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()">
-  <button id="pw-btn" onclick="login()">로그인</button>
+<nav>
+  <span class="logo-text">FORTUNA · 사용자 문의</span>
+  <a href="admin.html" class="back-btn">← 관리자 대시보드</a>
+</nav>
+
+<div id="deny">
+  <div>권한을 확인하는 중...</div>
 </div>
 
 <div id="main">
   <div id="user-list">
-    <h2>💬 문의 사용자 <button id="refresh-btn" onclick="loadUsers()">새로고침</button></h2>
+    <h2><span class="title-txt">💬 문의 사용자</span><button id="refresh-btn" onclick="loadUsers()">새로고침</button></h2>
     <div id="users"></div>
   </div>
   <div id="chat-area">
@@ -66,15 +96,24 @@ body { font-family: 'Noto Sans KR', sans-serif; background: #1a120a; color: #f0e
 <script>
 var SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
 var SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
-var ADMIN_PW = '99f9f77a';
+var ADMIN_UUID = '99f9f77a-2f2a-4055-ab44-421d1c070341';
 var HEADERS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
 var currentUid = null;
 var autoTimer = null;
 
-function login() {
-  var pw = document.getElementById('pw-input').value.trim();
-  if (pw !== ADMIN_PW) { alert('비밀번호가 틀렸어요.'); return; }
-  document.getElementById('login-screen').style.display = 'none';
+function checkAuth() {
+  var pu = null;
+  try { pu = JSON.parse(localStorage.getItem('pico_user') || 'null'); } catch(e) {}
+  var savedAdmin = localStorage.getItem('pico_admin_uuid') || '';
+  var puUuid = (pu && pu.uuid) ? pu.uuid : '';
+  var isAdmin = (savedAdmin === ADMIN_UUID) || (puUuid === ADMIN_UUID);
+  if (!isAdmin) {
+    document.getElementById('deny').innerHTML =
+      '<div>권한이 없어요.</div>' +
+      '<div><a href="index.html?tab=mypage">← 마이페이지로</a></div>';
+    return;
+  }
+  document.getElementById('deny').style.display = 'none';
   document.getElementById('main').style.display = 'flex';
   loadUsers();
   autoTimer = setInterval(function() {
@@ -88,7 +127,6 @@ async function loadUsers() {
   if (!r.ok) return;
   var msgs = await r.json();
 
-  // 사용자별 마지막 메시지 + 읽지않음 집계
   var map = {};
   msgs.forEach(function(m) {
     if (!map[m.user_id]) map[m.user_id] = { uid: m.user_id, last: m, unread: 0 };
@@ -100,7 +138,7 @@ async function loadUsers() {
   });
 
   var el = document.getElementById('users');
-  if (!list.length) { el.innerHTML = '<div style="padding:20px;font-size:12px;color:rgba(240,232,208,0.4);text-align:center;">문의가 없어요</div>'; return; }
+  if (!list.length) { el.innerHTML = '<div style="padding:20px;font-size:12px;color:var(--muted);text-align:center;">문의가 없어요</div>'; return; }
 
   el.innerHTML = list.map(function(u) {
     var d = new Date(u.last.created_at);
@@ -110,7 +148,7 @@ async function loadUsers() {
     return '<div class="user-item' + (currentUid === u.uid ? ' active' : '') + '" onclick="selectUser(\'' + u.uid + '\')">' +
       '<div class="uid">' + u.uid.replace('kakao_','') + unreadDot + '</div>' +
       '<div class="preview">' + preview.slice(0,40) + '</div>' +
-      '<div class="meta"><span>' + t + '</span>' + (u.unread ? '<span style="color:#e53935;">미확인 ' + u.unread + '</span>' : '') + '</div>' +
+      '<div class="meta"><span>' + t + '</span>' + (u.unread ? '<span style="color:#c94a3a;">미확인 ' + u.unread + '</span>' : '') + '</div>' +
       '</div>';
   }).join('');
 }
@@ -130,14 +168,13 @@ async function loadChat(uid, scroll) {
   if (!r.ok) return;
   var msgs = await r.json();
   var el = document.getElementById('chat-msgs');
-  if (!msgs.length) { el.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;color:rgba(240,232,208,0.4);">대화 없음</div>'; return; }
+  if (!msgs.length) { el.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;color:var(--muted);">대화 없음</div>'; return; }
   el.innerHTML = msgs.map(function(m) {
     var d = new Date(m.created_at);
     var t = (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
     return '<div class="cm ' + m.sender + '">' + escHtml(m.content) + '<time>' + t + '</time></div>';
   }).join('');
   if (scroll) el.scrollTop = el.scrollHeight;
-  // 읽음 처리 (user 메시지)
   await fetch(SB_URL + '/rest/v1/support_messages?user_id=eq.' + encodeURIComponent(uid) + '&sender=eq.user&read=eq.false', {
     method: 'PATCH', headers: Object.assign({}, HEADERS, {'Prefer':'return=minimal'}),
     body: JSON.stringify({ read: true })
@@ -169,6 +206,8 @@ document.addEventListener('keydown', function(e) {
 function escHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 }
+
+checkAuth();
 </script>
 </body>
 </html>

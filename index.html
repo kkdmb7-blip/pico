@@ -2511,6 +2511,9 @@
       <button id="btnAdminDash" onclick="goAdminDashboard()" style="display:none;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--gold-deep);font-size:14px;cursor:pointer;text-align:left;width:100%;font-weight:700;">
         <span><i class="pi pi-sparkle"></i> 관리자 대시보드</span><span style="color:var(--muted);">›</span>
       </button>
+      <button id="btnAdminChat" onclick="goAdminChat()" style="display:none;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--gold-deep);font-size:14px;cursor:pointer;text-align:left;width:100%;font-weight:700;">
+        <span><i class="pi pi-comments"></i> 사용자 문의 답변 <span id="adminChatBadge" style="display:none;background:#c94a3a;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;">0</span></span><span style="color:var(--muted);">›</span>
+      </button>
       <button onclick="logout()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;color:#b91c1c;font-size:14px;cursor:pointer;text-align:left;width:100%;">
         <span>로그아웃</span><span style="color:var(--muted);">›</span>
       </button>
@@ -5836,12 +5839,15 @@ async function checkAdminAccess() {
   try {
     if (!currentUser || !currentUser.id) return;
     var btn = document.getElementById('btnAdminDash');
-    // index.html의 currentUser.id는 resolve-user가 돌려준 UUID가 저장됨
-    if (currentUser.id === ADMIN_UUID) {
+    var btnChat = document.getElementById('btnAdminChat');
+    function showAdmin() {
       if (btn) btn.style.display = 'flex';
+      if (btnChat) btnChat.style.display = 'flex';
       localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
-      return;
+      loadAdminChatUnread();
     }
+    // index.html의 currentUser.id는 resolve-user가 돌려준 UUID가 저장됨
+    if (currentUser.id === ADMIN_UUID) { showAdmin(); return; }
     // fallback: 구버전 pico_user (kakao_ 접두어) 인 경우만 resolve-user 호출
     if (currentUser.id.indexOf('kakao_') === 0) {
       var kakaoId = currentUser.id.slice(6);
@@ -5851,16 +5857,31 @@ async function checkAdminAccess() {
         body: JSON.stringify({ kakao_id: kakaoId, name: currentUser.name || '' })
       });
       var data = await r.json();
-      if (data && data.id === ADMIN_UUID) {
-        if (btn) btn.style.display = 'flex';
-        localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
-      }
+      if (data && data.id === ADMIN_UUID) showAdmin();
     }
+  } catch(e) {}
+}
+async function loadAdminChatUnread() {
+  try {
+    var r = await fetch('https://ymghmfkqctckxxysxkvy.supabase.co/rest/v1/support_messages?select=id&sender=eq.user&read=eq.false', {
+      headers: { 'apikey': 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x', 'Authorization': 'Bearer sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x' }
+    });
+    if (!r.ok) return;
+    var rows = await r.json();
+    var n = Array.isArray(rows) ? rows.length : 0;
+    var badge = document.getElementById('adminChatBadge');
+    if (!badge) return;
+    if (n > 0) { badge.style.display = 'inline-block'; badge.textContent = n > 99 ? '99+' : n; }
+    else { badge.style.display = 'none'; }
   } catch(e) {}
 }
 function goAdminDashboard() {
   localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
   location.href = 'admin.html';
+}
+function goAdminChat() {
+  localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
+  location.href = 'admin-chat.html';
 }
 function updateMypageTab() {
   var guest = document.getElementById('mypageGuest');
