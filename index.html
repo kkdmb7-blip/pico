@@ -1233,14 +1233,14 @@
 <div class="section-divider"></div>
 <!-- 오늘의 행운 뽑기 + 도미넌트 행성 -->
 <div style="padding:16px 16px;display:flex;gap:10px;">
-  <div class="luck-banner" onclick="window.location.href='game-luck.html'" style="flex:1;">
-    <div class="luck-banner-left">
-      <div class="luck-banner-title"><i class="pi pi-sparkle"></i> 오늘의 행운 뽑기</div>
-      <div class="luck-banner-desc">오행 구슬로 오늘의 운 확인</div>
+  <div onclick="window.location.href='game-luck.html'" style="flex:1;min-width:0;background:linear-gradient(135deg,#fdf4f1 0%,#f9e8e0 100%);border:1px solid var(--border-soft);border-radius:16px;padding:14px 14px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-shadow:var(--shadow-soft);" onmouseover="this.style.borderColor='rgba(140,74,48,0.5)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='var(--border-soft)';this.style.transform=''">
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#8c4a30;margin-bottom:4px;"><i class="pi pi-sparkle"></i> 오늘의 행운</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.4;">오행 구슬로 오늘 운 뽑기</div>
     </div>
-    <div class="luck-banner-btn">뽑기 →</div>
+    <div style="font-size:11px;color:#8c4a30;font-weight:600;margin-top:8px;">뽑기 →</div>
   </div>
-  <div onclick="window.location.href='dominant.html'" style="flex:1;background:linear-gradient(135deg,rgba(180,140,255,0.12),rgba(140,100,220,0.07));border:1px solid rgba(180,140,255,0.3);border-radius:16px;padding:14px 14px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.borderColor='rgba(180,140,255,0.65)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='rgba(180,140,255,0.3)';this.style.transform=''">
+  <div onclick="window.location.href='dominant.html'" style="flex:1;min-width:0;background:linear-gradient(135deg,rgba(180,140,255,0.12),rgba(140,100,220,0.07));border:1px solid rgba(180,140,255,0.3);border-radius:16px;padding:14px 14px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.borderColor='rgba(180,140,255,0.65)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='rgba(180,140,255,0.3)';this.style.transform=''">
     <div>
       <div style="font-size:12px;font-weight:700;color:#9b6fe0;margin-bottom:4px;">♅ 도미넌트 행성</div>
       <div style="font-size:11px;color:var(--muted);line-height:1.4;">나를 움직이는 핵심 행성</div>
@@ -6187,7 +6187,7 @@ function _urlBase64ToUint8Array(b64) {
 })();
 
 // SW 등록 (페이지 로드 시)
-var APP_VERSION = '1.0.1';
+var APP_VERSION = '1.0.2';
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js?v=' + APP_VERSION, { scope: '/' }).catch(function(e) {
     console.warn('[pico sw]', e);
