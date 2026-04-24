@@ -3087,8 +3087,13 @@ function renderMarkdown(text) {
   // # 헤더 → 굵은 금색 텍스트
   text = text.replace(/^#{1,3}\s+(.+)$/gm,
     '<div style="font-size:14px;font-weight:700;color:var(--gold);margin:12px 0 4px;">$1</div>');
-  // **bold**
-  text = text.replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--gold);">$1</strong>');
+  // **bold** — 과다 볼드 차단: 섹션당 2개 넘으면 일반 텍스트로 벗김
+  const boldMatches = text.match(/\*\*(.+?)\*\*/g) || [];
+  if (boldMatches.length > 2) {
+    text = text.replace(/\*\*(.+?)\*\*/g, '$1');
+  } else {
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--gold);">$1</strong>');
+  }
   // *italic*
   text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
   // 빈 줄 → 단락 구분
@@ -3286,8 +3291,14 @@ async function loadAllData(withZiwei, withAstro) {
         dasha:vd.currentDasha?`${vd.currentDasha.planet||''} (${vd.currentDasha.end?new Date(vd.currentDasha.end).getFullYear()+'년까지':''})`:null,
         antardasha:vd.antardasha?(vd.antardasha.planet||null):null,
         currentDasha:vd.currentDasha||null,
+        dashaHistory:vd.dashaHistory||null,
         planets:vd.planets||null, navamsa:vd.navamsa||null,
-        ashtakavarga:vd.ashtakavarga||null, yogas:vd.yogas||null, muhurta:vd.muhurta||null,
+        ashtakavarga:vd.ashtakavarga||null,
+        ashtakavargaHouses:vd.ashtakavargaHouses||null,
+        bavChart:vd.bavChart||null,
+        savTotal:vd.savTotal||null,
+        weakPlanets:vd.weakPlanets||null,
+        yogas:vd.yogas||null, muhurta:vd.muhurta||null,
         atmakaraka:vd.atmakaraka||null, karakamsha:vd.karakamsha||null,
         sadeSati:vd.sadeSati||null, dashaSandhi:vd.dashaSandhi||null,
         nakshatraBlock:vd.nakshatraBlock||'', planetBlock:vd.planetBlock||'', dashaBlock:vd.dashaBlock||'',
@@ -3373,7 +3384,24 @@ function buildVedicPrecisionBlock(opts) {
     parts.push(s);
   }
   if (o.ashtakavarga && _vedicData.ashtakavarga) {
-    parts.push(`【Ashtakavarga 삶의 영역별 강약】\n${Object.entries(_vedicData.ashtakavarga).map(([k,v])=>`${k}:${v}점`).join(' / ')}\n(각 행성 0~56점. 25+ 강/20~25 중/20 미만 약)`);
+    parts.push(`【Ashtakavarga 행성별 빈두】\n${Object.entries(_vedicData.ashtakavarga).map(([k,v])=>`${k}:${v}점`).join(' / ')}\n(각 행성이 실제 위치한 사인의 BAV, 0~8점. 4+ 길/2~3 중/0~1 약)`);
+  }
+  if (o.ashtakaHouses && Array.isArray(_vedicData.ashtakavargaHouses)) {
+    const HOUSE_TOPIC = ['자아/몸','재물/가족','형제/용기','어머니/가정','자녀/창작','직장/건강','배우자/파트너','변환/유산','지혜/행운','커리어/명예','수입/친구','해탈/해외'];
+    const lines = _vedicData.ashtakavargaHouses.map((h,i)=>`${h.house}H(${HOUSE_TOPIC[i]}):${h.sav}점 ${h.strength}`);
+    const total = _vedicData.savTotal || _vedicData.ashtakavargaHouses.reduce((s,h)=>s+h.sav,0);
+    parts.push(`【SAV 12하우스 삶의 영역별 강약】\n${lines.join('\n')}\n전체 합계: ${total} (평균 28/하우스, 32+ 강 · 25~28 보통 · 25- 약)`);
+  }
+  if (o.dashaHistory && Array.isArray(_vedicData.dashaHistory)) {
+    const lines = _vedicData.dashaHistory.map(d=>{
+      const mark = d.status==='current'?' ★현재':(d.status==='past'?' ✓지나감':' →예정');
+      return `${d.planet} ${d.ageStart}~${d.ageEnd}세 (${d.startDate}~${d.endDate}, ${d.years}년)${mark}`;
+    });
+    parts.push(`【빔쇼타리 다샤 120년 전체 흐름】\n${lines.join('\n')}`);
+  }
+  if (o.weakPlanets && Array.isArray(_vedicData.weakPlanets) && _vedicData.weakPlanets.length) {
+    const lines = _vedicData.weakPlanets.map(w=>`${w.planet}: ${w.sign} ${w.house}H, 빈두 ${w.bindu} — 사유: ${w.reasons.join(', ')}`);
+    parts.push(`【개운 대상(약한 행성) 상위 3】\n${lines.join('\n')}\n(함몰>두스타나>저빈두 순 우선. 이 행성들의 에너지를 만트라·요일색·봉사로 보강)`);
   }
   if (o.navamsa && _vedicData.navamsa) {
     parts.push(`【Navamsa D9 결혼·영적 차트】\n${Object.entries(_vedicData.navamsa).map(([k,v])=>`${k}:${v}`).join(' / ')}`);
@@ -6266,7 +6294,7 @@ ${prevText}
 - # ## ### 헤더 기호 절대 사용 금지. 마크다운 제목 금지.
 - 섹션 제목 없이 본문만 작성
 - ${charLimit}자 내외로 작성
-- **볼드** 적극 활용 (핵심 키워드 3~5개)
+- 볼드(**...**) 사용 최소화 — 한 섹션에 0~1개만, 꼭 필요한 단어만
 - 전문 용어 사용 후 쉬운 말로 풀어쓰기
 - 마지막 문장은 희망적으로 마무리
 - 위 사주 원국 및 베딕 데이터를 반드시 분석에 반영할 것
@@ -7404,16 +7432,16 @@ async function generateVedicPadaReport() {
 // 3. 120년 다샤 로드맵
 async function generateVedicDashaLifeReport() {
   return generateVedicPrecisionReport({
-    precisionOpts: { dasha: true },
+    precisionOpts: { dasha: true, dashaHistory: true },
     theoryName: '120년 빔쇼타리 다샤 분석',
     promptsA: [
-      `빔쇼타리 9행성 순서와 각 길이(6~20년). 이 사주의 출발 행성기와 지금까지 인생 흐름 개관.`,
-      `이미 지나온 마하다샤들이 남긴 흔적. 어린 시절·청소년기·청년기 어떤 행성기를 보냈고 어떤 기질이 형성됐는지.`,
-      `현재 마하다샤 ${_vedicData?.dasha||'미확인'} + 안타르다샤 ${_vedicData?.antardasha||'미확인'}가 활성화하는 삶의 주제와 에너지.`
+      `제공된 '빔쇼타리 다샤 120년 전체 흐름' 표를 그대로 인용하며 9개 마하다샤 순서와 나이 구간·연도를 정확히 명시. 출발 행성기의 기질 형성 영향을 간단히.`,
+      `표에서 '지나감'으로 표시된 과거 다샤 구간을 순서대로 훑으며 각 시기의 테마와 남긴 흔적을 근거와 함께. 나이·연도는 반드시 표의 값 그대로.`,
+      `표에서 '현재' 마크된 마하다샤 + 안타르다샤 ${_vedicData?.antardasha||'미확인'}가 활성화하는 지금의 주제. 끝나는 연도까지 남은 기간을 정확히.`
     ],
     promptsB: [
-      `다음 마하다샤와 그 이후 — 3년·10년·20년 단위로 무엇이 일어날 가능성이 높은지. 각 행성기의 테마 요약.`,
-      `다샤 흐름을 탄 장기 전략. 지금 심을 씨앗, 다음 행성기에 거둘 과실, 피해야 할 충동 각 1가지씩.`
+      `표에서 '예정'으로 표시된 다음 2~3개 마하다샤의 연도 구간과 나이를 그대로 인용하며 각 행성기의 테마 요약. 3년·10년·20년 앞의 전환점.`,
+      `다샤 흐름을 탄 장기 전략. 지금 심을 씨앗, 다음 행성기에 거둘 과실, 피해야 할 충동 각 1가지씩. 추정 연도·나이는 표와 일치시킬 것.`
     ],
     advice2A: ['이직/커리어','투자/재테크'],
     advice2B: ['창업/비즈니스','대인관계/부부']
@@ -7522,16 +7550,16 @@ async function generateVedicSandhiReport() {
 // 9. Ashtakavarga
 async function generateVedicAshtakavargaReport() {
   return generateVedicPrecisionReport({
-    precisionOpts: { ashtakavarga: true, ashtaka: true },
+    precisionOpts: { ashtakavarga: true, ashtaka: true, ashtakaHouses: true },
     theoryName: 'Ashtakavarga 삶의 영역별 강약 분석',
     promptsA: [
-      `7행성의 SAV 총점과 전체 강도 요약. 강한 별자리 상위 3, 약한 별자리 하위 3을 수치로.`,
-      `행성별 점수 해석 — 태양(자아/권위), 달(감정/어머니), 화성(의지), 수성(지성), 목성(확장), 금성(사랑), 토성(책임). 각 행성의 BAV 점수 의미.`,
-      `삶의 영역별 강약 — 1하우스(몸/자아), 7하우스(결혼), 10하우스(커리어), 11하우스(수입) 등 주요 하우스의 점수 해석.`
+      `제공된 '행성별 빈두'와 'SAV 12하우스 강약' 표에서 전체 합계를 그대로 인용하며 차트 전반 강도 총평. 추측 금지, 수치는 표와 100% 일치.`,
+      `행성별 빈두를 표 그대로 나열하며 각 행성 영역 해석 — 태양(자아/권위), 달(감정/어머니), 화성(의지), 수성(지성), 목성(확장), 금성(사랑), 토성(책임). 점수 높낮이가 그 영역에 어떻게 나타나는지.`,
+      `SAV 12하우스 표에서 강한 하우스 상위 3과 약한 하우스 하위 3을 그대로 인용. 어떤 삶의 주제가 힘 있고 어떤 주제가 도움이 필요한지 구체적으로.`
     ],
     promptsB: [
-      `약한 하우스·행성의 개운 전략. 점수 낮음이 무엇을 의미하고 어떻게 보완하는가 — 사주 용신과 교차.`,
-      `강한 영역을 극대화하는 법. 점수 높은 영역은 상대적 노력으로 큰 결실 — 구체적 활용 전략 3가지.`
+      `약한 하우스·행성의 개운 방향. 점수가 낮다는 것이 차단이 아니라 수련 과제임을 풀며 사주 용신과 교차로 보완법.`,
+      `강한 영역을 극대화하는 법. 점수 높은 하우스가 만드는 레버리지와 구체적 활용 전략 3가지.`
     ],
     advice2A: ['창업/비즈니스','이직/커리어'],
     advice2B: ['투자/재테크']
@@ -7600,16 +7628,16 @@ async function generateVedicAscendantReport() {
 // 13. 행성 개운(Upaya)
 async function generateVedicRemedyReport() {
   return generateVedicPrecisionReport({
-    precisionOpts: { planet: true, ashtakavarga: true, dusthana: true },
+    precisionOpts: { planet: true, ashtakavarga: true, dusthana: true, weakPlanets: true },
     theoryName: 'Upaya 행성 개운법 처방',
     promptsA: [
-      `차트에서 가장 시급한 개운이 필요한 행성 1순위와 그 이유.`,
-      `약한 행성 3가지와 각각이 만드는 삶의 영향. 왜 이 행성들이 도움이 필요한지.`,
-      `각 행성별 전통 처방 — 비자 만트라(옴 수르야 나마하 등), 요일 색상, 요일 행동, 방위.`
+      `제공된 '개운 대상(약한 행성) 상위 3' 표에서 1순위 행성과 그 사유(함몰/두스타나/저빈두)를 그대로 인용하며 왜 가장 시급한지 설명. 추측으로 다른 행성을 꼽지 말 것.`,
+      `표의 3개 행성 각각이 만드는 삶의 구체적 영향 — 해당 하우스 주제와 약해진 에너지의 현실 증상. 사주 용신과 교차.`,
+      `각 행성별 전통 베딕 개운 처방을 정확한 대응으로 — 태양(일요일·루비·옴 수르야 나마하), 달(월요일·진주·옴 소마야 나마하), 화성(화요일·산호·옴 앙가라카야 나마하), 수성(수요일·에메랄드·옴 부다야 나마하), 목성(목요일·황옥·옴 브리하스파테), 금성(금요일·다이아·옴 슈크라야), 토성(토요일·블루사파이어 신중·옴 샤나이차라야). 표의 3행성에 한해.`
     ],
     promptsB: [
-      `자선·봉사로 풀어내는 법. 각 행성이 상징하는 대상(토성=노동자, 화성=군인, 달=어머니)에 대한 나눔.`,
-      `7일 시작 루틴 — 요일별 구체적 행동 목록. 오늘부터 실천 가능한 것들.`
+      `자선·봉사로 풀어내는 법. 표의 3행성이 상징하는 대상(토성=노동자·노인, 화성=군인·외과, 달=어머니·여성, 태양=아버지·권위자, 수성=학생·언론, 목성=스승·수행자, 금성=예술가·여성)에 대한 나눔을 해당 요일에.`,
+      `7일 시작 루틴 — 요일별 구체적 행동 목록. 표의 3행성 요일은 반드시 포함하고 나머지 요일은 가벼운 유지. 오늘부터 실천 가능한 것들.`
     ],
     advice2A: ['대인관계/부부'],
     advice2B: ['이직/커리어']
@@ -7911,7 +7939,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 - 독자는 부모님. "아이는", "이 사주를 가진 아이는" 으로 서술
 - 직업군보다 '어떤 환경에서 꽃피는지'에 초점
 - 겁박하거나 단정짓지 말 것 — 가능성으로 서술
-- **볼드** 핵심단어 3~5개
+- 볼드(**...**) 사용 최소화 — 섹션당 0~1개만
 - #헤더 금지, 표 금지
 
 섹션 구성:
@@ -8050,10 +8078,10 @@ async function generateGuideReport() {
   const relTxt = _profile?.relation ? `(독자와의 관계: ${_profile.relation})` : '';
   const subjectStr = `분석 대상: ${_profile?.name||'이 사람'} ${relTxt} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'}`;
 
-  const promptA = `${subjectStr}\n\n${sb2}${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n오행 분포: ${fivePctStr}\n신강도: ${_singang||'미확인'} / 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal}\n십신 분포: ${tenGodsStr}\n\n중요: 이 리포트는 당사자가 아니라 그를 가까이에서 대하는 사람을 위한 가이드입니다. 반드시 제3자 관찰자 시점("이 사람은~", "상대는~")으로 작성하세요. 2인칭("당신은~") 절대 금지.\n\n섹션 구성:\n1. 이 사람의 성격 핵심 (3줄 요약) — 일간(${_ilju||'미확인'})·격국·신강도 기반으로 이 사람을 한눈에 파악할 수 있는 3줄 요약. 첫인상·진짜 모습·말 못하는 욕구 한 줄씩. 약 300자.\n2. 대화할 때 주의할 포인트 — 어떤 말투·주제에 민감한지, 어떻게 말을 꺼내야 잘 받아들이는지. 십신 분포(특히 관성·인성·식상)와 일지 배우자궁 기반으로 의사소통 스타일과 지뢰 지점을 구체적 예문과 함께. 약 600자.\n3. 스트레스 받을 때·화났을 때 대처법 — 이 사람이 화가 났을 때 보이는 패턴(억누름/폭발/회피 중 어느 쪽), 풀어주는 데 효과적인 방법, 절대 하면 안 되는 반응. 신강/신약과 비겁·식상 기반. 약 500자.\n\n총 1300~1500자. 섹션 번호(1. 2. 3.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+  const promptA = `${subjectStr}\n\n${sb2}${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n오행 분포: ${fivePctStr}\n신강도: ${_singang||'미확인'} / 격국: ${_geokguk||'미확인'} / 용신: ${ysFinal}\n십신 분포: ${tenGodsStr}\n\n중요: 이 리포트는 당사자가 아니라 그를 가까이에서 대하는 사람을 위한 가이드입니다. 반드시 제3자 관찰자 시점("이 사람은~", "상대는~")으로 작성하세요. 2인칭("당신은~") 절대 금지.\n\n섹션 구성:\n1. 이 사람의 성격 핵심 (3줄 요약) — 일간(${_ilju||'미확인'})·격국·신강도 기반으로 이 사람을 한눈에 파악할 수 있는 3줄 요약. 첫인상·진짜 모습·말 못하는 욕구 한 줄씩. 약 300자.\n2. 대화할 때 주의할 포인트 — 어떤 말투·주제에 민감한지, 어떻게 말을 꺼내야 잘 받아들이는지. 십신 분포(특히 관성·인성·식상)와 일지 배우자궁 기반으로 의사소통 스타일과 지뢰 지점을 구체적 예문과 함께. 약 600자.\n3. 스트레스 받을 때·화났을 때 대처법 — 이 사람이 화가 났을 때 보이는 패턴(억누름/폭발/회피 중 어느 쪽), 풀어주는 데 효과적인 방법, 절대 하면 안 되는 반응. 신강/신약과 비겁·식상 기반. 약 500자.\n\n총 1300~1500자. 섹션 번호(1. 2. 3.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(promptA, [0,1,2], '이 사람 사용설명서', ysFinal, '', false);
 
-  const promptB = `${subjectStr}\n\n${sb2}${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n오행 분포: ${fivePctStr}\n신강도: ${_singang||'미확인'} / 용신: ${ysFinal}\n십신 분포: ${tenGodsStr}\n\n섹션 구성:\n4. 신뢰를 얻고 마음을 여는 방법 — 이 사람이 마음을 여는 데 시간이 얼마나 걸리는지, 어떤 행동·태도가 신뢰를 쌓는지. 인성·재성·관성의 강약 기반. 구체적 행동 팁 3~4가지. 약 500자.\n5. 절대 피해야 할 말과 행동 — 이 사람을 가장 빠르게 멀어지게 하는 말·행동. 자존심·콤플렉스·가치관과 충돌하는 영역을 격국·십신·원진살 기반으로. 구체 예문 포함. 약 400자.\n\n총 800~1000자. 섹션 번호(4. 5.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+  const promptB = `${subjectStr}\n\n${sb2}${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n오행 분포: ${fivePctStr}\n신강도: ${_singang||'미확인'} / 용신: ${ysFinal}\n십신 분포: ${tenGodsStr}\n\n섹션 구성:\n4. 신뢰를 얻고 마음을 여는 방법 — 이 사람이 마음을 여는 데 시간이 얼마나 걸리는지, 어떤 행동·태도가 신뢰를 쌓는지. 인성·재성·관성의 강약 기반. 구체적 행동 팁 3~4가지. 약 500자.\n5. 절대 피해야 할 말과 행동 — 이 사람을 가장 빠르게 멀어지게 하는 말·행동. 자존심·콤플렉스·가치관과 충돌하는 영역을 격국·십신·원진살 기반으로. 구체 예문 포함. 약 400자.\n\n총 800~1000자. 섹션 번호(4. 5.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(promptB, [3,4], '이 사람 사용설명서', ysFinal, '', true);
 
   try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data){ _reportId = data.id; showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } } catch(e){}
@@ -8094,7 +8122,7 @@ async function generatePastlifeReport() {
 - 구체적이고 흥미롭게 — 어떤 시대, 어떤 삶, 어떤 감정, 어떤 결말
 - 확정 단정 금지 — 암시·가능성·흔적 언어 사용
 - #헤더 금지, 표 금지, 섹션 제목 반복 금지
-- **볼드**는 핵심 단어 3~5개만`;
+- 볼드(**...**) 사용 최소화 — 섹션당 0~1개만`;
 
   const promptA = `${profileStr}
 ${napeumBlock}
@@ -8166,7 +8194,7 @@ ${genderNote}
 2. 실제로 잘 맞는 파트너 기질 — 일지 배우자궁의 십신·지지와 용신(${ysFinal}) 관점에서 에너지가 충돌하지 않고 안정적으로 함께할 수 있는 사람의 유형. 겉으로 끌리는 유형과 실제 잘 맞는 유형이 다를 경우 명확하게 구분. 약 400자.
 3. 끌리지만 결국 힘든 유형 — 합·충·형·파와 기신 오행 관점에서 끌리지만 결국 에너지 소모가 큰 유형. 왜 끌리는지, 왜 결국 힘든지 사주 구조로 설명. 약 300자.
 
-총 1000~1200자. 섹션 번호(1. 2. 3.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+총 1000~1200자. 섹션 번호(1. 2. 3.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(soulmatePromptA, [0,1,2], '운명의 상대방 분석', ysFinal, '', false);
 
   const soulmatePromptB = `${profileStr}
@@ -8181,7 +8209,7 @@ ${genderNote}
 4. 가장 오래 함께할 수 있는 관계 패턴 — 나를 보완하는 에너지 조합. 용신 오행을 가진 상대가 가져오는 안정감. 장기적으로 성장을 함께할 수 있는 관계의 구체적 특성. 약 400자.
 5. 인연이 오는 시기와 조건 — ${partnerStar}이 활성화되는 대운과 세운 교차점. 현재 대운 ${_daeun||'미확인'} 기준 지금 이 시기가 인연 에너지가 강한지 약한지. 만남의 조건이 갖춰지는 구체적 시기대와 주의사항. 약 400자.
 
-총 700~900자. 섹션 번호(4. 5.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+총 700~900자. 섹션 번호(4. 5.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(soulmatePromptB, [3,4], '운명의 상대방 분석', ysFinal, '', true);
 
   try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
@@ -8212,7 +8240,7 @@ async function generateSajuPoemReport() {
 - 서정적이고 아름다우면서도 이 사람의 사주를 정확히 반영
 - 너무 어둡거나 너무 긍정적인 방향으로 왜곡 금지 — 사실에 기반한 시
 - #헤더 금지, 표 금지. 자연스러운 산문시 또는 짧은 이미지 묘사 형식
-- **볼드**는 핵심 시어(詩語) 3~5개만`;
+- 볼드(**...**) 사용 최소화 — 섹션당 0~1개만`;
 
   const poemPromptA = `${profileStr}
 납음: ${napeumName2}(${napeumOh2}) — ${napeumImg2}
@@ -8293,7 +8321,7 @@ ${shinsalStr3}
 2. 이번 생에 완성해야 할 것 — 용신 오행(${ysFinal})과 격국 구조가 충족될 때 어떤 방식의 삶이 되는지. 어떤 역할·관계·방식이 이 사주에서 "완성"을 의미하는지. 현실적이고 구체적으로. 약 450자.
 3. 반드시 내려놓아야 할 것 — 기신(忌神) 오행과 과다 십신이 만드는 반복 패턴. 이 사람이 자꾸 빠지는 함정, 에너지를 소모시키는 방향, 붙잡고 있지만 결국 놓아야 할 것. 약 400자.
 
-총 1200~1400자. 섹션 번호(1. 2. 3.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+총 1200~1400자. 섹션 번호(1. 2. 3.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(missionPromptA, [0,1,2], '이번 생 미션 분석', ysFinal, '', false);
 
   const missionPromptB = `${profileStr}
@@ -8309,7 +8337,7 @@ ${shinsalStr3}
 4. 미션을 방해하는 패턴 — 과다한 십신이나 기신 오행이 만드는 행동 패턴. 이 사람이 습관적으로 빠지는 방해 패턴(집착/회피/과잉반응 등)을 사주 구조로 설명하고, 이를 인식하고 전환하는 방법. 신살이 있다면 신살의 역할도 포함. 약 450자.
 5. 지금 당장 미션을 실천하는 3가지 방법 — 현재 대운(${_daeun||'미확인'})과 세운(${_sewun||'미확인'}) 에너지를 고려한 실천 가능한 3가지 액션. 추상적 방향이 아닌 "이번 달, 올해, 앞으로 3년 안에" 할 수 있는 구체적인 것. 약 400자.
 
-총 800~1000자. 섹션 번호(4. 5.) 붙여 작성. **볼드**로 핵심 키워드 강조.`;
+총 800~1000자. 섹션 번호(4. 5.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(missionPromptB, [3,4], '이번 생 미션 분석', ysFinal, '', true);
 
   try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
@@ -8336,7 +8364,7 @@ async function generateVillainReport() {
 - 비판이 아닌 이해의 관점으로 — "왜 이런 패턴이 생기는가"를 사주 구조로 설명
 - 재미있고 공감되는 언어 사용 ("맞아 맞아" 반응을 이끌어내는 톤)
 - 확정적 판단 금지, 패턴과 경향으로 서술
-- #헤더 금지, **볼드**는 핵심 키워드 3~5개`;
+- #헤더 금지, 볼드(**...**)는 섹션당 0~1개만`;
 
   const promptA = `${profileStr}
 사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})
@@ -8351,7 +8379,7 @@ ${sb2}${buildAccuracyLayerBlock()}
 2. 흑역사 패턴 분석 — 이 사주가 반복하는 관계·직장·일상에서의 흑역사 패턴. 기신 오행이 활성화될 때 어떤 방식으로 문제가 생기는지 구체적으로. "이 사람 주변에 꼭 있어" 식의 공감형. 약 500자.
 3. 내 안의 어두운 면 — 겉으로 드러나지 않지만 내면 깊이 있는 욕구나 패턴. 억압된 기신 에너지가 어떤 형태로 표출되는지. 솔직하고 때로 충격적으로. 약 400자.
 
-총 1100~1300자. 섹션 번호(1. 2. 3.) 붙여 작성. **볼드**로 핵심 키워드.`;
+총 1100~1300자. 섹션 번호(1. 2. 3.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(promptA, [0,1,2], '빌런 기질 분석', ysFinal, '', false, villainSys);
 
   const promptB = `${profileStr}
@@ -8403,7 +8431,7 @@ ${sb2}${buildAccuracyLayerBlock()}
 2. 왜 그 사람이 구조적으로 힘든가 — 기신-용신 충돌, 십신 간 갈등 구조를 설명. 왜 이 유형과 만나면 내 에너지가 고갈되는지 사주 구조로. 약 450자.
 3. 반복되는 충돌 패턴 — 이 관계에서 반복적으로 일어나는 갈등의 시나리오. 어떻게 시작되고 어떻게 악화되는지. 약 400자.
 
-총 1100~1300자. 섹션 번호(1. 2. 3.) 붙여 작성. **볼드**로 핵심 키워드.`;
+총 1100~1300자. 섹션 번호(1. 2. 3.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(promptA, [0,1,2], '에너지 소진 관계 분석', ysFinal, '', false);
 
   const promptB = `${profileStr}
@@ -8447,7 +8475,7 @@ async function generateLoveHistoryReport() {
 - 비판이 아닌 이해: "왜 이렇게 되는가"를 사주 구조로 설명
 - "맞아 이거야" 공감 반응을 이끌어내는 구체적 묘사
 - 확정 단정 금지, 패턴과 경향으로 서술
-- #헤더 금지, **볼드**는 핵심 키워드 3~5개`;
+- #헤더 금지, 볼드(**...**)는 섹션당 0~1개만`;
 
   const promptA = `${profileStr}
 이 사주의 연애 흑역사 패턴 진단: "${lhPatternG}" (일간 ${_ilju||''} 기반)
@@ -8465,7 +8493,7 @@ ${sb2}${buildAccuracyLayerBlock()}
 2. 끌리지만 항상 실패하는 이유 — 왜 특정 유형에게 끌리면서도 항상 같은 방식으로 상처받는지. 기신 오행과 ${partnerStar} 충돌 구조. "나 이거 너무 공감돼" 수준의 구체성. 약 500자.
 3. 내가 반복하는 연애 실수 — 일지 십신과 과다 십신이 만드는 행동 패턴. 상대를 지치게 하는 나의 습관적 실수. 솔직하게. 약 400자.
 
-총 1100~1300자. 섹션 번호(1. 2. 3.) 붙여 작성. **볼드**로 핵심.`;
+총 1100~1300자. 섹션 번호(1. 2. 3.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(promptA, [0,1,2], '연애 흑역사 분석', ysFinal, '', false, loveHistSys);
 
   const promptB = `${profileStr}
@@ -8505,7 +8533,7 @@ async function generateEraReport() {
 - 생생한 이야기체: "이 사람은 그 시대에 ~ 로 살았을 것 같습니다"
 - 로맨틱하고 흥미롭게 — 독자가 그 시대로 빠져들게
 - 확정 단정 금지, 가능성·흔적·공명 언어 사용
-- #헤더 금지, **볼드**는 핵심 시대명·역할명 강조`;
+- #헤더 금지, 볼드(**...**)는 섹션당 0~1개만`;
 
   const promptA = `${profileStr}
 납음: ${napeumName}(${napeumOh}) — ${napeumImg}
@@ -8571,7 +8599,7 @@ ${sb2}${buildAccuracyLayerBlock()}
 2. 왜 지금껏 발현되지 않았나 — 기신 오행이 억누르는 구조, 주변 환경·교육이 이 능력을 강화하지 않은 이유. "내가 이 방향으로 안 가게 된 이유"가 사주에 있다. 약 450자.
 3. 재능이 숨어있는 사주 구조 — 어떤 십신·오행·격국 조합이 이 잠재력을 만드는지. 기술적으로 설명하되 이해하기 쉽게. 약 400자.
 
-총 1100~1300자. 섹션 번호(1. 2. 3.) 붙여 작성. **볼드**로 핵심.`;
+총 1100~1300자. 섹션 번호(1. 2. 3.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(promptA, [0,1,2], '숨겨진 재능 분석', ysFinal, '', false);
 
   const promptB = `${profileStr}
@@ -8616,7 +8644,7 @@ async function generateTotemReport() {
 - 납음 이미지에서 힌트를 끌어내세요 (해중금→바다 관련, 노중화→불꽃 관련)
 - 생생하고 아름다운 묘사. 독자가 자기 동물을 SNS에 공유하고 싶게.
 - 확정 단정 금지, 흔적·공명 언어
-- #헤더 금지, **볼드**는 동물 이름과 핵심 특성`;
+- #헤더 금지, 볼드(**...**)는 섹션당 0~1개만`;
 
   const promptA = `${profileStr}
 납음: ${napeumName}(${napeumOh}) — ${napeumImg}
@@ -8726,7 +8754,7 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 - 사주 구조(일간·격국·십신·오행)를 근거로 "왜 이렇게 반응하는지"를 쉽게 설명
 - 없는 오행을 "있다"고 쓰지 마세요
 - #헤더 금지, 표 금지
-- **볼드**는 핵심 단어에만 3~5개
+- 볼드(**...**) 사용 최소화 — 섹션당 0~1개만
 - 섹션 제목 쓰지 마세요 (카드 헤더에 이미 표시됨)
 - 본문 안에서 소항목 번호 쓸 때는 가), 나), 다) 형식 사용 (1. 2. 3. 사용 금지)
 - 분석 범위를 벗어난 미래 시점 예측·언급 절대 금지
@@ -8734,7 +8762,7 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
     : `당신은 ${theoryName || '억부지전'} 기반 사주 분석가입니다.
 절대 규칙:
 - #헤더 금지, 표 금지
-- **볼드**는 핵심 단어에만 3~5개
+- 볼드(**...**) 사용 최소화 — 섹션당 0~1개만
 - 톤: 따뜻하고 정확한 친구 같은 전문가
 - 없는 오행을 "있다"고 쓰면 안 됨
 - 용신(${ysFinal || ''})을 기신/불리로 쓰면 안 됨
@@ -9197,7 +9225,7 @@ async function easyExplain() {
 - 일상 비유나 예시 1~2개 반드시 포함 (요리/계절/길찾기/직장 등)
 - 6~10문장, 친한 친구가 카톡으로 설명하듯 다정한 존댓말
 - 원본 리포트 내용만 풀이, 새 정보·추측 절대 추가 금지
-- **볼드** 핵심 단어 3~5개로 강조
+- 볼드(**...**) 사용 최소화 — 섹션당 0~1개만
 - 마지막 문장은 따뜻한 응원으로 마무리`;
 
   try {
