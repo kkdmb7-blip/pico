@@ -18,7 +18,7 @@
   // ── CSS 주입 ──
   var css = `
 #sw-btn {
-  position: fixed; bottom: calc(156px + env(safe-area-inset-bottom, 0px)); right: 14px; z-index: 9980;
+  position: fixed; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); right: 14px; z-index: 9980;
   height: 44px; padding: 0 16px 0 14px; border-radius: 24px;
   max-width: calc(100vw - 28px);
   background: linear-gradient(135deg, #c9a84c, #7a5a10);
@@ -47,7 +47,7 @@
   line-height: 1;
 }
 #sw-panel {
-  position: fixed; bottom: calc(210px + env(safe-area-inset-bottom, 0px)); right: 14px; z-index: 9981;
+  position: fixed; bottom: calc(130px + env(safe-area-inset-bottom, 0px)); right: 14px; z-index: 9981;
   width: min(340px, calc(100vw - 28px));
   background: #fdf8f0; border-radius: 18px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
@@ -259,9 +259,22 @@
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
   }
 
+  // ── 용신알(미각성 유저) 있으면 그 위로 스택, 없으면 탭바 바로 위 ──
+  function adjustPosition() {
+    var btn = document.getElementById('sw-btn');
+    var panel = document.getElementById('sw-panel');
+    var hasEgg = !!document.getElementById('yongsin-egg-btn');
+    var btnBottom = hasEgg ? 156 : 76;
+    var panelBottom = hasEgg ? 210 : 130;
+    if (btn) btn.style.bottom = 'calc(' + btnBottom + 'px + env(safe-area-inset-bottom, 0px))';
+    if (panel) panel.style.bottom = 'calc(' + panelBottom + 'px + env(safe-area-inset-bottom, 0px))';
+  }
+
   // ── 초기화 ──
   function init() {
     buildUI();
+    adjustPosition();
+    setInterval(adjustPosition, 2000);
     var uid = getUserId();
     if (uid) {
       loadMessages(); // 배지 업데이트용 초기 로드
