@@ -3052,11 +3052,14 @@
       <path d="M8.5 8.5L7 7M15.5 8.5L17 7M12 6V4"/>
     </svg>상담
   </button>
-  <button onclick="switchTab('mypage')" id="tnMypage" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#5a4830;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-      <circle cx="12" cy="7" r="4"/>
-    </svg>마이페이지
+  <button onclick="switchTab('mypage')" id="tnMypage" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:#5a4830;font-size:12px;font-weight:600;letter-spacing:0.5px;transition:color 0.2s;position:relative;">
+    <span style="position:relative;display:inline-flex;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span id="tnMypageDot" style="display:none;position:absolute;top:-2px;right:-6px;background:#c94a3a;color:#fff;min-width:16px;height:16px;border-radius:10px;font-size:10px;font-weight:700;padding:0 4px;display:none;align-items:center;justify-content:center;border:2px solid var(--bg,#fff);line-height:1;">!</span>
+    </span>마이페이지
   </button>
 </div>
 
@@ -5861,19 +5864,48 @@ async function checkAdminAccess() {
     }
   } catch(e) {}
 }
+var _lastAdminUnread = 0;
+var _adminChatPollStarted = false;
 async function loadAdminChatUnread() {
   try {
-    var r = await fetch('https://ymghmfkqctckxxysxkvy.supabase.co/rest/v1/support_messages?select=id&sender=eq.user&read=eq.false', {
+    var r = await fetch('https://ymghmfkqctckxxysxkvy.supabase.co/rest/v1/support_messages?select=id,user_id,content,created_at&sender=eq.user&read=eq.false&order=created_at.desc', {
       headers: { 'apikey': 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x', 'Authorization': 'Bearer sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x' }
     });
     if (!r.ok) return;
     var rows = await r.json();
     var n = Array.isArray(rows) ? rows.length : 0;
     var badge = document.getElementById('adminChatBadge');
-    if (!badge) return;
-    if (n > 0) { badge.style.display = 'inline-block'; badge.textContent = n > 99 ? '99+' : n; }
-    else { badge.style.display = 'none'; }
+    if (badge) {
+      if (n > 0) { badge.style.display = 'inline-block'; badge.textContent = n > 99 ? '99+' : n; }
+      else { badge.style.display = 'none'; }
+    }
+    var dot = document.getElementById('tnMypageDot');
+    if (dot) {
+      if (n > 0) { dot.style.display = 'inline-flex'; dot.textContent = n > 9 ? '9+' : n; }
+      else { dot.style.display = 'none'; }
+    }
+    // 새 문의가 도착했을 때만 브라우저 알림
+    if (n > _lastAdminUnread && rows[0] && 'Notification' in window) {
+      if (Notification.permission === 'granted') {
+        try {
+          var latest = rows[0];
+          new Notification('💬 새 문의가 도착했어요', {
+            body: (latest.user_id || '').replace('kakao_','') + ': ' + (latest.content || '').slice(0,60),
+            tag: 'pico-support',
+            icon: '/img/goddess-app.png'
+          });
+        } catch(e) {}
+      } else if (Notification.permission === 'default') {
+        try { Notification.requestPermission(); } catch(e) {}
+      }
+    }
+    _lastAdminUnread = n;
   } catch(e) {}
+  // 관리자면 60초마다 재조회
+  if (!_adminChatPollStarted) {
+    _adminChatPollStarted = true;
+    setInterval(loadAdminChatUnread, 60000);
+  }
 }
 function goAdminDashboard() {
   localStorage.setItem('pico_admin_uuid', ADMIN_UUID);

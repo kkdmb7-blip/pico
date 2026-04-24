@@ -702,8 +702,7 @@ function buildVedicAIContext(d) {
       (antar_planet ? '\n안타르다샤: ' + antar_planet : '')
     )),
     '',
-    '=== 요가 ===',
-    yoga_summary,
+    (d.yogaBlock || ('=== 요가 ===\n' + yoga_summary)),
   ].filter(function(x){ return x !== null && x !== undefined; }).join('\n');
 }
 
