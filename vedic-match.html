@@ -34,8 +34,8 @@
   .logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
   .logo img{height:40px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(60,30,10,0.35)) brightness(0.78);}
   .logo-text{font-family:'Noto Serif KR',serif;font-weight:700;font-size:15px;letter-spacing:2px;color:var(--accent);}
-  .nav-btn{padding:8px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,var(--accent),#5a1810);color:#fcf7ea;border:none;font-family:inherit;text-decoration:none;transition:all .2s;white-space:nowrap;}
-  .nav-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift);}
+  .nav-btn{padding:8px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:rgba(122,36,24,0.10);color:var(--accent);border:1px solid rgba(122,36,24,0.30);font-family:inherit;text-decoration:none;transition:all .2s;white-space:nowrap;}
+  .nav-btn:hover{background:rgba(122,36,24,0.16);border-color:rgba(122,36,24,0.45);transform:translateY(-1px);}
 
   /* MAIN */
   .main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:40px 20px 80px;}
@@ -58,8 +58,8 @@
   .field input:focus,.field select:focus{outline:none;border-color:var(--accent);}
   .date-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
   .hour-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-  .btn-submit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:15px 0;border-radius:14px;background:linear-gradient(135deg,var(--accent),#5a1810);color:#fcf7ea;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:700;transition:all .2s;}
-  .btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(122,36,24,.28);}
+  .btn-submit{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:15px 0;border-radius:14px;background:rgba(138,106,21,0.12);color:#6a4f0c;border:1px solid rgba(138,106,21,0.35);cursor:pointer;font-family:inherit;font-size:15px;font-weight:700;transition:all .2s;}
+  .btn-submit:hover{background:rgba(138,106,21,0.20);border-color:rgba(138,106,21,0.55);transform:translateY(-1px);}
   .btn-submit:disabled{opacity:.5;cursor:default;transform:none;}
 
   /* STATUS */
@@ -137,8 +137,8 @@
   .ai-section-body{font-size:14px;color:var(--text);line-height:1.85;}
   .ai-section-body strong{color:var(--gold-deep);}
   .ai-sec-loading{font-size:13px;color:var(--muted);padding:6px 0;}
-  .btn-match-ai{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 0;border-radius:14px;background:linear-gradient(135deg,#4a3280,#7b56c8);color:#fff;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;transition:all .2s;}
-  .btn-match-ai:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(74,50,128,.35);}
+  .btn-match-ai{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 0;border-radius:14px;background:rgba(140,90,210,0.13);color:#7a3fc0;border:1px solid rgba(140,90,210,0.38);cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;transition:all .2s;}
+  .btn-match-ai:hover{background:rgba(140,90,210,0.22);border-color:rgba(140,90,210,0.60);transform:translateY(-1px);}
   .btn-match-ai:disabled{opacity:.5;cursor:default;transform:none;}
   .match-ai-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(30,20,50,0.95);color:#c4a8f0;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;transition:opacity 0.4s;white-space:nowrap;opacity:0;}
 
@@ -158,11 +158,8 @@
 
 <nav>
   <a href="/" class="logo"><img src="img/goddess/goddess.png" alt="FORTUNA"><span class="logo-text">FORTUNA</span></a>
-  <a href="vedic.html" class="nav-btn">내 베딕 차트</a>
+  <a href="vedic.html" class="nav-btn" id="navVedicLink">내 베딕 차트</a>
 </nav>
-
-<div id="profile-bar-root"></div>
-<script src="profile-bar.js"></script>
 
 <main class="main">
   <h1 class="page-title">베딕 <em>궁합</em></h1>
@@ -180,16 +177,16 @@
         <div class="field">
           <label>생년월일 (양력)</label>
           <div class="date-row">
-            <input type="number" id="m-year" placeholder="1990" min="1900" max="2030">
-            <input type="number" id="m-month" placeholder="월" min="1" max="12">
-            <input type="number" id="m-day" placeholder="일" min="1" max="31">
+            <select id="m-year"></select>
+            <select id="m-month"></select>
+            <select id="m-day"></select>
           </div>
         </div>
         <div class="field">
           <label>출생 시각</label>
           <div class="hour-row">
-            <input type="number" id="m-hour" placeholder="시 (0-23)" min="0" max="23">
-            <input type="number" id="m-min" placeholder="분 (0-59)" min="0" max="59" value="0">
+            <select id="m-hour"></select>
+            <select id="m-min"></select>
           </div>
         </div>
       </div>
@@ -203,16 +200,16 @@
         <div class="field">
           <label>생년월일 (양력)</label>
           <div class="date-row">
-            <input type="number" id="f-year" placeholder="1990" min="1900" max="2030">
-            <input type="number" id="f-month" placeholder="월" min="1" max="12">
-            <input type="number" id="f-day" placeholder="일" min="1" max="31">
+            <select id="f-year"></select>
+            <select id="f-month"></select>
+            <select id="f-day"></select>
           </div>
         </div>
         <div class="field">
           <label>출생 시각</label>
           <div class="hour-row">
-            <input type="number" id="f-hour" placeholder="시 (0-23)" min="0" max="23">
-            <input type="number" id="f-min" placeholder="분 (0-59)" min="0" max="59" value="0">
+            <select id="f-hour"></select>
+            <select id="f-min"></select>
           </div>
         </div>
       </div>
@@ -719,22 +716,71 @@ function shareMatchKakao() {
   }
 })();
 
-// ── INIT: 내 프로필 자동 채움 ─────────────────────────────
+// ── 연·월·일·시·분 셀렉트 옵션 채우기 (pico 표준) ─────────
+function _populateMatchSelect(elId, kind) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  var opts = '';
+  if (kind === 'year') {
+    opts += '<option value="">연도</option>';
+    var nowY = new Date().getFullYear();
+    for (var y = nowY; y >= 1930; y--) opts += '<option value="' + y + '">' + y + '년</option>';
+  } else if (kind === 'month') {
+    opts += '<option value="">월</option>';
+    for (var m = 1; m <= 12; m++) opts += '<option value="' + m + '">' + m + '월</option>';
+  } else if (kind === 'day') {
+    opts += '<option value="">일</option>';
+    for (var d = 1; d <= 31; d++) opts += '<option value="' + d + '">' + d + '일</option>';
+  } else if (kind === 'hour') {
+    opts += '<option value="">시</option>';
+    for (var h = 0; h < 24; h++) opts += '<option value="' + h + '">' + String(h).padStart(2,'0') + '시</option>';
+  } else if (kind === 'min') {
+    opts += '<option value="0" selected>00분</option>';
+    for (var mi = 5; mi < 60; mi += 5) opts += '<option value="' + mi + '">' + String(mi).padStart(2,'0') + '분</option>';
+  }
+  el.innerHTML = opts;
+}
+
 (function() {
-  try {
-    var prof = JSON.parse(localStorage.getItem('pico_profile') || 'null');
-    if (prof && prof.year && prof.month && prof.day) {
-      var useFemale = prof.gender === 'female';
-      var prefix = useFemale ? 'f-' : 'm-';
-      if (prof.name) document.getElementById(prefix + 'name').value = prof.name;
-      document.getElementById(prefix + 'year').value = prof.year;
-      document.getElementById(prefix + 'month').value = prof.month;
-      document.getElementById(prefix + 'day').value = prof.day;
-      if (prof.hour != null && prof.hour !== 'unknown') {
-        document.getElementById(prefix + 'hour').value = prof.hour;
-      }
+  ['m','f'].forEach(function(pre){
+    _populateMatchSelect(pre + '-year', 'year');
+    _populateMatchSelect(pre + '-month', 'month');
+    _populateMatchSelect(pre + '-day', 'day');
+    _populateMatchSelect(pre + '-hour', 'hour');
+    _populateMatchSelect(pre + '-min', 'min');
+  });
+})();
+
+// ── INIT: 내 프로필 자동 채움 + 네비 링크에 프로필 파라미터 첨부 ──
+(function() {
+  var prof = null;
+  try { prof = JSON.parse(localStorage.getItem('pico_profile') || 'null'); } catch(e) {}
+
+  if (prof && prof.year && prof.month && prof.day) {
+    var useFemale = prof.gender === 'female';
+    var prefix = useFemale ? 'f-' : 'm-';
+    if (prof.name) document.getElementById(prefix + 'name').value = prof.name;
+    document.getElementById(prefix + 'year').value = prof.year;
+    document.getElementById(prefix + 'month').value = prof.month;
+    document.getElementById(prefix + 'day').value = prof.day;
+    if (prof.hour != null && prof.hour !== 'unknown') {
+      document.getElementById(prefix + 'hour').value = prof.hour;
     }
-  } catch(e) {}
+
+    // 네비 '내 베딕 차트' 버튼에 프로필 파라미터 자동 첨부
+    var navLink = document.getElementById('navVedicLink');
+    if (navLink) {
+      var sp = new URLSearchParams();
+      sp.set('year', prof.year);
+      sp.set('month', prof.month);
+      sp.set('day', prof.day);
+      if (prof.hour != null && prof.hour !== 'unknown') sp.set('hour', prof.hour);
+      if (prof.minute != null) sp.set('minute', prof.minute);
+      if (prof.gender) sp.set('gender', prof.gender);
+      if (prof.name) sp.set('name', prof.name);
+      navLink.href = 'vedic.html?' + sp.toString();
+    }
+  }
 
   // URL 파라미터에서 자동 입력 (?my=year,month,day,hour,gender)
   var p = new URLSearchParams(location.search);
