@@ -1032,7 +1032,11 @@ const TYPE_CONFIG = {
   vedic_muhurta:{ title:'7일 길시 캘린더', orb:190, emoji:'<i class="pi pi-calendar"></i>', focus:'이번주 7일 각 날의 Tithi·Nakshatra·Muhurta 길흉 시간대',
     desc:'오늘부터 7일간 매일의 Tithi(월상)·Nakshatra·행동별 길시를 베딕 전통 Muhurta 시스템으로 안내' },
   qimen_wonmyong:{ title:'기문 본명국 분석', orb:590, emoji:'<i class="pi pi-compass"></i>', focus:'출생 시점의 기문 포국으로 본 평생 운명 — 직부성·구성·팔문 본명',
-    desc:'태어난 그 순간 우주의 기운 배치(기문 9궁 포국)를 출생시 직부성·직사문·연명궁 기준으로 평생 운명 청사진을 읽어냅니다. 사주가 시간 흐름이라면 본명국은 공간 배치 — 사주와 다른 각도의 정밀 분석.' }
+    desc:'태어난 그 순간 우주의 기운 배치(기문 9궁 포국)를 출생시 직부성·직사문·연명궁 기준으로 평생 운명 청사진을 읽어냅니다. 사주가 시간 흐름이라면 본명국은 공간 배치 — 사주와 다른 각도의 정밀 분석.' },
+  qimen_today:{ title:'오늘의 기문 정밀 운세', orb:290, emoji:'<i class="pi pi-clock"></i>', focus:'오늘 24시간의 9궁 포국으로 본 길방·길시·하기 좋은 일',
+    desc:'오늘 이 시간 우주의 기운 배치를 9궁 포국으로 정밀 분석. 시간대별 길흉, 좋은 방향, 추천 활동, 피해야 할 일까지 — 오늘 하루 행동 가이드.' },
+  qimen_taegil:{ title:'기문 택일 가이드 (14일)', orb:390, emoji:'<i class="pi pi-calendar"></i>', focus:'이번주~다음주 14일 흐름에서 사업·계약·이사·면접 길일 추천',
+    desc:'14일간의 일가기문 흐름에서 활동별(사업/계약/이사/면접/만남) 가장 좋은 날과 피해야 할 날을 추천.' }
 };
 
 const TYPE_COLORS = {
@@ -1083,7 +1087,9 @@ const TYPE_COLORS = {
   vedic_remedy:      { main:'#3a8a6a', soft:'rgba(58,138,106,0.12)', border:'rgba(58,138,106,0.32)' },
   vedic_gemstone:    { main:'#6a4a9a', soft:'rgba(106,74,154,0.12)', border:'rgba(106,74,154,0.32)' },
   vedic_muhurta:     { main:'#4a7a8a', soft:'rgba(74,122,138,0.12)', border:'rgba(74,122,138,0.32)' },
-  qimen_wonmyong:    { main:'#7a3fc0', soft:'rgba(122,63,192,0.13)', border:'rgba(122,63,192,0.38)' }
+  qimen_wonmyong:    { main:'#7a3fc0', soft:'rgba(122,63,192,0.13)', border:'rgba(122,63,192,0.38)' },
+  qimen_today:       { main:'#9a3fc0', soft:'rgba(154,63,192,0.13)', border:'rgba(154,63,192,0.38)' },
+  qimen_taegil:      { main:'#5a3fc0', soft:'rgba(90,63,192,0.13)',  border:'rgba(90,63,192,0.38)' }
 };
 
 function applyTypeTheme() {
@@ -1423,6 +1429,20 @@ const TYPE_SECTIONS = {
     { name:'팔문·팔신으로 본 행동 패턴과 인생 흐름', chars: 500 },
     { name:'사주 일간×본명국 통합 — 평생 운명 청사진', chars: 500 },
     { name:'기문 본명국이 권하는 인생 방향', chars: 400 }
+  ],
+  qimen_today: [
+    { name:'오늘의 기운 핵심 한줄', chars: 250 },
+    { name:'시간대별 길흉 흐름 (12시진)', chars: 450 },
+    { name:'오늘 좋은 방향 · 좋은 시간', chars: 400 },
+    { name:'오늘 하면 좋은 일 / 피해야 할 일', chars: 400 },
+    { name:'오늘 한 줄 행동 지침', chars: 250 }
+  ],
+  qimen_taegil: [
+    { name:'14일 흐름 전체 개관', chars: 300 },
+    { name:'사업·계약·서명에 좋은 날', chars: 400 },
+    { name:'이사·여행·이동에 좋은 날', chars: 400 },
+    { name:'만남·면접·발표에 좋은 날', chars: 400 },
+    { name:'피해야 할 날과 그 이유', chars: 400 }
   ]
 };
 
@@ -6474,6 +6494,8 @@ async function generateReport() {
   if (_type === 'vedic_gemstone')     { await generateVedicGemstoneReport();     return; }
   if (_type === 'vedic_muhurta')      { await generateVedicMuhurtaReport();      return; }
   if (_type === 'qimen_wonmyong')     { await generateQimenWonmyongReport();     return; }
+  if (_type === 'qimen_today')        { await generateQimenTodayReport();        return; }
+  if (_type === 'qimen_taegil')       { await generateQimenTaegilReport();       return; }
   // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
@@ -8007,6 +8029,175 @@ ${buildAccuracyLayerBlock()}
 
 총 700~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '기문 본명국 분석', ysFinal, '', true, customSys);
+
+  try {
+    const sb=getSb();
+    const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
+    if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
+  } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display='flex';
+  showConsultBanner();
+}
+
+// ── 기문 오늘 / 택일 데이터 빌더 ──
+async function fetchQimenByType(type) {
+  const now = new Date();
+  const sp = new URLSearchParams({
+    year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate(),
+    hour: now.getHours(), minute: now.getMinutes() || 0, type: type
+  });
+  try {
+    const res = await fetch('https://fortuna.kkdmb7.workers.dev/qimen?' + sp.toString());
+    if (!res.ok) return null;
+    return await res.json();
+  } catch(e) { console.warn('[qimen] fetch fail', e); return null; }
+}
+
+// ── 오늘의 기문 정밀 운세 ──
+async function generateQimenTodayReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const qm = await fetchQimenByType('siga');
+  if (!qm) {
+    for (let i = 0; i < 5; i++) {
+      const el = document.getElementById(`sbody-${i}`);
+      const ld = document.getElementById(`sloading-${i}`);
+      if (ld) ld.style.display = 'none';
+      if (el) { el.style.display = 'block'; el.innerHTML = '<span style="color:#a85a2e;">기문 데이터를 불러오지 못했습니다.</span>'; }
+    }
+    return;
+  }
+  const sb2 = buildSajuBlock();
+  const qb = buildQimenBlock(qm);
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'}`;
+  const today = new Date(Date.now() + 9*3600000).toISOString().slice(0,10);
+  const customSys = `당신은 기문둔갑 전문가지만 일반 독자에게 친구처럼 쉬운 한국어로 풀어 설명한다.
+한자 단독 표기 절대 금지 — 반드시 한자(한글) 또는 한글만 (예: 천보(天輔)).
+어려운 명리 전문용어 사용 금지, 일상 언어로 풀어 설명.
+오늘(${today})의 흐름만 다룰 것 — 평생 운명·먼 미래 언급 금지.
+데이터에 없는 사실 만들지 말 것. #헤더·표·이모지·별표 금지.
+섹션 제목 쓰지 말 것 (카드 헤더에 이미 표시됨). 본문 안 소항목은 가)·나)·다) 형식.`;
+
+  const promptA = `${profileStr}
+
+오늘 날짜: ${today}
+
+${sb2}
+
+${qb}
+
+${buildAccuracyLayerBlock()}
+
+섹션 구성 (오늘 24시간 기준 정밀 분석):
+1. 오늘의 기운 핵심 한줄 — 직부성·직사문이 가리키는 오늘의 흐름을 1~2문장으로 압축. 일상 언어.
+2. 시간대별 길흉 흐름 (12시진) — 12지지 시간대(자시·축시…해시) 중 좋은 시간 3개와 나쁜 시간 2개를 한국 표준시로 변환해 명시. 각 시간대의 특성.
+3. 오늘 좋은 방향 · 좋은 시간 — 9궁의 생문/개문/육합 위치를 동·서·남·북 한국어로. 약속·이동에 적용.
+
+총 1100자. 섹션 번호(1. 2. 3.) 붙여 작성. 한자(한글) 표기.`;
+  await streamToSections(promptA, [0,1,2], '기문 오늘 운세', ysFinal, '', false, customSys);
+
+  const promptB = `${profileStr}
+
+오늘 날짜: ${today}
+
+${sb2}
+
+${qb}
+
+${buildAccuracyLayerBlock()}
+
+섹션 구성:
+4. 오늘 하면 좋은 일 / 피해야 할 일 — 직사문·격국에 맞는 추천 활동 3가지와 회피 활동 2가지. 구체적 행동.
+5. 오늘 한 줄 행동 지침 — 오늘 하루 관통하는 핵심 메시지. 짧고 강하게.
+
+총 650자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(promptB, [3,4], '기문 오늘 운세', ysFinal, '', true, customSys);
+
+  try {
+    const sb=getSb();
+    const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
+    if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
+  } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display='flex';
+  showConsultBanner();
+}
+
+// ── 기문 택일 가이드 (14일) ──
+async function generateQimenTaegilReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const ilga = await fetchQimenByType('ilga');
+  const wolga = await fetchQimenByType('wolga');
+  if (!ilga || !wolga) {
+    for (let i = 0; i < 5; i++) {
+      const el = document.getElementById(`sbody-${i}`);
+      const ld = document.getElementById(`sloading-${i}`);
+      if (ld) ld.style.display = 'none';
+      if (el) { el.style.display = 'block'; el.innerHTML = '<span style="color:#a85a2e;">기문 데이터를 불러오지 못했습니다.</span>'; }
+    }
+    return;
+  }
+  const sb2 = buildSajuBlock();
+  const ilgaBlock = buildQimenBlock(ilga).replace('【기문 본명국 — 출생 시점 9궁 포국 (확정 사실)】', '【오늘의 일가기문 — 일 단위 9궁 포국 (확정 사실)】');
+  const wolgaBlock = buildQimenBlock(wolga).replace('【기문 본명국 — 출생 시점 9궁 포국 (확정 사실)】', '【이번달 월가기문 — 월 단위 9궁 포국 (확정 사실)】');
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 일주: ${_ilju||'미확인'}`;
+  const today = new Date(Date.now() + 9*3600000);
+  const todayStr = today.toISOString().slice(0,10);
+  const endDate = new Date(today.getTime() + 14*86400000);
+  const endStr = endDate.toISOString().slice(0,10);
+  const customSys = `당신은 기문둔갑 택일 전문가지만 일반 독자에게 친구처럼 쉬운 한국어로 풀어 설명한다.
+한자(한글) 또는 한글 표기. 어려운 명리 용어 금지.
+14일 범위(${todayStr} ~ ${endStr})만 다룰 것 — 그 너머 미래 언급 금지.
+구체적 날짜 추천 시 반드시 위 14일 범위 안의 실제 날짜로 (예: ${todayStr}, 또는 그 다음날). 가짜 날짜 만들지 말 것.
+일가기문(일별 흐름)과 월가기문(월 단위 흐름)을 함께 고려해 추천.
+#헤더·표·이모지 금지. 섹션 제목 쓰지 말 것.`;
+
+  const promptA = `${profileStr}
+
+기간: ${todayStr} ~ ${endStr} (14일)
+
+${sb2}
+
+${ilgaBlock}
+
+${wolgaBlock}
+
+${buildAccuracyLayerBlock()}
+
+섹션 구성:
+1. 14일 흐름 전체 개관 — 월가기문이 가리키는 이번 달 큰 흐름과, 일가기문 직부성·직사문이 알려주는 14일의 톤. 어떤 활동이 전반적으로 유리·불리한지.
+2. 사업·계약·서명에 좋은 날 — 14일 안에서 추천 2~3일. 어떤 날이 왜 좋은지 일가 직사문(생문/개문 위주)과 사주 일간 매칭으로. 한 줄씩.
+3. 이사·여행·이동에 좋은 날 — 14일 안에서 추천 2~3일. 육합·역마와 길방 위치 활용. 한 줄씩.
+
+총 1100자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+  await streamToSections(promptA, [0,1,2], '기문 택일', ysFinal, '', false, customSys);
+
+  const promptB = `${profileStr}
+
+기간: ${todayStr} ~ ${endStr}
+
+${sb2}
+
+${ilgaBlock}
+
+${wolgaBlock}
+
+${buildAccuracyLayerBlock()}
+
+섹션 구성:
+4. 만남·면접·발표에 좋은 날 — 14일 안에서 추천 2일. 경문(밝은 기운)과 사주 식상 매칭으로. 시간대까지.
+5. 피해야 할 날과 그 이유 — 14일 안에서 보류 권장 2일. 사문/상문/경문(흉문) 위치와 사주 충형 연결. 무엇을 피해야 하는지 명시.
+
+총 800자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(promptB, [3,4], '기문 택일', ysFinal, '', true, customSys);
 
   try {
     const sb=getSb();
