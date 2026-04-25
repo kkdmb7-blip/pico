@@ -1216,6 +1216,78 @@
     });
   }catch(e){}
 })();</script>
+<!-- 오늘의 추천 리포트 (로그인 + 프로필 있을 때만) -->
+<section id="todayRecoSection" style="display:none;padding:20px 16px 0;max-width:640px;margin:0 auto;">
+  <div style="background:linear-gradient(135deg,rgba(212,175,55,0.10),rgba(123,94,167,0.06));border:1px solid rgba(212,175,55,0.32);border-radius:18px;padding:18px 16px 14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+      <i class="pi pi-sparkle" style="color:var(--gold);font-size:14px;"></i>
+      <div style="font-size:14px;font-weight:800;color:var(--gold);font-family:'Noto Serif KR',serif;letter-spacing:0.3px;">오늘 당신을 위한 리포트</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;letter-spacing:0.2px;">고민 없이 시작 — 지금 가장 잘 맞는 3가지를 골랐습니다</div>
+    <div id="todayRecoCards" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</section>
+<script>
+(function(){
+  try {
+    var user = JSON.parse(localStorage.getItem('pico_user') || 'null');
+    var profile = JSON.parse(localStorage.getItem('pico_profile') || 'null');
+    if (!user || !profile) return; // 로그인+프로필 둘 다 있을 때만 노출
+
+    // 추천 POOL
+    var POOL = {
+      qimen_today:    { icon:'pi-clock',     iconColor:'#9a3fc0', title:'오늘의 기문 운세',     desc:'오늘 24시간 길방·길시·하면 좋은 일',    orb:290 },
+      character:      { icon:'pi-crystal',   iconColor:'#a16d1f', title:'타고난 기질 분석',     desc:'45종 정밀 데이터로 보는 본질',          orb:490 },
+      money:          { icon:'pi-coin',      iconColor:'#2a8577', title:'재물·사업 분석',       desc:'재성·식상·대운으로 보는 돈의 흐름',     orb:690 },
+      love:           { icon:'pi-heart',     iconColor:'#8b2447', title:'연애·결혼 분석',       desc:'관성·배우자궁·신살 정밀 분석',          orb:690 },
+      daeun:          { icon:'pi-asc',       iconColor:'#7a4aa8', title:'대운 흐름 분석',       desc:'10년 단위 인생 흐름과 타이밍',          orb:790 },
+      year:           { icon:'pi-sparkle',   iconColor:'#2e6ba8', title:'올해 운세 상세',       desc:'세운확장·월운절기 정밀 데이터',         orb:490 },
+      summary:        { icon:'pi-sparkle',   iconColor:'#a16d1f', title:'사주 포인트 요약',     desc:'3분 진단 — 핵심만 빠르게',              orb:190 },
+      classic:        { icon:'pi-book',      iconColor:'#8b5a2b', title:'고전 명리 해석',       desc:'적천수·자평진전·납음·조후',             orb:590 },
+      qimen_taegil:   { icon:'pi-calendar',  iconColor:'#5a3fc0', title:'기문 택일 14일',       desc:'사업·계약·이사·면접 길일 추천',         orb:390 },
+      qimen_wonmyong: { icon:'pi-compass',   iconColor:'#7a3fc0', title:'기문 본명국 분석',     desc:'출생 9궁이 가리키는 평생 운명',         orb:590 },
+      hidden_talent:  { icon:'pi-sparkle',   iconColor:'#3a4a5a', title:'숨겨진 재능',           desc:'희신·잠재 십신의 미발현 능력',          orb:190 },
+      soulmate:       { icon:'pi-heart',     iconColor:'#7a3a4a', title:'운명의 상대방 유형',    desc:'관성·재성·일지로 보는 끌림 유형',       orb:390 },
+      timing:         { icon:'pi-calendar',  iconColor:'#2e6ba8', title:'인생 타이밍',           desc:'결정·이직·투자 최적 시기',              orb:490 },
+      wealth_timing:  { icon:'pi-chart',     iconColor:'#a16d1f', title:'재물 타이밍',           desc:'대운별·월별 재물 흐름',                 orb:490 },
+      life_mission:   { icon:'pi-send',      iconColor:'#3a5a48', title:'이번 생 미션',           desc:'격국·용신이 가리키는 인생 과제',        orb:390 }
+    };
+
+    // 요일별 추천 (qimen_today 항상 + 분야 2개)
+    // 0=일 1=월 ... 6=토
+    var DAY_THEME = {
+      0: ['love', 'soulmate'],
+      1: ['money', 'wealth_timing'],
+      2: ['character', 'classic'],
+      3: ['daeun', 'timing'],
+      4: ['hidden_talent', 'life_mission'],
+      5: ['year', 'qimen_taegil'],
+      6: ['summary', 'qimen_wonmyong']
+    };
+
+    var day = new Date().getDay();
+    var theme = DAY_THEME[day] || ['character', 'summary'];
+    // 항상 qimen_today + 요일별 2개
+    var recs = ['qimen_today', theme[0], theme[1]];
+
+    var cardsHtml = recs.map(function(t) {
+      var p = POOL[t]; if (!p) return '';
+      return '<a href="report.html?type=' + t + '" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.55);border:1px solid rgba(154,122,38,0.22);border-radius:12px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor=\'rgba(154,122,38,0.5)\'" onmouseout="this.style.borderColor=\'rgba(154,122,38,0.22)\'">'
+        + '<div style="font-size:20px;color:' + p.iconColor + ';flex-shrink:0;"><i class="pi ' + p.icon + '"></i></div>'
+        + '<div style="flex:1;min-width:0;">'
+        + '  <div style="font-size:13px;font-weight:700;color:' + p.iconColor + ';margin-bottom:2px;">' + p.title + '</div>'
+        + '  <div style="font-size:10px;color:var(--muted);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.desc + '</div>'
+        + '</div>'
+        + '<div style="font-size:10px;font-weight:700;color:' + p.iconColor + ';flex-shrink:0;">' + p.orb + ' Orb</div>'
+        + '</a>';
+    }).join('');
+
+    document.getElementById('todayRecoCards').innerHTML = cardsHtml;
+    document.getElementById('todayRecoSection').style.display = 'block';
+  } catch(e) { console.warn('[reco] init fail', e); }
+})();
+</script>
+
 <!-- HERO (비로그인 전용) -->
 <script>(function(){try{if(localStorage.getItem('pico_user')){document.write('<style>.hero,#heroInputWrap{display:none}</style>');}}catch(e){}})();</script>
 <section class="hero">
