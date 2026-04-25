@@ -1974,10 +1974,11 @@ function runQimenAI() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      user_id: _u ? _u.id : '',
+      user_id: _u && _u.id ? _u.id : 'guest_qimen',
       skip_orb: true,
+      mode: 'raw',
       messages: [{ role: 'user', content: userMsg }],
-      system_prompt: '너는 기문둔갑·사주 명리 전문가다. 주어진 데이터만으로 정밀 해석을 작성한다. 데이터에 없는 사실 추측 금지.',
+      system_prompt: '너는 기문둔갑·사주 명리 전문가다. 주어진 데이터만으로 정밀 해석을 작성한다. 데이터에 없는 사실 추측 금지. 마크다운 헤더(#)·표·이모지·별표 강조 금지. 일반 문단으로만 작성.',
       max_tokens: 900
     })
   }).then(function(r) {
