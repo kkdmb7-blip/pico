@@ -270,6 +270,78 @@ select.input option{background:#fff;color:var(--text);}
 }
 .mbti-note span{font-weight:700;color:var(--type);font-style:normal;}
 
+/* 4축 점수 막대 */
+.mbti-bars{
+  margin-top:18px;display:flex;flex-direction:column;gap:10px;
+  position:relative;z-index:1;text-align:left;
+  padding:14px 0 0;border-top:1px dashed rgba(var(--type-rgb),0.22);
+}
+.mbti-bar-row{display:flex;align-items:center;gap:10px;font-size:11px;}
+.mbti-bar-label-l{
+  width:54px;text-align:right;color:var(--text2);font-weight:700;
+  display:flex;align-items:center;justify-content:flex-end;gap:4px;
+}
+.mbti-bar-label-l strong{color:var(--type);font-size:13px;}
+.mbti-bar-label-r{
+  width:54px;text-align:left;color:var(--muted);
+  display:flex;align-items:center;gap:4px;
+}
+.mbti-bar{
+  flex:1;height:8px;border-radius:8px;
+  background:rgba(var(--type-rgb),0.08);
+  border:1px solid rgba(var(--type-rgb),0.18);
+  position:relative;overflow:hidden;
+}
+.mbti-bar-fill{
+  position:absolute;top:0;bottom:0;
+  background:linear-gradient(90deg, rgba(var(--type-rgb),0.5), rgba(var(--type-rgb),0.85));
+  transition:width 0.6s ease;
+}
+.mbti-bar-fill.right{right:0;}
+.mbti-bar-fill.left{left:0;}
+
+/* 판정 근거 details */
+.mbti-evidence{
+  margin-top:16px;text-align:left;position:relative;z-index:1;
+  padding:0;border-top:1px dashed rgba(var(--type-rgb),0.22);padding-top:14px;
+}
+.mbti-evidence summary{
+  cursor:pointer;font-size:12px;color:var(--type);font-weight:700;letter-spacing:0.05em;
+  list-style:none;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 12px;border-radius:8px;
+  background:rgba(var(--type-rgb),0.06);
+  border:1px solid rgba(var(--type-rgb),0.22);
+  transition:all 0.2s;
+}
+.mbti-evidence summary::-webkit-details-marker{display:none;}
+.mbti-evidence summary:hover{background:rgba(var(--type-rgb),0.12);}
+.mbti-evidence[open] .mbti-evi-arrow{transform:rotate(180deg);}
+.mbti-evi-arrow{display:inline-block;transition:transform 0.2s;font-size:10px;}
+.mbti-evi-body{margin-top:14px;display:flex;flex-direction:column;gap:12px;}
+.mbti-evi-axis{
+  background:rgba(255,255,255,0.4);border:1px solid rgba(var(--type-rgb),0.18);
+  border-radius:10px;padding:12px 14px;
+}
+.mbti-evi-axis-head{
+  display:flex;align-items:center;gap:8px;margin-bottom:8px;
+  font-size:12px;font-weight:800;color:var(--type);letter-spacing:0.05em;
+}
+.mbti-evi-axis-head strong{font-size:16px;font-family:'Noto Serif KR',serif;letter-spacing:0.1em;}
+.mbti-evi-axis ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;}
+.mbti-evi-axis li{
+  font-size:11.5px;color:var(--text2);line-height:1.55;letter-spacing:-0.005em;
+  padding-left:14px;position:relative;
+}
+.mbti-evi-axis li::before{
+  content:'·';position:absolute;left:5px;color:var(--type);font-weight:800;
+}
+.mbti-evi-footer{
+  margin-top:12px;font-size:10.5px;color:var(--muted);line-height:1.7;
+  padding:10px 12px;background:rgba(var(--type-rgb),0.04);border-radius:8px;
+  border:1px dashed rgba(var(--type-rgb),0.22);letter-spacing:-0.005em;
+}
+.mbti-evi-footer strong{color:var(--type);font-weight:700;}
+
 /* ═══════ 4축 카드 ═══════ */
 .axes-card{
   background:var(--surface);border:1px solid var(--border-soft);
@@ -616,6 +688,19 @@ select.input option{background:#fff;color:var(--text);}
         <div class="mbti-name" id="closeMbtiName"></div>
       </div>
       <div class="mbti-desc" id="closeMbtiDesc"></div>
+
+      <!-- 4축 점수 막대 -->
+      <div class="mbti-bars" id="mbtiBars"></div>
+
+      <!-- 판정 근거 토글 -->
+      <details class="mbti-evidence">
+        <summary>판정 근거 자세히 보기 <span class="mbti-evi-arrow">▾</span></summary>
+        <div class="mbti-evi-body" id="mbtiEvidenceBody"></div>
+        <div class="mbti-evi-footer">
+          본 매핑은 <strong>적천수(滴天髓)</strong> 통변론(陽動陰靜)과 <strong>자평진전(子平眞詮)</strong> 십성론(正/偏)을 기반으로 사주 데이터를 융 심리유형(MBTI 4축)에 대응시킨 결과입니다.
+        </div>
+      </details>
+
       <div class="mbti-note">※ MBTI는 친숙성 진입용 매핑 — 정밀 분석은 위 16유형(<span id="mbtiCloseCode"></span>) 기준</div>
     </div>
 
@@ -869,33 +954,93 @@ function classifyRealMbti(sd) {
   var strength = sd.strength_level_5 || '';
   var isStrong = strength.indexOf('강') >= 0 || strength.indexOf('왕') >= 0;
 
-  // E/I: 일간 음양 + 사주 세기 + 외향/내향 십신 종합
-  // 양간 = +1, 음간 = -1, ext-int 차이 + 신강 보너스 합산해 양수면 E
-  var extScore = cnt(['비견','겁재','식신','상관','편재','정재']);
-  var intScore = cnt(['편관','정관','편인','정인']);
-  var eiBase = isYangDay ? 1 : -1;
-  var eiDiff = extScore - intScore; // 외향 십신이 더 많으면 +
-  var eiStrength = isStrong ? 1 : -1;
-  var f1 = (eiBase + eiDiff + eiStrength) > 0 ? 'E' : 'I';
-
-  // S/N: 토·금 일간 또는 정관/정재 강 → S(현실), 목·화·수 일간 또는 식상/편인 강 → N(직관)
   var dayEl = ({갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수',
                 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수'})[dayStem] || '';
-  var sBase = (dayEl==='토'||dayEl==='금') ? 1 : 0;
-  var sScore = sBase + (cnt(['정재','정관'])>=cnt(['식신','상관','편인']) ? 1 : 0) + (earth+metal >= wood+fire+water ? 1 : 0);
-  var f2 = sScore >= 2 ? 'S' : 'N';
 
-  // T/F: 관성+재성 → T, 식상+인성 → F
+  // ── 축 1: E/I ──
+  // 적천수 通變論: "陽之氣 主動, 陰之氣 主靜" (양은 활동, 음은 고요)
+  // 외향 십신(비겁·식상·재성) = 외부 교류, 내향 십신(관·인) = 내면 수용
+  var extScore = cnt(['비견','겁재','식신','상관','편재','정재']);
+  var intScore = cnt(['편관','정관','편인','정인']);
+  var eiPos = (isYangDay ? 1 : 0) + Math.max(0, extScore - intScore) + (isStrong ? 1 : 0);
+  var eiNeg = (isYangDay ? 0 : 1) + Math.max(0, intScore - extScore) + (isStrong ? 0 : 1);
+  var f1 = eiPos > eiNeg ? 'E' : 'I';
+  var eiTotal = eiPos + eiNeg || 1;
+  var ePct = Math.round(eiPos / eiTotal * 100);
+
+  // ── 축 2: S/N ──
+  // 자평진전: 정관·정재는 規矩(규칙·현실), 식상·편인은 활용·창의
+  // 오행: 토(중정·실용), 금(구조·논리) = S; 목(성장·확장), 화(상상), 수(흐름) = N
+  var sBase = (dayEl==='토'||dayEl==='금') ? 1 : 0;
+  var nBase = (dayEl==='목'||dayEl==='화'||dayEl==='수') ? 1 : 0;
+  var sJeongPyeon = cnt(['정재','정관']) - cnt(['식신','상관','편인']);
+  var sElDom = (earth + metal) - (wood + fire + water);
+  var sPos = sBase + Math.max(0, sJeongPyeon) + (sElDom >= 0 ? 1 : 0);
+  var nPos = nBase + Math.max(0, -sJeongPyeon) + (sElDom < 0 ? 1 : 0);
+  var f2 = sPos >= nPos ? 'S' : 'N';
+  var snTotal = sPos + nPos || 1;
+  var sPct = Math.round(sPos / snTotal * 100);
+
+  // ── 축 3: T/F ──
+  // 자평진전 십성론: 관성·재성은 외부 규율/실리(논리적 판단)
+  //                  식상·인성은 표현/공감(감정적 처리)
   var tScore = cnt(['편관','정관','편재','정재']);
   var fScore = cnt(['식신','상관','편인','정인']);
   var f3 = tScore >= fScore ? 'T' : 'F';
+  var tfTotal = tScore + fScore || 1;
+  var tPct = Math.round(tScore / tfTotal * 100);
 
-  // J/P: 정십신+신강 → J, 편십신+상관식신 → P
+  // ── 축 4: J/P ──
+  // 자평진전: 정관·정재·정인은 正(질서·계획), 편관·편재·편인·식상은 偏(자유·즉흥)
+  // 신강(주관 명확) → J, 신약(상황 적응) → P 보조
   var jScore = cnt(['정관','정재','정인']) + (isStrong ? 1 : 0);
   var pScore = cnt(['편관','편재','편인','상관','식신','겁재']);
   var f4 = jScore >= pScore ? 'J' : 'P';
+  var jpTotal = jScore + pScore || 1;
+  var jPct = Math.round(jScore / jpTotal * 100);
 
-  return f1 + f2 + f3 + f4;
+  return {
+    code: f1 + f2 + f3 + f4,
+    scores: { e: ePct, i: 100-ePct, s: sPct, n: 100-sPct, t: tPct, f: 100-tPct, j: jPct, p: 100-jPct },
+    evidence: {
+      ei: {
+        axis: 'E/I',
+        result: f1,
+        bases: [
+          (isYangDay ? '일간 ' + dayStem + '은 양간 (양의 기운은 활동·외향)' : '일간 ' + dayStem + '은 음간 (음의 기운은 고요·내향)'),
+          '외향 십신(비겁·식상·재성) ' + extScore + '개 vs 내향 십신(관·인) ' + intScore + '개',
+          (isStrong ? '신강 — 주관 표출이 강함' : '신약 — 외부 수용 우선')
+        ]
+      },
+      sn: {
+        axis: 'S/N',
+        result: f2,
+        bases: [
+          '일간 오행은 ' + (dayEl||'미상') + ' (' + (dayEl==='토'||dayEl==='금'?'현실·구조 = S':'성장·직관 = N') + ')',
+          '정십신(정관·정재) ' + cnt(['정재','정관']) + ' vs 활용십신(식상·편인) ' + cnt(['식신','상관','편인']),
+          '오행 토·금 ' + (earth+metal) + '% vs 목·화·수 ' + (wood+fire+water) + '%'
+        ]
+      },
+      tf: {
+        axis: 'T/F',
+        result: f3,
+        bases: [
+          '관성·재성(외부 규율·실리 = 논리) ' + tScore + '개',
+          '식상·인성(표현·공감 = 감정) ' + fScore + '개',
+          (tScore > fScore ? '논리 우세' : tScore < fScore ? '공감 우세' : '균형')
+        ]
+      },
+      jp: {
+        axis: 'J/P',
+        result: f4,
+        bases: [
+          '정십신(정관·정재·정인 = 질서·계획) ' + cnt(['정관','정재','정인']) + '개',
+          '편십신(편십신·식상·겁재 = 자유·즉흥) ' + pScore + '개',
+          (isStrong ? '신강 — 계획 추진 우세' : '신약 — 상황 적응 우세')
+        ]
+      }
+    }
+  };
 }
 
 function classifyMbti(sd) {
@@ -1016,9 +1161,9 @@ async function calcMbti() {
     var code = classifyMbti(sd);
     currentType = code;
     var info = TYPES[code] || TYPES['OMNC'];
-    var realMbti = classifyRealMbti(sd);
+    var mbtiResult = classifyRealMbti(sd);
 
-    renderResult(code, info, realMbti);
+    renderResult(code, info, mbtiResult);
 
     try {
       localStorage.setItem('pico_profile', JSON.stringify({
@@ -1049,18 +1194,55 @@ function renderResult(code, info, realMbti) {
   document.getElementById('resultDesc').textContent = info.desc;
 
   // 진짜 MBTI 매핑 표시
-  if (realMbti && MBTI_NAMES[realMbti]) {
-    var mInfo = MBTI_NAMES[realMbti];
-    document.getElementById('closeMbtiCode').textContent = realMbti;
+  if (realMbti && realMbti.code && MBTI_NAMES[realMbti.code]) {
+    var mCode = realMbti.code;
+    var mInfo = MBTI_NAMES[mCode];
+    var mScores = realMbti.scores || {};
+    var mEvi = realMbti.evidence || {};
+
+    document.getElementById('closeMbtiCode').textContent = mCode;
     document.getElementById('closeMbtiName').textContent = mInfo.n;
     document.getElementById('closeMbtiDesc').textContent = mInfo.d;
     var mbtiCloseCode = document.getElementById('mbtiCloseCode');
     if (mbtiCloseCode) mbtiCloseCode.textContent = code;
     document.getElementById('closeMbtiCard').style.display = 'block';
+
+    // 4축 점수 막대
+    var bars = document.getElementById('mbtiBars');
+    if (bars) {
+      var pairs = [
+        {l:'E', r:'I', lp:mScores.e, rp:mScores.i, won:mCode.charAt(0)},
+        {l:'S', r:'N', lp:mScores.s, rp:mScores.n, won:mCode.charAt(1)},
+        {l:'T', r:'F', lp:mScores.t, rp:mScores.f, won:mCode.charAt(2)},
+        {l:'J', r:'P', lp:mScores.j, rp:mScores.p, won:mCode.charAt(3)},
+      ];
+      bars.innerHTML = pairs.map(function(p) {
+        var leftWon = p.won === p.l;
+        return '<div class="mbti-bar-row">'
+          + '<div class="mbti-bar-label-l">' + (leftWon ? '<strong>' + p.l + ' ' + p.lp + '%</strong>' : p.l + ' ' + p.lp + '%') + '</div>'
+          + '<div class="mbti-bar"><div class="mbti-bar-fill ' + (leftWon ? 'left' : 'right') + '" style="width:' + (leftWon ? p.lp : p.rp) + '%;"></div></div>'
+          + '<div class="mbti-bar-label-r">' + (!leftWon ? '<strong>' + p.r + ' ' + p.rp + '%</strong>' : p.rp + '% ' + p.r) + '</div>'
+          + '</div>';
+      }).join('');
+    }
+
+    // 판정 근거
+    var eviBody = document.getElementById('mbtiEvidenceBody');
+    if (eviBody) {
+      var keys = ['ei','sn','tf','jp'];
+      eviBody.innerHTML = keys.map(function(k) {
+        var e = mEvi[k]; if (!e) return '';
+        return '<div class="mbti-evi-axis">'
+          + '<div class="mbti-evi-axis-head">' + e.axis + ' → <strong>' + e.result + '</strong></div>'
+          + '<ul>' + e.bases.map(function(b){return '<li>' + b + '</li>';}).join('') + '</ul>'
+          + '</div>';
+      }).join('');
+    }
+
     // hero 끝에 작은 라벨
     var heroTag = document.getElementById('heroMbtiTag');
     if (heroTag) {
-      heroTag.textContent = '가까운 MBTI · ' + realMbti;
+      heroTag.textContent = '가까운 MBTI · ' + mCode;
       heroTag.style.display = 'inline-flex';
     }
   }
