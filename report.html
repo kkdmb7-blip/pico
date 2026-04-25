@@ -3349,9 +3349,31 @@ function fiveCountToKor(cnt) {
 function buildSajuBlock() {
   const sd = _sdFull; const rpt = _rptFull;
   const pillars = sd?.summary?.pillars || {};
-  return `【사주 원국】
+  const tg = sd?.ten_gods_map || {};
+  // 8자리 십신을 천간/지지 분리해 명시 (환각 방지: AI가 통째 라벨링 못하게)
+  const yS = pillars.year ? pillars.year[0] : '?';
+  const yB = pillars.year ? pillars.year[1] : '?';
+  const mS = pillars.month ? pillars.month[0] : '?';
+  const mB = pillars.month ? pillars.month[1] : '?';
+  const dS = pillars.day ? pillars.day[0] : '?';
+  const dB = pillars.day ? pillars.day[1] : '?';
+  const hS = pillars.hour ? pillars.hour[0] : '?';
+  const hB = pillars.hour ? pillars.hour[1] : '?';
+  const tgTable =
+`  연간 ${yS} = ${tg.year_stem||'?'}     연지 ${yB} = ${tg.year_branch||'?'}
+  월간 ${mS} = ${tg.month_stem||'?'}     월지 ${mB} = ${tg.month_branch||'?'}
+  일간 ${dS} = 일간(자기자신)   일지 ${dB} = ${tg.day_branch||'?'}
+  시간 ${hS} = ${tg.hour_stem||'?'}     시지 ${hB} = ${tg.hour_branch||'?'}`;
+  // 사주에 실제 등장한 글자 (대운 글자는 buildDaeunBlock 등에서 따로 명시됨)
+  const sajuChars = [...new Set([yS,yB,mS,mB,dS,dB,hS,hB].filter(c => c && c !== '?'))].join(' ');
+  return `【사주 원국 — 확정 사실, 아래 표만 인용 가능】
 일주: ${_ilju||'미확인'}  성별: ${_profile?.gender==='F'?'여성':'남성'}
 사주: 연주 ${pillars.year||'?'} / 월주 ${pillars.month||'?'} / 일주 ${pillars.day||'?'} / 시주 ${pillars.hour||'?'}
+사주에 실제 등장한 글자: ${sajuChars} (이 8자 외의 천간·지지는 사주 원국에 없음)
+
+[8자리 십신 표 — 천간과 지지를 반드시 분리해서 인용]
+${tgTable}
+
 신강신약: ${_singang||sd?.strength_level_5||'미확인'} (${sd?.strength_score||''}점)
 격국: ${_geokguk||sd?.geokguk?.geok_kor||'미확인'}
 용신: ${_yongsin||sd?.yongshin?.primary||'미확인'}
@@ -3359,9 +3381,14 @@ function buildSajuBlock() {
 오행수: 목${sd?.five_count?.wood||0} 화${sd?.five_count?.fire||0} 토${sd?.five_count?.earth||0} 금${sd?.five_count?.metal||0} 수${sd?.five_count?.water||0}
 오행%: ${fivePctToKor(sd?.five_pct)}
 패턴: ${sd?.pattern?.type||''} ${sd?.pattern?.subtype||''}
-십신맵: ${sd?.ten_gods_map?JSON.stringify(sd.ten_gods_map):'미확인'}
 공망: ${sd?.gongmang||'미확인'}
-충합형파: ${Array.isArray(sd?.branch_relations_kor)?sd.branch_relations_kor.join(', '):(sd?.branch_relations_kor||'없음')}`;
+충합형파: ${Array.isArray(sd?.branch_relations_kor)?sd.branch_relations_kor.join(', '):(sd?.branch_relations_kor||'없음')}
+
+★ 십신·천간·지지 인용 절대 규칙 (위반 시 사실 오류로 간주):
+1. 위 [8자리 십신 표]에 명시된 라벨만 사용. 표에 없는 십신 매핑 절대 금지.
+2. 천간과 지지는 반드시 분리해서 인용. "병오시는 겁재"·"무오월의 비견" 같이 한 기둥 통째 라벨 금지. 반드시 "시간 병=겁재, 시지 오=비견" 형식.
+3. "사주에 실제 등장한 글자" 목록에 없는 천간·지지(예: 戌, 寅 등)를 사주 원국에 있다고 쓰지 말 것. 대운·세운 글자는 별도 블록에서만 인용.
+4. 십신을 임의로 변경하지 말 것 (예: "월간 무 = 식신" 같이 표와 다르게 쓰면 안 됨).`;
 }
 function buildVedicBlock() {
   if (!_vedicData) return '';
@@ -8840,7 +8867,13 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 - 본문 안에서 소항목 번호 쓸 때는 가), 나), 다) 형식 사용 (1. 2. 3. 사용 금지)
 - 분석 범위를 벗어난 미래 시점(다음 달, 내년 등) 예측·대비·언급 절대 금지
 - 【사주 정밀분석】 블록이 포함된 경우, 그 안의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 수치·판정·결론을 절대 변경하지 마세요.
-- 프롬프트에 명시된 연도·기간·퍼센트 수치를 그대로 인용하세요. 새로운 연도나 기간을 만들어내거나 추측하지 마세요.${wg || ''}`);
+- 프롬프트에 명시된 연도·기간·퍼센트 수치를 그대로 인용하세요. 새로운 연도나 기간을 만들어내거나 추측하지 마세요.
+
+★ 환각 방지 절대 규칙 (위반 시 사실 오류로 간주):
+1. 십신 라벨은 【사주 원국】 블록의 [8자리 십신 표]에 있는 그대로만 사용. 표와 다르게 매핑 금지.
+2. 천간과 지지는 반드시 분리해서 인용. "병오시는 겁재", "무오월의 비견" 같이 한 기둥(천간+지지)을 하나의 십신으로 통째 라벨링하는 표현 절대 금지. 반드시 "시간 병=겁재, 시지 오=비견" 형식으로 분리.
+3. 【사주 원국】 블록에 명시된 "사주에 실제 등장한 글자" 목록에 없는 천간·지지(예: 戌, 寅 등)를 "이 사주에 있다"고 서술 금지. 대운·세운 글자는 해당 블록(【대운분석】, 【올해 운세】 등)에서만 인용 가능.
+4. 사주 원국 글자와 대운·세운 글자를 혼동하지 말 것. 원국에 없는 글자는 반드시 "대운에 오는 X", "세운의 X" 식으로 출처를 명시.${wg || ''}`);
 
   for (let i = 0; i < secIndices.length; i++) {
     const secIdx = secIndices[i];
@@ -8853,22 +8886,27 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 }
 
 // 단일 섹션 실행 — 실패 시 재시도 버튼 노출 (Orb 차감 없음: skip_orb:true)
-async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPrompt) {
+async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPrompt, _retryCount) {
+  const retryCount = _retryCount || 0;
   const controller = new AbortController();
   const tid = setTimeout(() => controller.abort(), 45000);
   const sloadEl = document.getElementById(`sloading-${secIdx}`);
   if (sloadEl) {
     sloadEl.style.display = 'flex';
-    sloadEl.innerHTML = '<span class="spin"></span> 생성 중...';
+    sloadEl.innerHTML = retryCount > 0 ? '<span class="spin"></span> 정확도 재검증 중...' : '<span class="spin"></span> 생성 중...';
   }
   try {
+    // 환각 재시도일 경우 system_prompt에 강조 룰 추가
+    const effectiveSys = retryCount > 0
+      ? sysPrompt + `\n\n[재생성 경고] 이전 출력에서 사주에 없는 천간·지지를 사용하는 환각이 감지되었습니다. 【사주 원국】 블록의 "사주에 실제 등장한 글자"와 대운·세운 블록에 명시된 글자만 사용하세요. 출처가 모호하면 글자 자체를 인용하지 말고 십신/오행으로만 서술하세요.`
+      : sysPrompt;
     const res = await fetch(CHAT_API, {
       signal: controller.signal,
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         user_id: _user.id,
         messages: [{role: 'user', content: sectionPrompt}],
-        system_prompt: sysPrompt,
+        system_prompt: effectiveSys,
         mode: 'saju', max_tokens: Math.min(Math.round(secChars * 2.5), 1500),
         skip_orb: true
       })
@@ -8880,6 +8918,14 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
     text = cleanSectionText(text);
     text = sanitizeAIText(text);
     text = stripDuplicateTitle(text, secName);
+    // 환각 검증: 사주·대운·세운에 없는 천간·지지 등장 시 1회 자동 재시도
+    if (retryCount === 0) {
+      const halluc = detectHallucination(text);
+      if (halluc && halluc.offenders.length) {
+        console.warn('[hallucination detected]', halluc.offenders, '→ retrying once');
+        return runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPrompt, 1);
+      }
+    }
     if (sloadEl) sloadEl.style.display = 'none';
     const body = document.getElementById(`sbody-${secIdx}`);
     body.innerHTML = renderMarkdown(text);
@@ -8907,6 +8953,42 @@ window.__retrySingleSection = function(secIdx) {
   if (!p) return;
   runSingleSection(secIdx, p.secName, p.secChars, p.sectionPrompt, p.sysPrompt);
 };
+
+// ── 환각 검증: 사주 원국에 없는 천간·지지를 "이 사주에 있다"는 식으로 인용했는지 검출 ──
+// 대운·세운 글자는 해당 블록에서 명시된 경우만 허용.
+function detectHallucination(text) {
+  if (!text || !_sdFull?.summary?.pillars) return null;
+  const p = _sdFull.summary.pillars;
+  // 사주 원국 8자
+  const sajuChars = new Set([p.year, p.month, p.day, p.hour].join('').split('').filter(Boolean));
+  // 대운 글자 (big_luck_analysis)
+  const daeunChars = new Set();
+  (_sdFull.big_luck_analysis || []).forEach(d => { if (d.pillar_kor) d.pillar_kor.split('').forEach(c => daeunChars.add(c)); });
+  // 세운 (현재년 + 인접년) — _sewunData에서 글자 추출 시도
+  const sewunChars = new Set();
+  if (_sewunData && Array.isArray(_sewunData)) {
+    _sewunData.forEach(s => { if (s.pillar) s.pillar.split('').forEach(c => sewunChars.add(c)); });
+  }
+  const allValid = new Set([...sajuChars, ...daeunChars, ...sewunChars]);
+  const STEMS = '甲乙丙丁戊己庚辛壬癸갑을병정무기경신임계';
+  const BRANCHES_HJ = '子丑寅卯辰巳午未申酉戌亥';
+  const BRANCHES_KO = '자축인묘진사오미신유술해';
+  const ALL_CHARS = STEMS + BRANCHES_HJ + BRANCHES_KO;
+  // 텍스트에 등장한 천간·지지 중 사주·대운·세운에 없는 것 (한자/한글 혼용 처리)
+  const HJ_TO_KO = {子:'자',丑:'축',寅:'인',卯:'묘',辰:'진',巳:'사',午:'오',未:'미',申:'신',酉:'유',戌:'술',亥:'해',
+    甲:'갑',乙:'을',丙:'병',丁:'정',戊:'무',己:'기',庚:'경',辛:'신',壬:'임',癸:'계'};
+  const offenders = new Set();
+  for (const c of text) {
+    if (!ALL_CHARS.includes(c)) continue;
+    const koC = HJ_TO_KO[c] || c;
+    if (allValid.has(koC) || allValid.has(c)) continue;
+    offenders.add(c);
+  }
+  if (offenders.size === 0) return null;
+  // 사주에 있다는 단정적 문맥인지 확인 (대운·세운 출처 명시 여부)
+  // 단순화: offender가 텍스트에 한 번이라도 나오면 검증 실패로 간주 (안전 우선)
+  return { offenders: [...offenders] };
+}
 
 // ── Layer 3: AI 생성 텍스트 사후 검증·치환 ──
 function sanitizeAIText(text) {
