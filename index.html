@@ -1190,7 +1190,7 @@
         <div style="font-size:11px;color:var(--text);line-height:1.3;">AI 리포트·<br>상담</div>
       </div>
     </div>
-    <button id="picoOnboardStart" style="width:100%;background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:0;border-radius:10px;padding:11px 0;font-size:13px;font-weight:700;cursor:pointer;">지금 시작하기 →</button>
+    <button id="picoOnboardStart" style="width:100%;background:rgba(123,94,167,0.13);color:#5a3f87;border:1px solid rgba(123,94,167,0.4);border-radius:10px;padding:11px 0;font-size:13px;font-weight:700;cursor:pointer;">지금 시작하기 →</button>
   </div>
 </div>
 <script>(function(){
@@ -2533,7 +2533,7 @@
       </div>
     </div>
 
-    <button class="saju-submit-btn" onclick="submitGunghap()" style="background:linear-gradient(135deg,#8b2447,#b8526e);color:#fcf7ea;border-color:rgba(184,82,110,0.5);">궁합 보기 <i class="pi pi-sparkle"></i></button>
+    <button class="saju-submit-btn" onclick="submitGunghap()" style="background:rgba(184,82,110,0.13);color:#8b2447;border:1px solid rgba(139,36,71,0.4);">궁합 보기 <i class="pi pi-sparkle"></i></button>
   </div>
 </div>
 
@@ -2638,7 +2638,7 @@
       </div>
     </div>
 
-    <button class="saju-submit-btn" onclick="submitGuideProfile()" style="background:linear-gradient(135deg,#8b2447,#c47490);color:#fcf7ea;border-color:rgba(184,82,110,0.5);">설명서 보기 <i class="pi pi-sparkle"></i></button>
+    <button class="saju-submit-btn" onclick="submitGuideProfile()" style="background:rgba(196,116,144,0.13);color:#8b2447;border:1px solid rgba(139,36,71,0.4);">설명서 보기 <i class="pi pi-sparkle"></i></button>
   </div>
 </div>
 
@@ -3739,7 +3739,7 @@ async function openHistoryModal() {
       + '<div style="font-size:36px;margin-bottom:10px;opacity:0.55;"><i class="pi pi-crystal"></i></div>'
       + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">아직 저장된 분석이 없어요</div>'
       + '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;">사주·점성·리포트를 생성하면<br>여기에 자동으로 쌓입니다</div>'
-      + '<button onclick="closeHistoryModal();if(typeof switchTab===\'function\')switchTab(\'report\');" style="background:linear-gradient(135deg,#7b5ea7,#a07fd4);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;">리포트 둘러보기 →</button>'
+      + '<button onclick="closeHistoryModal();if(typeof switchTab===\'function\')switchTab(\'report\');" style="background:rgba(123,94,167,0.13);color:#5a3f87;border:1px solid rgba(123,94,167,0.4);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;">리포트 둘러보기 →</button>'
       + '</div>';
     return;
   }
@@ -6251,7 +6251,7 @@ function _urlBase64ToUint8Array(b64) {
 })();
 
 // SW 등록 (페이지 로드 시)
-var APP_VERSION = '1.0.5';
+var APP_VERSION = '1.0.6';
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js?v=' + APP_VERSION, { scope: '/' }).catch(function(e) {
     console.warn('[pico sw]', e);

@@ -59,7 +59,7 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(244,237,224,0.92); bac
 .event-btn.selected{ background:rgba(122,36,24,0.08); border-color:rgba(122,36,24,0.35); color:var(--accent); }
 
 /* BUTTONS */
-.btn-primary{ width:100%; padding:13px; background:linear-gradient(135deg,#7a2418,#5a1810); color:#fcf7ea; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:10px; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; box-shadow:var(--shadow-lift); }
+.btn-primary{ width:100%; padding:13px; background:rgba(122,36,24,0.13); color:#7a2418; border:1px solid rgba(90,24,16,0.4); border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:10px; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; }
 .btn-primary:active{ transform:scale(0.98); }
 .btn-ghost{ width:100%; padding:11px; background:none; color:var(--muted); border:1px solid var(--border-soft); border-radius:12px; font-size:13px; cursor:pointer; margin-top:8px; font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif; }
 
@@ -736,7 +736,6 @@ function showLoginPromptInEl(elId, colSpan) {
     '<div style="grid-column:1/-1;"><div class="empty-state"><div class="ei"><i class="pi pi-lock"></i></div><p>로그인 후 이용 가능해</p></div></div>';
 }
 </script>
-<script src="yongsin-float.js"></script>
 <script>
 (function(){
   document.addEventListener('copy',function(e){e.preventDefault();});
