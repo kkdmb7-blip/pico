@@ -822,6 +822,10 @@
   <div class="qm-personal-wrap" id="qm-personal-wrap" style="display:none;max-width:520px;margin:18px auto 0;padding:0 20px;">
     <div class="doorshen-section-title">사주 맞춤 정밀 해석 <span style="font-size:11px;font-weight:400;opacity:0.82">일간 × 포국</span></div>
     <div id="qm-personal-grid" style="display:grid;grid-template-columns:1fr;gap:8px;"></div>
+    <button id="qm-ai-btn" onclick="runQimenAI()" style="margin-top:12px;width:100%;padding:14px;background:linear-gradient(135deg,rgba(140,90,210,0.13),rgba(110,70,180,0.07));border:1px solid rgba(140,90,210,0.38);border-radius:12px;cursor:pointer;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:13px;font-weight:700;color:#7a3fc0;transition:all 0.3s;">
+      <i class="pi pi-sparkle"></i> AI 정밀 해석 받기
+    </button>
+    <div id="qm-ai-result" style="display:none;margin-top:12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;"></div>
   </div>
 
   <div class="bestdir-box" id="bestdir-box">
@@ -1435,7 +1439,11 @@ function renderResult(data) {
   const dunEl = document.getElementById('m-duntype');
   dunEl.textContent = meta.음양둔;
   dunEl.className   = 'meta-value ' + (meta.음양둔 === '양둔' ? 'yang' : 'eum');
-  document.getElementById('m-jieqi').textContent = meta.절기;
+  var jieqiText = meta.절기;
+  if (meta.다음절기 && meta.남은일수 != null) {
+    jieqiText += ' (' + meta.남은일수 + '일 후 ' + meta.다음절기 + ')';
+  }
+  document.getElementById('m-jieqi').textContent = jieqiText;
   document.getElementById('m-won').textContent   = meta.원;
   document.getElementById('m-guk').textContent   = meta.국수 + '국';
   document.getElementById('m-ilju').textContent  = meta.일주;
@@ -1890,6 +1898,102 @@ function renderPersonalQimen(data) {
 
   grid.innerHTML = html;
   wrap.style.display = '';
+
+  // AI 버튼/결과 초기화 (포국 변경 시 재요청 가능)
+  var _aiBtn = document.getElementById('qm-ai-btn');
+  var _aiRes = document.getElementById('qm-ai-result');
+  if (_aiBtn) {
+    _aiBtn.style.display = '';
+    _aiBtn.disabled = false;
+    _aiBtn.innerHTML = '<i class="pi pi-sparkle"></i> AI 정밀 해석 받기';
+  }
+  if (_aiRes) { _aiRes.style.display = 'none'; _aiRes.textContent = ''; }
+
+  // 종합 데이터 캐시 (AI 호출용)
+  window._qimenAIContext = {
+    ilju: ilju, dayStem: dayStemHan, dayBranch: dayBranchHan,
+    dayEl: userDayEl, ymGong: ymGong, ymBranches: ymBranches,
+    zfStar: zfStar, zfDoor: zfDoor, zfStem: zfStem, zfBranches: zfBranches,
+    sipsinStem: sipsinStem, sipsinYm: sipsinYm,
+    zfUnseong: zfUnseong, ymUnseong: ymUnseong,
+    zfGongmang: zfGongmang, ymGongmang: ymGongmang,
+    score: score, verdict: verdict,
+    meta: data.meta || {}
+  };
+}
+
+// ── AI 정밀 해석 ──
+function runQimenAI() {
+  var btn = document.getElementById('qm-ai-btn');
+  var resBox = document.getElementById('qm-ai-result');
+  var ctx = window._qimenAIContext;
+  if (!ctx) { alert('사주 프로필을 먼저 설정해 주세요.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="pi pi-spinner pi-spin"></i> AI 분석 중…';
+
+  var sipsinLine = ctx.sipsinStem ? ('직부궁 천간 ' + ctx.zfStem + '은 일간 ' + ctx.dayStem + '의 ' + ctx.sipsinStem + '. ') : '';
+  if (ctx.sipsinYm) sipsinLine += '연명궁 천간 십신: ' + ctx.sipsinYm + '. ';
+  var unseongLine = ctx.zfUnseong ? ('일간 ' + ctx.dayStem + '이 직부궁 ' + (ctx.zfBranches.join('·')) + '에서 12운성 ' + ctx.zfUnseong + '. ') : '';
+  if (ctx.ymUnseong) unseongLine += '연명궁 12운성: ' + ctx.ymUnseong + '. ';
+  var gongmangLine = '';
+  if (ctx.zfGongmang) gongmangLine += '직부궁이 일주 공망지에 적중(효력 반감). ';
+  if (ctx.ymGongmang) gongmangLine += '연명궁이 일주 공망지에 적중(본명 영역 약화). ';
+
+  var userMsg = [
+    '아래 데이터로 사용자 맞춤 기문 정밀 해석을 작성해줘.',
+    '',
+    '[사주 정보]',
+    '일주: ' + (ctx.ilju || '미상'),
+    '일간 오행: ' + ctx.dayEl,
+    '연명궁: ' + ctx.ymGong + '궁',
+    '',
+    '[포국 정보]',
+    '직부성: ' + ctx.zfStar + ', 직사문: ' + ctx.zfDoor + '門, 직부궁 지반: ' + ctx.zfStem,
+    '음양둔/원/국수: ' + (ctx.meta.음양둔||'') + ' ' + (ctx.meta.원||'') + ' ' + (ctx.meta.국수||'') + '국',
+    '절기: ' + (ctx.meta.절기||''),
+    '',
+    '[정밀 분석]',
+    sipsinLine || '(십신 데이터 없음)',
+    unseongLine || '(12운성 데이터 없음)',
+    gongmangLine || '(공망 적중 없음)',
+    '종합 점수: ' + ctx.score + ' → ' + ctx.verdict,
+    '',
+    '작성 규칙:',
+    '- 320~420자, 4단락',
+    '- 각 단락 첫 줄에 [핵심] [십신·운성] [방향·시기] [실천] 라벨',
+    '- 따뜻하고 실용적인 톤, 확정적 예언/거창한 표현 금지',
+    '- 위 데이터에 없는 수치·연도·이름 만들지 말 것',
+    '- 마크다운 헤더(#) 금지, 표 금지'
+  ].join('\n');
+
+  var _u = null;
+  try { _u = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
+
+  fetch('https://fortuna-silk.vercel.app/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_id: _u ? _u.id : '',
+      skip_orb: true,
+      messages: [{ role: 'user', content: userMsg }],
+      system_prompt: '너는 기문둔갑·사주 명리 전문가다. 주어진 데이터만으로 정밀 해석을 작성한다. 데이터에 없는 사실 추측 금지.',
+      max_tokens: 900
+    })
+  }).then(function(r) {
+    if (!r.ok) throw new Error('API ' + r.status);
+    return r.json();
+  }).then(function(d) {
+    var text = (d && (d.reply || d.content || d.text)) || '';
+    if (!text) throw new Error('빈 응답');
+    resBox.textContent = text.trim();
+    resBox.style.display = '';
+    btn.style.display = 'none';
+  }).catch(function(err) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="pi pi-sparkle"></i> AI 정밀 해석 받기 (재시도)';
+    alert('AI 해석 실패: ' + err.message);
+  });
 }
 
 // ── 택일 추천 카드 ──
