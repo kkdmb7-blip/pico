@@ -1654,6 +1654,77 @@ function renderDoorShenPanel(data) {
   try { renderPersonalQimen(data); } catch(e) { console.error('personal qimen err', e); }
 }
 
+// ── 천간 음양 ──
+var STEM_YINYANG = {'甲':'양','乙':'음','丙':'양','丁':'음','戊':'양','己':'음','庚':'양','辛':'음','壬':'양','癸':'음'};
+
+// ── 십신 매핑 (일간 기준 천간 → 십신) ──
+function getSipsin(dayStem, otherStem) {
+  if (!dayStem || !otherStem) return null;
+  var SO = {'甲':'목','乙':'목','丙':'화','丁':'화','戊':'토','己':'토','庚':'금','辛':'금','壬':'수','癸':'수'};
+  var SAENG = {목:'화',화:'토',토:'금',금:'수',수:'목'};
+  var GEUK  = {목:'토',토:'수',수:'화',화:'금',금:'목'};
+  var dEl = SO[dayStem], dY = STEM_YINYANG[dayStem];
+  var oEl = SO[otherStem], oY = STEM_YINYANG[otherStem];
+  if (!dEl || !oEl) return null;
+  var same = dY === oY;
+  if (dEl === oEl) return same ? '비견' : '겁재';
+  if (SAENG[dEl] === oEl) return same ? '식신' : '상관';
+  if (GEUK[dEl] === oEl) return same ? '편재' : '정재';
+  if (GEUK[oEl] === dEl) return same ? '편관' : '정관';
+  if (SAENG[oEl] === dEl) return same ? '편인' : '정인';
+  return null;
+}
+var SIPSIN_BADGE = {
+  '비견':'jung','겁재':'hyung','식신':'gil','상관':'jung',
+  '편재':'gil','정재':'gil','편관':'hyung','정관':'gil',
+  '편인':'jung','정인':'daegil'
+};
+var SIPSIN_DESC = {
+  '비견':'동료·경쟁자','겁재':'손재·다툼 위험','식신':'표현·여유·재물원천','상관':'재능·반항·구설',
+  '편재':'유동성 재물·기회','정재':'안정 재물·노력의 결실','편관':'압박·도전·시험','정관':'명예·질서·승진',
+  '편인':'학문·기술·고독','정인':'귀인·지원·문서'
+};
+
+// ── 십이운성 (일간 × 지지) ──
+var SIPYIUN_TABLE = {
+  '甲':{'亥':'장생','子':'목욕','丑':'관대','寅':'건록','卯':'제왕','辰':'쇠','巳':'병','午':'사','未':'묘','申':'절','酉':'태','戌':'양'},
+  '乙':{'午':'장생','巳':'목욕','辰':'관대','卯':'건록','寅':'제왕','丑':'쇠','子':'병','亥':'사','戌':'묘','酉':'절','申':'태','未':'양'},
+  '丙':{'寅':'장생','卯':'목욕','辰':'관대','巳':'건록','午':'제왕','未':'쇠','申':'병','酉':'사','戌':'묘','亥':'절','子':'태','丑':'양'},
+  '丁':{'酉':'장생','申':'목욕','未':'관대','午':'건록','巳':'제왕','辰':'쇠','卯':'병','寅':'사','丑':'묘','子':'절','亥':'태','戌':'양'},
+  '戊':{'寅':'장생','卯':'목욕','辰':'관대','巳':'건록','午':'제왕','未':'쇠','申':'병','酉':'사','戌':'묘','亥':'절','子':'태','丑':'양'},
+  '己':{'酉':'장생','申':'목욕','未':'관대','午':'건록','巳':'제왕','辰':'쇠','卯':'병','寅':'사','丑':'묘','子':'절','亥':'태','戌':'양'},
+  '庚':{'巳':'장생','午':'목욕','未':'관대','申':'건록','酉':'제왕','戌':'쇠','亥':'병','子':'사','丑':'묘','寅':'절','卯':'태','辰':'양'},
+  '辛':{'子':'장생','亥':'목욕','戌':'관대','酉':'건록','申':'제왕','未':'쇠','午':'병','巳':'사','辰':'묘','卯':'절','寅':'태','丑':'양'},
+  '壬':{'申':'장생','酉':'목욕','戌':'관대','亥':'건록','子':'제왕','丑':'쇠','寅':'병','卯':'사','辰':'묘','巳':'절','午':'태','未':'양'},
+  '癸':{'卯':'장생','寅':'목욕','丑':'관대','子':'건록','亥':'제왕','戌':'쇠','酉':'병','申':'사','未':'묘','午':'절','巳':'태','辰':'양'}
+};
+var UNSEONG_BADGE = {
+  '장생':'gil','목욕':'jung','관대':'gil','건록':'daegil','제왕':'daegil',
+  '쇠':'jung','병':'hyung','사':'hyung','묘':'jung','절':'hyung','태':'jung','양':'gil'
+};
+
+// ── 9궁 → 지지 (낙서 배치) ──
+var GONG_BRANCH = {
+  1:['子'], 2:['未','申'], 3:['卯'], 4:['辰','巳'],
+  6:['戌','亥'], 7:['酉'], 8:['丑','寅'], 9:['午']
+};
+
+// ── 60갑자 공망 (일주 → [공망지지 2개]) ──
+var GONGMANG_TABLE = (function() {
+  var stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var branches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  // 6순(旬) 시작: 甲子, 甲戌, 甲申, 甲午, 甲辰, 甲寅 / 공망: 戌亥, 申酉, 午未, 辰巳, 寅卯, 子丑
+  var sunStart = [0, 10, 20, 30, 40, 50]; // 60갑자 인덱스
+  var gongmangs = [['戌','亥'],['申','酉'],['午','未'],['辰','巳'],['寅','卯'],['子','丑']];
+  var tbl = {};
+  for (var i = 0; i < 60; i++) {
+    var ilju = stems[i % 10] + branches[i % 12];
+    var sun = Math.floor(i / 10);
+    tbl[ilju] = gongmangs[sun];
+  }
+  return tbl;
+})();
+
 // ── 사주 맞춤 정밀 해석 ──
 function renderPersonalQimen(data) {
   var wrap = document.getElementById('qm-personal-wrap');
@@ -1716,14 +1787,72 @@ function renderPersonalQimen(data) {
   var ymStemEl = ymStem ? (STEM_OHAENG_MAP[ymStem[0]] || '') : '';
   var r4 = ymStemEl ? relRich(ymStemEl, userDayEl) : null;
 
-  var html = '';
-  html += row('일간', EL_KR[userDayEl] + ' 일간', '내 사주 본기', 'jung');
-  if (zfStar) html += row('직부성', zfStar + (starEl ? ' (' + EL_KR[starEl] + ')' : ''), '직부성 ' + r1.tag + ' · ' + r1.label, r1.badge);
-  if (zfDoor) html += row('직사문', zfDoor + '門' + (doorEl ? ' (' + EL_KR[doorEl] + ')' : ''), '직사문 ' + r2.tag + ' · ' + r2.label, r2.badge);
-  if (zfStem) html += row('직부궁 지반', zfStem + (stemEl ? ' (' + EL_KR[stemEl] + ')' : ''), '지반 ' + r3.tag + ' · ' + r3.label, r3.badge);
-  if (r4) html += row('연명궁 지반', ymStem + ' (' + EL_KR[ymStemEl] + ')', '연명궁 ' + r4.tag + ' · ' + r4.label, r4.badge);
+  // 일간 한자 + 일주(공망 계산용)
+  var dayStemHan = window._userDayStemHan || '';
+  var dayBranchHan = window._userDayBranchHan || '';
+  var ilju = (dayStemHan && dayBranchHan) ? (dayStemHan + dayBranchHan) : '';
+  var gongmang = ilju && GONGMANG_TABLE[ilju] ? GONGMANG_TABLE[ilju] : null;
 
-  // 종합 판정
+  // 십신 계산
+  var sipsinStem = (zfStem && dayStemHan) ? getSipsin(dayStemHan, zfStem[0]) : null;
+  var sipsinYm = (ymStem && dayStemHan) ? getSipsin(dayStemHan, ymStem[0]) : null;
+
+  // 직부궁 지지 (낙서 배치)
+  var zfBranches = GONG_BRANCH[parseInt(zfGong)] || [];
+  var ymBranches = ymGong ? (GONG_BRANCH[ymGong] || []) : [];
+
+  // 십이운성 (일간 vs 직부궁 지지)
+  var zfUnseong = null;
+  if (dayStemHan && SIPYIUN_TABLE[dayStemHan] && zfBranches.length) {
+    zfUnseong = SIPYIUN_TABLE[dayStemHan][zfBranches[0]] || null;
+  }
+  var ymUnseong = null;
+  if (dayStemHan && SIPYIUN_TABLE[dayStemHan] && ymBranches.length) {
+    ymUnseong = SIPYIUN_TABLE[dayStemHan][ymBranches[0]] || null;
+  }
+
+  // 공망 체크
+  var zfGongmang = false, ymGongmang = false;
+  if (gongmang) {
+    zfGongmang = zfBranches.some(function(b) { return gongmang.indexOf(b) >= 0; });
+    ymGongmang = ymBranches.some(function(b) { return gongmang.indexOf(b) >= 0; });
+  }
+
+  var html = '';
+  var ijuLabel = ilju ? (dayStemHan + dayBranchHan + ' 일주') : (EL_KR[userDayEl] + ' 일간');
+  var ijuSub = '내 사주 본기' + (gongmang ? ' · 공망 ' + gongmang.join('·') : '');
+  html += row('일간', ijuLabel, ijuSub, 'jung');
+
+  if (zfStar) html += row('직부성', zfStar + (starEl ? ' (' + EL_KR[starEl] + ')' : ''), '오행관계 ' + r1.tag + ' · ' + r1.label, r1.badge);
+  if (zfDoor) html += row('직사문', zfDoor + '門' + (doorEl ? ' (' + EL_KR[doorEl] + ')' : ''), '오행관계 ' + r2.tag + ' · ' + r2.label, r2.badge);
+  if (zfStem) {
+    var stemSub = '오행관계 ' + r3.tag + ' · ' + r3.label;
+    if (sipsinStem) stemSub = '십신 [' + sipsinStem + '] · ' + (SIPSIN_DESC[sipsinStem] || '');
+    var stemBadge = sipsinStem ? (SIPSIN_BADGE[sipsinStem] || r3.badge) : r3.badge;
+    html += row('직부궁 천간', zfStem + (sipsinStem ? ' → ' + sipsinStem : ''), stemSub, stemBadge);
+  }
+  if (zfBranches.length) {
+    var zfBlabel = zfBranches.join('·') + (zfUnseong ? ' · 12운성 [' + zfUnseong + ']' : '') + (zfGongmang ? ' (공망)' : '');
+    var zfBsub = zfUnseong ? '일간이 직부궁 지지에서 ' + zfUnseong + ' 상태' : '직부궁 지지';
+    if (zfGongmang) zfBsub += ' · 공망 적중 → 효력 반감';
+    var zfBbadge = zfGongmang ? 'hyung' : (zfUnseong ? (UNSEONG_BADGE[zfUnseong] || 'jung') : 'jung');
+    html += row('직부궁 지지', zfBlabel, zfBsub, zfBbadge);
+  }
+  if (r4) {
+    var ymSub = '오행관계 ' + r4.tag + ' · ' + r4.label;
+    if (sipsinYm) ymSub = '십신 [' + sipsinYm + '] · ' + (SIPSIN_DESC[sipsinYm] || '');
+    var ymBadge = sipsinYm ? (SIPSIN_BADGE[sipsinYm] || r4.badge) : r4.badge;
+    html += row('연명궁 천간', ymStem + (sipsinYm ? ' → ' + sipsinYm : ''), ymSub, ymBadge);
+  }
+  if (ymBranches.length) {
+    var ymBlabel = ymBranches.join('·') + (ymUnseong ? ' · 12운성 [' + ymUnseong + ']' : '') + (ymGongmang ? ' (공망)' : '');
+    var ymBsub = ymUnseong ? '일간이 연명궁 지지에서 ' + ymUnseong + ' 상태' : '연명궁 지지';
+    if (ymGongmang) ymBsub += ' · 공망 적중 → 본명 영역 약화';
+    var ymBbadge = ymGongmang ? 'hyung' : (ymUnseong ? (UNSEONG_BADGE[ymUnseong] || 'jung') : 'jung');
+    html += row('연명궁 지지', ymBlabel, ymBsub, ymBbadge);
+  }
+
+  // 종합 판정 (십신/12운성/공망 가중)
   var score = 0;
   [r1, r2, r3, r4].forEach(function(r) {
     if (!r) return;
@@ -1732,11 +1861,30 @@ function renderPersonalQimen(data) {
     else if (r.badge === 'hyung') score -= 1;
     else if (r.badge === 'daehyung') score -= 2;
   });
+  // 십신 가중
+  [sipsinStem, sipsinYm].forEach(function(s) {
+    if (!s) return;
+    var b = SIPSIN_BADGE[s];
+    if (b === 'daegil') score += 2;
+    else if (b === 'gil') score += 1;
+    else if (b === 'hyung') score -= 1;
+  });
+  // 12운성 가중
+  [zfUnseong, ymUnseong].forEach(function(u) {
+    if (!u) return;
+    var b = UNSEONG_BADGE[u];
+    if (b === 'daegil') score += 1;
+    else if (b === 'hyung') score -= 1;
+  });
+  // 공망 페널티
+  if (zfGongmang) score -= 2;
+  if (ymGongmang) score -= 1;
+
   var verdict, vbadge;
-  if (score >= 4)      { verdict = '포국이 사주와 강하게 부합 — 핵심 의사결정 추진'; vbadge = 'daegil'; }
-  else if (score >= 2) { verdict = '포국이 사주와 우호적 — 주요 일정 진행 양호'; vbadge = 'gil'; }
-  else if (score >= -1){ verdict = '포국이 중립적 — 평소 일과 유지'; vbadge = 'jung'; }
-  else if (score >= -3){ verdict = '포국이 사주와 어긋남 — 큰 결정·계약 보류'; vbadge = 'hyung'; }
+  if (score >= 6)      { verdict = '포국이 사주와 강하게 부합 — 핵심 의사결정 추진'; vbadge = 'daegil'; }
+  else if (score >= 3) { verdict = '포국이 사주와 우호적 — 주요 일정 진행 양호'; vbadge = 'gil'; }
+  else if (score >= -2){ verdict = '포국이 중립적 — 평소 일과 유지'; vbadge = 'jung'; }
+  else if (score >= -5){ verdict = '포국이 사주와 어긋남 — 큰 결정·계약 보류'; vbadge = 'hyung'; }
   else                 { verdict = '포국이 사주와 정면 충돌 — 휴식·정리 권장'; vbadge = 'daehyung'; }
   html += row('종합', '점수 ' + (score >= 0 ? '+' : '') + score, verdict, vbadge);
 
@@ -2587,6 +2735,10 @@ function shareQimenKakao() {
         if (dayPillar && dayPillar.length >= 1) {
           userDayEl = STEM_EL_KOR[dayPillar[0]];
           userDayStem = KOR_HAN[dayPillar[0]] || dayPillar[0];
+          if (dayPillar.length >= 2) {
+            window._userDayStemHan = userDayStem;
+            window._userDayBranchHan = KOR_BRANCH[dayPillar[1]] || dayPillar[1];
+          }
         }
       } catch(e) {}
     }
