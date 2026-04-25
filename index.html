@@ -6097,8 +6097,7 @@ function updateMypageTab() {
 
     function selectCol(idx){
       colEls.forEach(function(col, i){
-        var bar = col.querySelector('.qw-bar');
-        var label = col.querySelector('.qw-label');
+        var bar = col.bar, label = col.label;
         if(!bar||!label) return;
         if(i===idx){
           var d=weekData[i]; if(!d)return;
@@ -6108,8 +6107,10 @@ function updateMypageTab() {
           label.style.background=GRADE_BG[d.grade]||'rgba(167,139,250,0.1)';
           label.style.borderRadius='0 0 10px 10px';
         } else {
-          if(bar) { bar.style.opacity=weekData[i]?'0.6':'0.15'; bar.style.boxShadow=''; }
-          if(label) { label.style.background=''; label.style.borderRadius=''; }
+          bar.style.opacity=weekData[i]?'0.6':'0.15';
+          bar.style.boxShadow='';
+          label.style.background='';
+          label.style.borderRadius='';
         }
       });
       selectedIdx=idx;
