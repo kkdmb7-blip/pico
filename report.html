@@ -342,7 +342,7 @@ nav {
   font-size: 14px; font-weight: 700; cursor: pointer;
   font-family: var(--fn); margin-bottom: 10px;
 }
-.modal-btn-primary { background: linear-gradient(135deg,#7a2418,#5a1810); color: #fcf7ea; }
+.modal-btn-primary { background: rgba(122,36,24,0.13); color: #7a2418; border: 1px solid rgba(90,24,16,0.4); }
 .modal-btn-cancel { background: var(--surface2); color: var(--muted); font-size: 13px; }
 
 /* ── 쉽게 풀어주기 ── */
@@ -1030,7 +1030,9 @@ const TYPE_CONFIG = {
   vedic_gemstone:{ title:'나의 행성 보석', orb:300, emoji:'<i class="pi pi-crown"></i>', focus:'Atmakaraka와 이로운 행성이 가리키는 베딕 전통 보석 처방',
     desc:'영혼의 행성 Atmakaraka와 이로운 행성에 대응하는 9가지 베딕 보석 중 — 나에게 맞는 보석과 착용법' },
   vedic_muhurta:{ title:'7일 길시 캘린더', orb:200, emoji:'<i class="pi pi-calendar"></i>', focus:'이번주 7일 각 날의 Tithi·Nakshatra·Muhurta 길흉 시간대',
-    desc:'오늘부터 7일간 매일의 Tithi(월상)·Nakshatra·행동별 길시를 베딕 전통 Muhurta 시스템으로 안내' }
+    desc:'오늘부터 7일간 매일의 Tithi(월상)·Nakshatra·행동별 길시를 베딕 전통 Muhurta 시스템으로 안내' },
+  qimen_wonmyong:{ title:'기문 본명국 분석', orb:600, emoji:'<i class="pi pi-compass"></i>', focus:'출생 시점의 기문 포국으로 본 평생 운명 — 직부성·구성·팔문 본명',
+    desc:'태어난 그 순간 우주의 기운 배치(기문 9궁 포국)를 출생시 직부성·직사문·연명궁 기준으로 평생 운명 청사진을 읽어냅니다. 사주가 시간 흐름이라면 본명국은 공간 배치 — 사주와 다른 각도의 정밀 분석.' }
 };
 
 const TYPE_COLORS = {
@@ -1080,7 +1082,8 @@ const TYPE_COLORS = {
   vedic_ascendant:   { main:'#8a6a3a', soft:'rgba(138,106,58,0.12)', border:'rgba(138,106,58,0.32)' },
   vedic_remedy:      { main:'#3a8a6a', soft:'rgba(58,138,106,0.12)', border:'rgba(58,138,106,0.32)' },
   vedic_gemstone:    { main:'#6a4a9a', soft:'rgba(106,74,154,0.12)', border:'rgba(106,74,154,0.32)' },
-  vedic_muhurta:     { main:'#4a7a8a', soft:'rgba(74,122,138,0.12)', border:'rgba(74,122,138,0.32)' }
+  vedic_muhurta:     { main:'#4a7a8a', soft:'rgba(74,122,138,0.12)', border:'rgba(74,122,138,0.32)' },
+  qimen_wonmyong:    { main:'#7a3fc0', soft:'rgba(122,63,192,0.13)', border:'rgba(122,63,192,0.38)' }
 };
 
 function applyTypeTheme() {
@@ -1413,6 +1416,13 @@ const TYPE_SECTIONS = {
     { name:'행동별(계약·여행·면접) 최적 타이밍', chars: 500 },
     { name:'이번주 특이 Tithi·Nakshatra 주의', chars: 400 },
     { name:'이번주 한 줄 행동 지침', chars: 300 }
+  ],
+  qimen_wonmyong: [
+    { name:'본명 포국 핵심 정체성', chars: 300 },
+    { name:'직부성·구성이 가리키는 인생 본질', chars: 500 },
+    { name:'팔문·팔신으로 본 행동 패턴과 인생 흐름', chars: 500 },
+    { name:'사주 일간×본명국 통합 — 평생 운명 청사진', chars: 500 },
+    { name:'기문 본명국이 권하는 인생 방향', chars: 400 }
   ]
 };
 
@@ -6136,7 +6146,7 @@ function renderIntro() {
           '</div>' +
           (dtTxt ? '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + dtTxt + ' 생성</div>' : '') +
         '</div>' +
-        '<button id="introResumeBtn" style="flex-shrink:0;background:linear-gradient(135deg,#d4af37,#b89048);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;letter-spacing:0.3px;box-shadow:0 4px 12px rgba(184,144,72,0.35);">이어보기 →</button>';
+        '<button id="introResumeBtn" style="flex-shrink:0;background:rgba(212,175,55,0.18);color:#967032;border:1px solid rgba(184,144,72,0.45);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;letter-spacing:0.3px;">이어보기 →</button>';
       const btn = document.getElementById('introResumeBtn');
       if (btn) btn.onclick = function() {
         const c = window._cachedReport;
@@ -6463,6 +6473,7 @@ async function generateReport() {
   if (_type === 'vedic_remedy')       { await generateVedicRemedyReport();       return; }
   if (_type === 'vedic_gemstone')     { await generateVedicGemstoneReport();     return; }
   if (_type === 'vedic_muhurta')      { await generateVedicMuhurtaReport();      return; }
+  if (_type === 'qimen_wonmyong')     { await generateQimenWonmyongReport();     return; }
   // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
@@ -7876,6 +7887,138 @@ async function generateVedicMuhurtaReport() {
     advice2A: ['창업/비즈니스','이직/커리어','투자/재테크'],
     advice2B: ['대인관계/부부']
   });
+}
+
+// ── 기문 본명국 데이터 빌더 ──
+async function fetchQimenWonmyong() {
+  if (window._qimenWonmyongData) return window._qimenWonmyongData;
+  const p = _profile || {};
+  if (!p.year || !p.month || !p.day) return null;
+  // 본명국 = 출생 시점의 시가(時家) 포국. 워커는 wonmyong 미지원 → siga로 호출
+  const sp = new URLSearchParams({
+    year: p.year, month: p.month, day: p.day,
+    hour: (p.hour === 'unknown' || p.hour == null) ? 12 : p.hour,
+    minute: p.minute || 0, type: 'siga'
+  });
+  try {
+    const res = await fetch('https://fortuna.kkdmb7.workers.dev/qimen?' + sp.toString());
+    if (!res.ok) return null;
+    const data = await res.json();
+    window._qimenWonmyongData = data;
+    return data;
+  } catch(e) { console.warn('[qimen-wonmyong] fetch fail', e); return null; }
+}
+
+function buildQimenBlock(qm) {
+  if (!qm) return '【기문 본명국】 데이터 없음';
+  const meta = qm.meta || {};
+  const palaces = qm.palaces || {};
+  const GONG_DIR = {1:'북',2:'남서',3:'동',4:'남동',5:'중앙',6:'북서',7:'서',8:'북동',9:'남'};
+  const palaceLines = [];
+  for (let n = 1; n <= 9; n++) {
+    if (n === 5) continue;
+    const p = palaces[String(n)];
+    if (!p) continue;
+    const isZf = (n === qm['직부궁']);
+    palaceLines.push(`  ${n}궁(${GONG_DIR[n]}): 지반 ${p.지반||'-'} / 구성 ${p.구성||'-'} / 팔문 ${p.팔문||'-'}門 / 팔신 ${p.팔신||'-'}${isZf?' ★직부궁':''}`);
+  }
+  const door_kr = {生:'생문(시작·생기)',開:'개문(개운·왕성)',休:'휴문(안정·휴식)',景:'경문(문서·창작)',傷:'상문(충돌·손상)',杜:'두문(은닉·정체)',驚:'경문(놀람·변동)',死:'사문(소멸·정체)'};
+  const star_kr = {天蓬:'천봉(흐름·움직임)',天芮:'천예(질병·장애)',天衝:'천충(투쟁·돌격)',天輔:'천보(문창·지혜)',天禽:'천금(중앙·균형)',天心:'천심(자비·의술)',天柱:'천주(파괴·절손)',天任:'천임(안정·수성)',天英:'천영(허영·소모)'};
+  const shen_kr = {直符:'직부(귀인·보호)',値符:'직부(귀인·보호)',螣蛇:'등사(허위·기이)',太陰:'태음(은밀·여성)',六合:'육합(합작·역마)',白虎:'백호(살기·사고)',玄武:'현무(도둑·어둠)',九地:'구지(잠복·안정)',九天:'구천(성취·비상)'};
+  const zfStar = qm['직부성']||'';
+  const zfDoor = qm['직사문']||'';
+  const zfPal = palaces[String(qm['직부궁'])] || {};
+  const zfShen = zfPal.팔신 || '';
+  return `【기문 본명국 — 출생 시점 9궁 포국 (확정 사실)】
+음양둔: ${meta.음양둔||'-'} / 원: ${meta.원||'-'} / 국수: ${meta.국수||'-'}국 / 절기: ${meta.절기||'-'}
+일주: ${meta.일주||'-'}
+직부궁: ${qm['직부궁']||'-'}궁(${GONG_DIR[qm['직부궁']]||'-'})
+직부성: ${zfStar} ${star_kr[zfStar]?('— '+star_kr[zfStar]):''}
+직사문: ${zfDoor}門 ${door_kr[zfDoor]?('— '+door_kr[zfDoor]):''}
+직부궁 팔신: ${zfShen} ${shen_kr[zfShen]?('— '+shen_kr[zfShen]):''}
+
+[9궁 포국 상세]
+${palaceLines.join('\n')}
+
+★ 인용 절대 규칙:
+1. 위 9궁 데이터(지반·구성·팔문·팔신·궁번호·방위)만 인용. 데이터 외 천간·구성·팔문 만들기 금지.
+2. 직부궁/직부성/직사문은 위 표시만 사용.
+3. 본명국은 출생 시점 고정 데이터 — "오늘", "현재"가 아닌 "타고난", "본래"로 표현.`;
+}
+
+// ── 기문 본명국 분석 ──
+async function generateQimenWonmyongReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const qm = await fetchQimenWonmyong();
+  if (!qm) {
+    for (let i = 0; i < 5; i++) {
+      const el = document.getElementById(`sbody-${i}`);
+      const ld = document.getElementById(`sloading-${i}`);
+      if (ld) ld.style.display = 'none';
+      if (el) { el.style.display = 'block'; el.innerHTML = '<span style="color:#a85a2e;">기문 본명국 데이터를 불러오지 못했습니다. 프로필 출생 정보를 확인해 주세요.</span>'; }
+    }
+    return;
+  }
+  const sb2 = buildSajuBlock();
+  const qb = buildQimenBlock(qm);
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const customSys = `당신은 기문둔갑+사주 명리(적천수+자평진전) 통합 분석 전문가입니다.
+기문 본명국은 출생 시점의 우주 기운 배치(9궁 포국)로 평생 운명의 청사진입니다.
+
+절대 규칙:
+- #헤더 금지, 표 금지, 이모지 금지
+- 볼드(**...**) 사용 최소화
+- 톤: 따뜻하고 정확한 친구 같은 전문가
+- 기문 데이터 블록의 9궁 정보(지반·구성·팔문·팔신·궁번호·방위)만 인용. 데이터 외 글자 만들지 말 것.
+- 직부성·직사문·직부궁 정보는 데이터 그대로 사용.
+- "오늘", "현재", "올해" 같은 시간 표현 금지 — 본명국은 평생 고정. "타고난", "본래", "평생" 사용.
+- 사주 데이터(일간·격국·용신·통근)와 기문 데이터(직부성·구성·팔문)를 통합 해석할 때 두 시스템의 차이를 명시.
+- 섹션 제목 쓰지 마세요 (카드 헤더에 이미 표시됨).
+- 본문 안 소항목은 가), 나), 다) 형식 사용.`;
+
+  const promptA = `${profileStr}
+
+${sb2}
+
+${qb}
+
+${buildAccuracyLayerBlock()}
+
+섹션 구성:
+1. 본명 포국 핵심 정체성 — 직부궁 위치(${qm['직부궁']}궁), 직부성(${qm['직부성']||'-'}), 직사문(${qm['직사문']||'-'}門)을 핵심으로 이 사람의 타고난 정체성·운명 색깔을 압축. 음양둔(${qm.meta?.음양둔||'-'})과 절기(${qm.meta?.절기||'-'})가 가리키는 우주 기운.
+2. 직부성·구성이 가리키는 인생 본질 — 직부성(${qm['직부성']||'-'})의 의미를 사주 일간(${(_ilju||'')[0]||'-'})과 연결. 9궁에 분포한 다른 구성(천봉·천보·천심 등)이 평생 어떤 영역에 영향을 미치는지.
+3. 팔문·팔신으로 본 행동 패턴과 인생 흐름 — 직사문(${qm['직사문']||'-'}門)이 평생 행동 양식에서 어떤 역할을 하는지. 9궁의 팔문·팔신 분포로 본 인생의 길/흉 방향.
+
+총 1000~1300자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
+  await streamToSections(promptA, [0,1,2], '기문 본명국 분석', ysFinal, '', false, customSys);
+
+  const promptB = `${profileStr}
+
+${sb2}
+
+${qb}
+
+${buildAccuracyLayerBlock()}
+
+섹션 구성:
+4. 사주 일간×본명국 통합 — 평생 운명 청사진 — 사주 일간(${(_ilju||'')[0]||'-'})·격국(${_geokguk||'-'})·용신(${ysFinal})과 기문 본명국 직부성·직사문이 같은 방향을 가리키는지 또는 충돌하는지 통합 분석. 사주가 시간 흐름이라면 본명국은 공간 배치 — 두 시스템이 만들어내는 평생 운명의 입체 청사진.
+5. 기문 본명국이 권하는 인생 방향 — 본명국 길방(생문·개문·육합 위치)과 흉방(死문·傷문 위치)을 평생 활동 방향에 적용. 직부성에 맞는 직업·환경·관계 유형. 일생 동안 피해야 할 패턴과 추구해야 할 방향. 실생활 적용 3가지.
+
+총 700~900자. 섹션 번호(4. 5.) 붙여 작성.`;
+  await streamToSections(promptB, [3,4], '기문 본명국 분석', ysFinal, '', true, customSys);
+
+  try {
+    const sb=getSb();
+    const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
+    if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
+  } catch(e){}
+  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display='flex';
+  showConsultBanner();
 }
 
 // ── 서양 점성술 심층 분석 ──
@@ -9644,7 +9787,6 @@ function shareKakao() {
 }
 </script>
 
-<script src="yongsin-float.js"></script>
 <script>
 (function(){
   document.addEventListener('copy',function(e){e.preventDefault();});
