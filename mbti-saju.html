@@ -544,6 +544,13 @@ select.input option{background:#fff;color:var(--text);}
       <div class="rarity-badge" id="rarityBadge"></div>
       <hr class="result-divider">
       <div class="result-desc" id="resultDesc"></div>
+      <div id="closeMbtiWrap" style="display:none;margin-top:18px;padding:14px;background:rgba(123,94,167,0.08);border:1px solid rgba(123,94,167,0.28);border-radius:12px;text-align:center;">
+        <div style="font-size:11px;color:rgba(90,63,135,0.85);font-weight:700;letter-spacing:1px;margin-bottom:6px;">가까운 MBTI</div>
+        <div id="closeMbtiCode" style="font-size:24px;font-weight:800;color:#5a3f87;font-family:'Cinzel','Noto Serif KR',serif;letter-spacing:2px;margin-bottom:4px;"></div>
+        <div id="closeMbtiName" style="font-size:13px;color:#7b5ea7;font-weight:700;margin-bottom:8px;"></div>
+        <div id="closeMbtiDesc" style="font-size:11px;color:rgba(60,40,20,0.7);line-height:1.6;"></div>
+        <div style="font-size:10px;color:rgba(60,40,20,0.5);margin-top:8px;font-style:italic;">※ MBTI 친숙성 매핑 — 정밀 분석은 위 16유형 기준</div>
+      </div>
     </div>
 
     <div class="evidence-card">
@@ -752,6 +759,79 @@ var AXIS_MAP = {
 // ══════════════════════════════════════════════
 // 판정 로직
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// 진짜 MBTI 매핑 (사주 데이터 → ESTJ/INFP 등 16타입)
+// 명리학 근거:
+//   E/I = 일간 음양 + 외향 십신(비겁·식상·재성) vs 내향 십신(관성·인성)
+//   S/N = 일간 오행(토·금=현실 vs 목·화·수=직관) + 정/편 격국
+//   T/F = 관성·재성(논리·판단) vs 식상·인성(표현·공감)
+//   J/P = 정십신(정관·정재·정인=계획) vs 편십신(편관·편재·편인·식상=즉흥)
+// ══════════════════════════════════════════════
+var MBTI_NAMES = {
+  ENTJ:{n:'통솔자',d:'전략적 사고와 강한 추진력. 큰 그림을 그리고 사람을 이끄는 타입.'},
+  ENTP:{n:'토론가',d:'호기심·논쟁·아이디어. 새 가능성에 끌리는 자유로운 사고형.'},
+  ENFJ:{n:'선도자',d:'사람의 잠재력을 끌어내는 따뜻한 카리스마. 영향력의 외향형.'},
+  ENFP:{n:'활동가',d:'열정·영감·자유. 사람과 가능성에서 에너지를 얻는다.'},
+  ESTJ:{n:'경영자',d:'질서·책임·실행. 시스템을 만들고 결과를 내는 현실 리더.'},
+  ESTP:{n:'사업가',d:'순발력·실용·즉흥. 행동으로 학습하는 현장 해결사.'},
+  ESFJ:{n:'집정관',d:'협력·배려·전통. 공동체의 조화를 가꾸는 따뜻한 관리자.'},
+  ESFP:{n:'연예인',d:'즐거움·표현·공감. 분위기를 살리는 사람 중심 행동가.'},
+  INTJ:{n:'전략가',d:'장기 비전·체계·독립. 깊이 있게 설계하고 조용히 실행.'},
+  INTP:{n:'논리술사',d:'호기심·분석·이론. 본질을 파고드는 사색형 전문가.'},
+  INFJ:{n:'옹호자',d:'통찰·이상·헌신. 깊은 의미를 추구하는 조용한 비전가.'},
+  INFP:{n:'중재자',d:'가치·상상·진정성. 자기 신념을 따르는 따뜻한 이상가.'},
+  ISTJ:{n:'현실주의자',d:'성실·책임·꾸준함. 약속과 원칙을 지키는 신뢰의 기둥.'},
+  ISTP:{n:'장인',d:'관찰·실용·기술. 손과 도구로 문제를 푸는 조용한 해결사.'},
+  ISFJ:{n:'수호자',d:'헌신·세심함·보살핌. 가까운 사람을 묵묵히 지키는 타입.'},
+  ISFP:{n:'모험가',d:'감성·자유·예술. 자기 리듬으로 살아가는 부드러운 개성파.'}
+};
+
+function classifyRealMbti(sd) {
+  var dayPillar = (sd.summary && sd.summary.pillars && sd.summary.pillars.day) || '';
+  var dayStem = dayPillar.charAt(0);
+  var yangStems = ['甲','丙','戊','庚','壬','갑','병','무','경','임'];
+  var isYangDay = yangStems.indexOf(dayStem) >= 0;
+
+  var five = sd.five_pct || sd.five_count || {};
+  var wood = Number(five.wood)||0, fire = Number(five.fire)||0;
+  var earth = Number(five.earth)||0, metal = Number(five.metal)||0, water = Number(five.water)||0;
+
+  var tg = sd.ten_gods_map || {};
+  var tgVals = Object.values(tg);
+  function cnt(list) { return tgVals.filter(function(v){return list.indexOf(v)>=0;}).length; }
+
+  var strength = sd.strength_level_5 || '';
+  var isStrong = strength.indexOf('강') >= 0 || strength.indexOf('왕') >= 0;
+
+  // E/I: 일간 음양 + 사주 세기 + 외향/내향 십신 종합
+  // 양간 = +1, 음간 = -1, ext-int 차이 + 신강 보너스 합산해 양수면 E
+  var extScore = cnt(['비견','겁재','식신','상관','편재','정재']);
+  var intScore = cnt(['편관','정관','편인','정인']);
+  var eiBase = isYangDay ? 1 : -1;
+  var eiDiff = extScore - intScore; // 외향 십신이 더 많으면 +
+  var eiStrength = isStrong ? 1 : -1;
+  var f1 = (eiBase + eiDiff + eiStrength) > 0 ? 'E' : 'I';
+
+  // S/N: 토·금 일간 또는 정관/정재 강 → S(현실), 목·화·수 일간 또는 식상/편인 강 → N(직관)
+  var dayEl = ({갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수',
+                甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수'})[dayStem] || '';
+  var sBase = (dayEl==='토'||dayEl==='금') ? 1 : 0;
+  var sScore = sBase + (cnt(['정재','정관'])>=cnt(['식신','상관','편인']) ? 1 : 0) + (earth+metal >= wood+fire+water ? 1 : 0);
+  var f2 = sScore >= 2 ? 'S' : 'N';
+
+  // T/F: 관성+재성 → T, 식상+인성 → F
+  var tScore = cnt(['편관','정관','편재','정재']);
+  var fScore = cnt(['식신','상관','편인','정인']);
+  var f3 = tScore >= fScore ? 'T' : 'F';
+
+  // J/P: 정십신+신강 → J, 편십신+상관식신 → P
+  var jScore = cnt(['정관','정재','정인']) + (isStrong ? 1 : 0);
+  var pScore = cnt(['편관','편재','편인','상관','식신','겁재']);
+  var f4 = jScore >= pScore ? 'J' : 'P';
+
+  return f1 + f2 + f3 + f4;
+}
+
 function classifyMbti(sd) {
   var five = sd.five_pct || sd.five_count || {};
   var wood = Number(five.wood)||0, fire = Number(five.fire)||0, earth = Number(five.earth)||0, metal = Number(five.metal)||0, water = Number(five.water)||0;
@@ -870,8 +950,9 @@ async function calcMbti() {
     var code = classifyMbti(sd);
     currentType = code;
     var info = TYPES[code] || TYPES['OMNC'];
+    var realMbti = classifyRealMbti(sd);
 
-    renderResult(code, info);
+    renderResult(code, info, realMbti);
 
     try {
       localStorage.setItem('pico_profile', JSON.stringify({
@@ -890,7 +971,7 @@ async function calcMbti() {
   btn.disabled = false; btn.textContent = '내 사주 16유형 확인하기';
 }
 
-function renderResult(code, info) {
+function renderResult(code, info, realMbti) {
   document.documentElement.style.setProperty('--type', info.color);
   document.documentElement.style.setProperty('--type-rgb', info.rgb);
 
@@ -900,6 +981,15 @@ function renderResult(code, info) {
   document.getElementById('resultSubtitle').textContent = info.subtitle;
   document.getElementById('rarityBadge').innerHTML = '한국인 중 상위 ' + info.rarity + '% 유형';
   document.getElementById('resultDesc').textContent = info.desc;
+
+  // 진짜 MBTI 매핑 표시
+  if (realMbti && MBTI_NAMES[realMbti]) {
+    var mInfo = MBTI_NAMES[realMbti];
+    document.getElementById('closeMbtiCode').textContent = realMbti;
+    document.getElementById('closeMbtiName').textContent = realMbti + ' · ' + mInfo.n;
+    document.getElementById('closeMbtiDesc').textContent = mInfo.d;
+    document.getElementById('closeMbtiWrap').style.display = 'block';
+  }
 
   renderEvidence(window._lastSd || {});
   renderDex(code);
