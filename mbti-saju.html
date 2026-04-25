@@ -209,6 +209,67 @@ select.input option{background:#fff;color:var(--text);}
   font-size:14px;line-height:1.95;color:var(--text);text-align:left;letter-spacing:-0.005em;
 }
 
+/* hero 안 MBTI 작은 라벨 */
+.hero-mbti-tag{
+  position:relative;z-index:1;
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:18px;padding:6px 14px;
+  background:rgba(var(--type-rgb),0.08);
+  border:1px solid rgba(var(--type-rgb),0.32);
+  border-radius:100px;
+  font-size:11px;color:var(--type);font-weight:700;letter-spacing:0.05em;
+}
+.hero-mbti-tag::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--type);opacity:0.8;
+}
+
+/* ═══════ 가까운 MBTI 카드 ═══════ */
+.mbti-card{
+  position:relative;overflow:hidden;
+  border-radius:18px;padding:24px 22px;margin-bottom:14px;text-align:center;
+  background:linear-gradient(135deg, rgba(var(--type-rgb),0.05), rgba(var(--type-rgb),0.02));
+  border:1px solid rgba(var(--type-rgb),0.32);
+  box-shadow:0 4px 18px rgba(var(--type-rgb),0.10), 0 1px 4px rgba(60,40,20,0.06);
+}
+.mbti-card::before{
+  content:'';position:absolute;top:-30px;right:-30px;
+  width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle, rgba(var(--type-rgb),0.18) 0%, transparent 70%);
+  pointer-events:none;
+}
+.mbti-eyebrow{
+  font-size:10.5px;letter-spacing:0.3em;color:var(--type);
+  font-weight:700;text-transform:uppercase;
+  margin-bottom:14px;position:relative;z-index:1;opacity:0.85;
+}
+.mbti-code-row{
+  display:flex;align-items:baseline;justify-content:center;gap:14px;
+  margin-bottom:14px;position:relative;z-index:1;flex-wrap:wrap;
+}
+.mbti-code{
+  font-family:'Cinzel','Noto Serif KR',serif;
+  font-size:42px;font-weight:700;letter-spacing:5px;
+  color:var(--type);line-height:1;
+  text-shadow:0 2px 14px rgba(var(--type-rgb),0.25);
+}
+.mbti-name{
+  font-family:'Noto Serif KR',serif;
+  font-size:17px;font-weight:700;color:var(--ink);
+  letter-spacing:-0.005em;
+}
+.mbti-desc{
+  font-size:13px;line-height:1.85;color:var(--text2);
+  position:relative;z-index:1;letter-spacing:-0.005em;
+  max-width:380px;margin:0 auto;
+}
+.mbti-note{
+  margin-top:14px;font-size:10.5px;color:var(--muted);
+  position:relative;z-index:1;font-style:italic;letter-spacing:0.01em;
+  padding-top:12px;border-top:1px dashed rgba(var(--type-rgb),0.22);
+}
+.mbti-note span{font-weight:700;color:var(--type);font-style:normal;}
+
 /* ═══════ 4축 카드 ═══════ */
 .axes-card{
   background:var(--surface);border:1px solid var(--border-soft);
@@ -544,13 +605,18 @@ select.input option{background:#fff;color:var(--text);}
       <div class="rarity-badge" id="rarityBadge"></div>
       <hr class="result-divider">
       <div class="result-desc" id="resultDesc"></div>
-      <div id="closeMbtiWrap" style="display:none;margin-top:18px;padding:14px;background:rgba(123,94,167,0.08);border:1px solid rgba(123,94,167,0.28);border-radius:12px;text-align:center;">
-        <div style="font-size:11px;color:rgba(90,63,135,0.85);font-weight:700;letter-spacing:1px;margin-bottom:6px;">가까운 MBTI</div>
-        <div id="closeMbtiCode" style="font-size:24px;font-weight:800;color:#5a3f87;font-family:'Cinzel','Noto Serif KR',serif;letter-spacing:2px;margin-bottom:4px;"></div>
-        <div id="closeMbtiName" style="font-size:13px;color:#7b5ea7;font-weight:700;margin-bottom:8px;"></div>
-        <div id="closeMbtiDesc" style="font-size:11px;color:rgba(60,40,20,0.7);line-height:1.6;"></div>
-        <div style="font-size:10px;color:rgba(60,40,20,0.5);margin-top:8px;font-style:italic;">※ MBTI 친숙성 매핑 — 정밀 분석은 위 16유형 기준</div>
+      <div id="heroMbtiTag" class="hero-mbti-tag" style="display:none;"></div>
+    </div>
+
+    <!-- 가까운 MBTI 카드 (페이지 톤 일치) -->
+    <div id="closeMbtiCard" class="mbti-card" style="display:none;">
+      <div class="mbti-eyebrow">가까운 MBTI</div>
+      <div class="mbti-code-row">
+        <div class="mbti-code" id="closeMbtiCode"></div>
+        <div class="mbti-name" id="closeMbtiName"></div>
       </div>
+      <div class="mbti-desc" id="closeMbtiDesc"></div>
+      <div class="mbti-note">※ MBTI는 친숙성 진입용 매핑 — 정밀 분석은 위 16유형(<span id="mbtiCloseCode"></span>) 기준</div>
     </div>
 
     <div class="evidence-card">
@@ -986,9 +1052,17 @@ function renderResult(code, info, realMbti) {
   if (realMbti && MBTI_NAMES[realMbti]) {
     var mInfo = MBTI_NAMES[realMbti];
     document.getElementById('closeMbtiCode').textContent = realMbti;
-    document.getElementById('closeMbtiName').textContent = realMbti + ' · ' + mInfo.n;
+    document.getElementById('closeMbtiName').textContent = mInfo.n;
     document.getElementById('closeMbtiDesc').textContent = mInfo.d;
-    document.getElementById('closeMbtiWrap').style.display = 'block';
+    var mbtiCloseCode = document.getElementById('mbtiCloseCode');
+    if (mbtiCloseCode) mbtiCloseCode.textContent = code;
+    document.getElementById('closeMbtiCard').style.display = 'block';
+    // hero 끝에 작은 라벨
+    var heroTag = document.getElementById('heroMbtiTag');
+    if (heroTag) {
+      heroTag.textContent = '가까운 MBTI · ' + realMbti;
+      heroTag.style.display = 'inline-flex';
+    }
   }
 
   renderEvidence(window._lastSd || {});
