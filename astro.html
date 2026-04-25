@@ -343,6 +343,33 @@
     </a>
   </div>
 
+  <!-- 서양 점성 정밀 리포트 추천 -->
+  <div id="astroReportSuggestWrap" style="display:none;padding:24px 20px 16px;max-width:520px;margin:0 auto;">
+    <div style="font-family:'Noto Serif KR',serif;font-size:16px;font-weight:800;color:#a16d1f;margin-bottom:4px;">이 차트로 정밀 리포트 받기</div>
+    <div style="font-size:11px;color:#8a7a5a;margin-bottom:14px;">행성 배치 + 사주 정밀 데이터 교차 — 동서양 통합 분석</div>
+    <div style="display:grid;grid-template-columns:1fr;gap:8px;">
+      <a href="report.html?type=astro_full" style="display:block;text-decoration:none;background:linear-gradient(135deg,rgba(255,220,100,0.12),rgba(161,109,31,0.06));border:1px solid rgba(255,220,100,0.30);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(255,220,100,0.6)'" onmouseout="this.style.borderColor='rgba(255,220,100,0.30)'">
+        <div style="font-size:24px;color:#a16d1f;"><i class="pi pi-star"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:700;color:#a16d1f;margin-bottom:3px;">서양 점성술 심층 분석</div>
+          <div style="font-size:10px;color:#8a7a5a;line-height:1.4;">사주 정밀 데이터 + 행성 배치·트랜짓 교차 분석</div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:#a16d1f;flex-shrink:0;">500 Orb</div>
+      </a>
+      <a href="report.html?type=triple" style="display:block;text-decoration:none;background:linear-gradient(135deg,rgba(100,130,220,0.15),rgba(220,130,100,0.15));border:1px solid rgba(180,160,240,0.3);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(180,160,240,0.7)'" onmouseout="this.style.borderColor='rgba(180,160,240,0.3)'">
+        <div style="font-size:24px;color:#6a4aa0;"><i class="pi pi-eye"></i></div>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:700;color:#6a4aa0;margin-bottom:3px;">동서양 통합 분석 <span style="font-size:9px;color:#9a6dd0;">PREMIUM</span></div>
+          <div style="font-size:10px;color:#8a7a5a;line-height:1.4;">사주·베딕·서양·자미두수 4시스템 동시 교차</div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:#6a4aa0;flex-shrink:0;">800 Orb</div>
+      </a>
+    </div>
+    <a href="index.html#tabReport" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:12px;background:rgba(161,109,31,0.05);border:1px dashed rgba(161,109,31,0.3);border-radius:12px;text-decoration:none;color:#a16d1f;font-size:12px;font-weight:700;transition:all 0.2s;" onmouseover="this.style.borderStyle='solid';this.style.background='rgba(161,109,31,0.1)'" onmouseout="this.style.borderStyle='dashed';this.style.background='rgba(161,109,31,0.05)'">
+      <i class="pi pi-list"></i> 모든 리포트 보기 →
+    </a>
+  </div>
+
   <div id="astroShareBtnWrap" style="display:none;padding:0 20px 36px;flex-direction:column;gap:10px;max-width:440px;margin:0 auto;">
     <button id="astroKakaoBtn" onclick="shareAstroKakao()" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(200,160,50,0.13),rgba(180,130,30,0.07));border:1px solid rgba(200,160,50,0.38);border-radius:14px;text-align:center;cursor:pointer;box-shadow:none;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(200,160,50,0.72)';this.style.background='linear-gradient(135deg,rgba(200,160,50,0.22),rgba(180,130,30,0.14))'" onmouseout="this.style.borderColor='rgba(200,160,50,0.38)';this.style.background='linear-gradient(135deg,rgba(200,160,50,0.13),rgba(180,130,30,0.07))'">
       <div style="font-size:15px;font-weight:700;color:#9a6e10;margin-bottom:4px;"><i class="pi pi-chat"></i> 카카오톡 공유 →</div>
@@ -647,6 +674,7 @@ async function loadChart(year, month, day, hour, min) {
     window._astroData = { planets, aspects, name: _pn, birthYear: year, birthMonth: month, birthDay: day };
     var wrap = document.getElementById('astroShareBtnWrap');
     wrap.style.display = 'flex';
+    var _arsw = document.getElementById('astroReportSuggestWrap'); if (_arsw) _arsw.style.display = 'block';
     document.getElementById('astroReportHook').style.display = 'block';
 
   } catch(e) {

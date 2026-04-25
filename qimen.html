@@ -858,6 +858,23 @@
 
   </div><!-- /qm-detail-wrap -->
 
+  <!-- 기문 정밀 리포트 추천 -->
+  <div id="qimenReportSuggestWrap" style="display:none;padding:24px 20px 16px;max-width:520px;margin:0 auto;">
+    <div style="font-family:'Noto Serif KR',serif;font-size:16px;font-weight:800;color:#7a3fc0;margin-bottom:4px;">이 포국으로 정밀 리포트 받기</div>
+    <div style="font-size:11px;color:#8a7a8a;margin-bottom:14px;">출생 시점 9궁 포국 + 사주 통합 — 평생 운명의 청사진</div>
+    <a href="report.html?type=qimen_wonmyong" style="display:block;text-decoration:none;background:linear-gradient(135deg,rgba(122,63,192,0.13),rgba(122,63,192,0.05));border:1px solid rgba(122,63,192,0.30);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='rgba(122,63,192,0.65)'" onmouseout="this.style.borderColor='rgba(122,63,192,0.30)'">
+      <div style="font-size:24px;color:#7a3fc0;"><i class="pi pi-compass"></i></div>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:700;color:#7a3fc0;margin-bottom:3px;">기문 본명국 분석 <span style="font-size:9px;color:#9a5fd0;">NEW</span></div>
+        <div style="font-size:10px;color:#8a7a8a;line-height:1.4;">출생 시점 9궁 포국으로 본 평생 운명 — 사주가 시간이라면 본명국은 공간 배치</div>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:#7a3fc0;flex-shrink:0;">600 Orb</div>
+    </a>
+    <a href="index.html#tabReport" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:12px;background:rgba(122,63,192,0.05);border:1px dashed rgba(122,63,192,0.3);border-radius:12px;text-decoration:none;color:#7a3fc0;font-size:12px;font-weight:700;transition:all 0.2s;" onmouseover="this.style.borderStyle='solid';this.style.background='rgba(122,63,192,0.1)'" onmouseout="this.style.borderStyle='dashed';this.style.background='rgba(122,63,192,0.05)'">
+      <i class="pi pi-list"></i> 모든 리포트 보기 →
+    </a>
+  </div>
+
   <!-- 버튼 그룹 -->
   <div id="qimenShareBtnWrap" style="display:none;padding:0 20px 36px;flex-direction:column;gap:10px;max-width:440px;margin:0 auto;">
     <button onclick="shareQimenKakao()" id="qimenKakaoBtn" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(200,160,50,0.13),rgba(180,130,30,0.07));border:1px solid rgba(200,160,50,0.38);border-radius:14px;text-align:center;cursor:pointer;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(200,160,50,0.72)';this.style.background='linear-gradient(135deg,rgba(200,160,50,0.22),rgba(180,130,30,0.14))'" onmouseout="this.style.borderColor='rgba(200,160,50,0.38)';this.style.background='linear-gradient(135deg,rgba(200,160,50,0.13),rgba(180,130,30,0.07))'">
@@ -1502,6 +1519,7 @@ function renderResult(data) {
   _qimenData = data;
   var wrap = document.getElementById('qimenShareBtnWrap');
   wrap.style.display = 'flex';
+  var _qrsw = document.getElementById('qimenReportSuggestWrap'); if (_qrsw) _qrsw.style.display = 'block';
 }
 
 function buildCell(n, p, isZhifu) {
