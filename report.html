@@ -7430,6 +7430,36 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 }
 
 // ── 베딕 정밀 리포트 공통 헬퍼 ──
+// ── 베딕 공통 베이스라인 system_prompt ──
+// 모든 베딕 정밀 리포트(13종)가 공유하는 톤·금지표현·이론 룰.
+// 각 타입은 이 문자열에 타입특화 룰을 덧붙여 customSys로 사용.
+const VEDIC_BASE_SYS = `당신은 베딕 점성술(Jyotish) 전문 분석가입니다. 라시 차트(Parashari)와 자이미니(Jaimini) 시스템을 정확히 구분해 사용하세요.
+
+절대 규칙:
+- #헤더 금지, 표 금지
+- 볼드(**...**) 사용 최소화 — 섹션당 0~1개만
+- 톤: 따뜻하고 정확한 친구 같은 베딕 전문가. 신비주의 과장 금지, 실용적·관찰적 언어 우선.
+- 섹션 제목 쓰지 마세요 (카드 헤더에 이미 표시됨)
+- 본문 안에서 소항목 번호 쓸 때는 가), 나), 다) 형식 사용 (1. 2. 3. 사용 금지)
+
+베딕 이론 정확성 룰 (위반 시 사실 오류):
+1. 학파 구분: D1 라시 차트는 Parashari, Atmakaraka·Karakamsha는 Jaimini 시스템. 두 학파의 개념을 임의로 섞지 말 것.
+2. D1(라시 차트) vs D9(나바암샤) 위치 혼동 금지. D9 데이터는 반드시 "나바암샤(D9)" 명시.
+3. Atmakaraka는 출생시 경도 최고 행성(영혼 행성), Karakamsha는 D9에서 Atmakaraka가 위치한 별자리(영적 사명). 두 개념 혼동 금지.
+4. 산스크리트 용어 정확 표기: 낙샤트라(Nakshatra) 27개, 라시(Rashi) 12개, 다샤(Dasha) 9행성, 요가(Yoga). 음역 통일.
+5. 다샤 시기·날짜는 프롬프트 블록에 명시된 것만 인용. 새 날짜·기간 만들지 말 것.
+6. 사데사티(Sade Sati) 단계는 Pre-Sade·Sade·Post-Sade 3단계. 7.5년 시기는 토성 트랜짓 데이터로만 판정.
+7. 개운법(Upaya): 베딕 전통(만트라·요일색·보석·자선) 한정. 풍수·타로 등 비(非)베딕 New Age 혼합 금지.
+
+확정 표현 금지:
+- "반드시 ~ 일어남", "이 시기에 무조건 ~", "확정적으로" 같은 단정 절대 금지
+- "경향이 있다", "가능성이 높다", "흔적·공명이 보인다" 식 표현 사용
+- 분석 범위를 벗어난 미래 시점 예측 절대 금지
+
+데이터 인용 룰:
+- 【Vedic 정밀분석】·【Atmakaraka】·【Sade Sati】 등 블록 문장은 서버 계산 확정 사실. 수치·날짜·하우스 번호 변경 금지.
+- 【사주 원국】 블록의 [8자리 십신 표]에 있는 라벨만 사용. 사주 글자(천간·지지)와 베딕 행성·낙샤트라를 혼동하지 말 것.`;
+
 async function generateVedicPrecisionReport(cfg) {
   if (!await setupSectionsAndDeductOrb()) return;
   const sb2 = buildSajuBlock();
@@ -7440,6 +7470,8 @@ async function generateVedicPrecisionReport(cfg) {
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
   const sections = TYPE_SECTIONS[_type] || [];
   const theoryName = cfg.theoryName || '베딕 정밀 분석';
+  // 베딕 공통 베이스라인 + 타입특화 룰
+  const vedicSys = cfg.customSys ? `${VEDIC_BASE_SYS}\n\n${cfg.customSys}` : VEDIC_BASE_SYS;
 
   const secA = cfg.promptsA.map((p, i) => `${i+1}. ${sections[i]?.name||''} — ${p}`).join('\n');
   const prompt2A = `${profileStr}
@@ -7454,7 +7486,7 @@ ${buildYongsinBlock(cfg.yongsin2A||['직업','피해야할것'])}${buildAccuracy
 ${secA}
 
 총 700~1100자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
-  await streamToSections(prompt2A, [0,1,2], theoryName, ysFinal, '', false);
+  await streamToSections(prompt2A, [0,1,2], theoryName, ysFinal, '', false, vedicSys);
 
   const secB = cfg.promptsB.map((p, i) => `${i+4}. ${sections[i+3]?.name||''} — ${p}`).join('\n');
   const prompt2B = `${profileStr}
@@ -7471,7 +7503,7 @@ ${buildYongsinBlock(cfg.yongsin2B)}${buildAccuracyLayerBlock()}
 ${secB}
 
 총 500~800자. 섹션 번호(4. 5.) 붙여 작성.`;
-  await streamToSections(prompt2B, [3,4], theoryName, ysFinal, '', true);
+  await streamToSections(prompt2B, [3,4], theoryName, ysFinal, '', true, vedicSys);
   try {
     const sb = getSb();
     const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
@@ -8867,13 +8899,17 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 - 본문 안에서 소항목 번호 쓸 때는 가), 나), 다) 형식 사용 (1. 2. 3. 사용 금지)
 - 분석 범위를 벗어난 미래 시점(다음 달, 내년 등) 예측·대비·언급 절대 금지
 - 【사주 정밀분석】 블록이 포함된 경우, 그 안의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 수치·판정·결론을 절대 변경하지 마세요.
-- 프롬프트에 명시된 연도·기간·퍼센트 수치를 그대로 인용하세요. 새로운 연도나 기간을 만들어내거나 추측하지 마세요.
+- 프롬프트에 명시된 연도·기간·퍼센트 수치를 그대로 인용하세요. 새로운 연도나 기간을 만들어내거나 추측하지 마세요.${wg || ''}`);
+
+  // 환각 방지 가드 — 모든 경로(default/guide/customSys)에 일관 적용
+  const HALLUC_GUARD = `
 
 ★ 환각 방지 절대 규칙 (위반 시 사실 오류로 간주):
 1. 십신 라벨은 【사주 원국】 블록의 [8자리 십신 표]에 있는 그대로만 사용. 표와 다르게 매핑 금지.
 2. 천간과 지지는 반드시 분리해서 인용. "병오시는 겁재", "무오월의 비견" 같이 한 기둥(천간+지지)을 하나의 십신으로 통째 라벨링하는 표현 절대 금지. 반드시 "시간 병=겁재, 시지 오=비견" 형식으로 분리.
-3. 【사주 원국】 블록에 명시된 "사주에 실제 등장한 글자" 목록에 없는 천간·지지(예: 戌, 寅 등)를 "이 사주에 있다"고 서술 금지. 대운·세운 글자는 해당 블록(【대운분석】, 【올해 운세】 등)에서만 인용 가능.
-4. 사주 원국 글자와 대운·세운 글자를 혼동하지 말 것. 원국에 없는 글자는 반드시 "대운에 오는 X", "세운의 X" 식으로 출처를 명시.${wg || ''}`);
+3. 【사주 원국】 블록에 명시된 "사주에 실제 등장한 글자" 목록에 없는 천간·지지(예: 戌, 寅 등)를 "이 사주에 있다"고 서술 금지. 대운·세운 글자는 해당 블록에서만 인용 가능.
+4. 사주 원국 글자와 대운·세운 글자를 혼동하지 말 것. 원국에 없는 글자는 반드시 "대운에 오는 X", "세운의 X" 식으로 출처를 명시.`;
+  const finalSys = sysPrompt + HALLUC_GUARD;
 
   for (let i = 0; i < secIndices.length; i++) {
     const secIdx = secIndices[i];
@@ -8881,7 +8917,7 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
     const secName = typeSec[secIdx]?.name || '';
     const secChars = typeSec[secIdx]?.chars || 400;
     const sectionPrompt = prompt + `\n\n[작성 지시] 위 내용에서 섹션 ${secNum}번 "${secName}"만 작성하세요. 다른 섹션은 절대 쓰지 마세요. 분량: 약 ${secChars}자. 섹션 제목 반복 금지.`;
-    await runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPrompt);
+    await runSingleSection(secIdx, secName, secChars, sectionPrompt, finalSys);
   }
 }
 
