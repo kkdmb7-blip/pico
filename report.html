@@ -9301,8 +9301,9 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 - 【사주 정밀분석】 블록이 포함된 경우, 그 안의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 수치·판정·결론을 절대 변경하지 마세요.
 - 프롬프트에 명시된 연도·기간·퍼센트 수치를 그대로 인용하세요. 새로운 연도나 기간을 만들어내거나 추측하지 마세요.${wg || ''}`);
 
-  // 환각 방지 가드 — 모든 경로(default/guide/customSys)에 일관 적용
-  const HALLUC_GUARD = `
+  // 환각 방지 가드 — 사주 기반 리포트만 (기문 등은 9궁 천간이 자유롭게 등장하므로 skip)
+  const isQimenReport = (_type === 'qimen_wonmyong' || _type === 'qimen_today' || _type === 'qimen_taegil');
+  const HALLUC_GUARD = isQimenReport ? '' : `
 
 ★ 환각 방지 절대 규칙 (위반 시 사실 오류로 간주):
 1. 십신 라벨은 【사주 원국】 블록의 [8자리 십신 표]에 있는 그대로만 사용. 표와 다르게 매핑 금지.
@@ -9317,13 +9318,16 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
     const secName = typeSec[secIdx]?.name || '';
     const secChars = typeSec[secIdx]?.chars || 400;
     const sectionPrompt = prompt + `\n\n[작성 지시] 위 내용에서 섹션 ${secNum}번 "${secName}"만 작성하세요. 다른 섹션은 절대 쓰지 마세요. 분량: 약 ${secChars}자. 섹션 제목 반복 금지.`;
-    await runSingleSection(secIdx, secName, secChars, sectionPrompt, finalSys);
+    // 기문 리포트는 mode='raw' (chat.js 일진 자동 주입 우회) + 환각검증 skip
+    await runSingleSection(secIdx, secName, secChars, sectionPrompt, finalSys, 0, isQimenReport ? 'raw' : 'saju', isQimenReport);
   }
 }
 
 // 단일 섹션 실행 — 실패 시 재시도 버튼 노출 (Orb 차감 없음: skip_orb:true)
-async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPrompt, _retryCount) {
+async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPrompt, _retryCount, _mode, _skipHalluc) {
   const retryCount = _retryCount || 0;
+  const apiMode = _mode || 'saju';
+  const skipHalluc = !!_skipHalluc;
   const controller = new AbortController();
   const tid = setTimeout(() => controller.abort(), 45000);
   const sloadEl = document.getElementById(`sloading-${secIdx}`);
@@ -9332,8 +9336,8 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
     sloadEl.innerHTML = retryCount > 0 ? '<span class="spin"></span> 정확도 재검증 중...' : '<span class="spin"></span> 생성 중...';
   }
   try {
-    // 환각 재시도일 경우 system_prompt에 강조 룰 추가
-    const effectiveSys = retryCount > 0
+    // 환각 재시도일 경우 system_prompt에 강조 룰 추가 (사주 리포트만)
+    const effectiveSys = (retryCount > 0 && !skipHalluc)
       ? sysPrompt + `\n\n[재생성 경고] 이전 출력에서 사주에 없는 천간·지지를 사용하는 환각이 감지되었습니다. 【사주 원국】 블록의 "사주에 실제 등장한 글자"와 대운·세운 블록에 명시된 글자만 사용하세요. 출처가 모호하면 글자 자체를 인용하지 말고 십신/오행으로만 서술하세요.`
       : sysPrompt;
     const res = await fetch(CHAT_API, {
@@ -9343,7 +9347,7 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
         user_id: _user.id,
         messages: [{role: 'user', content: sectionPrompt}],
         system_prompt: effectiveSys,
-        mode: 'saju', max_tokens: Math.min(Math.round(secChars * 2.5), 1500),
+        mode: apiMode, max_tokens: Math.min(Math.round(secChars * 2.5), 1500),
         skip_orb: true
       })
     });
@@ -9354,12 +9358,12 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
     text = cleanSectionText(text);
     text = sanitizeAIText(text);
     text = stripDuplicateTitle(text, secName);
-    // 환각 검증: 사주·대운·세운에 없는 천간·지지 등장 시 1회 자동 재시도
-    if (retryCount === 0) {
+    // 환각 검증: 사주·대운·세운에 없는 천간·지지 등장 시 1회 자동 재시도 (기문 리포트는 skip)
+    if (retryCount === 0 && !skipHalluc) {
       const halluc = detectHallucination(text);
       if (halluc && halluc.offenders.length) {
         console.warn('[hallucination detected]', halluc.offenders, '→ retrying once');
-        return runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPrompt, 1);
+        return runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPrompt, 1, apiMode, skipHalluc);
       }
     }
     if (sloadEl) sloadEl.style.display = 'none';
@@ -9372,7 +9376,7 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
     if (el) {
       const msg = e.name === 'AbortError' ? '시간 초과' : '생성 실패';
       window.__retryPool = window.__retryPool || {};
-      window.__retryPool[secIdx] = { secName, secChars, sectionPrompt, sysPrompt };
+      window.__retryPool[secIdx] = { secName, secChars, sectionPrompt, sysPrompt, mode: apiMode, skipHalluc };
       el.innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 0;">
           <span style="color:#a94a3a;font-weight:600;">${msg} — 이 섹션만 다시 시도 (Orb 추가 차감 없음)</span>
@@ -9387,7 +9391,7 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
 window.__retrySingleSection = function(secIdx) {
   const p = (window.__retryPool || {})[secIdx];
   if (!p) return;
-  runSingleSection(secIdx, p.secName, p.secChars, p.sectionPrompt, p.sysPrompt);
+  runSingleSection(secIdx, p.secName, p.secChars, p.sectionPrompt, p.sysPrompt, 0, p.mode, p.skipHalluc);
 };
 
 // ── 환각 검증: 사주 원국에 없는 천간·지지를 "이 사주에 있다"는 식으로 인용했는지 검출 ──
