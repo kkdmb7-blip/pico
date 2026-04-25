@@ -3384,6 +3384,20 @@ ${tgTable}
 공망: ${sd?.gongmang||'미확인'}
 충합형파: ${Array.isArray(sd?.branch_relations_kor)?sd.branch_relations_kor.join(', '):(sd?.branch_relations_kor||'없음')}
 
+[자평진전 격국 정밀 — 적천수 통근론 + 자평진전 격국론 통합 결과]
+자평진전 격국: ${sd?.geokguk?.geok_zpjj||sd?.geokguk?.geok_kor||'미확인'}
+격국 판정 근거: ${sd?.geokguk?.geok_basis||'미확인'}
+격국 성패: ${sd?.geokguk?.geok_status||'미판정'}${(Array.isArray(sd?.geokguk?.sangsin_match)&&sd.geokguk.sangsin_match.length)?` (상신: ${sd.geokguk.sangsin_match.join('·')})`:''}${(Array.isArray(sd?.geokguk?.gisin_present)&&sd.geokguk.gisin_present.length)?` (기신: ${sd.geokguk.gisin_present.join('·')})`:''}
+통합 용신: ${sd?.yongshin?.final_kor||sd?.yongshin?.primary_kor||'미확인'}${sd?.yongshin?.final_basis?` (${sd.yongshin.final_basis})`:''}
+부용신: ${sd?.yongshin?.final_secondary_kor||sd?.yongshin?.secondary_kor||'미확인'}${sd?.yongshin?.final_secondary_basis?` (${sd.yongshin.final_secondary_basis})`:''}
+일간 통근: ${sd?.tonggeun?.day_stem_strength?.strength||'미확인'}${sd?.tonggeun?.day_stem_strength?.total_score!=null?` (${sd.tonggeun.day_stem_strength.total_score}점, 뿌리 ${(sd.tonggeun.day_stem_strength.roots||[]).map(r=>r.position+r.branch+r.type).join('·')})`:''}
+
+★ 자평진전·적천수 표현 가이드 (위 데이터를 그대로 인용):
+- "격국 성패"가 "성격"이면 격이 잘 갖춰진 사주 → 긍정 톤. "파격"이면 부정 톤. "구응"이면 부분 보완. "중성"이면 평이.
+- "통합 용신"은 격국용신·억부용신·조후용신·통관용신을 우선순위로 통합한 결정. 이 오행을 핵심 용신으로 서술.
+- "일간 통근"이 "강근"이면 일간 자체가 단단함 (성격 강건/주관 뚜렷), "중근"이면 보통, "약근/무근"이면 일간 의존도 높음(인성·비겁 도움 필요).
+- 상신은 격을 보호·완성하는 십신, 기신은 격을 깨뜨리는 십신. 사주에 상신이 있으면 그 십신이 길역할.
+
 ★ 십신·천간·지지 인용 절대 규칙 (위반 시 사실 오류로 간주):
 1. 위 [8자리 십신 표]에 명시된 라벨만 사용. 표에 없는 십신 매핑 절대 금지.
 2. 천간과 지지는 반드시 분리해서 인용. "병오시는 겁재"·"무오월의 비견" 같이 한 기둥 통째 라벨 금지. 반드시 "시간 병=겁재, 시지 오=비견" 형식.
