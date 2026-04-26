@@ -6941,16 +6941,9 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   await streamToSections(strategyPrompt, [3, 4], theoryName, ysFinal, wg, true);
 
   // 저장
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length: 5}, (_, i) => document.getElementById(`sbody-${i}`)?.innerText || '');
-    const { data } = await sb.from('reports').insert({
-      user_id: _user.id, report_type: _type,
-      content: [...allTexts, getProfileKey()], orb_spent: _config.orb,
-      created_at: new Date().toISOString()
-    }).select().maybeSingle();
-    if (data) { _reportId = data.id; showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다. 마이페이지에서 다시 확인할 수 있어요.'); }
-  } catch(e) {}
+  const allTexts = Array.from({length: 5}, (_, i) => document.getElementById(`sbody-${i}`)?.innerText || '');
+  const _savedData = await safeInsertReport(allTexts, getProfileKey());
+  if (_savedData) _reportId = _savedData.id;
 
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
@@ -7037,12 +7030,8 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '재물 구조 분석', ysFinal, wg, true);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -7121,12 +7110,8 @@ ${buildAccuracyLayerBlock()}
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '연애 구조 분석', ysFinal, wg, true);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -7213,12 +7198,8 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '대운 분석', ysFinal, wg, true);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -7300,12 +7281,8 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], `${thisYear}년 세운 분석`, ysFinal, wg, true);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -7416,12 +7393,8 @@ ${buildAccuracyLayerBlock()}
 
 총 500~700자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], `${monthStr} 월운 분석`, ysFinal, wg, true);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')} (${monthStr})`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -7505,12 +7478,8 @@ ${buildAccuracyLayerBlock()}
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '용신 생활 가이드', ysFinal, wg, true);
 
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -7588,12 +7557,8 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '베딕·사주 통합 분석', ysFinal, '', true);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -7675,12 +7640,8 @@ ${secB}
 
 총 500~800자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], theoryName, ysFinal, '', true, vedicSys);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8159,12 +8120,8 @@ ${buildAccuracyLayerBlock()}
 총 700~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '기문 본명국 분석', ysFinal, '', true, customSys);
 
-  try {
-    const sb=getSb();
-    const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+  await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8251,12 +8208,8 @@ ${buildAccuracyLayerBlock()}
 총 650자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '기문 오늘 운세', ysFinal, '', true, customSys);
 
-  try {
-    const sb=getSb();
-    const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+  await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8339,12 +8292,8 @@ ${buildAccuracyLayerBlock()}
 총 800자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '기문 택일', ysFinal, '', true, customSys);
 
-  try {
-    const sb=getSb();
-    const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+  await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8392,12 +8341,8 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '서양 점성술·사주 통합 분석', ysFinal, '', true);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8445,12 +8390,8 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '자미두수·사주 통합 분석', ysFinal, '', true);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8505,12 +8446,8 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 
 총 700~1000자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '동서양 통합 분석', ysFinal, '', true);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8568,12 +8505,8 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '직업·사업 심층 분석', ysFinal, '', true);
-  try {
-    const sb = getSb();
-    const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
-    const {data} = await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
-  } catch(e){}
+  const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
+    await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8634,12 +8567,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   try {
     const sb = getSb();
     const allTexts = Array.from({length:5}, (_, i) => document.getElementById(`sbody-${i}`)?.innerText || '');
-    const {data} = await sb.from('reports').insert({
-      user_id: _user.id, report_type: _type,
-      content: [...allTexts, getProfileKey()],
-      orb_spent: _config.orb, created_at: new Date().toISOString()
-    }).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
+    await safeInsertReport(allTexts, getProfileKey());
   } catch(e) {}
 
   document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
