@@ -3163,16 +3163,87 @@ async function picoRetryFetch(url, opts, maxRetries) {
   throw new Error('fetch failed');
 }
 
-// ── 안전 저장 (빈 리포트 방지) ──
-// 섹션 내용이 충분하지 않으면 저장 안 함 → Orb 차감됐지만 빈 리포트 저장 방지
+// ── Orb 자동 환불 ──
+// 리포트 생성 실패 시 선차감된 Orb를 자동 복구
+// 차감은 free→paid 순. 환불은 paid_balance에 올림 (보수적 접근)
+async function refundOrb(amount, reason) {
+  if (!_user || !_user.id || !amount || amount <= 0) return false;
+  const SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
+  const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
+  try {
+    // 현재 잔액 조회
+    const balRes = await fetch(`${SB_URL}/rest/v1/orb_balance?user_id=eq.${encodeURIComponent(_user.id)}&select=balance,free_balance,paid_balance`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+    });
+    const balData = await balRes.json();
+    if (!Array.isArray(balData) || !balData[0]) {
+      console.warn('[refundOrb] 잔액 조회 실패');
+      return false;
+    }
+    const cur = balData[0];
+    const newBalance  = (cur.balance      || 0) + amount;
+    const newPaid     = (cur.paid_balance  || 0) + amount;
+    const newFree     = cur.free_balance   || 0; // 무료 잔액 그대로
+
+    // 3필드 동시 업데이트 (불일치 방지)
+    const upRes = await fetch(`${SB_URL}/rest/v1/orb_balance?user_id=eq.${encodeURIComponent(_user.id)}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ balance: newBalance, paid_balance: newPaid, free_balance: newFree })
+    });
+    if (!upRes.ok) { console.warn('[refundOrb] 잔액 업데이트 실패', upRes.status); return false; }
+
+    // 환불 트랜잭션 기록
+    await fetch(`${SB_URL}/rest/v1/orb_transactions`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        user_id: _user.id, amount: amount, type: 'refund',
+        description: reason || '리포트 생성 실패 자동 환불',
+        balance_after: newBalance, created_at: new Date().toISOString()
+      })
+    });
+
+    console.log(`[refundOrb] 환불 완료 +${amount} Orb / 잔액 ${cur.balance}→${newBalance}`);
+    showToast(`<i class="pi pi-refresh"></i> 생성 실패로 ${amount.toLocaleString()} Orb가 자동 환불됐습니다.`);
+
+    // 관리자 텔레그램 알림
+    fetch('https://fortuna.kkdmb7.workers.dev/notify-support', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'refund',
+        user_id: _user.id,
+        message: `[자동환불] ${_user.name||_user.id} | ${(_config&&_config.title)||_type} | ${amount} Orb 자동 환불 (생성 실패)`
+      })
+    }).catch(() => {});
+
+    return true;
+  } catch(e) {
+    console.error('[refundOrb] 환불 실패:', e);
+    return false;
+  }
+}
+
+// ── 안전 저장 (빈 리포트 방지 + 생성 실패 시 Orb 자동 환불) ──
+// 유효 기준: 전체 섹션의 60% 이상이 50자 초과 (5섹션→3개, 3섹션→2개)
 async function safeInsertReport(allTexts, profileKey) {
-  const validCount = allTexts.filter(t => t && t.trim().length > 50).length;
-  if (validCount < 2) {
-    // 유효 섹션 2개 미만 = 거의 다 실패 → 저장하지 않고 경고
-    showToast('<i class="pi pi-warning"></i> 일부 섹션 생성 실패 — 저장되지 않았습니다. 섹션별 "다시 시도" 버튼을 눌러주세요.');
-    console.warn('[safeInsert] 유효 섹션', validCount, '/ 저장 스킵');
+  const totalSecs = allTexts.length;
+  const validCount = allTexts.filter(function(t) { return t && t.trim().length > 50; }).length;
+  const minValid = Math.ceil(totalSecs * 0.6); // 60% 기준
+
+  if (validCount < minValid) {
+    const orbAmt = _config && _config.orb ? _config.orb : 0;
+    console.warn('[safeInsert] 유효', validCount, '/', totalSecs, '(기준', minValid, ') → 저장 스킵, Orb 환불 시도:', orbAmt);
+
+    // 자동 환불
+    if (orbAmt > 0) {
+      await refundOrb(orbAmt, `리포트 생성 실패 자동 환불 (${_type||'unknown'}, 유효섹션 ${validCount}/${totalSecs})`);
+    } else {
+      showToast('<i class="pi pi-warning"></i> 일부 섹션 생성 실패 — 섹션별 "다시 시도" 버튼을 이용해 주세요.');
+    }
     return null;
   }
+
   try {
     const sb = getSb();
     const { data } = await sb.from('reports').insert({
