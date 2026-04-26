@@ -687,6 +687,7 @@ select.input option{background:#fff;color:var(--text);}
         <div class="mbti-code" id="closeMbtiCode"></div>
         <div class="mbti-name" id="closeMbtiName"></div>
       </div>
+      <div id="closeMbtiPct" style="display:none;font-size:12px;font-weight:700;color:var(--type);letter-spacing:0.08em;margin:-6px 0 10px;opacity:0.82;position:relative;z-index:1;"></div>
       <div class="mbti-desc" id="closeMbtiDesc"></div>
 
       <!-- 4축 점수 막대 -->
@@ -1261,6 +1262,19 @@ function renderResult(code, info, realMbti) {
 
     document.getElementById('closeMbtiCode').textContent = mCode;
     document.getElementById('closeMbtiName').textContent = mInfo.n;
+
+    // 퍼센트 한 줄 표시
+    var pctEl = document.getElementById('closeMbtiPct');
+    if (pctEl && mScores) {
+      var parts = [
+        (mCode.charAt(0)==='E' ? 'E '+mScores.e+'%' : 'I '+mScores.i+'%'),
+        (mCode.charAt(1)==='S' ? 'S '+mScores.s+'%' : 'N '+mScores.n+'%'),
+        (mCode.charAt(2)==='T' ? 'T '+mScores.t+'%' : 'F '+mScores.f+'%'),
+        (mCode.charAt(3)==='J' ? 'J '+mScores.j+'%' : 'P '+mScores.p+'%')
+      ];
+      pctEl.textContent = parts.join(' · ');
+      pctEl.style.display = 'block';
+    }
     document.getElementById('closeMbtiDesc').textContent = mInfo.d;
     var mbtiCloseCode = document.getElementById('mbtiCloseCode');
     if (mbtiCloseCode) mbtiCloseCode.textContent = code;
