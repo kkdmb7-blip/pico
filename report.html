@@ -3163,6 +3163,28 @@ async function picoRetryFetch(url, opts, maxRetries) {
   throw new Error('fetch failed');
 }
 
+// ── 안전 저장 (빈 리포트 방지) ──
+// 섹션 내용이 충분하지 않으면 저장 안 함 → Orb 차감됐지만 빈 리포트 저장 방지
+async function safeInsertReport(allTexts, profileKey) {
+  const validCount = allTexts.filter(t => t && t.trim().length > 50).length;
+  if (validCount < 2) {
+    // 유효 섹션 2개 미만 = 거의 다 실패 → 저장하지 않고 경고
+    showToast('<i class="pi pi-warning"></i> 일부 섹션 생성 실패 — 저장되지 않았습니다. 섹션별 "다시 시도" 버튼을 눌러주세요.');
+    console.warn('[safeInsert] 유효 섹션', validCount, '/ 저장 스킵');
+    return null;
+  }
+  try {
+    const sb = getSb();
+    const { data } = await sb.from('reports').insert({
+      user_id: _user.id, report_type: _type,
+      content: [...allTexts, profileKey], orb_spent: _config.orb,
+      created_at: new Date().toISOString()
+    }).select().maybeSingle();
+    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
+    return data;
+  } catch(e) { console.warn('[safeInsert] 저장 실패', e); return null; }
+}
+
 function showToast(msg) {
   var t = document.getElementById('_reportToast');
   if (!t) {
@@ -8641,7 +8663,7 @@ async function generateSummaryReport() {
     '\n3. 지금 실천할 것 3가지 — 용신(' + ysFinal + ') 기반 즉시 실천 가능한 구체적 액션 3가지. 색상·방위·행동 중심.' +
     '\n\n총 400~600자. 섹션 번호(1. 2. 3.) 붙여 작성. 간결하고 임팩트 있게.';
   await streamToSections(prompt, [0,1,2], '사주 포인트 요약', ysFinal, '', true);
-  try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8658,7 +8680,7 @@ async function generateBalanceReport() {
   const fiveCountStr = fiveCountToKor(_sdFull?.five_count);
   const prompt = `${profileStr}\n\n${sb2}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 오행 분포 현황 — 오행 개수(${fiveCountStr})와 비율(${fivePctStr}), 신강/신약(${_singang||'미확인'})으로 본 이 사주의 에너지 구조. 가장 강한 오행과 가장 약한 오행이 만드는 체질적 특성.\n2. 부족·과잉 오행의 영향 — 부족한 오행이 성격·건강·재물·관계에 미치는 구체적 영향. 과잉된 오행이 만드는 편향과 약점. 용신(${ysFinal})이 이 불균형을 어떻게 보완하는지.\n3. 오행 보완 실천법 — 부족 오행을 보완하는 색상(옷·소품), 방위(집·사무실), 음식, 계절별 생활습관. 용신 오행 중심으로 지금 당장 실천할 구체적 방법 5가지.\n\n총 500~700자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt, [0,1,2], '오행 밸런스 분석', ysFinal, '', true);
-  try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8674,7 +8696,7 @@ async function generateSinsalReport() {
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
   const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 나의 길신 총정리 — 이 사주에 존재하는 모든 길신(천을귀인, 문창귀인, 천덕귀인, 월덕귀인, 학당, 역마 등)을 빠짐없이 정리. 각 길신이 어느 기둥에 있고 실생활에서 어떻게 발현되는지 구체적으로.\n2. 주의 신살과 해소법 — 삼재, 양인살, 원진살, 귀문관살, 백호대살, 겁살, 화개살 등 주의 필요한 신살 총정리. 각 흉신의 실제 영향과 구체적인 해소·완화 방법.\n3. 올해 신살 영향과 전략 — 올해 세운 ${_sewun||''}에서 새로 활성화되거나 해소되는 신살. 올해 특히 주의할 신살과 활용할 길신. 신살 기반 올해 전략.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성. 【사주 정밀분석】 블록의 신살 데이터를 정확히 인용.`;
   await streamToSections(prompt, [0,1,2], '신살 종합 분석', ysFinal, '', true);
-  try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8691,7 +8713,7 @@ async function generateHealthReport() {
   const fivePctStr = fivePctToKor(_sdFull?.five_pct);
   const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock()}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n오행↔장기 매핑: 목(간·담·눈·근육), 화(심장·소장·혀·혈관), 토(비위·위장·입·살), 금(폐·대장·코·피부), 수(신장·방광·귀·뼈)\n\n섹션 구성:\n1. 체질 구조와 오행 건강 지도 — 오행 분포(${fivePctStr})와 신강/신약(${_singang||'미확인'})으로 본 체질 유형. 강한 오행이 지배하는 장기(과잉 주의)와 약한 오행이 취약한 장기(보강 필요)를 구체적으로 매핑.\n2. 취약 장기와 건강 주의 시기 — 오행 부족/과잉이 만드는 구체적 건강 위험과 증상. 현재 대운 ${_curDaeunBL||_daeun||'미확인'}과 올해 세운이 건강에 미치는 영향. 특히 조심할 계절과 시기.\n3. 체질 맞춤 건강 관리법 — 용신 오행(${ysFinal}) 기반 보강 음식·운동·생활습관. 부족 오행 보완 식단. 계절별 주의사항. 지금 당장 실천할 건강 전략 3가지.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt, [0,1,2], '건강·체질 분석', ysFinal, '', true);
-  try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8707,7 +8729,7 @@ async function generateFamilyReport() {
   const pillars = _sdFull?.summary?.pillars || {};
   const prompt = `${profileStr}\n\n${sb2}\n${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n십신궁위 참고: 년주=조상·부모(아버지) 궁, 월주=부모(어머니)·형제 궁, 일지=배우자 궁, 시주=자녀 궁\n\n섹션 구성:\n1. 부모·윗사람 인연 구조 — 년주·월주의 십신과 관계로 본 부모와의 인연. 인성(어머니)·편재/정재(아버지) 위치와 강약. 부모로부터 받는 에너지와 갈등 패턴. 귀인이 년월에 있으면 부모 복.\n2. 배우자·자녀 인연 구조 — 일지(배우자궁)의 십신으로 본 배우자 기질과 궁합 패턴. 시주의 십신으로 본 자녀 인연과 자녀 성향. 원진살·귀문관살이 배우자·자녀궁에 있으면 구체적 영향.\n3. 가족 관계 개선 전략 — 약한 인연을 보완하는 구체적 방법. 갈등이 예상되는 관계의 소통 전략. 귀인 활용법. 용신(${ysFinal}) 기반 가족 관계 개운법 3가지.\n\n총 600~800자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt, [0,1,2], '가족·인연 분석', ysFinal, '', true);
-  try { const sb=getSb(); const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8731,7 +8753,7 @@ async function generateGuideReport() {
   const promptB = `${subjectStr}\n\n${sb2}${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n오행 분포: ${fivePctStr}\n신강도: ${_singang||'미확인'} / 용신: ${ysFinal}\n십신 분포: ${tenGodsStr}\n\n섹션 구성:\n4. 신뢰를 얻고 마음을 여는 방법 — 이 사람이 마음을 여는 데 시간이 얼마나 걸리는지, 어떤 행동·태도가 신뢰를 쌓는지. 인성·재성·관성의 강약 기반. 구체적 행동 팁 3~4가지. 약 500자.\n5. 절대 피해야 할 말과 행동 — 이 사람을 가장 빠르게 멀어지게 하는 말·행동. 자존심·콤플렉스·가치관과 충돌하는 영역을 격국·십신·원진살 기반으로. 구체 예문 포함. 약 400자.\n\n총 800~1000자. 섹션 번호(4. 5.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(promptB, [3,4], '이 사람 사용설명서', ysFinal, '', true);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data){ _reportId = data.id; showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const _data = await safeInsertReport(allTexts, getProfileKey()); if (_data) _reportId = _data.id;
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8804,7 +8826,7 @@ ${shinsalStr}
 
   await streamToSections(promptB, [3,4], '전생 분석', '', '', true, pastlifeSys);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8859,7 +8881,7 @@ ${genderNote}
 총 700~900자. 섹션 번호(4. 5.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(soulmatePromptB, [3,4], '운명의 상대방 분석', ysFinal, '', true);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8922,7 +8944,7 @@ ${_geokguk||'이 격국'}의 구조를 하나의 이야기 구도로. 격국의 
 총 600~700자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(poemPromptB, [3,4], '사주 시 창작', '', '', true, poemSys);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -8987,7 +9009,7 @@ ${shinsalStr3}
 총 800~1000자. 섹션 번호(4. 5.) 붙여 작성. 볼드(**...**)는 꼭 필요한 단어 0~1개만.`;
   await streamToSections(missionPromptB, [3,4], '이번 생 미션 분석', ysFinal, '', true);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -9040,7 +9062,7 @@ ${sb2}${buildAccuracyLayerBlock()}
 총 750~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '빌런 기질 분석', ysFinal, '', true, villainSys);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -9091,7 +9113,7 @@ ${sb2}${buildAccuracyLayerBlock()}
 총 750~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '에너지 소진 관계 분석', ysFinal, '', true);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -9154,7 +9176,7 @@ ${genderNote}
 총 750~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '연애 흑역사 분석', ysFinal, '', true, loveHistSys);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -9206,7 +9228,7 @@ async function generateEraReport() {
 총 700~800자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '시대 에너지 분석', ysFinal, '', true, eraSys);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -9260,7 +9282,7 @@ ${sb2}${buildAccuracyLayerBlock()}
 총 750~900자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '숨겨진 재능 분석', ysFinal, '', true);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -9318,7 +9340,7 @@ async function generateTotemReport() {
 총 700~800자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(promptB, [3,4], '수호 동물 분석', ysFinal, '', true, totemSys);
 
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -9336,7 +9358,7 @@ async function generateTimingReport() {
   await streamToSections(prompt2A, [0,1,2], '인생 타이밍 분석', ysFinal, '', false);
   const prompt2B = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['창업/비즈니스','대인관계/부부'])}\n${buildYongsinBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 올해 월별 타이밍 포인트 — 올해 12개월 중 에너지가 강한 달, 주의할 달, 결정에 좋은 달을 구체적으로. 월별 천간·지지와 일간의 관계 기반.\n5. 타이밍 활용 실전 전략 — 이직·전직 최적 시기, 투자·계약 적기, 연애·결혼 유리한 시기, 건강 주의 시기를 종합. 지금 당장 타이밍에 맞춰 실행할 액션 3가지.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '인생 타이밍 분석', ysFinal, '', true);
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -9354,7 +9376,7 @@ async function generateWealthTimingReport() {
   await streamToSections(prompt2A, [0,1,2], '재물 타이밍 분석', ysFinal, '', false);
   const prompt2B = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['투자/재테크'])}\n${buildYongsinBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 월별 재물 포인트 — 올해 12개월 중 재물 에너지가 활성화되는 달, 지출 주의 달, 투자 적기를 구체적으로. 월별 재성·식상 활성도 기반.\n5. 재물 극대화 실천 전략 — 이 사주 구조에 맞는 재물 전략(저축형/투자형/사업형). 용신(${ysFinal}) 기반 재물 개운법. 지금 당장 실행할 재물 액션 3가지와 절대 피해야 할 재물 패턴.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성. 구체적 금액·종목 예측 절대 금지.`;
   await streamToSections(prompt2B, [3,4], '재물 타이밍 분석', ysFinal, '', true);
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
@@ -9376,7 +9398,7 @@ async function generateClassicReport() {
   await streamToSections(prompt2A, [0,1,2], '고전 명리 해석', ysFinal, '', false);
   const prompt2B = `${profileStr}\n\n${sb2}\n${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 통근·일주 종합론 — 일간의 통근(뿌리) 강약을 고전 관점에서 분석. 어느 기둥에 뿌리가 있고 얼마나 강한지. 일주(${_ilju||''}) 60갑자 특성을 고전 명리 관점으로 해석.\n5. 고전 관점 인생 방향 — 적천수·자평진전·조후·납음을 종합한 이 사주의 인생 방향과 처세 지침. 고전 명리가 권하는 삶의 자세와 주의점. 실생활 적용 방향 3가지.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '고전 명리 해석', ysFinal, '', true);
-  try { const sb=getSb(); const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const {data}=await sb.from('reports').insert({user_id:_user.id,report_type:_type,content:[...allTexts,getProfileKey()],orb_spent:_config.orb,created_at:new Date().toISOString()}).select().maybeSingle(); if(data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.'); } catch(e){}
+  const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
   document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
