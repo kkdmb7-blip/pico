@@ -1057,8 +1057,9 @@ function renderOrbTable(rows) {
       <td style="padding:7px 8px;text-align:right;color:#2a7a3e;">${(r.free_balance||0).toLocaleString()}</td>
       <td style="padding:7px 8px;text-align:right;color:#2e6ba8;">${(r.paid_balance||0).toLocaleString()}</td>
       <td style="padding:7px 8px;text-align:right;color:${mColor};font-size:12px;">${mismatch}</td>
-      <td style="padding:7px 8px;text-align:center;">
+      <td style="padding:7px 8px;text-align:center;display:flex;gap:4px;justify-content:center;">
         <button onclick="openOrbGrant('${r.user_id}','${r.name}')" style="padding:4px 10px;background:rgba(154,122,38,0.13);border:1px solid rgba(154,122,38,0.3);border-radius:6px;font-size:11px;font-weight:700;color:var(--gold-deep);cursor:pointer;">충전</button>
+        <a href="admin-chat.html?user_id=${encodeURIComponent(r.user_id)}&name=${encodeURIComponent(r.name||'')}" style="padding:4px 10px;background:rgba(122,36,24,0.10);border:1px solid rgba(122,36,24,0.3);border-radius:6px;font-size:11px;font-weight:700;color:var(--accent);cursor:pointer;text-decoration:none;">문의</a>
       </td>
     </tr>`;
   }).join('');
