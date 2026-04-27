@@ -293,6 +293,12 @@ td.reasons span {
   .daily-row .day-label { width:58px; font-size:10px; }
   .daily-row .count { width:68px; font-size:9.5px; }
 }
+
+/* 섹션 아코디언 */
+.sec-h2 { cursor:pointer; }
+.sec-h2 .arr { font-size:10px; margin-left:5px; color:var(--muted); transition:transform 0.15s; display:inline-block; vertical-align:middle; }
+.sec-h2.open .arr { transform:rotate(180deg); }
+.sec-body.hidden { display:none; }
 </style>
 </head>
 <body>
@@ -328,15 +334,16 @@ td.reasons span {
     <div class="stat"><div class="label">채팅 메시지</div><div class="value" id="stMessages">-</div><div class="sub">오늘 주고받은 메시지</div></div>
   </div>
 
-  <h2>
-    <span>사용자 행동 분석 <span id="anDays" style="font-size:11px;color:var(--muted);font-weight:400;"></span></span>
-    <select id="anRange" style="padding:5px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--border-soft);color:var(--text);font-size:11.5px;font-family:inherit;">
+  <h2 class="sec-h2" onclick="toggleSec('secAnalysis',this)">
+    <span>사용자 행동 분석 <span id="anDays" style="font-size:11px;color:var(--muted);font-weight:400;"></span><span class="arr">▼</span></span>
+    <select id="anRange" style="padding:5px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--border-soft);color:var(--text);font-size:11.5px;font-family:inherit;" onclick="event.stopPropagation()">
       <option value="1">최근 1일</option>
       <option value="7" selected>최근 7일</option>
       <option value="14">최근 14일</option>
       <option value="30">최근 30일</option>
     </select>
   </h2>
+  <div id="secAnalysis" class="sec-body hidden">
   <div id="anSummary" class="summary-grid"></div>
   <h2 style="font-size:13px;">인기 페이지 (뷰 기준)</h2>
   <div id="anPages" class="card"><div class="loading">불러오는 중...</div></div>
@@ -371,8 +378,10 @@ td.reasons span {
   </div>
   <h2 style="font-size:13px;">JS 에러 모니터링</h2>
   <div id="anErrors" class="card"><div class="loading">불러오는 중...</div></div>
+  </div>
 
-  <h2>리포트 사용 통계</h2>
+  <h2 class="sec-h2" onclick="toggleSec('secReports',this)">리포트 사용 통계 <span class="arr">▼</span></h2>
+  <div id="secReports" class="sec-body hidden">
   <div class="card" style="padding:14px 12px;">
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
       <span style="font-size:12px;color:var(--muted);">기간:</span>
@@ -387,6 +396,7 @@ td.reasons span {
     <div id="statsChartWrap" style="display:flex;flex-direction:column;gap:6px;">
       <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">로딩 중...</div>
     </div>
+  </div>
   </div>
 
   <h2>Orb 잔액 관리</h2>
@@ -436,7 +446,8 @@ td.reasons span {
     </div>
   </div>
 
-  <h2>AI 피드백 대시보드</h2>
+  <h2 class="sec-h2" onclick="toggleSec('secFeedback',this)">AI 피드백 대시보드 <span class="arr">▼</span></h2>
+  <div id="secFeedback" class="sec-body hidden">
 
   <div id="summaryGrid" class="summary-grid"></div>
 
@@ -471,6 +482,7 @@ td.reasons span {
     <button class="primary" id="fltApply">새로고침</button>
   </div>
   <div id="recentTable" class="card"><div class="loading">불러오는 중...</div></div>
+  </div>
 </div>
 
 <script>
@@ -481,6 +493,14 @@ const LS_KEY = 'pico_admin_uuid';
 let adminUuid = '';
 let recentRows = [];
 let sb = null;
+
+function toggleSec(id, h2El) {
+  var body = document.getElementById(id);
+  if (!body) return;
+  var willOpen = body.classList.contains('hidden');
+  body.classList.toggle('hidden');
+  h2El.classList.toggle('open', willOpen);
+}
 
 function qs(id){ return document.getElementById(id); }
 function getSb() {
