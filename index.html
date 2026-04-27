@@ -1223,7 +1223,7 @@
       <i class="pi pi-sparkle" style="color:var(--gold);font-size:14px;"></i>
       <div style="font-size:14px;font-weight:800;color:var(--gold);font-family:'Noto Serif KR',serif;letter-spacing:0.3px;">오늘 당신을 위한 리포트</div>
     </div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;letter-spacing:0.2px;">고민 없이 시작 — 지금 가장 잘 맞는 3가지를 골랐습니다</div>
+    <div id="recoSubtitle" style="font-size:11px;color:var(--muted);margin-bottom:14px;letter-spacing:0.2px;">고민 없이 시작 — 지금 가장 잘 맞는 3가지를 골랐습니다</div>
     <div id="todayRecoCards" style="display:flex;flex-direction:column;gap:8px;"></div>
   </div>
 </section>
@@ -1265,25 +1265,67 @@
       6: ['summary', 'qimen_wonmyong']
     };
 
+    // 격국별 추천 매핑 (geokguk_zpjj 기반)
+    var GEOKGUK_THEME = {
+      '양인격':   { recs:['character','career_deep','classic'],  reason:'양인격 — 강한 추진력과 본질 탐구가 핵심입니다' },
+      '건록격':   { recs:['character','money','career_deep'],    reason:'건록격 — 안정된 자기 기반으로 재물과 직업을 파악하세요' },
+      '식신격':   { recs:['hidden_talent','money','soulmate'],   reason:'식신격 — 숨겨진 재능과 표현력이 재물의 열쇠입니다' },
+      '상관격':   { recs:['hidden_talent','life_mission','soulmate'], reason:'상관격 — 창의성과 이번 생의 미션을 연결하세요' },
+      '정재격':   { recs:['money','wealth_timing','career_deep'], reason:'정재격 — 안정적 재물 구조와 직업 방향을 점검하세요' },
+      '편재격':   { recs:['money','timing','career_deep'],       reason:'편재격 — 유동적 재물 타이밍과 사업 적성이 중요합니다' },
+      '정관격':   { recs:['character','daeun','timing'],         reason:'정관격 — 명예와 대운 흐름 속 결정 타이밍을 파악하세요' },
+      '편관격':   { recs:['character','career_deep','timing'],   reason:'편관격 — 강한 의지를 직업과 타이밍으로 연결하세요' },
+      '정인격':   { recs:['classic','life_mission','balance'],   reason:'정인격 — 고전 명리와 오행 균형이 본질을 드러냅니다' },
+      '편인격':   { recs:['classic','hidden_talent','life_mission'], reason:'편인격 — 직관과 잠재 재능, 이번 생의 과제를 보세요' },
+      '양신성상': { recs:['classic','life_mission','balance'],   reason:'양신성상 — 두 오행의 흐름과 인생 과제가 핵심입니다' },
+      '종격':     { recs:['life_mission','pastlife','classic'],  reason:'종격 — 운명의 방향과 전생 패턴이 연결되어 있습니다' },
+      '잡격':     { recs:['character','balance','classic'],      reason:'잡기 격국 — 오행 균형과 본질 파악이 먼저입니다' }
+    };
+
+    function buildRecoCards(recs, reason) {
+      var subtitle = document.getElementById('recoSubtitle');
+      if (subtitle && reason) subtitle.textContent = reason;
+      return ['qimen_today'].concat(recs.slice(0, 2)).map(function(t) {
+        var p = POOL[t]; if (!p) return '';
+        return '<a href="report.html?type=' + t + '" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.55);border:1px solid rgba(154,122,38,0.22);border-radius:12px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor=\'rgba(154,122,38,0.5)\'" onmouseout="this.style.borderColor=\'rgba(154,122,38,0.22)\'">'
+          + '<div style="font-size:20px;color:' + p.iconColor + ';flex-shrink:0;"><i class="pi ' + p.icon + '"></i></div>'
+          + '<div style="flex:1;min-width:0;">'
+          + '  <div style="font-size:13px;font-weight:700;color:' + p.iconColor + ';margin-bottom:2px;">' + p.title + '</div>'
+          + '  <div style="font-size:10px;color:var(--muted);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.desc + '</div>'
+          + '</div>'
+          + '<div style="font-size:10px;font-weight:700;color:' + p.iconColor + ';flex-shrink:0;">' + p.orb + ' Orb</div>'
+          + '</a>';
+      }).join('');
+    }
+
+    // 1단계: 요일 기반으로 먼저 빠르게 표시
     var day = new Date().getDay();
     var theme = DAY_THEME[day] || ['character', 'summary'];
-    // 항상 qimen_today + 요일별 2개
-    var recs = ['qimen_today', theme[0], theme[1]];
-
-    var cardsHtml = recs.map(function(t) {
-      var p = POOL[t]; if (!p) return '';
-      return '<a href="report.html?type=' + t + '" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.55);border:1px solid rgba(154,122,38,0.22);border-radius:12px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.borderColor=\'rgba(154,122,38,0.5)\'" onmouseout="this.style.borderColor=\'rgba(154,122,38,0.22)\'">'
-        + '<div style="font-size:20px;color:' + p.iconColor + ';flex-shrink:0;"><i class="pi ' + p.icon + '"></i></div>'
-        + '<div style="flex:1;min-width:0;">'
-        + '  <div style="font-size:13px;font-weight:700;color:' + p.iconColor + ';margin-bottom:2px;">' + p.title + '</div>'
-        + '  <div style="font-size:10px;color:var(--muted);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.desc + '</div>'
-        + '</div>'
-        + '<div style="font-size:10px;font-weight:700;color:' + p.iconColor + ';flex-shrink:0;">' + p.orb + ' Orb</div>'
-        + '</a>';
-    }).join('');
-
-    document.getElementById('todayRecoCards').innerHTML = cardsHtml;
+    document.getElementById('todayRecoCards').innerHTML = buildRecoCards(theme);
     document.getElementById('todayRecoSection').style.display = 'block';
+
+    // 2단계: 사주 데이터로 격국 파악 → 추천 업데이트 (비동기)
+    (function() {
+      var p = profile;
+      if (!p || !p.year || !p.month || !p.day) return;
+      var hour = (p.hour === 'unknown' || p.hour == null) ? 12 : p.hour;
+      var iso = p.year + '-' + String(p.month).padStart(2,'0') + '-' + String(p.day).padStart(2,'0')
+              + 'T' + String(hour).padStart(2,'0') + ':00:00';
+      fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ birth: iso, gender: (p.gender==='F'?'female':'male'), calendar: 'solar' })
+      }).then(function(r){ return r.ok ? r.json() : null; }).then(function(sd) {
+        if (!sd || !sd.geokguk) return;
+        var geok = sd.geokguk.geok_zpjj || sd.geokguk.geok_kor || '';
+        // 패턴 타입도 체크 (양신성상·종격)
+        var pType = (sd.pattern && sd.pattern.type) || '';
+        var key = GEOKGUK_THEME[geok] ? geok : (GEOKGUK_THEME[pType] ? pType : null);
+        if (!key) return;
+        var matched = GEOKGUK_THEME[key];
+        document.getElementById('todayRecoCards').innerHTML = buildRecoCards(matched.recs, matched.reason);
+      }).catch(function(){});
+    })();
+
   } catch(e) { console.warn('[reco] init fail', e); }
 })();
 </script>
