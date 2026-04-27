@@ -1066,6 +1066,8 @@ async function doSubscribe(plan) {
   await loadBalance();
   await handleRedirectResult();
   await recoverPending();
+  // #sub 해시로 진입 시 구독 탭 자동 전환
+  if (location.hash === '#sub') switchChargeTab('sub');
 })();
 </script>
 <script>

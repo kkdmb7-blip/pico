@@ -200,6 +200,19 @@ nav {
       <button class="orb-charge-btn" onclick="location.href='charge.html'"><i class="pi pi-sparkle"></i> Orb 충전하기</button>
     </div>
 
+    <!-- 구독 상태 -->
+    <div id="subCard" style="display:none;margin-top:10px;background:rgba(95,140,181,0.08);border:1.5px solid rgba(95,140,181,0.30);border-radius:16px;padding:14px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <span style="width:7px;height:7px;border-radius:50%;background:#2a7a3e;display:inline-block;"></span>
+          <span style="font-size:13px;font-weight:800;color:var(--ink);">월정액 구독 중</span>
+        </div>
+        <button onclick="goToSubManage()" style="font-size:11px;font-weight:700;color:var(--orb);background:transparent;border:1px solid rgba(95,140,181,0.4);border-radius:8px;padding:3px 10px;cursor:pointer;">관리</button>
+      </div>
+      <div id="subCardPlan" style="font-size:12px;color:var(--text2);"></div>
+      <div id="subCardNext" style="font-size:11px;color:var(--muted);margin-top:2px;"></div>
+    </div>
+
     <!-- 사주 프로필 -->
     <div id="profileSection" style="display:none;">
       <div class="section-title">저장된 프로필</div>
@@ -275,6 +288,7 @@ async function init() {
   document.getElementById('myContent').style.display = 'block';
   renderUser();
   fetchOrb();
+  fetchSubscription();
   renderProfiles();
   checkAdmin();
 }
@@ -320,6 +334,23 @@ async function fetchOrb() {
   } catch(e) {
     document.getElementById('myOrbBalance').textContent = '0';
   }
+}
+
+async function fetchSubscription() {
+  try {
+    var r = await fetch('https://fortuna-silk.vercel.app/api/subscription?user_id=' + encodeURIComponent(currentUser.id));
+    var sub = await r.json();
+    if (!sub) return;
+    var PLAN_LABELS = { monthly_5000: 'Basic — 5,000 Orb/월 · ₩9,900', monthly_12000: 'Pro — 12,000 Orb/월 · ₩19,900' };
+    var next = sub.next_billing_at ? new Date(sub.next_billing_at).toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric'}) : '-';
+    document.getElementById('subCardPlan').textContent = PLAN_LABELS[sub.plan] || sub.plan;
+    document.getElementById('subCardNext').textContent = '다음 결제일: ' + next;
+    document.getElementById('subCard').style.display = 'block';
+  } catch(e) {}
+}
+
+function goToSubManage() {
+  location.href = 'charge.html#sub';
 }
 
 function renderProfiles() {
