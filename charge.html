@@ -968,7 +968,7 @@ async function cancelSubscription() {
   if (!confirm('구독을 취소하시겠어요? 이미 지급된 Orb는 유지됩니다.')) return;
   showLoading();
   try {
-    var r = await fetch('https://fortuna-silk.vercel.app/api/save-profile?action=subscription', {
+    var r = await fetch('https://fortuna-silk.vercel.app/api/subscription', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: currentUserId }),
@@ -992,12 +992,18 @@ async function cancelSubscription() {
 async function doSubscribe(plan) {
   if (!currentUserId) { toast('로그인이 필요해요.'); return; }
   if (typeof PortOne === 'undefined') { toast('결제 모듈 로드 중이에요. 잠시 후 다시 시도해주세요.'); return; }
+  if (typeof PortOne.requestIssueBillingKey !== 'function') {
+    toast('빌링키 발급 미지원 환경이에요. 브라우저를 업데이트하거나 다른 브라우저를 이용해주세요.');
+    console.error('[doSubscribe] PortOne.requestIssueBillingKey 미존재. PortOne 메서드:', Object.keys(PortOne));
+    return;
+  }
 
   var PLAN_NAMES = { monthly_5000: '포르투나 월정액 Basic', monthly_12000: '포르투나 월정액 Pro' };
   var issueId = 'BK-' + plan + '-' + String(currentUserId).slice(0,8) + '-' + Date.now();
 
   showLoading();
   try {
+    console.log('[doSubscribe] requestIssueBillingKey 호출', { plan, issueId });
     var rsp = await PortOne.requestIssueBillingKey({
       storeId: 'store-1139f195-d75f-44ca-bed6-c2c89c59e913',
       channelKey: 'channel-key-c7608d6b-f758-4bbb-a0ad-252c5141c50c',
@@ -1005,16 +1011,17 @@ async function doSubscribe(plan) {
       issueId: issueId,
       issueName: PLAN_NAMES[plan] || '포르투나 월정액',
       customer: {
-        customerId: currentUserId,
+        customerId: String(currentUserId),
         fullName: currentUserName || '포르투나 회원',
-        email: currentUserEmail || 'user@fortuna.app',
+        email: currentUserEmail || 'user@picolab.kr',
         phoneNumber: '01000000000',
       },
     });
+    console.log('[doSubscribe] rsp:', JSON.stringify(rsp));
     hideLoading();
-    if (rsp.code) {
-      var msg = rsp.message || rsp.code;
-      if (String(msg).indexOf('취소') !== -1 || !msg) { toast('빌링키 등록이 취소됐어요.'); }
+    if (!rsp || rsp.code) {
+      var msg = (rsp && (rsp.message || rsp.code)) || '알 수 없는 오류';
+      if (String(msg).indexOf('취소') !== -1) { toast('빌링키 등록이 취소됐어요.'); }
       else { toast('등록 실패: ' + msg); }
       return;
     }
@@ -1023,7 +1030,7 @@ async function doSubscribe(plan) {
     if (!billingKey) { toast('빌링키를 받지 못했어요. 다시 시도해주세요.'); return; }
 
     showLoading();
-    var subResp = await fetch('https://fortuna-silk.vercel.app/api/save-profile?action=subscription', {
+    var subResp = await fetch('https://fortuna-silk.vercel.app/api/subscription', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
