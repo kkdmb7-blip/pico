@@ -245,6 +245,8 @@ td.reasons span {
   .back-btn { font-size:11px; padding:5px 8px; }
   .wrap { padding:16px 12px 48px; }
   h2 { font-size:13.5px; margin:18px 0 10px; gap:8px; }
+  /* Orb 테이블: 무료/유료/일치 컬럼 모바일 숨김 */
+  .orb-hide-mobile { display:none !important; }
   .card { padding:12px; border-radius:12px; }
   .summary-grid { gap:8px; margin-bottom:12px; }
   .stat { padding:10px 12px; border-radius:10px; }
@@ -394,9 +396,9 @@ td.reasons span {
           <col style="width:90px">
           <col style="width:70px">
           <col style="width:62px">
-          <col style="width:52px">
-          <col style="width:52px">
-          <col style="width:36px">
+          <col class="orb-hide-mobile" style="width:52px">
+          <col class="orb-hide-mobile" style="width:52px">
+          <col class="orb-hide-mobile" style="width:36px">
           <col style="width:90px">
         </colgroup>
         <thead>
@@ -404,9 +406,9 @@ td.reasons span {
             <th onclick="orbSort('name')" style="text-align:left;padding:6px 6px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">이름 <span id="sort_name"></span></th>
             <th style="text-align:left;padding:6px 6px;border-bottom:1px solid var(--border-soft);color:var(--muted);">ID앞8자</th>
             <th onclick="orbSort('balance')" style="text-align:right;padding:6px 6px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">잔액 <span id="sort_balance">▼</span></th>
-            <th onclick="orbSort('free_balance')" style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">무료 <span id="sort_free_balance"></span></th>
-            <th onclick="orbSort('paid_balance')" style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">유료 <span id="sort_paid_balance"></span></th>
-            <th style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border-soft);color:var(--muted);">✓</th>
+            <th class="orb-hide-mobile" onclick="orbSort('free_balance')" style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">무료 <span id="sort_free_balance"></span></th>
+            <th class="orb-hide-mobile" onclick="orbSort('paid_balance')" style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">유료 <span id="sort_paid_balance"></span></th>
+            <th class="orb-hide-mobile" style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border-soft);color:var(--muted);">✓</th>
             <th style="text-align:center;padding:6px 4px;border-bottom:1px solid var(--border-soft);color:var(--muted);">관리</th>
           </tr>
         </thead>
@@ -1063,9 +1065,9 @@ function renderOrbTable(rows) {
       <td style="padding:6px 6px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.name}">${r.name}</td>
       <td style="padding:6px 6px;color:var(--muted);font-size:11px;font-family:monospace;">${r.uid_short}</td>
       <td style="padding:6px 6px;text-align:right;font-weight:700;color:var(--gold-deep);">${(r.balance||0).toLocaleString()}</td>
-      <td style="padding:6px 4px;text-align:right;color:#2a7a3e;">${(r.free_balance||0).toLocaleString()}</td>
-      <td style="padding:6px 4px;text-align:right;color:#2e6ba8;">${(r.paid_balance||0).toLocaleString()}</td>
-      <td style="padding:6px 4px;text-align:right;color:${mColor};font-size:12px;">${mismatch}</td>
+      <td class="orb-hide-mobile" style="padding:6px 4px;text-align:right;color:#2a7a3e;">${(r.free_balance||0).toLocaleString()}</td>
+      <td class="orb-hide-mobile" style="padding:6px 4px;text-align:right;color:#2e6ba8;">${(r.paid_balance||0).toLocaleString()}</td>
+      <td class="orb-hide-mobile" style="padding:6px 4px;text-align:right;color:${mColor};font-size:12px;">${mismatch}</td>
       <td style="padding:6px 4px;white-space:nowrap;">
         <div style="display:inline-flex;gap:4px;">
           <button onclick="openOrbGrant('${r.user_id}','${r.name}')" style="padding:4px 10px;background:rgba(154,122,38,0.13);border:1px solid rgba(154,122,38,0.3);border-radius:6px;font-size:11px;font-weight:700;color:var(--gold-deep);cursor:pointer;white-space:nowrap;">충전</button>
