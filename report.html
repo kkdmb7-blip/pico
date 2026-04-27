@@ -3049,6 +3049,44 @@ const TYPE_DETAIL = {
       '14일 안에서 만남·면접·발표에 좋은 2일. 경문(밝은 기운)과 사주 식상 매칭으로.',
       '14일 안에서 보류 권장 2일. 사문/상문/경문(흉문) 위치와 사주 충형 연결. 무엇을 피해야 하는지.'
     ]
+  },
+
+  // ── 패키지 ──
+  pkg_saju_core: {
+    emoji: '<i class="pi pi-sparkle"></i>',
+    subtitle: '기질 · 재물 · 연애 — 인생 3대 질문을 한 번에',
+    desc: '타고난 기질, 재물 구조, 연애 패턴을 하나의 패키지로. 개별 구매 대비 20% 할인.',
+    recommend: ['사주를 처음 접하고 핵심을 한 번에 파악하고 싶은 분', '기질·돈·사랑 세 가지가 모두 궁금한 분', '분산 구매 대신 한 번에 깊이 분석받고 싶은 분'],
+    engines: ['사주', '적천수', '자평진전'],
+    sectionDesc: ['기질 분석 5섹션', '재물·사업 분석 5섹션', '연애·결혼 분석 5섹션'],
+    sectionDetail: ['타고난 성격, 강점·약점, 삶의 방식', '재물운 구조, 대운별 재물 흐름', '연애 패턴, 이상형, 결혼운']
+  },
+  pkg_timing: {
+    emoji: '<i class="pi pi-calendar"></i>',
+    subtitle: '대운 · 올해 · 결정 타이밍 — 언제를 알면 인생이 보인다',
+    desc: '대운 흐름, 올해 운세, 인생 결정 타이밍을 하나의 패키지로. 개별 구매 대비 21% 할인.',
+    recommend: ['지금이 전진할 때인지 기다릴 때인지 모르겠는 분', '이직·투자·결혼 타이밍이 궁금한 분', '대운과 올해를 함께 보고 싶은 분'],
+    engines: ['사주', '적천수', '자평진전'],
+    sectionDesc: ['대운 흐름 분석 5섹션', '올해 운세 5섹션', '인생 타이밍 가이드 5섹션'],
+    sectionDetail: ['현재 대운 진단, 과거·미래 흐름', '올해 세운과 월별 에너지', '결정·이직·투자 최적 타이밍']
+  },
+  pkg_relations: {
+    emoji: '<i class="pi pi-heart"></i>',
+    subtitle: '연애 · 가족 · 사용설명서 · 이상형 — 모든 인연을 한눈에',
+    desc: '연애, 가족 관계, 관계 설명서, 이상형 유형을 하나의 패키지로. 개별 구매 대비 21% 할인.',
+    recommend: ['내 주변 인연 구조가 통째로 궁금한 분', '연애·가족 모두 이해하고 싶은 분', '이 사람 설명서가 필요한 분'],
+    engines: ['사주', '십신'],
+    sectionDesc: ['연애·결혼 분석 5섹션', '가족·인연 분석 5섹션', '관계 설명서 5섹션', '이상형 유형 5섹션'],
+    sectionDetail: ['연애 패턴과 결혼운', '가족 관계 구조', '상대방이 보는 나의 설명서', '내가 끌리는 유형 분석']
+  },
+  pkg_world: {
+    emoji: '<i class="pi pi-globe"></i>',
+    subtitle: '베딕 · 서양 점성 · 자미두수 — 동서양이 함께 본 나',
+    desc: '인도 베딕, 서양 점성술, 자미두수 세 관점을 하나의 패키지로. 개별 구매 대비 할인.',
+    recommend: ['동양과 서양 점성술이 모두 궁금한 분', '사주 외 다른 시스템으로도 검증받고 싶은 분', '운명을 다각도로 분석받고 싶은 분'],
+    engines: ['베딕', '서양 점성', '자미두수'],
+    sectionDesc: ['베딕 점성술 분석 5섹션', '서양 점성술 분석 5섹션', '자미두수 분석 5섹션'],
+    sectionDetail: ['낙샤트라·다샤·라그나 기반 분석', '태양·달·상승점 기반 분석', '명궁·신궁·12궁 기반 분석']
   }
 };
 
@@ -6491,18 +6529,33 @@ function renderIntro() {
   // 섹션 목록 (sectionDesc + sectionDetail)
   const secWrap = document.getElementById('introSections');
   secWrap.innerHTML = '';
-  const sections = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
-  sections.forEach((s, i) => {
-    const el = document.createElement('div');
-    el.className = 'intro-section-item';
-    el.innerHTML = `<div class="intro-section-num">${i+1}</div>
-      <div class="intro-section-text">
-        <div class="intro-section-name">${s.name}</div>
-        <div class="intro-section-desc">${d.sectionDesc[i]}</div>
-        ${d.sectionDetail && d.sectionDetail[i] ? `<div class="intro-section-detail">${d.sectionDetail[i]}</div>` : ''}
-      </div>`;
-    secWrap.appendChild(el);
-  });
+  const isPkg = _type.startsWith('pkg_');
+  if (isPkg) {
+    // 패키지: 서브 리포트 목록으로 표시
+    (d.sectionDesc || []).forEach((desc, i) => {
+      const el = document.createElement('div');
+      el.className = 'intro-section-item';
+      el.innerHTML = `<div class="intro-section-num">${i+1}</div>
+        <div class="intro-section-text">
+          <div class="intro-section-name">${desc}</div>
+          ${d.sectionDetail && d.sectionDetail[i] ? `<div class="intro-section-desc">${d.sectionDetail[i]}</div>` : ''}
+        </div>`;
+      secWrap.appendChild(el);
+    });
+  } else {
+    const sections = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
+    sections.forEach((s, i) => {
+      const el = document.createElement('div');
+      el.className = 'intro-section-item';
+      el.innerHTML = `<div class="intro-section-num">${i+1}</div>
+        <div class="intro-section-text">
+          <div class="intro-section-name">${s.name}</div>
+          <div class="intro-section-desc">${d.sectionDesc[i]}</div>
+          ${d.sectionDetail && d.sectionDetail[i] ? `<div class="intro-section-detail">${d.sectionDetail[i]}</div>` : ''}
+        </div>`;
+      secWrap.appendChild(el);
+    });
+  }
 
   // 샘플 미리보기
   let previewEl = document.getElementById('introPreview');
