@@ -6568,7 +6568,7 @@ function renderIntro() {
   }
   previewEl.innerHTML = `<div class="intro-preview-label">미리보기</div>
     <div class="intro-preview-inner">
-      <div class="intro-preview-text">${d.preview}</div>
+      <div class="intro-preview-text">${d.preview || ''}</div>
       <div class="intro-preview-fade"></div>
     </div>
     <div class="intro-preview-lock"><i class="pi pi-sparkle"></i> 전체 내용은 리포트 생성 후 확인 가능합니다</div>`;
@@ -6585,13 +6585,15 @@ function renderIntro() {
     const backBtn = document.querySelector('#stateIntro .btn-intro-back');
     backBtn.parentNode.insertBefore(faqEl, backBtn);
   }
-  faqEl.innerHTML = `<div class="intro-faq-label">자주 묻는 질문</div>` +
-    d.faq.map(f => `<div class="intro-faq-item">
-      <div class="intro-faq-q" onclick="this.parentNode.classList.toggle('open')">
-        <span>${f.q}</span><span class="intro-faq-arrow">›</span>
-      </div>
-      <div class="intro-faq-a">${f.a}</div>
-    </div>`).join('');
+  faqEl.innerHTML = (d.faq && d.faq.length)
+    ? `<div class="intro-faq-label">자주 묻는 질문</div>` +
+      d.faq.map(f => `<div class="intro-faq-item">
+        <div class="intro-faq-q" onclick="this.parentNode.classList.toggle('open')">
+          <span>${f.q}</span><span class="intro-faq-arrow">›</span>
+        </div>
+        <div class="intro-faq-a">${f.a}</div>
+      </div>`).join('')
+    : '';
 }
 
 // ── 생성 시작 (소개 화면 → 실제 흐름) ──
