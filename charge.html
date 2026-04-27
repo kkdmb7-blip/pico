@@ -930,7 +930,7 @@ var PLAN_LABELS = { monthly_5000: 'Basic (5,000 Orb/월)', monthly_12000: 'Pro (
 async function loadSubscription() {
   if (!currentUserId) return;
   try {
-    var r = await fetch('https://fortuna-silk.vercel.app/api/subscription?user_id=' + encodeURIComponent(currentUserId));
+    var r = await fetch('https://fortuna-silk.vercel.app/api/save-profile?action=subscription&user_id=' + encodeURIComponent(currentUserId));
     currentSubscription = await r.json();
     renderSubscriptionStatus();
   } catch(e) { currentSubscription = null; }
@@ -968,7 +968,7 @@ async function cancelSubscription() {
   if (!confirm('구독을 취소하시겠어요? 이미 지급된 Orb는 유지됩니다.')) return;
   showLoading();
   try {
-    var r = await fetch('https://fortuna-silk.vercel.app/api/subscription', {
+    var r = await fetch('https://fortuna-silk.vercel.app/api/save-profile?action=subscription', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: currentUserId }),
@@ -1023,7 +1023,7 @@ async function doSubscribe(plan) {
     if (!billingKey) { toast('빌링키를 받지 못했어요. 다시 시도해주세요.'); return; }
 
     showLoading();
-    var subResp = await fetch('https://fortuna-silk.vercel.app/api/subscription', {
+    var subResp = await fetch('https://fortuna-silk.vercel.app/api/save-profile?action=subscription', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
