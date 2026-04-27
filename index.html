@@ -6676,101 +6676,68 @@ async function refreshPushBtnLabel() {
   } catch(e) {}
 }
 
-// 구독 저장 to Supabase
-async function savePicoSubscription(userId, name, sub, ilgan, geokguk, yongshin) {
-  var payload = {
-    user_id: userId,
-    name: name || '',
-    subscription: JSON.stringify(sub),
-    ilgan: ilgan || '',
-    geokguk: geokguk || '',
-    yongshin: yongshin || ''
-  };
-  // DELETE 후 INSERT (upsert 대신)
-  await fetch(PICO_PUSH_SB_URL + '/rest/v1/pico_push_subscriptions?user_id=eq.' + userId, {
-    method: 'DELETE',
-    headers: { apikey: PICO_PUSH_SB_KEY, Authorization: 'Bearer ' + PICO_PUSH_SB_KEY }
-  });
-  await fetch(PICO_PUSH_SB_URL + '/rest/v1/pico_push_subscriptions', {
-    method: 'POST',
-    headers: {
-      apikey: PICO_PUSH_SB_KEY,
-      Authorization: 'Bearer ' + PICO_PUSH_SB_KEY,
-      'Content-Type': 'application/json',
-      Prefer: 'return=minimal'
-    },
-    body: JSON.stringify(payload)
-  });
-}
+var _PICO_SB   = 'https://ymghmfkqctckxxysxkvy.supabase.co';
+var _PICO_KEY  = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
+var _PICO_VAPID = 'BJY4cJSg25L1wOIkbJf06cIsONQT-un3frY2AZxZEMZO6Zm9j8a6MsmHVrcaRlQQHgwj0YcybLo-VZWLOt89V_g';
 
-// 구독 삭제 from Supabase
-async function deletePicoSubscription(userId) {
-  await fetch(PICO_PUSH_SB_URL + '/rest/v1/pico_push_subscriptions?user_id=eq.' + userId, {
-    method: 'DELETE',
-    headers: { apikey: PICO_PUSH_SB_KEY, Authorization: 'Bearer ' + PICO_PUSH_SB_KEY }
-  });
+function _picoToast(msg) {
+  var t = document.getElementById('globalToast');
+  if (!t) { t = document.createElement('div'); t.id='globalToast'; t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#241a10;color:#fcf7ea;border-radius:12px;padding:11px 20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(function() { t.style.opacity = '0'; }, 2800);
 }
 
 // 토글 버튼 클릭
 window.togglePushSubscription = async function() {
   var user = null;
   try { user = JSON.parse(localStorage.getItem('pico_user')); } catch(e) {}
-  if (!user || !user.id) { alert('로그인 후 이용해주세요.'); return; }
-
+  if (!user || !user.id) { _picoToast('로그인 후 이용해주세요.'); return; }
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    alert('이 브라우저는 푸시 알림을 지원하지 않아요.'); return;
+    _picoToast('이 브라우저는 푸시 알림을 지원하지 않아요.'); return;
   }
 
-  var reg = await navigator.serviceWorker.ready;
+  var sbH = { apikey: _PICO_KEY, Authorization: 'Bearer ' + _PICO_KEY, 'Content-Type': 'application/json' };
+  var reg = await navigator.serviceWorker.register('/sw.js');
   var existing = await reg.pushManager.getSubscription();
 
   if (existing) {
-    // 구독 해제
     await existing.unsubscribe();
-    await deletePicoSubscription(user.id);
+    await fetch(_PICO_SB + '/rest/v1/pico_push_subscriptions?user_id=eq.' + user.id, { method: 'DELETE', headers: sbH });
     document.getElementById('btnPushLabel').innerHTML = '<i class="pi pi-bell"></i> 오늘의 명언 알림 켜기';
+    _picoToast('알림이 해제됐어요.');
     return;
   }
 
-  // 구독 신규
-  var permission = await Notification.requestPermission();
-  if (permission !== 'granted') { alert('알림 권한이 필요해요.'); return; }
+  var permission = Notification.permission;
+  if (permission === 'denied') { _picoToast('브라우저 설정에서 알림을 허용해주세요.'); return; }
+  if (permission === 'default') {
+    permission = await Notification.requestPermission();
+  }
+  if (permission !== 'granted') { _picoToast('알림 권한이 필요해요.'); return; }
 
   try {
-    var sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: _urlBase64ToUint8Array(PICO_VAPID_PUBLIC_KEY)
-    });
+    var sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(_PICO_VAPID) });
 
-    // 사주 프로필에서 일간/격국/용신 가져오기 (이미 로드된 _sajuData 활용)
+    // 사주 데이터 (없으면 빈 값)
     var ilgan = '', geokguk = '', yongshin = '';
     try {
-      var prof = JSON.parse(localStorage.getItem('pico_profile'));
+      var prof = JSON.parse(localStorage.getItem('pico_profile') || 'null');
       if (prof && prof.year) {
         var hour = (prof.hour != null && prof.hour !== 'unknown') ? parseInt(prof.hour) : 12;
-        var birth = prof.year + '-' + String(prof.month).padStart(2,'0') + '-' + String(prof.day).padStart(2,'0')
-                  + 'T' + String(hour).padStart(2,'0') + ':00:00';
-        var gender = prof.gender === 'F' ? 'female' : 'male';
-        var sdRes = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
-          method: 'POST', headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({birth, gender, calendar:'solar'})
-        });
-        if (sdRes.ok) {
-          var sd = await sdRes.json();
-          var dayS = sd?.summary?.pillars?.day || '';
-          ilgan = dayS ? dayS[0] : '';
-          geokguk = sd?.geokguk?.geok_kor || '';
-          yongshin = sd?.yongshin?.primary || '';
-        }
+        var birth = prof.year + '-' + String(prof.month).padStart(2,'0') + '-' + String(prof.day).padStart(2,'0') + 'T' + String(hour).padStart(2,'0') + ':00:00';
+        var sdRes = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({birth, gender: prof.gender==='F'?'female':'male', calendar:'solar'}) });
+        if (sdRes.ok) { var sd = await sdRes.json(); var dayS = sd?.summary?.pillars?.day||''; ilgan=dayS?dayS[0]:''; geokguk=sd?.geokguk?.geok_kor||''; yongshin=sd?.yongshin?.primary||''; }
       }
     } catch(e2) {}
 
-    await savePicoSubscription(user.id, user.name, sub, ilgan, geokguk, yongshin);
+    await fetch(_PICO_SB + '/rest/v1/pico_push_subscriptions?user_id=eq.' + user.id, { method:'DELETE', headers: sbH });
+    await fetch(_PICO_SB + '/rest/v1/pico_push_subscriptions', { method:'POST', headers: { ...sbH, Prefer:'return=minimal' }, body: JSON.stringify({ user_id: user.id, name: user.name||'', subscription: JSON.stringify(sub), ilgan, geokguk, yongshin }) });
     document.getElementById('btnPushLabel').innerHTML = '<i class="pi pi-bell"></i> 오늘의 명언 알림 끄기';
-    alert('✅ 매일 아침 8시에 사주 맞춤 명언을 보내드릴게요!');
+    _picoToast('매일 07:30에 사주 맞춤 메시지를 보내드릴게요.');
   } catch(e) {
     console.error('[push]', e);
-    alert('알림 설정 중 오류가 발생했어요.');
+    _picoToast('알림 설정 중 오류가 발생했어요.');
   }
 };
 
