@@ -8365,13 +8365,19 @@ async function generatePackageReport(types, labels) {
     } catch(e) {}
   }
 
-  const allExist = types.every(function(t) { return !!existing[t]; });
+  const missingTypes = types.filter(function(t) { return !existing[t]; });
+  const missingCount = missingTypes.length;
 
-  if (!allExist) {
-    // 없는 리포트가 있으면 Orb 차감
-    if (!await setupSectionsAndDeductOrb()) return;
+  if (missingCount > 0) {
+    // 없는 리포트 비율만큼만 차감
+    const chargeOrb = Math.round((missingCount / types.length) * _config.orb);
+    const origOrb = _config.orb;
+    _config.orb = chargeOrb;
+    const ok = await setupSectionsAndDeductOrb();
+    _config.orb = origOrb;
+    if (!ok) return;
   } else {
-    // 전부 있으면 무료로 바로 표시
+    // 전부 있으면 무료
     showState('report');
     document.getElementById('reportTitle').textContent = _config.title;
   }
