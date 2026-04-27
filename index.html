@@ -6140,7 +6140,7 @@ async function registerPushIfNeeded(userId) {
     await new Promise(function(r) { setTimeout(r, 3000); });
 
     // VAPID 공개키 가져오기
-    var keyRes = await fetch('https://fortuna-silk.vercel.app/api/vapid-key');
+    var keyRes = await fetch('https://fortuna-silk.vercel.app/api/push?action=vapid-key');
     var keyData = await keyRes.json();
     if (!keyData.key) return;
 
