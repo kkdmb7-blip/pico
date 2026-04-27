@@ -9715,7 +9715,8 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 - 프롬프트에 명시된 연도·기간·퍼센트 수치를 그대로 인용하세요. 새로운 연도나 기간을 만들어내거나 추측하지 마세요.${wg || ''}`);
 
   // 환각 방지 가드 — 사주 기반 리포트만 (기문 등은 9궁 천간이 자유롭게 등장하므로 skip)
-  const isQimenReport = (_type === 'qimen_wonmyong' || _type === 'qimen_today' || _type === 'qimen_taegil');
+  const isQimenReport = (_type === 'qimen_wonmyong' || _type === 'qimen_today' || _type === 'qimen_taegil'
+    || _type === 'vedic_full' || _type === 'astro_full' || _type === 'ziwei_full');
   const HALLUC_GUARD = isQimenReport ? '' : `
 
 ★ 환각 방지 절대 규칙 (위반 시 사실 오류로 간주):
@@ -9761,7 +9762,7 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
         user_id: _user.id,
         messages: [{role: 'user', content: sectionPrompt}],
         system_prompt: effectiveSys,
-        mode: apiMode, max_tokens: Math.min(Math.round(secChars * 2.5), 1500),
+        mode: apiMode, max_tokens: Math.min(Math.round(secChars * 2.5), secChars > 500 ? 2000 : 1500),
         skip_orb: true
       })
     });
