@@ -8343,7 +8343,38 @@ async function batchPackageSections(secs, secIndices, subTitle, prompt) {
 
 // ── 패키지 리포트: DB에서 기존 리포트 불러와 탭으로 표시 ──
 async function generatePackageReport(types, labels) {
-  if (!await setupSectionsAndDeductOrb()) return;
+  const sb = getSb();
+
+  // 기존 리포트 사전 조회
+  showState('loading');
+  setLoading('기존 리포트 확인 중...', '');
+  const existing = {};
+  for (const rType of types) {
+    try {
+      if (sb && _user && _user.id) {
+        const { data } = await sb.from('reports')
+          .select('content, created_at')
+          .eq('user_id', _user.id)
+          .eq('report_type', rType)
+          .order('created_at', { ascending: false })
+          .limit(1).maybeSingle();
+        if (data && Array.isArray(data.content) && data.content.length >= 5) {
+          existing[rType] = data.content;
+        }
+      }
+    } catch(e) {}
+  }
+
+  const allExist = types.every(function(t) { return !!existing[t]; });
+
+  if (!allExist) {
+    // 없는 리포트가 있으면 Orb 차감
+    if (!await setupSectionsAndDeductOrb()) return;
+  } else {
+    // 전부 있으면 무료로 바로 표시
+    showState('report');
+    document.getElementById('reportTitle').textContent = _config.title;
+  }
 
   const pkgColor  = (TYPE_COLORS[_type]||{}).main || '#9a6e10';
   const pkgSoft   = (TYPE_COLORS[_type]||{}).soft || 'rgba(154,110,16,0.08)';
@@ -8380,8 +8411,6 @@ async function generatePackageReport(types, labels) {
     }
   };
 
-  const sb = getSb();
-
   // 각 서브리포트: DB에서 기존 리포트 조회 후 표시
   for (let ti = 0; ti < types.length; ti++) {
     const rType = types[ti];
@@ -8401,22 +8430,8 @@ async function generatePackageReport(types, labels) {
         }).join('');
     wrap.appendChild(panel);
 
-    // DB에서 기존 리포트 조회
-    let content = null;
-    try {
-      if (sb && _user && _user.id) {
-        const { data } = await sb.from('reports')
-          .select('content, created_at')
-          .eq('user_id', _user.id)
-          .eq('report_type', rType)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        if (data && Array.isArray(data.content) && data.content.length >= 5) {
-          content = data.content;
-        }
-      }
-    } catch(e) {}
+    // 사전 조회 결과 사용
+    const content = existing[rType] || null;
 
     if (content) {
       // 기존 리포트 섹션별 렌더링
