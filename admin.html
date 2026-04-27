@@ -374,14 +374,14 @@ td.reasons span {
     <div style="overflow-x:auto;">
       <table id="orbTable" style="width:100%;border-collapse:collapse;font-size:12px;">
         <thead>
-          <tr style="color:var(--muted);font-size:11px;letter-spacing:0.04em;">
-            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border-soft);">이름</th>
-            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border-soft);">ID앞8자</th>
-            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);">총잔액</th>
-            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);">무료</th>
-            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);">유료</th>
-            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);">일치</th>
-            <th style="text-align:center;padding:6px 8px;border-bottom:1px solid var(--border-soft);">충전</th>
+          <tr style="font-size:11px;letter-spacing:0.04em;">
+            <th onclick="orbSort('name')" style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">이름 <span id="sort_name"></span></th>
+            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border-soft);color:var(--muted);">ID앞8자</th>
+            <th onclick="orbSort('balance')" style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">총잔액 <span id="sort_balance">▼</span></th>
+            <th onclick="orbSort('free_balance')" style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">무료 <span id="sort_free_balance"></span></th>
+            <th onclick="orbSort('paid_balance')" style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">유료 <span id="sort_paid_balance"></span></th>
+            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);color:var(--muted);">일치</th>
+            <th style="text-align:center;padding:6px 8px;border-bottom:1px solid var(--border-soft);color:var(--muted);">충전</th>
           </tr>
         </thead>
         <tbody id="orbTableBody"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">로딩 중...</td></tr></tbody>
@@ -935,6 +935,28 @@ boot();
 // ── Orb 관리 ──
 let orbAllRows = [];
 let orbGrantUserId = '';
+let orbSortCol = 'balance';
+let orbSortDir = 'desc';
+
+function orbSort(col) {
+  if (orbSortCol === col) {
+    orbSortDir = orbSortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    orbSortCol = col;
+    orbSortDir = col === 'name' ? 'asc' : 'desc';
+  }
+  // 화살표 업데이트
+  ['name','balance','free_balance','paid_balance'].forEach(c => {
+    const el = document.getElementById('sort_' + c);
+    if (!el) return;
+    el.textContent = c === orbSortCol ? (orbSortDir === 'desc' ? '▼' : '▲') : '';
+  });
+  const q = (document.getElementById('orbSearch')?.value || '').toLowerCase();
+  const filtered = q ? orbAllRows.filter(r =>
+    (r.name||'').toLowerCase().includes(q) || (r.uid_short||'').toLowerCase().includes(q)
+  ) : orbAllRows;
+  renderOrbTable(filtered);
+}
 
 async function loadOrbUsers() {
   const tbody = document.getElementById('orbTableBody');
@@ -964,6 +986,14 @@ function renderOrbTable(rows) {
   const total = document.getElementById('orbTotal');
   if (!tbody) return;
   if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">없음</td></tr>'; return; }
+
+  // 정렬
+  const sorted = [...rows].sort((a, b) => {
+    let av = a[orbSortCol], bv = b[orbSortCol];
+    if (orbSortCol === 'name') { av = av||''; bv = bv||''; return orbSortDir === 'asc' ? av.localeCompare(bv,'ko') : bv.localeCompare(av,'ko'); }
+    return orbSortDir === 'desc' ? (bv||0)-(av||0) : (av||0)-(bv||0);
+  });
+  rows = sorted;
 
   tbody.innerHTML = rows.map(r => {
     const match = (r.balance === r.free_balance + r.paid_balance);
