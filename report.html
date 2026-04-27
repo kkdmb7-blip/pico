@@ -9727,9 +9727,10 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 
   for (let i = 0; i < secIndices.length; i++) {
     const secIdx = secIndices[i];
-    const secNum = secIdx + 1;
-    const secName = typeSec[secIdx]?.name || '';
-    const secChars = typeSec[secIdx]?.chars || 400;
+    const localIdx = secIdx % (typeSec.length || 5); // 패키지 오프셋 보정 (5~14 → 0~4)
+    const secNum = localIdx + 1;
+    const secName = typeSec[localIdx]?.name || '';
+    const secChars = typeSec[localIdx]?.chars || 400;
     const sectionPrompt = prompt + `\n\n[작성 지시] 위 내용에서 섹션 ${secNum}번 "${secName}"만 작성하세요. 다른 섹션은 절대 쓰지 마세요. 분량: 약 ${secChars}자. 섹션 제목 반복 금지.`;
     // 기문 리포트는 mode='raw' (chat.js 일진 자동 주입 우회) + 환각검증 skip
     await runSingleSection(secIdx, secName, secChars, sectionPrompt, finalSys, 0, isQimenReport ? 'raw' : 'saju', isQimenReport);
