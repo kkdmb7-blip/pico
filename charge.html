@@ -117,6 +117,80 @@ nav {
 .pack-badge-sale  { background:linear-gradient(90deg,#2a7a3e,#1e5c2e); color:#fcf7ea; }
 .pack-badge-super { background:linear-gradient(135deg,#1a4a7a,#2e6ba8); color:#fcf7ea; }
 
+/* ── 충전 탭 ── */
+.charge-tabs {
+  display:flex; gap:0; margin-bottom:20px; margin-top:4px;
+  border:1.5px solid var(--border-soft); border-radius:14px; overflow:hidden;
+  background:var(--surface2);
+}
+.charge-tab {
+  flex:1; padding:11px 0; font-size:14px; font-weight:700;
+  background:transparent; border:0; color:var(--muted); cursor:pointer;
+  transition:background 0.2s, color 0.2s;
+}
+.charge-tab.active {
+  background:var(--surface); color:var(--gold-deep);
+  border-radius:12px; box-shadow:0 1px 4px rgba(60,40,20,0.10);
+}
+
+/* ── 구독 카드 ── */
+.sub-list { display:flex; flex-direction:column; gap:10px; }
+.sub-card {
+  background:var(--surface); border:1.5px solid var(--border-soft);
+  border-radius:16px; padding:18px 18px 16px; position:relative; overflow:hidden;
+  cursor:pointer; transition:border-color 0.2s, box-shadow 0.2s;
+  box-shadow:var(--shadow-soft);
+}
+.sub-card:hover { border-color:var(--gold-deep); box-shadow:var(--shadow-lift); }
+.sub-card.sub-pro {
+  border-color:rgba(95,140,181,0.45);
+  background:linear-gradient(135deg,rgba(95,140,181,0.06),rgba(95,140,181,0.01));
+}
+.sub-card.sub-pro:hover { border-color:var(--orb); }
+.sub-plan-badge {
+  position:absolute; top:0; right:14px;
+  font-size:10px; font-weight:800; padding:3px 10px; border-radius:0 0 8px 8px; letter-spacing:0.3px;
+}
+.sub-plan-badge.basic { background:linear-gradient(90deg,#9a7a26,#7a5e1c); color:#fcf7ea; }
+.sub-plan-badge.pro   { background:linear-gradient(90deg,#2a5a9a,#1e4a7a); color:#fcf7ea; }
+.sub-head { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.sub-icon { font-size:26px; color:var(--gold-deep); flex-shrink:0; }
+.sub-icon.pro { color:var(--orb); }
+.sub-name { font-size:17px; font-weight:800; color:var(--ink); letter-spacing:-0.2px; }
+.sub-tagline { font-size:12px; color:var(--text2); margin-top:1px; }
+.sub-body { display:flex; align-items:flex-end; justify-content:space-between; gap:8px; }
+.sub-orb { font-size:22px; font-weight:800; color:var(--orb); font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; }
+.sub-orb span { font-size:12px; font-weight:600; color:var(--text2); margin-left:3px; }
+.sub-price-block { text-align:right; }
+.sub-price { font-size:18px; font-weight:800; color:var(--ink); }
+.sub-price-note { font-size:11px; color:var(--muted); margin-top:1px; }
+.sub-perks { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.sub-perk {
+  font-size:11px; color:var(--text2); font-weight:600;
+  background:rgba(60,40,20,0.06); border:1px solid rgba(60,40,20,0.12);
+  border-radius:20px; padding:3px 9px;
+}
+
+/* ── 구독 상태 카드 ── */
+.sub-status-card {
+  background:var(--surface); border:1.5px solid rgba(95,140,181,0.35);
+  border-radius:16px; padding:18px 18px 16px;
+  box-shadow:var(--shadow-soft);
+}
+.sub-status-head { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.sub-status-dot { width:8px; height:8px; border-radius:50%; background:#2a7a3e; flex-shrink:0; }
+.sub-status-title { font-size:15px; font-weight:800; color:var(--ink); }
+.sub-status-row { display:flex; justify-content:space-between; font-size:13px; color:var(--text2); padding:5px 0; border-bottom:1px solid var(--border-soft); }
+.sub-status-row:last-of-type { border-bottom:0; }
+.sub-status-row strong { color:var(--ink); }
+.sub-cancel-btn {
+  width:100%; margin-top:14px; padding:11px 0; border-radius:12px;
+  background:transparent; border:1px solid rgba(122,36,24,0.3); color:#7a2418;
+  font-size:13px; font-weight:600; cursor:pointer;
+  transition:background 0.2s;
+}
+.sub-cancel-btn:hover { background:rgba(122,36,24,0.06); }
+
 .pack-icon { font-size:28px; flex-shrink:0; color:var(--gold-deep); }
 .pack-orb { font-size:18px; font-weight:800; letter-spacing:-0.3px; color:var(--orb); font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; }
 .pack-orb-bonus { font-size:13px; color:var(--gold-deep); font-weight:700; margin-top:1px; }
@@ -211,6 +285,15 @@ nav {
     <div class="hero-sub">AI 채팅 1회에 20 Orb가 사용됩니다<br>충전한 Orb는 만료되지 않아요</div>
   </div>
 
+  <!-- 탭 -->
+  <div class="charge-tabs">
+    <button class="charge-tab active" id="tabBtnPack" onclick="switchChargeTab('pack')">일회 충전</button>
+    <button class="charge-tab"        id="tabBtnSub"  onclick="switchChargeTab('sub')">월정액 구독</button>
+  </div>
+
+  <!-- 일회 충전 탭 -->
+  <div id="tabContentPack">
+
   <!-- 첫 충전 1+1 배너 (첫 충전자만 표시) -->
   <div id="firstChargeBanner" style="display:none;background:linear-gradient(135deg,rgba(154,122,38,0.10),rgba(154,122,38,0.03));border:1.5px solid rgba(154,122,38,0.35);border-radius:16px;padding:16px 18px;margin-bottom:16px;text-align:center;box-shadow:var(--shadow-soft);">
     <div style="font-size:20px;margin-bottom:6px;color:var(--gold-deep);"><i class="pi pi-gift pi-xl"></i></div>
@@ -240,6 +323,79 @@ nav {
     <div class="how-item"><i class="pi pi-lock"></i> <span>결제는 <strong>KG이니시스</strong> 안전 처리</span></div>
     <div class="how-item"><i class="pi pi-phone"></i> <span>문의: <strong>picolab.kr</strong></span></div>
   </div>
+
+  </div><!-- /tabContentPack -->
+
+  <!-- 월정액 구독 탭 -->
+  <div id="tabContentSub" style="display:none">
+    <!-- 구독 상태 (active 중이면 표시) -->
+    <div id="subStatusWrap" style="display:none;margin-bottom:16px;"></div>
+
+    <!-- 구독 상품 (미구독 상태에서 표시) -->
+    <div id="subPlansWrap">
+      <div class="sub-list">
+        <!-- Basic -->
+        <div class="sub-card" onclick="doSubscribe('monthly_5000')">
+          <div class="sub-plan-badge basic">BASIC</div>
+          <div class="sub-head">
+            <div class="sub-icon"><i class="pi pi-gem"></i></div>
+            <div>
+              <div class="sub-name">Basic</div>
+              <div class="sub-tagline">매월 5,000 Orb 자동 지급</div>
+            </div>
+          </div>
+          <div class="sub-body">
+            <div>
+              <div class="sub-orb">5,000 Orb<span>/월</span></div>
+              <div class="sub-perks">
+                <span class="sub-perk">채팅 250회</span>
+                <span class="sub-perk">리포트 10개</span>
+              </div>
+            </div>
+            <div class="sub-price-block">
+              <div class="sub-price">₩9,900</div>
+              <div class="sub-price-note">개당 약 1.98원</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pro -->
+        <div class="sub-card sub-pro" onclick="doSubscribe('monthly_12000')">
+          <div class="sub-plan-badge pro">PRO</div>
+          <div class="sub-head">
+            <div class="sub-icon pro"><i class="pi pi-crown"></i></div>
+            <div>
+              <div class="sub-name">Pro</div>
+              <div class="sub-tagline">매월 12,000 Orb 자동 지급</div>
+            </div>
+          </div>
+          <div class="sub-body">
+            <div>
+              <div class="sub-orb">12,000 Orb<span>/월</span></div>
+              <div class="sub-perks">
+                <span class="sub-perk">채팅 600회</span>
+                <span class="sub-perk">리포트 24개</span>
+                <span class="sub-perk">패키지 8회</span>
+              </div>
+            </div>
+            <div class="sub-price-block">
+              <div class="sub-price">₩19,900</div>
+              <div class="sub-price-note">개당 약 1.66원</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:20px;">구독 안내</div>
+    <div class="how-list">
+      <div class="how-item"><i class="pi pi-refresh"></i> <span>매월 자동 결제 후 Orb <strong>즉시 지급</strong></span></div>
+      <div class="how-item"><i class="pi pi-calendar"></i> <span>구독일 기준 <strong>1개월 후</strong> 자동 갱신</span></div>
+      <div class="how-item"><i class="pi pi-times-circle"></i> <span>언제든 <strong>구독 취소</strong> 가능, 잔여 Orb 유지</span></div>
+      <div class="how-item"><i class="pi pi-lock"></i> <span>결제는 <strong>KG이니시스</strong> 안전 처리</span></div>
+    </div>
+  </div><!-- /tabContentSub -->
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -755,6 +911,152 @@ async function handleRedirectResult() {
     console.warn('[리다이렉트 충전 오류]', e);
   }
   return true;
+}
+
+// ── 탭 전환 ──────────────────────────────────────────────────────
+function switchChargeTab(tab) {
+  var isPack = (tab === 'pack');
+  document.getElementById('tabContentPack').style.display = isPack ? 'block' : 'none';
+  document.getElementById('tabContentSub').style.display  = isPack ? 'none'  : 'block';
+  document.getElementById('tabBtnPack').classList.toggle('active',  isPack);
+  document.getElementById('tabBtnSub').classList.toggle('active',  !isPack);
+  if (!isPack && !currentSubscription && currentUserId) loadSubscription();
+}
+
+// ── 구독 상태 ────────────────────────────────────────────────────
+var currentSubscription = null;
+var PLAN_LABELS = { monthly_5000: 'Basic (5,000 Orb/월)', monthly_12000: 'Pro (12,000 Orb/월)' };
+
+async function loadSubscription() {
+  if (!currentUserId) return;
+  try {
+    var r = await fetch('https://fortuna-silk.vercel.app/api/subscription?user_id=' + encodeURIComponent(currentUserId));
+    currentSubscription = await r.json();
+    renderSubscriptionStatus();
+  } catch(e) { currentSubscription = null; }
+}
+
+function renderSubscriptionStatus() {
+  var statusWrap = document.getElementById('subStatusWrap');
+  var plansWrap  = document.getElementById('subPlansWrap');
+  if (!statusWrap || !plansWrap) return;
+
+  if (!currentSubscription) {
+    statusWrap.style.display = 'none';
+    plansWrap.style.display = 'block';
+    return;
+  }
+
+  plansWrap.style.display = 'none';
+  var next = currentSubscription.next_billing_at ? new Date(currentSubscription.next_billing_at).toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric'}) : '-';
+  var planLabel = PLAN_LABELS[currentSubscription.plan] || currentSubscription.plan;
+
+  statusWrap.innerHTML =
+    '<div class="sub-status-card">' +
+      '<div class="sub-status-head"><div class="sub-status-dot"></div><div class="sub-status-title">구독 중</div></div>' +
+      '<div class="sub-status-row"><span>구독 플랜</span><strong>' + planLabel + '</strong></div>' +
+      '<div class="sub-status-row"><span>월 Orb</span><strong>' + (currentSubscription.orb_per_month || 0).toLocaleString() + ' Orb</strong></div>' +
+      '<div class="sub-status-row"><span>월 결제금액</span><strong>₩' + (currentSubscription.price || 0).toLocaleString() + '</strong></div>' +
+      '<div class="sub-status-row"><span>다음 결제일</span><strong>' + next + '</strong></div>' +
+      '<button class="sub-cancel-btn" onclick="cancelSubscription()">구독 취소</button>' +
+    '</div>';
+  statusWrap.style.display = 'block';
+}
+
+async function cancelSubscription() {
+  if (!currentUserId) return;
+  if (!confirm('구독을 취소하시겠어요? 이미 지급된 Orb는 유지됩니다.')) return;
+  showLoading();
+  try {
+    var r = await fetch('https://fortuna-silk.vercel.app/api/subscription', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUserId }),
+    });
+    var d = await r.json();
+    hideLoading();
+    if (d.ok) {
+      currentSubscription = null;
+      renderSubscriptionStatus();
+      toast('구독이 취소됐어요. 다음 결제일부터 청구되지 않아요.', 3500);
+    } else {
+      toast('취소 중 오류: ' + (d.error || '알 수 없음'));
+    }
+  } catch(e) {
+    hideLoading();
+    toast('취소 중 오류가 발생했어요: ' + e.message);
+  }
+}
+
+// ── 구독 신청 ────────────────────────────────────────────────────
+async function doSubscribe(plan) {
+  if (!currentUserId) { toast('로그인이 필요해요.'); return; }
+  if (typeof PortOne === 'undefined') { toast('결제 모듈 로드 중이에요. 잠시 후 다시 시도해주세요.'); return; }
+
+  var PLAN_NAMES = { monthly_5000: '포르투나 월정액 Basic', monthly_12000: '포르투나 월정액 Pro' };
+  var issueId = 'BK-' + plan + '-' + String(currentUserId).slice(0,8) + '-' + Date.now();
+
+  showLoading();
+  try {
+    var rsp = await PortOne.requestIssueBillingKey({
+      storeId: 'store-1139f195-d75f-44ca-bed6-c2c89c59e913',
+      channelKey: 'channel-key-c7608d6b-f758-4bbb-a0ad-252c5141c50c',
+      billingKeyMethod: 'CARD',
+      issueId: issueId,
+      issueName: PLAN_NAMES[plan] || '포르투나 월정액',
+      customer: {
+        customerId: currentUserId,
+        fullName: currentUserName || '포르투나 회원',
+        email: currentUserEmail || 'user@fortuna.app',
+        phoneNumber: '01000000000',
+      },
+    });
+    hideLoading();
+    if (rsp.code) {
+      var msg = rsp.message || rsp.code;
+      if (String(msg).indexOf('취소') !== -1 || !msg) { toast('빌링키 등록이 취소됐어요.'); }
+      else { toast('등록 실패: ' + msg); }
+      return;
+    }
+
+    var billingKey = rsp.billingKey;
+    if (!billingKey) { toast('빌링키를 받지 못했어요. 다시 시도해주세요.'); return; }
+
+    showLoading();
+    var subResp = await fetch('https://fortuna-silk.vercel.app/api/subscription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: currentUserId,
+        plan: plan,
+        billing_key: billingKey,
+        user_name: currentUserName || '',
+        user_email: currentUserEmail || '',
+      }),
+    });
+    var subData = await subResp.json();
+    hideLoading();
+
+    if (subData.ok) {
+      currentBalance += (subData.orb || 0);
+      currentPaidBalance += (subData.orb || 0);
+      document.getElementById('currentBalance').textContent = currentBalance + ' Orb';
+      toast('구독 완료! ' + (subData.orb || 0).toLocaleString() + ' Orb가 지급됐어요.', 3500);
+      await loadSubscription();
+      // 텔레그램 알림
+      try {
+        fetch('https://fortuna.kkdmb7.workers.dev/notify-payment', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: currentUserName, user_id: currentUserId, product: plan, amount: plan === 'monthly_5000' ? 9900 : 19900, orbs: subData.orb || 0, type: 'subscription' })
+        }).catch(function(){});
+      } catch(_) {}
+    } else {
+      toast('구독 처리 중 오류: ' + (subData.error || '알 수 없음'));
+    }
+  } catch(e) {
+    hideLoading();
+    toast('결제 오류: ' + (e.message || String(e)));
+  }
 }
 
 // 초기화
