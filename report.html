@@ -1043,8 +1043,8 @@ const TYPE_CONFIG = {
     focus:'기질+재물+연애 — 인생 3대 질문을 한 번에', desc:'타고난 기질·재물 구조·연애 패턴을 하나의 패키지로. 개별 1,870 Orb에서 20% 할인.' },
   pkg_timing:     { title:'패키지 · 타이밍이 인생을 바꾼다', orb:1390, emoji:'<i class="pi pi-calendar"></i>',
     focus:'대운+올해+결정 타이밍 — 언제를 알면 인생이 보인다', desc:'대운 흐름·올해 운세·결정 타이밍을 하나의 패키지로. 개별 1,770 Orb에서 21% 할인.' },
-  pkg_relations:  { title:'패키지 · 내 사람 완전 분석', orb:1790, emoji:'<i class="pi pi-heart"></i>',
-    focus:'연애+가족+설명서+이상형 — 모든 인연을 한눈에', desc:'연애·가족·관계 설명서·이상형 유형을 하나의 패키지로. 개별 2,260 Orb에서 21% 할인.' },
+  pkg_relations:  { title:'패키지 · 나의 인연 완전 분석', orb:1490, emoji:'<i class="pi pi-heart"></i>',
+    focus:'연애+가족+이상형 — 내 인연 구조를 한눈에', desc:'연애·가족·이상형 유형을 하나의 패키지로. 개별 1,870 Orb에서 20% 할인.' },
   pkg_world:      { title:'패키지 · 세계가 본 나', orb:1190, emoji:'<i class="pi pi-globe"></i>',
     focus:'베딕+서양점성+자미두수 — 동서양이 일치할 때', desc:'베딕·서양점성·자미두수 3개 학파를 하나의 패키지로. 개별 1,470 Orb에서 19% 할인.' }
 };
@@ -3084,18 +3084,18 @@ const TYPE_DETAIL = {
   },
   pkg_relations: {
     emoji: '<i class="pi pi-heart"></i>',
-    subtitle: '연애 · 가족 · 사용설명서 · 이상형 — 모든 인연을 한눈에',
-    desc: '연애, 가족 관계, 관계 설명서, 이상형 유형을 하나의 패키지로. 개별 구매 대비 21% 할인.',
-    recommend: ['내 주변 인연 구조가 통째로 궁금한 분', '연애·가족 모두 이해하고 싶은 분', '이 사람 설명서가 필요한 분'],
-    preview: '연애/결혼 5섹션 · 가족/인연 5섹션 · 관계 설명서 5섹션 · 이상형 5섹션 — 총 20섹션. 내 연애 패턴, 가족 관계 구조, 상대방이 보는 나의 설명서, 내가 끌리는 이상형까지 한 번에.',
+    subtitle: '연애 · 가족 · 이상형 — 내 인연 구조를 한눈에',
+    desc: '연애, 가족 관계, 이상형 유형을 하나의 패키지로. 모두 내 사주 기반으로 분석합니다. 개별 구매 대비 20% 할인.',
+    recommend: ['내 연애 패턴과 가족 관계가 모두 궁금한 분', '내가 끌리는 이상형의 구조를 알고 싶은 분', '인연 전체를 한 번에 파악하고 싶은 분'],
+    preview: '연애/결혼 5섹션 · 가족/인연 5섹션 · 이상형 유형 5섹션 — 총 15섹션. 내 연애 패턴, 가족 관계 구조, 내가 끌리는 이상형 유형까지 내 사주 기반으로 분석합니다.',
     faq: [
-      { q: '4개 리포트를 각각 살 때와 다른가요?', a: '내용은 동일하되, 21% 할인된 가격으로 한 번에 생성됩니다.' },
-      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 4개 리포트를 순차 생성하며 약 5~7분 소요됩니다. 생성 후 영구 저장됩니다.' }
+      { q: '3개 리포트를 각각 살 때와 다른가요?', a: '내용은 동일하되, 20% 할인된 가격으로 한 번에 볼 수 있습니다.' },
+      { q: '상대방 정보도 필요한가요?', a: '아니요. 연애·가족·이상형 모두 내 사주 기반 분석이라 내 정보만 있으면 됩니다.' }
     ],
     engines: ['사주', '십신'],
-    keyQuestions: ['나는 왜 이런 연애 패턴을 반복하는가?', '가족 관계에서 내 역할과 인연 구조는?', '상대방에게 나는 어떤 사람으로 보이는가?', '내가 진짜 끌리는 이상형은 누구인가?'],
-    sectionDesc: ['연애·결혼 분석 5섹션', '가족·인연 분석 5섹션', '관계 설명서 5섹션', '이상형 유형 5섹션'],
-    sectionDetail: ['연애 패턴과 결혼운', '가족 관계 구조', '상대방이 보는 나의 설명서', '내가 끌리는 유형 분석']
+    keyQuestions: ['나는 왜 이런 연애 패턴을 반복하는가?', '가족 관계에서 내 역할과 인연 구조는?', '내가 진짜 끌리는 이상형은 누구인가?'],
+    sectionDesc: ['연애·결혼 분석 5섹션', '가족·인연 분석 5섹션', '이상형 유형 5섹션'],
+    sectionDetail: ['연애 패턴과 결혼운', '가족 관계 구조', '내가 끌리는 유형 분석']
   },
   pkg_world: {
     emoji: '<i class="pi pi-globe"></i>',
@@ -6807,7 +6807,7 @@ async function generateReport() {
   if (_type === 'qimen_taegil')       { await generateQimenTaegilReport();       return; }
   if (_type === 'pkg_saju_core')      { await generatePackageReport(['character','money','love'],     ['기질 분석','재물·사업','연애·결혼']); return; }
   if (_type === 'pkg_timing')         { await generatePackageReport(['daeun','year','timing'],        ['대운 흐름','올해 운세','결정 타이밍']); return; }
-  if (_type === 'pkg_relations')      { await generatePackageReport(['love','family','guide','soulmate'],['연애·결혼','가족·인연','사용설명서','이상형']); return; }
+  if (_type === 'pkg_relations')      { await generatePackageReport(['love','family','soulmate'],['연애·결혼','가족·인연','이상형']); return; }
   if (_type === 'pkg_world')          { await generatePackageReport(['vedic_full','astro_full','ziwei_full'],['베딕','서양 점성','자미두수']); return; }
   // fallback
   showState('report');
