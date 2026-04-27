@@ -247,7 +247,8 @@ td.reasons span {
   h2 { font-size:13.5px; margin:18px 0 10px; gap:8px; }
   /* Orb 테이블: 무료/유료/일치 컬럼 모바일 숨김 */
   .orb-hide-mobile { display:none !important; }
-  #orbTable { width:100% !important; }
+  #orbTable { width:100% !important; table-layout:fixed !important; min-width:0 !important; }
+  #orbTable col.orb-hide-mobile { width:0 !important; }
   #orbTable col:first-child { width:30% !important; }
   #orbTable col:nth-child(2) { width:22% !important; }
   #orbTable col:nth-child(3) { width:18% !important; }
