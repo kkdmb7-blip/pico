@@ -8366,21 +8366,30 @@ async function generatePackageReport(types, labels) {
   }
 
   const missingTypes = types.filter(function(t) { return !existing[t]; });
-  const missingCount = missingTypes.length;
 
-  if (missingCount > 0) {
-    // 없는 리포트 비율만큼만 차감
-    const chargeOrb = Math.round((missingCount / types.length) * _config.orb);
-    const origOrb = _config.orb;
-    _config.orb = chargeOrb;
-    const ok = await setupSectionsAndDeductOrb();
-    _config.orb = origOrb;
-    if (!ok) return;
-  } else {
-    // 전부 있으면 무료
+  if (missingTypes.length > 0) {
+    // 없는 리포트 있으면 Orb 차감 없이 안내만
     showState('report');
     document.getElementById('reportTitle').textContent = _config.title;
+    document.getElementById('reportMeta').textContent = '';
+    const wrap2 = document.getElementById('sectionsWrap');
+    wrap2.innerHTML =
+      '<div style="text-align:center;padding:32px 20px;">' +
+      '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:10px;">먼저 개별 리포트를 생성해주세요</div>' +
+      '<div style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:20px;">아래 리포트를 생성하면 패키지에서 한 번에 볼 수 있어요.<br><span style="font-size:11px;color:var(--muted);">Orb는 차감되지 않았습니다.</span></div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;">' +
+      missingTypes.map(function(t) {
+        const cfg = TYPE_CONFIG[t] || {};
+        return '<a href="report.html?type=' + t + '" style="display:block;padding:13px 20px;background:rgba(154,122,38,0.10);border:1px solid rgba(154,122,38,0.32);border-radius:13px;text-decoration:none;color:var(--gold-deep);font-size:14px;font-weight:700;">' + (cfg.title || t) + ' 생성하러 가기 →</a>';
+      }).join('') +
+      '</div></div>';
+    document.getElementById('reportActions').style.display = 'none';
+    return;
   }
+
+  // 전부 있으면 무료 표시
+  showState('report');
+  document.getElementById('reportTitle').textContent = _config.title;
 
   const pkgColor  = (TYPE_COLORS[_type]||{}).main || '#9a6e10';
   const pkgSoft   = (TYPE_COLORS[_type]||{}).soft || 'rgba(154,110,16,0.08)';
