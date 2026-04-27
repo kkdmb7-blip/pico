@@ -365,6 +365,23 @@ td.reasons span {
   <h2 style="font-size:13px;">JS 에러 모니터링</h2>
   <div id="anErrors" class="card"><div class="loading">불러오는 중...</div></div>
 
+  <h2>리포트 사용 통계</h2>
+  <div class="card" style="padding:14px 12px;">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+      <span style="font-size:12px;color:var(--muted);">기간:</span>
+      <select id="statsDays" onchange="loadReportStats()" style="padding:6px 10px;border:1px solid var(--border-soft);border-radius:8px;font-size:12px;background:var(--surface);color:var(--text);cursor:pointer;">
+        <option value="7">최근 7일</option>
+        <option value="30" selected>최근 30일</option>
+        <option value="90">최근 90일</option>
+        <option value="365">전체 1년</option>
+      </select>
+      <span id="statsTotalLabel" style="font-size:11px;color:var(--muted);margin-left:4px;"></span>
+    </div>
+    <div id="statsChartWrap" style="display:flex;flex-direction:column;gap:6px;">
+      <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">로딩 중...</div>
+    </div>
+  </div>
+
   <h2>Orb 잔액 관리</h2>
   <div class="card" style="padding:14px 12px;">
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
@@ -664,6 +681,7 @@ async function boot() {
   loadRecent();
   loadChatUnread();
   loadAnalytics();
+  loadReportStats();
   loadOrbUsers();
 }
 
@@ -931,6 +949,39 @@ qs('csvBtn').addEventListener('click', exportCsv);
 qs('anRange').addEventListener('change', loadAnalytics);
 
 boot();
+
+// ── 리포트 통계 ──
+async function loadReportStats() {
+  const days = document.getElementById('statsDays')?.value || '30';
+  const wrap = document.getElementById('statsChartWrap');
+  const label = document.getElementById('statsTotalLabel');
+  if (!wrap) return;
+  wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">로딩 중...</div>';
+  try {
+    const res = await fetch(`${API}/admin/report-stats?admin=${encodeURIComponent(adminUuid)}&days=${days}`);
+    const data = await res.json();
+    if (!data.ok) { wrap.innerHTML = '<div style="color:#a94a3a;font-size:12px;">로드 실패</div>'; return; }
+    const stats = data.stats || [];
+    const total = data.total || 0;
+    if (label) label.textContent = `총 ${total}건`;
+    if (!stats.length) { wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">데이터 없음</div>'; return; }
+    const maxCount = stats[0].count;
+    wrap.innerHTML = stats.map(s => {
+      const barW = Math.round(s.count / maxCount * 100);
+      const heat = s.count === 0 ? '#e0d8cc' : s.pct >= 8 ? '#9a6e10' : s.pct >= 4 ? '#c89830' : s.pct >= 2 ? '#d4aa50' : '#8a8a70';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
+        <div style="width:130px;font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;">${s.type}</div>
+        <div style="flex:1;height:16px;background:rgba(154,122,38,0.08);border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:${barW}%;background:${heat};border-radius:4px;transition:width 0.4s;"></div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:${heat};width:32px;text-align:right;flex-shrink:0;">${s.count}</div>
+        <div style="font-size:10px;color:var(--muted);width:28px;text-align:right;flex-shrink:0;">${s.pct}%</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    wrap.innerHTML = `<div style="color:#a94a3a;font-size:12px;">에러: ${e.message}</div>`;
+  }
+}
 
 // ── Orb 관리 ──
 let orbAllRows = [];
