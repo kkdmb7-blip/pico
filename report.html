@@ -4592,6 +4592,13 @@ function openChildModal() {
 function closeChildModal() {
   document.getElementById('childOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  // 입력 완료 전 닫으면 버튼 복원 → 다시 모달 열 수 있게
+  var btn = document.getElementById('btnGenerate');
+  if (btn && btn.style.display === 'none') {
+    btn.style.display = '';
+    btn.innerHTML = '<i class="pi pi-user"></i> 정보 입력하기';
+    btn.onclick = function() { openChildModal(); };
+  }
 }
 
 function clearChildForm() {
