@@ -8348,63 +8348,41 @@ async function batchPackageSections(secs, secIndices, subTitle, prompt) {
   }
 }
 
-// ── 패키지 리포트: DB에서 기존 리포트 불러와 탭으로 표시 ──
+// ── 패키지 리포트 ──────────────────────────────────────────────
 async function generatePackageReport(types, labels) {
+  showState('loading');
+  setLoading('확인 중...', '');
   const sb = getSb();
 
-  // 기존 리포트 사전 조회
-  showState('loading');
-  setLoading('기존 리포트 확인 중...', '');
-  const existing = {};
-  for (const rType of types) {
+  // 1. 이미 구매한 패키지인지 확인 (pkg_* 레코드 존재 여부)
+  let alreadyBought = false;
+  try {
+    const { data } = await sb.from('reports')
+      .select('id').eq('user_id', _user.id).eq('report_type', _type)
+      .limit(1).maybeSingle();
+    if (data) alreadyBought = true;
+  } catch(e) {}
+
+  // 2. 첫 구매면 Orb 차감 후 pkg 레코드 저장
+  if (!alreadyBought) {
+    if (!await setupSectionsAndDeductOrb()) return;
     try {
-      if (sb && _user && _user.id) {
-        const { data } = await sb.from('reports')
-          .select('content, created_at')
-          .eq('user_id', _user.id)
-          .eq('report_type', rType)
-          .order('created_at', { ascending: false })
-          .limit(1).maybeSingle();
-        if (data && Array.isArray(data.content) && data.content.length >= 5) {
-          existing[rType] = data.content;
-        }
-      }
+      await sb.from('reports').insert({
+        user_id: _user.id, report_type: _type,
+        content: [getProfileKey()], orb_spent: _config.orb,
+        created_at: new Date().toISOString()
+      });
     } catch(e) {}
   }
 
-  const missingTypes = types.filter(function(t) { return !existing[t]; });
-
-  if (missingTypes.length > 0) {
-    // 없는 리포트 있으면 Orb 차감 없이 안내만
-    showState('report');
-    document.getElementById('reportTitle').textContent = _config.title;
-    document.getElementById('reportMeta').textContent = '';
-    const wrap2 = document.getElementById('sectionsWrap');
-    wrap2.innerHTML =
-      '<div style="text-align:center;padding:32px 20px;">' +
-      '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:10px;">먼저 개별 리포트를 생성해주세요</div>' +
-      '<div style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:20px;">아래 리포트를 생성하면 패키지에서 한 번에 볼 수 있어요.<br><span style="font-size:11px;color:var(--muted);">Orb는 차감되지 않았습니다.</span></div>' +
-      '<div style="display:flex;flex-direction:column;gap:10px;">' +
-      missingTypes.map(function(t) {
-        const cfg = TYPE_CONFIG[t] || {};
-        return '<a href="report.html?type=' + t + '" style="display:block;padding:13px 20px;background:rgba(154,122,38,0.10);border:1px solid rgba(154,122,38,0.32);border-radius:13px;text-decoration:none;color:var(--gold-deep);font-size:14px;font-weight:700;">' + (cfg.title || t) + ' 생성하러 가기 →</a>';
-      }).join('') +
-      '</div></div>';
-    document.getElementById('reportActions').style.display = 'none';
-    return;
-  }
-
-  // 전부 있으면 무료 표시
+  // 3. 화면 세팅
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
+  document.getElementById('reportMeta').textContent = alreadyBought ? '저장된 패키지' : '생성일: ' + new Date().toLocaleDateString('ko-KR');
 
   const pkgColor  = (TYPE_COLORS[_type]||{}).main || '#9a6e10';
   const pkgSoft   = (TYPE_COLORS[_type]||{}).soft || 'rgba(154,110,16,0.08)';
   const pkgBorder = (TYPE_COLORS[_type]||{}).border || 'rgba(154,110,16,0.32)';
-
-  showState('report');
-  document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = '불러오는 중...';
 
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
@@ -8412,82 +8390,59 @@ async function generatePackageReport(types, labels) {
   // 탭 헤더
   const tabBar = document.createElement('div');
   tabBar.style.cssText = 'display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;';
-  tabBar.id = 'pkg-tabbar';
   labels.forEach(function(lbl, i) {
     const btn = document.createElement('button');
-    btn.id = 'pkg-tab-' + i;
     btn.textContent = lbl;
     btn.onclick = function() { switchPkgTab(i, types.length); };
-    btn.style.cssText = 'padding:8px 16px;border-radius:20px;border:1px solid ' + pkgBorder + ';background:' + (i===0?pkgSoft:'transparent') + ';color:' + pkgColor + ';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;';
+    btn.style.cssText = 'padding:8px 16px;border-radius:20px;border:1px solid ' + pkgBorder + ';background:' + (i===0?pkgSoft:'transparent') + ';color:' + pkgColor + ';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;';
     tabBar.appendChild(btn);
   });
   wrap.appendChild(tabBar);
 
-  // 탭 전환 함수
   window.switchPkgTab = function(idx, total) {
     for (var i = 0; i < total; i++) {
-      var p = document.getElementById('pkg-panel-' + i);
-      var b = document.getElementById('pkg-tab-' + i);
+      const p = document.getElementById('pkg-panel-' + i);
+      const b = tabBar.children[i];
       if (p) p.style.display = i === idx ? 'block' : 'none';
       if (b) b.style.background = i === idx ? pkgSoft : 'transparent';
     }
   };
 
-  // 각 서브리포트: DB에서 기존 리포트 조회 후 표시
+  // 4. 각 서브리포트: DB 조회 후 탭 패널 렌더링
   for (let ti = 0; ti < types.length; ti++) {
     const rType = types[ti];
     const secs = TYPE_SECTIONS[rType] || TYPE_SECTIONS.character;
     const rTitle = (TYPE_CONFIG[rType] && TYPE_CONFIG[rType].title) || labels[ti];
 
-    // 패널 생성
     const panel = document.createElement('div');
     panel.id = 'pkg-panel-' + ti;
     panel.style.display = ti === 0 ? 'block' : 'none';
-    panel.innerHTML = '<div style="font-size:11px;font-weight:700;color:' + pkgColor + ';letter-spacing:0.5px;margin-bottom:12px;padding:8px 12px;background:' + pkgSoft + ';border-radius:8px;">' + (labels[ti]||rType) + ' 리포트</div>'
-      + secs.map(function(s, i) {
-          return '<div class="section-card" id="pkg-sec-' + ti + '-' + i + '">'
-            + '<div class="section-header"><div class="section-num">' + (i+1) + '</div><div class="section-name">' + s.name + '</div></div>'
-            + '<div class="section-loading" id="pkg-sl-' + ti + '-' + i + '"><div class="dot-spin"></div> 불러오는 중...</div>'
-            + '<div class="section-body" id="pkg-sb-' + ti + '-' + i + '" style="display:none;"></div></div>';
-        }).join('');
     wrap.appendChild(panel);
 
-    // 사전 조회 결과 사용
-    const content = existing[rType] || null;
+    // 개별 리포트 조회
+    let content = null;
+    try {
+      const { data } = await sb.from('reports')
+        .select('content').eq('user_id', _user.id).eq('report_type', rType)
+        .order('created_at', { ascending: false }).limit(1).maybeSingle();
+      if (data && Array.isArray(data.content) && data.content.length >= 5) content = data.content;
+    } catch(e) {}
 
     if (content) {
-      // 기존 리포트 섹션별 렌더링
-      secs.forEach(function(s, i) {
-        const sl = document.getElementById('pkg-sl-' + ti + '-' + i);
-        const sbEl = document.getElementById('pkg-sb-' + ti + '-' + i);
-        if (sl) sl.style.display = 'none';
-        if (sbEl) { sbEl.innerHTML = renderMarkdown(content[i] || ''); sbEl.style.display = 'block'; }
-      });
+      panel.innerHTML = '<div style="font-size:11px;font-weight:700;color:' + pkgColor + ';margin-bottom:12px;padding:8px 12px;background:' + pkgSoft + ';border-radius:8px;">' + labels[ti] + ' 리포트</div>'
+        + secs.map(function(s, i) {
+            return '<div class="section-card"><div class="section-header"><div class="section-num">' + (i+1) + '</div><div class="section-name">' + s.name + '</div></div>'
+              + '<div class="section-body" style="display:block;">' + renderMarkdown(content[i] || '') + '</div></div>';
+          }).join('');
     } else {
-      // 리포트 없음 → 개별 생성 안내
-      secs.forEach(function(s, i) {
-        const sl = document.getElementById('pkg-sl-' + ti + '-' + i);
-        if (sl) sl.style.display = 'none';
-      });
-      const firstSb = document.getElementById('pkg-sb-' + ti + '-0');
-      if (firstSb) {
-        firstSb.innerHTML =
-          '<div style="text-align:center;padding:28px 16px;color:var(--muted);">' +
-          '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;">아직 생성된 리포트가 없어요</div>' +
-          '<div style="font-size:13px;line-height:1.75;margin-bottom:18px;color:var(--text2);">' + rTitle + '를 먼저 생성하면<br>패키지에서 바로 확인할 수 있어요.</div>' +
-          '<a href="report.html?type=' + rType + '" style="display:inline-block;padding:11px 24px;background:rgba(154,122,38,0.13);border:1px solid rgba(154,122,38,0.35);border-radius:12px;text-decoration:none;color:var(--gold-deep);font-weight:700;font-size:13px;">' + rTitle + ' 생성하러 가기 →</a>' +
-          '</div>';
-        firstSb.style.display = 'block';
-        // 나머지 섹션 숨김
-        for (let i = 1; i < secs.length; i++) {
-          const card = document.getElementById('pkg-sec-' + ti + '-' + i);
-          if (card) card.style.display = 'none';
-        }
-      }
+      panel.innerHTML = '<div style="text-align:center;padding:32px 16px;">'
+        + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">' + rTitle + '가 아직 없어요</div>'
+        + '<div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;">개별 리포트를 먼저 생성하면<br>여기서 바로 볼 수 있어요.</div>'
+        + '<a href="report.html?type=' + rType + '" style="display:inline-block;padding:11px 24px;background:rgba(154,122,38,0.12);border:1px solid rgba(154,122,38,0.35);border-radius:12px;text-decoration:none;color:var(--gold-deep);font-weight:700;font-size:13px;">' + rTitle + ' 생성하러 가기 →</a>'
+        + '</div>';
     }
   }
 
-  document.getElementById('reportMeta').textContent = '조회일: ' + new Date().toLocaleDateString('ko-KR');
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' PACKAGE';
   { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = '각 리포트를 개별 생성 후 패키지에서 확인하세요'; }
   document.getElementById('reportActions').style.display = 'flex';
