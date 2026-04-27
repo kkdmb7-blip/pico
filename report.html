@@ -3207,19 +3207,32 @@ async function refundOrb(amount, reason) {
     console.log(`[refundOrb] 환불 완료 +${amount} Orb / 잔액 ${cur.balance}→${newBalance}`);
     showToast(`<i class="pi pi-refresh"></i> 생성 실패로 ${amount.toLocaleString()} Orb가 자동 환불됐습니다.`);
 
-    // 관리자 텔레그램 알림
-    fetch('https://fortuna.kkdmb7.workers.dev/notify-support', {
+    // 관리자 텔레그램 알림 (환불 성공)
+    fetch('https://fortuna.kkdmb7.workers.dev/notify-admin', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'refund',
-        user_id: _user.id,
-        message: `[자동환불] ${_user.name||_user.id} | ${(_config&&_config.title)||_type} | ${amount} Orb 자동 환불 (생성 실패)`
+        user_id: (_user.id||'').slice(0,8),
+        user_name: _user.name || _user.id || '?',
+        title: (_config&&_config.title) || _type || '',
+        message: `${amount} Orb 자동 환불 완료 | 잔액 ${cur.balance}→${newBalance}`
       })
     }).catch(() => {});
 
     return true;
   } catch(e) {
     console.error('[refundOrb] 환불 실패:', e);
+    // 환불 실패 시 관리자 알림 (가장 중요한 케이스)
+    fetch('https://fortuna.kkdmb7.workers.dev/notify-admin', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'refund_fail',
+        user_id: (_user&&_user.id||'').slice(0,8),
+        user_name: (_user&&_user.name) || '?',
+        title: (_config&&_config.title) || _type || '',
+        message: `${amount} Orb 환불 실패! 수동 처리 필요 | 오류: ${e.message}`
+      })
+    }).catch(() => {});
     return false;
   }
 }
@@ -9523,6 +9536,19 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
             <i class="pi pi-refresh"></i> 다시 시도
           </button>
         </div>`;
+    }
+    // retry=1(2차 시도)에서도 실패 시 관리자 알림
+    if (retryCount >= 1 && _user && _user.id) {
+      fetch('https://fortuna.kkdmb7.workers.dev/notify-admin', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'section_fail',
+          user_id: (_user.id||'').slice(0,8),
+          user_name: _user.name || '?',
+          title: (_config&&_config.title) || _type || '',
+          message: `섹션 ${secIdx+1}번 "${secName}" 최종 실패 | ${e.name==='AbortError'?'45초 타임아웃':'API 오류'}`
+        })
+      }).catch(() => {});
     }
   }
 }
