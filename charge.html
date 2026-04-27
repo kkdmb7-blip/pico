@@ -114,6 +114,8 @@ nav {
   background:linear-gradient(90deg,#7a2418,#5a1810);
   color:#fcf7ea;
 }
+.pack-badge-sale  { background:linear-gradient(90deg,#2a7a3e,#1e5c2e); color:#fcf7ea; }
+.pack-badge-super { background:linear-gradient(135deg,#1a4a7a,#2e6ba8); color:#fcf7ea; }
 
 .pack-icon { font-size:28px; flex-shrink:0; color:var(--gold-deep); }
 .pack-orb { font-size:18px; font-weight:800; letter-spacing:-0.3px; color:var(--orb); font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif; }
@@ -331,6 +333,26 @@ var PACKS = [
     priceLabel: '₩33,000',
     perLabel: '개당 약 10.0원',
   },
+  {
+    id: 'pack_5500',
+    icon: '<i class="pi pi-star"></i>',
+    orb: 5500,
+    label: 'SALE',
+    desc: '리포트 약 11개 · 채팅 약 275회',
+    price: 49900,
+    priceLabel: '₩49,900',
+    perLabel: '개당 약 9.1원 (10% 할인)',
+  },
+  {
+    id: 'pack_10000',
+    icon: '<i class="pi pi-crown"></i>',
+    orb: 10000,
+    label: 'SUPER',
+    desc: '리포트 약 20개 · 패키지 7회 이상',
+    price: 79900,
+    priceLabel: '₩79,900',
+    perLabel: '개당 약 8.0원 (20% 할인)',
+  },
 ];
 
 function toast(msg, dur) {
@@ -422,7 +444,7 @@ function renderPacks() {
     var showBonus = pack.firstOnly && isFirstCharge;
 
     var card = document.createElement('div');
-    card.className = 'pack-card' + (showBonus ? ' featured' : '');
+    card.className = 'pack-card' + (showBonus || pack.label === 'SUPER' ? ' featured' : '');
 
     var totalOrb = pack.orb + (showBonus ? (pack.bonus || 0) : 0);
 
@@ -431,6 +453,10 @@ function renderPacks() {
       badgeHtml = '<div class="pack-badge">첫 충전 1+1 <i class="pi pi-gift"></i></div>';
     } else if (pack.label === 'BEST') {
       badgeHtml = '<div class="pack-badge pack-badge-best">BEST</div>';
+    } else if (pack.label === 'SALE') {
+      badgeHtml = '<div class="pack-badge pack-badge-sale">SALE 10%↓</div>';
+    } else if (pack.label === 'SUPER') {
+      badgeHtml = '<div class="pack-badge pack-badge-super">SUPER 20%↓</div>';
     }
 
     var orbHtml = '<div class="pack-orb">' + totalOrb.toLocaleString() + ' Orb</div>';
