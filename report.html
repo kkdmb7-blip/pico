@@ -1036,7 +1036,17 @@ const TYPE_CONFIG = {
   qimen_today:{ title:'오늘의 기문 정밀 운세', orb:290, emoji:'<i class="pi pi-clock"></i>', focus:'오늘 24시간의 9궁 포국으로 본 길방·길시·하기 좋은 일',
     desc:'오늘 이 시간 우주의 기운 배치를 9궁 포국으로 정밀 분석. 시간대별 길흉, 좋은 방향, 추천 활동, 피해야 할 일까지 — 오늘 하루 행동 가이드.' },
   qimen_taegil:{ title:'기문 택일 가이드 (14일)', orb:390, emoji:'<i class="pi pi-calendar"></i>', focus:'이번주~다음주 14일 흐름에서 사업·계약·이사·면접 길일 추천',
-    desc:'14일간의 일가기문 흐름에서 활동별(사업/계약/이사/면접/만남) 가장 좋은 날과 피해야 할 날을 추천.' }
+    desc:'14일간의 일가기문 흐름에서 활동별(사업/계약/이사/면접/만남) 가장 좋은 날과 피해야 할 날을 추천.' },
+
+  // ── 패키지 ──
+  pkg_saju_core:  { title:'패키지 · 사주 첫 번째 여정', orb:1490, emoji:'<i class="pi pi-sparkle"></i>',
+    focus:'기질+재물+연애 — 인생 3대 질문을 한 번에', desc:'타고난 기질·재물 구조·연애 패턴을 하나의 패키지로. 개별 1,870 Orb에서 20% 할인.' },
+  pkg_timing:     { title:'패키지 · 타이밍이 인생을 바꾼다', orb:1390, emoji:'<i class="pi pi-calendar"></i>',
+    focus:'대운+올해+결정 타이밍 — 언제를 알면 인생이 보인다', desc:'대운 흐름·올해 운세·결정 타이밍을 하나의 패키지로. 개별 1,770 Orb에서 21% 할인.' },
+  pkg_relations:  { title:'패키지 · 내 사람 완전 분석', orb:1790, emoji:'<i class="pi pi-heart"></i>',
+    focus:'연애+가족+설명서+이상형 — 모든 인연을 한눈에', desc:'연애·가족·관계 설명서·이상형 유형을 하나의 패키지로. 개별 2,260 Orb에서 21% 할인.' },
+  pkg_world:      { title:'패키지 · 세계가 본 나', orb:1190, emoji:'<i class="pi pi-globe"></i>',
+    focus:'베딕+서양점성+자미두수 — 동서양이 일치할 때', desc:'베딕·서양점성·자미두수 3개 학파를 하나의 패키지로. 개별 1,470 Orb에서 19% 할인.' }
 };
 
 const TYPE_COLORS = {
@@ -1089,7 +1099,11 @@ const TYPE_COLORS = {
   vedic_muhurta:     { main:'#4a7a8a', soft:'rgba(74,122,138,0.12)', border:'rgba(74,122,138,0.32)' },
   qimen_wonmyong:    { main:'#7a3fc0', soft:'rgba(122,63,192,0.13)', border:'rgba(122,63,192,0.38)' },
   qimen_today:       { main:'#9a3fc0', soft:'rgba(154,63,192,0.13)', border:'rgba(154,63,192,0.38)' },
-  qimen_taegil:      { main:'#5a3fc0', soft:'rgba(90,63,192,0.13)',  border:'rgba(90,63,192,0.38)' }
+  qimen_taegil:      { main:'#5a3fc0', soft:'rgba(90,63,192,0.13)',  border:'rgba(90,63,192,0.38)' },
+  pkg_saju_core:     { main:'#9a6e10', soft:'rgba(154,110,16,0.13)', border:'rgba(154,110,16,0.38)' },
+  pkg_timing:        { main:'#7a4aa8', soft:'rgba(122,74,168,0.13)', border:'rgba(122,74,168,0.38)' },
+  pkg_relations:     { main:'#8b2447', soft:'rgba(139,36,71,0.13)',  border:'rgba(139,36,71,0.38)' },
+  pkg_world:         { main:'#2e6ba8', soft:'rgba(46,107,168,0.13)', border:'rgba(46,107,168,0.38)' }
 };
 
 function applyTypeTheme() {
@@ -6704,6 +6718,10 @@ async function generateReport() {
   if (_type === 'qimen_wonmyong')     { await generateQimenWonmyongReport();     return; }
   if (_type === 'qimen_today')        { await generateQimenTodayReport();        return; }
   if (_type === 'qimen_taegil')       { await generateQimenTaegilReport();       return; }
+  if (_type === 'pkg_saju_core')      { await generatePackageReport(['character','money','love'],     ['기질 분석','재물·사업','연애·결혼']); return; }
+  if (_type === 'pkg_timing')         { await generatePackageReport(['daeun','year','timing'],        ['대운 흐름','올해 운세','결정 타이밍']); return; }
+  if (_type === 'pkg_relations')      { await generatePackageReport(['love','family','guide','soulmate'],['연애·결혼','가족·인연','사용설명서','이상형']); return; }
+  if (_type === 'pkg_world')          { await generatePackageReport(['vedic_full','astro_full','ziwei_full'],['베딕','서양 점성','자미두수']); return; }
   // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
@@ -8172,6 +8190,147 @@ async function generateVedicMuhurtaReport() {
     advice2A: ['창업/비즈니스','이직/커리어','투자/재테크'],
     advice2B: ['대인관계/부부']
   });
+}
+
+// ── 패키지 리포트 공통 생성 함수 ──
+// types: 리포트 타입 배열, labels: 탭 라벨 배열
+async function generatePackageReport(types, labels) {
+  if (!await setupSectionsAndDeductOrb()) return;
+
+  const pkgColor  = (TYPE_COLORS[_type]||{}).main || '#9a6e10';
+  const pkgSoft   = (TYPE_COLORS[_type]||{}).soft || 'rgba(154,110,16,0.08)';
+  const pkgBorder = (TYPE_COLORS[_type]||{}).border || 'rgba(154,110,16,0.32)';
+
+  // 탭+섹션 UI 구성
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.innerHTML = '';
+
+  // 탭 헤더
+  const tabBar = document.createElement('div');
+  tabBar.style.cssText = 'display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;';
+  tabBar.id = 'pkg-tabbar';
+  labels.forEach(function(lbl, i) {
+    const btn = document.createElement('button');
+    btn.id = 'pkg-tab-' + i;
+    btn.textContent = lbl;
+    btn.onclick = function() { switchPkgTab(i, types.length); };
+    btn.style.cssText = 'padding:8px 16px;border-radius:20px;border:1px solid ' + pkgBorder + ';background:' + (i===0?pkgSoft:'transparent') + ';color:' + pkgColor + ';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;font-family:var(--fn);';
+    tabBar.appendChild(btn);
+  });
+  wrap.appendChild(tabBar);
+
+  // 각 리포트 섹션 패널
+  types.forEach(function(type, ti) {
+    const panel = document.createElement('div');
+    panel.id = 'pkg-panel-' + ti;
+    panel.style.display = ti === 0 ? 'block' : 'none';
+    const secs = TYPE_SECTIONS[type] || TYPE_SECTIONS.character;
+    panel.innerHTML = '<div style="font-size:11px;font-weight:700;color:' + pkgColor + ';letter-spacing:0.5px;margin-bottom:12px;padding:8px 12px;background:' + pkgSoft + ';border-radius:8px;">' + (labels[ti]||type) + ' 리포트</div>'
+      + secs.map(function(s, i) {
+          var idx = ti * 5 + i;
+          return '<div class="section-card" id="section-' + idx + '">'
+            + '<div class="section-header"><div class="section-num">' + (i+1) + '</div><div class="section-name">' + s.name + '</div></div>'
+            + '<div class="section-loading" id="sloading-' + idx + '"><div class="dot-spin"></div> 분석 중...</div>'
+            + '<div class="section-body" id="sbody-' + idx + '" style="display:none;"></div></div>';
+        }).join('');
+    wrap.appendChild(panel);
+  });
+
+  // 탭 전환 함수
+  window.switchPkgTab = function(idx, total) {
+    for (var i = 0; i < total; i++) {
+      var p = document.getElementById('pkg-panel-' + i);
+      var b = document.getElementById('pkg-tab-' + i);
+      if (p) p.style.display = i === idx ? 'block' : 'none';
+      if (b) b.style.background = i === idx ? pkgSoft : 'transparent';
+    }
+  };
+
+  // 각 리포트 순차 생성 (타입 임시 변경 후 복구)
+  const origType = _type;
+  for (var ti = 0; ti < types.length; ti++) {
+    var rType = types[ti];
+    var secOffset = ti * 5;
+    var secs = TYPE_SECTIONS[rType] || TYPE_SECTIONS.character;
+    var ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+    var sb2 = buildSajuBlock();
+
+    // 타입별 프롬프트·시스템 구성
+    var rOldType = _type;
+    _type = rType; // detectHallucination 등에서 _type 참조
+    try {
+      var secIndices = secs.map(function(_, i) { return secOffset + i; });
+      var customSysForPkg = (rType.startsWith('vedic') || rType.startsWith('qimen')) ? undefined : undefined;
+
+      if (rType === 'character') {
+        // character는 buildCharacterPrompts 대신 간략화
+        var prompt = buildSajuBlock() + '\n' + buildAccuracyLayerBlock()
+          + '\n\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자. 섹션 번호 붙여 작성.';
+        await streamToSections(prompt, secIndices, '기질 분석', ysFinal, '', false);
+      } else if (rType === 'money') {
+        var prompt2 = sb2 + '\n' + buildDaeunBlock() + '\n' + buildAccuracyLayerBlock()
+          + '\n\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자. 섹션 번호 붙여 작성.';
+        await streamToSections(prompt2, secIndices, '재물 분석', ysFinal, '', false);
+      } else if (rType === 'love') {
+        var prompt3 = sb2 + '\n' + buildAccuracyLayerBlock()
+          + '\n\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자. 섹션 번호 붙여 작성.';
+        await streamToSections(prompt3, secIndices, '연애 분석', ysFinal, '', false);
+      } else if (rType === 'daeun') {
+        var pd = sb2 + '\n' + buildDaeunBlock() + '\n' + buildAccuracyLayerBlock()
+          + '\n\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자. 섹션 번호 붙여 작성.';
+        await streamToSections(pd, secIndices, '대운 분석', ysFinal, '', false);
+      } else if (rType === 'year') {
+        var py = sb2 + '\n' + buildDaeunBlock() + '\n' + buildAccuracyLayerBlock()
+          + '\n\n올해(' + new Date().getFullYear() + ')를 중심으로\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자. 섹션 번호 붙여 작성.';
+        await streamToSections(py, secIndices, '올해 운세', ysFinal, '', false);
+      } else if (rType === 'timing') {
+        var pt = sb2 + '\n' + buildDaeunBlock() + '\n' + buildAccuracyLayerBlock()
+          + '\n\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자. 섹션 번호 붙여 작성.';
+        await streamToSections(pt, secIndices, '타이밍 분석', ysFinal, '', false);
+      } else if (rType === 'family') {
+        var pf = sb2 + '\n' + buildAccuracyLayerBlock()
+          + '\n\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자. 섹션 번호 붙여 작성.';
+        await streamToSections(pf, secIndices, '가족 분석', ysFinal, '', false);
+      } else if (rType === 'guide') {
+        var pg = sb2 + '\n' + buildAccuracyLayerBlock()
+          + '\n\n2인칭 금지. "이 사람은 ~" 제3자 시점.\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자.';
+        await streamToSections(pg, secIndices, '관계 가이드', ysFinal, '', false);
+      } else if (rType === 'soulmate') {
+        var ps = sb2 + '\n' + buildAccuracyLayerBlock()
+          + '\n\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자.';
+        await streamToSections(ps, secIndices, '이상형 분석', ysFinal, '', false);
+      } else if (rType === 'vedic_full') {
+        if (!_vedicData || !_vedicData.nakshatra) { if (_profile && _profile.year) await loadVedicData(); }
+        var pvf = sb2 + '\n' + buildVedicBlock() + '\n' + buildAccuracyLayerBlock()
+          + '\n\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자.';
+        await streamToSections(pvf, secIndices, '베딕 분석', ysFinal, '', false, VEDIC_BASE_SYS);
+      } else if (rType === 'astro_full') {
+        if (!_astroData) { if (_profile && _profile.year) await loadExtraData(false, true); }
+        var pa = sb2 + '\n' + buildAccuracyLayerBlock()
+          + '\n\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자.';
+        await streamToSections(pa, secIndices, '서양 점성', ysFinal, '', false);
+      } else if (rType === 'ziwei_full') {
+        if (!_ziweiData) { if (_profile && _profile.year) await loadExtraData(true, false); }
+        var pz = sb2 + '\n' + buildAccuracyLayerBlock()
+          + '\n\n섹션 구성:\n' + secs.map(function(s,i){return (i+1)+'. '+s.name;}).join('\n') + '\n\n총 800자.';
+        await streamToSections(pz, secIndices, '자미두수', ysFinal, '', false);
+      }
+    } finally {
+      _type = origType;
+    }
+  }
+  _type = origType;
+
+  // 저장
+  const allTexts = Array.from({length: types.length * 5}, function(_, i) {
+    return document.getElementById('sbody-' + i)?.innerText || '';
+  });
+  await safeInsertReport(allTexts, getProfileKey());
+  document.getElementById('reportMeta').textContent = '생성일: ' + new Date().toLocaleDateString('ko-KR');
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' PACKAGE REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = '다시 생성 시 ' + _config.orb.toLocaleString() + ' Orb 추가 차감'; }
+  document.getElementById('reportActions').style.display = 'flex';
+  showConsultBanner();
 }
 
 // ── 기문 본명국 데이터 빌더 ──
