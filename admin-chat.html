@@ -140,10 +140,10 @@ function checkAuth() {
   document.getElementById('deny').style.display = 'none';
   document.getElementById('main').style.display = 'flex';
   loadUsers().then(function() {
-    // URL ?user_id= 로 진입 시 해당 유저 자동 선택
+    // URL ?user_id= 로 진입 시 해당 유저 채팅 자동 열기
     var params = new URLSearchParams(location.search);
     var targetUid = params.get('user_id');
-    if (targetUid) loadChat(targetUid, true);
+    if (targetUid) selectUser(targetUid);
   });
   autoTimer = setInterval(function() {
     loadUsers();
