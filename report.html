@@ -7738,6 +7738,12 @@ async function generateVedicNakshatraReport() {
   return generateVedicPrecisionReport({
     precisionOpts: { nakshatra: true, planets: true },
     theoryName: '낙샤트라 정밀 분석',
+    customSys: `[낙샤트라 타입특화 룰]
+- 27낙샤트라 이름은 산스크리트 표기 그대로 사용 (Ashwini, Bharani, Krittika... Revati). 임의 음역·단축 금지.
+- 지배 신성(Deity)·지배 행성·상징 동물·식물은 전통 BPHS 기준으로만. 임의 연결 금지.
+- 파다(1~4) 분석 시 각 파다가 대응하는 D9 라시를 정확히 명시.
+- 낙샤트라 기질(Deva/Manushya/Rakshasa, Sthira/Chara/Ugra 등) 언급 시 전통 분류만.
+- "이 낙샤트라면 반드시 ~" 단정 금지. "경향·공명·흔적"으로 표현.`,
     promptsA: [
       `낙샤트라 ${nak}의 지배 행성·상징 동물/나무/색상을 "당신은 ~의 사람입니다" 형식으로 한 줄 선언. 사주 일주 ${_ilju||''}와 공통으로 가리키는 영혼의 색깔.`,
       `낙샤트라 ${nak}의 신화(아쉬위니=치유 쌍둥이, 로히니=달의 사랑, 크리티카=불의 칼 등 27개 중 해당)와 상징의 의미를 스토리텔링으로.`,
@@ -7760,6 +7766,12 @@ async function generateVedicPadaReport() {
   return generateVedicPrecisionReport({
     precisionOpts: { nakshatra: true, navamsa: true },
     theoryName: '낙샤트라 파다 세분 분석',
+    customSys: `[파다(Pada) 타입특화 룰]
+- 파다 1~4는 각각 아리에스→타우루스→제미나이→캔서 D9 라시에 대응 (낙샤트라별로 시작 라시 다름). 매핑 임의 변경 금지.
+- Vargottama(D1과 D9 파다 라시가 같은 경우) 여부를 명시 — 해당되면 그 행성 에너지 강화 표현.
+- D9 분석은 반드시 "나바암샤(D9)에서" 명시. D1 라시와 혼동 금지.
+- 파다에 따른 성격 차이는 미묘한 스펙트럼으로. 같은 낙샤트라 4파다를 완전히 다른 사람처럼 묘사 금지.
+- 파다 지배 행성의 상태(D9 위치·품위)를 반영해 해석 강도 조절.`,
     promptsA: [
       `낙샤트라 ${nak} 파다 ${pada} 선언. 이 파다가 대응하는 D9 별자리와 의미. "당신은 ${nak} 파다 ${pada} — D9 ~별자리의 사람입니다."`,
       `같은 ${nak} 낙샤트라의 파다1~4가 각각 어떤 얼굴을 가지는지 전체 개관. 4가지 얼굴 중 왜 이 파다가 가장 ~한 성향인가.`,
@@ -7779,6 +7791,13 @@ async function generateVedicDashaLifeReport() {
   return generateVedicPrecisionReport({
     precisionOpts: { dasha: true, dashaHistory: true },
     theoryName: '120년 빔쇼타리 다샤 분석',
+    customSys: `[빔쇼타리 다샤 타입특화 룰]
+- 9행성 주기 합계는 반드시 120년 (태양9·달10·화성7·라후18·목성16·토성19·수성17·케투7·금성20).
+- 다샤·안타르다샤·프라티안타르다샤 3단계 명칭과 기간은 데이터 블록 표 값만 인용. 임의 계산·추정 절대 금지.
+- "이 다샤에 반드시 X가 일어난다" 단정 표현 절대 금지. "테마·경향·가능성" 표현 사용.
+- 다샤 행성의 길흉은 D1 하우스 지배·위치·각도(특히 삼각·케드라)로 판단. 단순 '길성=좋음' 도식 금지.
+- Sandhi(전환기) 구간에서는 에너지 혼란·불안정 표현. 이 구간의 중요 결정 보류 권유.
+- 과거 다샤 해석은 사실로 기정화. 미래 다샤는 "경향·준비" 관점으로.`,
     promptsA: [
       `제공된 '빔쇼타리 다샤 120년 전체 흐름' 표를 그대로 인용하며 9개 마하다샤 순서와 나이 구간·연도를 정확히 명시. 출발 행성기의 기질 형성 영향을 간단히.`,
       `표에서 '지나감'으로 표시된 과거 다샤 구간을 순서대로 훑으며 각 시기의 테마와 남긴 흔적을 근거와 함께. 나이·연도는 반드시 표의 값 그대로.`,
@@ -7826,6 +7845,13 @@ async function generateVedicAtmakarakaReport() {
   return generateVedicPrecisionReport({
     precisionOpts: { atmakaraka: true, planet: true },
     theoryName: 'Atmakaraka 영혼의 행성 분석',
+    customSys: `[Atmakaraka 타입특화 룰]
+- Atmakaraka(AK)는 출생시 가장 높은 도수(0~30° 중)를 가진 행성 — Jaimini 시스템 전용. Parashari에서 이 개념 사용 금지.
+- AK 판별 시 라후·케투는 제외(Jaimini 논쟁 있음). 데이터 블록 AK 행성 값만 인용.
+- Atmakaraka ≠ Amatyakaraka(직업 행성). 두 Karaka 혼동 금지.
+- AK 행성 주제: 태양=권위/영적 자아, 달=양육/공감, 화성=용기/의지, 수성=소통/분석, 목성=지혜/확장, 금성=사랑/예술, 토성=인내/업(業), 라후=집착·욕망(포함 시).
+- Jaimini 원리: AK 주제를 회피할수록 시련 강도 상승. 통합이 해법. 이 맥락으로 서술.
+- AK가 D1·D9에서 받는 각도(drishti)와 품위(고양/데트리멘트)를 해석 강도에 반영.`,
     promptsA: [
       `Atmakaraka 행성 ${akName} 선언 — "당신의 영혼은 ${akName}입니다." 별자리·도수와 함께.`,
       `${akName}이 가리키는 영혼의 숙제: 태양=자아/권위, 달=정서/양육, 화성=의지/용기, 수성=지성/소통, 목성=지혜/확장, 금성=사랑/예술, 토성=책임/한계, 라후=집착/탐욕, 케투=해방/고독. 해당 행성 주제를 깊이.`,
@@ -7847,6 +7873,12 @@ async function generateVedicKarakamshaReport() {
   return generateVedicPrecisionReport({
     precisionOpts: { karakamsha: true, atmakaraka: true, navamsa: true },
     theoryName: 'Karakamsha 영적 사명 분석',
+    customSys: `[Karakamsha 타입특화 룰]
+- Karakamsha = D9(나바암샤) 차트에서 Atmakaraka 행성이 위치한 별자리(라시). D1 위치와 혼동 절대 금지.
+- 분석은 전적으로 D9 기준. "D9에서 ${akName}은 ~라시에 위치" 형식으로 명시.
+- Karakamsha 하우스에서 행성들의 시선(drishti)이 영적 성향 결정 — 특히 케투(해탈)·목성(지혜)·토성(수련) 시선 의미 있음.
+- "이번 생에 반드시 해탈 달성" 같은 확정 표현 절대 금지. "경향·방향·소명" 표현.
+- Jaimini 시스템 맥락 명시. Parashari D9 배우자 분석과 혼동하지 말 것 (같은 D9지만 분석 틀이 다름).`,
     promptsA: [
       `Karakamsha 선언: Atmakaraka ${akName}이 D9에서 ${kk?.sign||'미확인'}에 위치. "당신의 영혼은 D9 ${kk?.sign||''}에서 완성을 기다립니다."`,
       `D9 ${kk?.sign||''} 별자리의 성질·지배 행성·원소가 가리키는 영적 주제. 사자자리=창조/표현, 물고기자리=해탈/봉사 등.`,
@@ -7892,6 +7924,13 @@ async function generateVedicSandhiReport() {
   return generateVedicPrecisionReport({
     precisionOpts: { dashaSandhi: true, dasha: true },
     theoryName: '다샤 Sandhi 전환기 분석',
+    customSys: `[Sandhi 전환기 타입특화 룰]
+- Sandhi = 마하다샤 또는 안타르다샤 전환 구간 (보통 1~6개월 전후). 정확한 전환일은 데이터 블록만 인용.
+- Sandhi 특성: 이전 행성기 에너지 소진 + 다음 행성기 에너지 미착. "에너지 공백기·혼란기·불안정기"로 표현.
+- 이 구간에 큰 결정(이직·결혼·투자·이사) 보류 권유가 기본값. 단, 다음 행성기가 길성이면 준비 시작 긍정적으로 표현.
+- "Sandhi라 반드시 나쁜 일 생긴다" 단정 절대 금지. "에너지 취약 구간" 표현.
+- 전환 전·후 각각의 다샤 행성이 D1에서 어떤 하우스를 지배하는지 비교로 테마 변화 설명.
+- Sandhi 극복 핵심 메시지: 인내·준비·명상. 충동 행동 자제.`,
     promptsA: [
       `현재 마하다샤 잔여 개월·안타르다샤 잔여 개월·Sandhi 활성 여부를 숫자로 정리.`,
       `마하다샤 종료 시점과 다음 행성기 테마. 과거 행성기가 남긴 과제와 다음 행성기가 요구하는 준비.`,
@@ -7911,6 +7950,13 @@ async function generateVedicAshtakavargaReport() {
   return generateVedicPrecisionReport({
     precisionOpts: { ashtakavarga: true, ashtaka: true, ashtakaHouses: true },
     theoryName: 'Ashtakavarga 삶의 영역별 강약 분석',
+    customSys: `[Ashtakavarga 타입특화 룰]
+- Ashtakavarga 점수 기준: 0~8점 (4점 이상=길, 3점 이하=흉). 28~32점/하우스가 평균.
+- BAV(행성별 빈두) vs SAV(총합 강약) 구분 명확히. BAV는 개별 행성 영역, SAV는 하우스별 종합 강도.
+- 점수는 데이터 블록 값만 인용. 임의 계산·추정 금지.
+- "점수 낮은 하우스 = 금지·불가능" 표현 금지. "수련 영역·조심 필요" 표현.
+- 트랜짓(Gochara) 활용: 강한 하우스로 토성·목성 이동 시 그 행성기 결과 강화됨 — 이 맥락 반영.
+- 8개 행성 빈두 + 12하우스 SAV 모두 데이터에 있을 때만 분석. 없는 데이터 추측 금지.`,
     promptsA: [
       `제공된 '행성별 빈두'와 'SAV 12하우스 강약' 표에서 전체 합계를 그대로 인용하며 차트 전반 강도 총평. 추측 금지, 수치는 표와 100% 일치.`,
       `행성별 빈두를 표 그대로 나열하며 각 행성 영역 해석 — 태양(자아/권위), 달(감정/어머니), 화성(의지), 수성(지성), 목성(확장), 금성(사랑), 토성(책임). 점수 높낮이가 그 영역에 어떻게 나타나는지.`,
@@ -7930,6 +7976,13 @@ async function generateVedicNavamsaReport() {
   return generateVedicPrecisionReport({
     precisionOpts: { navamsa: true },
     theoryName: 'Navamsa D9 결혼·운명 분석',
+    customSys: `[Navamsa(D9) 타입특화 룰]
+- D9(나바암샤)는 출생 차트를 9등분한 Divisional Chart. D1 배치와 D9 배치가 반드시 다를 수 있음.
+- D9 데이터 인용 시 항상 "D9에서" 명시. "차트에서" 단독 표현은 D1 오해 유발 — 금지.
+- Vargottama(D1과 D9 같은 라시) 행성: 해당 행성 에너지 강화. 데이터 블록에 있으면 반드시 언급.
+- 배우자 분석: 7하우스 지배 행성, 금성(남성차트), 목성(여성차트)의 D9 위치 기준.
+- D9 라그나는 잠재 자아·30대 이후 드러나는 본성. D1 라그나와 비교 시 "D1 겉 vs D9 속" 프레임으로.
+- "D9가 이러면 반드시 이런 결혼" 단정 금지. "경향·가능성" 표현.`,
     promptsA: [
       `D9 라그나와 핵심 행성 위치 개관. "D9의 나는 ~한 사람"으로 정리.`,
       `금성의 D9 별자리로 보는 결혼 상대 유형·관계 에너지·애정 표현 방식.`,
@@ -7950,6 +8003,13 @@ async function generateVedicMoonReport() {
   return generateVedicPrecisionReport({
     precisionOpts: { planet: true },
     theoryName: 'Moon 라시(월궁) 심층 분석',
+    customSys: `[달(Chandra) 라시 타입특화 룰]
+- 달의 라시 = Janma Rashi(월궁). 달 위치는 감정·무의식·어머니·대중·공동체 관장.
+- 달 낙샤트라(Janma Nakshatra)와 달 라시 조합으로 감정 패턴 분석. 두 개 동시 활용.
+- 달에 시선(drishti)을 보내는 행성들의 영향 — 특히 토성(억압), 화성(충동), 라후(집착) 시선은 달에 강한 영향.
+- "달 라시가 ~이면 무조건 내향/외향" 단순 단정 금지. 달 위치 + 행성 조합으로 뉘앙스.
+- Chandra Lagna(달을 라그나로 보는 관점)도 언급 가능 — "달 기준으로 보면 ~하우스에 ~가 있어 ~"
+- 감정 건강 조언은 베딕 전통(달의 요일=월요일, 흰색, 물·우유 공양) 기준 우선.`,
     promptsA: [
       `라시 ${rashi} 선언과 지배 행성·원소·양식. "감정의 원형은 ${rashi}입니다."`,
       `${rashi}가 가리키는 무의식 감정 패턴. 스트레스 반응·회복 방식·정서 언어.`,
@@ -7970,6 +8030,13 @@ async function generateVedicAscendantReport() {
   return generateVedicPrecisionReport({
     precisionOpts: { planet: true },
     theoryName: '라그나(상승궁) 페르소나 분석',
+    customSys: `[Lagna(라그나) 타입특화 룰]
+- 라그나(Lagna) = 출생 순간 동쪽 지평선에 떠오른 라시. D1 차트의 1하우스 기준점.
+- Lagnesh(라그나 지배 행성) 위치·품위·각도가 전체 차트 해석의 열쇠 — 반드시 분석.
+- 라그나는 외적 신체·건강·첫인상·본능 반응·삶에 대한 접근 방식 관장.
+- 라그나와 달(감정)·태양(자아)의 차이 명시 — 세 가지가 다르면 "겉(라그나) vs 속(달 라시) vs 자아(태양)" 프레임 활용.
+- Lagna에 위치한 행성들(1하우스 행성) 영향 필수 언급 — 그 행성이 라그나를 강화 또는 변색.
+- 신체·체질 분석은 Ayurveda 연결 가능 (라그나 원소: 불=피타, 흙·물=카파, 바람=바타).`,
     promptsA: [
       `라그나 ${asc} 선언과 지배 행성. "당신의 라그나는 ${asc}입니다."`,
       `${asc} 라그나가 만드는 외적 인상·첫 이미지·타인이 가장 먼저 느끼는 특성.`,
