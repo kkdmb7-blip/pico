@@ -984,15 +984,33 @@ function classifyRealMbti(sd) {
   // 보강: 자기충족(비겁과다+식상0) → I, 인성과다+신강 → I (지식형 내향)
   // ══════════════════════════════════════════════
   var extScore = cnt(['비견','겁재','식신','상관','편재','정재']);
-  var intScore = cnt(['편관','정관','편인','정인']);
+  // 신강이면 관성을 눌리는 힘이 아닌 활용하는 힘으로 → 내향 점수 절반만 반영
+  // 신약이면 관성에 눌림 → 전체 반영
+  var gwanCnt = cnt(['편관','정관']);
+  var inCnt   = cnt(['편인','정인']);
+  var gwanScore = isStrong ? Math.floor(gwanCnt / 2) : gwanCnt;
+  var intScore = gwanScore + inCnt;
   var eiPos = (isYangDay ? 1 : 0) + Math.max(0, extScore - intScore) + (isStrong && !selfContained ? 1 : 0);
   var eiNeg = (isYangDay ? 0 : 1) + Math.max(0, intScore - extScore) + (isStrong ? 0 : 1);
   // 보강 1: 자기충족 패턴 = I 강한 가중
   if (selfContained) { eiNeg += 3; eiPos = Math.max(0, eiPos - 1); }
   // 보강 2: 학자형 (인성 강 + 신강) = I 가중 (외부 교류 X, 내적 흡수)
   if (scholarPattern) { eiNeg += 2; }
-  // 보강 3: 양신성상·종격 = 일반 사회 활동 X → I 약간 가중
-  if (isSpecial) { eiNeg += 1; }
+  // 보강 3: 양신성상·독상 = 일반 사회 활동 X → I 약간 가중
+  if (isYangshin) { eiNeg += 1; }
+  // 보강 4: 신강 + 관성 강(2개 이상) = 사회적 역할·직위 지향 → E 가중
+  // 단 자기충족·학자형 아닐 때만 (이 패턴들은 이미 I 가중됨)
+  if (isStrong && gwanSeongCnt >= 2 && !selfContained && !scholarPattern) { eiPos += 1; }
+  // 보강 5: 종격 세분화 — 종아격·종재격은 식상·재성 흐름이라 외향(E)
+  //         종인격·종비격은 인성·비겁 흐름이라 내향(I)
+  if (isJongguk) {
+    var pSubtype = (sd.pattern && sd.pattern.subtype) || '';
+    if (pSubtype.indexOf('종아') >= 0 || pSubtype.indexOf('종재') >= 0) {
+      eiPos += 1; eiNeg = Math.max(0, eiNeg - 1); // 종아·종재 = E
+    } else {
+      eiNeg += 1; // 종인·종비 = I
+    }
+  }
   var f1 = eiPos > eiNeg ? 'E' : 'I';
   var eiTotal = eiPos + eiNeg || 1;
   var ePct = Math.round(eiPos / eiTotal * 100);
