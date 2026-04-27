@@ -365,6 +365,44 @@ td.reasons span {
   <h2 style="font-size:13px;">JS 에러 모니터링</h2>
   <div id="anErrors" class="card"><div class="loading">불러오는 중...</div></div>
 
+  <h2>Orb 잔액 관리</h2>
+  <div class="card" style="padding:14px 12px;">
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <input id="orbSearch" type="text" placeholder="이름 또는 앞8자리 검색..." style="flex:1;min-width:140px;padding:8px 12px;border:1px solid var(--border-soft);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);outline:none;" oninput="filterOrbTable()">
+      <button onclick="loadOrbUsers()" style="padding:8px 14px;background:rgba(154,122,38,0.13);border:1px solid rgba(154,122,38,0.35);border-radius:8px;font-size:12px;font-weight:700;color:var(--gold-deep);cursor:pointer;">새로고침</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table id="orbTable" style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr style="color:var(--muted);font-size:11px;letter-spacing:0.04em;">
+            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border-soft);">이름</th>
+            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border-soft);">ID앞8자</th>
+            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);">총잔액</th>
+            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);">무료</th>
+            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);">유료</th>
+            <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border-soft);">일치</th>
+            <th style="text-align:center;padding:6px 8px;border-bottom:1px solid var(--border-soft);">충전</th>
+          </tr>
+        </thead>
+        <tbody id="orbTableBody"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">로딩 중...</td></tr></tbody>
+      </table>
+    </div>
+    <div id="orbTotal" style="margin-top:10px;font-size:11px;color:var(--muted);text-align:right;"></div>
+  </div>
+
+  <!-- 수동 충전 모달 -->
+  <div id="orbGrantModal" style="display:none;position:fixed;inset:0;background:rgba(40,28,16,0.55);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fcf7ea;border-radius:16px;padding:24px;width:90%;max-width:360px;box-shadow:0 10px 40px rgba(60,40,20,0.2);">
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">수동 Orb 충전</div>
+      <div id="orbGrantTarget" style="font-size:11px;color:var(--muted);margin-bottom:16px;"></div>
+      <input id="orbGrantAmount" type="number" placeholder="충전할 Orb 수량" style="width:100%;padding:10px 12px;border:1px solid var(--border-soft);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);outline:none;box-sizing:border-box;margin-bottom:12px;">
+      <div style="display:flex;gap:8px;">
+        <button onclick="closeOrbGrant()" style="flex:1;padding:10px;background:rgba(80,55,30,0.08);border:none;border-radius:8px;font-size:13px;cursor:pointer;">취소</button>
+        <button onclick="submitOrbGrant()" style="flex:1;padding:10px;background:var(--gold-deep);color:#fcf7ea;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">충전</button>
+      </div>
+    </div>
+  </div>
+
   <h2>AI 피드백 대시보드</h2>
 
   <div id="summaryGrid" class="summary-grid"></div>
@@ -626,6 +664,7 @@ async function boot() {
   loadRecent();
   loadChatUnread();
   loadAnalytics();
+  loadOrbUsers();
 }
 
 async function loadAnalytics() {
@@ -892,6 +931,92 @@ qs('csvBtn').addEventListener('click', exportCsv);
 qs('anRange').addEventListener('change', loadAnalytics);
 
 boot();
+
+// ── Orb 관리 ──
+let orbAllRows = [];
+let orbGrantUserId = '';
+
+async function loadOrbUsers() {
+  const tbody = document.getElementById('orbTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">로딩 중...</td></tr>';
+  try {
+    const res = await fetch(`${API}/admin/orb-users?admin=${encodeURIComponent(adminUuid)}`);
+    const data = await res.json();
+    if (!data.ok) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#a94a3a;">로드 실패</td></tr>'; return; }
+    orbAllRows = data.rows || [];
+    renderOrbTable(orbAllRows);
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#a94a3a;">에러: ' + e.message + '</td></tr>';
+  }
+}
+
+function filterOrbTable() {
+  const q = (document.getElementById('orbSearch')?.value || '').toLowerCase();
+  const filtered = q ? orbAllRows.filter(r =>
+    (r.name||'').toLowerCase().includes(q) || (r.uid_short||'').toLowerCase().includes(q)
+  ) : orbAllRows;
+  renderOrbTable(filtered);
+}
+
+function renderOrbTable(rows) {
+  const tbody = document.getElementById('orbTableBody');
+  const total = document.getElementById('orbTotal');
+  if (!tbody) return;
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">없음</td></tr>'; return; }
+
+  tbody.innerHTML = rows.map(r => {
+    const match = (r.balance === r.free_balance + r.paid_balance);
+    const mismatch = !match ? '⚠️' : '✓';
+    const mColor = match ? '#2a7a3e' : '#a94a3a';
+    return `<tr style="border-bottom:1px solid rgba(154,122,38,0.1);">
+      <td style="padding:7px 8px;font-weight:600;color:var(--text);">${r.name}</td>
+      <td style="padding:7px 8px;color:var(--muted);font-size:11px;font-family:monospace;">${r.uid_short}</td>
+      <td style="padding:7px 8px;text-align:right;font-weight:700;color:var(--gold-deep);">${(r.balance||0).toLocaleString()}</td>
+      <td style="padding:7px 8px;text-align:right;color:#2a7a3e;">${(r.free_balance||0).toLocaleString()}</td>
+      <td style="padding:7px 8px;text-align:right;color:#2e6ba8;">${(r.paid_balance||0).toLocaleString()}</td>
+      <td style="padding:7px 8px;text-align:right;color:${mColor};font-size:12px;">${mismatch}</td>
+      <td style="padding:7px 8px;text-align:center;">
+        <button onclick="openOrbGrant('${r.user_id}','${r.name}')" style="padding:4px 10px;background:rgba(154,122,38,0.13);border:1px solid rgba(154,122,38,0.3);border-radius:6px;font-size:11px;font-weight:700;color:var(--gold-deep);cursor:pointer;">충전</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  if (total) total.textContent = `총 ${rows.length}명 · 잔액 합계 ${rows.reduce((s,r)=>s+(r.balance||0),0).toLocaleString()} Orb`;
+}
+
+function openOrbGrant(userId, name) {
+  orbGrantUserId = userId;
+  const tgt = document.getElementById('orbGrantTarget');
+  const amt = document.getElementById('orbGrantAmount');
+  const modal = document.getElementById('orbGrantModal');
+  if (tgt) tgt.textContent = name + ' (' + userId.slice(0,8) + '...)';
+  if (amt) amt.value = '';
+  if (modal) modal.style.display = 'flex';
+}
+function closeOrbGrant() {
+  const modal = document.getElementById('orbGrantModal');
+  if (modal) modal.style.display = 'none';
+  orbGrantUserId = '';
+}
+async function submitOrbGrant() {
+  const amount = parseInt(document.getElementById('orbGrantAmount')?.value || '0');
+  if (!amount || amount <= 0 || !orbGrantUserId) return alert('수량을 입력해주세요.');
+  try {
+    const res = await fetch(`${API}/admin/grant-orb?admin=${encodeURIComponent(adminUuid)}`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id: orbGrantUserId, amount, reason: '관리자 수동 충전' })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      alert(`완료! 잔액: ${data.current?.balance?.toLocaleString()} Orb`);
+      closeOrbGrant();
+      loadOrbUsers();
+    } else {
+      alert('실패: ' + (data.error || '알 수 없는 오류'));
+    }
+  } catch(e) { alert('오류: ' + e.message); }
+}
 </script>
 <script>
 (function(){
