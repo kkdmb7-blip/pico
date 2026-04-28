@@ -7247,7 +7247,7 @@ async function generateCharacterReport() {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         user_id: _user.id,
-        orb_override: _config.orb,
+        skip_orb: true,
         system_prompt: '당신은 사주 이론 판별 엔진입니다. JSON만 반환하세요. 텍스트 해석 절대 금지.\n\n판단 규칙:\n- pattern.type이 "양신성상" 또는 "독상" → primary_theory: "적천수"\n- strength_level_5가 "극왕" 또는 "극약" → primary_theory: "적천수"\n- strength_level_5가 "신강" 또는 "신약" + pattern.type이 "정격" → primary_theory: "억부지전"\n- johu.needs의 원소가 five_count에서 0개 → secondary_theory: "궁통보감"\n\n용신 재확인:\n- 양신성상이면: 象을 疏(통하게)하는 오행 = 용신\n- 정격이면: yongshin.primary 그대로\n- 극왕 종격이면: 비겁/인성이 포섭, 식상이 용신\n\n성향 보정:\n- social=introvert + 비겁과다 → personality_keywords에 "내향적" 포함\n- action=impulsive_start → "아이디어다발_마무리약" 포함\n- stress=need_alone_time → "독립선호" 포함',
         messages: [{ role: 'user', content: '분석 데이터:\n' + JSON.stringify(step2Body) + '\n\nJSON만 반환. 필드: primary_theory, secondary_theory, yongshin_final:{primary,primary_element,in_chart}, structure_summary, strength_interpretation, bijob_role, personality_keywords[], wealth_structure:{type,note}, career_tendency, writing_guidelines[], 격국유형, 분석프레임, 핵심키워드[], 성향반영, 주의점' }]
       })
@@ -7369,7 +7369,7 @@ async function generateMoneyReport() {
   let wealthFrame = { wealth_type:'미확인', primary_path:'미확인', income_style:'미확인', risk_factors:[], writing_guidelines:[] };
   try {
     const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+      body: JSON.stringify({ user_id:_user.id, skip_orb:true,
         system_prompt:`당신은 사주 재물 구조 분석 엔진입니다. JSON만 반환. 해설 금지.
 wealth_type: "식상생재형"|"재성독립형"|"비겁탈재위험"|"관인재물형"|"재성약형"
 income_style: "사업"|"직장"|"투자"|"전문직"|"복합"
@@ -7452,7 +7452,7 @@ async function generateLoveReport() {
   let loveFrame = { love_type:'미확인', partner_element:'미확인', romance_style:'미확인', marriage_timing:'미확인', writing_guidelines:[] };
   try {
     const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+      body: JSON.stringify({ user_id:_user.id, skip_orb:true,
         system_prompt:`당신은 사주 연애 구조 분석 엔진입니다. JSON만 반환. 해설 금지.
 love_type: "관성강형"|"관성약형"|"상관견관형"|"식신생재연애형"|"인성연애형" 중 하나
 partner_element: 배우자성 오행 (예: "금(金)형")
@@ -7534,7 +7534,7 @@ async function generateDaeunReport() {
   let daeunFrame = { current_phase:'미확인', key_theme:'미확인', opportunities:[], risks:[], writing_guidelines:[] };
   try {
     const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+      body: JSON.stringify({ user_id:_user.id, skip_orb:true,
         system_prompt:`당신은 사주 대운 분석 엔진입니다. JSON만 반환. 해설 금지.
 current_phase: "성장기"|"전환기"|"수확기"|"정비기"|"도약기" 중 하나
 key_theme: 현재 대운 핵심 테마 한 문장
@@ -7622,7 +7622,7 @@ async function generateYearReport() {
   let yearFrame = { year_theme:'미확인', strong_areas:[], weak_areas:[], key_months:[], writing_guidelines:[] };
   try {
     const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+      body: JSON.stringify({ user_id:_user.id, skip_orb:true,
         system_prompt:`당신은 사주 세운 분석 엔진입니다. JSON만 반환. 해설 금지.
 year_theme: 올해 세운 핵심 테마 한 문장
 year_ten_god: 올해 세운 천간의 일간 대비 십신
@@ -7717,7 +7717,7 @@ async function generateMonthReport() {
     const step1Ctrl = new AbortController();
     const step1Tid = setTimeout(() => step1Ctrl.abort(), 30000);
     const r0 = await fetch(CHAT_API, { signal:step1Ctrl.signal, method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+      body: JSON.stringify({ user_id:_user.id, skip_orb:true,
         system_prompt:`당신은 사주 월운 분석 엔진입니다. JSON만 반환. 해설 금지.
 현재: ${monthStr}
 이달 월건(월주): ${monthPillarStr}
@@ -7822,7 +7822,7 @@ async function generateYongsinReport() {
     const step1Ctrl = new AbortController();
     const step1Tid = setTimeout(() => step1Ctrl.abort(), 30000);
     const r0 = await fetch(CHAT_API, { signal: step1Ctrl.signal, method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ user_id: _user.id, orb_override: _config.orb,
+      body: JSON.stringify({ user_id: _user.id, skip_orb: true,
         system_prompt: `당신은 사주 용신 분석 엔진입니다. JSON만 반환. 해설 금지.
 yongsin_element: 용신 오행 한 글자 (목/화/토/금/수)
 yongsin_reason: 이 사주에서 이 오행이 용신인 이유 한 문장
@@ -7898,7 +7898,7 @@ async function setupSectionsAndDeductOrb() {
   // Orb 차감 (최소 호출로 deduct)
   try {
     const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
+      body: JSON.stringify({ user_id:_user.id, skip_orb:true,
         system_prompt:'사주 분석 준비 엔진. "READY"만 반환.',
         messages:[{role:'user', content:'준비'}]
       })
