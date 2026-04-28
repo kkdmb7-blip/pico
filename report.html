@@ -4681,7 +4681,7 @@ function closeChildModal() {
   var btn = document.getElementById('btnGenerate');
   if (btn && btn.style.display === 'none') {
     btn.style.display = '';
-    btn.innerHTML = '<i class="pi pi-sparkle"></i> 리포트 생성하기';
+    btn.innerHTML = '<i class="pi pi-sparkle"></i> 리포트 생성하기<span class="btn-intro-gen-sub" id="introOrbCost"></span>';
     btn.onclick = function() { openChildModal(); };
   }
 }
@@ -6799,7 +6799,7 @@ function renderIntro() {
   }
 
   // Orb 비용
-  document.getElementById('introOrbCost').textContent = `${_config.orb.toLocaleString()} Orb 차감`;
+  { const _oc = document.getElementById('introOrbCost'); if (_oc && _config && _config.orb) _oc.textContent = _config.orb.toLocaleString() + ' Orb 차감'; }
 
   // FAQ
   let faqEl = document.getElementById('introFaq');
