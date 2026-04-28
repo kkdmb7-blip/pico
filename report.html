@@ -9832,7 +9832,8 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 
   // 환각 방지 가드 — 사주 기반 리포트만 (기문 등은 9궁 천간이 자유롭게 등장하므로 skip)
   const isQimenReport = (_type === 'qimen_wonmyong' || _type === 'qimen_today' || _type === 'qimen_taegil'
-    || _type === 'vedic_full' || _type === 'astro_full' || _type === 'ziwei_full');
+    || _type === 'astro_full' || _type === 'ziwei_full'
+    || _type.startsWith('vedic_'));
   const HALLUC_GUARD = isQimenReport ? '' : `
 
 ★ 환각 방지 절대 규칙 (위반 시 사실 오류로 간주):
