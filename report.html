@@ -746,7 +746,7 @@ function navBack() {
     <div class="modal-icon"><i class="pi pi-gem"></i></div>
     <div class="modal-title">Orb가 부족해요</div>
     <div class="modal-sub" id="orbModalSub">Orb를 충전하고 리포트를 받아보세요.</div>
-    <button class="modal-btn modal-btn-primary" onclick="location.href='charge.html'"><i class="pi pi-gem"></i> 충전하기</button>
+    <button class="modal-btn modal-btn-primary" onclick="location.href='charge.html?ret='+encodeURIComponent(location.href)"><i class="pi pi-gem"></i> 충전하기</button>
     <button class="modal-btn modal-btn-cancel" onclick="document.getElementById('orbModal').classList.remove('open');location.href='index.html?tab=report'">돌아가기</button>
   </div>
 </div>
@@ -6629,7 +6629,10 @@ function renderIntro() {
 }
 
 // ── 생성 시작 (소개 화면 → 실제 흐름) ──
+var _isGenerating = false;
 async function startGeneration() {
+  if (_isGenerating) return;
+  _isGenerating = true;
   showState('loading');
 
   setLoading('사주 정보 불러오는 중...', '');
@@ -6653,7 +6656,7 @@ async function startGeneration() {
     return;
   }
 
-  await generateReport();
+  try { await generateReport(); } finally { _isGenerating = false; }
 }
 
 // ── 기존 리포트 조회 ──

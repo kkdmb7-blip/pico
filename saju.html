@@ -673,12 +673,19 @@ const pHour  = UP.get('hour') || '12';
 const pMinute= UP.get('minute') || '0';
 const pGender= UP.get('gender') || 'male';
 const pMidnight = parseInt(UP.get('midnightType') || '0');
+const pCalendar = UP.get('calendar') || 'solar';
 const pName  = UP.get('name') || '';
 const pBirth = (pYear && pMonth && pDay)
   ? pYear + '-' + String(pMonth).padStart(2,'0') + '-' + String(pDay).padStart(2,'0')
   : null;
 
-if (pBirth) {
+if (pBirth && parseInt(pYear) > new Date().getFullYear()) {
+  document.getElementById('S_load').style.display='none';
+  const fe=document.getElementById('f_err');
+  fe.textContent='미래 날짜는 분석할 수 없어요.';
+  fe.style.display='block';
+  document.getElementById('S_form').style.display='block';
+} else if (pBirth) {
   document.getElementById('S_load').style.display='flex';
   fetchSaju();
 } else {
@@ -696,7 +703,7 @@ async function fetchSaju() {
     const res = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({birth:birthISO,gender:pGender,calendar:'solar',midnightType:pMidnight})
+      body:JSON.stringify({birth:birthISO,gender:pGender,calendar:pCalendar,midnightType:pMidnight})
     });
     const data = await res.json();
     if(data.error) throw new Error(data.error);
