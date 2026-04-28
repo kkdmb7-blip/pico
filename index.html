@@ -5152,7 +5152,7 @@ function handleKakaoCallback(code) {
   .then(function(r) { return r.json(); })
   .then(function(profile) {
     var name   = (profile.kakao_account && profile.kakao_account.profile && profile.kakao_account.profile.nickname) || '사용자';
-    var avatar = (profile.kakao_account && profile.kakao_account.profile && profile.kakao_account.profile.profile_image_url) || '';
+    var avatar = ((profile.kakao_account && profile.kakao_account.profile && profile.kakao_account.profile.profile_image_url) || '').replace(/^http:\/\//,'https://');
     var email  = (profile.kakao_account && profile.kakao_account.email) || '';
     var kakaoFallbackId = 'kakao_' + profile.id;
 
@@ -6429,7 +6429,7 @@ function updateMypageTab() {
     // Orb 잔액 표시
     (function(uid) {
       try {
-        var sb = window.supabase && window.supabase.createClient('https://ymghmfkqctckxxysxkvy.supabase.co','sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x');
+        var sb = getSb();
         if (!sb) return;
         sb.from('orb_balance').select('balance').eq('user_id', uid).maybeSingle().then(function(res) {
           var badge = document.getElementById('mypageOrbBadge');
