@@ -6724,7 +6724,7 @@ function renderIntro() {
   // 생성 버튼 색상
   const _genBtn = document.getElementById('btnGenerate');
   if (_genBtn) {
-    _genBtn.style.cssText = (_genBtn.style.cssText || '') + ';background:linear-gradient(135deg,' + _introMain + ',#241a10);color:#fcf7ea;border:none;font-size:16px;font-weight:800;padding:16px;border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,0.22);';
+    _genBtn.style.cssText = (_genBtn.style.cssText || '') + ';background:' + _introSoft.replace('0.08','0.18') + ';color:' + _introMain + ';border:1.5px solid ' + _introBd + ';font-size:15px;font-weight:800;padding:16px;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.08);';
   }
 
   // Orb 비용
