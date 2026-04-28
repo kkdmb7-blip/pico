@@ -10254,9 +10254,7 @@ function detectHallucination(text) {
   (_sdFull.big_luck_analysis || []).forEach(d => { if (d.pillar_kor) d.pillar_kor.split('').forEach(c => daeunChars.add(c)); });
   // 세운 (현재년 + 인접년) — _sewunData에서 글자 추출 시도
   const sewunChars = new Set();
-  if (_sewunData && Array.isArray(_sewunData)) {
-    _sewunData.forEach(s => { if (s.pillar) s.pillar.split('').forEach(c => sewunChars.add(c)); });
-  }
+  if (_sewun && typeof _sewun === 'string') { _sewun.split('').forEach(c => sewunChars.add(c)); }
   const allValid = new Set([...sajuChars, ...daeunChars, ...sewunChars]);
   const STEMS = '甲乙丙丁戊己庚辛壬癸갑을병정무기경신임계';
   const BRANCHES_HJ = '子丑寅卯辰巳午未申酉戌亥';
