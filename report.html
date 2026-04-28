@@ -4493,6 +4493,9 @@ async function loadSharedReportById(reportId) {
 
 function proceedAfterProfile() {
   document.getElementById('btnGenerate').style.display = '';
+  // Orb 비용 즉시 표시 (renderIntro 전에도 보이도록)
+  var _orbEl = document.getElementById('introOrbCost');
+  if (_orbEl && _config && _config.orb) _orbEl.textContent = _config.orb.toLocaleString() + ' Orb 차감';
   document.getElementById('btnGenerate').onclick = function() {
     if (_type === 'character') {
       showState('personality');
