@@ -402,7 +402,7 @@
     const LABEL_MAP = { 수리논리: '수리·논리' };
     return arr.map(function (a) { return Object.assign({}, a, { label: LABEL_MAP[a.name] || a.name }); });
   }
-  function scoreCharacterTraits(ctx) { return scoreMatrix(CHARACTER_TRAITS, ctx); }
+  function scoreCharacterTraits(ctx) { return scoreMatrix(CHARACTER_TRAITS, ctx).map(function(a){ return Object.assign({}, a, { label: a.name }); }); }
   function scoreMoneyPatterns(ctx) { return scoreMatrix(MONEY_PATTERNS, ctx); }
   function scoreLoveStyles(ctx) { return scoreMatrix(LOVE_STYLES, ctx); }
 
