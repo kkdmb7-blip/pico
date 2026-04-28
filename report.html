@@ -10256,16 +10256,15 @@ function detectHallucination(text) {
   const sewunChars = new Set();
   if (_sewun && typeof _sewun === 'string') { _sewun.split('').forEach(c => sewunChars.add(c)); }
   const allValid = new Set([...sajuChars, ...daeunChars, ...sewunChars]);
-  const STEMS = '甲乙丙丁戊己庚辛壬癸갑을병정무기경신임계';
+  // 한자만 체크 (한글 지지·천간은 일상 단어에도 나와 오탐 많음)
+  const STEMS_HJ = '甲乙丙丁戊己庚辛壬癸';
   const BRANCHES_HJ = '子丑寅卯辰巳午未申酉戌亥';
-  const BRANCHES_KO = '자축인묘진사오미신유술해';
-  const ALL_CHARS = STEMS + BRANCHES_HJ + BRANCHES_KO;
-  // 텍스트에 등장한 천간·지지 중 사주·대운·세운에 없는 것 (한자/한글 혼용 처리)
+  const ALL_HJ = STEMS_HJ + BRANCHES_HJ;
   const HJ_TO_KO = {子:'자',丑:'축',寅:'인',卯:'묘',辰:'진',巳:'사',午:'오',未:'미',申:'신',酉:'유',戌:'술',亥:'해',
     甲:'갑',乙:'을',丙:'병',丁:'정',戊:'무',己:'기',庚:'경',辛:'신',壬:'임',癸:'계'};
   const offenders = new Set();
   for (const c of text) {
-    if (!ALL_CHARS.includes(c)) continue;
+    if (!ALL_HJ.includes(c)) continue;
     const koC = HJ_TO_KO[c] || c;
     if (allValid.has(koC) || allValid.has(c)) continue;
     offenders.add(c);
