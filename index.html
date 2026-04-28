@@ -6170,6 +6170,8 @@ async function checkAdminAccess() {
       if (btnChat) btnChat.style.display = 'flex';
       localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
       loadAdminChatUnread();
+      var _pkg = document.getElementById('pkgSection');
+      if (_pkg) _pkg.style.display = 'block';
     }
     // index.html의 currentUser.id는 resolve-user가 돌려준 UUID가 저장됨
     if (currentUser.id === ADMIN_UUID) { showAdmin(); return; }
@@ -6261,10 +6263,6 @@ function updateMypageTab() {
     })(currentUser.id);
     checkAdminAccess();
     refreshPushBtnLabel();
-    if (currentUser.id === '99f9f77a-2f2a-4055-ab44-421d1c070341') {
-      var _pkg = document.getElementById('pkgSection');
-      if (_pkg) _pkg.style.display = 'block';
-    }
   } else {
     guest.style.display = '';
     user.style.display = 'none';
