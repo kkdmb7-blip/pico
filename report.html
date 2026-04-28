@@ -6506,6 +6506,57 @@ function renderCharVisual() {
   </div>`;
 }
 
+// 패키지 서브리포트 매핑
+const PKG_SUB_MAP = {
+  pkg_saju_core:  { types:['character','money','love'],   labels:['기질 분석','재물·사업','연애·결혼'] },
+  pkg_timing:     { types:['daeun','year','timing'],      labels:['대운 흐름','올해 운세','결정 타이밍'] },
+  pkg_relations:  { types:['love','family','soulmate'],   labels:['연애·결혼','가족·인연','이상형'] },
+  pkg_world:      { types:['vedic_full','astro_full','ziwei_full'], labels:['베딕','서양 점성','자미두수'] },
+};
+
+// 패키지 상태 비동기 조회 → 인트로 업데이트
+async function loadAndRenderPackageStatus() {
+  const pkg = PKG_SUB_MAP[_type];
+  if (!pkg) return;
+  const sb = getSb();
+  if (!sb || !_user) return;
+
+  const statusEl = document.getElementById('pkgStatusList');
+  if (!statusEl) return;
+
+  const results = await Promise.all(pkg.types.map(async function(t) {
+    try {
+      const { data } = await sb.from('reports').select('created_at').eq('user_id', _user.id).eq('report_type', t).order('created_at', { ascending: false }).limit(1).maybeSingle();
+      return { type: t, done: !!(data && data.created_at), date: data && data.created_at };
+    } catch(e) { return { type: t, done: false }; }
+  }));
+
+  const col = TYPE_COLORS[_type] || { main:'#8a6a15', soft:'rgba(154,122,38,0.08)', border:'rgba(154,122,38,0.25)' };
+  const allDone = results.every(function(r){ return r.done; });
+  const missingCount = results.filter(function(r){ return !r.done; }).length;
+
+  statusEl.innerHTML = results.map(function(r, i) {
+    const dtTxt = r.date ? new Date(r.date).toLocaleDateString('ko-KR', {month:'short', day:'numeric'}) : '';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:' + (r.done ? 'rgba(34,120,60,0.08)' : 'rgba(0,0,0,0.04)') + ';margin-bottom:5px;">'
+      + '<div style="width:20px;height:20px;border-radius:50%;background:' + (r.done ? '#1a7a3a' : 'rgba(0,0,0,0.12)') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:#fff;font-weight:800;">' + (r.done ? '✓' : (i+1)) + '</div>'
+      + '<div style="flex:1;font-size:13px;font-weight:' + (r.done ? '600' : '500') + ';color:' + (r.done ? '#1a5a2a' : '#5a4830') + ';">' + pkg.labels[i] + '</div>'
+      + (r.done ? '<div style="font-size:10px;color:#3a8a3a;">' + dtTxt + ' 생성됨</div>' : '<div style="font-size:10px;color:#8a7a60;">아직 없음</div>')
+      + '</div>';
+  }).join('');
+
+  // 버튼 텍스트 업데이트
+  const btn = document.getElementById('btnGenerate');
+  if (btn) {
+    if (allDone) {
+      btn.innerHTML = '<i class="pi pi-sparkle"></i> 무료로 모아보기<span class="btn-intro-gen-sub">이미 생성된 리포트 · Orb 차감 없음</span>';
+    } else if (missingCount === pkg.types.length) {
+      btn.innerHTML = '<i class="pi pi-sparkle"></i> 리포트 생성하기<span class="btn-intro-gen-sub">' + _config.orb.toLocaleString() + ' Orb 차감</span>';
+    } else {
+      btn.innerHTML = '<i class="pi pi-sparkle"></i> 모아보기 (' + (pkg.types.length - missingCount) + '개 바로 · ' + missingCount + '개 없음)<span class="btn-intro-gen-sub">없는 리포트는 링크 안내 · Orb 차감 없음</span>';
+    }
+  }
+}
+
 function renderIntro() {
   const d = TYPE_DETAIL[_type];
   if (!d) return;
@@ -6674,6 +6725,23 @@ function renderIntro() {
   const secWrap = document.getElementById('introSections');
   secWrap.innerHTML = '';
   const isPkg = _type.startsWith('pkg_');
+
+  // 패키지: 상태 영역 삽입 + 비동기 조회
+  if (isPkg) {
+    let pkgStatusWrap = document.getElementById('pkgStatusWrap');
+    if (!pkgStatusWrap) {
+      pkgStatusWrap = document.createElement('div');
+      pkgStatusWrap.id = 'pkgStatusWrap';
+      pkgStatusWrap.style.cssText = 'margin-bottom:14px;';
+      pkgStatusWrap.innerHTML = '<div style="font-size:10px;font-weight:800;color:' + _introMain + ';letter-spacing:0.18em;margin-bottom:8px;">포함된 리포트 현황</div>'
+        + '<div id="pkgStatusList"><div style="font-size:12px;color:var(--muted);padding:8px 0;">확인 중...</div></div>';
+      const secList = document.querySelector('.intro-section-list');
+      if (secList) secList.parentNode.insertBefore(pkgStatusWrap, secList);
+    }
+    loadAndRenderPackageStatus();
+    document.querySelector('.intro-section-list').style.display = 'none';
+  }
+
   if (isPkg) {
     // 패키지: 서브 리포트 목록으로 표시
     (d.sectionDesc || []).forEach((desc, i) => {
@@ -8609,9 +8677,10 @@ async function generatePackageReport(types, labels) {
   tabBar.style.cssText = 'display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;';
   labels.forEach(function(lbl, i) {
     const btn = document.createElement('button');
-    btn.textContent = lbl;
+    btn.id = 'pkg-tab-' + i;
+    btn.innerHTML = '<span id="pkg-tab-dot-' + i + '" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ccc;margin-right:5px;vertical-align:middle;"></span>' + lbl;
     btn.onclick = function() { switchPkgTab(i, types.length); };
-    btn.style.cssText = 'padding:8px 16px;border-radius:20px;border:1px solid ' + pkgBorder + ';background:' + (i===0?pkgSoft:'transparent') + ';color:' + pkgColor + ';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;';
+    btn.style.cssText = 'padding:8px 14px;border-radius:20px;border:1px solid ' + pkgBorder + ';background:' + (i===0?pkgSoft:'transparent') + ';color:' + pkgColor + ';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;';
     tabBar.appendChild(btn);
   });
   wrap.appendChild(tabBar);
@@ -8646,6 +8715,8 @@ async function generatePackageReport(types, labels) {
     } catch(e) {}
 
     if (content) {
+      const _dot = document.getElementById('pkg-tab-dot-' + ti);
+      if (_dot) { _dot.style.background = '#1a7a3a'; }
       panel.innerHTML = '<div style="font-size:11px;font-weight:700;color:' + pkgColor + ';margin-bottom:12px;padding:8px 12px;background:' + pkgSoft + ';border-radius:8px;">' + labels[ti] + ' 리포트</div>'
         + secs.map(function(s, i) {
             return '<div class="section-card"><div class="section-header"><div class="section-num">' + (i+1) + '</div><div class="section-name">' + s.name + '</div></div>'
