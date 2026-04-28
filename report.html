@@ -8260,27 +8260,82 @@ async function generateVedicGemstoneReport() {
   });
 }
 
-// 15. 이번주 길시 (Muhurta)
+// 15. 이번주 길시 (Muhurta) — 시각 캘린더 + AI 분석
 async function generateVedicMuhurtaReport() {
+  if (!_vedicData || !_vedicData.nakshatra) {
+    if (_profile && _profile.year) await loadVedicData();
+    if (!_vedicData || !_vedicData.nakshatra) { showDataMissingError('vedic.html', '베딕 점성술'); return; }
+  }
+  if (!await setupSectionsAndDeductOrb()) return;
+
+  // ── 시각 캘린더 삽입 (sectionsWrap 위에) ──
+  const wrap = document.getElementById('sectionsWrap');
+  const calCard = document.createElement('div');
+  calCard.id = 'muhurtaCalCard';
+
+  const QUALITY_STYLE = {
+    '대길': { bg:'rgba(34,120,60,0.12)',  bd:'rgba(34,120,60,0.40)',  dot:'#1a7a3a', label:'대길' },
+    '길':   { bg:'rgba(80,160,80,0.10)',  bd:'rgba(80,160,80,0.35)',  dot:'#3a8a3a', label:'길' },
+    '보통': { bg:'rgba(90,90,90,0.07)',   bd:'rgba(90,90,90,0.22)',   dot:'#888',    label:'보통' },
+    '주의': { bg:'rgba(200,120,20,0.10)', bd:'rgba(200,120,20,0.38)', dot:'#b06010', label:'주의' },
+    '흉':   { bg:'rgba(180,30,30,0.10)',  bd:'rgba(180,30,30,0.38)',  dot:'#a02020', label:'흉' },
+  };
+
+  const days = Array.isArray(_vedicData.muhurta) ? _vedicData.muhurta : [];
+  let calHtml = '<div style="margin-bottom:16px;">'
+    + '<div style="font-size:10px;font-weight:800;color:#4a7a8a;letter-spacing:0.22em;margin-bottom:10px;">이번 주 7일 길흉</div>'
+    + '<div style="display:flex;flex-direction:column;gap:7px;">';
+
+  days.forEach(function(d) {
+    const q = QUALITY_STYLE[d.quality] || QUALITY_STYLE['보통'];
+    const dateObj = new Date(d.date);
+    const dateStr = (dateObj.getMonth()+1) + '/' + dateObj.getDate();
+    const tithiShort = (d.tithi || '').split(' ').slice(0,2).join(' ');
+    const specBadge = d.specials && d.specials.length
+      ? '<span style="font-size:9px;background:rgba(34,120,60,0.15);color:#1a7a3a;border-radius:10px;padding:1px 7px;font-weight:700;margin-left:4px;">' + d.specials[0].split(' ')[0] + '</span>' : '';
+    const cautionBadge = d.cautions && d.cautions.length
+      ? '<span style="font-size:9px;background:rgba(180,60,20,0.12);color:#a03010;border-radius:10px;padding:1px 7px;font-weight:700;margin-left:4px;">' + d.cautions[0].split('(')[0].trim() + '</span>' : '';
+
+    calHtml += '<div style="display:flex;align-items:center;gap:10px;background:' + q.bg + ';border:1px solid ' + q.bd + ';border-radius:12px;padding:10px 13px;">'
+      + '<div style="text-align:center;min-width:38px;flex-shrink:0;">'
+        + '<div style="font-size:11px;font-weight:800;color:' + q.dot + ';">' + d.weekday + '</div>'
+        + '<div style="font-size:12px;font-weight:700;color:#241a10;">' + dateStr + '</div>'
+      + '</div>'
+      + '<div style="width:6px;height:6px;border-radius:50%;background:' + q.dot + ';flex-shrink:0;"></div>'
+      + '<div style="flex:1;min-width:0;">'
+        + '<div style="font-size:12px;color:#241a10;line-height:1.5;">'
+          + '<span style="font-weight:700;">' + (d.nakshatra || '') + '</span>'
+          + '<span style="color:#5a4830;margin-left:5px;font-size:11px;">' + tithiShort + '</span>'
+          + specBadge + cautionBadge
+        + '</div>'
+        + (d.rahuKala ? '<div style="font-size:10px;color:#8a7a60;margin-top:1px;">라후 칼라 ' + d.rahuKala + '</div>' : '')
+      + '</div>'
+      + '<div style="flex-shrink:0;font-size:11px;font-weight:800;color:' + q.dot + ';padding:2px 8px;background:' + q.bg + ';border-radius:8px;border:1px solid ' + q.bd + ';">' + q.label + '</div>'
+      + '</div>';
+  });
+
+  calHtml += '</div></div>';
+  calCard.innerHTML = calHtml;
+  wrap.insertBefore(calCard, wrap.firstChild);
+
+  // ── AI 분석 5섹션 ──
   return generateVedicPrecisionReport({
     precisionOpts: { muhurta: true, transit: true },
-    theoryName: 'Muhurta 이번주 길시 캘린더',
+    theoryName: 'Muhurta 이번주 길시 분석',
     customSys: `[Muhurta 7일 캘린더 타입특화 룰]
-- 【Muhurta 이번주 길흉시】 데이터 블록의 7일 각 항목(date, tithi, nakshatra, quality)을 그대로 인용. 새 날짜·새 Tithi·새 Nakshatra 만들지 말 것.
-- Tithi 30종 정확 분류: Nanda(1·6·11)=즐거움, Bhadra(2·7·12)=풍요, Jaya(3·8·13)=승리, Rikta(4·9·14)=공허·시작 부적합, Purna(5·10·15)=완성. Rikta Tithi에 새 시작 권장 금지.
-- 흉Tithi 명시: 아마바샤(신월·30일=정신적 일·명상 적합, 새 시작 부적합), 차투르티(4·14·24=장애), 아쉬타미(8·23=싸움), 차투르다시(14·29=긴장).
-- 27 Nakshatra 분류: Mridu(부드러움)·Tikshna(날카로움)·Krura(잔혹) 카테고리에 따라 행동별 적합도 다름. Pushya·Rohini·Anuradha=가장 길한 Nakshatra. Bharani·Krittika·Magha·Moola·Ashlesha=Krura(부드러운 일 부적합).
-- Yoga 27종 중 Vyatipata·Vaidhruti·Parigha 3개=흉. 명시되면 신중.
-- "최적 시각"은 데이터 블록의 quality 필드 기반. 주관적 시간대 추천 금지.
-- 행동별 적합 분류: 결혼·계약=Mridu+Bhadra/Jaya/Purna Tithi, 시작=Rohini/Pushya/Anuradha+Nanda, 여행=동방향 화·금·수요일, 의료=Tikshna+적합 Nakshatra.`,
+- 【Muhurta 이번주 길흉시】 데이터 블록의 7일 각 항목을 그대로 인용. 새 날짜·Tithi·Nakshatra 만들지 말 것.
+- Tithi 분류: Nanda(1·6·11)=즐거움, Bhadra(2·7·12)=풍요, Jaya(3·8·13)=승리, Rikta(4·9·14)=공허·시작 부적합, Purna(5·10·15)=완성.
+- Nakshatra 분류: Mridu(부드러움)·Tikshna(날카로움)·Krura(잔혹). Pushya·Rohini·Anuradha=가장 길한 별자리.
+- 행동별 분류: 계약=Mridu+Bhadra/Jaya/Purna Tithi, 시작=Rohini/Pushya/Anuradha+Nanda, 여행=동방향 화·금·수요일.
+- 산스크리트 용어 첫 등장 시 한국어 설명 괄호 병기.`,
     promptsA: [
-      `이번주 전반적 에너지 개관 — 주초·주중·주말의 흐름과 한 줄 주제.`,
-      `요일별 지배 행성·Nakshatra·Tithi 기반 길시·흉시. 7일 각각 2~3줄씩 정확한 날짜와 함께.`,
-      `행동별 최적 타이밍 — 중요 결정/계약/여행/면접/새 시작 각각 언제가 좋은지 요일·시간대로.`
+      `이번주 전체 에너지 흐름 — 대길·길·흉 날 분포로 본 주간 테마를 한 단락으로.`,
+      `이번주 가장 좋은 날과 피해야 할 날 — 날짜·요일·이유를 구체적으로.`,
+      `행동별 최적 시점 — 계약·결정·여행·면접·새 시작 각각 언제가 좋은지.`
     ],
     promptsB: [
-      `이번주 특히 주의할 Tithi(아마바샤·차투르티)·Nakshatra·Yoga. 있다면 정확히 지적.`,
-      `이번주 관통하는 한 줄 행동 지침. 무엇을 하고 무엇을 미뤄야 하는가.`
+      `이번주 라후 칼라와 흉시 — 절대 피해야 할 시간대와 그 이유.`,
+      `이번주 나에게 전하는 한 줄 행동 지침.`
     ],
     advice2A: ['창업/비즈니스','이직/커리어','투자/재테크'],
     advice2B: ['대인관계/부부']
