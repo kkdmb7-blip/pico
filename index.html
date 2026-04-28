@@ -6431,12 +6431,14 @@ function updateMypageTab() {
     (function(uid) {
       try {
         var sb = getSb();
+        console.log('[updateMypageTab] uid:', uid, 'sb:', !!sb);
         if (!sb) return;
         sb.from('orb_balance').select('balance').eq('user_id', uid).maybeSingle().then(function(res) {
+          console.log('[updateMypageTab] orb res:', res.data);
           var badge = document.getElementById('mypageOrbBadge');
           if (badge) badge.innerHTML = '<i class="pi pi-sparkle"></i> ' + ((res.data && res.data.balance != null) ? res.data.balance.toLocaleString() : '0') + ' Orb';
         });
-      } catch(e) {}
+      } catch(e) { console.error('[updateMypageTab] error:', e); }
     })(currentUser.id);
     checkAdminAccess();
     setTimeout(function(){ if (typeof refreshPushBtnLabel === 'function') refreshPushBtnLabel(); }, 0);
@@ -6511,7 +6513,9 @@ function urlBase64ToUint8Array(base64String) {
       updateNavOrb(u && u.id ? u.id : null);
       // 마이페이지 탭이 열려있으면 Orb 갱신
       var mTab = document.getElementById('tabMypage');
+      console.log('[updateAuthUI] mTab display:', mTab && mTab.style.display, 'currentUser:', !!currentUser);
       if (mTab && mTab.style.display !== 'none' && typeof updateMypageTab === 'function') {
+        console.log('[updateAuthUI] calling updateMypageTab');
         updateMypageTab();
       }
     } catch(e) {}
