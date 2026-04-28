@@ -6509,6 +6509,11 @@ function urlBase64ToUint8Array(base64String) {
       var stored = localStorage.getItem('pico_user');
       var u = stored ? JSON.parse(stored) : null;
       updateNavOrb(u && u.id ? u.id : null);
+      // 마이페이지 탭이 열려있으면 Orb 갱신
+      var mTab = document.getElementById('tabMypage');
+      if (mTab && mTab.style.display !== 'none' && typeof updateMypageTab === 'function') {
+        updateMypageTab();
+      }
     } catch(e) {}
   };
   window.getSb = getSb;
