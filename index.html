@@ -1738,6 +1738,7 @@
       </div>
     </div>
     <div class="life-hero-sec">살아있는 매 순간 · <b id="lifeHeroSec">0</b> 초째</div>
+    <button onclick="shareLifeDays()" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:8px 20px;background:rgba(245,217,122,0.13);border:1px solid rgba(245,217,122,0.32);border-radius:20px;color:rgba(245,217,122,0.88);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.03em;position:relative;z-index:1;font-family:inherit;"><i class="pi pi-share-alt"></i> 공유하기</button>
   </div>
 </div>
 <script>(function(){
@@ -1803,7 +1804,40 @@
 
     document.getElementById('lifeDaysWrap').style.display = 'block';
   } catch(e) {}
-})();</script>
+})();
+window.shareLifeDays = function() {
+  var who   = (document.getElementById('lifeHeroWho').textContent || '').replace('이 세상에 나온 지','').trim();
+  var days  = document.getElementById('lifeHeroNum').textContent || '0';
+  var msg   = document.getElementById('lifeHeroMsg').textContent || '';
+  var years = document.getElementById('lifeHeroY').textContent || '0';
+  var weeks = document.getElementById('lifeHeroW').textContent || '0';
+  var hours = document.getElementById('lifeHeroH').textContent || '0';
+  var moons = document.getElementById('lifeHeroMoon').textContent || '0';
+  var pageUrl = 'https://picolab.kr';
+  var text = '✦ LIFE DAYS ✦\n\n' + who + '이 세상에 나온 지 ' + days + '일\n' + msg
+    + '\n\nYEARS ' + years + '  ·  WEEKS ' + weeks
+    + '\nHOURS ' + hours + '  ·  MOONS ' + moons
+    + '\n\n' + pageUrl;
+  if (navigator.share) {
+    navigator.share({ title: '내 인생 시간 기록 · FORTUNA', text: text }).catch(function(){});
+    return;
+  }
+  if (window.Kakao && Kakao.Share) {
+    if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e){} }
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: who + '이 세상에 나온 지 ' + days + '일',
+        description: msg + '\nYEARS ' + years + '  WEEKS ' + weeks + '  HOURS ' + hours,
+        imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
+        link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
+      },
+      buttons: [{ title: '나의 인생 시간 보기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+    });
+    return;
+  }
+  try { navigator.clipboard.writeText(text).then(function(){ _showToast('클립보드에 복사됐어요!'); }); } catch(e){}
+};</script>
 <!-- 오늘의 행운 뽑기 + 도미넌트 행성 -->
 <div style="padding:16px 16px;display:flex;gap:10px;">
   <div onclick="window.location.href='game-luck.html'" style="flex:1;min-width:0;background:linear-gradient(135deg,#fdf4f1 0%,#f9e8e0 100%);border:1px solid var(--border-soft);border-radius:16px;padding:14px 14px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-shadow:var(--shadow-soft);" onmouseover="this.style.borderColor='rgba(140,74,48,0.5)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='var(--border-soft)';this.style.transform=''">
