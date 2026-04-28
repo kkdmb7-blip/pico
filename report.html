@@ -10209,6 +10209,7 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
     const el = document.getElementById(`sloading-${secIdx}`);
     if (el) {
       const msg = e.name === 'AbortError' ? '시간 초과' : '생성 실패';
+      console.error('[runSingleSection 오류]', secIdx, e.name, e.message, e);
       window.__retryPool = window.__retryPool || {};
       window.__retryPool[secIdx] = { secName, secChars, sectionPrompt, sysPrompt, mode: apiMode, skipHalluc };
       el.innerHTML = `
