@@ -4435,6 +4435,19 @@ async function loadSharedReportById(reportId) {
   _config = TYPE_CONFIG[_type];
   if (!_config) { setLoading('잘못된 접근', '리포트 타입이 올바르지 않아요'); return; }
 
+  // 패키지에서 연결된 경우 할인가 적용 (B안)
+  const _fromPkg = params.get('from_pkg');
+  if (_fromPkg && TYPE_CONFIG[_fromPkg]) {
+    const PKG_DISCOUNT = { pkg_saju_core:0.20, pkg_timing:0.12, pkg_relations:0.20, pkg_world:0.19 };
+    const disc = PKG_DISCOUNT[_fromPkg] || 0;
+    if (disc > 0) {
+      _config = Object.assign({}, _config, {
+        orb: Math.round(_config.orb * (1 - disc)),
+        _pkgDiscountLabel: '패키지 할인가 (' + Math.round(disc*100) + '% 할인)'
+      });
+    }
+  }
+
   document.getElementById('navTitle').textContent = _config.title;
 
   // 공유 링크 (?r=<id>): 로그인 없이 공유받은 리포트 전체 표시
@@ -4515,7 +4528,9 @@ function proceedAfterProfile() {
   showState('intro');
   // renderIntro 완료 후 Orb 확정
   var _oc2 = document.getElementById('introOrbCost');
-  if (_oc2 && _config && _config.orb) _oc2.textContent = _config.orb.toLocaleString() + ' Orb 차감';
+  if (_oc2 && _config && _config.orb) {
+    _oc2.textContent = _config.orb.toLocaleString() + ' Orb 차감' + (_config._pkgDiscountLabel ? ' · ' + _config._pkgDiscountLabel : '');
+  }
 }
 
 // ── 아이 프로필 입력 모달 (child_career 전용) — 만세력 동일 포맷 ──
@@ -6745,7 +6760,7 @@ function renderIntro() {
       if (secList) secList.parentNode.insertBefore(pkgStatusWrap, secList);
     }
     loadAndRenderPackageStatus();
-    document.querySelector('.intro-section-list').style.display = 'none';
+    { const _sl = document.querySelector('.intro-section-list'); if (_sl) _sl.style.display = 'none'; }
   }
 
   if (isPkg) {
@@ -8723,7 +8738,7 @@ async function generatePackageReport(types, labels) {
       panel.innerHTML = '<div style="text-align:center;padding:32px 16px;">'
         + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">' + rTitle + '가 아직 없어요</div>'
         + '<div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;">개별 리포트를 먼저 생성하면<br>여기서 바로 볼 수 있어요.</div>'
-        + '<a href="report.html?type=' + rType + '" style="display:inline-block;padding:11px 24px;background:rgba(154,122,38,0.12);border:1px solid rgba(154,122,38,0.35);border-radius:12px;text-decoration:none;color:var(--gold-deep);font-weight:700;font-size:13px;">' + rTitle + ' 생성하러 가기 →</a>'
+        + '<a href="report.html?type=' + rType + '&from_pkg=' + _type + '" style="display:inline-block;padding:11px 24px;background:rgba(154,122,38,0.12);border:1px solid rgba(154,122,38,0.35);border-radius:12px;text-decoration:none;color:var(--gold-deep);font-weight:700;font-size:13px;">' + rTitle + ' 생성하러 가기 →</a>'
         + '</div>';
     }
   }
