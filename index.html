@@ -6073,8 +6073,6 @@ async function loadAdminChatUnread() {
             icon: '/img/goddess-app.png'
           });
         } catch(e) {}
-      } else if (Notification.permission === 'default') {
-        try { Notification.requestPermission(); } catch(e) {}
       }
     }
     _lastAdminUnread = n;
