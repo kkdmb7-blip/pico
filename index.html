@@ -6430,7 +6430,7 @@ function updateMypageTab() {
     // Orb 잔액 표시
     (function(uid) {
       try {
-        var sb = getSb();
+        var sb = window.supabase && window.supabase.createClient('https://ymghmfkqctckxxysxkvy.supabase.co','sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x');
         console.log('[updateMypageTab] uid:', uid, 'sb:', !!sb);
         if (!sb) return;
         sb.from('orb_balance').select('balance').eq('user_id', uid).maybeSingle().then(function(res) {
