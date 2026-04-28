@@ -4924,6 +4924,7 @@ function checkAuth() {
     var stored = localStorage.getItem('pico_user');
     if (stored) {
       currentUser = JSON.parse(stored);
+      if (currentUser && currentUser.avatar) currentUser.avatar = currentUser.avatar.replace(/^http:\/\//,'https://');
       // _v<6 이거나 kakao_ 접두어면 UUID 재검증 (v6: 프로필 초기화 후 ID 변경 대응)
       var needsUpgrade = currentUser.email && ((!currentUser._v || currentUser._v < 6) || (currentUser.id && currentUser.id.indexOf('kakao_') === 0));
       if (needsUpgrade) {
@@ -6438,7 +6439,7 @@ function updateMypageTab() {
       } catch(e) {}
     })(currentUser.id);
     checkAdminAccess();
-    refreshPushBtnLabel();
+    if (typeof refreshPushBtnLabel === 'function') refreshPushBtnLabel();
   } else {
     guest.style.display = '';
     user.style.display = 'none';
