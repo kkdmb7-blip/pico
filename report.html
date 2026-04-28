@@ -6855,6 +6855,7 @@ async function startGeneration() {
       `이 리포트에는 ${_config.orb.toLocaleString()} Orb가 필요해요.\n현재 잔액: ${balance.toLocaleString()} Orb`;
     document.getElementById('orbModal').classList.add('open');
     document.getElementById('stateLoading').style.display = 'none';
+    _isGenerating = false;
     return;
   }
 
