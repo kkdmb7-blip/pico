@@ -88,6 +88,65 @@ nav {
 .intro-title { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 700; margin-bottom: 10px; }
 .intro-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
 
+/* ── 인트로 히어로 카드 ── */
+.intro-hero-card {
+  position: relative; overflow: hidden;
+  border-radius: 20px; padding: 24px 20px 20px;
+  margin-bottom: 16px;
+  border: 1.5px solid var(--intro-bd, rgba(154,122,38,0.35));
+  background: var(--intro-bg, linear-gradient(140deg,rgba(154,122,38,0.08),rgba(122,36,24,0.04)));
+}
+.intro-hero-glyph {
+  position: absolute; right: -10px; top: -20px;
+  font-size: 110px; opacity: 0.07; line-height: 1;
+  color: var(--intro-color, #8a6a15); pointer-events: none;
+}
+.intro-hero-label {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.25em;
+  color: var(--intro-color, #8a6a15); opacity: 0.7;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.intro-hero-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 22px; font-weight: 800; line-height: 1.3;
+  color: var(--ink); margin-bottom: 6px;
+}
+.intro-hero-sub {
+  font-size: 13px; color: var(--text2); line-height: 1.6;
+  margin-bottom: 14px;
+}
+.intro-hero-divider {
+  height: 1px; margin: 12px 0;
+  background: linear-gradient(to right, var(--intro-bd, rgba(154,122,38,0.3)), transparent);
+}
+.intro-hook-list { display: flex; flex-direction: column; gap: 7px; }
+.intro-hook-item {
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 13px; color: var(--text); line-height: 1.5;
+}
+.intro-hook-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--intro-color, #8a6a15);
+  flex-shrink: 0; margin-top: 7px;
+}
+
+/* ── 이런 분께 ── */
+.intro-for-card {
+  border-radius: 14px; padding: 16px;
+  margin-bottom: 14px;
+  background: rgba(154,122,38,0.06);
+  border: 1px solid rgba(154,122,38,0.20);
+}
+.intro-for-label { font-size: 10px; font-weight: 800; color: var(--gold-deep); letter-spacing: 0.12em; margin-bottom: 10px; }
+.intro-for-item { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; font-size: 13px; color: var(--text); line-height: 1.5; }
+.intro-for-check { color: var(--gold-deep); font-weight: 800; flex-shrink: 0; font-size: 11px; margin-top: 2px; }
+
+/* ── 생성 버튼 강화 ── */
+.btn-intro-gen-wrap {
+  position: sticky; bottom: 12px; z-index: 50;
+  margin-top: 16px;
+}
+
 .intro-section-list {
   background: var(--surface);
   border: 1px solid var(--border-soft);
@@ -6451,9 +6510,36 @@ function renderIntro() {
   const d = TYPE_DETAIL[_type];
   if (!d) return;
 
+  // ── TYPE_COLORS 기반 색상 적용 ──
+  const _introCol = TYPE_COLORS[_type] || { main:'#8a6a15', soft:'rgba(154,122,38,0.08)', border:'rgba(154,122,38,0.25)' };
+  const _introMain = _introCol.main, _introSoft = _introCol.soft, _introBd = _introCol.border;
+
+  // 히어로 헤더 카드로 변환
+  const _hdr = document.querySelector('.intro-header');
+  if (_hdr) {
+    _hdr.style.cssText = 'text-align:left;padding:22px 18px 18px;background:linear-gradient(145deg,' + _introSoft + ',rgba(255,255,255,0.01));border:1.5px solid ' + _introBd + ';border-radius:20px;margin-bottom:14px;position:relative;overflow:hidden;';
+    // 글리프 배경
+    let _gl = _hdr.querySelector('.intro-glyph-bg');
+    if (!_gl) { _gl = document.createElement('div'); _gl.className = 'intro-glyph-bg'; _gl.style.cssText = 'position:absolute;right:-8px;top:-16px;font-size:100px;opacity:0.07;line-height:1;pointer-events:none;color:' + _introMain + ';'; _hdr.appendChild(_gl); }
+    _gl.innerHTML = d.emoji;
+  }
+
+  // 레이블 (리포트 유형)
+  let _lblEl = document.getElementById('introTypeLabel');
+  if (!_lblEl) { _lblEl = document.createElement('div'); _lblEl.id = 'introTypeLabel'; document.getElementById('introEmoji').before(_lblEl); }
+  _lblEl.style.cssText = 'font-size:9px;font-weight:800;letter-spacing:0.25em;color:' + _introMain + ';opacity:0.75;text-transform:uppercase;margin-bottom:8px;';
+  _lblEl.textContent = (_config.title || '').replace('패키지 · ', '').toUpperCase();
+
+  document.getElementById('introEmoji').style.cssText = 'font-size:36px;margin-bottom:8px;display:block;';
   document.getElementById('introEmoji').innerHTML = d.emoji;
-  document.getElementById('introTitle').textContent = _config.title;
-  document.getElementById('introDesc').textContent = d.subtitle;
+
+  const _titleEl = document.getElementById('introTitle');
+  _titleEl.style.cssText = 'font-family:Noto Serif KR,serif;font-size:22px;font-weight:800;line-height:1.3;color:#241a10;margin-bottom:6px;';
+  _titleEl.textContent = _config.title;
+
+  const _descEl = document.getElementById('introDesc');
+  _descEl.style.cssText = 'font-size:13px;color:#5a4830;line-height:1.7;';
+  _descEl.textContent = d.subtitle;
 
   // ── 이전 리포트 이어보기 배너 (현재 프로필과 일치하는 캐시만 노출) ──
   try {
@@ -6552,8 +6638,9 @@ function renderIntro() {
       recEl, document.querySelector('.intro-section-list')
     );
   }
-  recEl.innerHTML = `<div class="intro-recommend-label">이런 분께 추천해요</div>` +
-    d.recommend.map(r => `<div class="intro-recommend-item"><span class="intro-check">✓</span>${r}</div>`).join('');
+  recEl.style.cssText = 'border-radius:14px;padding:14px 16px;margin-bottom:14px;background:rgba(255,255,255,0.5);border:1px solid ' + _introBd + ';';
+  recEl.innerHTML = `<div style="font-size:10px;font-weight:800;color:${_introMain};letter-spacing:0.18em;margin-bottom:10px;">이런 분께 추천해요</div>` +
+    d.recommend.map(r => `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-size:13px;color:#241a10;line-height:1.5;"><span style="color:${_introMain};font-weight:900;flex-shrink:0;font-size:14px;">✓</span><span>${r}</span></div>`).join('');
 
   // 핵심 질문 (recommend 앞에 삽입)
   let kqEl = document.getElementById('introKeyQ');
@@ -6564,8 +6651,10 @@ function renderIntro() {
     document.getElementById('stateIntro').insertBefore(kqEl, recEl);
   }
   if (d.keyQuestions && d.keyQuestions.length) {
-    kqEl.innerHTML = `<div class="intro-keyq-label">이 리포트가 답해드려요</div>` +
-      d.keyQuestions.map(q => `<div class="intro-keyq-item"><span class="intro-keyq-dot">▸</span><span>${q}</span></div>`).join('');
+    kqEl.style.cssText = 'border-radius:16px;padding:16px;margin-bottom:14px;background:' + _introSoft + ';border:1.5px solid ' + _introBd + ';';
+    kqEl.innerHTML = `<div style="font-size:10px;font-weight:800;color:${_introMain};letter-spacing:0.18em;margin-bottom:12px;">이 리포트가 답해드려요</div>` +
+      d.keyQuestions.map(q => `<div style="display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,0.65);border:1px solid ${_introBd};border-radius:10px;padding:10px 13px;margin-bottom:7px;font-size:13px;color:#241a10;line-height:1.5;"><span style="color:${_introMain};font-weight:800;font-size:11px;flex-shrink:0;margin-top:1px;">Q</span><span>${q}</span></div>`).join('') +
+      `<div style="margin-bottom:7px;"></div>`;
   }
 
   // 분석 엔진 배지 (keyQ 앞에 삽입)
@@ -6578,7 +6667,7 @@ function renderIntro() {
   }
   if (d.engines && d.engines.length) {
     engEl.innerHTML = '<span style="font-size:11px;color:var(--muted);flex-shrink:0;">분석 엔진</span>' +
-      d.engines.map(e => `<span style="font-size:11px;font-weight:700;padding:3px 11px;border-radius:20px;background:rgba(154,122,38,0.14);border:1px solid rgba(154,122,38,0.28);color:#7a5e1c;">${e}</span>`).join('');
+      d.engines.map(e => `<span style="font-size:11px;font-weight:700;padding:3px 11px;border-radius:20px;background:${_introSoft};border:1px solid ${_introBd};color:${_introMain};">${e}</span>`).join('');
   }
 
   // 섹션 목록 (sectionDesc + sectionDetail)
@@ -6627,6 +6716,16 @@ function renderIntro() {
       <div class="intro-preview-fade"></div>
     </div>
     <div class="intro-preview-lock"><i class="pi pi-sparkle"></i> 전체 내용은 리포트 생성 후 확인 가능합니다</div>`;
+
+  // 포함 내용 레이블 색상
+  const _secLabel = document.querySelector('.intro-section-label');
+  if (_secLabel) _secLabel.style.color = _introMain;
+
+  // 생성 버튼 색상
+  const _genBtn = document.getElementById('btnGenerate');
+  if (_genBtn) {
+    _genBtn.style.cssText = (_genBtn.style.cssText || '') + ';background:linear-gradient(135deg,' + _introMain + ',#241a10);color:#fcf7ea;border:none;font-size:16px;font-weight:800;padding:16px;border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,0.22);';
+  }
 
   // Orb 비용
   document.getElementById('introOrbCost').textContent = `${_config.orb.toLocaleString()} Orb 차감`;
