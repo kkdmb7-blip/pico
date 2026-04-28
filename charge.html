@@ -1016,6 +1016,11 @@ async function doSubscribe(plan) {
         email: currentUserEmail || 'user@picolab.kr',
         phoneNumber: '01000000000',
       },
+      bypass: {
+        inicis_v2: {
+          cardCertCode: 'N',
+        },
+      },
     });
     console.log('[doSubscribe] rsp:', JSON.stringify(rsp));
     hideLoading();
