@@ -3378,7 +3378,7 @@ async function refundOrb(amount, reason) {
 async function safeInsertReport(allTexts, profileKey) {
   const totalSecs = allTexts.length;
   const validCount = allTexts.filter(function(t) { return t && t.trim().length > 50; }).length;
-  const minValid = totalSecs; // 전 섹션 완성 필수 — 하나라도 빠지면 환불
+  const minValid = Math.ceil(totalSecs * 0.6); // 60% 이상 유효 시 저장
 
   if (validCount < minValid) {
     const orbAmt = _config && _config.orb ? _config.orb : 0;
