@@ -6439,7 +6439,7 @@ function updateMypageTab() {
       } catch(e) {}
     })(currentUser.id);
     checkAdminAccess();
-    if (typeof refreshPushBtnLabel === 'function') refreshPushBtnLabel();
+    setTimeout(function(){ if (typeof refreshPushBtnLabel === 'function') refreshPushBtnLabel(); }, 0);
   } else {
     guest.style.display = '';
     user.style.display = 'none';
