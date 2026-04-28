@@ -6842,7 +6842,8 @@ async function startGeneration() {
   const withAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
   const needsZiwei = withZiwei && !_ziweiData;
   const needsAstro = withAstro && !_astroData;
-  if (!_sdFull && !_rptFull) {
+  if (!_sdFull) {
+    // _rptFull 있어도 _sdFull 없으면 반드시 로드 (사주 계산 데이터 필수)
     await loadAllData(withZiwei, withAstro);
   } else if (needsZiwei || needsAstro) {
     await loadExtraData(needsZiwei, needsAstro);
