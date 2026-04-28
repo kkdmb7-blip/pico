@@ -8266,60 +8266,8 @@ async function generateVedicMuhurtaReport() {
     if (_profile && _profile.year) await loadVedicData();
     if (!_vedicData || !_vedicData.nakshatra) { showDataMissingError('vedic.html', '베딕 점성술'); return; }
   }
-  if (!await setupSectionsAndDeductOrb()) return;
-
-  // ── 시각 캘린더 삽입 (sectionsWrap 위에) ──
-  const wrap = document.getElementById('sectionsWrap');
-  const calCard = document.createElement('div');
-  calCard.id = 'muhurtaCalCard';
-
-  const QUALITY_STYLE = {
-    '대길': { bg:'rgba(34,120,60,0.12)',  bd:'rgba(34,120,60,0.40)',  dot:'#1a7a3a', label:'대길' },
-    '길':   { bg:'rgba(80,160,80,0.10)',  bd:'rgba(80,160,80,0.35)',  dot:'#3a8a3a', label:'길' },
-    '보통': { bg:'rgba(90,90,90,0.07)',   bd:'rgba(90,90,90,0.22)',   dot:'#888',    label:'보통' },
-    '주의': { bg:'rgba(200,120,20,0.10)', bd:'rgba(200,120,20,0.38)', dot:'#b06010', label:'주의' },
-    '흉':   { bg:'rgba(180,30,30,0.10)',  bd:'rgba(180,30,30,0.38)',  dot:'#a02020', label:'흉' },
-  };
-
-  const days = Array.isArray(_vedicData.muhurta) ? _vedicData.muhurta : [];
-  let calHtml = '<div style="margin-bottom:16px;">'
-    + '<div style="font-size:10px;font-weight:800;color:#4a7a8a;letter-spacing:0.22em;margin-bottom:10px;">이번 주 7일 길흉</div>'
-    + '<div style="display:flex;flex-direction:column;gap:7px;">';
-
-  days.forEach(function(d) {
-    const q = QUALITY_STYLE[d.quality] || QUALITY_STYLE['보통'];
-    const dateObj = new Date(d.date);
-    const dateStr = (dateObj.getMonth()+1) + '/' + dateObj.getDate();
-    const tithiShort = (d.tithi || '').split(' ').slice(0,2).join(' ');
-    const specBadge = d.specials && d.specials.length
-      ? '<span style="font-size:9px;background:rgba(34,120,60,0.15);color:#1a7a3a;border-radius:10px;padding:1px 7px;font-weight:700;margin-left:4px;">' + d.specials[0].split(' ')[0] + '</span>' : '';
-    const cautionBadge = d.cautions && d.cautions.length
-      ? '<span style="font-size:9px;background:rgba(180,60,20,0.12);color:#a03010;border-radius:10px;padding:1px 7px;font-weight:700;margin-left:4px;">' + d.cautions[0].split('(')[0].trim() + '</span>' : '';
-
-    calHtml += '<div style="display:flex;align-items:center;gap:10px;background:' + q.bg + ';border:1px solid ' + q.bd + ';border-radius:12px;padding:10px 13px;">'
-      + '<div style="text-align:center;min-width:38px;flex-shrink:0;">'
-        + '<div style="font-size:11px;font-weight:800;color:' + q.dot + ';">' + d.weekday + '</div>'
-        + '<div style="font-size:12px;font-weight:700;color:#241a10;">' + dateStr + '</div>'
-      + '</div>'
-      + '<div style="width:6px;height:6px;border-radius:50%;background:' + q.dot + ';flex-shrink:0;"></div>'
-      + '<div style="flex:1;min-width:0;">'
-        + '<div style="font-size:12px;color:#241a10;line-height:1.5;">'
-          + '<span style="font-weight:700;">' + (d.nakshatra || '') + '</span>'
-          + '<span style="color:#5a4830;margin-left:5px;font-size:11px;">' + tithiShort + '</span>'
-          + specBadge + cautionBadge
-        + '</div>'
-        + (d.rahuKala ? '<div style="font-size:10px;color:#8a7a60;margin-top:1px;">라후 칼라 ' + d.rahuKala + '</div>' : '')
-      + '</div>'
-      + '<div style="flex-shrink:0;font-size:11px;font-weight:800;color:' + q.dot + ';padding:2px 8px;background:' + q.bg + ';border-radius:8px;border:1px solid ' + q.bd + ';">' + q.label + '</div>'
-      + '</div>';
-  });
-
-  calHtml += '</div></div>';
-  calCard.innerHTML = calHtml;
-  wrap.insertBefore(calCard, wrap.firstChild);
-
-  // ── AI 분석 5섹션 ──
-  return generateVedicPrecisionReport({
+  // AI 섹션 생성 (setupSectionsAndDeductOrb 포함되어 있음)
+  await generateVedicPrecisionReport({
     precisionOpts: { muhurta: true, transit: true },
     theoryName: 'Muhurta 이번주 길시 분석',
     customSys: `[Muhurta 7일 캘린더 타입특화 룰]
@@ -8340,6 +8288,51 @@ async function generateVedicMuhurtaReport() {
     advice2A: ['창업/비즈니스','이직/커리어','투자/재테크'],
     advice2B: ['대인관계/부부']
   });
+
+  // ── AI 완료 후 시각 캘린더를 sectionsWrap 맨 앞에 삽입 ──
+  const wrap = document.getElementById('sectionsWrap');
+  if (wrap && _vedicData && Array.isArray(_vedicData.muhurta)) {
+    const QUALITY_STYLE = {
+      '대길': { bg:'rgba(34,120,60,0.12)',  bd:'rgba(34,120,60,0.40)',  dot:'#1a7a3a', label:'대길' },
+      '길':   { bg:'rgba(80,160,80,0.10)',  bd:'rgba(80,160,80,0.35)',  dot:'#3a8a3a', label:'길' },
+      '보통': { bg:'rgba(90,90,90,0.07)',   bd:'rgba(90,90,90,0.22)',   dot:'#888',    label:'보통' },
+      '주의': { bg:'rgba(200,120,20,0.10)', bd:'rgba(200,120,20,0.38)', dot:'#b06010', label:'주의' },
+      '흉':   { bg:'rgba(180,30,30,0.10)',  bd:'rgba(180,30,30,0.38)',  dot:'#a02020', label:'흉' },
+    };
+    let calHtml = '<div style="margin-bottom:18px;padding:14px 0 2px;">'
+      + '<div style="font-size:10px;font-weight:800;color:#4a7a8a;letter-spacing:0.22em;margin-bottom:10px;">이번 주 7일 길흉</div>'
+      + '<div style="display:flex;flex-direction:column;gap:7px;">';
+    _vedicData.muhurta.forEach(function(d) {
+      const q = QUALITY_STYLE[d.quality] || QUALITY_STYLE['보통'];
+      const dateObj = new Date(d.date);
+      const dateStr = (dateObj.getMonth()+1) + '/' + dateObj.getDate();
+      const tithiShort = (d.tithi || '').split(' ').slice(0,2).join(' ');
+      const specBadge = d.specials && d.specials.length
+        ? '<span style="font-size:9px;background:rgba(34,120,60,0.15);color:#1a7a3a;border-radius:10px;padding:1px 7px;font-weight:700;margin-left:4px;">' + d.specials[0].split(' ')[0] + '</span>' : '';
+      const cautionBadge = d.cautions && d.cautions.length
+        ? '<span style="font-size:9px;background:rgba(180,60,20,0.12);color:#a03010;border-radius:10px;padding:1px 7px;font-weight:700;margin-left:4px;">' + d.cautions[0].split('(')[0].trim() + '</span>' : '';
+      calHtml += '<div style="display:flex;align-items:center;gap:10px;background:' + q.bg + ';border:1px solid ' + q.bd + ';border-radius:12px;padding:10px 13px;">'
+        + '<div style="text-align:center;min-width:38px;flex-shrink:0;">'
+          + '<div style="font-size:11px;font-weight:800;color:' + q.dot + ';">' + d.weekday + '</div>'
+          + '<div style="font-size:12px;font-weight:700;color:#241a10;">' + dateStr + '</div>'
+        + '</div>'
+        + '<div style="width:6px;height:6px;border-radius:50%;background:' + q.dot + ';flex-shrink:0;"></div>'
+        + '<div style="flex:1;min-width:0;">'
+          + '<div style="font-size:12px;color:#241a10;line-height:1.5;">'
+            + '<span style="font-weight:700;">' + (d.nakshatra || '') + '</span>'
+            + '<span style="color:#5a4830;margin-left:5px;font-size:11px;">' + tithiShort + '</span>'
+            + specBadge + cautionBadge
+          + '</div>'
+          + (d.rahuKala ? '<div style="font-size:10px;color:#8a7a60;margin-top:1px;">라후 칼라 ' + d.rahuKala + '</div>' : '')
+        + '</div>'
+        + '<div style="flex-shrink:0;font-size:11px;font-weight:800;color:' + q.dot + ';padding:2px 8px;background:' + q.bg + ';border-radius:8px;border:1px solid ' + q.bd + ';">' + q.label + '</div>'
+        + '</div>';
+    });
+    calHtml += '</div></div>';
+    const calCard = document.createElement('div');
+    calCard.innerHTML = calHtml;
+    wrap.insertBefore(calCard, wrap.firstChild);
+  }
 }
 
 // ── 패키지 전용: 서브리포트 5섹션을 1번 API 호출로 생성 ──
