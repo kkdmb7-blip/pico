@@ -4513,6 +4513,9 @@ function proceedAfterProfile() {
 
   renderIntro();
   showState('intro');
+  // renderIntro 완료 후 Orb 확정
+  var _oc2 = document.getElementById('introOrbCost');
+  if (_oc2 && _config && _config.orb) _oc2.textContent = _config.orb.toLocaleString() + ' Orb 차감';
 }
 
 // ── 아이 프로필 입력 모달 (child_career 전용) — 만세력 동일 포맷 ──
@@ -6791,15 +6794,6 @@ function renderIntro() {
   // 포함 내용 레이블 색상
   const _secLabel = document.querySelector('.intro-section-label');
   if (_secLabel) _secLabel.style.color = _introMain;
-
-  // 생성 버튼 색상
-  const _genBtn = document.getElementById('btnGenerate');
-  if (_genBtn) {
-    _genBtn.style.cssText = (_genBtn.style.cssText || '') + ';background:' + _introSoft.replace('0.08','0.18') + ';color:' + _introMain + ';border:1.5px solid ' + _introBd + ';font-size:15px;font-weight:800;padding:16px;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.08);';
-  }
-
-  // Orb 비용
-  { const _oc = document.getElementById('introOrbCost'); if (_oc && _config && _config.orb) _oc.textContent = _config.orb.toLocaleString() + ' Orb 차감'; }
 
   // FAQ
   let faqEl = document.getElementById('introFaq');
