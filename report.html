@@ -7898,7 +7898,7 @@ async function setupSectionsAndDeductOrb() {
   // Orb 차감 (최소 호출로 deduct)
   try {
     const r0 = await fetch(CHAT_API, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ user_id:_user.id, skip_orb:true,
+      body: JSON.stringify({ user_id:_user.id, orb_override:_config.orb,
         system_prompt:'사주 분석 준비 엔진. "READY"만 반환.',
         messages:[{role:'user', content:'준비'}]
       })
