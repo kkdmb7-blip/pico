@@ -1803,7 +1803,7 @@
     document.getElementById('lifeDaysWrap').style.display = 'block';
   } catch(e) {}
 })();
-window.shareLifeDays = function() {
+function _drawLifeDaysCard(cb) {
   var who   = (document.getElementById('lifeHeroWho').textContent || '').replace('이 세상에 나온 지','').trim();
   var days  = document.getElementById('lifeHeroNum').textContent || '0';
   var msg   = document.getElementById('lifeHeroMsg').textContent || '';
@@ -1811,30 +1811,135 @@ window.shareLifeDays = function() {
   var weeks = document.getElementById('lifeHeroW').textContent || '0';
   var hours = document.getElementById('lifeHeroH').textContent || '0';
   var moons = document.getElementById('lifeHeroMoon').textContent || '0';
-  var pageUrl = 'https://picolab.kr';
-  var text = '✦ LIFE DAYS ✦\n\n' + who + '이 세상에 나온 지 ' + days + '일\n' + msg
-    + '\n\nYEARS ' + years + '  ·  WEEKS ' + weeks
-    + '\nHOURS ' + hours + '  ·  MOONS ' + moons
-    + '\n\n' + pageUrl;
-  if (navigator.share) {
-    navigator.share({ title: '내 인생 시간 기록 · FORTUNA', text: text }).catch(function(){});
-    return;
-  }
-  if (window.Kakao && Kakao.Share) {
-    if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e){} }
-    Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: who + '이 세상에 나온 지 ' + days + '일',
-        description: msg + '\nYEARS ' + years + '  WEEKS ' + weeks + '  HOURS ' + hours,
-        imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
-        link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
-      },
-      buttons: [{ title: '나의 인생 시간 보기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
+  var secs  = document.getElementById('lifeHeroSec').textContent || '0';
+
+  document.fonts.ready.then(function() {
+    var W = 1080, H = 1350, PAD = 80;
+    var cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    var ctx = cv.getContext('2d');
+    if (!ctx.roundRect) { ctx.roundRect = function(x,y,w,h,r){ this.rect(x,y,w,h); }; }
+    var cx = W / 2;
+
+    // ── 배경 ──
+    var bg = ctx.createLinearGradient(W*0.3, 0, 0, H);
+    bg.addColorStop(0, '#fdf8ef'); bg.addColorStop(0.5, '#f8f0df'); bg.addColorStop(1, '#eee0c6');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    var gl = ctx.createRadialGradient(W*0.22, H*0.08, 0, W*0.22, H*0.08, W*0.65);
+    gl.addColorStop(0, 'rgba(212,175,55,0.13)'); gl.addColorStop(1, 'rgba(212,175,55,0)');
+    ctx.fillStyle = gl; ctx.fillRect(0, 0, W, H);
+
+    // ── 상단 레이블 ──
+    var y = 150;
+    ctx.textAlign = 'center';
+    ctx.font = '700 30px "Noto Sans KR", sans-serif';
+    ctx.fillStyle = 'rgba(138,106,21,0.60)';
+    ctx.fillText('✦   LIFE  DAYS   ✦', cx, y);
+
+    // ── 이름 ──
+    y += 90;
+    ctx.font = '400 46px "Noto Serif KR", serif';
+    ctx.fillStyle = 'rgba(26,18,10,0.68)';
+    ctx.fillText(who + '이 세상에 나온 지', cx, y);
+
+    // ── 큰 숫자 + 일 단위 (함께 중앙 정렬) ──
+    y += 50;
+    ctx.font = '900 168px "Noto Serif KR", serif';
+    var numW = ctx.measureText(days).width;
+    ctx.font = '700 64px "Noto Serif KR", serif';
+    var unitW = ctx.measureText('일').width;
+    var totalW = numW + 16 + unitW;
+    var numX = cx - totalW / 2;
+    var numGrad = ctx.createLinearGradient(numX, 0, numX + numW, 0);
+    numGrad.addColorStop(0, '#9a7a1a'); numGrad.addColorStop(0.5, '#c49a20'); numGrad.addColorStop(1, '#6a4f0c');
+    ctx.font = '900 168px "Noto Serif KR", serif';
+    ctx.fillStyle = numGrad;
+    ctx.textAlign = 'left';
+    ctx.fillText(days, numX, y + 140);
+    ctx.font = '700 64px "Noto Serif KR", serif';
+    ctx.fillStyle = '#8a6a15';
+    ctx.fillText('일', numX + numW + 16, y + 120);
+    y += 180;
+
+    // ── 메시지 ──
+    y += 24;
+    ctx.textAlign = 'center';
+    ctx.font = '600 46px "Noto Serif KR", serif';
+    ctx.fillStyle = 'rgba(26,18,10,0.78)';
+    ctx.fillText(msg, cx, y);
+
+    // ── 구분선 ──
+    y += 80;
+    var lg = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
+    lg.addColorStop(0,'rgba(154,122,38,0)'); lg.addColorStop(0.5,'rgba(154,122,38,0.32)'); lg.addColorStop(1,'rgba(154,122,38,0)');
+    ctx.beginPath(); ctx.strokeStyle = lg; ctx.lineWidth = 2;
+    ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
+
+    // ── 스탯 2×2 ──
+    y += 60;
+    var stats = [['YEARS',years],['WEEKS',weeks],['HOURS',hours],['MOONS',moons]];
+    var sW = (W - PAD*2 - 20) / 2, sH = 136, sGap = 20;
+    [[0,1],[2,3]].forEach(function(row, ri) {
+      row.forEach(function(idx, ci) {
+        var sx = PAD + ci*(sW+sGap), sy = y + ri*(sH+sGap);
+        ctx.fillStyle = 'rgba(212,175,55,0.07)';
+        ctx.beginPath(); ctx.roundRect(sx, sy, sW, sH, 18); ctx.fill();
+        ctx.strokeStyle = 'rgba(154,122,38,0.18)'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.roundRect(sx, sy, sW, sH, 18); ctx.stroke();
+        ctx.textAlign = 'center';
+        ctx.font = '800 54px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = '#7a5e1c';
+        ctx.fillText(stats[idx][1], sx + sW/2, sy + 70);
+        ctx.font = '600 24px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = 'rgba(106,79,12,0.52)';
+        ctx.fillText(stats[idx][0], sx + sW/2, sy + 108);
+      });
     });
-    return;
-  }
-  try { navigator.clipboard.writeText(text).then(function(){ _showToast('클립보드에 복사됐어요!'); }); } catch(e){}
+    y += 2*sH + sGap + 64;
+
+    // ── 초 카운터 ──
+    ctx.textAlign = 'center';
+    ctx.font = '400 34px "Noto Sans KR", sans-serif';
+    ctx.fillStyle = 'rgba(106,79,12,0.58)';
+    ctx.fillText('살아있는 매 순간  ·  ' + secs + ' 초째', cx, y);
+
+    // ── 하단 브랜딩 ──
+    ctx.textAlign = 'center';
+    ctx.font = '400 28px "Cinzel", "Noto Serif KR", serif';
+    ctx.fillStyle = 'rgba(138,106,21,0.38)';
+    ctx.fillText('FORTUNA  ·  picolab.kr', cx, H - 70);
+
+    if (cb) cb(cv);
+  });
+}
+
+window.shareLifeDays = function() {
+  var who   = (document.getElementById('lifeHeroWho').textContent || '').replace('이 세상에 나온 지','').trim();
+  var days  = document.getElementById('lifeHeroNum').textContent || '0';
+  var msg   = document.getElementById('lifeHeroMsg').textContent || '';
+  var pageUrl = 'https://picolab.kr';
+  var text = '✦ LIFE DAYS ✦\n\n' + who + '이 세상에 나온 지 ' + days + '일\n' + msg + '\n\n' + pageUrl;
+
+  _drawLifeDaysCard(function(cv) {
+    if (!cv) {
+      if (navigator.share) navigator.share({ title: '내 인생 시간 기록 · FORTUNA', text: text }).catch(function(){});
+      return;
+    }
+    cv.toBlob(function(blob) {
+      var file = new File([blob], 'fortuna_lifedays.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], text: text }).catch(function(){});
+      } else if (navigator.share) {
+        navigator.share({ title: '내 인생 시간 기록', text: text, url: pageUrl }).catch(function(){});
+      } else {
+        var a = document.createElement('a');
+        a.href = cv.toDataURL('image/png');
+        a.download = 'fortuna_lifedays.png';
+        a.click();
+        _showToast('이미지가 저장됐어요!');
+      }
+    }, 'image/png');
+  });
 };</script>
 <!-- 오늘의 행운 뽑기 + 도미넌트 행성 -->
 <div style="padding:16px 16px;display:flex;gap:10px;">
