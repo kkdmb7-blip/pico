@@ -1,9 +1,8 @@
 // pico service worker — push notifications + offline cache
 
-var CACHE = 'pico-v1';
+var CACHE = 'pico-v2';
+// HTML 파일은 캐시하지 않음 (자주 업데이트되므로)
 var CORE = [
-  '/', '/index.html', '/saju.html', '/astro.html', '/vedic.html',
-  '/ziwei.html', '/qimen.html', '/report.html', '/charge.html', '/mypage.html',
   '/manifest.json', '/img/goddess/goddess.png', '/img/goddess/goddess-app.png',
   '/img/goddess/goddess-badge.png', '/img/goddess/goddess-maskable.png',
   '/pico-icons.css', '/support-widget.js'
@@ -38,17 +37,26 @@ self.addEventListener('fetch', function(e) {
       url.indexOf('supabase.co') !== -1 || url.indexOf('kakao') !== -1) return;
 
   e.respondWith(
-    caches.match(req).then(function(cached) {
-      var networkFetch = fetch(req).then(function(res) {
-        if (res && res.status === 200 && res.type !== 'opaque') {
-          var clone = res.clone();
-          caches.open(CACHE).then(function(c) { c.put(req, clone); });
-        }
-        return res;
+    (function() {
+      // HTML 파일은 항상 네트워크 우선 (자주 업데이트)
+      var isHtml = url.match(/\.(html)(\?|$)/) || req.mode === 'navigate';
+      if (isHtml) {
+        return fetch(req).catch(function() {
+          return caches.match(req) || caches.match('/index.html');
+        });
+      }
+      // 이미지·CSS 등 정적 자원은 캐시 우선
+      return caches.match(req).then(function(cached) {
+        var networkFetch = fetch(req).then(function(res) {
+          if (res && res.status === 200 && res.type !== 'opaque') {
+            var clone = res.clone();
+            caches.open(CACHE).then(function(c) { c.put(req, clone); });
+          }
+          return res;
+        });
+        return cached || networkFetch;
       });
-      // 캐시 있으면 즉시 반환하면서 백그라운드 갱신, 없으면 네트워크
-      return cached || networkFetch;
-    }).catch(function() {
+    })().catch(function() {
       // 오프라인 + 캐시 미스: 네비게이션 요청이면 index.html 반환
       if (req.mode === 'navigate') {
         return caches.match('/index.html');
