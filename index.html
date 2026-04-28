@@ -2545,7 +2545,12 @@
         <span><i class="pi pi-scroll"></i> 지난 분석 보기</span><span style="color:var(--muted);">›</span>
       </button>
       <button id="btnPushToggle" onclick="togglePushSubscription()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span id="btnPushLabel"><i class="pi pi-bell"></i> 오늘의 명언 알림 켜기</span><span style="color:var(--muted);">›</span>
+        <span id="btnPushLabel"><i class="pi pi-bell"></i> 오늘의 명언 알림</span>
+        <span id="btnPushSwitch" style="display:inline-flex;align-items:center;gap:6px;">
+          <span id="btnPushDot" style="width:36px;height:20px;border-radius:10px;background:#ccc;position:relative;transition:background 0.2s;flex-shrink:0;">
+            <span style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);" id="btnPushKnob"></span>
+          </span>
+        </span>
       </button>
       <button onclick="openHelpModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
         <span><i class="pi pi-question"></i> 도움말 · FAQ</span><span style="color:var(--muted);">›</span>
@@ -6610,20 +6615,25 @@ if (picoIsInAppBrowser()) {
   });
 })();
 
-// 현재 구독 상태 확인 후 버튼 레이블 업데이트
+function _setPushUI(on) {
+  var dot = document.getElementById('btnPushDot');
+  var knob = document.getElementById('btnPushKnob');
+  if (dot) dot.style.background = on ? '#2a7a3e' : '#ccc';
+  if (knob) knob.style.left = on ? '18px' : '2px';
+}
+
 async function refreshPushBtnLabel() {
-  var btn = document.getElementById('btnPushLabel');
-  if (!btn) return;
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    btn.innerHTML = '<i class="pi pi-bell"></i> 알림 미지원 브라우저';
-    document.getElementById('btnPushToggle').disabled = true;
+    _setPushUI(false);
+    var t = document.getElementById('btnPushToggle');
+    if (t) t.disabled = true;
     return;
   }
   try {
-    var reg = await navigator.serviceWorker.ready;
+    var reg = await navigator.serviceWorker.register('/sw.js');
     var sub = await reg.pushManager.getSubscription();
-    btn.innerHTML = sub ? '<i class="pi pi-bell"></i> 오늘의 명언 알림 끄기' : '<i class="pi pi-bell"></i> 오늘의 명언 알림 켜기';
-  } catch(e) {}
+    _setPushUI(!!sub);
+  } catch(e) { _setPushUI(false); }
 }
 
 var _PICO_SB   = 'https://ymghmfkqctckxxysxkvy.supabase.co';
@@ -6654,7 +6664,7 @@ window.togglePushSubscription = async function() {
   if (existing) {
     await existing.unsubscribe();
     await fetch(_PICO_SB + '/rest/v1/pico_push_subscriptions?user_id=eq.' + user.id, { method: 'DELETE', headers: sbH });
-    document.getElementById('btnPushLabel').innerHTML = '<i class="pi pi-bell"></i> 오늘의 명언 알림 켜기';
+    _setPushUI(false);
     _picoToast('알림이 해제됐어요.');
     return;
   }
@@ -6683,7 +6693,7 @@ window.togglePushSubscription = async function() {
 
     await fetch(_PICO_SB + '/rest/v1/pico_push_subscriptions?user_id=eq.' + user.id, { method:'DELETE', headers: sbH });
     await fetch(_PICO_SB + '/rest/v1/pico_push_subscriptions', { method:'POST', headers: { ...sbH, Prefer:'return=minimal' }, body: JSON.stringify({ user_id: user.id, name: user.name||'', subscription: JSON.stringify(sub), ilgan, geokguk, yongshin }) });
-    document.getElementById('btnPushLabel').innerHTML = '<i class="pi pi-bell"></i> 오늘의 명언 알림 끄기';
+    _setPushUI(true);
     _picoToast('매일 07:30에 사주 맞춤 메시지를 보내드릴게요.');
   } catch(e) {
     console.error('[push]', e);
