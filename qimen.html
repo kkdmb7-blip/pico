@@ -2499,6 +2499,7 @@ function _drawQimenCard(cb) {
   canvas.width = W; canvas.height = H;
   var ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = true;
+  if (!ctx.roundRect) { ctx.roundRect = function(x,y,w,h,r){ this.rect(x,y,w,h); }; }
 
   // 배경 (아이보리)
   var bg = ctx.createLinearGradient(0, 0, W*0.3, H);
