@@ -415,6 +415,7 @@ td.reasons span {
           <col class="orb-hide-mobile" style="width:52px">
           <col class="orb-hide-mobile" style="width:52px">
           <col class="orb-hide-mobile" style="width:36px">
+          <col class="orb-hide-mobile" style="width:68px">
           <col style="width:90px">
         </colgroup>
         <thead>
@@ -425,10 +426,11 @@ td.reasons span {
             <th class="orb-hide-mobile" onclick="orbSort('free_balance')" style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">무료 <span id="sort_free_balance"></span></th>
             <th class="orb-hide-mobile" onclick="orbSort('paid_balance')" style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">유료 <span id="sort_paid_balance"></span></th>
             <th class="orb-hide-mobile" style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border-soft);color:var(--muted);">✓</th>
+            <th class="orb-hide-mobile" onclick="orbSort('created_at')" style="text-align:right;padding:6px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;user-select:none;color:var(--muted);">가입일 <span id="sort_created_at"></span></th>
             <th style="text-align:center;padding:6px 4px;border-bottom:1px solid var(--border-soft);color:var(--muted);">관리</th>
           </tr>
         </thead>
-        <tbody id="orbTableBody"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">로딩 중...</td></tr></tbody>
+        <tbody id="orbTableBody"><tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted);">로딩 중...</td></tr></tbody>
       </table>
     </div>
     <div id="orbTotal" style="margin-top:10px;font-size:11px;color:var(--muted);text-align:right;"></div>
@@ -1034,7 +1036,7 @@ function orbSort(col) {
     orbSortDir = col === 'name' ? 'asc' : 'desc';
   }
   // 화살표 업데이트
-  ['name','balance','free_balance','paid_balance'].forEach(c => {
+  ['name','balance','free_balance','paid_balance','created_at'].forEach(c => {
     const el = document.getElementById('sort_' + c);
     if (!el) return;
     el.textContent = c === orbSortCol ? (orbSortDir === 'desc' ? '▼' : '▲') : '';
@@ -1073,12 +1075,13 @@ function renderOrbTable(rows) {
   const tbody = document.getElementById('orbTableBody');
   const total = document.getElementById('orbTotal');
   if (!tbody) return;
-  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">없음</td></tr>'; return; }
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted);">없음</td></tr>'; return; }
 
   // 정렬
   const sorted = [...rows].sort((a, b) => {
     let av = a[orbSortCol], bv = b[orbSortCol];
     if (orbSortCol === 'name') { av = av||''; bv = bv||''; return orbSortDir === 'asc' ? av.localeCompare(bv,'ko') : bv.localeCompare(av,'ko'); }
+    if (orbSortCol === 'created_at') { av = av||''; bv = bv||''; return orbSortDir === 'desc' ? bv.localeCompare(av) : av.localeCompare(bv); }
     return orbSortDir === 'desc' ? (bv||0)-(av||0) : (av||0)-(bv||0);
   });
   rows = sorted;
@@ -1094,6 +1097,7 @@ function renderOrbTable(rows) {
       <td class="orb-hide-mobile" style="padding:6px 4px;text-align:right;color:#2a7a3e;">${(r.free_balance||0).toLocaleString()}</td>
       <td class="orb-hide-mobile" style="padding:6px 4px;text-align:right;color:#2e6ba8;">${(r.paid_balance||0).toLocaleString()}</td>
       <td class="orb-hide-mobile" style="padding:6px 4px;text-align:right;color:${mColor};font-size:12px;">${mismatch}</td>
+      <td class="orb-hide-mobile" style="padding:6px 4px;text-align:right;color:var(--muted);font-size:11px;">${r.created_at ? new Date(new Date(r.created_at).getTime()+9*3600000).toISOString().slice(2,10).replace(/-/g,'.') : '-'}</td>
       <td style="padding:6px 4px;white-space:nowrap;">
         <div style="display:inline-flex;gap:4px;">
           <button onclick="openOrbGrant('${r.user_id}','${r.name}')" style="padding:4px 10px;background:rgba(154,122,38,0.13);border:1px solid rgba(154,122,38,0.3);border-radius:6px;font-size:11px;font-weight:700;color:var(--gold-deep);cursor:pointer;white-space:nowrap;">충전</button>
