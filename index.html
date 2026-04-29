@@ -2237,6 +2237,13 @@ window.shareLifeDays = function() {
         <div style="font-size:10px;color:var(--muted);line-height:1.4;">대운별·월별 재물 흐름 + 투자 적기</div>
         <div class="orb-chip" style="margin-top:8px;">490 Orb</div>
       </div>
+      <div id="cardWealthLifetime" onclick="window.location.href='report.html?type=wealth_lifetime'" style="display:none;grid-column:1/-1;background:linear-gradient(135deg,rgba(184,134,11,0.14),rgba(184,134,11,0.05));border:1px solid rgba(184,134,11,0.32);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;position:relative;" onmouseover="this.style.borderColor='rgba(184,134,11,0.65)'" onmouseout="this.style.borderColor='rgba(184,134,11,0.32)'">
+        <div style="position:absolute;top:8px;right:10px;font-size:9px;font-weight:800;letter-spacing:0.12em;color:#7a5a08;background:rgba(184,134,11,0.18);padding:2px 7px;border-radius:6px;">ADMIN</div>
+        <div style="font-size:22px;margin-bottom:6px;color:#b8860b;"><i class="pi pi-chart-line"></i></div>
+        <div style="font-size:14px;font-weight:800;color:#7a5a08;margin-bottom:5px;">내 인생 재물 곡선</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5;">대운 8개 곡선 차트 + 그릇·통로·정점/저점 분석</div>
+        <div class="orb-chip" style="margin-top:8px;background:rgba(184,134,11,0.18);color:#7a5a08;">990 Orb</div>
+      </div>
     </div>
   </div>
 
@@ -6136,6 +6143,8 @@ async function checkAdminAccess() {
       if (btnChat) btnChat.style.display = 'flex';
       localStorage.setItem('pico_admin_uuid', ADMIN_UUID);
       loadAdminChatUnread();
+      var _cardWL = document.getElementById('cardWealthLifetime');
+      if (_cardWL) _cardWL.style.display = 'block';
     }
     // index.html의 currentUser.id는 resolve-user가 돌려준 UUID가 저장됨
     if (currentUser.id === ADMIN_UUID) { showAdmin(); return; }
