@@ -8928,12 +8928,83 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 }
 
 // ── 자미두수 심층 분석 ──
+// ── 자미두수 시각 블록 (격국 뱃지 + 5궁 미니 명반) ─────────────
+function renderZiweiVisualBlock() {
+  if (!_ziweiData) return '';
+  const z = _ziweiData;
+  const patterns = z.patterns || [];
+  const sihuaPatterns = z.sihuaCross?.patterns || [];
+  const sihua = z.sihua || {};
+  const palaces = z.palaces || [];
+  const brStar = z.brightness?.byStar || {};
+  const cat = z.brightness?.category || {};
+
+  const allBadges = [...patterns, ...sihuaPatterns];
+  const badgesHtml = allBadges.length
+    ? allBadges.map(p => {
+        const isAuspicious = p.type === 'auspicious';
+        const isSevere = p.type === 'severe' || p.type === 'inauspicious';
+        const bg = isSevere ? 'rgba(169,74,58,0.10)' : isAuspicious ? 'rgba(122,42,154,0.10)' : 'rgba(120,80,20,0.08)';
+        const bd = isSevere ? 'rgba(169,74,58,0.32)' : isAuspicious ? 'rgba(122,42,154,0.32)' : 'rgba(120,80,20,0.25)';
+        const fg = isSevere ? '#8a3a2a' : isAuspicious ? '#5a1f7a' : '#5a4830';
+        return `<span style="display:inline-block;background:${bg};border:1px solid ${bd};color:${fg};padding:5px 12px;border-radius:14px;font-size:11px;font-weight:700;margin:2px;">${p.name}</span>`;
+      }).join('')
+    : '<span style="color:rgba(60,40,8,0.5);font-size:11px;">검출된 격국 없음</span>';
+
+  const KEY_PALACES = ['명궁','재백','관록','부처','천이'];
+  const sihuaPillFor = (palaceName) => {
+    const out = [];
+    const mk = (label, color) => `<span style="display:inline-block;background:${color};color:#fff;padding:1px 5px;border-radius:6px;font-size:9px;font-weight:800;margin:0 1px;">${label}</span>`;
+    if (sihua.lu?.palace   === palaceName) out.push(mk('록', '#3a8a3a'));
+    if (sihua.quan?.palace === palaceName) out.push(mk('권', '#7a3fc0'));
+    if (sihua.ke?.palace   === palaceName) out.push(mk('과', '#2e6ba8'));
+    if (sihua.ji?.palace   === palaceName) out.push(mk('기', '#a94a3a'));
+    return out.join('');
+  };
+
+  const palaceCards = KEY_PALACES.map(name => {
+    const p = palaces.find(x => x.name === name);
+    if (!p) return '';
+    const starsHtml = (p.majorStars || []).length
+      ? p.majorStars.map(s => {
+          const b = brStar[s] || '';
+          const c = cat[s];
+          const color = c === '강' ? '#5a1f7a' : c === '약' ? '#a94a3a' : '#241a10';
+          return `<div style="font-size:11px;font-weight:700;color:${color};line-height:1.5;">${s}${b?'<span style="font-size:9px;color:rgba(60,40,8,0.55);margin-left:3px;">'+b+'</span>':''}</div>`;
+        }).join('')
+      : '<div style="font-size:10px;color:rgba(60,40,8,0.5);">(공궁)</div>';
+    const isMyung = name === '명궁';
+    const pills = sihuaPillFor(name);
+    return `<div style="background:${isMyung?'rgba(122,42,154,0.08)':'rgba(0,0,0,0.025)'};border:${isMyung?'1.5px solid #7a2a9a':'1px solid rgba(0,0,0,0.12)'};border-radius:10px;padding:10px 8px;text-align:center;min-height:88px;">
+      <div style="font-size:10px;font-weight:800;color:${isMyung?'#5a1f7a':'#7a5a30'};letter-spacing:0.06em;">${name}</div>
+      <div style="font-size:9px;color:rgba(60,40,8,0.5);margin:2px 0 6px;">${p.heavenlyStem||''}${p.earthlyBranch||''}</div>
+      ${starsHtml}
+      ${pills ? `<div style="margin-top:5px;">${pills}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  return `<div style="margin-bottom:18px;padding:14px;background:linear-gradient(135deg,rgba(122,42,154,0.04),rgba(154,110,16,0.03));border:1px solid rgba(122,42,154,0.18);border-radius:14px;">
+    <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;color:#5a1f7a;margin-bottom:8px;text-align:center;">DETECTED PATTERNS · 검출된 격국</div>
+    <div style="text-align:center;margin-bottom:14px;">${badgesHtml}</div>
+    <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;color:#5a1f7a;margin-bottom:8px;text-align:center;">핵심 5궁 미니 명반</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:6px;">${palaceCards}</div>
+    <div style="margin-top:10px;text-align:center;font-size:9px;color:rgba(60,40,8,0.6);line-height:1.6;">
+      <span style="display:inline-block;background:#3a8a3a;color:#fff;padding:1px 5px;border-radius:5px;font-weight:700;">록</span> 화록 ·
+      <span style="display:inline-block;background:#7a3fc0;color:#fff;padding:1px 5px;border-radius:5px;font-weight:700;">권</span> 화권 ·
+      <span style="display:inline-block;background:#2e6ba8;color:#fff;padding:1px 5px;border-radius:5px;font-weight:700;">과</span> 화과 ·
+      <span style="display:inline-block;background:#a94a3a;color:#fff;padding:1px 5px;border-radius:5px;font-weight:700;">기</span> 화기
+    </div>
+  </div>`;
+}
+
 async function generateZiweiFullReport() {
   if (!_ziweiData) {
     if (_profile && _profile.year) await loadExtraData(true, false);
     if (!_ziweiData) { showDataMissingError('ziwei.html', '자미두수'); return; }
   }
   if (!await setupSectionsAndDeductOrb()) return;
+  // 시각 블록 (격국 뱃지 + 5궁 미니 명반) 상단 삽입
+  { const _vb = renderZiweiVisualBlock(); const _sw = document.getElementById('sectionsWrap'); if (_vb && _sw) _sw.insertAdjacentHTML('afterbegin', _vb); }
   const sb2 = buildSajuBlock();
   const zb = buildFullZiweiBlock();
   const db = buildDaeunBlock();
@@ -8983,6 +9054,7 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 // ── 동서양 통합 분석 ──
 async function generateTripleReport() {
   if (!await setupSectionsAndDeductOrb()) return;
+  { const _vb = renderZiweiVisualBlock(); const _sw = document.getElementById('sectionsWrap'); if (_vb && _sw) _sw.insertAdjacentHTML('afterbegin', _vb); }
   const sb2 = buildSajuBlock();
   const vb = buildVedicBlock();
   const ab = buildFullAstroBlock();
@@ -9039,6 +9111,7 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 // ── 직업·사업 심층 분석 ──
 async function generateCareerDeepReport() {
   if (!await setupSectionsAndDeductOrb()) return;
+  { const _vb = renderZiweiVisualBlock(); const _sw = document.getElementById('sectionsWrap'); if (_vb && _sw) _sw.insertAdjacentHTML('afterbegin', _vb); }
   const sb2 = buildSajuBlock();
   const vb = buildVedicBlock();
   const ab = buildFullAstroBlock();
