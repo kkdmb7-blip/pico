@@ -3729,10 +3729,13 @@ function buildSajuBlock() {
   시간 ${hS} = ${tg.hour_stem||'?'}     시지 ${hB} = ${tg.hour_branch||'?'}`;
   // 사주에 실제 등장한 글자 (대운 글자는 buildDaeunBlock 등에서 따로 명시됨)
   const sajuChars = [...new Set([yS,yB,mS,mB,dS,dB,hS,hB].filter(c => c && c !== '?'))].join(' ');
+  const birthLine = _profile ? `생년월일: ${_profile.year}년 ${_profile.month}월 ${_profile.day}일 (${new Date().getFullYear() - _profile.year}세, 만 나이 기준 출생연도 ${_profile.year}년)` : '';
   return `【사주 원국 — 확정 사실, 아래 표만 인용 가능】
+${birthLine}
 일주: ${_ilju||'미확인'}  성별: ${_profile?.gender==='F'?'여성':'남성'}
 사주: 연주 ${pillars.year||'?'} / 월주 ${pillars.month||'?'} / 일주 ${pillars.day||'?'} / 시주 ${pillars.hour||'?'}
 사주에 실제 등장한 글자: ${sajuChars} (이 8자 외의 천간·지지는 사주 원국에 없음)
+※ 모든 대운·세운 연도는 출생연도(${_profile?.year||''}년) 기준으로 계산됨. 본문에서 연도 인용 시 buildDaeunBlock 의 year_range 그대로 사용. 임의 계산 절대 금지.
 
 [8자리 십신 표 — 천간과 지지를 반드시 분리해서 인용]
 ${tgTable}
@@ -3852,15 +3855,25 @@ function _computeCurDaeun(sd) {
 function buildDaeunBlock() {
   if (!_daeunList) return `현재 대운: ${_curDaeunBL||_daeun||'미확인'}`;
   const now = new Date(Date.now() + 9*3600000).getUTCFullYear();
+  const birthY = _profile?.year || 0;
+  const fmtAge = (yr) => birthY ? `${yr - birthY}세` : '';
+  const fmtRange = (d) => {
+    const r = (d.year_range || '').split(/[–\-]/);
+    const s = parseInt(r[0]) || 0, e = parseInt(r[1]) || 0;
+    return birthY ? `${s}년~${e}년 (${fmtAge(s)}~${fmtAge(e)})` : (d.year_range || '');
+  };
   const cur = _daeunList.find(d=>{const r=(d.year_range||'').split(/[–\-]/);return now>=parseInt(r[0])&&now<=parseInt(r[1]);})||_daeunList[0];
   const past = _daeunList.filter(d=>{const r=(d.year_range||'').split(/[–\-]/);return parseInt(r[1])<now;});
   const future = _daeunList.filter(d=>{const r=(d.year_range||'').split(/[–\-]/);return parseInt(r[0])>now;});
-  const curLabel = _curDaeunBL || (cur ? `${cur.ganjee||''}(${cur.year_range||''})` : (_daeun||'미확인'));
+  const curLabel = cur ? `${cur.ganjee||''} ${fmtRange(cur)}` : (_curDaeunBL||_daeun||'미확인');
   return `【대운 흐름】
+사용자 출생연도: ${birthY||'미확인'}년 (현재 ${now}년 기준 ${birthY?now-birthY+'세':'?'})
 현재 대운: ${curLabel}
-과거 대운: ${past.map(d=>`${d.ganjee}(${d.year_range})`).join(' → ')||'없음'}
-미래 대운: ${future.slice(0,3).map(d=>`${d.ganjee}(${d.year_range})`).join(' → ')||'없음'}
-전체: ${JSON.stringify(_daeunList.slice(0,8))}`;
+과거 대운: ${past.map(d=>`${d.ganjee} ${fmtRange(d)}`).join(' → ')||'없음'}
+미래 대운: ${future.slice(0,3).map(d=>`${d.ganjee} ${fmtRange(d)}`).join(' → ')||'없음'}
+전체 대운 (${_daeunList.length}개):\n${_daeunList.slice(0,8).map(d=>`  - ${d.ganjee||'?'}: ${fmtRange(d)} 십신:${d.stem_ten_god||'?'}`).join('\n')}
+
+★ 대운 연도는 위에 명시된 그대로 사용. 사용자 출생연도(${birthY}년) 외 기준으로 임의 계산 금지.`;
 }
 function buildZiweiBlock() {
   if (!_ziweiData) return '';
