@@ -1095,17 +1095,7 @@ const TYPE_CONFIG = {
   qimen_today:{ title:'오늘의 기문 정밀 운세', orb:290, emoji:'<i class="pi pi-clock"></i>', focus:'오늘 24시간의 9궁 포국으로 본 길방·길시·하기 좋은 일',
     desc:'오늘 이 시간 우주의 기운 배치를 9궁 포국으로 정밀 분석. 시간대별 길흉, 좋은 방향, 추천 활동, 피해야 할 일까지 — 오늘 하루 행동 가이드.' },
   qimen_taegil:{ title:'기문 택일 가이드 (14일)', orb:390, emoji:'<i class="pi pi-calendar"></i>', focus:'이번주~다음주 14일 흐름에서 사업·계약·이사·면접 길일 추천',
-    desc:'14일간의 일가기문 흐름에서 활동별(사업/계약/이사/면접/만남) 가장 좋은 날과 피해야 할 날을 추천.' },
-
-  // ── 패키지 ──
-  pkg_saju_core:  { title:'패키지 · 사주 첫 번째 여정', orb:1490, emoji:'<i class="pi pi-sparkle"></i>',
-    focus:'기질+재물+연애 — 인생 3대 질문을 한 번에', desc:'타고난 기질·재물 구조·연애 패턴을 하나의 패키지로. 개별 1,870 Orb에서 20% 할인.' },
-  pkg_timing:     { title:'패키지 · 타이밍이 인생을 바꾼다', orb:1390, emoji:'<i class="pi pi-calendar"></i>',
-    focus:'대운+올해+결정 타이밍 — 언제를 알면 인생이 보인다', desc:'대운 흐름·올해 운세·결정 타이밍을 하나의 패키지로. 개별 1,770 Orb에서 21% 할인.' },
-  pkg_relations:  { title:'패키지 · 나의 인연 완전 분석', orb:1490, emoji:'<i class="pi pi-heart"></i>',
-    focus:'연애+가족+이상형 — 내 인연 구조를 한눈에', desc:'연애·가족·이상형 유형을 하나의 패키지로. 개별 1,870 Orb에서 20% 할인.' },
-  pkg_world:      { title:'패키지 · 세계가 본 나', orb:1190, emoji:'<i class="pi pi-globe"></i>',
-    focus:'베딕+서양점성+자미두수 — 동서양이 일치할 때', desc:'베딕·서양점성·자미두수 3개 학파를 하나의 패키지로. 개별 1,470 Orb에서 19% 할인.' }
+    desc:'14일간의 일가기문 흐름에서 활동별(사업/계약/이사/면접/만남) 가장 좋은 날과 피해야 할 날을 추천.' }
 };
 
 const TYPE_COLORS = {
@@ -1158,11 +1148,7 @@ const TYPE_COLORS = {
   vedic_muhurta:     { main:'#4a7a8a', soft:'rgba(74,122,138,0.12)', border:'rgba(74,122,138,0.32)' },
   qimen_wonmyong:    { main:'#7a3fc0', soft:'rgba(122,63,192,0.13)', border:'rgba(122,63,192,0.38)' },
   qimen_today:       { main:'#9a3fc0', soft:'rgba(154,63,192,0.13)', border:'rgba(154,63,192,0.38)' },
-  qimen_taegil:      { main:'#5a3fc0', soft:'rgba(90,63,192,0.13)',  border:'rgba(90,63,192,0.38)' },
-  pkg_saju_core:     { main:'#9a6e10', soft:'rgba(154,110,16,0.13)', border:'rgba(154,110,16,0.38)' },
-  pkg_timing:        { main:'#7a4aa8', soft:'rgba(122,74,168,0.13)', border:'rgba(122,74,168,0.38)' },
-  pkg_relations:     { main:'#8b2447', soft:'rgba(139,36,71,0.13)',  border:'rgba(139,36,71,0.38)' },
-  pkg_world:         { main:'#2e6ba8', soft:'rgba(46,107,168,0.13)', border:'rgba(46,107,168,0.38)' }
+  qimen_taegil:      { main:'#5a3fc0', soft:'rgba(90,63,192,0.13)',  border:'rgba(90,63,192,0.38)' }
 };
 
 function applyTypeTheme() {
@@ -3108,69 +3094,6 @@ const TYPE_DETAIL = {
       '14일 안에서 만남·면접·발표에 좋은 2일. 경문(밝은 기운)과 사주 식상 매칭으로.',
       '14일 안에서 보류 권장 2일. 사문/상문/경문(흉문) 위치와 사주 충형 연결. 무엇을 피해야 하는지.'
     ]
-  },
-
-  // ── 패키지 ──
-  pkg_saju_core: {
-    emoji: '<i class="pi pi-sparkle"></i>',
-    subtitle: '기질 · 재물 · 연애 — 인생 3대 질문을 한 번에',
-    desc: '타고난 기질, 재물 구조, 연애 패턴을 하나의 패키지로. 개별 구매 대비 20% 할인.',
-    recommend: ['사주를 처음 접하고 핵심을 한 번에 파악하고 싶은 분', '기질·돈·사랑 세 가지가 모두 궁금한 분', '분산 구매 대신 한 번에 깊이 분석받고 싶은 분'],
-    preview: '기질 분석 5섹션 · 재물/사업 분석 5섹션 · 연애/결혼 분석 5섹션 — 총 15섹션을 한 번에 생성합니다. 타고난 성격의 본질부터 재물이 들어오는 구조, 연애 패턴과 이상형까지. 사주 데이터 기반으로 실제 분석됩니다.',
-    faq: [
-      { q: '3개 리포트를 각각 살 때와 다른가요?', a: '내용은 동일하되, 20% 할인된 가격으로 한 번에 생성됩니다. 탭으로 나뉘어 각 리포트를 바로 확인할 수 있습니다.' },
-      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 3개 리포트를 순차 생성하며 약 3~5분 소요됩니다. 생성 후 영구 저장됩니다.' }
-    ],
-    engines: ['사주', '적천수', '자평진전'],
-    keyQuestions: ['나는 어떤 기질로 태어났는가?', '내 사주에서 재물은 어떻게 들어오는가?', '나는 왜 이런 연애 패턴을 반복하는가?'],
-    sectionDesc: ['기질 분석 5섹션', '재물·사업 분석 5섹션', '연애·결혼 분석 5섹션'],
-    sectionDetail: ['타고난 성격, 강점·약점, 삶의 방식', '재물운 구조, 대운별 재물 흐름', '연애 패턴, 이상형, 결혼운']
-  },
-  pkg_timing: {
-    emoji: '<i class="pi pi-calendar"></i>',
-    subtitle: '대운 · 올해 · 결정 타이밍 — 언제를 알면 인생이 보인다',
-    desc: '대운 흐름, 올해 운세, 인생 결정 타이밍을 하나의 패키지로. 개별 구매 대비 21% 할인.',
-    recommend: ['지금이 전진할 때인지 기다릴 때인지 모르겠는 분', '이직·투자·결혼 타이밍이 궁금한 분', '대운과 올해를 함께 보고 싶은 분'],
-    preview: '대운 흐름 5섹션 · 올해 운세 5섹션 · 인생 타이밍 5섹션 — 총 15섹션. 지금 대운이 상승기인지 조심기인지, 올해 월별 에너지, 이직·투자·결혼의 최적 타이밍까지 사주 데이터로 분석합니다.',
-    faq: [
-      { q: '3개 리포트를 각각 살 때와 다른가요?', a: '내용은 동일하되, 21% 할인된 가격으로 한 번에 생성됩니다.' },
-      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 3개 리포트를 순차 생성하며 약 3~5분 소요됩니다. 생성 후 영구 저장됩니다.' }
-    ],
-    engines: ['사주', '적천수', '자평진전'],
-    keyQuestions: ['지금 내 대운은 상승기인가 조심기인가?', '올해 에너지가 가장 강한 달은 언제인가?', '이직·결혼·투자의 최적 타이밍은 언제인가?'],
-    sectionDesc: ['대운 흐름 분석 5섹션', '올해 운세 5섹션', '인생 타이밍 가이드 5섹션'],
-    sectionDetail: ['현재 대운 진단, 과거·미래 흐름', '올해 세운과 월별 에너지', '결정·이직·투자 최적 타이밍']
-  },
-  pkg_relations: {
-    emoji: '<i class="pi pi-heart"></i>',
-    subtitle: '연애 · 가족 · 이상형 — 내 인연 구조를 한눈에',
-    desc: '연애, 가족 관계, 이상형 유형을 하나의 패키지로. 모두 내 사주 기반으로 분석합니다. 개별 구매 대비 20% 할인.',
-    recommend: ['내 연애 패턴과 가족 관계가 모두 궁금한 분', '내가 끌리는 이상형의 구조를 알고 싶은 분', '인연 전체를 한 번에 파악하고 싶은 분'],
-    preview: '연애/결혼 5섹션 · 가족/인연 5섹션 · 이상형 유형 5섹션 — 총 15섹션. 내 연애 패턴, 가족 관계 구조, 내가 끌리는 이상형 유형까지 내 사주 기반으로 분석합니다.',
-    faq: [
-      { q: '3개 리포트를 각각 살 때와 다른가요?', a: '내용은 동일하되, 20% 할인된 가격으로 한 번에 볼 수 있습니다.' },
-      { q: '상대방 정보도 필요한가요?', a: '아니요. 연애·가족·이상형 모두 내 사주 기반 분석이라 내 정보만 있으면 됩니다.' }
-    ],
-    engines: ['사주', '십신'],
-    keyQuestions: ['나는 왜 이런 연애 패턴을 반복하는가?', '가족 관계에서 내 역할과 인연 구조는?', '내가 진짜 끌리는 이상형은 누구인가?'],
-    sectionDesc: ['연애·결혼 분석 5섹션', '가족·인연 분석 5섹션', '이상형 유형 5섹션'],
-    sectionDetail: ['연애 패턴과 결혼운', '가족 관계 구조', '내가 끌리는 유형 분석']
-  },
-  pkg_world: {
-    emoji: '<i class="pi pi-globe"></i>',
-    subtitle: '베딕 · 서양 점성 · 자미두수 — 동서양이 함께 본 나',
-    desc: '인도 베딕, 서양 점성술, 자미두수 세 관점을 하나의 패키지로. 개별 구매 대비 할인.',
-    recommend: ['동양과 서양 점성술이 모두 궁금한 분', '사주 외 다른 시스템으로도 검증받고 싶은 분', '운명을 다각도로 분석받고 싶은 분'],
-    preview: '베딕 점성술 5섹션 · 서양 점성술 5섹션 · 자미두수 5섹션 — 총 15섹션. 인도·그리스·중국 3개 고대 시스템이 동시에 분석하는 나의 운명 지도.',
-    faq: [
-      { q: '3개 리포트를 각각 살 때와 다른가요?', a: '내용은 동일하되, 할인된 가격으로 한 번에 생성됩니다.' },
-      { q: '사주 데이터가 없어도 되나요?', a: '베딕·자미두수는 출생 정보로 계산하며, 사주 분석과 교차 검증하는 방식으로 진행됩니다.' },
-      { q: '리포트는 얼마나 걸리나요?', a: 'AI가 3개 리포트를 순차 생성하며 약 3~5분 소요됩니다. 생성 후 영구 저장됩니다.' }
-    ],
-    engines: ['베딕', '서양 점성', '자미두수'],
-    keyQuestions: ['베딕 낙샤트라로 본 내 운명 패턴은?', '서양 점성술 출생 차트가 말하는 나는?', '자미두수 명궁이 가리키는 삶의 방향은?'],
-    sectionDesc: ['베딕 점성술 분석 5섹션', '서양 점성술 분석 5섹션', '자미두수 분석 5섹션'],
-    sectionDetail: ['낙샤트라·다샤·라그나 기반 분석', '태양·달·상승점 기반 분석', '명궁·신궁·12궁 기반 분석']
   }
 };
 
@@ -4435,19 +4358,6 @@ async function loadSharedReportById(reportId) {
   _config = TYPE_CONFIG[_type];
   if (!_config) { setLoading('잘못된 접근', '리포트 타입이 올바르지 않아요'); return; }
 
-  // 패키지에서 연결된 경우 할인가 적용 (B안)
-  const _fromPkg = params.get('from_pkg');
-  if (_fromPkg && TYPE_CONFIG[_fromPkg]) {
-    const PKG_DISCOUNT = { pkg_saju_core:0.20, pkg_timing:0.12, pkg_relations:0.20, pkg_world:0.19 };
-    const disc = PKG_DISCOUNT[_fromPkg] || 0;
-    if (disc > 0) {
-      _config = Object.assign({}, _config, {
-        orb: Math.round(_config.orb * (1 - disc)),
-        _pkgDiscountLabel: '패키지 할인가 (' + Math.round(disc*100) + '% 할인)'
-      });
-    }
-  }
-
   document.getElementById('navTitle').textContent = _config.title;
 
   // 공유 링크 (?r=<id>): 로그인 없이 공유받은 리포트 전체 표시
@@ -4529,7 +4439,7 @@ function proceedAfterProfile() {
   // renderIntro 완료 후 Orb 확정
   var _oc2 = document.getElementById('introOrbCost');
   if (_oc2 && _config && _config.orb) {
-    _oc2.textContent = _config.orb.toLocaleString() + ' Orb 차감' + (_config._pkgDiscountLabel ? ' · ' + _config._pkgDiscountLabel : '');
+    _oc2.textContent = _config.orb.toLocaleString() + ' Orb 차감';
   }
 }
 
@@ -6527,57 +6437,6 @@ function renderCharVisual() {
   </div>`;
 }
 
-// 패키지 서브리포트 매핑
-const PKG_SUB_MAP = {
-  pkg_saju_core:  { types:['character','money','love'],   labels:['기질 분석','재물·사업','연애·결혼'] },
-  pkg_timing:     { types:['daeun','year','timing'],      labels:['대운 흐름','올해 운세','결정 타이밍'] },
-  pkg_relations:  { types:['love','family','soulmate'],   labels:['연애·결혼','가족·인연','이상형'] },
-  pkg_world:      { types:['vedic_full','astro_full','ziwei_full'], labels:['베딕','서양 점성','자미두수'] },
-};
-
-// 패키지 상태 비동기 조회 → 인트로 업데이트
-async function loadAndRenderPackageStatus() {
-  const pkg = PKG_SUB_MAP[_type];
-  if (!pkg) return;
-  const sb = getSb();
-  if (!sb || !_user) return;
-
-  const statusEl = document.getElementById('pkgStatusList');
-  if (!statusEl) return;
-
-  const results = await Promise.all(pkg.types.map(async function(t) {
-    try {
-      const { data } = await sb.from('reports').select('created_at').eq('user_id', _user.id).eq('report_type', t).order('created_at', { ascending: false }).limit(1).maybeSingle();
-      return { type: t, done: !!(data && data.created_at), date: data && data.created_at };
-    } catch(e) { return { type: t, done: false }; }
-  }));
-
-  const col = TYPE_COLORS[_type] || { main:'#8a6a15', soft:'rgba(154,122,38,0.08)', border:'rgba(154,122,38,0.25)' };
-  const allDone = results.every(function(r){ return r.done; });
-  const missingCount = results.filter(function(r){ return !r.done; }).length;
-
-  statusEl.innerHTML = results.map(function(r, i) {
-    const dtTxt = r.date ? new Date(r.date).toLocaleDateString('ko-KR', {month:'short', day:'numeric'}) : '';
-    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:' + (r.done ? 'rgba(34,120,60,0.08)' : 'rgba(0,0,0,0.04)') + ';margin-bottom:5px;">'
-      + '<div style="width:20px;height:20px;border-radius:50%;background:' + (r.done ? '#1a7a3a' : 'rgba(0,0,0,0.12)') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:#fff;font-weight:800;">' + (r.done ? '✓' : (i+1)) + '</div>'
-      + '<div style="flex:1;font-size:13px;font-weight:' + (r.done ? '600' : '500') + ';color:' + (r.done ? '#1a5a2a' : '#5a4830') + ';">' + pkg.labels[i] + '</div>'
-      + (r.done ? '<div style="font-size:10px;color:#3a8a3a;">' + dtTxt + ' 생성됨</div>' : '<div style="font-size:10px;color:#8a7a60;">아직 없음</div>')
-      + '</div>';
-  }).join('');
-
-  // 버튼 텍스트 업데이트
-  const btn = document.getElementById('btnGenerate');
-  if (btn) {
-    if (allDone) {
-      btn.innerHTML = '<i class="pi pi-sparkle"></i> 무료로 모아보기<span class="btn-intro-gen-sub">이미 생성된 리포트 · Orb 차감 없음</span>';
-    } else if (missingCount === pkg.types.length) {
-      btn.innerHTML = '<i class="pi pi-sparkle"></i> 리포트 생성하기<span class="btn-intro-gen-sub">' + _config.orb.toLocaleString() + ' Orb 차감</span>';
-    } else {
-      btn.innerHTML = '<i class="pi pi-sparkle"></i> 모아보기 (' + (pkg.types.length - missingCount) + '개 바로 · ' + missingCount + '개 없음)<span class="btn-intro-gen-sub">없는 리포트는 링크 안내 · Orb 차감 없음</span>';
-    }
-  }
-}
-
 function renderIntro() {
   const d = TYPE_DETAIL[_type];
   if (!d) return;
@@ -6600,7 +6459,7 @@ function renderIntro() {
   let _lblEl = document.getElementById('introTypeLabel');
   if (!_lblEl) { _lblEl = document.createElement('div'); _lblEl.id = 'introTypeLabel'; document.getElementById('introEmoji').before(_lblEl); }
   _lblEl.style.cssText = 'font-size:9px;font-weight:800;letter-spacing:0.25em;color:' + _introMain + ';opacity:0.75;text-transform:uppercase;margin-bottom:8px;';
-  _lblEl.textContent = (_config.title || '').replace('패키지 · ', '').toUpperCase();
+  _lblEl.textContent = (_config.title || '').toUpperCase();
 
   document.getElementById('introEmoji').style.cssText = 'font-size:36px;margin-bottom:8px;display:block;';
   document.getElementById('introEmoji').innerHTML = d.emoji;
@@ -6745,37 +6604,7 @@ function renderIntro() {
   // 섹션 목록 (sectionDesc + sectionDetail)
   const secWrap = document.getElementById('introSections');
   secWrap.innerHTML = '';
-  const isPkg = _type.startsWith('pkg_');
-
-  // 패키지: 상태 영역 삽입 + 비동기 조회
-  if (isPkg) {
-    let pkgStatusWrap = document.getElementById('pkgStatusWrap');
-    if (!pkgStatusWrap) {
-      pkgStatusWrap = document.createElement('div');
-      pkgStatusWrap.id = 'pkgStatusWrap';
-      pkgStatusWrap.style.cssText = 'margin-bottom:14px;';
-      pkgStatusWrap.innerHTML = '<div style="font-size:10px;font-weight:800;color:' + _introMain + ';letter-spacing:0.18em;margin-bottom:8px;">포함된 리포트 현황</div>'
-        + '<div id="pkgStatusList"><div style="font-size:12px;color:var(--muted);padding:8px 0;">확인 중...</div></div>';
-      const secList = document.querySelector('.intro-section-list');
-      if (secList) secList.parentNode.insertBefore(pkgStatusWrap, secList);
-    }
-    loadAndRenderPackageStatus();
-    { const _sl = document.querySelector('.intro-section-list'); if (_sl) _sl.style.display = 'none'; }
-  }
-
-  if (isPkg) {
-    // 패키지: 서브 리포트 목록으로 표시
-    (d.sectionDesc || []).forEach((desc, i) => {
-      const el = document.createElement('div');
-      el.className = 'intro-section-item';
-      el.innerHTML = `<div class="intro-section-num">${i+1}</div>
-        <div class="intro-section-text">
-          <div class="intro-section-name">${desc}</div>
-          ${d.sectionDetail && d.sectionDetail[i] ? `<div class="intro-section-desc">${d.sectionDetail[i]}</div>` : ''}
-        </div>`;
-      secWrap.appendChild(el);
-    });
-  } else {
+  {
     const sections = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
     sections.forEach((s, i) => {
       const el = document.createElement('div');
@@ -7012,10 +6841,6 @@ async function generateReport() {
   if (_type === 'qimen_wonmyong')     { await generateQimenWonmyongReport();     return; }
   if (_type === 'qimen_today')        { await generateQimenTodayReport();        return; }
   if (_type === 'qimen_taegil')       { await generateQimenTaegilReport();       return; }
-  if (_type === 'pkg_saju_core')      { await generatePackageReport(['character','money','love'],     ['기질 분석','재물·사업','연애·결혼']); return; }
-  if (_type === 'pkg_timing')         { await generatePackageReport(['daeun','year','timing'],        ['대운 흐름','올해 운세','결정 타이밍']); return; }
-  if (_type === 'pkg_relations')      { await generatePackageReport(['love','family','soulmate'],['연애·결혼','가족·인연','이상형']); return; }
-  if (_type === 'pkg_world')          { await generatePackageReport(['vedic_full','astro_full','ziwei_full'],['베딕','서양 점성','자미두수']); return; }
   // fallback
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
@@ -8578,178 +8403,6 @@ async function generateVedicMuhurtaReport() {
   }
 }
 
-// ── 패키지 전용: 서브리포트 5섹션을 1번 API 호출로 생성 ──
-async function batchPackageSections(secs, secIndices, subTitle, prompt) {
-  // 모든 섹션 로딩 표시
-  secIndices.forEach(idx => {
-    const sl = document.getElementById('sloading-' + idx);
-    if (sl) { sl.style.display = 'flex'; sl.innerHTML = '<span class="spin"></span> ' + subTitle + ' 생성 중...'; }
-    const sb = document.getElementById('sbody-' + idx);
-    if (sb) sb.style.display = 'none';
-  });
-
-  const sysPrompt = `당신은 사주 분석 전문가입니다. 아래 지시에 따라 섹션을 모두 작성하세요.
-절대 규칙: #헤더 금지. **볼드**는 핵심 단어에만 3~5개. 톤: 따뜻하고 정확한 전문가.
-사주 원국에 없는 천간·지지 사용 금지. 대운·세운 글자는 해당 블록에서만 인용.`;
-
-  const fullPrompt = prompt + '\n\n[작성 지시] 아래 섹션을 순서대로 모두 작성하세요. 각 섹션 앞에 반드시 【1】 【2】 【3】 형식 구분자를 붙이세요.\n'
-    + secs.map((s, i) => `【${i+1}】 ${s.name} (약 ${s.chars}자)`).join('\n')
-    + '\n\n전체 약 ' + secs.reduce((a, s) => a + s.chars, 0) + '자.';
-
-  const controller = new AbortController();
-  const tid = setTimeout(() => controller.abort(), 90000);
-
-  try {
-    const res = await fetch(CHAT_API, {
-      signal: controller.signal,
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: _user.id,
-        messages: [{ role: 'user', content: fullPrompt }],
-        system_prompt: sysPrompt,
-        mode: 'saju', max_tokens: 3500, skip_orb: true
-      })
-    });
-    clearTimeout(tid);
-    if (!res.ok) throw new Error('API ' + res.status);
-    const data = await res.json();
-    const text = (data.reply || '').trim();
-
-    // 【N】 구분자로 섹션 분리
-    for (let i = 0; i < secs.length; i++) {
-      const marker = `【${i + 1}】`;
-      const nextMarker = `【${i + 2}】`;
-      const start = text.indexOf(marker);
-      const end = i < secs.length - 1 ? text.indexOf(nextMarker) : text.length;
-      let content = start !== -1 ? text.slice(start + marker.length, end > -1 ? end : text.length).trim() : '';
-      content = cleanSectionText(sanitizeAIText(content));
-
-      const secIdx = secIndices[i];
-      const sl = document.getElementById('sloading-' + secIdx);
-      const sb = document.getElementById('sbody-' + secIdx);
-      if (sl) sl.style.display = 'none';
-      if (sb) {
-        if (content && content.length > 30) {
-          sb.innerHTML = renderMarkdown(content);
-          sb.style.display = 'block';
-        } else {
-          if (sl) { sl.style.display = 'flex'; sl.innerHTML = '<span style="color:#a94a3a;font-weight:600;">섹션 생성 미완료</span>'; }
-        }
-      }
-    }
-  } catch(e) {
-    clearTimeout(tid);
-    const msg = e.name === 'AbortError' ? '시간 초과' : '생성 실패';
-    secIndices.forEach(idx => {
-      const sl = document.getElementById('sloading-' + idx);
-      if (sl) { sl.style.display = 'flex'; sl.innerHTML = `<span style="color:#a94a3a;font-weight:600;">${msg}</span>`; }
-    });
-  }
-}
-
-// ── 패키지 리포트 ──────────────────────────────────────────────
-async function generatePackageReport(types, labels) {
-  showState('loading');
-  setLoading('확인 중...', '');
-  const sb = getSb();
-
-  // 1. 이미 구매한 패키지인지 확인 (pkg_* 레코드 존재 여부)
-  let alreadyBought = false;
-  try {
-    const { data } = await sb.from('reports')
-      .select('id').eq('user_id', _user.id).eq('report_type', _type)
-      .limit(1).maybeSingle();
-    if (data) alreadyBought = true;
-  } catch(e) {}
-
-  // 2. 첫 구매면 Orb 차감 후 pkg 레코드 저장
-  if (!alreadyBought) {
-    if (!await setupSectionsAndDeductOrb()) return;
-    try {
-      await sb.from('reports').insert({
-        user_id: _user.id, report_type: _type,
-        content: [getProfileKey()], orb_spent: _config.orb,
-        created_at: new Date().toISOString()
-      });
-    } catch(e) {}
-  }
-
-  // 3. 화면 세팅
-  showState('report');
-  document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = alreadyBought ? '저장된 패키지' : '생성일: ' + new Date().toLocaleDateString('ko-KR');
-
-  const pkgColor  = (TYPE_COLORS[_type]||{}).main || '#9a6e10';
-  const pkgSoft   = (TYPE_COLORS[_type]||{}).soft || 'rgba(154,110,16,0.08)';
-  const pkgBorder = (TYPE_COLORS[_type]||{}).border || 'rgba(154,110,16,0.32)';
-
-  const wrap = document.getElementById('sectionsWrap');
-  wrap.innerHTML = '';
-
-  // 탭 헤더
-  const tabBar = document.createElement('div');
-  tabBar.style.cssText = 'display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;';
-  labels.forEach(function(lbl, i) {
-    const btn = document.createElement('button');
-    btn.id = 'pkg-tab-' + i;
-    btn.innerHTML = '<span id="pkg-tab-dot-' + i + '" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ccc;margin-right:5px;vertical-align:middle;"></span>' + lbl;
-    btn.onclick = function() { switchPkgTab(i, types.length); };
-    btn.style.cssText = 'padding:8px 14px;border-radius:20px;border:1px solid ' + pkgBorder + ';background:' + (i===0?pkgSoft:'transparent') + ';color:' + pkgColor + ';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;';
-    tabBar.appendChild(btn);
-  });
-  wrap.appendChild(tabBar);
-
-  window.switchPkgTab = function(idx, total) {
-    for (var i = 0; i < total; i++) {
-      const p = document.getElementById('pkg-panel-' + i);
-      const b = tabBar.children[i];
-      if (p) p.style.display = i === idx ? 'block' : 'none';
-      if (b) b.style.background = i === idx ? pkgSoft : 'transparent';
-    }
-  };
-
-  // 4. 각 서브리포트: DB 조회 후 탭 패널 렌더링
-  for (let ti = 0; ti < types.length; ti++) {
-    const rType = types[ti];
-    const secs = TYPE_SECTIONS[rType] || TYPE_SECTIONS.character;
-    const rTitle = (TYPE_CONFIG[rType] && TYPE_CONFIG[rType].title) || labels[ti];
-
-    const panel = document.createElement('div');
-    panel.id = 'pkg-panel-' + ti;
-    panel.style.display = ti === 0 ? 'block' : 'none';
-    wrap.appendChild(panel);
-
-    // 개별 리포트 조회
-    let content = null;
-    try {
-      const { data } = await sb.from('reports')
-        .select('content').eq('user_id', _user.id).eq('report_type', rType)
-        .order('created_at', { ascending: false }).limit(1).maybeSingle();
-      if (data && Array.isArray(data.content) && data.content.length >= 5) content = data.content;
-    } catch(e) {}
-
-    if (content) {
-      const _dot = document.getElementById('pkg-tab-dot-' + ti);
-      if (_dot) { _dot.style.background = '#1a7a3a'; }
-      panel.innerHTML = '<div style="font-size:11px;font-weight:700;color:' + pkgColor + ';margin-bottom:12px;padding:8px 12px;background:' + pkgSoft + ';border-radius:8px;">' + labels[ti] + ' 리포트</div>'
-        + secs.map(function(s, i) {
-            return '<div class="section-card"><div class="section-header"><div class="section-num">' + (i+1) + '</div><div class="section-name">' + s.name + '</div></div>'
-              + '<div class="section-body" style="display:block;">' + renderMarkdown(content[i] || '') + '</div></div>';
-          }).join('');
-    } else {
-      panel.innerHTML = '<div style="text-align:center;padding:32px 16px;">'
-        + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;">' + rTitle + '가 아직 없어요</div>'
-        + '<div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;">개별 리포트를 먼저 생성하면<br>여기서 바로 볼 수 있어요.</div>'
-        + '<a href="report.html?type=' + rType + '&from_pkg=' + _type + '" style="display:inline-block;padding:11px 24px;background:rgba(154,122,38,0.12);border:1px solid rgba(154,122,38,0.35);border-radius:12px;text-decoration:none;color:var(--gold-deep);font-weight:700;font-size:13px;">' + rTitle + ' 생성하러 가기 →</a>'
-        + '</div>';
-    }
-  }
-
-  document.getElementById('reportBadge').innerHTML = _config.emoji + ' PACKAGE';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = '각 리포트를 개별 생성 후 패키지에서 확인하세요'; }
-  document.getElementById('reportActions').style.display = 'flex';
-  showConsultBanner();
-}
 
 // ── 기문 본명국 데이터 빌더 ──
 async function fetchQimenWonmyong() {
@@ -10147,7 +9800,7 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 
   for (let i = 0; i < secIndices.length; i++) {
     const secIdx = secIndices[i];
-    const localIdx = secIdx % (typeSec.length || 5); // 패키지 오프셋 보정 (5~14 → 0~4)
+    const localIdx = secIdx % (typeSec.length || 5);
     const secNum = localIdx + 1;
     const secName = typeSec[localIdx]?.name || '';
     const secChars = typeSec[localIdx]?.chars || 400;
