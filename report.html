@@ -6757,6 +6757,20 @@ function renderIntro() {
     });
   }
 
+  // wealth_lifetime: 인트로에 샘플 곡선 (개인화 X, 마케팅용 미리보기)
+  if (_type === 'wealth_lifetime') {
+    let sampleWrap = document.getElementById('introSampleChart');
+    if (!sampleWrap) {
+      sampleWrap = document.createElement('div');
+      sampleWrap.id = 'introSampleChart';
+      sampleWrap.style.cssText = 'margin: 16px 0 4px;';
+      secWrap.parentNode.insertBefore(sampleWrap, secWrap.nextSibling);
+    }
+    const sampleBadge = '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#7a5a08;margin-bottom:-4px;">SAMPLE PREVIEW</div>';
+    const sampleNote = '<div style="text-align:center;font-size:11px;color:#7a5a30;margin-top:4px;line-height:1.6;">↑ 샘플 곡선 — 실제는 본인 사주·자미두수 데이터로 그려집니다</div>';
+    sampleWrap.innerHTML = sampleBadge + renderWealthCurveSvg(WEALTH_SAMPLE_CURVE) + sampleNote;
+  }
+
   // 샘플 미리보기
   let previewEl = document.getElementById('introPreview');
   if (!previewEl) {
@@ -9917,6 +9931,23 @@ function computeWealthCurve() {
 
   return { points, peakIdx, valleyIdx, currentIdx };
 }
+
+// ── 인트로 페이지용 샘플 곡선 (개인화 X, 마케팅용 데모) ──────────
+const WEALTH_SAMPLE_CURVE = {
+  points: [
+    { idx:0, score:5, tenGod:'정관',  pillar:'갑인', yearRange:'1990-1999', ageRange:'0~9세',  yStart:1990, yEnd:1999 },
+    { idx:1, score:6, tenGod:'편관',  pillar:'을묘', yearRange:'2000-2009', ageRange:'10~19세', yStart:2000, yEnd:2009 },
+    { idx:2, score:7, tenGod:'식신',  pillar:'병진', yearRange:'2010-2019', ageRange:'20~29세', yStart:2010, yEnd:2019 },
+    { idx:3, score:9, tenGod:'편재',  pillar:'정사', yearRange:'2020-2029', ageRange:'30~39세', yStart:2020, yEnd:2029 },
+    { idx:4, score:8, tenGod:'정재',  pillar:'무오', yearRange:'2030-2039', ageRange:'40~49세', yStart:2030, yEnd:2039 },
+    { idx:5, score:6, tenGod:'정인',  pillar:'기미', yearRange:'2040-2049', ageRange:'50~59세', yStart:2040, yEnd:2049 },
+    { idx:6, score:4, tenGod:'겁재',  pillar:'경신', yearRange:'2050-2059', ageRange:'60~69세', yStart:2050, yEnd:2059 },
+    { idx:7, score:5, tenGod:'편인',  pillar:'신유', yearRange:'2060-2069', ageRange:'70~79세', yStart:2060, yEnd:2069 },
+  ],
+  peakIdx: 3,
+  valleyIdx: 6,
+  currentIdx: -1,
+};
 
 // ── 재물 곡선 SVG 렌더링 ────────────────────────────────────────
 function renderWealthCurveSvg(curve) {
