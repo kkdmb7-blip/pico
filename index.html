@@ -5138,6 +5138,9 @@ function handleKakaoCallback(code) {
       currentUser = { id: userId, name: name, avatar: avatar, email: email, _v: resolved_v };
       localStorage.setItem('pico_user', JSON.stringify(currentUser));
       updateAuthUI();
+      if (resolved && resolved.signup_bonus) {
+        try { showSignupBonusModal(resolved.signup_bonus); } catch(e) {}
+      }
       syncProfilesFromServer(currentUser.id).then(function() {
         var existing = localStorage.getItem('pico_profile');
         if (!existing) openProfileModal();
@@ -5795,8 +5798,6 @@ async function loadMiniScore() {
     detailLink.href = 'score.html?' + p.toString();
   }
 
-  // 사주 유형 닮은꼴 렌더
-  try { renderLifeType(result.rawData && result.rawData.saju); } catch(e) {}
 }
 </script>
 <script>
@@ -7170,10 +7171,32 @@ window.togglePushSubscription = async function() {
   document.addEventListener('selectstart',function(e){if(!['INPUT','TEXTAREA'].includes(e.target.tagName))e.preventDefault();});
   document.addEventListener('dragstart',function(e){e.preventDefault();});
 })();
+function showSignupBonusModal(amount){
+  if (document.getElementById('signupBonusOverlay')) return;
+  var ov = document.createElement('div');
+  ov.id = 'signupBonusOverlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(20,12,4,0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;animation:bonusFadeIn 0.3s ease;';
+  ov.innerHTML = ''
+    + '<div style="max-width:340px;width:100%;background:linear-gradient(160deg,#fdf3df,#f7e6c0);border:1.5px solid rgba(154,110,16,0.35);border-radius:22px;padding:30px 24px 22px;text-align:center;box-shadow:0 18px 60px rgba(120,80,20,0.35);animation:bonusPop 0.5s cubic-bezier(0.34,1.56,0.64,1);">'
+    +   '<div style="font-size:42px;line-height:1;margin-bottom:14px;color:#9a6e10;"><i class="pi pi-star-fill"></i></div>'
+    +   '<div style="font-family:Noto Serif KR,serif;font-size:20px;font-weight:800;color:#5a3a08;margin-bottom:8px;">가입을 환영합니다</div>'
+    +   '<div style="font-size:13px;color:#7a5a30;line-height:1.7;margin-bottom:18px;">FORTUNA 가입 축하 보너스</div>'
+    +   '<div style="background:rgba(255,255,255,0.6);border:1px solid rgba(154,110,16,0.28);border-radius:14px;padding:18px 16px;margin-bottom:20px;">'
+    +     '<div style="font-size:11px;font-weight:700;letter-spacing:0.18em;color:#9a6e10;margin-bottom:6px;">SIGNUP BONUS</div>'
+    +     '<div style="font-family:Noto Serif KR,serif;font-size:36px;font-weight:800;color:#9a6e10;line-height:1.1;">' + amount.toLocaleString() + ' <span style="font-size:18px;font-weight:700;">Orb</span></div>'
+    +     '<div style="font-size:11px;color:#7a5a30;margin-top:6px;">바로 사용 가능</div>'
+    +   '</div>'
+    +   '<button onclick="document.getElementById(\'signupBonusOverlay\').remove()" style="width:100%;padding:13px;background:linear-gradient(135deg,#967032,#b89048);border:none;border-radius:12px;color:#fdf7e0;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:0.05em;">확인</button>'
+    + '</div>';
+  document.body.appendChild(ov);
+  ov.addEventListener('click', function(e){ if (e.target === ov) ov.remove(); });
+}
 </script>
 <style>
 body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
 input,textarea,select{-webkit-user-select:text;user-select:text;}
+@keyframes bonusFadeIn { from{opacity:0;} to{opacity:1;} }
+@keyframes bonusPop { 0%{transform:scale(0.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
 </style>
 </body>
 </html>
