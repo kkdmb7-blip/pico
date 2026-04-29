@@ -8928,6 +8928,54 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 }
 
 // ── 자미두수 심층 분석 ──
+// ── 자미두수 ↔ 사주 격국 의미적 매핑 (양학파 교차검증) ─────────
+// textbook 의미가 일치하는 격국끼리 매핑. 일치 시 "양학파 합치" 신호.
+const ZIWEI_SAJU_PATTERN_MAP = {
+  '살파랑':    ['양인격','편관격','칠살격','종강'],
+  '칠살조두':  ['칠살격','편관격','양인격'],
+  '자살동궁':  ['칠살격','편관격','양인격'],
+  '자파동궁':  ['칠살격','상관격','파재'],
+  '기월동량':  ['식신격','정인격','편인격'],
+  '자미독좌':  ['건록격','정관격','정인격'],
+  '자부동궁':  ['건록격','정관격','정인격','정재격'],
+  '자상동궁':  ['정관격','정인격','식신격'],
+  '자탐동궁':  ['상관격','편재격','도화'],
+  '일월동궁':  ['양신성상','종격'],
+  '부상조원':  ['정재격','정관격','건록격'],
+  '양양창록':  ['정인격','식신격','정관격'],
+  '군신경회':  ['정관격','정인격','건록격'],
+  '부상협명':  ['정재격','정관격','정인격'],
+  '명무정요':  ['종격','잡격'],
+  '화령협명':  ['칠살격','상관격','파재'],
+  '양타협명':  ['상관격','편관격'],
+};
+
+function buildCrossValidationBlock() {
+  if (!_ziweiData || !_geokguk) return '';
+  const ziweiPatterns = (_ziweiData.patterns || []).map(p => p.name);
+  if (ziweiPatterns.length === 0) return '';
+
+  const sajuG = String(_geokguk).replace(/\s/g,'');
+  const matches = [];
+  for (const zw of ziweiPatterns) {
+    const targets = ZIWEI_SAJU_PATTERN_MAP[zw] || [];
+    for (const t of targets) {
+      if (sajuG.includes(t) || t.includes(sajuG.replace(/격$/,''))) {
+        matches.push({ ziwei: zw, saju: sajuG, target: t });
+        break;
+      }
+    }
+  }
+
+  if (matches.length === 0) {
+    return `\n【교차 검증】\n사주 격국(${sajuG}) ↔ 자미두수 격국(${ziweiPatterns.join(',')}) 직접 일치 없음. 두 학파가 다른 각도로 접근. 본문에서는 각 시스템 고유 인사이트 모두 활용.`;
+  }
+
+  const lines = matches.map(m => `· 자미두수 [${m.ziwei}] ↔ 사주 [${m.saju}] — 두 학파가 같은 운명 키워드`).join('\n');
+  return `\n【★ 양학파 합치 신호 — 사주 ↔ 자미두수 격국 일치 (${matches.length}건)】\n${lines}
+→ 이 일치는 신뢰도가 매우 높음. 본문에서 "사주와 자미두수가 모두 X를 가리킨다" 라고 강하게 단정 가능. 환각 0%.`;
+}
+
 // ── 자미두수 시각 블록 (격국 뱃지 + 5궁 미니 명반) ─────────────
 function renderZiweiVisualBlock() {
   if (!_ziweiData) return '';
@@ -9007,6 +9055,7 @@ async function generateZiweiFullReport() {
   { const _vb = renderZiweiVisualBlock(); const _sw = document.getElementById('sectionsWrap'); if (_vb && _sw) _sw.insertAdjacentHTML('afterbegin', _vb); }
   const sb2 = buildSajuBlock();
   const zb = buildFullZiweiBlock();
+  const cv = buildCrossValidationBlock();
   const db = buildDaeunBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
@@ -9015,6 +9064,7 @@ async function generateZiweiFullReport() {
 
 ${sb2}
 ${zb}
+${cv}
 ${buildAdviceBlock(['창업/비즈니스','이직/커리어','투자/재테크'])}
 ${buildYongsinBlock()}
 ${buildAgeAdviceBlock()}
@@ -9032,6 +9082,7 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 ${sb2}
 ${zb}
+${cv}
 ${db}
 올해 세운: ${_sewun||'미확인'}
 ${buildAdviceBlock(['대인관계/부부'])}
@@ -9059,6 +9110,7 @@ async function generateTripleReport() {
   const vb = buildVedicBlock();
   const ab = buildFullAstroBlock();
   const zb = buildFullZiweiBlock();
+  const cv = buildCrossValidationBlock();
   const db = buildDaeunBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
@@ -9069,6 +9121,7 @@ ${sb2}
 ${vb}
 ${ab}
 ${zb}
+${cv}
 ${buildAdviceBlock()}
 ${buildYongsinBlock()}
 ${buildFamousBlock()}
@@ -9089,6 +9142,7 @@ ${sb2}
 ${vb}
 ${ab}
 ${zb}
+${cv}
 ${db}
 올해 세운: ${_sewun||'미확인'} / 세운 상세: ${_sewunFull?JSON.stringify(_sewunFull):''}
 ${buildAdviceBlock()}
@@ -9116,6 +9170,7 @@ async function generateCareerDeepReport() {
   const vb = buildVedicBlock();
   const ab = buildFullAstroBlock();
   const zb = buildFullZiweiBlock();
+  const cv = buildCrossValidationBlock();
   const db = buildDaeunBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
@@ -9129,6 +9184,7 @@ async function generateCareerDeepReport() {
 
 ${sb2}
 ${zb}
+${cv}
 ${vb}
 ${saturnStr}
 ${jupiterStr}
@@ -10139,6 +10195,7 @@ async function generateWealthLifetimeReport() {
   if (!await setupSectionsAndDeductOrb()) return;
   const sb2 = buildSajuBlock();
   const zb  = (_ziweiData ? buildFullZiweiBlock() : '');
+  const cv  = buildCrossValidationBlock();
   const db  = buildDaeunBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const birthLine = _profile ? `생년월일: ${_profile.year}년 ${_profile.month}월 ${_profile.day}일` : '';
@@ -10170,6 +10227,7 @@ ${curveLines}
 
 ${sb2}
 ${zb}
+${cv}
 ${wealthBlock}
 ${buildAdviceBlock(['투자/재테크','창업/비즈니스'])}
 ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
@@ -10196,6 +10254,7 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 
 ${sb2}
 ${zb}
+${cv}
 ${db}
 ${wealthBlock}
 ${buildAdviceBlock(['투자/재테크'])}
