@@ -1034,6 +1034,8 @@ const TYPE_CONFIG = {
     desc: '십신궁위·원진살·귀인 데이터로 보는 가족 인연 구조' },
   timing:     { title: '인생 타이밍 가이드', orb: 490, emoji: '<i class="pi pi-calendar"></i>', focus: '대운 전환기, 월별 타이밍, 결정·이직·투자 최적 시기',
     desc: '대운전환기·세운교차·십이운성 데이터 기반 타이밍 분석' },
+  wealth_lifetime:{ title: '내 인생 재물 곡선', orb: 990, emoji: '<i class="pi pi-chart-line"></i>', focus: '평생 재물 곡선·재물의 그릇·들어오는 통로·정점/저점 시기·실전 전략',
+    desc: '사주 대운 8개 + 자미두수 재백·사화 종합 — 평생 재물 흐름 곡선 차트 포함 (구체적 금액 예측 없음)' },
   wealth_timing:{ title: '재물 타이밍 특화', orb: 490, emoji: '<i class="pi pi-chart"></i>', focus: '재물 유입 시기, 대운별 재물 흐름, 월별 재물 포인트',
     desc: '재물운·대운교차·운세종합점수 기반 재물 타이밍 분석' },
   classic:    { title: '고전 명리 해석', orb: 590, emoji: '<i class="pi pi-book"></i>', focus: '적천수·자평진전·납음·조후 고전 원문 기반 해석',
@@ -1118,6 +1120,7 @@ const TYPE_COLORS = {
   health:       { main:'#2e7d32', soft:'rgba(46,125,50,0.13)',   border:'rgba(46,125,50,0.35)' },
   family:       { main:'#8d6e63', soft:'rgba(141,110,99,0.13)',  border:'rgba(141,110,99,0.38)' },
   timing:       { main:'#455a64', soft:'rgba(69,90,100,0.13)',   border:'rgba(69,90,100,0.35)' },
+  wealth_lifetime:{ main:'#b8860b', soft:'rgba(184,134,11,0.13)', border:'rgba(184,134,11,0.38)' },
   wealth_timing:{ main:'#a67500', soft:'rgba(166,117,0,0.13)',   border:'rgba(166,117,0,0.38)' },
   classic:      { main:'#7a2418', soft:'rgba(122,36,24,0.13)',   border:'rgba(122,36,24,0.38)' },
   guide:        { main:'#d81b60', soft:'rgba(216,27,96,0.13)',   border:'rgba(216,27,96,0.38)' },
@@ -1285,6 +1288,13 @@ const TYPE_SECTIONS = {
     { name: '대운 전환기 분석',              chars: 400 },
     { name: '올해 월별 타이밍 포인트',        chars: 400 },
     { name: '타이밍 활용 실전 전략',          chars: 400 }
+  ],
+  wealth_lifetime: [
+    { name: '재물의 그릇 — 평생 잠재력 등급',     chars: 350 },
+    { name: '재물이 들어오는 통로',              chars: 350 },
+    { name: '인생 재물 곡선과 정점·저점',         chars: 450 },
+    { name: '주의 시기와 재물 위험 신호',         chars: 350 },
+    { name: '실전 전략 — 그릇 키우기와 흐름 타기', chars: 400 }
   ],
   wealth_timing: [
     { name: '재물 에너지 구조 핵심',          chars: 300 },
@@ -2205,6 +2215,39 @@ const TYPE_DETAIL = {
       '다음 대운 전환까지 남은 시간, 전환 시 예상되는 에너지 변화. 전환 전 준비해야 할 것.',
       '올해 12개월 중 에너지가 강한 달(행동 적기), 주의할 달(방어 시기), 결정에 좋은 달을 월별로 제시합니다.',
       '이직·전직·투자·계약·연애·결혼의 최적 시기를 종합합니다. 지금 당장 타이밍에 맞춰 실행할 액션 3가지.'
+    ]
+  },
+  wealth_lifetime: {
+    emoji: '<i class="pi pi-chart-line"></i>',
+    subtitle: '내 인생 평생 재물 곡선 — 그릇·통로·시기를 한 장에',
+    desc: '사주 대운 8개 + 자미두수 재백·사화 + 격국 재물 구조를 종합하여 평생 재물 흐름 곡선을 그래프로. 어느 시기에 정점이 오고 어디서 위험이 오는지, 어느 통로(월급·사업·투자·전문직)로 들어오는지를 데이터 기반으로 진단합니다.',
+    recommend: [
+      '내 평생 재물 흐름의 큰 그림이 궁금한 분',
+      '내가 어떤 그릇인지(작은 안정형·큰 변동형·꾸준 누적형) 알고 싶은 분',
+      '어느 시기·어느 통로로 돈이 들어오는지 한눈에 보고 싶은 분',
+      '곡선 차트로 시각화된 재물 분석을 받고 싶은 분'
+    ],
+    sectionDesc: [
+      '재성·재고·격국으로 본 평생 재물 잠재력 등급',
+      '월급·사업·투자·전문직 등 들어오는 통로 진단',
+      '대운 8개 재물 곡선 + 정점·저점 + 지금 위치 (그래프 포함)',
+      '비겁쟁재·재성충 등 주의 시기와 재물 위험 신호',
+      '용신·격국 기반 그릇 키우기 + 흐름 타기 실전 전략'
+    ],
+    preview: '5섹션 + 시그니처 그래프. 재성 강약·식상생재·비겁탈재 + 자미두수 재백궁 주성·사화 + 격국 재물 구조를 종합해 평생 재물 곡선을 그립니다. 구체적 금액 예측은 절대 하지 않으며, 그릇·통로·시기·위험을 데이터 기반으로 진단합니다.',
+    faq: [
+      { q: '구체적 금액(억/원)이 나오나요?', a: '아니요. 사주·자미두수에 금액 예측 능력은 없습니다. 대신 "그릇 등급, 들어오는 통로, 정점·저점 시기"를 데이터 기반으로 분석합니다.' },
+      { q: 'money / wealth_timing 리포트와 다른가요?', a: 'money 는 재물운 일반, wealth_timing 은 단기 타이밍. 이 리포트는 평생 곡선 차트와 그릇 크기에 집중합니다.' },
+      { q: '곡선은 어떻게 계산되나요?', a: '대운 천간의 십신(정재·편재·식상·비겁 등) 점수 + 자미두수 재백궁 주성·사화 보정으로 1~10 스케일로 산출합니다. 결정적 알고리즘이라 같은 사주는 항상 같은 곡선이 나옵니다.' }
+    ],
+    engines: ['사주', '자미두수', '적천수', '자평진전'],
+    keyQuestions: ['내 평생 재물 곡선은 어떤 모양인가?', '내 재물 그릇은 얼마나 큰가?', '돈은 어느 통로로 들어오는가?', '정점과 저점은 언제인가?'],
+    sectionDetail: [
+      '재성(정재·편재) 위치·강약, 재고(辰戌丑未) 보유, 비겁쟁재 위험, 자미두수 재백궁 주성·강도를 종합한 1~10 등급.',
+      '월급(정관)·사업(편재)·투자(식상생재)·전문직(인성)·배우자운(부처궁) 중 어느 통로가 강한지.',
+      '대운 8개를 1~10점으로 환산한 곡선 차트. 정점(★)·저점(⚠)·현재 위치 표시. 사주 십신 + 자미두수 사화 가중.',
+      '비겁쟁재·재성충·화기 떨어진 대운·용신 충돌 시기 — 손실·사기·과욕 주의 신호.',
+      '용신 기반 재물 개운법, 그릇 키우기 액션 3가지, 흐름 타기 전략, 절대 피해야 할 재물 패턴.'
     ]
   },
   wealth_timing: {
@@ -4298,6 +4341,7 @@ function buildAccuracyLayerBlock() {
     health:     ['건강경향','조후','사주균형','강약수치','특수패턴','통근분석','조후용신분석'],
     family:     ['십신궁위','특수패턴','귀인','원진살','귀문관살','특수신살','사주균형','일주궁합','암합암충'],
     timing:     ['대운전환기','대운세운교차','십이운성확장','세운상호작용','대운트렌드','대운분리분석','운세종합점수','세운월별','신살시기'],
+    wealth_lifetime:['재물운','격국재물','대운트렌드','대운분리분석','대운세운교차','자미재백','자미사화','강약수치'],
     wealth_timing:['재물운','대운세운교차','세운확장분석','운세종합점수','대운트렌드','대운분리분석','격국검증','세운상호작용','세운월별'],
     classic:    ['적천수일간론','자평진전분석','납음분석','조후용신분석','격국세분','통근분석','일주론','조후','천간합충','지장간분석','암합암충'],
     guide:      ['일주론','십신궁위','격국세분','특수패턴','사주균형','십성분포','귀인','원진살','귀문관살','특수신살','강약수치'],
@@ -4522,7 +4566,7 @@ function proceedAfterProfile() {
   };
 
   // 사주+베딕+필요한 외부 데이터 선제 로드 (stateIntro 표시하면서 백그라운드)
-  const _bgWithZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
+  const _bgWithZiwei = ['daeun','year','ziwei_full','triple','career_deep','wealth_lifetime'].includes(_type);
   const _bgWithAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
   loadAllData(_bgWithZiwei, _bgWithAstro)
     .then(() => { renderCharVisual(); })
@@ -6761,7 +6805,7 @@ async function startGeneration() {
   showState('loading');
 
   setLoading('사주 정보 불러오는 중...', '');
-  const withZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
+  const withZiwei = ['daeun','year','ziwei_full','triple','career_deep','wealth_lifetime'].includes(_type);
   const withAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
   const needsZiwei = withZiwei && !_ziweiData;
   const needsAstro = withAstro && !_astroData;
@@ -6904,6 +6948,7 @@ async function generateReport() {
   if (_type === 'health')       { await generateHealthReport();      return; }
   if (_type === 'family')       { await generateFamilyReport();      return; }
   if (_type === 'timing')       { await generateTimingReport();      return; }
+  if (_type === 'wealth_lifetime'){ await generateWealthLifetimeReport(); return; }
   if (_type === 'wealth_timing'){ await generateWealthTimingReport(); return; }
   if (_type === 'classic')      { await generateClassicReport();     return; }
   if (_type === 'guide')        { await generateGuideReport();       return; }
@@ -7014,11 +7059,11 @@ async function regenReport() {
   // 캐시 적중 후 regen인 경우 _sdFull/_rptFull이 null일 수 있음 — 재생성 전 보강
   if (!_sdFull && !_rptFull) {
     setLoading('사주 정보 불러오는 중...', '');
-    const withZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
+    const withZiwei = ['daeun','year','ziwei_full','triple','career_deep','wealth_lifetime'].includes(_type);
     const withAstro = ['love','astro_full','triple','career_deep'].includes(_type);
     await loadAllData(withZiwei, withAstro);
   } else {
-    const withZiwei = ['daeun','year','ziwei_full','triple','career_deep'].includes(_type);
+    const withZiwei = ['daeun','year','ziwei_full','triple','career_deep','wealth_lifetime'].includes(_type);
     const withAstro = ['love','astro_full','triple','career_deep'].includes(_type);
     const needsZiwei = withZiwei && !_ziweiData;
     const needsAstro = withAstro && !_astroData;
@@ -9804,6 +9849,227 @@ async function generateTimingReport() {
 }
 
 // ── 재물 타이밍 특화 ──
+// ── 재물 곡선 점수 계산 (1~10 결정론적) ─────────────────────────
+function computeWealthCurve() {
+  const big = (_sdFull?.big_luck_analysis) || [];
+  if (!big.length) return null;
+
+  // 대운 천간 십신별 재물 점수 (사주 정밀화 데이터 기반)
+  const TG_SCORE = {
+    '정재':8, '편재':8,
+    '식신':7, '상관':7,
+    '정관':6, '편관':5,
+    '정인':5, '편인':4,
+    '비견':3, '겁재':3,
+  };
+
+  // 자미두수 사화 보정용
+  const lu = _ziweiData?.sihua?.lu;
+  const ji = _ziweiData?.sihua?.ji;
+  const luPalace = lu?.palace || '';
+  const jiPalace = ji?.palace || '';
+
+  // 자미두수 재성 별 (재백궁 주성 + 무곡/탐랑/태음/천부 등 재성)
+  const ziweiWealthStars = ['무곡','천부','탐랑','태음'];
+  const myungSb = _ziweiData?.samBangSaJung?.['명궁'];
+  const myungSamBangStars = (myungSb?.combinedMajorStars) || [];
+  const ziweiBaseModifier = ziweiWealthStars.filter(s => myungSamBangStars.includes(s)).length * 0.3;
+
+  const points = big.slice(0, 8).map((du, idx) => {
+    const tg = du.stem_ten_god || '';
+    let score = TG_SCORE[tg] ?? 5;
+
+    // 자미두수 재성 명궁 회조 시 base 보정
+    score += ziweiBaseModifier;
+
+    // 사화 보정 (대운 단위로는 자미두수 사화 위치 영향)
+    // 재성 별이 화록 받음 → 그 별이 명궁 삼방에 있으면 +0.5
+    if (lu?.star && myungSamBangStars.includes(lu.star) && ziweiWealthStars.includes(lu.star)) score += 0.5;
+    if (ji?.star && myungSamBangStars.includes(ji.star) && ziweiWealthStars.includes(ji.star)) score -= 0.5;
+
+    // 비겁 대운에 화기 가중
+    if ((tg === '비견' || tg === '겁재') && ji?.palace === '재백') score -= 0.5;
+    // 재성 대운에 화록 가중
+    if ((tg === '정재' || tg === '편재') && lu?.palace === '재백') score += 0.5;
+
+    score = Math.round(Math.max(1, Math.min(10, score)));
+
+    const range = (du.year_range || '').split(/[–\-~]/);
+    const yStart = parseInt(range[0]) || 0;
+    const yEnd   = parseInt(range[1]) || 0;
+    const ageStart = _profile?.year ? yStart - _profile.year : null;
+    const ageEnd   = _profile?.year ? yEnd   - _profile.year : null;
+
+    return {
+      idx, score, tenGod: tg,
+      pillar: du.pillar_kor || du.ganjee || '',
+      yearRange: `${yStart}-${yEnd}`,
+      ageRange: (ageStart!=null && ageEnd!=null) ? `${ageStart}~${ageEnd}세` : '',
+      yStart, yEnd,
+    };
+  });
+
+  // 정점/저점/현재
+  const peakIdx   = points.reduce((a,b,i,arr) => arr[a].score < b.score ? i : a, 0);
+  const valleyIdx = points.reduce((a,b,i,arr) => arr[a].score > b.score ? i : a, 0);
+  const nowY      = new Date().getFullYear();
+  const currentIdx = points.findIndex(p => nowY >= p.yStart && nowY <= p.yEnd);
+
+  return { points, peakIdx, valleyIdx, currentIdx };
+}
+
+// ── 재물 곡선 SVG 렌더링 ────────────────────────────────────────
+function renderWealthCurveSvg(curve) {
+  if (!curve || !curve.points || !curve.points.length) return '';
+  const { points, peakIdx, valleyIdx, currentIdx } = curve;
+  const W = 360, H = 240, padX = 32, padY = 40;
+  const xStep = (W - padX*2) / Math.max(1, points.length - 1);
+  const scaleY = score => H - padY - ((score - 1) / 9) * (H - padY*2);
+  const coords = points.map((p, i) => ({ x: padX + i*xStep, y: scaleY(p.score) }));
+
+  // Catmull-Rom → Bezier smooth curve
+  let pathD = `M ${coords[0].x} ${coords[0].y}`;
+  for (let i = 0; i < coords.length - 1; i++) {
+    const p0 = coords[i-1] || coords[i];
+    const p1 = coords[i];
+    const p2 = coords[i+1];
+    const p3 = coords[i+2] || coords[i+1];
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+    pathD += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+  }
+  const lastX = coords[coords.length-1].x;
+  const firstX = coords[0].x;
+  const areaD = `${pathD} L ${lastX} ${H-padY} L ${firstX} ${H-padY} Z`;
+
+  // 라벨 helper
+  const xLabels = coords.map((c, i) => {
+    const p = points[i];
+    return `<text x="${c.x}" y="${H - padY + 14}" text-anchor="middle" font-size="9" font-weight="600" fill="rgba(60,40,8,0.7)">${p.pillar}</text>
+            <text x="${c.x}" y="${H - padY + 26}" text-anchor="middle" font-size="8" fill="rgba(60,40,8,0.5)">${p.ageRange}</text>`;
+  }).join('');
+
+  // 점들
+  const dots = coords.map((c, i) => {
+    const isPeak    = i === peakIdx;
+    const isValley  = i === valleyIdx && peakIdx !== valleyIdx;
+    const isCurrent = i === currentIdx;
+    const r = (isPeak || isValley || isCurrent) ? 5 : 3.5;
+    const fill = isValley ? '#a94a3a' : '#b8860b';
+    return `<circle cx="${c.x}" cy="${c.y}" r="${r}" fill="${fill}" stroke="#fff" stroke-width="${r>=5?1.5:0}"/>`;
+  }).join('');
+
+  // 정점/저점/현재 배지
+  let badges = '';
+  if (peakIdx >= 0) {
+    const c = coords[peakIdx];
+    badges += `<text x="${c.x}" y="${c.y - 11}" text-anchor="middle" font-size="10" font-weight="800" fill="#7a5a08">★ 정점</text>`;
+  }
+  if (valleyIdx >= 0 && valleyIdx !== peakIdx) {
+    const c = coords[valleyIdx];
+    badges += `<text x="${c.x}" y="${c.y + 18}" text-anchor="middle" font-size="10" font-weight="800" fill="#a94a3a">⚠ 저점</text>`;
+  }
+  if (currentIdx >= 0) {
+    const c = coords[currentIdx];
+    badges += `<line x1="${c.x}" y1="${padY-4}" x2="${c.x}" y2="${H-padY}" stroke="#5a3a08" stroke-width="1" stroke-dasharray="3,3" opacity="0.55"/>
+               <text x="${c.x}" y="${padY - 8}" text-anchor="middle" font-size="9" font-weight="800" fill="#5a3a08">지금</text>`;
+  }
+
+  // y-axis grid (5 = 평균 기준선)
+  const midY = scaleY(5);
+
+  return `<div style="background:rgba(184,134,11,0.04);border:1px solid rgba(184,134,11,0.18);border-radius:14px;padding:14px 6px 10px;margin:14px 0 6px;">
+    <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;color:#7a5a08;text-align:center;margin-bottom:4px;">LIFETIME WEALTH CURVE</div>
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:380px;height:auto;display:block;margin:0 auto;">
+      <defs>
+        <linearGradient id="wealthGradFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#b8860b" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#b8860b" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
+      <line x1="${padX}" y1="${midY}" x2="${W-padX}" y2="${midY}" stroke="rgba(60,40,8,0.18)" stroke-dasharray="2,3"/>
+      <text x="${padX-4}" y="${midY+3}" text-anchor="end" font-size="8" fill="rgba(60,40,8,0.5)">평균</text>
+      <path d="${areaD}" fill="url(#wealthGradFill)"/>
+      <path d="${pathD}" stroke="#b8860b" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      ${dots}
+      ${badges}
+      ${xLabels}
+    </svg>
+    <div style="font-size:10px;color:rgba(60,40,8,0.6);text-align:center;line-height:1.5;margin-top:4px;">
+      세로축: 재물 활성도 1~10 (사주 십신 + 자미두수 사화 가중) · 가로축: 대운 8개
+    </div>
+  </div>`;
+}
+
+async function generateWealthLifetimeReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const zb  = (_ziweiData ? buildFullZiweiBlock() : '');
+  const db  = buildDaeunBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+
+  // 곡선 점수 계산
+  const curve = computeWealthCurve();
+  const curveLines = curve
+    ? curve.points.map(p => `${p.pillar}(${p.yearRange}/${p.ageRange}/${p.tenGod}): ${p.score}/10${p.idx===curve.peakIdx?' ★정점':''}${p.idx===curve.valleyIdx&&curve.peakIdx!==curve.valleyIdx?' ⚠저점':''}${p.idx===curve.currentIdx?' [지금]':''}`).join('\n')
+    : '대운 데이터 없음';
+
+  const wealthBlock = `\n【인생 재물 곡선 점수표 (절대 데이터 — 추측·변경 금지)】\n${curveLines}\n\n★ 위 점수는 대운 십신 + 자미두수 재백궁 사화로 결정론적으로 산출. 본문에서 점수·정점·저점·시기를 인용할 때 위 표 그대로 사용. 새 숫자 만들지 말 것.`;
+
+  // ── 섹션 1~3 (그릇·통로·곡선)
+  const prompt2A = `${profileStr}
+
+${sb2}
+${zb}
+${wealthBlock}
+${buildAdviceBlock(['투자/재테크','창업/비즈니스'])}
+${buildYongsinBlock()}${buildAccuracyLayerBlock()}
+
+섹션 구성:
+1. 재물의 그릇 — 평생 잠재력 등급 — 재성(정재·편재) 위치/강약, 재고(辰戌丑未) 보유, 비겁쟁재 위험, 자미두수 재백궁 주성·강도를 종합. "1~10 등급 / 작은 안정형 / 중간 누적형 / 큰 변동형 / 극부 잠재형" 중 어떤 그릇인지 단정. 구체적 금액 절대 금지.
+2. 재물이 들어오는 통로 — 사주 식상생재(사업)·정관(월급)·재성 입묘(큰 한방)·인성(전문직)·부처궁(배우자운) 패턴. 자미두수 무곡(사업·금융)/천부(관리)/탐랑(기획·연예)/양양창록(전문직) 회조 여부. 어느 통로가 가장 강한지 1~2개 단정.
+3. 인생 재물 곡선과 정점·저점 — 위 곡선 점수표를 본문에서 그대로 인용해 해석. 정점 대운(${curve?.points[curve.peakIdx]?.pillar||''} ${curve?.points[curve.peakIdx]?.ageRange||''})에 어떤 재물 흐름이 오는지, 저점 대운(${curve?.points[curve.valleyIdx]?.pillar||''} ${curve?.points[curve.valleyIdx]?.ageRange||''})에 어떤 위험이 있는지, 지금 대운(${curve?.points[curve.currentIdx]?.pillar||'-'})은 어디에 있는지.
+
+총 700~1000자. 섹션 번호(1. 2. 3.) 붙여 작성. 구체적 금액 예측 절대 금지. 점수표의 숫자·시기만 인용.`;
+  await streamToSections(prompt2A, [0,1,2], '재물 곡선 분석', ysFinal, '', false);
+
+  // 섹션 3에 차트 삽입
+  if (curve) {
+    const sec3 = document.getElementById('sbody-2');
+    if (sec3) {
+      const chartHtml = renderWealthCurveSvg(curve);
+      sec3.insertAdjacentHTML('beforeend', chartHtml);
+    }
+  }
+
+  // ── 섹션 4~5 (위험·전략)
+  const prompt2B = `${profileStr}
+
+${sb2}
+${zb}
+${db}
+${wealthBlock}
+${buildAdviceBlock(['투자/재테크'])}
+${buildYongsinBlock()}${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
+
+섹션 구성:
+4. 주의 시기와 재물 위험 신호 — 비겁쟁재(겁재·비견 대운)·재성충(子午卯酉 등)·화기 떨어진 시기·용신 충돌 패턴. 곡선 저점 시기(${curve?.points[curve.valleyIdx]?.pillar||''})에 어떤 위험이 오는지, 평생 절대 피해야 할 재물 패턴 3가지.
+5. 실전 전략 — 그릇 키우기와 흐름 타기 — 용신(${ysFinal}) 기반 재물 개운법, 그릇 키우기 액션 3가지(저축형/투자형/사업형 중 본인 구조에 맞는 것), 흐름 타기 전략(정점 시기 활용·저점 시기 방어), 절대 피해야 할 재물 패턴.
+
+총 600~900자. 섹션 번호(4. 5.) 붙여 작성. 구체적 종목·금액 절대 금지.`;
+  await streamToSections(prompt2B, [3,4], '재물 곡선 분석', ysFinal, '', true);
+
+  const allTexts = Array.from({length:5}, (_,i) => document.getElementById(`sbody-${i}`)?.innerText || '');
+  await safeInsertReport(allTexts, getProfileKey());
+  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
+}
+
 async function generateWealthTimingReport() {
   if (!await setupSectionsAndDeductOrb()) return;
   const sb2 = buildSajuBlock();
