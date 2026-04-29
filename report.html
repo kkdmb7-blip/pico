@@ -9908,11 +9908,23 @@ function computeWealthCurve() {
 
     score = Math.round(Math.max(1, Math.min(10, score)));
 
+    // 연도/나이 파싱: year_range 가 solar year 또는 age 둘 다 가능 — 안전 처리
     const range = (du.year_range || '').split(/[–\-~]/);
-    const yStart = parseInt(range[0]) || 0;
-    const yEnd   = parseInt(range[1]) || 0;
-    const ageStart = _profile?.year ? yStart - _profile.year : null;
-    const ageEnd   = _profile?.year ? yEnd   - _profile.year : null;
+    const r0 = parseInt(range[0]) || 0;
+    const r1 = parseInt(range[1]) || 0;
+    const birthY = _profile?.year || 0;
+    let yStart, yEnd, ageStart, ageEnd;
+    if (r0 >= 1900) {
+      yStart = r0; yEnd = r1;
+      ageStart = birthY ? r0 - birthY : null;
+      ageEnd   = birthY ? r1 - birthY : null;
+    } else if (r0 > 0 && birthY) {
+      // age 형식
+      ageStart = r0; ageEnd = r1;
+      yStart = birthY + r0; yEnd = birthY + r1;
+    } else {
+      yStart = r0; yEnd = r1; ageStart = null; ageEnd = null;
+    }
 
     return {
       idx, score, tenGod: tg,
@@ -9922,6 +9934,9 @@ function computeWealthCurve() {
       yStart, yEnd,
     };
   });
+
+  // 디버그: 콘솔에서 실제 데이터 확인 가능
+  try { console.log('[wealthCurve] birthYear=', _profile?.year, 'big_luck_analysis=', big.slice(0,3), 'computed points=', points); } catch(e) {}
 
   // 정점/저점/현재
   const peakIdx   = points.reduce((a,b,i,arr) => arr[a].score < b.score ? i : a, 0);
@@ -10040,15 +10055,29 @@ async function generateWealthLifetimeReport() {
   const zb  = (_ziweiData ? buildFullZiweiBlock() : '');
   const db  = buildDaeunBlock();
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
-  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+  const birthLine = _profile ? `생년월일: ${_profile.year}년 ${_profile.month}월 ${_profile.day}일` : '';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / ${birthLine} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
 
   // 곡선 점수 계산
   const curve = computeWealthCurve();
   const curveLines = curve
-    ? curve.points.map(p => `${p.pillar}(${p.yearRange}/${p.ageRange}/${p.tenGod}): ${p.score}/10${p.idx===curve.peakIdx?' ★정점':''}${p.idx===curve.valleyIdx&&curve.peakIdx!==curve.valleyIdx?' ⚠저점':''}${p.idx===curve.currentIdx?' [지금]':''}`).join('\n')
+    ? curve.points.map(p => {
+        const tags = [];
+        if (p.idx === curve.peakIdx) tags.push('★정점');
+        if (p.idx === curve.valleyIdx && curve.peakIdx !== curve.valleyIdx) tags.push('⚠저점');
+        if (p.idx === curve.currentIdx) tags.push('[지금]');
+        return `· ${p.pillar} 대운: ${p.yStart}년~${p.yEnd}년 (만 ${p.ageRange||'?'}, 십신 ${p.tenGod||'?'}) → 재물점수 ${p.score}/10 ${tags.join(' ')}`;
+      }).join('\n')
     : '대운 데이터 없음';
 
-  const wealthBlock = `\n【인생 재물 곡선 점수표 (절대 데이터 — 추측·변경 금지)】\n${curveLines}\n\n★ 위 점수는 대운 십신 + 자미두수 재백궁 사화로 결정론적으로 산출. 본문에서 점수·정점·저점·시기를 인용할 때 위 표 그대로 사용. 새 숫자 만들지 말 것.`;
+  const wealthBlock = `\n【인생 재물 곡선 점수표 (절대 데이터 — 추측·변경 금지)】
+사용자 출생: ${_profile?.year}년 (${birthLine})
+${curveLines}
+
+★ 절대 규칙:
+1. 위 점수표는 대운 십신 + 자미두수 사화로 결정론적으로 산출됨. 본문에서 점수·정점·저점·연도·나이를 인용할 때 표 그대로 사용. 새 숫자 만들지 말 것.
+2. 모든 대운의 시작·종료 연도는 위 표의 "${curve?.points[0]?.yStart}년~${curve?.points[0]?.yEnd}년" 형식 그대로 인용. 사용자 생년(${_profile?.year}년) 외 기준으로 임의 계산 절대 금지.
+3. 나이와 연도는 위 표에 같이 적혀 있음. 둘 중 하나만 보고 다른 하나를 추정하지 말 것 — 표를 그대로 사용.`;
 
   // ── 섹션 1~3 (그릇·통로·곡선)
   const prompt2A = `${profileStr}
@@ -10062,7 +10091,7 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 섹션 구성:
 1. 재물의 그릇 — 평생 잠재력 등급 — 재성(정재·편재) 위치/강약, 재고(辰戌丑未) 보유, 비겁쟁재 위험, 자미두수 재백궁 주성·강도를 종합. "1~10 등급 / 작은 안정형 / 중간 누적형 / 큰 변동형 / 극부 잠재형" 중 어떤 그릇인지 단정. 구체적 금액 절대 금지.
 2. 재물이 들어오는 통로 — 사주 식상생재(사업)·정관(월급)·재성 입묘(큰 한방)·인성(전문직)·부처궁(배우자운) 패턴. 자미두수 무곡(사업·금융)/천부(관리)/탐랑(기획·연예)/양양창록(전문직) 회조 여부. 어느 통로가 가장 강한지 1~2개 단정.
-3. 인생 재물 곡선과 정점·저점 — 위 곡선 점수표를 본문에서 그대로 인용해 해석. 정점 대운(${curve?.points[curve.peakIdx]?.pillar||''} ${curve?.points[curve.peakIdx]?.ageRange||''})에 어떤 재물 흐름이 오는지, 저점 대운(${curve?.points[curve.valleyIdx]?.pillar||''} ${curve?.points[curve.valleyIdx]?.ageRange||''})에 어떤 위험이 있는지, 지금 대운(${curve?.points[curve.currentIdx]?.pillar||'-'})은 어디에 있는지.
+3. 인생 재물 곡선과 정점·저점 — 위 곡선 점수표를 본문에서 그대로 인용해 해석. 정점 대운(${curve?.points[curve.peakIdx]?.pillar||''} ${curve?.points[curve.peakIdx]?.yStart||''}년~${curve?.points[curve.peakIdx]?.yEnd||''}년, ${curve?.points[curve.peakIdx]?.ageRange||''})에 어떤 재물 흐름이 오는지, 저점 대운(${curve?.points[curve.valleyIdx]?.pillar||''} ${curve?.points[curve.valleyIdx]?.yStart||''}년~${curve?.points[curve.valleyIdx]?.yEnd||''}년, ${curve?.points[curve.valleyIdx]?.ageRange||''})에 어떤 위험이 있는지, 지금 대운(${curve?.points[curve.currentIdx]?.pillar||'-'} ${curve?.points[curve.currentIdx]?.yStart||''}년~${curve?.points[curve.currentIdx]?.yEnd||''}년)은 어디에 있는지. 연도는 반드시 표의 yStart~yEnd 그대로 인용.
 
 총 700~1000자. 섹션 번호(1. 2. 3.) 붙여 작성. 구체적 금액 예측 절대 금지. 점수표의 숫자·시기만 인용.`;
   await streamToSections(prompt2A, [0,1,2], '재물 곡선 분석', ysFinal, '', false);
@@ -10087,7 +10116,7 @@ ${buildAdviceBlock(['투자/재테크'])}
 ${buildYongsinBlock()}${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
 섹션 구성:
-4. 주의 시기와 재물 위험 신호 — 비겁쟁재(겁재·비견 대운)·재성충(子午卯酉 등)·화기 떨어진 시기·용신 충돌 패턴. 곡선 저점 시기(${curve?.points[curve.valleyIdx]?.pillar||''})에 어떤 위험이 오는지, 평생 절대 피해야 할 재물 패턴 3가지.
+4. 주의 시기와 재물 위험 신호 — 비겁쟁재(겁재·비견 대운)·재성충(子午卯酉 등)·화기 떨어진 시기·용신 충돌 패턴. 곡선 저점 시기(${curve?.points[curve.valleyIdx]?.pillar||''} ${curve?.points[curve.valleyIdx]?.yStart||''}년~${curve?.points[curve.valleyIdx]?.yEnd||''}년)에 어떤 위험이 오는지, 평생 절대 피해야 할 재물 패턴 3가지. 연도는 반드시 표 그대로.
 5. 실전 전략 — 그릇 키우기와 흐름 타기 — 용신(${ysFinal}) 기반 재물 개운법, 그릇 키우기 액션 3가지(저축형/투자형/사업형 중 본인 구조에 맞는 것), 흐름 타기 전략(정점 시기 활용·저점 시기 방어), 절대 피해야 할 재물 패턴.
 
 총 600~900자. 섹션 번호(4. 5.) 붙여 작성. 구체적 종목·금액 절대 금지.`;
