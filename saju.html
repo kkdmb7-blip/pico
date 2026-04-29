@@ -1093,7 +1093,7 @@ function renderLuckTrend(data, cy) {
   const midY = padT + innerH/2;
 
   el.innerHTML = `<div style="margin-bottom:14px;padding:10px 6px 8px;background:rgba(80,55,30,0.04);border:1px solid rgba(80,55,30,0.10);border-radius:10px">
-    <div style="font-size:11px;color:rgba(74,58,42,0.72);margin:0 8px 4px"><i class="pi pi-chart-line"></i> 대운 용신 적합도 흐름</div>
+    <div style="font-size:11px;color:rgba(74,58,42,0.72);margin:0 8px 4px"><i class="pi pi-chart"></i> 대운 용신 적합도 흐름</div>
     <svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block">
       <line x1="${padL}" y1="${midY}" x2="${W-padR}" y2="${midY}" stroke="rgba(80,55,30,0.18)" stroke-dasharray="3 3"/>
       <text x="${padL-4}" y="${(midY+3).toFixed(1)}" fill="rgba(80,55,30,0.55)" font-size="9" text-anchor="end">50</text>
