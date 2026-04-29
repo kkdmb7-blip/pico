@@ -3821,13 +3821,21 @@ function buildDaeunBlock() {
 }
 function buildZiweiBlock() {
   if (!_ziweiData) return '';
-  const sp = _ziweiData.soulPalace;
-  const cd = _ziweiData.currentDecade;
-  const cy = _ziweiData.currentYear;
+  const z = _ziweiData;
+  const sp = z.soulPalace;
+  const cd = z.currentDecade;
+  const cy = z.currentYear;
+  const br = z.brightness?.byStar || {};
+  const fmtStars = (arr) => (arr || []).map(s => br[s] ? `${s}(${br[s]})` : s).join(',') || '없음';
+  const patternNames = (z.patterns || []).map(p => p.name).join(',') || '없음';
+  const sihuaLine = z.sihua ? `화록:${z.sihua.lu?.star}@${z.sihua.lu?.palace} 화권:${z.sihua.quan?.star}@${z.sihua.quan?.palace} 화과:${z.sihua.ke?.star}@${z.sihua.ke?.palace} 화기:${z.sihua.ji?.star}@${z.sihua.ji?.palace}` : '미확인';
   return `【자미두수】
-명궁: ${sp?`${sp.name}(${sp.heavenlyStem}${sp.earthlyBranch}) 주성:${sp.majorStars?.join(',')||''}`:' 미확인'}
-현재 대한: ${cd?`${cd.name} ${cd.heavenlyStem}${cd.earthlyBranch} ${cd.ageRange} 주성:${cd.stars?.join(',')||''}`:' 미확인'}
-현재 유년: ${cy?`${cy.year}년 ${cy.name} ${cy.heavenlyStem}${cy.earthlyBranch}`:' 미확인'}`;
+출생년 천간: ${z.yearStem || '미확인'}
+명궁: ${sp ? `${sp.name}(${sp.heavenlyStem}${sp.earthlyBranch}) 주성:${fmtStars(sp.majorStars)}` : ' 미확인'}
+사화: ${sihuaLine}
+검출 격국: ${patternNames}
+현재 대한: ${cd ? `${cd.name} ${cd.heavenlyStem}${cd.earthlyBranch} ${cd.ageRange} 주성:${cd.stars?.join(',')||''}` : ' 미확인'}
+현재 유년: ${cy ? `${cy.year}년 ${cy.name} ${cy.heavenlyStem}${cy.earthlyBranch}` : ' 미확인'}`;
 }
 function buildAstroBlock() {
   if (!_astroData) return '';
@@ -3852,21 +3860,107 @@ function buildFullAstroBlock() {
 
 function buildFullZiweiBlock() {
   if (!_ziweiData) return '';
-  const sp = _ziweiData.soulPalace;
-  const cd = _ziweiData.currentDecade;
-  const cy = _ziweiData.currentYear;
-  const palaces = _ziweiData.palaces || [];
-  const IMPORTANT = ['재백','관록','부처','교우','복덕','천이'];
-  const palaceLines = palaces
-    .filter(p => IMPORTANT.some(n => (p.name||p.palaceName||'').includes(n)))
-    .map(p => `${p.name||p.palaceName}: ${p.heavenlyStem||''}${p.earthlyBranch||''} 주성:${safeJoin(p.majorStars||p.stars,',')||'없음'}`)
-    .join('\n');
-  return `【자미두수 전체 궁위】
-명궁: ${sp?`${sp.name||''} ${sp.heavenlyStem||''}${sp.earthlyBranch||''} 주성:${safeJoin(sp.majorStars,',')||'없음'}`:'미확인'}
-현재 대한: ${cd?`${cd.name||''} ${cd.heavenlyStem||''}${cd.earthlyBranch||''} ${cd.ageRange||''} 주성:${safeJoin(cd.stars||cd.majorStars,',')||'없음'}`:'미확인'}
-현재 유년: ${cy?`${cy.year||''}년 ${cy.name||''} ${cy.heavenlyStem||''}${cy.earthlyBranch||''}`:'미확인'}
-${palaceLines||''}
-전체 데이터: ${JSON.stringify(_ziweiData).slice(0,1500)}`;
+  const z   = _ziweiData;
+  const sp  = z.soulPalace || {};
+  const cd  = z.currentDecade || {};
+  const cy  = z.currentYear || {};
+  const cm  = z.currentMonth || {};
+  const dd  = z.currentDay || {};
+  const br  = z.brightness?.byStar || {};
+  const cat = z.brightness?.category || {};
+  const sb  = z.samBangSaJung || {};
+  const sc  = z.sihuaCross || {};
+  const palaces = z.palaces || [];
+
+  const fmtStars = (arr) => (arr || []).map(s => br[s] ? `${s}(${br[s]}/${cat[s]||'-'})` : s).join(',') || '없음';
+  const fmtPalaceShort = (p) => p ? `${p.name||''}(${p.heavenlyStem||''}${p.earthlyBranch||''})` : '?';
+
+  // 핵심 5궁
+  const KEY_PALACES = ['명궁','재백','관록','부처','천이'];
+  const keyPalaceLines = KEY_PALACES.map(name => {
+    const p = palaces.find(x => x.name === name);
+    if (!p) return null;
+    return `${name}(${p.heavenlyStem}${p.earthlyBranch}): 주성[${fmtStars(p.majorStars)}] 보성[${(p.minorStars||[]).join(',')||'없음'}]`;
+  }).filter(Boolean).join('\n');
+
+  // 명궁 삼방사정
+  const myungSb = sb['명궁'];
+  const sambangLine = myungSb
+    ? `통합주성: ${fmtStars(myungSb.combinedMajorStars)}\n  · 본궁: ${fmtPalaceShort(myungSb.own)} ${fmtStars(myungSb.own?.majorStars)}\n  · 대궁(천이): ${fmtPalaceShort(myungSb.opposite)} ${fmtStars(myungSb.opposite?.majorStars)}\n  · 삼합1(재백): ${fmtPalaceShort(myungSb.samhap1)} ${fmtStars(myungSb.samhap1?.majorStars)}\n  · 삼합2(관록): ${fmtPalaceShort(myungSb.samhap2)} ${fmtStars(myungSb.samhap2?.majorStars)}`
+    : '미확인';
+
+  // 14주성 강도 한 줄 요약
+  const ZIWEI_14 = ['자미','천기','태양','무곡','천동','염정','천부','태음','탐랑','거문','천상','천량','칠살','파군'];
+  const brightnessLine = ZIWEI_14.map(s => `${s}:${br[s]||'-'}`).join(' ');
+
+  // 사화
+  const sihua = z.sihua || {};
+  const sihuaLines = [
+    `화록(lu):  ${sihua.lu?.star||'-'} → ${sihua.lu?.palace||'-'}`,
+    `화권(quan): ${sihua.quan?.star||'-'} → ${sihua.quan?.palace||'-'}`,
+    `화과(ke):  ${sihua.ke?.star||'-'} → ${sihua.ke?.palace||'-'}`,
+    `화기(ji):  ${sihua.ji?.star||'-'} → ${sihua.ji?.palace||'-'}`,
+  ].join('\n  ');
+
+  // 핵심궁별 사화 영향
+  const sihuaByPalace = sc.byPalace
+    ? KEY_PALACES.map(n => {
+        const info = sc.byPalace[n] || { direct:[], samBang:[] };
+        const dir = info.direct.length ? info.direct.join(', ') : '없음';
+        const sbg = info.samBang.length ? info.samBang.join(', ') : '없음';
+        return `  · ${n}: 직접[${dir}] 삼방회조[${sbg}]`;
+      }).join('\n')
+    : '';
+
+  // 검출 격국 + textbook 본문
+  const patternsBlock = (z.patterns || []).length
+    ? z.patterns.map(p => `■ ${p.name} (${p.type||'-'}) — ${p.description||''}\n  [textbook] ${p.doc||p.description||''}\n  [evidence] ${(p.evidence||[]).join(' / ')}`).join('\n\n')
+    : '검출된 격국 없음';
+
+  // 검출 사화 패턴 + textbook 본문
+  const sihuaPatterns = sc.patterns || [];
+  const sihuaPatternsBlock = sihuaPatterns.length
+    ? sihuaPatterns.map(p => `■ ${p.name} (${p.type||'-'}) — ${p.description||''}\n  [textbook] ${p.doc||p.description||''}\n  [evidence] ${(p.evidence||[]).join(' / ')}`).join('\n\n')
+    : '검출된 사화 패턴 없음';
+
+  return `【자미두수 정밀 차트 (절대 데이터 — 추측·변경 금지)】
+
+▣ 출생년 천간: ${z.yearStem || '미확인'}
+▣ 명주성: ${z.destinyMaster || '미확인'} / 신주성: ${z.bodyMaster || '미확인'} / 오국: ${z.element || '미확인'}
+
+▣ 핵심 5궁 (주성 강도 묘=강·왕=강·득=강·평=평·불·한·함=약):
+${keyPalaceLines}
+
+▣ 명궁 삼방사정 (본궁+대궁+삼합양궁):
+  ${sambangLine}
+
+▣ 14주성 강도 일람:
+  ${brightnessLine}
+
+▣ 사화 분포 (출생년 ${z.yearStem||''} 천간 기준):
+  ${sihuaLines}
+
+▣ 핵심궁별 사화 영향:
+${sihuaByPalace}
+
+▣ 운기 흐름:
+  대한: ${cd.name||'-'} ${cd.heavenlyStem||''}${cd.earthlyBranch||''} ${cd.ageRange||''} 주성:${(cd.stars||[]).join(',')||'-'}
+  유년: ${cy.year||'-'}년 ${cy.name||'-'} ${cy.heavenlyStem||''}${cy.earthlyBranch||''}
+  유월: ${cm.name||'-'} ${cm.heavenlyStem||''}${cm.earthlyBranch||''}
+  유일: ${dd.name||'-'} ${dd.heavenlyStem||''}${dd.earthlyBranch||''}
+
+【검출된 격국 (자미두수전서 표준 본문 — 그대로 인용·요약하라)】
+${patternsBlock}
+
+【검출된 사화 패턴 (textbook 본문 — 그대로 인용·요약하라)】
+${sihuaPatternsBlock}
+
+★ 절대 규칙 (반드시 지킬 것):
+1. 위 모든 데이터는 자미두수 표준 계산으로 도출된 절대값이다. 추측·변형 금지.
+2. 격국·사화의 [textbook] 본문은 자미두수전서 표준 해설이다. **본문을 그대로 인용하거나 짧게 요약만** 하라. 본인 표현으로 정의를 새로 만들지 말 것.
+3. 별 강도는 명시된 등급(묘/왕/득/평/불/한/함)을 그대로 사용. 임의 변경 금지.
+4. 데이터에 없는 별·궁·사화·격국은 절대 언급하지 말 것 (환각 금지).
+5. 별 위치·강도·삼방조합 같은 가변 요소만 본인이 결합해 개인화 해석하라.`;
 }
 
 function buildAdviceBlock(keys) {
