@@ -10730,8 +10730,33 @@ function detectHallucination(text) {
 }
 
 // ── Layer 3: AI 생성 텍스트 사후 검증·치환 ──
+// 두음법칙 치환 (명리 한자어 표준 한국어 표기)
+const DUEUM_FIX = [
+  // 천간 壬(임) + 12지지 (림자/림축/...)
+  ['림자','임자'],['림축','임축'],['림인','임인'],['림묘','임묘'],
+  ['림진','임진'],['림사','임사'],['림오','임오'],['림미','임미'],
+  ['림신','임신'],['림유','임유'],['림술','임술'],['림해','임해'],
+  // 천간 임(壬) 일반 표기
+  ['림수(壬','임수(壬'],['림(壬','임(壬'],
+  // 12운성
+  ['림관(臨','임관(臨'],['림관 ','임관 '],['림관,','임관,'],['림관·','임관·'],['림관 대운','임관 대운'],
+  // 자미두수 별 이름
+  ['렴정(廉','염정(廉'],['렴정 ','염정 '],['렴정,','염정,'],
+  // 유년·유월·유일 (자미두수 운기)
+  ['류년(流','유년(流'],['류년 ','유년 '],['류년,','유년,'],
+  ['류월(流','유월(流'],['류월 ','유월 '],
+  ['류일(流','유일(流'],['류일 ','유일 '],
+];
+function fixDueum(text) {
+  if (!text) return text;
+  for (const [from, to] of DUEUM_FIX) text = text.split(from).join(to);
+  return text;
+}
+
 function sanitizeAIText(text) {
   if (!text) return text;
+  // 두음법칙 표준 한국어 적용 (림진월 → 임진월, 렴정 → 염정 등)
+  text = fixDueum(text);
   // 유효한 대운 year_range 목록 (사주-test 계산값 + saju-report DB값 병합)
   const validRanges = new Set();
   (_sdFull && _sdFull.big_luck_analysis || []).forEach(d => { if (d.year_range) { validRanges.add(d.year_range.replace(/[–~]/g,'-')); } });
