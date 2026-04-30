@@ -10091,6 +10091,39 @@ function computeWealthCurve() {
     sajuPillars.year, sajuPillars.month, sajuPillars.day, sajuPillars.hour
   ].filter(p => p && p[1]).map(p => p[1]);
 
+  // ── Step 5: 재성 통근(透根) — 그릇 자체 크기 ────────────
+  // 일간이 극하는 오행 = 재성. 사주 8자에 재성 천간·지지가 통근되면 그릇 크다.
+  const JAESEONG_OF = {'갑':'토','을':'토','병':'금','정':'금','무':'수','기':'수','경':'목','신':'목','임':'화','계':'화'};
+  const STEMS_BY_OH = {'목':['갑','을'],'화':['병','정'],'토':['무','기'],'금':['경','신'],'수':['임','계']};
+  const BRANCHES_BY_OH = {'목':['인','묘'],'화':['사','오'],'토':['진','술','축','미'],'금':['신','유'],'수':['해','자']};
+  const jaeOh = JAESEONG_OF[dayStem] || '';
+  const jaeStems = STEMS_BY_OH[jaeOh] || [];
+  const jaeBranches = BRANCHES_BY_OH[jaeOh] || [];
+  const sajuStems = [sajuPillars.year, sajuPillars.month, sajuPillars.day, sajuPillars.hour]
+    .filter(p => p && p[0]).map(p => p[0]);
+  // 일간(day pillar 천간) 자체는 카운트 제외
+  const dayPillar = sajuPillars.day || '';
+  const stemsExceptDay = sajuStems.filter((s, idx) => {
+    return idx !== 2; // year=0, month=1, day=2, hour=3
+  });
+  const stemCount = stemsExceptDay.filter(s => jaeStems.includes(s)).length;
+  const branchCount = sajuBranches.filter(b => jaeBranches.includes(b)).length;
+
+  // 그릇 크기 점수 (모든 대운에 동일 적용 — base shift)
+  let geureoJum = 0;
+  let geureoTag = '';
+  if (stemCount >= 1 && branchCount >= 1) {
+    geureoJum = 1.5; geureoTag = '재성통근(천간+지지)';
+  } else if (branchCount >= 2) {
+    geureoJum = 1; geureoTag = '재성지지多';
+  } else if (branchCount === 1) {
+    geureoJum = 0.5; geureoTag = '재성지지1';
+  } else if (stemCount >= 1) {
+    geureoJum = 0.3; geureoTag = '재성투간만';
+  } else {
+    geureoJum = -1; geureoTag = '재성부재';
+  }
+
   // 자미두수 사화 보정용
   const lu = _ziweiData?.sihua?.lu;
   const ji = _ziweiData?.sihua?.ji;
@@ -10209,6 +10242,9 @@ function computeWealthCurve() {
     haphAdj = Math.max(-3, Math.min(3, haphAdj));
     score += haphAdj;
 
+    // ── Step 5: 재성 통근 (그릇 크기) — 모든 대운에 base shift ──
+    score += geureoJum;
+
     score = Math.round(Math.max(1, Math.min(10, score)));
 
     // 연도/나이 파싱: year_range 가 solar year 또는 age 둘 다 가능 — 안전 처리
@@ -10242,6 +10278,8 @@ function computeWealthCurve() {
       unseongAdj,
       haphAdj,
       haphLabels,
+      geureoJum,
+      geureoTag,
     };
   });
 
