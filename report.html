@@ -1036,6 +1036,8 @@ const TYPE_CONFIG = {
     desc: '대운전환기·세운교차·십이운성 데이터 기반 타이밍 분석' },
   wealth_lifetime:{ title: '내 인생 재물 곡선', orb: 990, emoji: '<i class="pi pi-chart"></i>', focus: '평생 재물 곡선·재물의 그릇·들어오는 통로·정점/저점 시기·실전 전략',
     desc: '사주 대운 8개 + 자미두수 재백·사화 종합 — 평생 재물 흐름 곡선 차트 포함 (구체적 금액 예측 없음)' },
+  monthly_calendar:{ title: '내 12개월 정밀 캘린더', orb: 590, emoji: '<i class="pi pi-calendar"></i>', focus: '올해 12개월 월별 운세·점수·등급·길흉월·실전 액션',
+    desc: '워커 세운월별 정밀 데이터 + 12개월 운세 막대 차트 — 매달 다시 와서 확인하는 캘린더 리포트' },
   wealth_timing:{ title: '재물 타이밍 특화', orb: 490, emoji: '<i class="pi pi-chart"></i>', focus: '재물 유입 시기, 대운별 재물 흐름, 월별 재물 포인트',
     desc: '재물운·대운교차·운세종합점수 기반 재물 타이밍 분석' },
   classic:    { title: '고전 명리 해석', orb: 590, emoji: '<i class="pi pi-book"></i>', focus: '적천수·자평진전·납음·조후 고전 원문 기반 해석',
@@ -1121,6 +1123,7 @@ const TYPE_COLORS = {
   family:       { main:'#8d6e63', soft:'rgba(141,110,99,0.13)',  border:'rgba(141,110,99,0.38)' },
   timing:       { main:'#455a64', soft:'rgba(69,90,100,0.13)',   border:'rgba(69,90,100,0.35)' },
   wealth_lifetime:{ main:'#b8860b', soft:'rgba(184,134,11,0.13)', border:'rgba(184,134,11,0.38)' },
+  monthly_calendar:{ main:'#3a8a8a', soft:'rgba(58,138,138,0.13)', border:'rgba(58,138,138,0.38)' },
   wealth_timing:{ main:'#a67500', soft:'rgba(166,117,0,0.13)',   border:'rgba(166,117,0,0.38)' },
   classic:      { main:'#7a2418', soft:'rgba(122,36,24,0.13)',   border:'rgba(122,36,24,0.38)' },
   guide:        { main:'#d81b60', soft:'rgba(216,27,96,0.13)',   border:'rgba(216,27,96,0.38)' },
@@ -1295,6 +1298,13 @@ const TYPE_SECTIONS = {
     { name: '인생 재물 곡선과 정점·저점',         chars: 450 },
     { name: '주의 시기와 재물 위험 신호',         chars: 350 },
     { name: '실전 전략 — 그릇 키우기와 흐름 타기', chars: 400 }
+  ],
+  monthly_calendar: [
+    { name: '올해 큰 흐름 + 12개월 차트·정점·저점', chars: 450 },
+    { name: '1분기 (1~3월) 월별 정밀',            chars: 400 },
+    { name: '2분기 (4~6월) 월별 정밀',            chars: 400 },
+    { name: '3분기 (7~9월) 월별 정밀',            chars: 400 },
+    { name: '4분기 (10~12월) + 길일·실전 액션',   chars: 450 }
   ],
   wealth_timing: [
     { name: '재물 에너지 구조 핵심',          chars: 300 },
@@ -2215,6 +2225,39 @@ const TYPE_DETAIL = {
       '다음 대운 전환까지 남은 시간, 전환 시 예상되는 에너지 변화. 전환 전 준비해야 할 것.',
       '올해 12개월 중 에너지가 강한 달(행동 적기), 주의할 달(방어 시기), 결정에 좋은 달을 월별로 제시합니다.',
       '이직·전직·투자·계약·연애·결혼의 최적 시기를 종합합니다. 지금 당장 타이밍에 맞춰 실행할 액션 3가지.'
+    ]
+  },
+  monthly_calendar: {
+    emoji: '<i class="pi pi-calendar"></i>',
+    subtitle: '내 12개월 정밀 캘린더 — 매달 다시 와서 확인하는 한 해의 지도',
+    desc: '올해 12개월 각각의 천간지지·십신·등급·점수·특이사항을 워커 세운월별 정밀 데이터로 분석. 막대 차트 + 정점/저점월 + 길일·흉월 + 분기별 실전 액션까지 한 장에.',
+    recommend: [
+      '올해 어느 달이 좋은지·조심해야 할지 한눈에 보고 싶은 분',
+      '매달 다시 와서 그 달 운세를 확인하고 싶은 분',
+      '신년 큰 그림 + 분기별 정밀까지 다 받고 싶은 분',
+      '12개월 점수 막대 차트로 시각화 받고 싶은 분'
+    ],
+    sectionDesc: [
+      '올해 큰 흐름 + 12개월 막대 차트 + 정점·저점월',
+      '1분기 (1~3월) 각 월별 천간·십신·등급·키워드',
+      '2분기 (4~6월) 각 월별 정밀',
+      '3분기 (7~9월) 각 월별 정밀',
+      '4분기 (10~12월) + 길일 추천 + 실전 액션'
+    ],
+    preview: '5섹션 + 시그니처 12개월 막대 차트. 워커 세운월별 정밀 데이터(점수 1~100, 등급, 특이사항, 휴식월) 활용. 매달 다시 와서 그 달의 키워드와 길흉을 확인할 수 있는 살아있는 캘린더.',
+    faq: [
+      { q: '"올해 운세 리포트(year)" 와 어떻게 다른가요?', a: 'year 는 5섹션에 1년을 압축. 이 리포트는 12개월을 분기별로 분리해서 매달 정밀 분석 + 막대 차트 시각화 포함.' },
+      { q: '구체적 날짜(길일)도 나오나요?', a: '월 단위 점수·등급은 정확하나, 일 단위 길일은 별도 기문 택일(qimen_taegil) 리포트를 추천드립니다.' },
+      { q: '리포트 1년 후에도 가치 있나요?', a: '시즌성 리포트입니다. 매년 새로 생성하시는 게 좋고, 같은 해 안에서는 매달 다시 보면서 그 달 키워드 확인 가능.' }
+    ],
+    engines: ['사주', '세운월별', '세운교차'],
+    keyQuestions: ['올해 어느 달이 정점인가?', '어느 달에 조심해야 하나?', '월별 키워드는 무엇인가?', '분기별 실전 전략은?'],
+    sectionDetail: [
+      '12개월 점수 막대 차트 (정점월·저점월·휴식월 표시) + 올해 큰 흐름 압축. 격국·용신과 교차.',
+      '1·2·3월 각각 천간지지, 십신, 등급, 특이사항(귀인·삼재·도화 등), 키워드를 정밀 분석.',
+      '4·5·6월 동일 정밀. 상반기 결산 한 줄.',
+      '7·8·9월 동일. 하반기 진입 신호.',
+      '10·11·12월 + 분기별 길일 추천 + 올해 마무리 + 실전 액션 3가지.'
     ]
   },
   wealth_lifetime: {
@@ -4355,6 +4398,7 @@ function buildAccuracyLayerBlock() {
     family:     ['십신궁위','특수패턴','귀인','원진살','귀문관살','특수신살','사주균형','일주궁합','암합암충'],
     timing:     ['대운전환기','대운세운교차','십이운성확장','세운상호작용','대운트렌드','대운분리분석','운세종합점수','세운월별','신살시기'],
     wealth_lifetime:['재물운','격국재물','대운트렌드','대운분리분석','대운세운교차','자미재백','자미사화','강약수치'],
+    monthly_calendar:['세운월별','세운확장','세운교차','대운트렌드','격국검증','신살시기','암합암충','월운절기'],
     wealth_timing:['재물운','대운세운교차','세운확장분석','운세종합점수','대운트렌드','대운분리분석','격국검증','세운상호작용','세운월별'],
     classic:    ['적천수일간론','자평진전분석','납음분석','조후용신분석','격국세분','통근분석','일주론','조후','천간합충','지장간분석','암합암충'],
     guide:      ['일주론','십신궁위','격국세분','특수패턴','사주균형','십성분포','귀인','원진살','귀문관살','특수신살','강약수치'],
@@ -6976,6 +7020,7 @@ async function generateReport() {
   if (_type === 'family')       { await generateFamilyReport();      return; }
   if (_type === 'timing')       { await generateTimingReport();      return; }
   if (_type === 'wealth_lifetime'){ await generateWealthLifetimeReport(); return; }
+  if (_type === 'monthly_calendar'){ await generateMonthlyCalendarReport(); return; }
   if (_type === 'wealth_timing'){ await generateWealthTimingReport(); return; }
   if (_type === 'classic')      { await generateClassicReport();     return; }
   if (_type === 'guide')        { await generateGuideReport();       return; }
@@ -10424,6 +10469,169 @@ function renderWealthCurveSvg(curve) {
   </div>`;
 }
 
+// ── 12개월 캘린더: 데이터 추출 + 막대차트 SVG ────────────────
+function computeMonthlyCalendar() {
+  // 워커 세운월별 데이터 (saju-report → _rptFull['세운월별'])
+  const sw = _rptFull && (_rptFull['세운월별'] || _rptFull['세운'] || null);
+  if (!sw) return null;
+  // 다양한 그룹 키 시도 (전반흐름·주거점·기회월 등)
+  const candidates = ['전반흐름','월별흐름','월별','main','months'];
+  let arr = null;
+  for (const k of candidates) {
+    if (Array.isArray(sw[k])) { arr = sw[k]; break; }
+  }
+  if (!arr) {
+    // dict 의 첫 값이 array 면 그것 사용
+    if (typeof sw === 'object' && !Array.isArray(sw)) {
+      const firstArr = Object.values(sw).find(v => Array.isArray(v) && v.length >= 8);
+      if (firstArr) arr = firstArr;
+    }
+  }
+  if (!arr || arr.length < 8) return null;
+
+  // 점수 정규화 (대부분 0~100, 1~10 으로 변환)
+  const points = arr.slice(0, 12).map((m, idx) => {
+    const score100 = Number(m['점수']) || 50;
+    const score10 = Math.round(Math.max(1, Math.min(10, score100 / 10)));
+    const monthLabel = String(m['월'] || ('' + (idx+1) + '월'));
+    return {
+      idx,
+      monthLabel,
+      branch: m['지지'] || '',
+      stemGod: m['천간십신'] || '',
+      branchGod: m['지지십신'] || '',
+      grade: m['등급'] || '',
+      special: m['특이사항'] || '',
+      restMonth: !!m['휴식월'],
+      score10,
+      score100,
+    };
+  });
+  const peakIdx   = points.reduce((a,b,i,arr) => arr[a].score10 < b.score10 ? i : a, 0);
+  const valleyIdx = points.reduce((a,b,i,arr) => arr[a].score10 > b.score10 ? i : a, 0);
+  // 현재 월 (KST 기준)
+  const nowM = new Date(Date.now() + 9*3600000).getUTCMonth(); // 0~11
+  const currentIdx = nowM < points.length ? nowM : -1;
+  return { points, peakIdx, valleyIdx, currentIdx };
+}
+
+function renderMonthlyBarChart(cal) {
+  if (!cal || !cal.points || !cal.points.length) return '';
+  const { points, peakIdx, valleyIdx, currentIdx } = cal;
+  const W = 360, H = 220, padX = 26, padY = 36;
+  const barW = (W - padX*2) / points.length - 2;
+  const baseY = H - padY;
+  const scaleH = (s) => Math.max(4, ((s - 1) / 9) * (H - padY*2));
+
+  const bars = points.map((p, i) => {
+    const x = padX + i * ((W - padX*2) / points.length) + 1;
+    const h = scaleH(p.score10);
+    const y = baseY - h;
+    const isPeak = i === peakIdx;
+    const isValley = i === valleyIdx && peakIdx !== valleyIdx;
+    const isCurrent = i === currentIdx;
+    const isRest = p.restMonth;
+    const fill = isValley ? '#a94a3a' : isRest ? 'rgba(120,120,140,0.5)' : isPeak ? '#3a8a8a' : '#5cb0b0';
+    const stroke = isCurrent ? '#1a4a4a' : 'transparent';
+    return `<g>
+      <rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${fill}" stroke="${stroke}" stroke-width="${isCurrent?2:0}" rx="2"/>
+      <text x="${x + barW/2}" y="${y - 3}" text-anchor="middle" font-size="9" font-weight="${isPeak||isValley||isCurrent?'800':'600'}" fill="#3a2a08">${p.score10}</text>
+      <text x="${x + barW/2}" y="${baseY + 12}" text-anchor="middle" font-size="9" font-weight="${isCurrent?'800':'500'}" fill="${isCurrent?'#1a4a4a':'rgba(60,40,8,0.7)'}">${i+1}월</text>
+      ${(isPeak||isValley) ? `<text x="${x + barW/2}" y="${y - 14}" text-anchor="middle" font-size="9" font-weight="800" fill="${isValley?'#a94a3a':'#1a4a4a'}">${isValley?'⚠':'★'}</text>` : ''}
+      ${isCurrent ? `<text x="${x + barW/2}" y="${baseY + 22}" text-anchor="middle" font-size="8" font-weight="700" fill="#1a4a4a">지금</text>` : ''}
+    </g>`;
+  }).join('');
+
+  return `<div style="background:rgba(58,138,138,0.04);border:1px solid rgba(58,138,138,0.18);border-radius:14px;padding:14px 6px 10px;margin:14px 0 6px;">
+    <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;text-align:center;margin-bottom:4px;">12-MONTH FORTUNE CALENDAR</div>
+    <svg viewBox="0 0 ${W} ${H+10}" style="width:100%;max-width:380px;height:auto;display:block;margin:0 auto;">
+      <line x1="${padX}" y1="${baseY}" x2="${W-padX}" y2="${baseY}" stroke="rgba(60,40,8,0.25)"/>
+      <line x1="${padX}" y1="${baseY-scaleH(5)}" x2="${W-padX}" y2="${baseY-scaleH(5)}" stroke="rgba(60,40,8,0.12)" stroke-dasharray="2,3"/>
+      ${bars}
+    </svg>
+    <div style="font-size:10px;color:rgba(60,40,8,0.6);text-align:center;line-height:1.5;margin-top:4px;">
+      ★ 정점월 · ⚠ 저점월 · 회색 휴식월 · 점수 1~10 (워커 세운월별 점수 / 10)
+    </div>
+  </div>`;
+}
+
+async function generateMonthlyCalendarReport() {
+  if (!await setupSectionsAndDeductOrb()) return;
+  const sb2 = buildSajuBlock();
+  const db  = buildDaeunBlock();
+  const ysFinal = _yongsin || _sdFull?.yongshin?.final || _sdFull?.yongshin?.primary || '미확인';
+  const birthLine = _profile ? `생년월일: ${_profile.year}년 ${_profile.month}월 ${_profile.day}일` : '';
+  const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / ${birthLine} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
+
+  const cal = computeMonthlyCalendar();
+  if (!cal) {
+    showDataMissingError('saju.html', '사주 세운월별');
+    return;
+  }
+  const monthLines = cal.points.map(p => {
+    const tags = [];
+    if (p.idx === cal.peakIdx) tags.push('★정점');
+    if (p.idx === cal.valleyIdx && cal.peakIdx !== cal.valleyIdx) tags.push('⚠저점');
+    if (p.idx === cal.currentIdx) tags.push('[지금]');
+    if (p.restMonth) tags.push('휴식월');
+    if (p.special) tags.push(p.special);
+    return `· ${p.monthLabel} (${p.branch}, 천간십신:${p.stemGod}, 지지십신:${p.branchGod}): 점수 ${p.score100}/100 (${p.score10}/10) 등급:${p.grade} ${tags.join(' ')}`;
+  }).join('\n');
+  const calBlock = `\n【올해 12개월 세운월별 (절대 데이터 — 워커 정밀 산출)】
+${monthLines}
+
+★ 절대 규칙:
+1. 위 점수·등급·특이사항은 사주 워커 정밀 계산 결과. 본문에서 인용 시 표 그대로 사용. 새 숫자 만들지 말 것.
+2. 매월 분석 시 (월명/지지/십신/점수/등급/특이사항) 모두 표에 적힌 그대로 인용.`;
+
+  // 섹션 1~3
+  const prompt2A = `${profileStr}
+
+${sb2}
+${db}
+${calBlock}
+${buildAdviceBlock(['투자/재테크','이직/커리어','대인관계/부부'])}
+${buildYongsinBlock()}${buildAccuracyLayerBlock()}
+
+섹션 구성:
+1. 올해 큰 흐름 + 12개월 정점·저점 — 위 표를 본문에서 인용해 올해의 큰 흐름과 정점월(${cal.points[cal.peakIdx]?.monthLabel||''}, 점수 ${cal.points[cal.peakIdx]?.score100||''}/100), 저점월(${cal.points[cal.valleyIdx]?.monthLabel||''}, 점수 ${cal.points[cal.valleyIdx]?.score100||''}/100)을 압축. 격국 ${_geokguk||''}·용신 ${ysFinal}과 교차.
+2. 1분기 (1·2·3월) 정밀 — 위 표의 1~3월 데이터를 그대로 인용해 각 달의 천간지지·십신·등급·특이사항을 풀어 설명. 각 월에서 무엇을 해야/피해야 하는지.
+3. 2분기 (4·5·6월) 정밀 — 동일 방식. 상반기 결산 한 줄 포함.
+
+총 700~1000자. 섹션 번호(1. 2. 3.) 붙여 작성. 점수·연도·월별 데이터는 표 그대로 인용.`;
+  await streamToSections(prompt2A, [0,1,2], '12개월 캘린더 분석', ysFinal, '', false);
+
+  // 섹션 1에 차트 삽입
+  const chartHtml = renderMonthlyBarChart(cal);
+  if (chartHtml) {
+    const sec1 = document.getElementById('sbody-0');
+    if (sec1) sec1.insertAdjacentHTML('beforeend', chartHtml);
+  }
+
+  // 섹션 4~5
+  const prompt2B = `${profileStr}
+
+${sb2}
+${db}
+${calBlock}
+${buildAdviceBlock(['투자/재테크'])}
+${buildYongsinBlock()}${buildAccuracyLayerBlock()}
+
+섹션 구성:
+4. 3분기 (7·8·9월) 정밀 — 위 표의 7~9월 데이터를 인용해 각 달 분석. 하반기 진입 신호.
+5. 4분기 (10·11·12월) + 분기별 길일 추천 + 실전 액션 — 위 표의 10~12월 인용 + 정점월(${cal.points[cal.peakIdx]?.monthLabel||''})에 해야 할 액션, 저점월(${cal.points[cal.valleyIdx]?.monthLabel||''})에 피해야 할 액션, 올해 마무리 핵심 3가지.
+
+총 600~900자. 섹션 번호(4. 5.) 붙여 작성. 표 데이터 그대로 인용.`;
+  await streamToSections(prompt2B, [3,4], '12개월 캘린더 분석', ysFinal, '', true);
+
+  const allTexts = Array.from({length:5}, (_,i) => document.getElementById(`sbody-${i}`)?.innerText || '');
+  await safeInsertReport(allTexts, getProfileKey());
+  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
+}
+
 async function generateWealthLifetimeReport() {
   if (!await setupSectionsAndDeductOrb()) return;
   const sb2 = buildSajuBlock();
@@ -10932,6 +11140,7 @@ function showConsultBanner() {
     timing:        { title: '중요 선택의 타이밍을 잡고 싶다면', desc: '이사·이직·결혼 등 시기 판단을\n<em>전문 상담사</em>가 맞춤 설계해 드립니다.' },
     wealth_timing: { title: '재물 타이밍, 실행 전략이 필요하다면', desc: '투자·계약·사업 개시 시점을\n<em>전문 상담사</em>가 구체적으로 코칭합니다.' },
     wealth_lifetime:{ title: '내 인생 재물 곡선, 정점 시기에 무엇을 할지', desc: '곡선 정점·저점에 맞춘 실전 재물 전략을\n<em>전문 상담사</em>가 1:1로 설계해 드립니다.' },
+    monthly_calendar:{ title: '12개월 캘린더, 정점월에 어떻게 행동할지', desc: '정점월 활용·저점월 방어 전략을\n<em>전문 상담사</em>가 월 단위로 코칭합니다.' },
     classic:       { title: '고전 명리 해석을 현대에 적용하려면', desc: '적천수·궁통보감 관점을\n<em>전문 상담사</em>가 실생활 언어로 풀어드립니다.' },
     pastlife:      { title: '전생 카르마, 이번 생에 어떻게 풀어야 할지', desc: 'AI가 읽어낸 카르마 미션을 바탕으로\n<em>전문 상담사</em>가 현실적인 실천 방향을 안내합니다.' },
     soulmate:      { title: '운명의 상대방, 더 구체적으로 알고 싶다면', desc: 'AI가 분석한 파트너 유형을 바탕으로\n<em>전문 상담사</em>가 현실적인 만남 전략을 안내합니다.' },
@@ -11033,6 +11242,9 @@ function showRelatedReports() {
     wealth_lifetime:[{t:'money',icon:'<i class="pi pi-coin"></i>',title:'재물·사업 분석',desc:'곡선 정점 시기에 작동하는 재물 구조'},
                      {t:'wealth_timing',icon:'<i class="pi pi-chart"></i>',title:'재물 타이밍',desc:'곡선 안의 단기 월별 흐름 정밀'},
                      {t:'career_deep',icon:'<i class="pi pi-target"></i>',title:'직업·사업 심층',desc:'곡선의 통로(직업) 심층 분석'}],
+    monthly_calendar:[{t:'year',icon:'<i class="pi pi-sparkle"></i>',title:'올해 운세',desc:'12개월 흐름의 큰 그림 압축'},
+                      {t:'qimen_taegil',icon:'<i class="pi pi-calendar"></i>',title:'기문 택일 14일',desc:'좋은 달 안에서 좋은 날까지'},
+                      {t:'wealth_timing',icon:'<i class="pi pi-chart"></i>',title:'재물 타이밍',desc:'재물 관점의 월별 정밀'}],
     classic:      [{t:'character',icon:'<i class="pi pi-star"></i>',title:'기질 분석',desc:'고전 개념을 현대 기질로'},
                    {t:'yongsin',icon:'<i class="pi pi-compass"></i>',title:'용신 활용',desc:'고전 용신을 일상에'}],
     pastlife:     [{t:'character',icon:'<i class="pi pi-star"></i>',title:'기질 분석',desc:'전생에서 이어진 본질 기질'},
@@ -11102,6 +11314,7 @@ function showRelatedReports() {
       timing:       {bg:'rgba(120,160,255,0.12)',  bd:'rgba(120,160,255,0.30)', ic:'#2e6ba8'},
       wealth_timing:{bg:'rgba(220,180,80,0.12)',   bd:'rgba(220,180,80,0.30)',  ic:'#a16d1f'},
       wealth_lifetime:{bg:'rgba(184,134,11,0.14)', bd:'rgba(184,134,11,0.32)',  ic:'#7a5a08'},
+      monthly_calendar:{bg:'rgba(58,138,138,0.13)', bd:'rgba(58,138,138,0.32)', ic:'#1a4a4a'},
       guide:        {bg:'rgba(240,140,180,0.12)',  bd:'rgba(240,140,180,0.30)', ic:'#8b2447'},
       career_deep:  {bg:'rgba(120,160,255,0.12)',  bd:'rgba(120,160,255,0.30)', ic:'#2e6ba8'},
       child_career: {bg:'rgba(100,200,140,0.12)',  bd:'rgba(100,200,140,0.30)', ic:'#2d8659'},
