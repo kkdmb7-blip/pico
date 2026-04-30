@@ -6814,28 +6814,37 @@ function renderIntro() {
     });
   }
 
-  // wealth_lifetime: 인트로에 샘플 곡선 (개인화 X, 마케팅용 미리보기)
+  // 시각 미리보기 anchor: 인트로 최상단 (header 바로 아래, 섹션 목록보다 위)
+  const _introTopAnchor = document.getElementById('introDesc') || document.getElementById('introTitle');
+
+  // wealth_lifetime: 인트로 상단에 샘플 곡선
   if (_type === 'wealth_lifetime') {
     let sampleWrap = document.getElementById('introSampleChart');
     if (!sampleWrap) {
       sampleWrap = document.createElement('div');
       sampleWrap.id = 'introSampleChart';
-      sampleWrap.style.cssText = 'margin: 16px 0 4px;';
-      secWrap.parentNode.insertBefore(sampleWrap, secWrap.nextSibling);
+      sampleWrap.style.cssText = 'margin: 16px 0 12px;';
+    }
+    if (_introTopAnchor && sampleWrap.parentNode !== _introTopAnchor.parentNode) {
+      _introTopAnchor.parentNode.insertBefore(sampleWrap, _introTopAnchor.nextSibling);
+    } else if (sampleWrap.parentNode !== _introTopAnchor?.parentNode) {
+      _introTopAnchor.parentNode.insertBefore(sampleWrap, _introTopAnchor.nextSibling);
     }
     const sampleBadge = '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#7a5a08;margin-bottom:-4px;">SAMPLE PREVIEW</div>';
     const sampleNote = '<div style="text-align:center;font-size:11px;color:#7a5a30;margin-top:4px;line-height:1.6;">↑ 샘플 곡선 — 실제는 본인 사주·자미두수 데이터로 그려집니다</div>';
     sampleWrap.innerHTML = sampleBadge + renderWealthCurveSvg(WEALTH_SAMPLE_CURVE) + sampleNote;
   }
 
-  // monthly_calendar: 인트로에 샘플 12개월 차트 + 정점/저점/휴식월 카드 + 호기심 후크
+  // monthly_calendar: 인트로 상단에 샘플 12개월 차트 + 정점/저점/휴식월 카드 + 호기심 후크
   if (_type === 'monthly_calendar') {
     let mcWrap = document.getElementById('introMonthlyMock');
     if (!mcWrap) {
       mcWrap = document.createElement('div');
       mcWrap.id = 'introMonthlyMock';
-      mcWrap.style.cssText = 'margin: 16px 0 4px;';
-      secWrap.parentNode.insertBefore(mcWrap, secWrap.nextSibling);
+      mcWrap.style.cssText = 'margin: 16px 0 12px;';
+    }
+    if (_introTopAnchor) {
+      _introTopAnchor.parentNode.insertBefore(mcWrap, _introTopAnchor.nextSibling);
     }
     const sample = MONTHLY_SAMPLE_CALENDAR;
     const peak = sample.points[sample.peakIdx];
