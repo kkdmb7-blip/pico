@@ -10019,6 +10019,26 @@ function computeWealthCurve() {
     '비견':3, '겁재':3,
   };
 
+  // ── 천간/지지 → 오행 매핑 (Step 1 — 용신·기신 보정용) ─────────
+  const STEM_OHAENG = {'갑':'목','을':'목','병':'화','정':'화','무':'토','기':'토','경':'금','신':'금','임':'수','계':'수'};
+  const BRANCH_OHAENG = {'인':'목','묘':'목','사':'화','오':'화','진':'토','술':'토','축':'토','미':'토','신':'금','유':'금','해':'수','자':'수'};
+  // 용신을 극(剋)하는 오행 = 기신
+  const GISIN_OF = {'목':'금','화':'수','토':'목','금':'화','수':'토'};
+  // 용신 정규화: 한글/영어/한자 모두 한글 한 글자로
+  const YONGSIN_MAP = {
+    '목':'목','화':'화','토':'토','금':'금','수':'수',
+    'wood':'목','fire':'화','earth':'토','metal':'금','water':'수',
+    '木':'목','火':'화','土':'토','金':'금','水':'수',
+  };
+  function normYongsin(y) {
+    if (!y) return '';
+    const s = String(y).toLowerCase().trim().replace(/[()]/g,'');
+    return YONGSIN_MAP[s] || YONGSIN_MAP[s.slice(0,1)] || '';
+  }
+  const yongsin = _sdFull?.yongshin?.primary || _yongsin || '';
+  const yongsinOh = normYongsin(yongsin);
+  const gisinOh = GISIN_OF[yongsinOh] || '';
+
   // 자미두수 사화 보정용
   const lu = _ziweiData?.sihua?.lu;
   const ji = _ziweiData?.sihua?.ji;
@@ -10039,7 +10059,6 @@ function computeWealthCurve() {
     score += ziweiBaseModifier;
 
     // 사화 보정 (대운 단위로는 자미두수 사화 위치 영향)
-    // 재성 별이 화록 받음 → 그 별이 명궁 삼방에 있으면 +0.5
     if (lu?.star && myungSamBangStars.includes(lu.star) && ziweiWealthStars.includes(lu.star)) score += 0.5;
     if (ji?.star && myungSamBangStars.includes(ji.star) && ziweiWealthStars.includes(ji.star)) score -= 0.5;
 
@@ -10047,6 +10066,17 @@ function computeWealthCurve() {
     if ((tg === '비견' || tg === '겁재') && ji?.palace === '재백') score -= 0.5;
     // 재성 대운에 화록 가중
     if ((tg === '정재' || tg === '편재') && lu?.palace === '재백') score += 0.5;
+
+    // ── Step 1: 용신·기신 천간 보정 (가장 큰 신호) ────────────
+    const pillarKor = du.pillar_kor || du.ganjee || '';
+    const stemKr = pillarKor[0] || '';
+    const stemOh = STEM_OHAENG[stemKr] || '';
+    let yongsinTag = '';
+    if (yongsinOh && stemOh === yongsinOh) {
+      score += 3; yongsinTag = '용신';
+    } else if (gisinOh && stemOh === gisinOh) {
+      score -= 3; yongsinTag = '기신';
+    }
 
     score = Math.round(Math.max(1, Math.min(10, score)));
 
@@ -10074,11 +10104,13 @@ function computeWealthCurve() {
       yearRange: `${yStart}-${yEnd}`,
       ageRange: (ageStart!=null && ageEnd!=null) ? `${ageStart}~${ageEnd}세` : '',
       yStart, yEnd,
+      stemOhaeng: stemOh,
+      yongsinTag,
     };
   });
 
   // 디버그: 콘솔에서 실제 데이터 확인 가능
-  try { console.log('[wealthCurve] birthYear=', _profile?.year, 'big_luck_analysis=', big.slice(0,3), 'computed points=', points); } catch(e) {}
+  try { console.log('[wealthCurve] birthYear=', _profile?.year, '용신=', yongsinOh, '기신=', gisinOh, 'computed=', points); } catch(e) {}
 
   // 정점/저점/현재
   const peakIdx   = points.reduce((a,b,i,arr) => arr[a].score < b.score ? i : a, 0);
@@ -10135,17 +10167,22 @@ function renderWealthCurveSvg(curve) {
   // 라벨 helper
   const xLabels = coords.map((c, i) => {
     const p = points[i];
-    return `<text x="${c.x}" y="${H - padY + 14}" text-anchor="middle" font-size="9" font-weight="600" fill="rgba(60,40,8,0.7)">${p.pillar}</text>
+    const ytColor = p.yongsinTag === '용신' ? '#3a8a3a' : p.yongsinTag === '기신' ? '#a94a3a' : 'rgba(60,40,8,0.7)';
+    const ytWeight = p.yongsinTag ? '800' : '600';
+    return `<text x="${c.x}" y="${H - padY + 14}" text-anchor="middle" font-size="9" font-weight="${ytWeight}" fill="${ytColor}">${p.pillar}</text>
             <text x="${c.x}" y="${H - padY + 26}" text-anchor="middle" font-size="8" fill="rgba(60,40,8,0.5)">${p.ageRange}</text>`;
   }).join('');
 
-  // 점들
+  // 점들 — 용신/기신 시각 강조
   const dots = coords.map((c, i) => {
+    const p = points[i];
     const isPeak    = i === peakIdx;
     const isValley  = i === valleyIdx && peakIdx !== valleyIdx;
     const isCurrent = i === currentIdx;
-    const r = (isPeak || isValley || isCurrent) ? 5 : 3.5;
-    const fill = isValley ? '#a94a3a' : '#b8860b';
+    const isYongsin = p.yongsinTag === '용신';
+    const isGisin   = p.yongsinTag === '기신';
+    const r = (isPeak || isValley || isCurrent || isYongsin || isGisin) ? 5 : 3.5;
+    const fill = isGisin ? '#a94a3a' : isYongsin ? '#3a8a3a' : isValley ? '#a94a3a' : '#b8860b';
     return `<circle cx="${c.x}" cy="${c.y}" r="${r}" fill="${fill}" stroke="#fff" stroke-width="${r>=5?1.5:0}"/>`;
   }).join('');
 
@@ -10209,7 +10246,10 @@ async function generateWealthLifetimeReport() {
         if (p.idx === curve.peakIdx) tags.push('★정점');
         if (p.idx === curve.valleyIdx && curve.peakIdx !== curve.valleyIdx) tags.push('⚠저점');
         if (p.idx === curve.currentIdx) tags.push('[지금]');
-        return `· ${p.pillar} 대운: ${p.yStart}년~${p.yEnd}년 (만 ${p.ageRange||'?'}, 십신 ${p.tenGod||'?'}) → 재물점수 ${p.score}/10 ${tags.join(' ')}`;
+        if (p.yongsinTag === '용신') tags.push('🟢용신');
+        else if (p.yongsinTag === '기신') tags.push('🔴기신');
+        const yt = p.yongsinTag ? `, ${p.yongsinTag} 대운(${p.stemOhaeng})` : '';
+        return `· ${p.pillar} 대운: ${p.yStart}년~${p.yEnd}년 (만 ${p.ageRange||'?'}, 십신 ${p.tenGod||'?'}${yt}) → 재물점수 ${p.score}/10 ${tags.join(' ')}`;
       }).join('\n')
     : '대운 데이터 없음';
 
