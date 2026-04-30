@@ -10071,8 +10071,9 @@ function computeWealthCurve() {
     '임':{'자':'제왕','축':'쇠','인':'병','묘':'사','진':'묘','사':'절','오':'태','미':'양','신':'장생','유':'목욕','술':'관대','해':'임관'},
     '계':{'자':'임관','축':'관대','인':'목욕','묘':'장생','진':'양','사':'태','오':'절','미':'묘','신':'사','유':'병','술':'쇠','해':'제왕'},
   };
-  // 12운성 강도: 제왕/임관 = 가장 강, 절 = 가장 약
-  const UNSEONG_STR = {'제왕':+2,'임관':+2,'관대':+1,'장생':+1,'양':0,'목욕':0,'쇠':-1,'병':-1,'사':-1,'묘':-1,'태':-1,'절':-2};
+  // 12운성 강도 (textbook 3등급 — sajustudy.com/63 기반)
+  // 강: 장생/관대/건록(임관)/제왕  · 중간: 목욕/쇠/태/양  · 약: 병/사/묘/절
+  const UNSEONG_STR = {'제왕':+2,'임관':+2,'관대':+1,'장생':+1,'양':0,'목욕':0,'쇠':0,'태':0,'병':-1,'사':-1,'묘':-1,'절':-2};
   const dayStem = ((_ilju || '')[0]) || '';
 
   // ── Step 4: 형충회합 매핑 (textbook 표준) ─────────────────
@@ -10155,7 +10156,8 @@ function computeWealthCurve() {
     let haphAdj = 0;
     const haphLabels = [];
     if (branchKr && sajuBranches.length) {
-      // 충 (-1 per match, max -2)
+      // textbook 강도 서열 (sajustudy.com/62): 방합 > 삼합 > 육합 = 육충 > 반합
+      // 충 (-1 per match, max -2). 육합과 강도 동일.
       let chungCount = 0;
       for (const sb of sajuBranches) {
         if (CHUNG[branchKr] === sb) { chungCount++; haphLabels.push('충'+sb); }
@@ -10165,13 +10167,10 @@ function computeWealthCurve() {
       // 형 (-0.5 per, max -1)
       let hyungCount = 0;
       for (const sb of sajuBranches) {
-        // 삼형
         for (const grp of SAMHYUNG_GROUPS) {
           if (grp.includes(branchKr) && grp.includes(sb) && branchKr !== sb) hyungCount++;
         }
-        // 자묘 무례지형
         if (JAMYO_HYUNG.includes(branchKr) && JAMYO_HYUNG.includes(sb) && branchKr !== sb) hyungCount++;
-        // 자형 (같은 글자)
         if (JAHYUNG.includes(branchKr) && branchKr === sb) hyungCount++;
       }
       if (hyungCount > 0) {
@@ -10179,35 +10178,35 @@ function computeWealthCurve() {
         haphLabels.push('형');
       }
 
-      // 육합 (+0.5 per, max +1)
+      // 육합 (+1 per, max +2). textbook 상 육충과 동일 강도
       let yukhapCount = 0;
       for (const sb of sajuBranches) {
         if (YUKHAP[branchKr] === sb) { yukhapCount++; haphLabels.push('육합'+sb); }
       }
-      haphAdj += Math.min(1, yukhapCount * 0.5);
+      haphAdj += Math.min(2, yukhapCount * 1);
 
-      // 삼합 완성 (+1.5) / 부분 (+0.3)
+      // 삼합 완성 (+1.5) / 부분=반합 (+0.5)
       for (const grp of SAMHAP_GROUPS) {
         if (grp.includes(branchKr)) {
           const others = grp.filter(g => g !== branchKr);
           const matched = others.filter(o => sajuBranches.includes(o));
           if (matched.length === 2) { haphAdj += 1.5; haphLabels.push('삼합완성'); break; }
-          else if (matched.length === 1) { haphAdj += 0.3; haphLabels.push('삼합부분'); break; }
+          else if (matched.length === 1) { haphAdj += 0.5; haphLabels.push('반합'); break; }
         }
       }
 
-      // 삼회/방합 완성 (+1)
+      // 삼회/방합 완성 (+2) — textbook 가장 강한 합
       for (const grp of SAMHOI_GROUPS) {
         if (grp.includes(branchKr)) {
           const others = grp.filter(g => g !== branchKr);
           if (others.every(o => sajuBranches.includes(o))) {
-            haphAdj += 1; haphLabels.push('삼회완성'); break;
+            haphAdj += 2; haphLabels.push('방합완성'); break;
           }
         }
       }
     }
-    // cap haphAdj at ±2.5
-    haphAdj = Math.max(-2.5, Math.min(2.5, haphAdj));
+    // cap haphAdj at ±3 (방합완성+육합 최대치 고려)
+    haphAdj = Math.max(-3, Math.min(3, haphAdj));
     score += haphAdj;
 
     score = Math.round(Math.max(1, Math.min(10, score)));
