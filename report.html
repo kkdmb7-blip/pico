@@ -6828,6 +6828,64 @@ function renderIntro() {
     sampleWrap.innerHTML = sampleBadge + renderWealthCurveSvg(WEALTH_SAMPLE_CURVE) + sampleNote;
   }
 
+  // monthly_calendar: 인트로에 샘플 12개월 차트 + 정점/저점/휴식월 카드 + 호기심 후크
+  if (_type === 'monthly_calendar') {
+    let mcWrap = document.getElementById('introMonthlyMock');
+    if (!mcWrap) {
+      mcWrap = document.createElement('div');
+      mcWrap.id = 'introMonthlyMock';
+      mcWrap.style.cssText = 'margin: 16px 0 4px;';
+      secWrap.parentNode.insertBefore(mcWrap, secWrap.nextSibling);
+    }
+    const sample = MONTHLY_SAMPLE_CALENDAR;
+    const peak = sample.points[sample.peakIdx];
+    const valley = sample.points[sample.valleyIdx];
+    const rest = sample.points.find(p => p.restMonth);
+    const sihuaGood = sample.points.filter(p => p.special && ['천을귀인','문창귀인','역마','화개'].includes(p.special));
+
+    const cardStyle = 'flex:1;min-width:140px;padding:10px 12px;border-radius:10px;text-align:left;';
+    const peakCard = `<div style="${cardStyle}background:rgba(58,138,138,0.10);border:1px solid rgba(58,138,138,0.32);">
+      <div style="font-size:10px;font-weight:800;color:#1a4a4a;letter-spacing:0.12em;">★ 정점월</div>
+      <div style="font-size:14px;font-weight:800;color:#1a4a4a;margin-top:3px;">${peak.monthLabel}</div>
+      <div style="font-size:11px;color:#3a6a6a;margin-top:2px;">${peak.score100}점 · ${peak.special||peak.grade}</div>
+    </div>`;
+    const valleyCard = `<div style="${cardStyle}background:rgba(169,74,58,0.08);border:1px solid rgba(169,74,58,0.30);">
+      <div style="font-size:10px;font-weight:800;color:#8a3a2a;letter-spacing:0.12em;">⚠ 저점월</div>
+      <div style="font-size:14px;font-weight:800;color:#8a3a2a;margin-top:3px;">${valley.monthLabel}</div>
+      <div style="font-size:11px;color:#a94a3a;margin-top:2px;">${valley.score100}점 · ${valley.special||valley.grade}</div>
+    </div>`;
+    const restCard = rest ? `<div style="${cardStyle}background:rgba(120,120,140,0.08);border:1px solid rgba(120,120,140,0.30);">
+      <div style="font-size:10px;font-weight:800;color:#5a5a6a;letter-spacing:0.12em;">😴 휴식월</div>
+      <div style="font-size:14px;font-weight:800;color:#5a5a6a;margin-top:3px;">${rest.monthLabel}</div>
+      <div style="font-size:11px;color:#7a7a8a;margin-top:2px;">${rest.score100}점 · 충전 권장</div>
+    </div>` : '';
+
+    const hookCard = (q, a) => `<div style="background:rgba(58,138,138,0.05);border-left:3px solid rgba(58,138,138,0.55);padding:9px 12px 9px 14px;margin-bottom:6px;border-radius:0 8px 8px 0;"><div style="font-size:12px;font-weight:700;color:#1a4a4a;line-height:1.5;">${q}</div><div style="font-size:11px;color:#5a7a7a;margin-top:3px;line-height:1.5;">${a}</div></div>`;
+
+    const sampleBadge = '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;margin-bottom:-4px;">SAMPLE PREVIEW</div>';
+    const sampleNote = '<div style="text-align:center;font-size:11px;color:#3a6a6a;margin-top:4px;line-height:1.6;">↑ 샘플 차트 — 실제는 본인 사주 세운월별 정밀 데이터로 그려집니다</div>';
+    const nowMonth = new Date().getMonth() + 1;
+    const hooks = [
+      hookCard('내 4월에 천을귀인이 진짜 활성화될까?', '워커 정밀 데이터로 내 사주의 활성 신살 정확히 추출'),
+      hookCard('9월 삼재가 나에게도 영향?', '특이사항(삼재·도화·역마 등)이 어느 달에 들어오는지 명시'),
+      hookCard('이번 달 (' + nowMonth + '월) 내 점수는?', '워커가 산출한 1~100 점수로 매달 등급 표시'),
+      hookCard('정점월에 무엇을 해야 하나?', '분기별 실전 액션 + 길일 추천까지 5섹션')
+    ].join('');
+
+    mcWrap.innerHTML = `
+      ${sampleBadge}
+      ${renderMonthlyBarChart(sample)}
+      ${sampleNote}
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 10px;">
+        ${peakCard}${valleyCard}${restCard}
+      </div>
+      <div style="margin:14px 0 6px;padding:14px;background:linear-gradient(135deg,rgba(58,138,138,0.06),rgba(184,134,11,0.04));border:1px solid rgba(58,138,138,0.20);border-radius:14px;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;margin-bottom:10px;">QUESTIONS YOU'LL ANSWER</div>
+        ${hooks}
+      </div>
+    `;
+  }
+
   // 샘플 미리보기
   let previewEl = document.getElementById('introPreview');
   if (!previewEl) {
@@ -10361,6 +10419,25 @@ function computeWealthCurve() {
 
   return { points, peakIdx, valleyIdx, currentIdx };
 }
+
+// ── 인트로용 샘플 12개월 캘린더 (개인화 X, 마케팅 데모) ──────
+const MONTHLY_SAMPLE_CALENDAR = {
+  points: [
+    { idx:0, monthLabel:'1월(소한)', branch:'축', stemGod:'정인', branchGod:'비견', grade:'보통',     special:null,        restMonth:false, score10:5, score100:50 },
+    { idx:1, monthLabel:'2월(입춘)', branch:'인', stemGod:'편관', branchGod:'겁재', grade:'보통',     special:null,        restMonth:false, score10:6, score100:62 },
+    { idx:2, monthLabel:'3월(경칩)', branch:'묘', stemGod:'식신', branchGod:'편재', grade:'좋음',     special:'천을귀인',  restMonth:false, score10:8, score100:78 },
+    { idx:3, monthLabel:'4월(청명)', branch:'진', stemGod:'편재', branchGod:'식신', grade:'매우좋음', special:'문창귀인',  restMonth:false, score10:9, score100:88 },
+    { idx:4, monthLabel:'5월(입하)', branch:'사', stemGod:'정관', branchGod:'편관', grade:'좋음',     special:null,        restMonth:false, score10:7, score100:72 },
+    { idx:5, monthLabel:'6월(망종)', branch:'오', stemGod:'정재', branchGod:'정재', grade:'좋음',     special:'역마',      restMonth:false, score10:7, score100:70 },
+    { idx:6, monthLabel:'7월(소서)', branch:'미', stemGod:'편인', branchGod:'편인', grade:'보통',     special:null,        restMonth:true,  score10:5, score100:48 },
+    { idx:7, monthLabel:'8월(입추)', branch:'신', stemGod:'정관', branchGod:'정관', grade:'보통',     special:null,        restMonth:false, score10:6, score100:60 },
+    { idx:8, monthLabel:'9월(백로)', branch:'유', stemGod:'편재', branchGod:'편관', grade:'주의',     special:'삼재',      restMonth:false, score10:3, score100:32 },
+    { idx:9, monthLabel:'10월(한로)',branch:'술', stemGod:'식신', branchGod:'정인', grade:'보통',     special:null,        restMonth:false, score10:5, score100:52 },
+    { idx:10,monthLabel:'11월(입동)',branch:'해', stemGod:'겁재', branchGod:'정인', grade:'좋음',     special:null,        restMonth:false, score10:7, score100:68 },
+    { idx:11,monthLabel:'12월(대설)',branch:'자', stemGod:'정재', branchGod:'편재', grade:'좋음',     special:'화개',      restMonth:false, score10:6, score100:65 },
+  ],
+  peakIdx: 3, valleyIdx: 8, currentIdx: -1,
+};
 
 // ── 인트로 페이지용 샘플 곡선 (개인화 X, 마케팅용 데모) ──────────
 const WEALTH_SAMPLE_CURVE = {
