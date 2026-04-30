@@ -2665,13 +2665,13 @@ window.shareLifeDays = function() {
         </span>
       </button>
       <button onclick="openHelpModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span><i class="pi pi-question"></i> 도움말 · FAQ</span><span style="color:var(--muted);">›</span>
+        <span><i class="pi pi-book"></i> 도움말 · FAQ</span><span style="color:var(--muted);">›</span>
       </button>
       <button id="btnAdminDash" onclick="goAdminDashboard()" style="display:none;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--gold-deep);font-size:14px;cursor:pointer;text-align:left;width:100%;font-weight:700;">
         <span><i class="pi pi-sparkle"></i> 관리자 대시보드</span><span style="color:var(--muted);">›</span>
       </button>
       <button id="btnAdminChat" onclick="goAdminChat()" style="display:none;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--gold-deep);font-size:14px;cursor:pointer;text-align:left;width:100%;font-weight:700;">
-        <span><i class="pi pi-comments"></i> 사용자 문의 답변 <span id="adminChatBadge" style="display:none;background:#c94a3a;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;">0</span></span><span style="color:var(--muted);">›</span>
+        <span><i class="pi pi-chat"></i> 사용자 문의 답변 <span id="adminChatBadge" style="display:none;background:#c94a3a;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;">0</span></span><span style="color:var(--muted);">›</span>
       </button>
       <button onclick="logout()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;color:#b91c1c;font-size:14px;cursor:pointer;text-align:left;width:100%;">
         <span>로그아웃</span><span style="color:var(--muted);">›</span>
@@ -6972,7 +6972,7 @@ window.togglePushSubscription = async function() {
 <div id="helpOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(26,18,10,0.55);align-items:center;justify-content:center;padding:16px;">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;max-width:480px;width:100%;max-height:86vh;overflow:hidden;display:flex;flex-direction:column;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);">
-      <div style="font-size:16px;font-weight:700;color:var(--text);"><i class="pi pi-question"></i> 도움말 · 자주 묻는 질문</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text);"><i class="pi pi-book"></i> 도움말 · 자주 묻는 질문</div>
       <button onclick="closeHelpModal()" aria-label="닫기" style="background:transparent;border:0;font-size:20px;line-height:1;color:var(--muted);cursor:pointer;padding:4px 6px;">×</button>
     </div>
     <div style="padding:8px 18px 18px;overflow-y:auto;" id="helpBody"></div>
