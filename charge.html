@@ -238,6 +238,7 @@ nav {
   animation:spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform:rotate(360deg); } }
+@keyframes pmPop { 0% { transform:scale(0.85); opacity:0; } 100% { transform:scale(1); opacity:1; } }
 </style>
 <script src="analytics.js" defer></script>
 </head>
@@ -629,9 +630,89 @@ function renderPacks() {
         '<div class="pack-price-per">' + pack.perLabel + '</div>' +
       '</div>';
 
-    card.addEventListener('click', function() { doPay(pack); });
+    card.addEventListener('click', function() { openPaymentMethodModal(pack); });
     list.appendChild(card);
   });
+}
+
+// ── Google Play 한국 외부결제 정책 대응 ─────────────────────────
+// 카드 클릭 → 결제 수단 선택 모달 → 외부결제 안내 → 기존 doPay 호출
+function openPaymentMethodModal(pack) {
+  var ov = document.getElementById('payMethodOverlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'payMethodOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(40,28,16,0.55);z-index:9700;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
+    document.body.appendChild(ov);
+  }
+  ov.innerHTML = ''
+    + '<div style="max-width:360px;width:100%;background:linear-gradient(160deg,#fdf8eb,#f7e9c8);border:1.5px solid rgba(106,79,12,0.28);border-radius:20px;padding:26px 22px;box-shadow:0 22px 60px rgba(60,40,8,0.30);animation:pmPop 0.32s cubic-bezier(0.34,1.56,0.64,1);">'
+    +   '<div style="text-align:center;margin-bottom:22px;">'
+    +     '<div style="font-family:\'Noto Serif KR\',serif;font-size:19px;font-weight:800;color:#3a2a08;margin-bottom:6px;letter-spacing:-0.3px;">결제 수단 선택</div>'
+    +     '<div style="font-size:12px;color:#6a4f0c;">' + pack.priceLabel + ' · ' + pack.label + '</div>'
+    +   '</div>'
+    +   '<button id="pmGooglePlay" disabled style="width:100%;padding:14px 16px;margin-bottom:10px;background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.10);border-radius:14px;cursor:not-allowed;text-align:left;display:flex;align-items:center;gap:12px;opacity:0.55;">'
+    +     '<div style="font-size:26px;color:#5a4830;width:30px;text-align:center;"><i class="pi pi-gem"></i></div>'
+    +     '<div style="flex:1;">'
+    +       '<div style="font-size:13px;font-weight:700;color:#3a2a08;">Google Play 결제</div>'
+    +       '<div style="font-size:10px;color:#7a5a30;margin-top:2px;">앱 내 결제 · 준비 중</div>'
+    +     '</div>'
+    +     '<div style="font-size:9px;font-weight:700;color:#7a5a30;background:rgba(0,0,0,0.06);padding:3px 8px;border-radius:6px;">SOON</div>'
+    +   '</button>'
+    +   '<button id="pmExternal" style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#967032,#b89048);border:none;border-radius:14px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:12px;color:#fdf7e0;box-shadow:0 6px 16px rgba(120,80,20,0.22);">'
+    +     '<div style="font-size:26px;width:30px;text-align:center;"><i class="pi pi-coin"></i></div>'
+    +     '<div style="flex:1;">'
+    +       '<div style="font-size:14px;font-weight:800;">외부 결제 (카드 · 간편결제)</div>'
+    +       '<div style="font-size:11px;opacity:0.85;margin-top:2px;">신용카드 · 카카오페이 · 계좌이체</div>'
+    +     '</div>'
+    +     '<div style="font-size:18px;">→</div>'
+    +   '</button>'
+    +   '<div style="text-align:center;margin-top:16px;">'
+    +     '<button id="pmCancel" style="background:none;border:none;color:#6a4f0c;font-size:12px;cursor:pointer;padding:6px 12px;">취소</button>'
+    +   '</div>'
+    + '</div>';
+  ov.style.display = 'flex';
+  document.getElementById('pmCancel').onclick = function() { ov.style.display = 'none'; };
+  ov.addEventListener('click', function(e) { if (e.target === ov) ov.style.display = 'none'; });
+  document.getElementById('pmExternal').onclick = function() {
+    ov.style.display = 'none';
+    showExternalNoticeModal(pack);
+  };
+}
+
+function showExternalNoticeModal(pack) {
+  var ov = document.getElementById('payNoticeOverlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'payNoticeOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(40,28,16,0.55);z-index:9700;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
+    document.body.appendChild(ov);
+  }
+  ov.innerHTML = ''
+    + '<div style="max-width:360px;width:100%;background:#fdf8eb;border:1.5px solid rgba(154,74,58,0.30);border-radius:20px;padding:26px 22px;box-shadow:0 22px 60px rgba(60,40,8,0.30);animation:pmPop 0.32s cubic-bezier(0.34,1.56,0.64,1);">'
+    +   '<div style="text-align:center;margin-bottom:18px;">'
+    +     '<div style="font-size:38px;color:#a94a3a;margin-bottom:10px;"><i class="pi pi-warning"></i></div>'
+    +     '<div style="font-family:\'Noto Serif KR\',serif;font-size:17px;font-weight:800;color:#3a2a08;letter-spacing:-0.3px;">외부 결제 안내</div>'
+    +   '</div>'
+    +   '<div style="background:rgba(169,74,58,0.07);border:1px solid rgba(169,74,58,0.22);border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.7;color:#3a2a08;margin-bottom:14px;">'
+    +     '이 결제는 <strong style="color:#8a3a2a;">Google Play 외부에서 처리</strong>됩니다.<br>'
+    +     'Google Play의 구매 보호 정책이 적용되지 않을 수 있습니다.'
+    +   '</div>'
+    +   '<div style="font-size:12px;color:#6a4f0c;line-height:1.7;margin-bottom:20px;padding:0 4px;">'
+    +     'FORTUNA 자체 결제 시스템(포트원 · KG이니시스) 으로 안전하게 처리되며, 환불·문의는 picolab.kr 고객센터에서 처리합니다.'
+    +   '</div>'
+    +   '<button id="pnConfirm" style="width:100%;padding:14px;background:linear-gradient(135deg,#967032,#b89048);border:none;border-radius:14px;cursor:pointer;color:#fdf7e0;font-size:14px;font-weight:800;letter-spacing:0.05em;box-shadow:0 6px 16px rgba(120,80,20,0.22);">확인하고 결제 진행</button>'
+    +   '<div style="text-align:center;margin-top:12px;">'
+    +     '<button id="pnCancel" style="background:none;border:none;color:#6a4f0c;font-size:12px;cursor:pointer;padding:6px 12px;">취소</button>'
+    +   '</div>'
+    + '</div>';
+  ov.style.display = 'flex';
+  document.getElementById('pnCancel').onclick = function() { ov.style.display = 'none'; };
+  ov.addEventListener('click', function(e) { if (e.target === ov) ov.style.display = 'none'; });
+  document.getElementById('pnConfirm').onclick = function() {
+    ov.style.display = 'none';
+    doPay(pack); // 기존 포트원 로직 그대로 호출
+  };
 }
 
 var PENDING_KEY = 'pico_pending_charge';
