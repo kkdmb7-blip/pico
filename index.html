@@ -3639,8 +3639,8 @@ async function submitGunghap() {
       fetch('https://fortuna.kkdmb7.workers.dev/saju-test?year='+_ghMyProfile.year+'&month='+_ghMyProfile.month+'&day='+_ghMyProfile.day+'&hour='+myH+'&minute=0&gender=male').then(function(r){return r.json()}).catch(function(){return{}}),
       fetch('https://fortuna.kkdmb7.workers.dev/saju-test?year='+pY+'&month='+pM+'&day='+pD+'&hour='+pH+'&minute=0&gender=male').then(function(r){return r.json()}).catch(function(){return{}})
     ]);
-    if (srvA.yongshin) mySaju._yongsin = EL_KOR[srvA.yongshin.primary] || srvA.yongshin.primary;
-    if (srvB.yongshin) pSaju._yongsin  = EL_KOR[srvB.yongshin.primary] || srvB.yongshin.primary;
+    if (srvA.yongshin) mySaju._yongsin = EL_KOR[srvA.yongshin.final || srvA.yongshin.primary] || (srvA.yongshin.final || srvA.yongshin.primary);
+    if (srvB.yongshin) pSaju._yongsin  = EL_KOR[srvB.yongshin.final || srvB.yongshin.primary] || (srvB.yongshin.final || srvB.yongshin.primary);
     mySaju._birthInfo = { year: _ghMyProfile.year, month: _ghMyProfile.month, day: _ghMyProfile.day, hour: myH };
     pSaju._birthInfo  = { year: pY, month: pM, day: pD, hour: pH };
   } catch(e) { console.warn('서버 용신 조회 실패:', e); }

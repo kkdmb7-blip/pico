@@ -10035,7 +10035,8 @@ function computeWealthCurve() {
     const s = String(y).toLowerCase().trim().replace(/[()]/g,'');
     return YONGSIN_MAP[s] || YONGSIN_MAP[s.slice(0,1)] || '';
   }
-  const yongsin = _sdFull?.yongshin?.primary || _yongsin || '';
+  // ★ 양신성상·종격 보정된 final 용신 우선. primary 는 1차 억부법 추정값.
+  const yongsin = _sdFull?.yongshin?.final || _sdFull?.yongshin?.primary || _yongsin || '';
   const yongsinOh = normYongsin(yongsin);
   const gisinOh = GISIN_OF[yongsinOh] || '';
 

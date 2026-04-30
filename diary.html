@@ -349,7 +349,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({ birth:birth, gender:prof.gender||'M', calendar:'solar' })
               }).then(function(r2){ return r2.json(); })
-                .then(function(sd){ _userYongshin = _toKoEl((sd.yongshin && sd.yongshin.primary) || ''); })
+                .then(function(sd){ _userYongshin = _toKoEl((sd.yongshin && (sd.yongshin.final || sd.yongshin.primary)) || ''); })
                 .catch(function(){});
             }
           } catch(e) {}

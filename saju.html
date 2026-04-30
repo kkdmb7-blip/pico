@@ -718,10 +718,12 @@ async function fetchSaju() {
     document.getElementById('sajuReportHook').style.display = 'block';
     // 용신 pico_yongsin 저장 — 본인 프로필과 일치할 때만 저장
     try {
-      if (data.yongshin && data.yongshin.primary) {
+      if (data.yongshin && (data.yongshin.final || data.yongshin.primary)) {
+        // 양신성상·종격 보정된 final 용신 우선, 없으면 primary
+        var _ysActual = data.yongshin.final || data.yongshin.primary;
         var _myP = JSON.parse(localStorage.getItem('pico_profile') || '{}');
         var _isMe = _myP.year == pYear && _myP.month == pMonth && _myP.day == pDay;
-        if (_isMe) localStorage.setItem('pico_yongsin', data.yongshin.primary);
+        if (_isMe) localStorage.setItem('pico_yongsin', _ysActual);
       }
     } catch(e2) {}
     // 용신 펫 EXP 연동 (사주 분석 완료 시 +50, 하루 1번)
@@ -1881,7 +1883,7 @@ function openSajuStoryCard(cb) {
   var elCols = ['#2d9e55','#d44030','#c49a20','#7a8898','#2b5ea8'];
 
   var EN_EL = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
-  var ysStr = d.yongshin ? (EN_EL[d.yongshin.primary] || d.yongshin.primary || '') : '';
+  var ysStr = d.yongshin ? (EN_EL[d.yongshin.final || d.yongshin.primary] || (d.yongshin.final || d.yongshin.primary) || '') : '';
 
   var rel = d.branch_relations_kor || {};
   var allTags = [
@@ -2153,7 +2155,7 @@ function doSajuShare() {
   var d = _sajuData || {};
   var dayPillar = (d.summary && d.summary.pillars && d.summary.pillars.day) || '';
   var EN_EL_MAP = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
-  var yongshin = d.yongshin ? (EN_EL_MAP[d.yongshin.primary]||d.yongshin.primary||'') : '';
+  var yongshin = d.yongshin ? (EN_EL_MAP[d.yongshin.final || d.yongshin.primary] || (d.yongshin.final || d.yongshin.primary) || '') : '';
   var pageUrl = 'https://picolab.kr';
   var text = '✨ FORTUNA 사주 분석\n일주: '+dayPillar+(yongshin?' · 용신: '+yongshin:'')+(d.summary&&d.summary.strength?' · '+d.summary.strength:'')+'\n\n나도 확인해봐 👇\n'+pageUrl;
   try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
