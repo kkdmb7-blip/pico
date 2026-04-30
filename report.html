@@ -10075,6 +10075,21 @@ function computeWealthCurve() {
   const UNSEONG_STR = {'제왕':+2,'임관':+2,'관대':+1,'장생':+1,'양':0,'목욕':0,'쇠':-1,'병':-1,'사':-1,'묘':-1,'태':-1,'절':-2};
   const dayStem = ((_ilju || '')[0]) || '';
 
+  // ── Step 4: 형충회합 매핑 (textbook 표준) ─────────────────
+  const YUKHAP = {'자':'축','축':'자','인':'해','해':'인','묘':'술','술':'묘','진':'유','유':'진','사':'신','신':'사','오':'미','미':'오'};
+  const CHUNG  = {'자':'오','오':'자','축':'미','미':'축','인':'신','신':'인','묘':'유','유':'묘','진':'술','술':'진','사':'해','해':'사'};
+  const SAMHYUNG_GROUPS = [['인','사','신'],['축','술','미']]; // 삼형
+  const JAMYO_HYUNG = ['자','묘']; // 자묘 무례지형
+  const JAHYUNG = ['진','오','유','해']; // 자형 (같은 글자)
+  const SAMHAP_GROUPS = [['신','자','진'],['인','오','술'],['사','유','축'],['해','묘','미']];
+  const SAMHOI_GROUPS = [['인','묘','진'],['사','오','미'],['신','유','술'],['해','자','축']];
+
+  // 사주 4지지 추출
+  const sajuPillars = _sdFull?.summary?.pillars || {};
+  const sajuBranches = [
+    sajuPillars.year, sajuPillars.month, sajuPillars.day, sajuPillars.hour
+  ].filter(p => p && p[1]).map(p => p[1]);
+
   // 자미두수 사화 보정용
   const lu = _ziweiData?.sihua?.lu;
   const ji = _ziweiData?.sihua?.ji;
@@ -10136,6 +10151,65 @@ function computeWealthCurve() {
     }
     score += unseongAdj;
 
+    // ── Step 4: 형충회합 — 대운 지지 vs 사주 4지지 ─────────
+    let haphAdj = 0;
+    const haphLabels = [];
+    if (branchKr && sajuBranches.length) {
+      // 충 (-1 per match, max -2)
+      let chungCount = 0;
+      for (const sb of sajuBranches) {
+        if (CHUNG[branchKr] === sb) { chungCount++; haphLabels.push('충'+sb); }
+      }
+      haphAdj += Math.max(-2, -chungCount * 1);
+
+      // 형 (-0.5 per, max -1)
+      let hyungCount = 0;
+      for (const sb of sajuBranches) {
+        // 삼형
+        for (const grp of SAMHYUNG_GROUPS) {
+          if (grp.includes(branchKr) && grp.includes(sb) && branchKr !== sb) hyungCount++;
+        }
+        // 자묘 무례지형
+        if (JAMYO_HYUNG.includes(branchKr) && JAMYO_HYUNG.includes(sb) && branchKr !== sb) hyungCount++;
+        // 자형 (같은 글자)
+        if (JAHYUNG.includes(branchKr) && branchKr === sb) hyungCount++;
+      }
+      if (hyungCount > 0) {
+        haphAdj += Math.max(-1, -hyungCount * 0.5);
+        haphLabels.push('형');
+      }
+
+      // 육합 (+0.5 per, max +1)
+      let yukhapCount = 0;
+      for (const sb of sajuBranches) {
+        if (YUKHAP[branchKr] === sb) { yukhapCount++; haphLabels.push('육합'+sb); }
+      }
+      haphAdj += Math.min(1, yukhapCount * 0.5);
+
+      // 삼합 완성 (+1.5) / 부분 (+0.3)
+      for (const grp of SAMHAP_GROUPS) {
+        if (grp.includes(branchKr)) {
+          const others = grp.filter(g => g !== branchKr);
+          const matched = others.filter(o => sajuBranches.includes(o));
+          if (matched.length === 2) { haphAdj += 1.5; haphLabels.push('삼합완성'); break; }
+          else if (matched.length === 1) { haphAdj += 0.3; haphLabels.push('삼합부분'); break; }
+        }
+      }
+
+      // 삼회/방합 완성 (+1)
+      for (const grp of SAMHOI_GROUPS) {
+        if (grp.includes(branchKr)) {
+          const others = grp.filter(g => g !== branchKr);
+          if (others.every(o => sajuBranches.includes(o))) {
+            haphAdj += 1; haphLabels.push('삼회완성'); break;
+          }
+        }
+      }
+    }
+    // cap haphAdj at ±2.5
+    haphAdj = Math.max(-2.5, Math.min(2.5, haphAdj));
+    score += haphAdj;
+
     score = Math.round(Math.max(1, Math.min(10, score)));
 
     // 연도/나이 파싱: year_range 가 solar year 또는 age 둘 다 가능 — 안전 처리
@@ -10167,6 +10241,8 @@ function computeWealthCurve() {
       sgsyAdj,
       unseong,
       unseongAdj,
+      haphAdj,
+      haphLabels,
     };
   });
 
