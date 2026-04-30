@@ -109,14 +109,58 @@ https://picolab.kr/privacy.html
 
 - [x] 짧은 설명 (28자)
 - [x] 긴 설명 (사용자 제공)
-- [x] 개인정보 처리방침 (privacy.html)
+- [x] 개인정보 처리방침 (privacy.html — 9조 운영자 정보 추가)
+- [x] 이용약관 (terms.html — 환불·미성년자 조항 보강)
 - [x] 결제 정책 대응 UI (charge.html 모달)
-- [ ] 앱 아이콘 512×512
+- [x] 앱 아이콘 512×512 (img/icon-512.png)
+- [x] AAB 빌드 (Bubblewrap, F:/twa/picolab-twa)
 - [ ] 스크린샷 폰 (최소 2장, 권장 5~8장)
-- [ ] AAB 빌드 (Bubblewrap)
-- [ ] targetSdkVersion 34 점검
-- [ ] Play App Signing 키 등록
+- [ ] Play App Signing 키 등록 + assetlinks.json fingerprint 교체
+- [ ] 사업자 등록 + 통신판매업 신고 → 정보 placeholder 채우기 (terms.html, privacy.html, charge.html)
 - [ ] 내부 테스트 트랙 → 비공개 → 공개
+
+---
+
+## 인프라 비용·약관 체크리스트 (출시 전 필수)
+
+### 🔴 Vercel Pro 업그레이드 (출시 전 필수)
+
+**현재 상태**: fortuna-silk 가 Hobby 무료 플랜 사용 중 (비상업 한정 약관)
+**위반 위험**: 매출 1원 발생 즉시 ToS 위반 → 함수 호출 차단 위험
+**해결**:
+1. https://vercel.com/account/plans 접속
+2. fortuna-silk 프로젝트 owner 계정으로 Pro 업그레이드 ($20/월)
+3. 결제 카드 등록 + 청구 주소 입력
+4. 업그레이드 후 vercel.json 에 `"plan": "pro"` 명시 안 해도 됨 (자동 적용)
+
+### 🟡 Supabase Pro (트래픽 늘면 필수)
+- 현재: Free (DB 500MB / 50K MAU / 5GB 대역폭)
+- 임계치: DAU 1,500 또는 누적 회원 50K 도달 전
+- Pro: $25/월 (DB 8GB / 100K MAU / 100GB 대역폭)
+- 모니터링: https://supabase.com/dashboard/project/ymghmfkqctckxxysxkvy → Settings → Usage
+
+### 🟡 Cloudflare Workers Paid
+- 현재: Free (100K req/일)
+- 임계치: DAU 10K 도달 시 503 발생
+- Paid: $5/월 (10M req/월, CPU 30s/req)
+- 워커 fortuna 가 ziwei·saju·vedic·qimen·astro 다 처리 → 사용자 1명당 5~10 req
+
+### 🟢 모니터링·알림 SOP
+
+- Vercel: Project Settings → Usage Alerts (이메일 알림 ON)
+- Supabase: Project → Settings → Billing → Usage notifications
+- Cloudflare: Workers Analytics → 일일 사용량 80% 도달 시 알림 (텔레그램 봇 연동 가능)
+- 텔레그램 운영자 알림: 메모리 [project_telegram_alert.md] 참고 — @kkdmbbot
+
+### 🟢 사업자 등록 후 채워 넣을 placeholder 위치
+
+| 파일 | 위치 |
+|---|---|
+| terms.html | 부칙 운영자 정보 (대표자/사업자번호/통신판매업/주소) |
+| privacy.html | 9조 운영자 정보 |
+| charge.html | footer biz-row 4개 (대표자/사업자번호/통신판매업/주소) |
+
+모든 placeholder 는 빨간색 `[입력 필요]` 로 표시되어 있어 grep 으로 일괄 찾기 쉬움.
 
 ## 참고
 
