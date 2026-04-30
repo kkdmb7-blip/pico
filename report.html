@@ -10057,6 +10057,24 @@ function computeWealthCurve() {
   const sgsyRaw = _sdFull?.strength_level_5 || _singang || '';
   const sgsyIdx = SGSY_INDEX[sgsyRaw] ?? 2;
 
+  // ── Step 3: 12운성 — 일간이 대운 지지에서 어느 단계인지 ────────
+  // 표준 12운성표 (일간 × 12지지)
+  const UNSEONG_TABLE = {
+    '갑':{'자':'목욕','축':'관대','인':'임관','묘':'제왕','진':'쇠','사':'병','오':'사','미':'묘','신':'절','유':'태','술':'양','해':'장생'},
+    '을':{'자':'병','축':'쇠','인':'제왕','묘':'임관','진':'관대','사':'목욕','오':'장생','미':'양','신':'태','유':'절','술':'묘','해':'사'},
+    '병':{'자':'태','축':'양','인':'장생','묘':'목욕','진':'관대','사':'임관','오':'제왕','미':'쇠','신':'병','유':'사','술':'묘','해':'절'},
+    '정':{'자':'절','축':'묘','인':'사','묘':'병','진':'쇠','사':'제왕','오':'임관','미':'관대','신':'목욕','유':'장생','술':'양','해':'태'},
+    '무':{'자':'태','축':'양','인':'장생','묘':'목욕','진':'관대','사':'임관','오':'제왕','미':'쇠','신':'병','유':'사','술':'묘','해':'절'},
+    '기':{'자':'절','축':'묘','인':'사','묘':'병','진':'쇠','사':'제왕','오':'임관','미':'관대','신':'목욕','유':'장생','술':'양','해':'태'},
+    '경':{'자':'사','축':'묘','인':'절','묘':'태','진':'양','사':'장생','오':'목욕','미':'관대','신':'임관','유':'제왕','술':'쇠','해':'병'},
+    '신':{'자':'장생','축':'양','인':'태','묘':'절','진':'묘','사':'사','오':'병','미':'쇠','신':'제왕','유':'임관','술':'관대','해':'목욕'},
+    '임':{'자':'제왕','축':'쇠','인':'병','묘':'사','진':'묘','사':'절','오':'태','미':'양','신':'장생','유':'목욕','술':'관대','해':'임관'},
+    '계':{'자':'임관','축':'관대','인':'목욕','묘':'장생','진':'양','사':'태','오':'절','미':'묘','신':'사','유':'병','술':'쇠','해':'제왕'},
+  };
+  // 12운성 강도: 제왕/임관 = 가장 강, 절 = 가장 약
+  const UNSEONG_STR = {'제왕':+2,'임관':+2,'관대':+1,'장생':+1,'양':0,'목욕':0,'쇠':-1,'병':-1,'사':-1,'묘':-1,'태':-1,'절':-2};
+  const dayStem = ((_ilju || '')[0]) || '';
+
   // 자미두수 사화 보정용
   const lu = _ziweiData?.sihua?.lu;
   const ji = _ziweiData?.sihua?.ji;
@@ -10092,6 +10110,7 @@ function computeWealthCurve() {
     // ── Step 1: 용신·기신 천간 보정 (가장 큰 신호) ────────────
     const pillarKor = du.pillar_kor || du.ganjee || '';
     const stemKr = pillarKor[0] || '';
+    const branchKr = pillarKor[1] || '';
     const stemOh = STEM_OHAENG[stemKr] || '';
     let yongsinTag = '';
     if (yongsinOh && stemOh === yongsinOh) {
@@ -10099,6 +10118,23 @@ function computeWealthCurve() {
     } else if (gisinOh && stemOh === gisinOh) {
       score -= 3; yongsinTag = '기신';
     }
+
+    // ── Step 3: 12운성 보정 — 일간이 대운 지지에서 어느 단계 ──
+    // textbook: 신약자에게 일간 강해짐(제왕·임관) = 길, 신강자에게는 흉
+    const unseong = (UNSEONG_TABLE[dayStem] && UNSEONG_TABLE[dayStem][branchKr]) || '';
+    const unseongStr = UNSEONG_STR[unseong] ?? 0;
+    let unseongAdj = 0;
+    if (sgsyIdx <= 1) {
+      // 극왕·신강: 일간 더 강해지면 흉 (반대 부호로 ±0.5 보정)
+      unseongAdj = -unseongStr * 0.5;
+    } else if (sgsyIdx >= 3) {
+      // 신약·극약: 일간 강해지면 길
+      unseongAdj = unseongStr * 0.5;
+    } else {
+      // 중화: 약간 강한 게 좋다 (안정 추구)
+      unseongAdj = unseongStr * 0.3;
+    }
+    score += unseongAdj;
 
     score = Math.round(Math.max(1, Math.min(10, score)));
 
@@ -10129,11 +10165,13 @@ function computeWealthCurve() {
       stemOhaeng: stemOh,
       yongsinTag,
       sgsyAdj,
+      unseong,
+      unseongAdj,
     };
   });
 
   // 디버그
-  try { console.log('[wealthCurve] birth=', _profile?.year, '신강신약=', sgsyRaw, '용신=', yongsinOh, '기신=', gisinOh, 'computed=', points); } catch(e) {}
+  try { console.log('[wealthCurve] birth=', _profile?.year, '일간=', dayStem, '신강신약=', sgsyRaw, '용신=', yongsinOh, '기신=', gisinOh, 'computed=', points); } catch(e) {}
 
   // 정점/저점/현재
   const peakIdx   = points.reduce((a,b,i,arr) => arr[a].score < b.score ? i : a, 0);
