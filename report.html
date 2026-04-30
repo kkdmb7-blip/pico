@@ -4626,7 +4626,7 @@ function proceedAfterProfile() {
   const _bgWithZiwei = ['daeun','year','ziwei_full','triple','career_deep','wealth_lifetime'].includes(_type);
   const _bgWithAstro  = ['love','astro_full','triple','career_deep'].includes(_type);
   loadAllData(_bgWithZiwei, _bgWithAstro)
-    .then(() => { renderCharVisual(); })
+    .then(() => { renderCharVisual(); try { renderIntro(); } catch(e){} })
     .catch(() => {});
 
   renderIntro();
@@ -6817,7 +6817,38 @@ function renderIntro() {
   // 시각 미리보기 anchor: 인트로 최상단 (header 바로 아래, 섹션 목록보다 위)
   const _introTopAnchor = document.getElementById('introDesc') || document.getElementById('introTitle');
 
-  // wealth_lifetime: 인트로 상단에 샘플 곡선
+  // 모든 리포트 공통 generic teaser (wealth_lifetime / monthly_calendar 는 자체 시각요소 사용)
+  if (!['wealth_lifetime','monthly_calendar'].includes(_type) && _sdFull && _profile) {
+    let gtWrap = document.getElementById('introGenericTeaser');
+    if (!gtWrap) {
+      gtWrap = document.createElement('div');
+      gtWrap.id = 'introGenericTeaser';
+      gtWrap.style.cssText = 'margin: 16px 0 12px;';
+    }
+    if (_introTopAnchor) _introTopAnchor.parentNode.insertBefore(gtWrap, _introTopAnchor.nextSibling);
+    const ilju = _ilju || _sdFull?.summary?.pillars?.day || '미확인';
+    const geokguk = _geokguk || _sdFull?.geokguk?.geok_kor || '미확인';
+    const sgsy = _singang || _sdFull?.strength_level_5 || '미확인';
+    const yongsinKor = _sdFull?.yongshin?.final_kor || _sdFull?.yongshin?.primary_kor || _yongsin || '미확인';
+    const cellCss = 'background:rgba(255,255,255,0.5);padding:8px 10px;border-radius:8px;';
+    gtWrap.innerHTML = `<div style="padding:14px;border:1px solid rgba(154,122,38,0.30);border-radius:14px;background:linear-gradient(135deg,rgba(154,122,38,0.06),rgba(123,94,167,0.04));">
+      <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;color:#7a5a08;margin-bottom:10px;">YOUR SAJU PREVIEW · 본인 정보 미리 공개</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+        <div style="${cellCss}"><div style="font-size:10px;color:rgba(60,40,8,0.55);">일주</div><div style="font-size:14px;font-weight:800;color:#3a2a08;">${ilju}</div></div>
+        <div style="${cellCss}"><div style="font-size:10px;color:rgba(60,40,8,0.55);">격국</div><div style="font-size:14px;font-weight:800;color:#3a2a08;">${geokguk}</div></div>
+        <div style="${cellCss}"><div style="font-size:10px;color:rgba(60,40,8,0.55);">신강신약</div><div style="font-size:14px;font-weight:800;color:#3a2a08;">${sgsy}</div></div>
+        <div style="${cellCss}"><div style="font-size:10px;color:rgba(60,40,8,0.55);">용신</div><div style="font-size:14px;font-weight:800;color:#3a2a08;">${yongsinKor}</div></div>
+      </div>
+      <div style="position:relative;background:rgba(0,0,0,0.04);padding:14px;border-radius:8px;overflow:hidden;">
+        <div style="filter:blur(4px);user-select:none;pointer-events:none;font-size:12px;line-height:1.7;color:#5a4830;">${_config.title} 풀 분석 — 정점 시기·통로·위험 신호·실전 전략·길흉 키워드·시기별 액션 다섯 섹션 본문이 여기 펼쳐집니다. 본인 일주·격국·용신·대운·세운 데이터로 textbook 정확도 99%로 작성됩니다.</div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+          <div style="background:rgba(255,255,255,0.92);border:1px solid rgba(154,122,38,0.32);border-radius:10px;padding:8px 14px;font-size:11px;font-weight:800;color:#7a5a08;">🔒 ${(_config.orb||0).toLocaleString()} Orb 결제 후 풀 공개</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // wealth_lifetime: 인트로 상단 — 데이터 로드되면 본인 곡선(teaser 모드), 아니면 SAMPLE
   if (_type === 'wealth_lifetime') {
     let sampleWrap = document.getElementById('introSampleChart');
     if (!sampleWrap) {
@@ -6825,17 +6856,46 @@ function renderIntro() {
       sampleWrap.id = 'introSampleChart';
       sampleWrap.style.cssText = 'margin: 16px 0 12px;';
     }
-    if (_introTopAnchor && sampleWrap.parentNode !== _introTopAnchor.parentNode) {
-      _introTopAnchor.parentNode.insertBefore(sampleWrap, _introTopAnchor.nextSibling);
-    } else if (sampleWrap.parentNode !== _introTopAnchor?.parentNode) {
+    if (_introTopAnchor) {
       _introTopAnchor.parentNode.insertBefore(sampleWrap, _introTopAnchor.nextSibling);
     }
-    const sampleBadge = '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#7a5a08;margin-bottom:-4px;">SAMPLE PREVIEW</div>';
-    const sampleNote = '<div style="text-align:center;font-size:11px;color:#7a5a30;margin-top:4px;line-height:1.6;">↑ 샘플 곡선 — 실제는 본인 사주·자미두수 데이터로 그려집니다</div>';
-    sampleWrap.innerHTML = sampleBadge + renderWealthCurveSvg(WEALTH_SAMPLE_CURVE) + sampleNote;
+    const realCurve = (_sdFull && computeWealthCurve()) || null;
+    const usingReal = !!realCurve;
+    const dataToShow = usingReal ? realCurve : WEALTH_SAMPLE_CURVE;
+    const badge = usingReal
+      ? '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#7a5a08;margin-bottom:-4px;">YOUR REAL CHART · PARTIAL PREVIEW</div>'
+      : '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#7a5a08;margin-bottom:-4px;">SAMPLE PREVIEW</div>';
+    let teaserCards = '';
+    if (usingReal) {
+      const peak = realCurve.points[realCurve.peakIdx];
+      const valley = realCurve.points[realCurve.valleyIdx];
+      const cur = realCurve.points[realCurve.currentIdx];
+      const cardCss = 'flex:1;min-width:120px;padding:10px 12px;border-radius:10px;text-align:left;';
+      teaserCards = `<div style="display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 10px;">
+        <div style="${cardCss}background:rgba(184,134,11,0.12);border:1px solid rgba(184,134,11,0.34);">
+          <div style="font-size:10px;font-weight:800;color:#7a5a08;letter-spacing:0.12em;">★ 정점 대운</div>
+          <div style="font-size:14px;font-weight:800;color:#7a5a08;margin-top:3px;">${peak.pillar} · ${peak.yStart}년~${peak.yEnd}년</div>
+          <div style="font-size:11px;color:#9a7a30;margin-top:2px;">점수 ${peak.score}/10 · ${peak.tenGod}</div>
+        </div>
+        <div style="${cardCss}background:rgba(169,74,58,0.08);border:1px solid rgba(169,74,58,0.30);">
+          <div style="font-size:10px;font-weight:800;color:#8a3a2a;letter-spacing:0.12em;">⚠ 저점 대운</div>
+          <div style="font-size:14px;font-weight:800;color:#8a3a2a;margin-top:3px;">${valley.pillar} · ${valley.yStart}년~${valley.yEnd}년</div>
+          <div style="font-size:11px;color:#a94a3a;margin-top:2px;">점수 ${valley.score}/10 · ${valley.tenGod}</div>
+        </div>
+        ${cur ? `<div style="${cardCss}background:rgba(58,138,138,0.08);border:1px solid rgba(58,138,138,0.30);">
+          <div style="font-size:10px;font-weight:800;color:#1a4a4a;letter-spacing:0.12em;">📍 지금 대운</div>
+          <div style="font-size:14px;font-weight:800;color:#1a4a4a;margin-top:3px;">${cur.pillar} · ${cur.yStart}년~${cur.yEnd}년</div>
+          <div style="font-size:11px;color:#3a6a6a;margin-top:2px;">점수 ${cur.score}/10 · ${cur.tenGod}</div>
+        </div>` : ''}
+      </div>
+      <div style="text-align:center;font-size:11px;color:#7a5a30;margin-top:4px;line-height:1.7;">🔒 곡선 모양·정점·저점·지금만 미리 공개. 자세한 점수·해석·전략은 990 Orb 결제 후 5섹션 풀 분석.</div>`;
+    } else {
+      teaserCards = '<div style="text-align:center;font-size:11px;color:#7a5a30;margin-top:4px;line-height:1.6;">↑ 샘플 곡선 — 실제는 본인 사주·자미두수 데이터로 그려집니다</div>';
+    }
+    sampleWrap.innerHTML = badge + renderWealthCurveSvg(dataToShow, { teaser: usingReal }) + teaserCards;
   }
 
-  // monthly_calendar: 인트로 상단에 샘플 12개월 차트 + 정점/저점/휴식월 카드 + 호기심 후크
+  // monthly_calendar: 인트로 상단 — 데이터 로드되면 본인 캘린더(teaser), 아니면 SAMPLE
   if (_type === 'monthly_calendar') {
     let mcWrap = document.getElementById('introMonthlyMock');
     if (!mcWrap) {
@@ -6846,7 +6906,9 @@ function renderIntro() {
     if (_introTopAnchor) {
       _introTopAnchor.parentNode.insertBefore(mcWrap, _introTopAnchor.nextSibling);
     }
-    const sample = MONTHLY_SAMPLE_CALENDAR;
+    const realCal = (_rptFull && computeMonthlyCalendar()) || null;
+    const usingReal = !!realCal;
+    const sample = usingReal ? realCal : MONTHLY_SAMPLE_CALENDAR;
     const peak = sample.points[sample.peakIdx];
     const valley = sample.points[sample.valleyIdx];
     const rest = sample.points.find(p => p.restMonth);
@@ -6871,10 +6933,19 @@ function renderIntro() {
 
     const hookCard = (q, a) => `<div style="background:rgba(58,138,138,0.05);border-left:3px solid rgba(58,138,138,0.55);padding:9px 12px 9px 14px;margin-bottom:6px;border-radius:0 8px 8px 0;"><div style="font-size:12px;font-weight:700;color:#1a4a4a;line-height:1.5;">${q}</div><div style="font-size:11px;color:#5a7a7a;margin-top:3px;line-height:1.5;">${a}</div></div>`;
 
-    const sampleBadge = '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;margin-bottom:-4px;">SAMPLE PREVIEW</div>';
-    const sampleNote = '<div style="text-align:center;font-size:11px;color:#3a6a6a;margin-top:4px;line-height:1.6;">↑ 샘플 차트 — 실제는 본인 사주 세운월별 정밀 데이터로 그려집니다</div>';
+    const sampleBadge = usingReal
+      ? '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;margin-bottom:-4px;">YOUR REAL CALENDAR · PARTIAL PREVIEW</div>'
+      : '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;margin-bottom:-4px;">SAMPLE PREVIEW</div>';
+    const sampleNote = usingReal
+      ? '<div style="text-align:center;font-size:11px;color:#3a6a6a;margin-top:4px;line-height:1.6;">🔒 정점·저점·현재·휴식월만 공개. 12개월 전체 분석은 590 Orb 결제 후.</div>'
+      : '<div style="text-align:center;font-size:11px;color:#3a6a6a;margin-top:4px;line-height:1.6;">↑ 샘플 차트 — 실제는 본인 사주 세운월별 정밀 데이터로 그려집니다</div>';
     const nowMonth = new Date().getMonth() + 1;
-    const hooks = [
+    const hooks = usingReal ? [
+      hookCard('정점월 ' + peak.monthLabel + ' 에 무엇이 활성화?', '정점월의 천간·십신·특이사항·실전 액션 풀 분석'),
+      hookCard('저점월 ' + valley.monthLabel + ' 어떻게 대비?', '주의 신호·해소법·대안 전략 명시'),
+      hookCard('이번 달 (' + nowMonth + '월) 점수는?', '12개월 모두 1~100 점수로 매달 등급 확인'),
+      hookCard('각 분기별 무엇을 해야 하나?', '4분기 정밀 분석 + 길일 추천 + 실전 액션 3가지')
+    ].join('') : [
       hookCard('내 4월에 천을귀인이 진짜 활성화될까?', '워커 정밀 데이터로 내 사주의 활성 신살 정확히 추출'),
       hookCard('9월 삼재가 나에게도 영향?', '특이사항(삼재·도화·역마 등)이 어느 달에 들어오는지 명시'),
       hookCard('이번 달 (' + nowMonth + '월) 내 점수는?', '워커가 산출한 1~100 점수로 매달 등급 표시'),
@@ -6883,7 +6954,7 @@ function renderIntro() {
 
     mcWrap.innerHTML = `
       ${sampleBadge}
-      ${renderMonthlyBarChart(sample)}
+      ${renderMonthlyBarChart(sample, { teaser: usingReal })}
       ${sampleNote}
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 10px;">
         ${peakCard}${valleyCard}${restCard}
@@ -10466,9 +10537,12 @@ const WEALTH_SAMPLE_CURVE = {
 };
 
 // ── 재물 곡선 SVG 렌더링 ────────────────────────────────────────
-function renderWealthCurveSvg(curve) {
+function renderWealthCurveSvg(curve, opt) {
+  opt = opt || {};
+  const teaserMode = opt.teaser === true;
   if (!curve || !curve.points || !curve.points.length) return '';
   const { points, peakIdx, valleyIdx, currentIdx } = curve;
+  const isHi = (i) => i === peakIdx || (i === valleyIdx && peakIdx !== valleyIdx) || i === currentIdx;
   const W = 360, H = 240, padX = 32, padY = 40;
   const xStep = (W - padX*2) / Math.max(1, points.length - 1);
   const scaleY = score => H - padY - ((score - 1) / 9) * (H - padY*2);
@@ -10496,8 +10570,9 @@ function renderWealthCurveSvg(curve) {
     const p = points[i];
     const ytColor = p.yongsinTag === '용신' ? '#3a8a3a' : p.yongsinTag === '기신' ? '#a94a3a' : 'rgba(60,40,8,0.7)';
     const ytWeight = p.yongsinTag ? '800' : '600';
-    return `<text x="${c.x}" y="${H - padY + 14}" text-anchor="middle" font-size="9" font-weight="${ytWeight}" fill="${ytColor}">${p.pillar}</text>
-            <text x="${c.x}" y="${H - padY + 26}" text-anchor="middle" font-size="8" fill="rgba(60,40,8,0.5)">${p.ageRange}</text>`;
+    const blur = teaserMode && !isHi(i) ? 'filter="url(#wcBlur)"' : '';
+    return `<g ${blur}><text x="${c.x}" y="${H - padY + 14}" text-anchor="middle" font-size="9" font-weight="${ytWeight}" fill="${ytColor}">${p.pillar}</text>
+            <text x="${c.x}" y="${H - padY + 26}" text-anchor="middle" font-size="8" fill="rgba(60,40,8,0.5)">${p.ageRange}</text></g>`;
   }).join('');
 
   // 점들 — 용신/기신 시각 강조
@@ -10510,7 +10585,8 @@ function renderWealthCurveSvg(curve) {
     const isGisin   = p.yongsinTag === '기신';
     const r = (isPeak || isValley || isCurrent || isYongsin || isGisin) ? 5 : 3.5;
     const fill = isGisin ? '#a94a3a' : isYongsin ? '#3a8a3a' : isValley ? '#a94a3a' : '#b8860b';
-    return `<circle cx="${c.x}" cy="${c.y}" r="${r}" fill="${fill}" stroke="#fff" stroke-width="${r>=5?1.5:0}"/>`;
+    const blur = teaserMode && !isHi(i) ? 'filter="url(#wcBlur)"' : '';
+    return `<circle ${blur} cx="${c.x}" cy="${c.y}" r="${r}" fill="${fill}" stroke="#fff" stroke-width="${r>=5?1.5:0}"/>`;
   }).join('');
 
   // 정점/저점/현재 배지
@@ -10540,6 +10616,7 @@ function renderWealthCurveSvg(curve) {
           <stop offset="0%" stop-color="#b8860b" stop-opacity="0.35"/>
           <stop offset="100%" stop-color="#b8860b" stop-opacity="0.02"/>
         </linearGradient>
+        ${teaserMode ? '<filter id="wcBlur"><feGaussianBlur stdDeviation="2.5"/></filter>' : ''}
       </defs>
       <line x1="${padX}" y1="${midY}" x2="${W-padX}" y2="${midY}" stroke="rgba(60,40,8,0.18)" stroke-dasharray="2,3"/>
       <text x="${padX-4}" y="${midY+3}" text-anchor="end" font-size="8" fill="rgba(60,40,8,0.5)">평균</text>
@@ -10601,13 +10678,16 @@ function computeMonthlyCalendar() {
   return { points, peakIdx, valleyIdx, currentIdx };
 }
 
-function renderMonthlyBarChart(cal) {
+function renderMonthlyBarChart(cal, opt) {
+  opt = opt || {};
+  const teaserMode = opt.teaser === true;
   if (!cal || !cal.points || !cal.points.length) return '';
   const { points, peakIdx, valleyIdx, currentIdx } = cal;
   const W = 360, H = 220, padX = 26, padY = 36;
   const barW = (W - padX*2) / points.length - 2;
   const baseY = H - padY;
   const scaleH = (s) => Math.max(4, ((s - 1) / 9) * (H - padY*2));
+  const isHi = (i) => i === peakIdx || (i === valleyIdx && peakIdx !== valleyIdx) || i === currentIdx || points[i].restMonth;
 
   const bars = points.map((p, i) => {
     const x = padX + i * ((W - padX*2) / points.length) + 1;
@@ -10619,7 +10699,8 @@ function renderMonthlyBarChart(cal) {
     const isRest = p.restMonth;
     const fill = isValley ? '#a94a3a' : isRest ? 'rgba(120,120,140,0.5)' : isPeak ? '#3a8a8a' : '#5cb0b0';
     const stroke = isCurrent ? '#1a4a4a' : 'transparent';
-    return `<g>
+    const blur = teaserMode && !isHi(i) ? 'filter="url(#mcBlur)"' : '';
+    return `<g ${blur}>
       <rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${fill}" stroke="${stroke}" stroke-width="${isCurrent?2:0}" rx="2"/>
       <text x="${x + barW/2}" y="${y - 3}" text-anchor="middle" font-size="9" font-weight="${isPeak||isValley||isCurrent?'800':'600'}" fill="#3a2a08">${p.score10}</text>
       <text x="${x + barW/2}" y="${baseY + 12}" text-anchor="middle" font-size="9" font-weight="${isCurrent?'800':'500'}" fill="${isCurrent?'#1a4a4a':'rgba(60,40,8,0.7)'}">${i+1}월</text>
@@ -10628,16 +10709,19 @@ function renderMonthlyBarChart(cal) {
     </g>`;
   }).join('');
 
+  const defs = teaserMode ? '<defs><filter id="mcBlur"><feGaussianBlur stdDeviation="2.5"/></filter></defs>' : '';
+  const note = teaserMode
+    ? '🔒 정점·저점·현재 외 8개월은 결제 후 전체 공개 — 실제 본인 사주 데이터'
+    : '★ 정점월 · ⚠ 저점월 · 회색 휴식월 · 점수 1~10 (워커 세운월별 점수 / 10)';
   return `<div style="background:rgba(58,138,138,0.04);border:1px solid rgba(58,138,138,0.18);border-radius:14px;padding:14px 6px 10px;margin:14px 0 6px;">
-    <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;text-align:center;margin-bottom:4px;">12-MONTH FORTUNE CALENDAR</div>
+    <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;text-align:center;margin-bottom:4px;">${teaserMode?'YOUR REAL CHART · PARTIAL PREVIEW':'12-MONTH FORTUNE CALENDAR'}</div>
     <svg viewBox="0 0 ${W} ${H+10}" style="width:100%;max-width:380px;height:auto;display:block;margin:0 auto;">
+      ${defs}
       <line x1="${padX}" y1="${baseY}" x2="${W-padX}" y2="${baseY}" stroke="rgba(60,40,8,0.25)"/>
       <line x1="${padX}" y1="${baseY-scaleH(5)}" x2="${W-padX}" y2="${baseY-scaleH(5)}" stroke="rgba(60,40,8,0.12)" stroke-dasharray="2,3"/>
       ${bars}
     </svg>
-    <div style="font-size:10px;color:rgba(60,40,8,0.6);text-align:center;line-height:1.5;margin-top:4px;">
-      ★ 정점월 · ⚠ 저점월 · 회색 휴식월 · 점수 1~10 (워커 세운월별 점수 / 10)
-    </div>
+    <div style="font-size:10px;color:rgba(60,40,8,0.6);text-align:center;line-height:1.5;margin-top:4px;">${note}</div>
   </div>`;
 }
 
