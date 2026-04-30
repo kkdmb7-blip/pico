@@ -10136,25 +10136,62 @@ function computeWealthCurve() {
   const myungSamBangStars = (myungSb?.combinedMajorStars) || [];
   const ziweiBaseModifier = ziweiWealthStars.filter(s => myungSamBangStars.includes(s)).length * 0.3;
 
+  // ── Step 6: 자미두수 대한별 시기 차별화 ─────────────────
+  // currentDecade ageRange 와 사주 대운 ageStart~ageEnd 비교로 보정 강도 결정
+  const cdAgeRange = (_ziweiData?.currentDecade?.ageRange || '').replace(/세/g,'');
+  const cdMatch = cdAgeRange.match(/(\d+)[-~–](\d+)/);
+  const cdStart = cdMatch ? parseInt(cdMatch[1]) : null;
+  const cdEnd   = cdMatch ? parseInt(cdMatch[2]) : null;
+
   const points = big.slice(0, 8).map((du, idx) => {
     const tg = du.stem_ten_god || '';
     let score = TG_SCORE[tg] ?? 5;
+
+    // 나이 파싱을 먼저 (Step 6 시기 차별화에 사용)
+    const range = (du.year_range || '').split(/[–\-~]/);
+    const r0 = parseInt(range[0]) || 0;
+    const r1 = parseInt(range[1]) || 0;
+    const birthY = _profile?.year || 0;
+    let yStart, yEnd, ageStart, ageEnd;
+    if (r0 >= 1900) {
+      yStart = r0; yEnd = r1;
+      ageStart = birthY ? r0 - birthY : null;
+      ageEnd   = birthY ? r1 - birthY : null;
+    } else if (r0 > 0 && birthY) {
+      ageStart = r0; ageEnd = r1;
+      yStart = birthY + r0; yEnd = birthY + r1;
+    } else {
+      yStart = r0; yEnd = r1; ageStart = null; ageEnd = null;
+    }
 
     // Step 2: 신강·신약 컨텍스트로 십신 base 점수 재해석
     const sgsyAdj = (SGSY_ADJ[tg] && SGSY_ADJ[tg][sgsyIdx]) || 0;
     score += sgsyAdj;
 
-    // 자미두수 재성 명궁 회조 시 base 보정
+    // 자미두수 재성 명궁 회조 시 base 보정 (그릇 크기 — 모든 대운 동일)
     score += ziweiBaseModifier;
 
-    // 사화 보정 (대운 단위로는 자미두수 사화 위치 영향)
-    if (lu?.star && myungSamBangStars.includes(lu.star) && ziweiWealthStars.includes(lu.star)) score += 0.5;
-    if (ji?.star && myungSamBangStars.includes(ji.star) && ziweiWealthStars.includes(ji.star)) score -= 0.5;
-
-    // 비겁 대운에 화기 가중
-    if ((tg === '비견' || tg === '겁재') && ji?.palace === '재백') score -= 0.5;
-    // 재성 대운에 화록 가중
-    if ((tg === '정재' || tg === '편재') && lu?.palace === '재백') score += 0.5;
+    // ── Step 6: 자미두수 사화 — 시기별 차별화 ──────────────
+    // currentDecade 와 사주 대운 ageStart~ageEnd 겹침 정도로 multiplier 결정
+    let ziweiTimeMul = 0.3;
+    if (cdStart != null && ageStart != null && ageEnd != null) {
+      const overlap = Math.max(0, Math.min(ageEnd, cdEnd) - Math.max(ageStart, cdStart) + 1);
+      if (overlap >= 5)      ziweiTimeMul = 1.0;
+      else if (overlap >= 1) ziweiTimeMul = 0.7;
+      else {
+        const dist = Math.min(Math.abs(ageStart - cdEnd), Math.abs(ageEnd - cdStart));
+        if (dist <= 10)      ziweiTimeMul = 0.5;
+        else if (dist <= 20) ziweiTimeMul = 0.3;
+        else                 ziweiTimeMul = 0.2;
+      }
+    }
+    let sihuaAdj = 0;
+    if (lu?.star && myungSamBangStars.includes(lu.star) && ziweiWealthStars.includes(lu.star)) sihuaAdj += 0.5;
+    if (ji?.star && myungSamBangStars.includes(ji.star) && ziweiWealthStars.includes(ji.star)) sihuaAdj -= 0.5;
+    if ((tg === '비견' || tg === '겁재') && ji?.palace === '재백') sihuaAdj -= 0.5;
+    if ((tg === '정재' || tg === '편재') && lu?.palace === '재백') sihuaAdj += 0.5;
+    const sihuaTimedAdj = sihuaAdj * ziweiTimeMul;
+    score += sihuaTimedAdj;
 
     // ── Step 1: 용신·기신 천간 보정 (가장 큰 신호) ────────────
     const pillarKor = du.pillar_kor || du.ganjee || '';
@@ -10247,24 +10284,6 @@ function computeWealthCurve() {
 
     score = Math.round(Math.max(1, Math.min(10, score)));
 
-    // 연도/나이 파싱: year_range 가 solar year 또는 age 둘 다 가능 — 안전 처리
-    const range = (du.year_range || '').split(/[–\-~]/);
-    const r0 = parseInt(range[0]) || 0;
-    const r1 = parseInt(range[1]) || 0;
-    const birthY = _profile?.year || 0;
-    let yStart, yEnd, ageStart, ageEnd;
-    if (r0 >= 1900) {
-      yStart = r0; yEnd = r1;
-      ageStart = birthY ? r0 - birthY : null;
-      ageEnd   = birthY ? r1 - birthY : null;
-    } else if (r0 > 0 && birthY) {
-      // age 형식
-      ageStart = r0; ageEnd = r1;
-      yStart = birthY + r0; yEnd = birthY + r1;
-    } else {
-      yStart = r0; yEnd = r1; ageStart = null; ageEnd = null;
-    }
-
     return {
       idx, score, tenGod: tg,
       pillar: du.pillar_kor || du.ganjee || '',
@@ -10280,6 +10299,8 @@ function computeWealthCurve() {
       haphLabels,
       geureoJum,
       geureoTag,
+      ziweiTimeMul,
+      sihuaTimedAdj,
     };
   });
 
