@@ -10039,6 +10039,24 @@ function computeWealthCurve() {
   const yongsinOh = normYongsin(yongsin);
   const gisinOh = GISIN_OF[yongsinOh] || '';
 
+  // ── Step 2: 신강·신약 컨텍스트 보정 ─────────────────────────
+  // textbook: 신약자에게 재관식상=짐, 신강자에게 인비=짐
+  const SGSY_INDEX = {'극왕':0,'신강':1,'중화':2,'신약':3,'극약':4};
+  const SGSY_ADJ = {
+    '정재': [ 0,  0,  0, -2, -3],
+    '편재': [ 0,  0,  0, -2, -3],
+    '식신': [+1,  0,  0, -1, -2],
+    '상관': [+1,  0,  0, -1, -2],
+    '정관': [ 0,  0,  0, -1, -2],
+    '편관': [ 0,  0,  0, -2, -3],
+    '정인': [-2, -1,  0, +1, +2],
+    '편인': [-2, -1,  0, +1, +2],
+    '비견': [-3, -2,  0, +1, +2],
+    '겁재': [-3, -2,  0, +1, +2],
+  };
+  const sgsyRaw = _sdFull?.strength_level_5 || _singang || '';
+  const sgsyIdx = SGSY_INDEX[sgsyRaw] ?? 2;
+
   // 자미두수 사화 보정용
   const lu = _ziweiData?.sihua?.lu;
   const ji = _ziweiData?.sihua?.ji;
@@ -10054,6 +10072,10 @@ function computeWealthCurve() {
   const points = big.slice(0, 8).map((du, idx) => {
     const tg = du.stem_ten_god || '';
     let score = TG_SCORE[tg] ?? 5;
+
+    // Step 2: 신강·신약 컨텍스트로 십신 base 점수 재해석
+    const sgsyAdj = (SGSY_ADJ[tg] && SGSY_ADJ[tg][sgsyIdx]) || 0;
+    score += sgsyAdj;
 
     // 자미두수 재성 명궁 회조 시 base 보정
     score += ziweiBaseModifier;
@@ -10106,11 +10128,12 @@ function computeWealthCurve() {
       yStart, yEnd,
       stemOhaeng: stemOh,
       yongsinTag,
+      sgsyAdj,
     };
   });
 
-  // 디버그: 콘솔에서 실제 데이터 확인 가능
-  try { console.log('[wealthCurve] birthYear=', _profile?.year, '용신=', yongsinOh, '기신=', gisinOh, 'computed=', points); } catch(e) {}
+  // 디버그
+  try { console.log('[wealthCurve] birth=', _profile?.year, '신강신약=', sgsyRaw, '용신=', yongsinOh, '기신=', gisinOh, 'computed=', points); } catch(e) {}
 
   // 정점/저점/현재
   const peakIdx   = points.reduce((a,b,i,arr) => arr[a].score < b.score ? i : a, 0);
