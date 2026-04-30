@@ -6754,7 +6754,28 @@ async function refreshPushBtnLabel() {
     var reg = await navigator.serviceWorker.register('/sw.js');
     var sub = await reg.pushManager.getSubscription();
     _setPushUI(!!sub);
+    if (sub) _syncPushEndpointIfChanged(sub);
   } catch(e) { _setPushUI(false); }
+}
+
+// FCM 토큰 회전 대응: DB endpoint와 현재 endpoint가 다르면 PATCH로 자동 갱신
+async function _syncPushEndpointIfChanged(sub) {
+  try {
+    var user = JSON.parse(localStorage.getItem('pico_user') || 'null');
+    if (!user || !user.id) return;
+    var sbH = { apikey: _PICO_KEY, Authorization: 'Bearer ' + _PICO_KEY, 'Content-Type': 'application/json' };
+    var r = await fetch(_PICO_SB + '/rest/v1/pico_push_subscriptions?user_id=eq.' + encodeURIComponent(user.id) + '&select=subscription', { headers: sbH });
+    var rows = await r.json().catch(function(){ return []; });
+    if (!Array.isArray(rows) || rows.length === 0) return;
+    var dbSub = null;
+    try { dbSub = typeof rows[0].subscription === 'string' ? JSON.parse(rows[0].subscription) : rows[0].subscription; } catch(e) {}
+    if (dbSub && dbSub.endpoint === sub.endpoint) return;
+    await fetch(_PICO_SB + '/rest/v1/pico_push_subscriptions?user_id=eq.' + encodeURIComponent(user.id), {
+      method: 'PATCH',
+      headers: { ...sbH, Prefer: 'return=minimal' },
+      body: JSON.stringify({ subscription: JSON.stringify(sub) })
+    });
+  } catch(e) {}
 }
 
 var _PICO_SB   = 'https://ymghmfkqctckxxysxkvy.supabase.co';
