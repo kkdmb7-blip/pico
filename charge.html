@@ -314,6 +314,12 @@ nav {
     <div style="font-size:18px;color:var(--muted);flex-shrink:0;">→</div>
   </div>
 
+  <!-- TWA(앱) 환경 진입 시 노출되는 안내 — JS 가 _picoIsTWA() 로 display 토글 -->
+  <div id="twaInlineNotice" style="display:none;background:rgba(154,122,38,0.08);border:1px solid rgba(154,122,38,0.25);padding:16px;border-radius:12px;margin-bottom:20px;text-align:center;">
+    <div style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;color:#7a5e1c;margin-bottom:8px;">웹사이트에서 충전해 주세요</div>
+    <div style="font-size:13px;color:#3a2c1e;line-height:1.7;">앱에서는 Orb 충전이 지원되지 않습니다.<br><strong style="color:#7a5e1c;">picolab.kr</strong> 에서 충전한 뒤 앱에서 그대로 사용하실 수 있어요.</div>
+  </div>
+
   <div class="section-label">충전 팩 선택</div>
   <div class="pack-list" id="packList"></div>
 
@@ -590,6 +596,13 @@ async function loadBalance() {
 }
 
 function renderPacks() {
+  // TWA(앱) 환경이면 inline 안내 노출 + 카드 흐림 (클릭 시 모달은 그대로 동작 → 안내 모달 호출됨)
+  if (typeof _picoIsTWA === 'function' && _picoIsTWA()) {
+    var notice = document.getElementById('twaInlineNotice');
+    if (notice) notice.style.display = 'block';
+    var listEl = document.getElementById('packList');
+    if (listEl) { listEl.style.opacity = '0.45'; listEl.style.filter = 'grayscale(0.6)'; }
+  }
   var list = document.getElementById('packList');
   list.innerHTML = '';
 
@@ -635,9 +648,46 @@ function renderPacks() {
   });
 }
 
+// ── TWA(Play Store 앱) 환경 감지 ───────────────────────────────
+// Google Play 정책: 디지털 재화는 IAP 의무. 앱에서 외부결제 노출 시 정책 위반 가능.
+// 처치: TWA 진입 시 결제 화면 막고 "웹사이트에서 충전" 안내. 적발 위험 0.
+function _picoIsTWA() {
+  try {
+    if (document.referrer && document.referrer.startsWith('android-app://')) {
+      try { localStorage.setItem('pico_is_twa', '1'); } catch(e) {}
+      return true;
+    }
+    if (localStorage.getItem('pico_is_twa') === '1') return true;
+    // navigator.userAgent 의 'wv'(WebView) 도 체크
+    var ua = (navigator.userAgent || '').toLowerCase();
+    if (ua.indexOf('; wv)') !== -1) return true;
+  } catch(e) {}
+  return false;
+}
+
+function openTWANoticeModal() {
+  var ov = document.getElementById('twaNoticeOverlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'twaNoticeOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(40,28,16,0.55);z-index:9800;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);';
+    ov.innerHTML =
+      '<div style="background:#fcf7ea;border-radius:18px;padding:28px 24px;max-width:380px;width:100%;box-shadow:0 16px 40px rgba(40,28,16,0.3);text-align:center;">' +
+        '<div style="font-family:\'Noto Serif KR\',serif;font-size:18px;font-weight:700;color:#241a10;margin-bottom:14px;">웹에서 충전해 주세요</div>' +
+        '<p style="font-size:13.5px;color:#3a2c1e;line-height:1.75;margin-bottom:20px;">앱에서는 Orb 충전이 지원되지 않습니다.<br>아래 주소에 접속하여 충전한 뒤<br>앱에서 그대로 사용하실 수 있어요.</p>' +
+        '<div style="background:rgba(154,122,38,0.08);border:1px solid rgba(154,122,38,0.2);border-radius:10px;padding:12px;margin-bottom:18px;font-family:monospace;font-size:13px;color:#7a5e1c;font-weight:700;">picolab.kr</div>' +
+        '<button id="twaNoticeOK" style="width:100%;padding:13px;background:rgba(154,122,38,0.12);color:#7a5e1c;border:1px solid rgba(154,122,38,0.4);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">확인</button>' +
+      '</div>';
+    document.body.appendChild(ov);
+    document.getElementById('twaNoticeOK').addEventListener('click', function() { ov.remove(); });
+  }
+}
+
 // ── Google Play 한국 외부결제 정책 대응 ─────────────────────────
 // 카드 클릭 → 결제 수단 선택 모달 → 외부결제 안내 → 기존 doPay 호출
+// (TWA 환경에서는 위 _picoIsTWA() 가 가로채서 안내 모달만 노출)
 function openPaymentMethodModal(pack) {
+  if (_picoIsTWA()) { openTWANoticeModal(); return; }
   var ov = document.getElementById('payMethodOverlay');
   if (!ov) {
     ov = document.createElement('div');
