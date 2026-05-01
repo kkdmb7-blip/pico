@@ -311,7 +311,7 @@ td.reasons span {
 
 <div id="gateView" class="gate" style="display:none;">
   <h1>관리자 인증</h1>
-  <input id="adminUuid" type="text" placeholder="관리자 UUID 입력" autocomplete="off">
+  <input id="adminUuid" type="password" placeholder="관리자 비밀키 입력" autocomplete="off">
   <button id="gateSubmit">접속</button>
   <div class="hint">권한이 없는 접근은 Worker에서 차단됩니다</div>
   <div id="gateError" class="err-text" style="font-size:11.5px; margin-top:10px;"></div>
@@ -492,8 +492,11 @@ td.reasons span {
 const API = 'https://fortuna.kkdmb7.workers.dev';
 const SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
 const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
-const LS_KEY = 'pico_admin_uuid';
-let adminUuid = '';
+// 비밀키는 sessionStorage(브라우저 닫으면 자동 폐기) 에만 저장
+const SS_KEY = 'pico_admin_secret';
+let adminSecret = '';
+// 기존 localStorage 노출 방식 클린업 (1회성)
+try { localStorage.removeItem('pico_admin_uuid'); } catch(e) {}
 let recentRows = [];
 let sb = null;
 
@@ -511,8 +514,20 @@ function getSb() {
   return sb;
 }
 
-async function fetchJson(path) {
-  const res = await fetch(`${API}${path}${path.includes('?') ? '&' : '?'}admin=${encodeURIComponent(adminUuid)}`);
+function adminHeaders(extra) {
+  var h = { 'Authorization': 'Bearer ' + adminSecret };
+  if (extra) Object.keys(extra).forEach(function(k){ h[k] = extra[k]; });
+  return h;
+}
+async function fetchJson(path, opts) {
+  opts = opts || {};
+  opts.headers = adminHeaders(opts.headers || {});
+  const res = await fetch(`${API}${path}`, opts);
+  if (res.status === 403 || res.status === 401) {
+    sessionStorage.removeItem(SS_KEY);
+    adminSecret = '';
+    throw new Error('인증 실패 (403)');
+  }
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
   return json;
@@ -657,7 +672,7 @@ async function loadRecent() {
         const id = btn.getAttribute('data-id');
         btn.disabled = true; btn.textContent = '삭제중...';
         try {
-          const res = await fetch(`${API}/feedback-row?admin=${encodeURIComponent(adminUuid)}&id=${encodeURIComponent(id)}`, { method:'DELETE' });
+          const res = await fetch(`${API}/feedback-row?id=${encodeURIComponent(id)}`, { method:'DELETE', headers: adminHeaders() });
           const data = await res.json().catch(() => ({}));
           if (!res.ok) throw new Error(data.error || 'delete failed');
           btn.closest('tr').remove();
@@ -699,16 +714,16 @@ function exportCsv() {
 }
 
 async function boot() {
-  adminUuid = localStorage.getItem(LS_KEY) || '';
-  if (!adminUuid) {
+  adminSecret = sessionStorage.getItem(SS_KEY) || '';
+  if (!adminSecret) {
     qs('gateView').style.display = 'block';
     return;
   }
   try {
     await fetchJson('/feedback-stats');
   } catch(e) {
-    localStorage.removeItem(LS_KEY);
-    adminUuid = '';
+    sessionStorage.removeItem(SS_KEY);
+    adminSecret = '';
     qs('gateView').style.display = 'block';
     qs('gateError').textContent = '인증 실패: ' + e.message;
     return;
@@ -970,16 +985,16 @@ async function loadToday() {
 qs('gateSubmit').addEventListener('click', async () => {
   const v = (qs('adminUuid').value || '').trim();
   if (!v) return;
-  adminUuid = v;
+  adminSecret = v;
   try {
     await fetchJson('/feedback-stats');
-    localStorage.setItem(LS_KEY, adminUuid);
+    sessionStorage.setItem(SS_KEY, adminSecret);
     qs('gateView').style.display = 'none';
     qs('mainView').style.display = 'block';
     loadToday(); loadStats(); loadDaily(); loadRecent(); loadAnalytics();
   } catch(e) {
     qs('gateError').textContent = '인증 실패: ' + e.message;
-    adminUuid = '';
+    adminSecret = '';
   }
 });
 qs('adminUuid')?.addEventListener('keydown', e => { if (e.key === 'Enter') qs('gateSubmit').click(); });
@@ -997,7 +1012,7 @@ async function loadReportStats() {
   if (!wrap) return;
   wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">로딩 중...</div>';
   try {
-    const res = await fetch(`${API}/admin/report-stats?admin=${encodeURIComponent(adminUuid)}&days=${days}`);
+    const res = await fetch(`${API}/admin/report-stats?days=${days}`, { headers: adminHeaders() });
     const data = await res.json();
     if (!data.ok) { wrap.innerHTML = '<div style="color:#a94a3a;font-size:12px;">로드 실패</div>'; return; }
     const stats = data.stats || [];
@@ -1053,7 +1068,7 @@ async function loadOrbUsers() {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">로딩 중...</td></tr>';
   try {
-    const res = await fetch(`${API}/admin/orb-users?admin=${encodeURIComponent(adminUuid)}`);
+    const res = await fetch(`${API}/admin/orb-users`, { headers: adminHeaders() });
     const data = await res.json();
     if (!data.ok) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#a94a3a;">로드 실패</td></tr>'; return; }
     orbAllRows = data.rows || [];
@@ -1128,8 +1143,8 @@ async function submitOrbGrant() {
   const amount = parseInt(document.getElementById('orbGrantAmount')?.value || '0');
   if (!amount || amount <= 0 || !orbGrantUserId) return alert('수량을 입력해주세요.');
   try {
-    const res = await fetch(`${API}/admin/grant-orb?admin=${encodeURIComponent(adminUuid)}`, {
-      method: 'POST', headers: {'Content-Type':'application/json'},
+    const res = await fetch(`${API}/admin/grant-orb`, {
+      method: 'POST', headers: adminHeaders({'Content-Type':'application/json'}),
       body: JSON.stringify({ user_id: orbGrantUserId, amount, reason: '관리자 수동 충전' })
     });
     const data = await res.json();
