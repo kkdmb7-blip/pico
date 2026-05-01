@@ -6170,11 +6170,16 @@ var _lastAdminUnread = 0;
 var _adminChatPollStarted = false;
 async function loadAdminChatUnread() {
   try {
-    var r = await fetch('https://ymghmfkqctckxxysxkvy.supabase.co/rest/v1/support_messages?select=id,user_id,content,created_at&sender=eq.user&read=eq.false&order=created_at.desc', {
-      headers: { 'apikey': 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x', 'Authorization': 'Bearer sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x' }
+    // Worker admin proxy 사용 (anon select 차단 후에도 동작) — 비밀키는 sessionStorage 보유 시
+    var adminSecret = '';
+    try { adminSecret = sessionStorage.getItem('pico_admin_secret') || ''; } catch(e) {}
+    if (!adminSecret) return; // 비밀키 없으면 admin 모드 아님
+    var r = await fetch('https://fortuna.kkdmb7.workers.dev/admin/support-messages?action=unread', {
+      headers: { 'Authorization': 'Bearer ' + adminSecret }
     });
     if (!r.ok) return;
-    var rows = await r.json();
+    var data = await r.json();
+    var rows = (data && data.messages) || [];
     var n = Array.isArray(rows) ? rows.length : 0;
     var badge = document.getElementById('adminChatBadge');
     if (badge) {

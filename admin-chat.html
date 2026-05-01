@@ -118,23 +118,30 @@ nav {
 </div>
 
 <script>
-var SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
-var SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
-var ADMIN_UUID = '99f9f77a-2f2a-4055-ab44-421d1c070341';
-var HEADERS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
+// admin-chat.html: 운영자 전용 사용자 문의 관리 (Worker /admin/support-messages 프록시)
+// 비밀키는 sessionStorage('pico_admin_secret') 에서 읽음 (admin.html 에서 입력 후 저장됨)
+var WORKER_BASE = 'https://fortuna.kkdmb7.workers.dev';
+var ADMIN_UUID = '99f9f77a-2f2a-4055-ab44-421d1c070341'; // 운영자 user_id 식별용 (권한 부여 X)
 var currentUid = null;
 var autoTimer = null;
 
+function _adminSecret() {
+  try { return sessionStorage.getItem('pico_admin_secret') || ''; } catch(e) { return ''; }
+}
+function _adminHeaders(extra) {
+  var h = { 'Authorization': 'Bearer ' + _adminSecret() };
+  if (extra) Object.keys(extra).forEach(function(k){ h[k] = extra[k]; });
+  return h;
+}
+
 function checkAuth() {
-  var pu = null;
-  try { pu = JSON.parse(localStorage.getItem('pico_user') || 'null'); } catch(e) {}
-  var savedAdmin = localStorage.getItem('pico_admin_uuid') || '';
-  var puUuid = (pu && pu.uuid) ? pu.uuid : '';
-  var isAdmin = (savedAdmin === ADMIN_UUID) || (puUuid === ADMIN_UUID);
-  if (!isAdmin) {
+  // 비밀키가 sessionStorage 에 있으면 admin 모드로 진입.
+  // 비밀키 없으면 admin.html 로 안내 (거기서 비밀키 입력 → 저장).
+  var secret = _adminSecret();
+  if (!secret) {
     document.getElementById('deny').innerHTML =
-      '<div>권한이 없어요.</div>' +
-      '<div><a href="index.html?tab=mypage">← 마이페이지로</a></div>';
+      '<div>관리자 비밀키 인증 필요</div>' +
+      '<div><a href="admin.html">← 관리자 페이지에서 인증</a></div>';
     return;
   }
   document.getElementById('deny').style.display = 'none';
@@ -152,9 +159,10 @@ function checkAuth() {
 }
 
 async function loadUsers() {
-  var r = await fetch(SB_URL + '/rest/v1/support_messages?select=user_id,sender,content,created_at,read&order=created_at.desc', { headers: HEADERS });
+  var r = await fetch(WORKER_BASE + '/admin/support-messages?action=users', { headers: _adminHeaders() });
   if (!r.ok) return;
-  var msgs = await r.json();
+  var data = await r.json();
+  var msgs = (data && data.messages) || [];
 
   var map = {};
   msgs.forEach(function(m) {
@@ -198,9 +206,10 @@ function closeChatMobile() {
 }
 
 async function loadChat(uid, scroll) {
-  var r = await fetch(SB_URL + '/rest/v1/support_messages?user_id=eq.' + encodeURIComponent(uid) + '&order=created_at.asc&limit=200', { headers: HEADERS });
+  var r = await fetch(WORKER_BASE + '/admin/support-messages?action=user&user_id=' + encodeURIComponent(uid), { headers: _adminHeaders() });
   if (!r.ok) return;
-  var msgs = await r.json();
+  var data = await r.json();
+  var msgs = (data && data.messages) || [];
   var el = document.getElementById('chat-msgs');
   if (!msgs.length) { el.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;color:var(--muted);">대화 없음</div>'; return; }
   el.innerHTML = msgs.map(function(m) {
@@ -209,9 +218,9 @@ async function loadChat(uid, scroll) {
     return '<div class="cm ' + m.sender + '">' + escHtml(m.content) + '<time>' + t + '</time></div>';
   }).join('');
   if (scroll) el.scrollTop = el.scrollHeight;
-  await fetch(SB_URL + '/rest/v1/support_messages?user_id=eq.' + encodeURIComponent(uid) + '&sender=eq.user&read=eq.false', {
-    method: 'PATCH', headers: Object.assign({}, HEADERS, {'Prefer':'return=minimal'}),
-    body: JSON.stringify({ read: true })
+  await fetch(WORKER_BASE + '/admin/support-messages', {
+    method: 'PATCH', headers: _adminHeaders({'Content-Type':'application/json'}),
+    body: JSON.stringify({ user_id: uid })
   });
 }
 
@@ -238,9 +247,9 @@ async function sendReply() {
   }
 
   try {
-    var r = await fetch(SB_URL + '/rest/v1/support_messages', {
-      method: 'POST', headers: Object.assign({}, HEADERS, {'Prefer':'return=representation'}),
-      body: JSON.stringify({ user_id: currentUid, sender: 'admin', content: text, read: false })
+    var r = await fetch(WORKER_BASE + '/admin/support-messages', {
+      method: 'POST', headers: _adminHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ user_id: currentUid, content: text })
     });
     if (!r.ok) {
       var errTxt = await r.text();

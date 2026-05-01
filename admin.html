@@ -953,13 +953,13 @@ async function loadAnalytics() {
 
 async function loadChatUnread() {
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/support_messages?select=id&sender=eq.user&read=eq.false`, {
-      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
-    });
+    // Worker admin proxy 사용 (anon select 차단된 후에도 동작)
+    const r = await fetch(`${API}/admin/support-messages?action=unread`, { headers: adminHeaders() });
     if (!r.ok) return;
-    const rows = await r.json();
+    const data = await r.json();
+    const rows = (data && data.messages) || [];
     const el = qs('adminChatUnread');
-    if (el) el.textContent = Array.isArray(rows) ? rows.length : 0;
+    if (el) el.textContent = rows.length;
   } catch(e) {}
 }
 

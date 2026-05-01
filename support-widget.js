@@ -148,17 +148,20 @@
     });
   }
 
-  // ── 메시지 로드 ──
+  // ── 메시지 로드 (Worker proxy 통과 — anon select 차단됨) ──
+  var WORKER_BASE = 'https://fortuna.kkdmb7.workers.dev';
   async function loadMessages() {
     var uid = getUserId();
     if (!uid) return;
-    var r = await fetch(SB_URL + '/rest/v1/support_messages?user_id=eq.' + encodeURIComponent(uid) + '&order=created_at.asc&limit=100', { headers: HEADERS });
-    if (!r.ok) return;
-    _messages = await r.json();
-    renderMessages();
-    updateBadge();
-    // 읽음 처리 (admin 메시지)
-    if (_open) markRead(uid);
+    try {
+      var r = await fetch(WORKER_BASE + '/me/support-messages?user_id=' + encodeURIComponent(uid));
+      if (!r.ok) return;
+      var data = await r.json();
+      _messages = (data && data.messages) || [];
+      renderMessages();
+      updateBadge();
+      if (_open) markRead(uid);
+    } catch(e) {}
   }
 
   function renderMessages() {
@@ -197,10 +200,12 @@
   }
 
   async function markRead(uid) {
-    await fetch(SB_URL + '/rest/v1/support_messages?user_id=eq.' + encodeURIComponent(uid) + '&sender=eq.admin&read=eq.false', {
-      method: 'PATCH', headers: Object.assign({}, HEADERS, { 'Prefer': 'return=minimal' }),
-      body: JSON.stringify({ read: true })
-    });
+    try {
+      await fetch(WORKER_BASE + '/me/support-messages', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: uid })
+      });
+    } catch(e) {}
   }
 
   // ── 메시지 전송 ──
@@ -220,12 +225,11 @@
     renderMessages();
 
     try {
-      var r = await fetch(SB_URL + '/rest/v1/support_messages', {
-        method: 'POST', headers: Object.assign({}, HEADERS, { 'Prefer': 'return=representation' }),
-        body: JSON.stringify({ user_id: uid, sender: 'user', content: text, read: true })
+      var r = await fetch(WORKER_BASE + '/me/support-messages', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: uid, content: text })
       });
       if (!r.ok) {
-        var err = await r.text();
         throw new Error('저장 실패 (' + r.status + ')');
       }
       // 운영자에게 텔레그램 알림 (실패해도 무시)
