@@ -4639,7 +4639,8 @@ function proceedAfterProfile() {
 }
 
 // ── 아이 프로필 입력 모달 (child_career 전용) — 만세력 동일 포맷 ──
-var _childGender = 'M';
+// _childGender 초기값 null — 사용자가 명시적으로 선택해야 함 (자동 'M' fallback 금지)
+var _childGender = null;
 
 function _normalizeChildProfile(p) {
   if (!p) return null;
@@ -4663,7 +4664,8 @@ function _normalizeChildProfile(p) {
   var g = p.gender;
   if (g === 'male') g = 'M';
   else if (g === 'female') g = 'F';
-  return { name: p.name || '', year: year, month: month, day: day, hour: hour, minute: minute, gender: g || 'M' };
+  // gender fallback 제거 — 누락된 경우 빈 값으로 두고 사용자가 직접 선택
+  return { name: p.name || '', year: year, month: month, day: day, hour: hour, minute: minute, gender: (g === 'M' || g === 'F') ? g : '' };
 }
 
 function initChildDateSelects() {
@@ -4735,7 +4737,12 @@ function _fillChildFields(norm) {
   document.getElementById('childMinute').value = norm.minute;
   var row = document.getElementById('childYajasiRow');
   row.style.display = (String(norm.hour) === '23') ? 'block' : 'none';
-  selectChildGender(norm.gender || 'M');
+  // 성별 fallback 'M' 제거 — 명시된 'F'/'M' 만 적용, 누락은 미선택으로
+  if (norm.gender === 'F' || norm.gender === 'M') {
+    selectChildGender(norm.gender);
+  } else {
+    selectChildGender(null);
+  }
 }
 
 function fillChildFromMine() {
@@ -4818,13 +4825,14 @@ function clearChildForm() {
   document.getElementById('childMinute').value = '0';
   document.getElementById('childYajasiRow').style.display = 'none';
   document.getElementById('childProfileSelect').value = '';
-  selectChildGender('M');
+  selectChildGender(null);
 }
 
 function selectChildGender(g) {
-  _childGender = g;
-  document.getElementById('childGenderM').classList.toggle('active', g === 'M');
-  document.getElementById('childGenderF').classList.toggle('active', g === 'F');
+  _childGender = (g === 'M' || g === 'F') ? g : null;
+  document.getElementById('childGenderM').classList.toggle('active', _childGender === 'M');
+  document.getElementById('childGenderF').classList.toggle('active', _childGender === 'F');
+  try { console.log('[gender] _childGender =', _childGender); } catch(e) {}
 }
 
 function submitChild() {
@@ -4839,6 +4847,15 @@ function submitChild() {
   if (!year)  { alert('태어난 연도를 선택해주세요'); return; }
   if (!month) { alert('태어난 월을 선택해주세요'); return; }
   if (!day)   { alert('태어난 일을 선택해주세요'); return; }
+  if (_childGender !== 'M' && _childGender !== 'F') {
+    alert('성별을 선택해주세요 (남성/여성)');
+    var gM = document.getElementById('childGenderM');
+    var gF = document.getElementById('childGenderF');
+    if (gM) gM.style.boxShadow = '0 0 0 2px #c83060';
+    if (gF) gF.style.boxShadow = '0 0 0 2px #c83060';
+    setTimeout(function(){ if (gM) gM.style.boxShadow=''; if (gF) gF.style.boxShadow=''; }, 2000);
+    return;
+  }
 
   var profile = { name: name, year: year, month: month, day: day, hour: hour, minute: minute, gender: _childGender };
 
