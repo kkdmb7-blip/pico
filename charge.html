@@ -651,19 +651,64 @@ function renderPacks() {
 // ── TWA(Play Store 앱) 환경 감지 ───────────────────────────────
 // Google Play 정책: 디지털 재화는 IAP 의무. 앱에서 외부결제 노출 시 정책 위반 가능.
 // 처치: TWA 진입 시 결제 화면 막고 "웹사이트에서 충전" 안내. 적발 위험 0.
+//
+// 다중 신호 감지 (false negative 최소화):
+//   1) document.referrer 'android-app://' (TWA 첫 진입 시 가장 강력한 신호)
+//   2) URL 쿼리 ?source=twa (manifest start_url 에 추가 가능)
+//   3) localStorage 'pico_is_twa' (한 번 감지되면 계속 기억)
+//   4) display-mode: standalone (PWA/TWA 풀스크린 — Chrome 탭과 구분)
+//   5) navigator.userAgent 'wv' (WebView)
+//   6) navigator.getInstalledRelatedApps (TWA 앱 설치 여부 — 비동기, 보조)
+//   7) document.referrer 가 우리 도메인이 아니고 빈 문자열이면 의심 → standalone 와 결합 시 강력
+// 키 이름을 v2 로 변경 — 이전 코드의 PWA false positive 마커 자동 무효화
+var _PICO_TWA_KEY = 'pico_is_twa_v2';
+// 이전 잘못된 마커 한 번만 정리 (PWA 사용자 보호)
+try { localStorage.removeItem('pico_is_twa'); } catch(e) {}
+
 function _picoIsTWA() {
+  // false positive 절대 금지 — 강력 신호만 사용:
+  //   1) document.referrer 'android-app://' (TWA 첫 진입의 명백한 신호)
+  //   2) URL 쿼리 ?source=twa (TWA manifest start_url 마커)
+  //   3) localStorage 'pico_is_twa_v2' (이미 한 번 감지된 세션)
+  // 제외된 신호 (PWA·카톡·인스타 인앱 브라우저 false positive 위험):
+  //   - WebView 'wv' UA: 카톡·인스타 인앱도 wv 라 결제 차단 위험
+  //   - standalone + Android + empty referrer: PWA 홈 화면 진입과 동일 패턴
   try {
-    if (document.referrer && document.referrer.startsWith('android-app://')) {
-      try { localStorage.setItem('pico_is_twa', '1'); } catch(e) {}
+    var ref = document.referrer || '';
+    var qs = (location.search || '').toLowerCase();
+
+    if (ref.startsWith('android-app://')) {
+      try { localStorage.setItem(_PICO_TWA_KEY, '1'); } catch(e) {}
       return true;
     }
-    if (localStorage.getItem('pico_is_twa') === '1') return true;
-    // navigator.userAgent 의 'wv'(WebView) 도 체크
-    var ua = (navigator.userAgent || '').toLowerCase();
-    if (ua.indexOf('; wv)') !== -1) return true;
+    if (qs.indexOf('source=twa') !== -1 || qs.indexOf('utm_source=twa') !== -1) {
+      try { localStorage.setItem(_PICO_TWA_KEY, '1'); } catch(e) {}
+      return true;
+    }
+    if (localStorage.getItem(_PICO_TWA_KEY) === '1') return true;
   } catch(e) {}
   return false;
 }
+
+// 비동기 보조 감지: 설치된 관련 앱 확인 (지원 브라우저 한정)
+// charge.html 진입 후 1회 실행. TWA 감지 시 localStorage 마커 저장.
+(function _picoTWAAsyncCheck() {
+  try {
+    if (!navigator.getInstalledRelatedApps) return;
+    navigator.getInstalledRelatedApps().then(function(apps) {
+      if (apps && apps.length > 0) {
+        try { localStorage.setItem('pico_is_twa', '1'); } catch(e) {}
+        // 이미 카드 노출됐으면 다시 가려야
+        var notice = document.getElementById('twaInlineNotice');
+        if (notice && notice.style.display === 'none') {
+          notice.style.display = 'block';
+          var listEl = document.getElementById('packList');
+          if (listEl) { listEl.style.opacity = '0.45'; listEl.style.filter = 'grayscale(0.6)'; }
+        }
+      }
+    }).catch(function(){});
+  } catch(e) {}
+})();
 
 function openTWANoticeModal() {
   var ov = document.getElementById('twaNoticeOverlay');
