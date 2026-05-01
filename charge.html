@@ -984,7 +984,8 @@ async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
   var paymentId = merchantUid || impUid;
   if (!paymentId) throw new Error('paymentId 없음');
 
-  var resp = await fetch('https://fortuna-silk.vercel.app/api/orb-charge', {
+  // Vercel 12 함수 한도 위해 save-profile 에 통합됨 — ?action=charge
+  var resp = await fetch('https://fortuna-silk.vercel.app/api/save-profile?action=charge', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ user_id: currentUserId, payment_id: paymentId, pack_id: pack.id })
