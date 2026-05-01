@@ -703,23 +703,24 @@ async function unlockPremium() {
 }
 
 async function deductOrb(cost) {
-  var sb = getSb();
-  var resp = await sb.from('orb_balance').select('balance,free_balance,paid_balance').eq('user_id', _user.id).single();
-  if (resp.error || !resp.data) { showErr('errBox2', 'Orb 잔액 조회 실패'); return false; }
-  var bal = resp.data;
-  var total = bal.balance || 0;
-  if (total < cost) { showErr('errBox2', 'Orb가 부족합니다. (보유: ' + total + ' / 필요: ' + cost + ')'); return false; }
-  var free = bal.free_balance || 0;
-  var paid = bal.paid_balance || 0;
-  var rem = cost;
-  var newFree = free, newPaid = paid;
-  if (free >= rem) { newFree = free - rem; rem = 0; }
-  else { rem -= free; newFree = 0; newPaid = Math.max(0, paid - rem); }
-  var newBal = newFree + newPaid;
-  var upRes = await sb.from('orb_balance').update({ balance: newBal, free_balance: newFree, paid_balance: newPaid }).eq('user_id', _user.id);
-  if (upRes.error) throw new Error('Orb 차감 실패: ' + upRes.error.message);
-  await sb.from('orb_transactions').insert({ user_id: _user.id, amount: -cost, type: 'use', description: '궁합 2.0 상세 분석', balance_after: newBal });
-  return true;
+  // 보안: 클라이언트 직접 UPDATE/INSERT 폐기. Worker /me/orb-deduct 가 service_role 로 처리.
+  try {
+    var resp = await fetch('https://fortuna.kkdmb7.workers.dev/me/orb-deduct', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: _user.id, amount: cost, type: 'use', description: '궁합 2.0 상세 분석' })
+    });
+    var data = await resp.json().catch(function(){ return {}; });
+    if (resp.status === 402) {
+      showErr('errBox2', 'Orb가 부족합니다. (보유: ' + (data.orb_balance || 0) + ' / 필요: ' + cost + ')');
+      return false;
+    }
+    if (!resp.ok || !data.ok) throw new Error('Orb 차감 실패: ' + (data.error || resp.status));
+    return true;
+  } catch(e) {
+    showErr('errBox2', 'Orb 차감 실패: ' + (e.message || e));
+    return false;
+  }
 }
 
 async function fetchPremiumDetail() {

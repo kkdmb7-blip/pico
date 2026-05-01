@@ -1457,18 +1457,20 @@ async function requestVedicAI() {
     }
   }
 
-  // Supabase reports 저장
+  // 보안: Worker /me/reports (service_role) 통과
   try {
     var prof = null;
     try { prof = JSON.parse(localStorage.getItem('pico_profile')); } catch(e2) {}
     var profKey = prof ? (prof.year + '-' + prof.month + '-' + prof.day + '-' + (prof.hour || 0) + '-' + (prof.gender || '')) : '';
-    var sb2 = getVedicSb();
-    await sb2.from('reports').insert({
-      user_id: user.id,
-      report_type: 'vedic_ai',
-      content: allTexts.concat([profKey]),
-      orb_spent: VEDIC_ORB,
-      created_at: new Date().toISOString()
+    await fetch('https://fortuna.kkdmb7.workers.dev/me/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: user.id,
+        report_type: 'vedic_ai',
+        content: allTexts.concat([profKey]),
+        orb_spent: VEDIC_ORB
+      })
     });
     showVedicToast('✦ 베딕 분석이 저장되었습니다. 마이페이지에서 다시 볼 수 있어요.');
   } catch(e) {}

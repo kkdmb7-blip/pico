@@ -688,21 +688,23 @@ async function getOrbBalance() {
 }
 
 async function deductOrb(amount) {
-  var balance = await getOrbBalance();
-  var newBal = balance - amount;
-  await sb.from('orb_balance').upsert({
-    user_id: currentUser.id,
-    balance: newBal,
-    updated_at: new Date().toISOString()
-  });
+  // 보안: 클라이언트 직접 UPSERT/INSERT 폐기. Worker /me/orb-deduct 가 service_role 로
+  // 3필드(balance/free/paid) 동시 처리 + 거래 기록.
   try {
-    await sb.from('orb_transactions').insert({
-      user_id: currentUser.id,
-      amount: -amount,
-      type: 'use',
-      description: '사주 리포트 생성'
+    var resp = await fetch('https://fortuna.kkdmb7.workers.dev/me/orb-deduct', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUser.id, amount: amount, type: 'use', description: '사주 리포트 생성' })
     });
-  } catch(e) {}
+    var data = await resp.json().catch(function(){ return {}; });
+    if (!resp.ok || !data.ok) {
+      console.error('[deductOrb] 실패:', data);
+      throw new Error(data.error || ('HTTP ' + resp.status));
+    }
+  } catch(e) {
+    console.error('orb 차감 실패:', e);
+    throw e;
+  }
 }
 
 // ── 생성 플로우 ──────────────────────────────────────────────────

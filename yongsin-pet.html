@@ -1106,31 +1106,30 @@ function getCurrentUserId() {
   try { var u = JSON.parse(localStorage.getItem('pico_user')); return u && u.id ? u.id : null; } catch(e) { return null; }
 }
 
-// Supabase 저장 (로그인 시)
+// 보안: Worker /me/reports proxy 사용
 function syncToServer() {
   var uid = getCurrentUserId();
   if (!uid) return;
   var body = JSON.stringify({ all: allStates, element: slotElements.slot1, element2: slotElements.slot2, updated_at: new Date().toISOString() });
-  fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state', {
-    method: 'DELETE',
-    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+  fetch('https://fortuna.kkdmb7.workers.dev/me/reports?user_id=' + encodeURIComponent(uid) + '&report_type=pet_state', {
+    method: 'DELETE'
   }).then(function() {
-    fetch(SB_URL + '/rest/v1/reports', {
+    fetch('https://fortuna.kkdmb7.workers.dev/me/reports', {
       method: 'POST',
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: uid, report_type: 'pet_state', content: [body], orb_spent: 0 })
     });
   }).catch(function() {});
 }
 
-// Supabase 로드
 function loadFromServer(cb) {
   var uid = getCurrentUserId();
   if (!uid) { cb(null); return; }
-  fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state&select=content,created_at&order=created_at.desc&limit=1', {
-    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-  }).then(function(r) { return r.json(); }).then(function(rows) {
-    if (rows && rows[0] && rows[0].content && rows[0].content[0]) {
+  fetch('https://fortuna.kkdmb7.workers.dev/me/reports?user_id=' + encodeURIComponent(uid) + '&report_type=pet_state').then(function(r) {
+    return r.json();
+  }).then(function(out) {
+    var rows = (out && out.reports) || [];
+    if (rows[0] && rows[0].content && rows[0].content[0]) {
       try { cb(JSON.parse(rows[0].content[0])); } catch(e) { cb(null); }
     } else { cb(null); }
   }).catch(function() { cb(null); });

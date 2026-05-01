@@ -657,18 +657,21 @@ async function requestMatchAI() {
   // 공유용으로 _matchData에 AI 본문 보관
   d._aiTexts = allTexts.slice();
 
-  // Supabase reports 저장
+  // 보안: Worker /me/reports (service_role) 통과
   try {
     var matchKey = d._mBirth + '_' + d._fBirth + '_' + d.total;
-    var sb2 = getMatchSb();
-    var ins = await sb2.from('reports').insert({
-      user_id: user.id,
-      report_type: 'vedic_match_ai',
-      content: allTexts.concat([matchKey, d._mName + '·' + d._fName + ' ' + d.total + '/36']),
-      orb_spent: VEDIC_ORB,
-      created_at: new Date().toISOString()
-    }).select('id').single();
-    if (ins && ins.data && ins.data.id) d._reportId = ins.data.id;
+    var rIns = await fetch('https://fortuna.kkdmb7.workers.dev/me/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: user.id,
+        report_type: 'vedic_match_ai',
+        content: allTexts.concat([matchKey, d._mName + '·' + d._fName + ' ' + d.total + '/36']),
+        orb_spent: VEDIC_ORB
+      })
+    });
+    var insOut = await rIns.json().catch(function(){ return {}; });
+    if (insOut && insOut.report && insOut.report.id) d._reportId = insOut.report.id;
     showMatchToast('✦ 궁합 분석이 저장되었습니다. 마이페이지에서 다시 볼 수 있어요.');
   } catch(e) {}
 }

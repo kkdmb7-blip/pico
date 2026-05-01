@@ -1381,16 +1381,13 @@ function saveRecommendReport(sur, top, activeYs, blurbs) {
     lines,
     '생성일: ' + new Date().toLocaleString('ko-KR')
   ];
-  fetch(SB_URL + '/rest/v1/reports', {
+  // 보안: Worker /me/reports (service_role) 통과
+  fetch('https://fortuna.kkdmb7.workers.dev/me/reports', {
     method: 'POST',
-    headers: {
-      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       user_id: user.id, report_type: 'name_rec',
-      content: content, orb_spent: REC_ORB_COST,
-      created_at: new Date().toISOString()
+      content: content, orb_spent: REC_ORB_COST
     })
   }).then(function(){ showToast('추천 결과가 저장되었습니다'); }).catch(function(){});
 }
@@ -1517,18 +1514,16 @@ function fetchChildYongsin(cb) {
 }
 
 function deductOrbChild(userId, amount) {
-  return getOrbBalance(userId).then(function(bal) {
-    if (bal < amount) return Promise.reject(new Error('잔액 부족'));
-    return fetch(SB_URL + '/rest/v1/orb_balance?user_id=eq.' + encodeURIComponent(userId), {
-      method: 'PATCH',
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ balance: bal - amount })
-    }).then(function() {
-      return fetch(SB_URL + '/rest/v1/orb_transactions', {
-        method: 'POST',
-        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ user_id: userId, amount: -amount, type: 'use', desc: '아이 작명' })
-      });
+  // 보안: Worker /me/orb-deduct (service_role) 통과
+  return fetch('https://fortuna.kkdmb7.workers.dev/me/orb-deduct', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, amount: amount, type: 'use', description: '아이 작명' })
+  }).then(function(r) {
+    return r.json().then(function(d) {
+      if (r.status === 402) return Promise.reject(new Error('잔액 부족'));
+      if (!r.ok || !d.ok) return Promise.reject(new Error(d.error || ('HTTP ' + r.status)));
+      return d;
     });
   });
 }
@@ -1825,13 +1820,12 @@ function saveChildReport(sur, top, blurbs) {
     lines,
     '생성일: ' + new Date().toLocaleString('ko-KR')
   ];
-  fetch(SB_URL + '/rest/v1/reports', {
+  fetch('https://fortuna.kkdmb7.workers.dev/me/reports', {
     method: 'POST',
-    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       user_id: user.id, report_type: 'name_child',
-      content: content, orb_spent: CHILD_ORB_COST,
-      created_at: new Date().toISOString()
+      content: content, orb_spent: CHILD_ORB_COST
     })
   }).then(function(){ showToast('아이 작명 결과가 저장되었습니다'); }).catch(function(){});
 }
@@ -2471,39 +2465,22 @@ function getOrbBalance(userId) {
   });
 }
 
-function deductOrb(userId, amount) {
-  return getOrbBalance(userId).then(function(bal) {
-    if (bal < amount) return Promise.reject(new Error('잔액 부족'));
-    return fetch(SB_URL + '/rest/v1/orb_balance?user_id=eq.' + encodeURIComponent(userId), {
-      method: 'PATCH',
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ balance: bal - amount })
-    }).then(function() {
-      return fetch(SB_URL + '/rest/v1/orb_transactions', {
-        method: 'POST',
-        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ user_id: userId, amount: -amount, type: 'use', desc: '이름 AI 심층분석' })
-      });
+// 보안: 클라이언트 직접 PATCH/INSERT 폐기. Worker /me/orb-deduct (service_role) 통과
+function _deductViaWorker(userId, amount, description) {
+  return fetch('https://fortuna.kkdmb7.workers.dev/me/orb-deduct', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, amount: amount, type: 'use', description: description })
+  }).then(function(r) {
+    return r.json().then(function(d) {
+      if (r.status === 402) return Promise.reject(new Error('잔액 부족'));
+      if (!r.ok || !d.ok) return Promise.reject(new Error(d.error || ('HTTP ' + r.status)));
+      return d;
     });
   });
 }
-
-function deductOrbRec(userId, amount) {
-  return getOrbBalance(userId).then(function(bal) {
-    if (bal < amount) return Promise.reject(new Error('잔액 부족'));
-    return fetch(SB_URL + '/rest/v1/orb_balance?user_id=eq.' + encodeURIComponent(userId), {
-      method: 'PATCH',
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ balance: bal - amount })
-    }).then(function() {
-      return fetch(SB_URL + '/rest/v1/orb_transactions', {
-        method: 'POST',
-        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ user_id: userId, amount: -amount, type: 'use', desc: '이름 추천' })
-      });
-    });
-  });
-}
+function deductOrb(userId, amount) { return _deductViaWorker(userId, amount, '이름 AI 심층분석'); }
+function deductOrbRec(userId, amount) { return _deductViaWorker(userId, amount, '이름 추천'); }
 
 function onAiAnalysisClick() {
   var user = null;
@@ -2624,16 +2601,12 @@ function saveAiAnalysisReport(sur, name, grades, totalScore, resultText) {
     resultText,
     '생성일: ' + new Date().toLocaleString('ko-KR')
   ];
-  fetch(SB_URL + '/rest/v1/reports', {
+  fetch('https://fortuna.kkdmb7.workers.dev/me/reports', {
     method: 'POST',
-    headers: {
-      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       user_id: user.id, report_type: 'name_ai',
-      content: content, orb_spent: 300,
-      created_at: new Date().toISOString()
+      content: content, orb_spent: 300
     })
   }).then(function(){ showToast('심층분석이 저장되었습니다'); }).catch(function(){});
 }

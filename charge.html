@@ -978,51 +978,32 @@ async function recoverPending() {
 }
 
 async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
-  console.log('[charge] 시작 user_id='+currentUserId+', totalOrb='+totalOrb+', balance='+currentBalance);
-  var newBalance = currentBalance + totalOrb;
-  var newPaidBalance = currentPaidBalance + totalOrb;
-  var newTotalCharged = currentTotalCharged + totalOrb;
+  // 보안: 클라이언트 직접 UPSERT 폐기. fortuna-silk /api/orb-charge 가 PortOne 영수증
+  // 검증 후 service_role 로 안전 갱신. paymentId 위조 / 잔액 임의 조작 차단.
+  console.log('[charge] 시작 user_id='+currentUserId+', pack='+pack.id+', impUid='+impUid);
+  var paymentId = merchantUid || impUid;
+  if (!paymentId) throw new Error('paymentId 없음');
 
-  // orb_balance upsert (balance + paid_balance 동시 업데이트)
-  try {
-    var r1 = await sb.from('orb_balance').upsert({
-      user_id: currentUserId,
-      balance: newBalance,
-      free_balance: currentFreeBalance,
-      paid_balance: newPaidBalance,
-      total_charged: newTotalCharged,
-      is_first_charge: false,
-      updated_at: new Date().toISOString(),
-    });
-    console.log('[charge] orb_balance upsert:', r1.error ? r1.error.message : 'OK');
-    if (r1.error) throw new Error('balance 업데이트 실패: ' + r1.error.message);
-  } catch(e) {
-    console.error('[charge] orb_balance 실패:', e);
-    throw e;
+  var resp = await fetch('https://fortuna-silk.vercel.app/api/orb-charge', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: currentUserId, payment_id: paymentId, pack_id: pack.id })
+  });
+  var data = await resp.json().catch(function(){ return {}; });
+  if (!resp.ok || !data.ok) {
+    console.error('[charge] 서버 검증 실패:', data);
+    throw new Error('충전 실패: ' + (data.error || ('HTTP ' + resp.status)));
   }
-
-  // orb_transactions 기록
-  try {
-    var r2 = await sb.from('orb_transactions').insert({
-      user_id: currentUserId,
-      type: 'charge',
-      amount: totalOrb,
-      description: (pack.firstOnly && isFirstCharge ? '첫충전 1+1 ' : '') + pack.id + ' imp:' + impUid,
-      balance_after: newBalance,
-    });
-    console.log('[charge] orb_transactions INSERT:', r2.error ? r2.error.message : 'OK');
-    if (r2.error) console.error('[charge] 거래 기록 실패 (충전은 완료):', r2.error.message);
-  } catch(e) {
-    console.error('[charge] 거래 기록 실패 (충전은 완료):', e);
-  }
+  var newBalance = data.new_balance != null ? data.new_balance : (currentBalance + totalOrb);
+  var grantedOrb = data.total_orb != null ? data.total_orb : totalOrb;
+  console.log('[charge] 서버 검증 완료, +' + grantedOrb + ' Orb, newBalance=' + newBalance);
 
   currentBalance = newBalance;
-  currentPaidBalance = newPaidBalance;
-  currentTotalCharged = newTotalCharged;
+  currentPaidBalance = currentPaidBalance + grantedOrb;
+  currentTotalCharged = currentTotalCharged + grantedOrb;
   isFirstCharge = false;
   document.getElementById('currentBalance').textContent = currentBalance + ' Orb';
   renderPacks();
-  console.log('[charge] 완료! newBalance='+newBalance);
 }
 
 function handleInviteCharge() {

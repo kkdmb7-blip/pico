@@ -3313,43 +3313,19 @@ async function picoRetryFetch(url, opts, maxRetries) {
 // 차감은 free→paid 순. 환불은 paid_balance에 올림 (보수적 접근)
 async function refundOrb(amount, reason) {
   if (!_user || !_user.id || !amount || amount <= 0) return false;
-  const SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
-  const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
+  // 보안: 클라이언트 직접 PATCH 폐기. Worker /me/orb-refund 가 매칭 차감 거래 검증 후 환불.
   try {
-    // 현재 잔액 조회
-    const balRes = await fetch(`${SB_URL}/rest/v1/orb_balance?user_id=eq.${encodeURIComponent(_user.id)}&select=balance,free_balance,paid_balance`, {
-      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+    const r = await fetch('https://fortuna.kkdmb7.workers.dev/me/orb-refund', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: _user.id, amount, reason: reason || '리포트 생성 실패 자동 환불' })
     });
-    const balData = await balRes.json();
-    if (!Array.isArray(balData) || !balData[0]) {
-      console.warn('[refundOrb] 잔액 조회 실패');
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok || !data.ok) {
+      console.warn('[refundOrb] 환불 실패:', data);
       return false;
     }
-    const cur = balData[0];
-    const newBalance  = (cur.balance      || 0) + amount;
-    const newPaid     = (cur.paid_balance  || 0) + amount;
-    const newFree     = cur.free_balance   || 0; // 무료 잔액 그대로
-
-    // 3필드 동시 업데이트 (불일치 방지)
-    const upRes = await fetch(`${SB_URL}/rest/v1/orb_balance?user_id=eq.${encodeURIComponent(_user.id)}`, {
-      method: 'PATCH',
-      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({ balance: newBalance, paid_balance: newPaid, free_balance: newFree })
-    });
-    if (!upRes.ok) { console.warn('[refundOrb] 잔액 업데이트 실패', upRes.status); return false; }
-
-    // 환불 트랜잭션 기록
-    await fetch(`${SB_URL}/rest/v1/orb_transactions`, {
-      method: 'POST',
-      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({
-        user_id: _user.id, amount: amount, type: 'refund',
-        description: reason || '리포트 생성 실패 자동 환불',
-        balance_after: newBalance, created_at: new Date().toISOString()
-      })
-    });
-
-    console.log(`[refundOrb] 환불 완료 +${amount} Orb / 잔액 ${cur.balance}→${newBalance}`);
+    console.log(`[refundOrb] 환불 완료 +${amount} Orb / newBalance=${data.balance}`);
     showToast(`<i class="pi pi-refresh"></i> 생성 실패로 ${amount.toLocaleString()} Orb가 자동 환불됐습니다.`);
 
     // 관리자 텔레그램 알림 (환불 성공)
@@ -3360,7 +3336,7 @@ async function refundOrb(amount, reason) {
         user_id: (_user.id||'').slice(0,8),
         user_name: _user.name || _user.id || '?',
         title: (_config&&_config.title) || _type || '',
-        message: `${amount} Orb 자동 환불 완료 | 잔액 ${cur.balance}→${newBalance}`
+        message: `${amount} Orb 자동 환불 완료 | 잔액 ${data.balance}`
       })
     }).catch(() => {});
 
@@ -3403,13 +3379,18 @@ async function safeInsertReport(allTexts, profileKey) {
   }
 
   try {
-    const sb = getSb();
-    const { data } = await sb.from('reports').insert({
-      user_id: _user.id, report_type: _type,
-      content: [...allTexts, profileKey], orb_spent: _config.orb,
-      created_at: new Date().toISOString()
-    }).select().maybeSingle();
-    if (data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
+    // 보안: 클라이언트 직접 INSERT 폐기. Worker /me/reports (service_role) 통과.
+    const r = await fetch('https://fortuna.kkdmb7.workers.dev/me/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: _user.id, report_type: _type,
+        content: [...allTexts, profileKey], orb_spent: _config.orb
+      })
+    });
+    const out = await r.json().catch(() => ({}));
+    const data = out.report;
+    if (r.ok && data) showToast('<i class="pi pi-sparkle"></i> 리포트가 저장되었습니다.');
     return data;
   } catch(e) { console.warn('[safeInsert] 저장 실패', e); return null; }
 }
@@ -7276,8 +7257,10 @@ document.addEventListener('click', function(ev){
 async function regenReport() {
   if (!confirm(`다시 생성하면 ${_config.orb.toLocaleString()} Orb가 추가 차감됩니다.\n계속하시겠어요?`)) return;
   try {
-    const sb = getSb();
-    await sb.from('reports').delete().eq('user_id', _user.id).eq('report_type', _type);
+    // 보안: 클라이언트 직접 DELETE 폐기. Worker /me/reports (service_role) 통과.
+    await fetch(`https://fortuna.kkdmb7.workers.dev/me/reports?user_id=${encodeURIComponent(_user.id)}&report_type=${encodeURIComponent(_type)}`, {
+      method: 'DELETE'
+    });
   } catch(e) {}
   try { localStorage.removeItem(`easy_${_user.id}_${_type}_v${REPORT_VERSION}`); } catch(e) {}
 

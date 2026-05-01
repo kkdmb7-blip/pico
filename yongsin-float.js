@@ -1408,16 +1408,20 @@
     }
 
     function fetchAndApply(onNew) {
-      // UUID로 먼저 조회, 없으면 kakao_xxx 형식으로 폴백 (in() 필터는 UUID 타입 컬럼에서 타입 오류 가능)
-      fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(uid) + '&report_type=eq.pet_state&select=content&order=created_at.desc&limit=1', {
-        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-      }).then(function(r) { return r.json(); }).then(function(rows) {
+      // 보안: Worker /me/reports (service_role) 통과
+      // UUID 가 아닌 kakao_xxx 형식이면 검증 실패 → onNew 로 폴백
+      var WORKER = 'https://fortuna.kkdmb7.workers.dev';
+      function _fetchPet(u) {
+        return fetch(WORKER + '/me/reports?user_id=' + encodeURIComponent(u) + '&report_type=pet_state').then(function(r) { return r.json(); }).then(function(out) {
+          // applyPetState 가 기대하는 rows 형식 [{ content: [body] }] 으로 변환
+          var rows = (out && out.reports) || [];
+          return rows;
+        });
+      }
+      _fetchPet(uid).then(function(rows) {
         if (applyPetState(rows, onNew)) return;
-        // UUID로 못 찾으면 kakao_xxx 형식 폴백
         if (!altUid || altUid === uid) { if (onNew) onNew(); return; }
-        fetch(SB_URL + '/rest/v1/reports?user_id=eq.' + encodeURIComponent(altUid) + '&report_type=eq.pet_state&select=content&order=created_at.desc&limit=1', {
-          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-        }).then(function(r2) { return r2.json(); }).then(function(rows2) {
+        _fetchPet(altUid).then(function(rows2) {
           if (!applyPetState(rows2, onNew) && onNew) onNew();
         }).catch(function() { if (onNew) onNew(); });
       }).catch(function() { if (onNew) onNew(); });
