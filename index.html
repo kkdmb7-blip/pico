@@ -5014,32 +5014,11 @@ function _picoAttendanceCheck(userId) {
   }).catch(function(){});
 }
 
-// 마이페이지 친구 초대 — charge.html handleInviteCharge 와 동일 흐름
+// 마이페이지 친구 초대 — share-invite.js 통합 (누적 분석 수 자동 삽입)
 function picoMypageInvite() {
   if (!currentUser || !currentUser.id) { alert('카카오 로그인이 필요해요'); return; }
-  var link = 'https://picolab.kr/?ref=' + currentUser.id;
-  var msg = '포르투나 — 사주·점성술 AI 운세 상담\n친구 초대로 양쪽 50 Orb 무료 지급!\n' + link;
-  if (navigator.share) {
-    navigator.share({ title: '포르투나 — 친구 초대', text: msg, url: link }).catch(function(){});
-  } else if (window.Kakao && window.Kakao.Share) {
-    if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
-    Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: '포르투나 — AI 운세 상담',
-        description: '카카오 로그인만 하면 양쪽 50 Orb 즉시 지급. 사주·점성·자미두수 AI 분석 무료 시작',
-        imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
-        link: { mobileWebUrl: link, webUrl: link }
-      },
-      buttons: [{ title: '무료로 시작 (+50 Orb)', link: { mobileWebUrl: link, webUrl: link } }]
-    });
-  } else {
-    navigator.clipboard.writeText(link).then(function() {
-      try {
-        var t = document.getElementById('toast');
-        if (t) { t.textContent = '초대 링크가 복사됐어요'; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 2500); }
-      } catch(e) {}
-    }).catch(function() { prompt('초대 링크:', link); });
+  if (window.picoShareInvite) {
+    window.picoShareInvite(currentUser.id, currentUser.name || '');
   }
 }
 
@@ -7326,5 +7305,6 @@ input,textarea,select{-webkit-user-select:text;user-select:text;}
 @keyframes bonusFadeIn { from{opacity:0;} to{opacity:1;} }
 @keyframes bonusPop { 0%{transform:scale(0.7);opacity:0;} 100%{transform:scale(1);opacity:1;} }
 </style>
+<script src="share-invite.js"></script>
 </body>
 </html>

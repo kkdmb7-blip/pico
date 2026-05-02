@@ -1008,28 +1008,11 @@ async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
 }
 
 function handleInviteCharge() {
-  if (!currentUserId) return;
-  // picolab.kr 메인으로 초대 → 친구가 카카오 로그인 시 _picoProcessReferral 자동 처리
-  var link = 'https://picolab.kr/?ref=' + currentUserId;
-  var msg = '포르투나 — 사주·점성술 AI 운세 상담\n친구 초대로 양쪽 50 Orb 무료 지급!\n' + link;
-  if (navigator.share) {
-    navigator.share({ title: '포르투나 — 친구 초대', text: msg, url: link }).catch(function(){});
-  } else if (window.Kakao && window.Kakao.Share) {
-    if (!Kakao.isInitialized()) { try { Kakao.init('25432f8a37e0ac51a5e10cbcba8ae413'); } catch(e) {} }
-    Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: '포르투나 — AI 운세 상담',
-        description: '카카오 로그인만 하면 양쪽 50 Orb 즉시 지급. 사주·점성·자미두수 AI 분석을 무료로 시작해보세요',
-        imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
-        link: { mobileWebUrl: link, webUrl: link }
-      },
-      buttons: [{ title: '무료로 시작하기 (+50 Orb)', link: { mobileWebUrl: link, webUrl: link } }]
-    });
-  } else {
-    navigator.clipboard.writeText(link).then(function() {
-      toast('초대 링크가 복사됐어요! 친구에게 공유해보세요');
-    }).catch(function() { prompt('초대 링크:', link); });
+  // share-invite.js 통합 함수 사용 — 누적 분석 수 자동 삽입
+  if (window.picoShareInvite) {
+    var name = '';
+    try { var u = JSON.parse(localStorage.getItem('pico_user') || 'null'); if (u && u.name) name = u.name; } catch(e) {}
+    window.picoShareInvite(currentUserId, name);
   }
 }
 
@@ -1276,5 +1259,6 @@ input,textarea,select{-webkit-user-select:text;user-select:text;}
   </div>
   <div style="margin-top:8px;font-size:10px;color:#9a8a70;">© 2026 FORTUNA · picolab.kr</div>
 </footer>
+<script src="share-invite.js"></script>
 </body>
 </html>
