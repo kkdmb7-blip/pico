@@ -863,7 +863,7 @@ function navBack() {
       <div class="saju-form-group">
         <label>성별</label>
         <div class="saju-gender-row">
-          <button class="saju-gender-btn active" type="button" id="childGenderM" onclick="selectChildGender('M')">남성 ♂</button>
+          <button class="saju-gender-btn" type="button" id="childGenderM" onclick="selectChildGender('M')">남성 ♂</button>
           <button class="saju-gender-btn" type="button" id="childGenderF" onclick="selectChildGender('F')">여성 ♀</button>
         </div>
       </div>
@@ -4777,7 +4777,19 @@ function openChildModal() {
     cached = JSON.parse(sessionStorage.getItem(cacheKey));
   } catch(e) {}
   if (cached && cached.year) {
-    _fillChildFields(_normalizeChildProfile(cached));
+    var normCached = _normalizeChildProfile(cached);
+    // 캐시에 gender 누락된 경우 본인 프로필로 보강 (이름·생일이 본인과 동일하면 본인 gender 적용)
+    if (normCached && !normCached.gender && _type !== 'child_career') {
+      try {
+        var myFallback = JSON.parse(localStorage.getItem('pico_profile'));
+        if (myFallback && (myFallback.gender === 'M' || myFallback.gender === 'F')
+            && (!normCached.name || !myFallback.name || normCached.name === myFallback.name)
+            && Number(normCached.year) === Number(myFallback.year)) {
+          normCached.gender = myFallback.gender;
+        }
+      } catch(e) {}
+    }
+    _fillChildFields(normCached);
   } else if (_type !== 'child_career') {
     var mine = null;
     try { mine = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
