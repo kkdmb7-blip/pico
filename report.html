@@ -788,8 +788,8 @@ function navBack() {
     <div class="consult-banner" id="consultBanner" style="display:none;">
       <div class="consult-icon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="16" stroke="url(#cg1)" stroke-width="1.5" opacity="0.5"/><path d="M18 6 L20.5 13.5 L28 14 L22 19.5 L24 27 L18 23 L12 27 L14 19.5 L8 14 L15.5 13.5Z" fill="url(#cg1)"/><defs><linearGradient id="cg1" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#6a4f0c"/><stop offset="1" stop-color="#7a2418"/></linearGradient></defs></svg></div>
       <div class="consult-title" id="consultTitle">리포트 내용이 궁금하신가요?</div>
-      <div class="consult-desc" id="consultDesc">AI 분석을 바탕으로 <em>전문 상담사</em>가 더 깊은 해석과<br>실질적인 조언을 1:1로 안내해 드립니다.</div>
-      <button class="btn-consult" onclick="window.open('http://pf.kakao.com/_krjxjn/chat','_blank')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg> 전문 상담 받기</button>
+      <div class="consult-desc" id="consultDesc">AI 분석에서 더 깊이 들여다보고 싶은 부분이 있다면,<br><em>전문 상담사</em>가 1:1로 같이 살펴봐 드릴게요.</div>
+      <button class="btn-consult" onclick="window.open('http://pf.kakao.com/_krjxjn/chat','_blank')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg> 상담사와 한 호흡 더</button>
     </div>
     <div class="report-actions" id="reportActions" style="display:none;">
       <a class="btn-action btn-memox" href="https://kkdmb7-blip.github.io/memox/" target="_blank"><i class="pi pi-sparkle"></i> AI 운세 상담하기</a>
@@ -11321,7 +11321,7 @@ function showConsultBanner() {
     }
   } catch(e) {}
   const bannerTexts = {
-    character: { title: '나의 기질, 더 깊이 알고 싶다면', desc: '타고난 성향과 잠재력을 <em>전문 상담사</em>가\n1:1로 풀어드립니다.' },
+    character: { title: '나의 기질, 더 깊이 알고 싶다면', desc: '타고난 성향과 잠재력을 <em>전문 상담사</em>가\n1:1로 같이 결을 짚어드릴게요.' },
     money:     { title: '재물운을 현실에 적용하고 싶다면', desc: '투자 시기, 사업 방향까지 <em>전문 상담사</em>가\n구체적으로 안내해 드립니다.' },
     love:      { title: '연애운이 궁금하신가요?', desc: '인연의 시기와 상대방 궁합까지\n<em>전문 상담사</em>가 세밀하게 풀어드립니다.' },
     daeun:     { title: '대운의 흐름, 전략이 필요하다면', desc: '지금 대운에서 어떻게 움직여야 하는지\n<em>전문 상담사</em>가 맞춤 전략을 세워드립니다.' },
@@ -11339,7 +11339,7 @@ function showConsultBanner() {
     balance:       { title: '오행 균형 처방, 생활에 적용하려면', desc: '색·방위·음식·직업까지 일상 처방을\n<em>전문 상담사</em>가 구체적으로 안내합니다.' },
     sinsal:        { title: '신살의 의미와 대응법이 궁금하다면', desc: '작용 강도와 완화법을\n<em>전문 상담사</em>가 실전 조언으로 풀어드립니다.' },
     health:        { title: '건강·체질 관점의 맞춤 가이드가 필요하다면', desc: '오행 체질·취약점 관리법을\n<em>전문 상담사</em>가 생활 밀착형으로 안내합니다.' },
-    family:        { title: '가족 관계 코칭이 필요하다면', desc: '부모·형제·자녀 관계 역학을\n<em>전문 상담사</em>가 1:1로 풀어드립니다.' },
+    family:        { title: '가족 관계 코칭이 필요하다면', desc: '부모·형제·자녀 관계 역학을\n<em>전문 상담사</em>가 1:1로 같이 결을 짚어드릴게요.' },
     timing:        { title: '중요 선택의 타이밍을 잡고 싶다면', desc: '이사·이직·결혼 등 시기 판단을\n<em>전문 상담사</em>가 맞춤 설계해 드립니다.' },
     wealth_timing: { title: '재물 타이밍, 실행 전략이 필요하다면', desc: '투자·계약·사업 개시 시점을\n<em>전문 상담사</em>가 구체적으로 코칭합니다.' },
     wealth_lifetime:{ title: '내 인생 재물 곡선, 정점 시기에 무엇을 할지', desc: '곡선 정점·저점에 맞춘 실전 재물 전략을\n<em>전문 상담사</em>가 1:1로 설계해 드립니다.' },
@@ -11355,7 +11355,7 @@ function showConsultBanner() {
     era:          { title: '내 시대 에너지, 현대에서 활용하고 싶다면', desc: '그 시대의 에너지를 현대에 적용하는 법\n<em>전문 상담사</em>가 구체적으로 안내합니다.' },
     hidden_talent:{ title: '숨겨진 재능, 어떻게 꺼내야 할지 모르겠다면', desc: 'AI가 찾아낸 재능을 바탕으로\n<em>전문 상담사</em>가 실천 방향을 안내합니다.' },
     totem:        { title: '수호 동물 에너지, 더 깊이 알고 싶다면', desc: '수호 동물의 에너지를 삶에 적용하는 법\n<em>전문 상담사</em>가 구체적으로 안내합니다.' },
-    vedic_nakshatra:    { title:'낙샤트라 해석, 더 깊이 듣고 싶다면', desc:'AI가 읽은 낙샤트라 기질을 바탕으로\n<em>전문 상담사</em>가 신화·다샤·실천까지 1:1로 풀어드립니다.' },
+    vedic_nakshatra:    { title:'낙샤트라 해석, 더 깊이 듣고 싶다면', desc:'AI가 읽은 낙샤트라 기질을 바탕으로\n<em>전문 상담사</em>가 신화·다샤·실천까지 1:1로 같이 결을 짚어드릴게요.' },
     vedic_pada:         { title:'파다 세분 분석, 맞춤 상담을 원한다면', desc:'같은 낙샤트라 속 4얼굴 중 내 파다의 의미를\n<em>전문 상담사</em>가 D9까지 연결해 안내합니다.' },
     vedic_dasha_life:   { title:'다샤 인생 지도, 장기 전략이 필요하다면', desc:'120년 다샤 흐름과 각 행성기 테마를\n<em>전문 상담사</em>가 1:1 맞춤 전략으로 풀어드립니다.' },
     vedic_yoga:         { title:'요가 조합, 발현 전략이 필요하다면', desc:'라자·다나·판차마하푸루샤 요가를\n<em>전문 상담사</em>가 활성 시기·개운법까지 안내합니다.' },
@@ -11364,17 +11364,17 @@ function showConsultBanner() {
     vedic_sadesati:     { title:'사데사티 대응 전략이 필요하다면', desc:'현재 단계와 시련 테마를\n<em>전문 상담사</em>가 전통 대응법과 함께 1:1로 안내합니다.' },
     vedic_sandhi:       { title:'다샤 전환기, 큰 결정 앞둔다면', desc:'Sandhi 구간의 흔들림과 기회를\n<em>전문 상담사</em>가 행동 전략으로 풀어드립니다.' },
     vedic_ashtakavarga: { title:'삶의 영역별 강약, 실전 전략이 필요하다면', desc:'Ashtakavarga 점수 해석과 약점 보강을\n<em>전문 상담사</em>가 맞춤 설계합니다.' },
-    vedic_navamsa:      { title:'D9 결혼·운명, 더 깊이 알고 싶다면', desc:'나바암샤가 가리키는 결혼·영적 성숙을\n<em>전문 상담사</em>가 1:1로 풀어드립니다.' },
+    vedic_navamsa:      { title:'D9 결혼·운명, 더 깊이 알고 싶다면', desc:'나바암샤가 가리키는 결혼·영적 성숙을\n<em>전문 상담사</em>가 1:1로 같이 결을 짚어드릴게요.' },
     vedic_moon:         { title:'감정의 근원, 실전 상담이 필요하다면', desc:'라시(월궁) 분석을 바탕으로\n<em>전문 상담사</em>가 정서 안정 전략을 안내합니다.' },
     vedic_ascendant:    { title:'라그나 페르소나, 활용법이 궁금하다면', desc:'외적 페르소나를 삶에 살리는 법을\n<em>전문 상담사</em>가 구체적 언어로 풀어드립니다.' },
     vedic_remedy:       { title:'개운 실천, 맞춤 설계가 필요하다면', desc:'AI가 찾은 약한 행성 개운법을\n<em>전문 상담사</em>가 40일 루틴으로 설계합니다.' },
     vedic_gemstone:     { title:'보석 처방, 실전 착용법이 필요하다면', desc:'나바라트나 보석 선택과 정화·착용법을\n<em>전문 상담사</em>가 1:1로 안내합니다.' },
     vedic_muhurta:      { title:'이번주 길시, 결정의 타이밍이 필요하다면', desc:'계약·여행·새 시작의 최적 시간을\n<em>전문 상담사</em>가 개인 차트 맞춤으로 풀어드립니다.' },
-    qimen_wonmyong:     { title:'본명국이 가리키는 인생 방향, 더 깊이 알고 싶다면', desc:'9궁 포국이 평생 어떻게 작용하는지\n<em>기문둔갑 전문 상담사</em>가 1:1로 풀어드립니다.' },
+    qimen_wonmyong:     { title:'본명국이 가리키는 인생 방향, 더 깊이 알고 싶다면', desc:'9궁 포국이 평생 어떻게 작용하는지\n<em>기문둔갑 전문 상담사</em>가 1:1로 같이 결을 짚어드릴게요.' },
     qimen_today:        { title:'오늘 결정해야 할 중요한 일이 있다면', desc:'시간대·방향·활동을\n<em>기문둔갑 전문 상담사</em>가 개인 차트 맞춤으로 안내합니다.' },
     qimen_taegil:       { title:'14일 안 중요한 일정이 있다면', desc:'사업·계약·이사 길일을\n<em>기문둔갑 전문 상담사</em>가 개인 사주에 맞춰 정밀 추천합니다.' }
   };
-  const t = bannerTexts[_type] || { title: '리포트 내용이 궁금하신가요?', desc: 'AI 분석을 바탕으로 <em>전문 상담사</em>가 더 깊은 해석과<br>실질적인 조언을 1:1로 안내해 드립니다.' };
+  const t = bannerTexts[_type] || { title: '리포트 내용이 궁금하신가요?', desc: 'AI 분석을 바탕으로 <em>전문 상담사</em>가 더 깊은 해석과<br>실질적인 조언을 1:1로 같이 살펴봐 드릴게요.' };
   document.getElementById('consultTitle').textContent = t.title;
   document.getElementById('consultDesc').innerHTML = t.desc.replace(/\n/g, '<br>');
   document.getElementById('consultBanner').style.display = 'block';
