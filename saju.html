@@ -2157,7 +2157,7 @@ function doSajuShare() {
   var EN_EL_MAP = {wood:'목',fire:'화',earth:'토',metal:'금',water:'수'};
   var yongshin = d.yongshin ? (EN_EL_MAP[d.yongshin.final || d.yongshin.primary] || (d.yongshin.final || d.yongshin.primary) || '') : '';
   var pageUrl = 'https://picolab.kr';
-  var text = '✨ FORTUNA 사주 분석\n일주: '+dayPillar+(yongshin?' · 용신: '+yongshin:'')+(d.summary&&d.summary.strength?' · '+d.summary.strength:'')+'\n\n나도 확인해봐 👇\n'+pageUrl;
+  var text = '✦ FORTUNA 사주 분석\n일주: '+dayPillar+(yongshin?' · 용신: '+yongshin:'')+(d.summary&&d.summary.strength?' · '+d.summary.strength:'')+'\n\n같이 한 번 살펴봐요 👇\n'+pageUrl;
   try { navigator.clipboard && navigator.clipboard.writeText(pageUrl); } catch(e) {}
   var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   cv.toBlob(function(blob) {

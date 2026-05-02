@@ -920,7 +920,7 @@ function markdownToHtml(md) {
 function shareKakao() {
   var ilju = (_workerData && _workerData.일주) || '';
   var pageUrl = 'https://picolab.kr/report-saju.html';
-  var shareText = '✨ ' + ilju + ' 일주 나만의 사주 리포트\n\nFORTUNA에서 AI 심층 사주 분석을 받아보세요!';
+  var shareText = '✦ ' + ilju + ' 일주 나만의 사주 리포트\n\nFORTUNA에서 AI 심층 사주 분석을 같이 살펴봐요';
   if (navigator.share) {
     navigator.share({ title: 'FORTUNA 사주 리포트', text: shareText, url: pageUrl }).catch(function(){});
     return;

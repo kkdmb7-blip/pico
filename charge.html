@@ -913,7 +913,7 @@ async function doPay(pack) {
     try {
       await trySave();
       hideLoading();
-      toast('✨ ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
+      toast('✦ ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
       // 운영자 텔레그램 알림 (실패해도 무시)
       try {
         var uname = '';
@@ -975,7 +975,7 @@ async function recoverPending() {
     userId: currentUserId,
     retryFn: async function() {
       showLoading();
-      try { await chargeOrb(pack, pending.totalOrb, pending.impUid, pending.paymentId); clearPending(); hideLoading(); toast('✨ ' + pending.totalOrb.toLocaleString() + ' Orb 지급 완료!', 3000); setTimeout(function(){ location.href=_chargeReturnUrl||'https://picolab.kr'; },1500); }
+      try { await chargeOrb(pack, pending.totalOrb, pending.impUid, pending.paymentId); clearPending(); hideLoading(); toast('✦ ' + pending.totalOrb.toLocaleString() + ' Orb 지급 완료!', 3000); setTimeout(function(){ location.href=_chargeReturnUrl||'https://picolab.kr'; },1500); }
       catch(err) { hideLoading(); throw err; }
     }
   });

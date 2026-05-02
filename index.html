@@ -1760,7 +1760,7 @@
     if (d === 0)       msg = '오늘 세상에 나왔어요 🐣';
     else if (d === 100) msg = '100일 축하해요 🌸';
     else if (d === 365) msg = '1년이 되었어요 💖';
-    else if (d === 1000) msg = '천 일의 이정표 ✨';
+    else if (d === 1000) msg = '천 일의 이정표 ✦';
     else if (d === 10000) msg = '만일의 하루 🎉';
     else if (d > 0 && d % 1000 === 0) msg = d.toLocaleString() + '일째 — 의미 있는 하루';
     else if (d > 0 && d % 365 === 0)  msg = (d/365) + '주년 되는 날 🌿';
@@ -5204,7 +5204,7 @@ async function openSharedGunghap(sharedId) {
         banner.id = 'sharedGhBanner';
         banner.style.cssText = 'margin:12px 0 0;padding:14px 16px;background:rgba(138,106,21,0.10);border:1px solid rgba(138,106,21,0.30);border-radius:12px;text-align:center;';
         banner.innerHTML =
-          '<div style="font-size:12.5px;color:#6a4f0c;margin-bottom:10px;line-height:1.6;">✨ 지인이 공유해준 궁합 분석이에요<br>나와 상대방의 궁합도 직접 확인해보세요</div>' +
+          '<div style="font-size:12.5px;color:#6a4f0c;margin-bottom:10px;line-height:1.6;">✦ 지인이 공유해 준 궁합 분석이에요<br>두 분의 결도 한 번 살펴봐요</div>' +
           '<button id="btnTryGunghap" style="display:inline-block;padding:10px 26px;font-size:12px;letter-spacing:0.12em;background:rgba(122,36,24,0.10);color:#7a2418;border:1px solid rgba(122,36,24,0.30);border-radius:22px;cursor:pointer;font-family:\'Noto Serif KR\',sans-serif;">나도 해보기 →</button>';
         // AI 아래, 공유 버튼 위에 삽입
         var aiWrap = document.getElementById('ghResultAI');
@@ -5228,7 +5228,7 @@ async function openSharedGunghap(sharedId) {
 
 function shareMainKakao() {
   var pageUrl = 'https://picolab.kr?utm_source=share&utm_medium=kakao';
-  var text = '✨ 포르투나 운세 - 사주·기문·점성·베딕·자미 5개 엔진 교차 분석!\n\n오늘 내 운세 점수가 궁금하면 확인해봐 👇\n무료로 바로 볼 수 있어!';
+  var text = '✦ 포르투나 운세 — 사주·기문·점성·베딕·자미 5엔진 교차 분석\n\n오늘 결이 궁금하면 같이 살펴봐요 👇\n무료로 한 번 둘러볼 수 있어요';
   var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (isMobile && navigator.share) {
     navigator.share({ title: 'FORTUNA 운세', text: text, url: pageUrl }).catch(function(){});
@@ -7151,7 +7151,7 @@ window.togglePushSubscription = async function() {
         Kakao.Share.sendDefault({
           objectType: 'feed',
           content: {
-            title: '✨ 오늘의 우주 메시지',
+            title: '✦ 오늘의 우주 메시지',
             description: '\u201c' + data.quote + '\u201d\n\u2014 ' + data.source,
             imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
             link: { mobileWebUrl: pageUrl, webUrl: pageUrl }

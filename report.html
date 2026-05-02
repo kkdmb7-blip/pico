@@ -69,7 +69,7 @@ nav {
 #stateLoading { display: flex; flex-direction: column; align-items: center; padding: 60px 0; gap: 20px; }
 .star-loader { position: relative; width: 60px; height: 60px; }
 .star-loader::before {
-  content: '✨';
+  content: '✦';
   font-size: 32px; color: var(--gold-deep);
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
   animation: pulse 1.4s ease-in-out infinite;
@@ -4499,7 +4499,7 @@ function injectSharedReportBanner() {
     wrap.id = 'sharedReportBanner';
     wrap.style.cssText = 'max-width:720px;margin:16px auto 20px;padding:16px 18px;background:rgba(138,106,21,0.10);border:1px solid rgba(138,106,21,0.30);border-radius:14px;text-align:center;font-family:\'Gowun Batang\',\'Noto Serif KR\',serif;';
     wrap.innerHTML =
-      '<div style="font-size:13px;color:#6a4f0c;margin-bottom:10px;line-height:1.6;">✨ 지인이 공유해준 AI 리포트예요<br>당신에게 맞는 리포트도 만들어보세요</div>' +
+      '<div style="font-size:13px;color:#6a4f0c;margin-bottom:10px;line-height:1.6;">✦ 지인이 공유해 준 AI 리포트예요<br>당신에게 맞는 리포트도 한 번 살펴봐요</div>' +
       '<button id="btnTryForMe" style="display:inline-block;padding:10px 28px;font-size:12px;letter-spacing:0.14em;background:rgba(122,36,24,0.10);color:#7a2418;border:1px solid rgba(122,36,24,0.30);border-radius:24px;cursor:pointer;">나도 해보기 →</button>';
     reportArea.insertBefore(wrap, reportArea.firstChild);
     const btn = document.getElementById('btnTryForMe');
@@ -6840,7 +6840,7 @@ function renderIntro() {
       <div style="position:relative;background:rgba(0,0,0,0.04);padding:14px;border-radius:8px;overflow:hidden;">
         <div style="filter:blur(4px);user-select:none;pointer-events:none;font-size:12px;line-height:1.7;color:#5a4830;">${_config.title} 풀 분석 — 정점 시기·통로·위험 신호·실전 전략·길흉 키워드·시기별 액션 다섯 섹션 본문이 여기 펼쳐집니다. 본인 일주·격국·용신·대운·세운 데이터로 textbook 정확도 99%로 작성됩니다.</div>
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-          <div style="background:rgba(255,255,255,0.92);border:1px solid rgba(154,122,38,0.32);border-radius:10px;padding:8px 14px;font-size:11px;font-weight:800;color:#7a5a08;">🔒 ${(_config.orb||0).toLocaleString()} Orb 결제 후 풀 공개</div>
+          <div style="background:rgba(255,255,255,0.92);border:1px solid rgba(154,122,38,0.32);border-radius:10px;padding:8px 14px;font-size:11px;font-weight:800;color:#7a5a08;"><i class="pi pi-lock"></i> ${(_config.orb||0).toLocaleString()} Orb 결제 후 풀 공개</div>
         </div>
       </div>
     </div>`;
@@ -6886,7 +6886,7 @@ function renderIntro() {
           <div style="font-size:11px;color:#3a6a6a;margin-top:2px;">점수 ${cur.score}/10 · ${cur.tenGod}</div>
         </div>` : ''}
       </div>
-      <div style="text-align:center;font-size:11px;color:#7a5a30;margin-top:4px;line-height:1.7;">🔒 곡선 모양·정점·저점·지금만 미리 공개. 자세한 점수·해석·전략은 990 Orb 결제 후 5섹션 풀 분석.</div>`;
+      <div style="text-align:center;font-size:11px;color:#7a5a30;margin-top:4px;line-height:1.7;"><i class="pi pi-lock"></i> 곡선 모양·정점·저점·지금만 미리 공개. 자세한 점수·해석·전략은 990 Orb 결제 후 5섹션 풀 분석.</div>`;
     } else {
       teaserCards = '<div style="text-align:center;font-size:11px;color:#7a5a30;margin-top:4px;line-height:1.6;">↑ 샘플 곡선 — 실제는 본인 사주·자미두수 데이터로 그려집니다</div>';
     }
@@ -6935,7 +6935,7 @@ function renderIntro() {
       ? '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;margin-bottom:-4px;">YOUR REAL CALENDAR · PARTIAL PREVIEW</div>'
       : '<div style="text-align:center;font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;margin-bottom:-4px;">SAMPLE PREVIEW</div>';
     const sampleNote = usingReal
-      ? '<div style="text-align:center;font-size:11px;color:#3a6a6a;margin-top:4px;line-height:1.6;">🔒 정점·저점·현재·휴식월만 공개. 12개월 전체 분석은 590 Orb 결제 후.</div>'
+      ? '<div style="text-align:center;font-size:11px;color:#3a6a6a;margin-top:4px;line-height:1.6;"><i class="pi pi-lock"></i> 정점·저점·현재·휴식월만 공개. 12개월 전체 분석은 590 Orb 결제 후.</div>'
       : '<div style="text-align:center;font-size:11px;color:#3a6a6a;margin-top:4px;line-height:1.6;">↑ 샘플 차트 — 실제는 본인 사주 세운월별 정밀 데이터로 그려집니다</div>';
     const nowMonth = new Date().getMonth() + 1;
     const hooks = usingReal ? [
@@ -10711,7 +10711,7 @@ function renderMonthlyBarChart(cal, opt) {
 
   const defs = teaserMode ? '<defs><filter id="mcBlur"><feGaussianBlur stdDeviation="2.5"/></filter></defs>' : '';
   const note = teaserMode
-    ? '🔒 정점·저점·현재 외 8개월은 결제 후 전체 공개 — 실제 본인 사주 데이터'
+    ? '정점·저점·현재 외 8개월은 결제 후 전체 공개 — 실제 본인 사주 데이터'
     : '★ 정점월 · ⚠ 저점월 · 회색 휴식월 · 점수 1~10 (워커 세운월별 점수 / 10)';
   return `<div style="background:rgba(58,138,138,0.04);border:1px solid rgba(58,138,138,0.18);border-radius:14px;padding:14px 6px 10px;margin:14px 0 6px;">
     <div style="font-size:10px;font-weight:800;letter-spacing:0.18em;color:#1a4a4a;text-align:center;margin-bottom:4px;">${teaserMode?'YOUR REAL CHART · PARTIAL PREVIEW':'12-MONTH FORTUNE CALENDAR'}</div>
@@ -11601,7 +11601,7 @@ async function easyExplain() {
 
   const btn = document.getElementById('easyBtn');
   btn.disabled = true;
-  btn.textContent = '✨ 풀이하는 중...';
+  btn.textContent = '✦ 풀이하는 중...';
 
   const sys = `당신은 사주를 처음 접한 친구에게 카톡으로 쉽게 풀어주는 따뜻한 친구입니다.
 
@@ -11701,7 +11701,7 @@ function shareKakao() {
   const url = buildShareReportUrl();
   const reportTitle = _config?.title || 'AI 운세 리포트';
   const userName = _profile?.name ? ` · ${_profile.name}님` : '';
-  const title = '✨ ' + reportTitle + userName;
+  const title = '✦ ' + reportTitle + userName;
 
   const summary = buildShareSummary();
   const isSharedGuide = (_type === 'guide' && _reportId);
