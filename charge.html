@@ -407,7 +407,7 @@ nav {
 <div class="toast" id="toast"></div>
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
-  <div style="font-size:14px;">결제 처리 중...</div>
+  <div style="font-size:14px;">결제 처리 중이에요 · 잠시만요</div>
 </div>
 
 <!-- 결제 오류 복구 모달 -->
@@ -415,13 +415,13 @@ nav {
   <div style="background:var(--surface);border:1.5px solid var(--border-soft);border-radius:18px;padding:24px 22px 20px;max-width:380px;width:100%;box-shadow:var(--shadow-lift);">
     <div style="text-align:center;margin-bottom:16px;">
       <div style="font-size:42px;margin-bottom:8px;" id="ceIcon">⚠️</div>
-      <div style="font-family:'Noto Serif KR',serif;font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px;" id="ceTitle">결제 저장에 실패했어요</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.65;" id="ceDesc">결제는 완료됐으나 Orb 지급 중 오류가 발생했어요. 아래 다시 시도해주세요.</div>
+      <div style="font-family:'Noto Serif KR',serif;font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px;" id="ceTitle">Orb 저장이 살짝 늦어지고 있어요</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.65;" id="ceDesc">결제는 잘 마무리됐어요. Orb만 잠시 막힌 듯해, 아래에서 한 번 더 시도해주시면 곧 도착할 거예요.</div>
     </div>
     <div style="background:var(--surface2);border:1px solid var(--border-soft);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.6;word-break:break-all;" id="ceDetails"></div>
     <div style="display:flex;flex-direction:column;gap:8px;">
       <button id="ceRetryBtn" style="background:rgba(154,122,38,0.13);color:#7a5e1c;border:1px solid rgba(122,94,28,0.4);border-radius:12px;padding:13px 0;font-size:14px;font-weight:700;cursor:pointer;">다시 시도</button>
-      <button id="ceCopyBtn" style="background:var(--surface2);color:var(--ink);border:1px solid var(--border-soft);border-radius:12px;padding:13px 0;font-size:13px;font-weight:600;cursor:pointer;">결제번호 복사 후 고객센터 문의</button>
+      <button id="ceCopyBtn" style="background:var(--surface2);color:var(--ink);border:1px solid var(--border-soft);border-radius:12px;padding:13px 0;font-size:13px;font-weight:600;cursor:pointer;">결제번호 복사 후 고객센터에 알리기</button>
       <button id="ceCloseBtn" style="background:transparent;color:var(--muted);border:0;padding:8px 0;font-size:12px;cursor:pointer;">나중에</button>
     </div>
   </div>
@@ -742,9 +742,10 @@ function openPaymentMethodModal(pack) {
   }
   ov.innerHTML = ''
     + '<div style="max-width:360px;width:100%;background:linear-gradient(160deg,#fdf8eb,#f7e9c8);border:1.5px solid rgba(106,79,12,0.28);border-radius:20px;padding:26px 22px;box-shadow:0 22px 60px rgba(60,40,8,0.30);animation:pmPop 0.32s cubic-bezier(0.34,1.56,0.64,1);">'
-    +   '<div style="text-align:center;margin-bottom:22px;">'
-    +     '<div style="font-family:\'Noto Serif KR\',serif;font-size:19px;font-weight:800;color:#3a2a08;margin-bottom:6px;letter-spacing:-0.3px;">결제 수단 선택</div>'
+    +   '<div style="text-align:center;margin-bottom:18px;">'
+    +     '<div style="font-family:\'Noto Serif KR\',serif;font-size:19px;font-weight:800;color:#3a2a08;margin-bottom:6px;letter-spacing:-0.3px;">어떻게 결제하실래요?</div>'
     +     '<div style="font-size:12px;color:#6a4f0c;">' + pack.priceLabel + ' · ' + pack.label + '</div>'
+    +     '<div style="font-size:11px;color:rgba(106,79,12,0.65);margin-top:6px;line-height:1.5;">결정은 천천히 — 취소도 언제든 OK</div>'
     +   '</div>'
     +   '<button id="pmGooglePlay" disabled style="width:100%;padding:14px 16px;margin-bottom:10px;background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.10);border-radius:14px;cursor:not-allowed;text-align:left;display:flex;align-items:center;gap:12px;opacity:0.55;">'
     +     '<div style="font-size:26px;color:#5a4830;width:30px;text-align:center;"><i class="pi pi-gem"></i></div>'
@@ -784,21 +785,24 @@ function showExternalNoticeModal(pack) {
     document.body.appendChild(ov);
   }
   ov.innerHTML = ''
-    + '<div style="max-width:360px;width:100%;background:#fdf8eb;border:1.5px solid rgba(154,74,58,0.30);border-radius:20px;padding:26px 22px;box-shadow:0 22px 60px rgba(60,40,8,0.30);animation:pmPop 0.32s cubic-bezier(0.34,1.56,0.64,1);">'
+    + '<div style="max-width:360px;width:100%;background:#fdf8eb;border:1.5px solid rgba(154,124,58,0.30);border-radius:20px;padding:26px 22px;box-shadow:0 22px 60px rgba(60,40,8,0.30);animation:pmPop 0.32s cubic-bezier(0.34,1.56,0.64,1);">'
     +   '<div style="text-align:center;margin-bottom:18px;">'
-    +     '<div style="font-size:38px;color:#a94a3a;margin-bottom:10px;"><i class="pi pi-warning"></i></div>'
-    +     '<div style="font-family:\'Noto Serif KR\',serif;font-size:17px;font-weight:800;color:#3a2a08;letter-spacing:-0.3px;">외부 결제 안내</div>'
+    +     '<div style="font-size:34px;color:#967032;margin-bottom:10px;"><i class="pi pi-info-circle"></i></div>'
+    +     '<div style="font-family:\'Noto Serif KR\',serif;font-size:17px;font-weight:800;color:#3a2a08;letter-spacing:-0.3px;">잠깐, 결제 전 안내드릴게요</div>'
+    +     '<div style="font-size:12px;color:rgba(106,79,12,0.70);margin-top:6px;line-height:1.55;">읽어보고 천천히 결정해주세요</div>'
     +   '</div>'
-    +   '<div style="background:rgba(169,74,58,0.07);border:1px solid rgba(169,74,58,0.22);border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.7;color:#3a2a08;margin-bottom:14px;">'
-    +     '이 결제는 <strong style="color:#8a3a2a;">Google Play 외부에서 처리</strong>됩니다.<br>'
-    +     'Google Play의 구매 보호 정책이 적용되지 않을 수 있습니다.'
+    +   '<div style="background:rgba(150,112,50,0.07);border:1px solid rgba(150,112,50,0.22);border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.75;color:#3a2a08;margin-bottom:12px;">'
+    +     '이 결제는 <strong style="color:#8a6a2a;">Google Play 외부</strong>에서 처리돼요.<br>'
+    +     '대신, <strong style="color:#8a6a2a;">FORTUNA 자체 결제(포트원 · KG이니시스)</strong>로 안전하게 진행돼요.'
     +   '</div>'
-    +   '<div style="font-size:12px;color:#6a4f0c;line-height:1.7;margin-bottom:20px;padding:0 4px;">'
-    +     'FORTUNA 자체 결제 시스템(포트원 · KG이니시스) 으로 안전하게 처리되며, 환불·문의는 picolab.kr 고객센터에서 처리합니다.'
+    +   '<div style="font-size:12px;color:#6a4f0c;line-height:1.75;margin-bottom:20px;padding:0 4px;">'
+    +     '· 카드사 보안 결제 그대로예요<br>'
+    +     '· 영수증·환불·문의 모두 picolab.kr 고객센터에서 도와드려요<br>'
+    +     '· 결제 후에도 마음 바뀌면 환불 요청 가능해요'
     +   '</div>'
-    +   '<button id="pnConfirm" style="width:100%;padding:14px;background:linear-gradient(135deg,#967032,#b89048);border:none;border-radius:14px;cursor:pointer;color:#fdf7e0;font-size:14px;font-weight:800;letter-spacing:0.05em;box-shadow:0 6px 16px rgba(120,80,20,0.22);">확인하고 결제 진행</button>'
+    +   '<button id="pnConfirm" style="width:100%;padding:14px;background:linear-gradient(135deg,#967032,#b89048);border:none;border-radius:14px;cursor:pointer;color:#fdf7e0;font-size:14px;font-weight:800;letter-spacing:0.05em;box-shadow:0 6px 16px rgba(120,80,20,0.22);">안내 확인했어요 · 결제로</button>'
     +   '<div style="text-align:center;margin-top:12px;">'
-    +     '<button id="pnCancel" style="background:none;border:none;color:#6a4f0c;font-size:12px;cursor:pointer;padding:6px 12px;">취소</button>'
+    +     '<button id="pnCancel" style="background:none;border:none;color:#6a4f0c;font-size:12px;cursor:pointer;padding:6px 12px;">다음에 할게요</button>'
     +   '</div>'
     + '</div>';
   ov.style.display = 'flex';
@@ -818,8 +822,8 @@ function loadPending() { try { var s = localStorage.getItem(PENDING_KEY); return
 function showChargeError(opts) {
   // opts: { icon, title, desc, paymentId, impUid, packId, retryFn }
   document.getElementById('ceIcon').textContent = opts.icon || '⚠️';
-  document.getElementById('ceTitle').textContent = opts.title || '결제 저장에 실패했어요';
-  document.getElementById('ceDesc').textContent = opts.desc || '결제는 완료됐으나 Orb 지급 중 오류가 발생했어요. 아래 다시 시도해주세요.';
+  document.getElementById('ceTitle').textContent = opts.title || 'Orb 저장이 살짝 늦어지고 있어요';
+  document.getElementById('ceDesc').textContent = opts.desc || '결제는 잘 마무리됐어요. Orb만 잠시 막힌 듯해, 아래에서 한 번 더 시도해주시면 곧 도착할 거예요.';
   var details = '결제번호: ' + (opts.paymentId || '-') + '\n';
   if (opts.impUid) details += '거래번호: ' + opts.impUid + '\n';
   if (opts.packId) details += '팩: ' + opts.packId + '\n';
@@ -844,14 +848,14 @@ function showChargeError(opts) {
     } catch(e) {
       retryBtn.disabled = false;
       retryBtn.textContent = '다시 시도';
-      toast('재시도 실패: ' + (e.message || e));
+      toast('아직 잘 안 되네요. 잠시 후 다시 시도하거나 picolab.kr 고객센터에 알려주세요. (' + (e.message || e) + ')', 4000);
     }
   };
   copyBtn.onclick = function() {
     var text = '[Orb 충전 문의] ' + details.replace(/\n/g,' | ');
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(function() {
-        toast('결제번호가 복사됐어요. 고객센터(picolab.kr)로 문의해주세요.', 3500);
+        toast('결제번호를 복사해뒀어요. picolab.kr 고객센터에 붙여넣어 주시면 바로 챙겨드릴게요.', 3800);
       }).catch(function() { prompt('복사해주세요:', text); });
     } else { prompt('복사해주세요:', text); }
   };
@@ -886,11 +890,11 @@ async function doPay(pack) {
     if (rsp && rsp.code) {
       var msg = rsp.message || rsp.code;
       if (String(msg).indexOf('취소') !== -1 || !msg) {
-        toast('결제가 취소되었어요.');
+        toast('결제를 멈췄어요. 언제든 다시 둘러봐도 괜찮아요.');
       } else if (String(msg).indexOf('잔액') !== -1 || String(msg).indexOf('한도') !== -1) {
-        showChargeError({ icon:'💳', title:'카드 결제가 거절됐어요', desc:'카드사에서 결제가 거절됐어요. 다른 카드를 이용하시거나 카드사에 문의해주세요.', paymentId: paymentId });
+        showChargeError({ icon:'💳', title:'카드 결제가 닿지 않았어요', desc:'카드사에서 잠시 막힌 듯해요. 다른 카드로 시도하거나 카드사에 문의해주세요. 부담 가지지 마세요.', paymentId: paymentId });
       } else {
-        showChargeError({ icon:'⚠️', title:'결제가 실패했어요', desc: msg, paymentId: paymentId });
+        showChargeError({ icon:'⚠️', title:'결제가 마무리되지 않았어요', desc: msg, paymentId: paymentId });
       }
       console.warn('[결제 실패]', rsp);
       return;
@@ -928,8 +932,8 @@ async function doPay(pack) {
       console.error('[charge] chargeOrb 에러:', e);
       showChargeError({
         icon:'⏳',
-        title:'Orb 지급이 지연되고 있어요',
-        desc:'결제는 정상 완료됐으나 Orb 지급이 실패했어요. 다시 시도하거나 결제번호를 복사해 문의해주세요.',
+        title:'Orb 지급이 잠시 늦어지고 있어요',
+        desc:'결제는 잘 마무리됐어요. Orb만 살짝 지연되는 중이라, 아래에서 다시 시도하거나 결제번호를 복사해 알려주시면 바로 도와드릴게요.',
         paymentId: paymentId,
         impUid: rsp.paymentId,
         packId: pack.id,
@@ -943,7 +947,7 @@ async function doPay(pack) {
     }
   } catch(e) {
     hideLoading();
-    showChargeError({ icon:'⚠️', title:'결제 오류', desc: e.message || String(e), paymentId: paymentId });
+    showChargeError({ icon:'⚠️', title:'결제 중 잠시 멈췄어요', desc: e.message || String(e), paymentId: paymentId });
     console.warn('[결제 오류]', e);
   }
 }
@@ -963,8 +967,8 @@ async function recoverPending() {
   } catch(e) {}
   showChargeError({
     icon:'🔔',
-    title:'지난 결제 Orb 지급이 미완료 상태예요',
-    desc:'직전 결제의 Orb 지급이 완료되지 않았어요. 지금 다시 시도할 수 있어요.',
+    title:'지난번 Orb 지급이 마무리되지 않았어요',
+    desc:'직전 결제 Orb가 아직 도착하지 않은 상태예요. 지금 한 번 더 시도해드릴까요?',
     paymentId: pending.paymentId,
     impUid: pending.impUid,
     packId: pending.packId,
@@ -1026,7 +1030,7 @@ async function handleRedirectResult() {
 
   var code = params.get('code');
   if (code) {
-    toast('결제가 취소되었어요.');
+    toast('결제를 멈췄어요. 언제든 다시 둘러봐도 괜찮아요.');
     return true;
   }
 
@@ -1039,7 +1043,7 @@ async function handleRedirectResult() {
     var pack = PACKS.find(function(p) { return p.id === packId; });
     if (!pack) {
       hideLoading();
-      toast('충전 팩 정보를 찾을 수 없어요. 고객센터에 문의해주세요.');
+      toast('충전 팩 정보를 잠시 못 찾았어요. picolab.kr 고객센터에서 바로 도와드릴게요.', 4000);
       return true;
     }
 
@@ -1049,7 +1053,7 @@ async function handleRedirectResult() {
     toast('<i class="pi pi-check"></i> ' + totalOrb.toLocaleString() + ' Orb 충전 완료!', 3000);
   } catch(e) {
     hideLoading();
-    toast('결제는 완료됐으나 저장 중 오류가 발생했어요. 고객센터에 문의해주세요.');
+    toast('결제는 잘 마무리됐어요. Orb 저장만 잠시 막혀, picolab.kr 고객센터에서 바로 도와드릴게요.', 4000);
     console.warn('[리다이렉트 충전 오류]', e);
   }
   return true;
