@@ -3923,7 +3923,7 @@ async function requestGunghapAI() {
   try {
     var r1 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, orb_override:80,
-        system_prompt: '사주명리 궁합 전문가. 두 사람의 연애 스타일과 감정 궁합만 분석해. 톤: 따뜻하고 희망적. 부정적 요소도 성장 포인트로 표현. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜/오행관계 설명 금지. **볼드**는 핵심 단어에만 3~5개.',
+        system_prompt: '사주명리 궁합 전문가. 두 사람의 연애 스타일과 감정 궁합만 분석해.\n\n[톤 — 절대 규칙]\n- 따뜻하고 권유하는 톤 (압박·단정 X)\n- "반드시" / "분명히" / "운명적" / "필연" 같은 확정·예언 표현 금지\n- 두 사람을 라벨링하지 말 것 ("차가운 사람" / "고집쟁이" 같은 단정 X)\n- 부정적 요소도 결정짓지 말고 "이런 결이 있을 수 있어요, 이렇게 다가가면 편해요" 식으로 동행\n- 결정은 두 사람이 — 우리는 결을 비춰만 줌\n\n절대 규칙: #헤더 금지. 표 금지. 일진/날짜/오행관계 설명 금지. **볼드**는 핵심 단어에만 3~5개.',
         messages: [{ role:'user', content: '【'+myName+' & '+pNameDisp+' 연애 스타일 분석】\n'
           +'궁합 점수: '+score.total+'점\n'
           +myName+'('+gA+'): 일주 '+iljuA+', '+ohaengA+', '+strA+'\n'
@@ -3959,7 +3959,7 @@ async function requestGunghapAI() {
   try {
     var r2 = await fetch(CHAT_URL, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user_id:user.id, skip_orb:true,
-        system_prompt: '사주명리 궁합 전문가. 현재 시기 궁합만 분석해. 톤: 따뜻하고 신비로운 느낌. "지금 이 만남은 우연이 아니다"는 감성을 자연스럽게 녹여. 절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
+        system_prompt: '사주명리 궁합 전문가. 현재 시기 궁합만 분석해.\n\n[톤 — 절대 규칙]\n- 따뜻하고 부드러운 권유 톤. 운명·필연·약속 같은 확정 표현은 사용하지 말 것\n- "지금 이 만남이 어떤 결의 시기인가" 정도까지만 (단정 X)\n- 두 사람의 결정과 자유의지를 존중하는 톤이어야 함\n- 어떤 흐름이든 "안 따라도 괜찮은 여지" 한 번은 자연스럽게 묻어두기\n\n절대 규칙: #헤더 금지. 표 금지. 일진/날짜 언급 금지. **볼드**는 핵심 단어에만 3~5개.',
         messages: [{ role:'user', content: '【'+myName+' & '+pNameDisp+' 현재 시기 분석】\n'
           +'궁합 점수: '+score.total+'점\n'
           +myName+': 일주 '+iljuA+', '+myAge+'\n'
