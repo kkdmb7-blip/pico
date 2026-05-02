@@ -624,12 +624,70 @@ function render(d) {
   if (gwanrok) addInterp(interps, '<i class="pi pi-trophy"></i>', '관록궁 (직업)', palaceInterp('관록궁', gwanrok.majorStars || []) || ((gwanrok.majorStars || []).join(', ') || '별 없음') + ' — 사회적 성취와 직업의 방향.');
   if (bucheo)  addInterp(interps, '<i class="pi pi-heart"></i>', '부처궁 (인연)', palaceInterp('부처궁', bucheo.majorStars || [])  || ((bucheo.majorStars || []).join(', ')  || '별 없음') + ' — 이성 인연과 파트너십.');
 
+  // ── 격국 뱃지 + 사화 교차 시각화 (무료 페이지 가치 ↑) ─────────
+  renderZiweiPatternBadges(d);
+
   // 공유 버튼 표시
   window._ziweiData = d;
   var wrap = document.getElementById('ziweiShareBtnWrap');
   wrap.style.display = 'flex';
   var _zrsw = document.getElementById('ziweiReportSuggestWrap'); if (_zrsw) _zrsw.style.display = 'block';
   document.getElementById('ziweiReportHook').style.display = 'block';
+}
+
+// 격국 뱃지 (살파랑·기월동량·양타협명·권과회명 등 17종) + 사화 교차 (10종) 시각화
+function renderZiweiPatternBadges(d) {
+  var container = document.getElementById('palaceGrid');
+  if (!container) return;
+  // Worker 응답: d.patterns = { patterns:[...], byPalace }, d.sihuaCross = { patterns:[...], byPalace }
+  var patterns = (d.patterns && Array.isArray(d.patterns.patterns)) ? d.patterns.patterns : (Array.isArray(d.patterns) ? d.patterns : []);
+  var sihuaCross = (d.sihuaCross && Array.isArray(d.sihuaCross.patterns)) ? d.sihuaCross.patterns : (Array.isArray(d.sihuaCross) ? d.sihuaCross : []);
+  if (!patterns.length && !sihuaCross.length) return;
+
+  var section = document.createElement('div');
+  section.style.cssText = 'margin:20px 0;padding:18px 16px;background:linear-gradient(135deg,rgba(123,94,167,0.07),rgba(154,122,38,0.05));border:1px solid rgba(123,94,167,0.22);border-radius:14px;';
+
+  function escAttr(s) { return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+  var html = '<div style="font-family:\'Noto Serif KR\',serif;font-size:14px;font-weight:700;color:#5a3f87;margin-bottom:10px;display:flex;align-items:center;gap:6px;">'
+    + '<i class="pi pi-sparkle" style="font-size:14px;"></i> 검출된 격국 · 사화 패턴'
+    + '<span style="font-size:10px;font-weight:500;color:rgba(90,63,135,0.55);margin-left:auto;">자미두수전서 표준</span>'
+    + '</div>';
+
+  if (patterns.length) {
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:' + (sihuaCross.length ? '12px' : '0') + ';">';
+    patterns.forEach(function(p) {
+      var name = p.name || '';
+      var note = p.desc || '';
+      var isAuspicious = (p.type === 'auspicious');
+      var bg = isAuspicious ? 'rgba(123,94,167,0.13)' : (p.type === 'inauspicious' ? 'rgba(169,74,58,0.10)' : 'rgba(110,110,140,0.10)');
+      var bd = isAuspicious ? 'rgba(123,94,167,0.35)' : (p.type === 'inauspicious' ? 'rgba(169,74,58,0.30)' : 'rgba(110,110,140,0.30)');
+      var fg = isAuspicious ? '#4a3173' : (p.type === 'inauspicious' ? '#8a3a2a' : '#4a4a5a');
+      html += '<span title="' + escAttr(note) + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;background:' + bg + ';border:1px solid ' + bd + ';border-radius:14px;font-size:11.5px;font-weight:700;color:' + fg + ';cursor:default;">'
+        + name + '</span>';
+    });
+    html += '</div>';
+  }
+
+  if (sihuaCross.length) {
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    sihuaCross.forEach(function(c) {
+      var name = c.name || '';
+      var note = c.desc || '';
+      var isAuspicious = (c.type === 'auspicious');
+      var bg = isAuspicious ? 'rgba(154,122,38,0.10)' : 'rgba(169,74,58,0.10)';
+      var bd = isAuspicious ? 'rgba(154,122,38,0.32)' : 'rgba(169,74,58,0.30)';
+      var fg = isAuspicious ? '#7a5e1c' : '#8a3a2a';
+      html += '<span title="' + escAttr(note) + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;background:' + bg + ';border:1px solid ' + bd + ';border-radius:14px;font-size:11.5px;font-weight:700;color:' + fg + ';cursor:default;">'
+        + '<i class="pi pi-bolt" style="font-size:9px;"></i> ' + name + '</span>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div style="margin-top:10px;font-size:10.5px;color:rgba(74,49,115,0.55);line-height:1.5;">길격은 보라/금 · 흉격은 적색 · 호버하면 자미두수전서 본문 · 자세한 풀이는 <a href="report.html?type=ziwei_full" style="color:#7a5e1c;font-weight:700;">자미두수 심층 리포트</a> 에서</div>';
+
+  section.innerHTML = html;
+  container.parentNode.insertBefore(section, container.nextSibling);
 }
 
 function addInterp(container, icon, label, text) {
