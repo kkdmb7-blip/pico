@@ -1997,6 +1997,25 @@ window.shareLifeDays = function() {
   </span>
 </div>
 
+<!-- 오늘 일진 hook (비로그인도 보임 — 첫인상 + 가입 동기) -->
+<div id="todayGanjiHook" style="display:none;padding:0 16px 16px;max-width:640px;margin:0 auto;">
+  <div style="background:linear-gradient(135deg,rgba(154,122,38,0.07),rgba(212,175,55,0.04));border:1px solid rgba(154,122,38,0.22);border-radius:18px;padding:16px 18px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <i class="pi pi-calendar" style="color:var(--gold-deep);font-size:15px;"></i>
+        <span style="font-family:'Noto Serif KR',serif;font-size:14px;font-weight:700;color:var(--text);">오늘의 일진</span>
+        <span id="todayGanjiDate" style="font-size:11px;color:var(--muted);"></span>
+      </div>
+      <span id="todayGanjiTag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;"></span>
+    </div>
+    <div id="todayGanjiName" style="font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--gold);margin-bottom:4px;letter-spacing:0.04em;"></div>
+    <div id="todayGanjiHint" style="font-size:12px;color:var(--text2);line-height:1.6;"></div>
+    <div id="todayGanjiCTA" style="margin-top:12px;">
+      <a id="todayGanjiCTABtn" href="javascript:void(0)" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:linear-gradient(135deg,#967032,#b89048);color:#fdf7e0;border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none;">내 사주와 매칭 <span>→</span></a>
+    </div>
+  </div>
+</div>
+
 
 <!-- QIMEN WEEKLY -->
 <section style="display:none;padding:16px 16px;max-width:640px;margin:0 auto;position:relative;z-index:1;" id="qimenWeeklyWrap">
@@ -6754,6 +6773,53 @@ function _urlBase64ToUint8Array(b64) {
   for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
   return arr;
 }
+
+// ── 오늘 일진 hook (비로그인 첫인상 + 가입 동기) ────────────────
+(function _picoTodayGanji() {
+  // 일진 일간(천간) 별 한줄 길흉 가이드 — 보편적·결정론 회피 표현
+  var STEM_HINTS = {
+    '갑': { tag: '시작', tagColor:'#3a8a4a', hint:'새 시작과 결단에 좋은 하루. 미루던 일을 시작하기 좋아요.' },
+    '을': { tag: '관계', tagColor:'#5a8a3a', hint:'유연한 마음이 인연을 잇는 날. 부드러운 대화가 통합니다.' },
+    '병': { tag: '활기', tagColor:'#a94a3a', hint:'에너지가 외부로 향하는 날. 발표·설득에 유리합니다.' },
+    '정': { tag: '집중', tagColor:'#a96a3a', hint:'섬세한 디테일이 빛나는 날. 글·기획에 잘 맞아요.' },
+    '무': { tag: '안정', tagColor:'#7a6a3a', hint:'기반을 다지기 좋은 날. 큰 결정보다 정리·점검을 추천.' },
+    '기': { tag: '실속', tagColor:'#8a7a4a', hint:'드러내지 않는 실리. 협업·중재가 잘 풀리는 흐름.' },
+    '경': { tag: '결단', tagColor:'#5a5a8a', hint:'단호한 판단이 통하는 날. 미적거리던 일은 매듭을.' },
+    '신': { tag: '정밀', tagColor:'#6a6a9a', hint:'정확함이 가치를 만듭니다. 검수·계약 검토에 유리.' },
+    '임': { tag: '확장', tagColor:'#3a6a8a', hint:'폭넓은 시야로 흐름을 읽기 좋은 날. 큰 그림을 그려요.' },
+    '계': { tag: '직관', tagColor:'#4a4a8a', hint:'직관과 영감이 강한 날. 창작·내면 작업에 좋아요.' }
+  };
+  fetch('https://fortuna.kkdmb7.workers.dev/today-ganji')
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (!d || !d.dayGanji) return;
+      var dayStem = d.dayGanji.charAt(0);
+      var info = STEM_HINTS[dayStem] || { tag:'오늘', tagColor:'#7a5e1c', hint:'오늘의 흐름을 차분히 점검해보세요.' };
+      var hook = document.getElementById('todayGanjiHook');
+      if (!hook) return;
+      document.getElementById('todayGanjiDate').textContent = '· ' + (d.date || '');
+      document.getElementById('todayGanjiName').textContent = d.dayGanji + '일';
+      document.getElementById('todayGanjiHint').textContent = info.hint;
+      var tagEl = document.getElementById('todayGanjiTag');
+      tagEl.textContent = info.tag;
+      tagEl.style.background = 'rgba(' + (info.tagColor.replace('#','').match(/.{2}/g).map(function(x){return parseInt(x,16);}).join(',')) + ',0.12)';
+      tagEl.style.color = info.tagColor;
+      tagEl.style.border = '1px solid ' + info.tagColor + '40';
+      // CTA 분기: 로그인 → 사주 페이지, 비로그인 → 카카오 로그인 (가입 보너스 강조)
+      var btn = document.getElementById('todayGanjiCTABtn');
+      var hasUser = false;
+      try { hasUser = !!(JSON.parse(localStorage.getItem('pico_user') || 'null') || {}).id; } catch(e) {}
+      if (hasUser) {
+        btn.textContent = '내 사주와 매칭 →';
+        btn.onclick = function() { location.href = 'saju.html'; };
+      } else {
+        btn.innerHTML = '카카오 로그인 · 500 Orb 시작 <span>→</span>';
+        btn.onclick = function() { try { kakaoLogin(); } catch(e) { location.href = '#'; } };
+      }
+      hook.style.display = 'block';
+    })
+    .catch(function(){});
+})();
 
 // ── 일일 방문자 + 누적 분석 카운터 (사회적 증거) ────────────────
 (function() {
