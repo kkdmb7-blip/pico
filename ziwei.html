@@ -627,6 +627,9 @@ function render(d) {
   // ── 격국 뱃지 + 사화 교차 시각화 (무료 페이지 가치 ↑) ─────────
   renderZiweiPatternBadges(d);
 
+  // ── 사주 ↔ 자미두수 양학파 합치 신호 (비동기) ─────────
+  renderSajuZiweiCross(d).catch(function(e){ console.warn('[cross] 실패', e); });
+
   // 공유 버튼 표시
   window._ziweiData = d;
   var wrap = document.getElementById('ziweiShareBtnWrap');
@@ -685,6 +688,85 @@ function renderZiweiPatternBadges(d) {
   }
 
   html += '<div style="margin-top:10px;font-size:10.5px;color:rgba(74,49,115,0.55);line-height:1.5;">길격은 보라/금 · 흉격은 적색 · 호버하면 자미두수전서 본문 · 자세한 풀이는 <a href="report.html?type=ziwei_full" style="color:#7a5e1c;font-weight:700;">자미두수 심층 리포트</a> 에서</div>';
+
+  section.innerHTML = html;
+  container.parentNode.insertBefore(section, container.nextSibling);
+}
+
+// ── 사주 ↔ 자미두수 양학파 합치 신호 ─────────────────────
+// 사주 격국과 자미두수 패턴이 같은 방향을 가리킬 때 합치 신호 생성.
+// 두 학파가 동일한 코어 메시지를 던지면 환각 0% + 신뢰도 ↑.
+async function renderSajuZiweiCross(d) {
+  if (!year || !month || !day) return;
+
+  // 사주 격국 조회 (POST /saju-test)
+  var birth = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0')
+    + 'T' + String(hour).padStart(2,'0') + ':00:00';
+  var sajuG = (gender === 'female' || gender === 'F') ? 'F' : 'M';
+  var sajuResp;
+  try {
+    var r = await fetch('https://fortuna.kkdmb7.workers.dev/saju-test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ birth: birth, gender: sajuG, calendar: 'solar' })
+    });
+    sajuResp = await r.json();
+  } catch(e) { return; }
+  if (!sajuResp || !sajuResp.geokguk) return;
+
+  var geokKor = String(sajuResp.geokguk.geok_kor || sajuResp.geokguk.geok || '');
+  if (!geokKor) return;
+
+  // 자미두수 패턴
+  var ziweiPats = (d.patterns && Array.isArray(d.patterns.patterns)) ? d.patterns.patterns
+    : (Array.isArray(d.patterns) ? d.patterns : []);
+  var ziweiCross = (d.sihuaCross && Array.isArray(d.sihuaCross.patterns)) ? d.sihuaCross.patterns
+    : (Array.isArray(d.sihuaCross) ? d.sihuaCross : []);
+  var allZiweiNames = ziweiPats.concat(ziweiCross).map(function(p){ return p.name || ''; });
+  if (!allZiweiNames.length) return;
+
+  // 매핑: 사주 격국 → 합치 가능한 자미두수 패턴 + 합치 메시지
+  var MAP = [
+    { saju: ['칠살격','편관격'],         ziwei: ['칠살조두','살파랑'],          theme: '권력·역동', signal: '두 학파가 모두 추진력·결단의 격을 가리킵니다' },
+    { saju: ['정관격'],                 ziwei: ['자미독좌','군신경회'],        theme: '권위·관료', signal: '두 학파가 모두 권위·체계의 격을 가리킵니다' },
+    { saju: ['정재격','편재격','잡기정재격','잡기편재격'], ziwei: ['부상조원','일월동궁'], theme: '재물 흐름', signal: '두 학파가 모두 재물 통로의 격을 가리킵니다' },
+    { saju: ['식신격','상관격'],         ziwei: ['일월동궁','기월동량'],        theme: '총명·표현', signal: '두 학파가 모두 총명·문장의 격을 가리킵니다' },
+    { saju: ['정인격','편인격'],         ziwei: ['양양창록','과입명궁'],        theme: '학문·명예', signal: '두 학파가 모두 학문·명예의 격을 가리킵니다' },
+    { saju: ['비견격','겁재격','양인격'], ziwei: ['살파랑','칠살조두'],          theme: '자수·역동', signal: '두 학파가 모두 자수성가·강한 추진의 격을 가리킵니다' },
+    { saju: ['종왕격','종강격'],         ziwei: ['자미독좌','군신경회'],        theme: '군왕·집중', signal: '두 학파가 모두 강한 집중·군왕의 격을 가리킵니다' },
+    { saju: ['양신성상격','종재격','종살격','종아격','화기격'], ziwei: ['록기상충','사화제회','록기동궁'], theme: '극단·전환', signal: '두 학파가 모두 극단·전환의 특수격을 가리킵니다' },
+  ];
+
+  var hits = [];
+  MAP.forEach(function(m) {
+    var sajuMatch = m.saju.some(function(g){ return geokKor.indexOf(g) !== -1; });
+    if (!sajuMatch) return;
+    var matched = m.ziwei.filter(function(zn){
+      return allZiweiNames.some(function(an){ return an.indexOf(zn) !== -1; });
+    });
+    if (matched.length) hits.push({ theme: m.theme, signal: m.signal, ziwei: matched, saju: geokKor });
+  });
+
+  if (!hits.length) return;
+
+  // 렌더 (renderZiweiPatternBadges 위에 삽입)
+  var container = document.getElementById('palaceGrid');
+  if (!container) return;
+  var section = document.createElement('div');
+  section.style.cssText = 'margin:18px 0 0;padding:16px 18px;background:linear-gradient(135deg,rgba(154,122,38,0.10),rgba(123,94,167,0.08));border:1.5px solid rgba(154,122,38,0.42);border-radius:14px;';
+
+  var html = '<div style="font-family:\'Noto Serif KR\',serif;font-size:14px;font-weight:700;color:#7a5e1c;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'
+    + '<i class="pi pi-check-circle" style="font-size:14px;"></i> 사주 ↔ 자미두수 양학파 합치'
+    + '<span style="font-size:10px;font-weight:500;color:rgba(122,94,28,0.55);margin-left:auto;">신뢰도 보강</span>'
+    + '</div>';
+  html += '<div style="font-size:11.5px;color:rgba(74,49,12,0.78);line-height:1.6;margin-bottom:10px;">사주의 <b>' + geokKor + '</b>과 자미두수 패턴이 같은 방향을 가리켜요. 두 학파가 합치하면 그 결은 한 번 들여다볼 만해요.</div>';
+  hits.forEach(function(h) {
+    html += '<div style="margin-bottom:8px;padding:9px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(154,122,38,0.25);border-radius:10px;">'
+      + '<div style="font-size:12px;font-weight:700;color:#5a3f87;margin-bottom:3px;">' + h.theme + '</div>'
+      + '<div style="font-size:11px;color:rgba(60,40,8,0.75);line-height:1.55;">' + h.signal + ' <span style="color:rgba(60,40,8,0.55);">(자미: ' + h.ziwei.join(' · ') + ')</span></div>'
+      + '</div>';
+  });
+  html += '<div style="margin-top:6px;font-size:10.5px;color:rgba(74,49,12,0.55);line-height:1.5;">합치는 점치는 답이 아니라, 결의 방향을 알아두는 신호예요. 결정은 천천히, 안 따라도 괜찮아요.</div>';
 
   section.innerHTML = html;
   container.parentNode.insertBefore(section, container.nextSibling);
