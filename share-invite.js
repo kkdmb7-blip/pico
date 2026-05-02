@@ -19,10 +19,11 @@
   function _buildDescription(stats) {
     var rep = stats && stats.reports ? stats.reports : 0;
     var hasMany = rep >= 100;
+    // 톤: 영업·압박 X / 권유·여지 ○ — 받는 사람이 결정 부담 안 느끼게
     var line1 = hasMany
-      ? '지금까지 ' + rep.toLocaleString() + '건의 운세 분석'
-      : '사주·점성·자미두수 AI 분석';
-    var line2 = '카카오 로그인만 하면 양쪽 50 Orb 즉시 지급';
+      ? '지금까지 ' + rep.toLocaleString() + '명이 살펴본 사주·점성 분석'
+      : '사주·점성·자미두수를 한 곳에서';
+    var line2 = '가볍게 살펴보세요. 카카오로 바로 시작하면 양쪽 50 Orb';
     return line1 + ' · ' + line2;
   }
 
@@ -39,7 +40,7 @@
 
     _fetchStats().then(function(stats) {
       var description = _buildDescription(stats);
-      var fullMsg = inviterName + '포르투나 — AI 운세 상담\n' + description + '\n' + link;
+      var fullMsg = inviterName + '포르투나에서 같이 가볍게 살펴봐요 ✦\n' + description + '\n' + link;
 
       // 1) 모바일: navigator.share 우선 (네이티브)
       if (navigator.share) {
@@ -62,7 +63,7 @@
             link: { mobileWebUrl: link, webUrl: link }
           },
           buttons: [{
-            title: '무료로 시작 (+50 Orb)',
+            title: '같이 살펴보기 · +50 Orb',
             link: { mobileWebUrl: link, webUrl: link }
           }]
         });

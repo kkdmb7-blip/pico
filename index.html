@@ -1997,13 +1997,13 @@ window.shareLifeDays = function() {
   </span>
 </div>
 
-<!-- 오늘 일진 hook (비로그인도 보임 — 첫인상 + 가입 동기) -->
+<!-- 오늘 일진 hook — 비로그인 첫인상 + 로그인 사용자 일일 무드 가이드 -->
 <div id="todayGanjiHook" style="display:none;padding:0 16px 16px;max-width:640px;margin:0 auto;">
   <div style="background:linear-gradient(135deg,rgba(154,122,38,0.07),rgba(212,175,55,0.04));border:1px solid rgba(154,122,38,0.22);border-radius:18px;padding:16px 18px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
       <div style="display:flex;align-items:center;gap:8px;">
         <i class="pi pi-calendar" style="color:var(--gold-deep);font-size:15px;"></i>
-        <span style="font-family:'Noto Serif KR',serif;font-size:14px;font-weight:700;color:var(--text);">오늘의 일진</span>
+        <span style="font-family:'Noto Serif KR',serif;font-size:14px;font-weight:700;color:var(--text);">오늘의 결</span>
         <span id="todayGanjiDate" style="font-size:11px;color:var(--muted);"></span>
       </div>
       <span id="todayGanjiTag" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;"></span>
@@ -2666,26 +2666,26 @@ window.shareLifeDays = function() {
       </div>
     </div>
 
-    <!-- 출석 도장 카드 (7일 연속 시 +50 Orb 자동 지급) -->
+    <!-- 출석 도장 카드 (7일째 함께 +50 Orb) -->
     <div id="attendanceCard" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:16px 18px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <i class="pi pi-calendar" style="color:var(--gold-deep);font-size:16px;"></i>
-          <span style="font-size:13.5px;font-weight:700;color:var(--text);">7일 연속 출석 · 50 Orb</span>
+          <span style="font-size:13.5px;font-weight:700;color:var(--text);">7일째 함께 · 50 Orb</span>
         </div>
         <span id="attendanceStreakNum" style="font-size:12px;font-weight:800;color:var(--gold-deep);">—</span>
       </div>
       <div id="attendanceDots" style="display:flex;gap:6px;justify-content:space-between;"></div>
-      <div id="attendanceMsg" style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.5;">매일 한 번 자동 출석</div>
+      <div id="attendanceMsg" style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.5;">꾸준히 와도 좋고, 가끔 들러도 괜찮아요</div>
     </div>
 
-    <!-- 친구 초대 카드 (양쪽 +50 Orb) -->
+    <!-- 친구 초대 카드 (같이 살펴봐요) -->
     <div onclick="picoMypageInvite()" style="background:var(--orb-bg);border:1.5px solid var(--orb-border);border-radius:20px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;">
       <div style="display:flex;align-items:center;gap:12px;">
         <i class="pi pi-people" style="font-size:20px;color:var(--orb);"></i>
         <div>
-          <div style="font-size:13.5px;font-weight:800;color:var(--orb);margin-bottom:2px;">친구 초대 · 양쪽 +50 Orb</div>
-          <div style="font-size:11px;color:var(--text2);line-height:1.5;">친구가 카카오 로그인하면 나도 친구도 즉시 +50</div>
+          <div style="font-size:13.5px;font-weight:800;color:var(--orb);margin-bottom:2px;">친구와 같이 살펴보기 · 양쪽 +50 Orb</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.5;">한 사람이 떠오르면, 가벼운 마음으로 한 번 권해보세요</div>
         </div>
       </div>
       <span style="font-size:18px;color:var(--muted);flex-shrink:0;">›</span>
@@ -4959,9 +4959,9 @@ function _picoRenderAttendance() {
   }
   dotsEl.innerHTML = html;
   if (msgEl) {
-    if (s.streak >= 7) msgEl.textContent = '오늘 +50 Orb 지급 완료';
-    else if (s.claimedToday) msgEl.textContent = '오늘 출석 완료 · ' + (7 - s.streak) + '일 남음';
-    else msgEl.textContent = '오늘 첫 진입 시 자동 출석';
+    if (s.streak >= 7) msgEl.textContent = '오늘 +50 Orb 함께 드렸어요. 다음 사이클도 편하게.';
+    else if (s.claimedToday) msgEl.textContent = '오늘 발걸음 잘 찍었어요 · 7일까지 ' + (7 - s.streak) + '일';
+    else msgEl.textContent = '꾸준히 오시면 좋고, 가끔 와도 괜찮아요';
   }
 }
 
@@ -4996,16 +4996,16 @@ function _picoAttendanceCheck(userId) {
       modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(40,28,16,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
       modal.innerHTML = '<div style="background:linear-gradient(135deg,#fcf7ea,#fff);border-radius:18px;padding:32px 26px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(40,28,16,0.4);">'
         + '<i class="pi pi-sparkle" style="font-size:36px;color:#7a5e1c;margin-bottom:12px;display:block;"></i>'
-        + '<div style="font-family:\'Noto Serif KR\',serif;font-size:20px;font-weight:700;color:#7a5e1c;margin-bottom:10px;">7일 연속 출석</div>'
-        + '<div style="font-size:14px;color:#3a2c1e;line-height:1.7;margin-bottom:18px;"><strong style="color:#7a5e1c;">+50 Orb</strong>가 즉시 지급됐어요</div>'
-        + '<button onclick="this.parentNode.parentNode.remove()" style="width:100%;padding:13px;background:linear-gradient(135deg,#967032,#b89048);color:#fdf7e0;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">고마워요</button>'
+        + '<div style="font-family:\'Noto Serif KR\',serif;font-size:20px;font-weight:700;color:#7a5e1c;margin-bottom:10px;">7일 같이 와줘서 고마워요</div>'
+        + '<div style="font-size:14px;color:#3a2c1e;line-height:1.75;margin-bottom:18px;">작은 발걸음 7개가 하나의 사이클이에요. 마음의 결을 따라 보고 가시는 동안<br><strong style="color:#7a5e1c;">+50 Orb</strong>를 함께 드려요.</div>'
+        + '<button onclick="this.parentNode.parentNode.remove()" style="width:100%;padding:13px;background:linear-gradient(135deg,#967032,#b89048);color:#fdf7e0;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">알겠어요</button>'
         + '</div>';
       document.body.appendChild(modal);
     } else if (typeof d.streak === 'number' && d.streak > 0) {
       try {
         var t = document.getElementById('toast');
         if (t) {
-          t.textContent = '오늘 출석 ' + d.streak + '/7일 — ' + (d.days_until_reward||0) + '일 남으면 +50 Orb';
+          t.textContent = '오늘 발걸음 잘 찍었어요 · 7일째 +50 Orb';
           t.classList.add('show');
           setTimeout(function(){ t.classList.remove('show'); }, 3500);
         }
@@ -6756,17 +6756,18 @@ function _urlBase64ToUint8Array(b64) {
 // ── 오늘 일진 hook (비로그인 첫인상 + 가입 동기) ────────────────
 (function _picoTodayGanji() {
   // 일진 일간(천간) 별 한줄 길흉 가이드 — 보편적·결정론 회피 표현
+  // 톤: 단정·명령 X / 권유·여지 ○ — 사용자 상태와 맞으면 따라가고 안 맞으면 흘려보내도 OK
   var STEM_HINTS = {
-    '갑': { tag: '시작', tagColor:'#3a8a4a', hint:'새 시작과 결단에 좋은 하루. 미루던 일을 시작하기 좋아요.' },
-    '을': { tag: '관계', tagColor:'#5a8a3a', hint:'유연한 마음이 인연을 잇는 날. 부드러운 대화가 통합니다.' },
-    '병': { tag: '활기', tagColor:'#a94a3a', hint:'에너지가 외부로 향하는 날. 발표·설득에 유리합니다.' },
-    '정': { tag: '집중', tagColor:'#a96a3a', hint:'섬세한 디테일이 빛나는 날. 글·기획에 잘 맞아요.' },
-    '무': { tag: '안정', tagColor:'#7a6a3a', hint:'기반을 다지기 좋은 날. 큰 결정보다 정리·점검을 추천.' },
-    '기': { tag: '실속', tagColor:'#8a7a4a', hint:'드러내지 않는 실리. 협업·중재가 잘 풀리는 흐름.' },
-    '경': { tag: '결단', tagColor:'#5a5a8a', hint:'단호한 판단이 통하는 날. 미적거리던 일은 매듭을.' },
-    '신': { tag: '정밀', tagColor:'#6a6a9a', hint:'정확함이 가치를 만듭니다. 검수·계약 검토에 유리.' },
-    '임': { tag: '확장', tagColor:'#3a6a8a', hint:'폭넓은 시야로 흐름을 읽기 좋은 날. 큰 그림을 그려요.' },
-    '계': { tag: '직관', tagColor:'#4a4a8a', hint:'직관과 영감이 강한 날. 창작·내면 작업에 좋아요.' }
+    '갑': { tag: '시작', tagColor:'#3a8a4a', hint:'미루던 한 가지가 마음에 떠오르면, 가볍게 한 발 내딛어 봐도 좋은 흐름이에요.' },
+    '을': { tag: '관계', tagColor:'#5a8a3a', hint:'한 사람의 안부를 떠올리기 좋은 날. 무리하지 않는 한마디면 충분해요.' },
+    '병': { tag: '활기', tagColor:'#a94a3a', hint:'밖으로 향하고 싶은 마음이 자연스러운 날. 단, 무리하지 않아도 괜찮아요.' },
+    '정': { tag: '집중', tagColor:'#a96a3a', hint:'작은 디테일에 마음이 머무는 날. 정리·기록·글쓰기와 잘 맞는 결입니다.' },
+    '무': { tag: '안정', tagColor:'#7a6a3a', hint:'큰 결정보다는 어제까지의 흐름을 가만히 정돈하기 좋은 하루예요.' },
+    '기': { tag: '실속', tagColor:'#8a7a4a', hint:'드러내지 않아도 충분한 날. 곁의 사람과 가볍게 협업하는 결이 좋아요.' },
+    '경': { tag: '결단', tagColor:'#5a5a8a', hint:'미루던 매듭이 떠오른다면, 부담 내려놓고 짧게 끊어보기 좋은 흐름.' },
+    '신': { tag: '정밀', tagColor:'#6a6a9a', hint:'세밀한 검토가 잘 통하는 날. 마음이 흐트러지면 한 호흡 쉬어가도 OK.' },
+    '임': { tag: '확장', tagColor:'#3a6a8a', hint:'시야가 넓어지는 날. 큰 그림을 그리되, 답을 내리지 않아도 괜찮아요.' },
+    '계': { tag: '직관', tagColor:'#4a4a8a', hint:'내면의 작은 신호에 귀 기울이기 좋은 날. 무엇이 떠오르든 그대로 둬보세요.' }
   };
   fetch('https://fortuna.kkdmb7.workers.dev/today-ganji')
     .then(function(r){ return r.json(); })
@@ -6789,10 +6790,10 @@ function _urlBase64ToUint8Array(b64) {
       var hasUser = false;
       try { hasUser = !!(JSON.parse(localStorage.getItem('pico_user') || 'null') || {}).id; } catch(e) {}
       if (hasUser) {
-        btn.textContent = '내 사주와 매칭 →';
+        btn.textContent = '내 사주와 함께 보기 →';
         btn.onclick = function() { location.href = 'saju.html'; };
       } else {
-        btn.innerHTML = '카카오 로그인 · 500 Orb 시작 <span>→</span>';
+        btn.innerHTML = '가볍게 시작하기 · 500 Orb <span>→</span>';
         btn.onclick = function() { try { kakaoLogin(); } catch(e) { location.href = '#'; } };
       }
       hook.style.display = 'block';
