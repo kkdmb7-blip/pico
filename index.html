@@ -4882,6 +4882,36 @@ var KAKAO_JS_KEY   = '2543c896dead8185e2edfa0976396f25';
 var WORKER_BASE = 'https://fortuna.kkdmb7.workers.dev';
 if (window.Kakao && !window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY);
 var currentUser = null;
+
+// ── 친구 초대 (?ref=USER_ID) — 진입 시 sessionStorage 저장, 신규 가입 시 보상 처리 ──
+(function _picoRefCapture() {
+  try {
+    var p = new URLSearchParams(location.search);
+    var ref = p.get('ref');
+    if (ref && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ref)) {
+      sessionStorage.setItem('pico_pending_ref', ref);
+    }
+  } catch(e) {}
+})();
+function _picoProcessReferral(refereeUserId) {
+  try {
+    var refId = sessionStorage.getItem('pico_pending_ref');
+    if (!refId || refId === refereeUserId) return; // 자기자신 추천 차단
+    fetch('https://fortuna-silk.vercel.app/api/support', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ referrer_id: refId, referee_id: refereeUserId })
+    }).then(function(r) { return r.json(); }).then(function(d) {
+      if (d && d.ok) {
+        try {
+          var t = document.getElementById('toast');
+          if (t) { t.textContent = '친구 초대 보상 +50 Orb 지급됐어요'; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 3500); }
+        } catch(e) {}
+      }
+      sessionStorage.removeItem('pico_pending_ref');
+    }).catch(function(){});
+  } catch(e) {}
+}
 var _profileGender = 'M';
 
 function checkAuth() {
@@ -5144,6 +5174,8 @@ function handleKakaoCallback(code) {
       updateAuthUI();
       if (resolved && resolved.signup_bonus) {
         try { showSignupBonusModal(resolved.signup_bonus); } catch(e) {}
+        // 신규 가입 + 초대 링크 ref 있으면 referral 처리 → 양쪽 50 Orb
+        try { _picoProcessReferral(userId); } catch(e) {}
       }
       syncProfilesFromServer(currentUser.id).then(function() {
         var existing = localStorage.getItem('pico_profile');

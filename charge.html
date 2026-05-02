@@ -307,8 +307,8 @@ nav {
     <div style="display:flex;align-items:center;gap:12px;">
       <div style="font-size:28px;color:var(--orb);"><i class="pi pi-people pi-xl"></i></div>
       <div>
-        <div style="font-size:15px;font-weight:800;color:var(--orb);margin-bottom:2px;">친구 초대하고 Orb 받기</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.5;">카카오톡으로 공유하면 친구가 가입할 때 Orb를 드려요</div>
+        <div style="font-size:15px;font-weight:800;color:var(--orb);margin-bottom:2px;">친구 초대 · 양쪽 +50 Orb</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.5;">친구가 카카오 로그인하면 <strong>나도 50 Orb · 친구도 50 Orb</strong> 즉시 지급</div>
       </div>
     </div>
     <div style="font-size:18px;color:var(--muted);flex-shrink:0;">→</div>
@@ -1009,25 +1009,26 @@ async function chargeOrb(pack, totalOrb, impUid, merchantUid) {
 
 function handleInviteCharge() {
   if (!currentUserId) return;
-  var link = 'https://kkdmb7-blip.github.io/memox/?ref=' + currentUserId;
-  var msg = '<i class="pi pi-crystal"></i> 포르투나 — 사주·점성술 AI 운세 상담\n' + link;
+  // picolab.kr 메인으로 초대 → 친구가 카카오 로그인 시 _picoProcessReferral 자동 처리
+  var link = 'https://picolab.kr/?ref=' + currentUserId;
+  var msg = '포르투나 — 사주·점성술 AI 운세 상담\n친구 초대로 양쪽 50 Orb 무료 지급!\n' + link;
   if (navigator.share) {
-    navigator.share({ title: '포르투나 초대', text: msg, url: link }).catch(function(){});
+    navigator.share({ title: '포르투나 — 친구 초대', text: msg, url: link }).catch(function(){});
   } else if (window.Kakao && window.Kakao.Share) {
     if (!Kakao.isInitialized()) { try { Kakao.init('25432f8a37e0ac51a5e10cbcba8ae413'); } catch(e) {} }
     Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
         title: '포르투나 — AI 운세 상담',
-        description: '사주·점성술 기반 AI 운세, 지금 무료로 시작해보세요',
+        description: '카카오 로그인만 하면 양쪽 50 Orb 즉시 지급. 사주·점성·자미두수 AI 분석을 무료로 시작해보세요',
         imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
         link: { mobileWebUrl: link, webUrl: link }
       },
-      buttons: [{ title: '무료로 시작하기', link: { mobileWebUrl: link, webUrl: link } }]
+      buttons: [{ title: '무료로 시작하기 (+50 Orb)', link: { mobileWebUrl: link, webUrl: link } }]
     });
   } else {
     navigator.clipboard.writeText(link).then(function() {
-      toast('초대 링크가 복사됐어요! 친구에게 공유해보세요 <i class="pi pi-crystal"></i>');
+      toast('초대 링크가 복사됐어요! 친구에게 공유해보세요');
     }).catch(function() { prompt('초대 링크:', link); });
   }
 }
