@@ -1,6 +1,7 @@
 // pico service worker — push notifications + offline cache
-
-var CACHE = 'pico-v2';
+// CACHE 이름을 sw.js 의 ?v= 쿼리에서 추출 → APP_VERSION 변경 시 자동 갱신
+var _swParams = new URL(self.location.href).searchParams;
+var CACHE = 'pico-v' + (_swParams.get('v') || '2');
 // HTML 파일은 캐시하지 않음 (자주 업데이트되므로)
 var CORE = [
   '/manifest.json', '/img/goddess/goddess.png', '/img/goddess/goddess-app.png',
