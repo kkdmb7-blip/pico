@@ -1667,7 +1667,7 @@ function _drawVedicCard(cb) {
     ctx.fillStyle='rgba(154,122,38,0.08)';fRR(PAD,y,W-PAD*2,nakInterpH,20);
     ctx.strokeStyle='rgba(154,122,38,0.35)';ctx.lineWidth=1.5;sRR(PAD,y,W-PAD*2,nakInterpH,20);
     ctx.font='600 21px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(122,94,28,0.9)';
-    ctx.fillText('✨ '+(d.nakshatra||'')+' 낙샤트라 해석',W/2,y+46);
+    ctx.fillText('✦ '+(d.nakshatra||'')+' 낙샤트라 해석',W/2,y+46);
     ctx.font='400 25px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(26,18,10,0.78)';
     fillWrapped(nakText,W/2,y+88,W-PAD*2-80,38);
     y+=nakInterpH+28;
@@ -1675,7 +1675,7 @@ function _drawVedicCard(cb) {
 
   // ── 다샤
   drawLine(y,180,0.3);y+=44;
-  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.8)';ctx.fillText('✨ 현재 다샤 (행성 대운)',W/2,y);y+=48;
+  ctx.font='700 28px "Noto Sans KR",sans-serif';ctx.fillStyle='rgba(74,58,42,0.8)';ctx.fillText('✦ 현재 다샤 (행성 대운)',W/2,y);y+=48;
   if(d.dasha){
     var dashaItems=[];
     if(d.dasha.mahadasha)dashaItems.push({label:'마하다샤',val:d.dasha.mahadasha});

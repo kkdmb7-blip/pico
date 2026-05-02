@@ -6382,7 +6382,7 @@ async function loadAdminChatUnread() {
           new Notification('💬 새 문의가 도착했어요', {
             body: (latest.user_id || '').replace('kakao_','') + ': ' + (latest.content || '').slice(0,60),
             tag: 'pico-support',
-            icon: '/img/goddess-app.png'
+            icon: '/img/goddess/goddess-app.png'
           });
         } catch(e) {}
       }

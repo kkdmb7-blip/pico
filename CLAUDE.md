@@ -345,7 +345,7 @@ wg는 STEP3 system_prompt 문자열 끝에 직접 연결됨 (`...쓰면 안 됨'
 
 ### 핵심 규칙
 - **objectType 반드시 `'feed'`** — `'text'`는 Error 4019 발생
-- **imageUrl은 실존 파일만** — `og-image.png` 없음, `https://picolab.kr/img/goddess-app.png` 사용
+- **imageUrl은 실존 파일만** — `og-image.png` 없음, `https://picolab.kr/img/goddess/goddess-app.png` 사용
 - **모바일에서 Kakao Share 직접 호출 시 4019 오류** — `navigator.share`로 우회하면 해결
 - Kakao SDK: `Kakao.Share` 존재 확인 → `isInitialized()` → `init(KAKAO_JS_KEY)` 순서
 
@@ -367,7 +367,7 @@ document.getElementById('btnShare').addEventListener('click', function() {
       content: {
         title: '제목',
         description: '설명 텍스트',
-        imageUrl: 'https://picolab.kr/img/goddess-app.png',
+        imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
         link: { mobileWebUrl: pageUrl, webUrl: pageUrl }
       },
       buttons: [{ title: '내 운세 보러가기', link: { mobileWebUrl: pageUrl, webUrl: pageUrl } }]
