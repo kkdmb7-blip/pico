@@ -6588,24 +6588,41 @@ function _urlBase64ToUint8Array(b64) {
   return arr;
 }
 
-// ── 일일 방문자 카운터 ─────────────────────────────────────────
+// ── 일일 방문자 + 누적 분석 카운터 (사회적 증거) ────────────────
 (function() {
   var today = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   var lsKey = 'pico_visit_' + today;
   var API = 'https://fortuna.kkdmb7.workers.dev/visit-count';
-  function show(count) {
+  var STATS_API = 'https://fortuna.kkdmb7.workers.dev/site-stats';
+
+  function show(daily, repTotal) {
     var chip = document.getElementById('visitCountChip');
     var txt  = document.getElementById('visitCountText');
-    if (!chip || !txt || count < 50) return;
-    txt.textContent = '오늘 ' + count.toLocaleString() + '명이 운세를 확인했어요';
+    if (!chip || !txt) return;
+    // 카피: 누적 분석이 있으면 우선 (강한 사회적 증거), 그게 0 이면 오늘 카운트만
+    if (repTotal && repTotal >= 100) {
+      txt.textContent = '지금까지 ' + repTotal.toLocaleString() + '건의 운세 분석 · 오늘 ' + daily.toLocaleString() + '명 방문';
+    } else if (daily >= 10) {
+      txt.textContent = '오늘 ' + daily.toLocaleString() + '명이 운세를 확인했어요';
+    } else {
+      // 너무 적으면 표시 안 함 (어색함 방지)
+      return;
+    }
     chip.style.opacity = '1';
   }
-  if (!localStorage.getItem(lsKey)) {
-    localStorage.setItem(lsKey, '1');
-    fetch(API, { method: 'POST' }).then(function(r){ return r.json(); }).then(function(d){ show(d.count); }).catch(function(){});
-  } else {
-    fetch(API).then(function(r){ return r.json(); }).then(function(d){ show(d.count); }).catch(function(){});
+
+  function fetchAndShow() {
+    Promise.all([
+      fetch(API, { method: localStorage.getItem(lsKey) ? 'GET' : 'POST' }).then(function(r){ return r.json(); }).catch(function(){ return {count:0}; }),
+      fetch(STATS_API).then(function(r){ return r.json(); }).catch(function(){ return {reports:0}; })
+    ]).then(function(arr) {
+      var visit = arr[0] || {};
+      var stats = arr[1] || {};
+      try { localStorage.setItem(lsKey, '1'); } catch(e) {}
+      show(visit.count || 0, stats.reports || 0);
+    });
   }
+  fetchAndShow();
 })();
 
 // SW 등록 (페이지 로드 시)
