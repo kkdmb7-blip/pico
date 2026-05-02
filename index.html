@@ -2646,6 +2646,31 @@ window.shareLifeDays = function() {
         <button onclick="location.href='charge.html'" style="font-size:11px;font-weight:700;color:var(--gold-deep);background:rgba(154,122,38,0.10);border:1px solid rgba(154,122,38,0.32);border-radius:16px;padding:5px 11px;cursor:pointer;white-space:nowrap;">충전</button>
       </div>
     </div>
+
+    <!-- 출석 도장 카드 (7일 연속 시 +50 Orb 자동 지급) -->
+    <div id="attendanceCard" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:16px 18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <i class="pi pi-calendar" style="color:var(--gold-deep);font-size:16px;"></i>
+          <span style="font-size:13.5px;font-weight:700;color:var(--text);">7일 연속 출석 · 50 Orb</span>
+        </div>
+        <span id="attendanceStreakNum" style="font-size:12px;font-weight:800;color:var(--gold-deep);">—</span>
+      </div>
+      <div id="attendanceDots" style="display:flex;gap:6px;justify-content:space-between;"></div>
+      <div id="attendanceMsg" style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.5;">매일 한 번 자동 출석</div>
+    </div>
+
+    <!-- 친구 초대 카드 (양쪽 +50 Orb) -->
+    <div onclick="picoMypageInvite()" style="background:var(--orb-bg);border:1.5px solid var(--orb-border);border-radius:20px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <i class="pi pi-people" style="font-size:20px;color:var(--orb);"></i>
+        <div>
+          <div style="font-size:13.5px;font-weight:800;color:var(--orb);margin-bottom:2px;">친구 초대 · 양쪽 +50 Orb</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.5;">친구가 카카오 로그인하면 나도 친구도 즉시 +50</div>
+        </div>
+      </div>
+      <span style="font-size:18px;color:var(--muted);flex-shrink:0;">›</span>
+    </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;">
       <button onclick="openProfilesModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
         <span><i class="pi pi-people"></i> 프로필 관리</span><span style="color:var(--muted);">›</span>
@@ -4894,12 +4919,50 @@ var currentUser = null;
   } catch(e) {}
 })();
 // ── 출석 체크 (매일 첫 진입 시 자동 + 7일 연속 시 +50 Orb 자동 지급) ──
+var _picoAttendanceState = { streak: 0, claimedToday: false };
+
+function _picoRenderAttendance() {
+  // 마이페이지 출석 도장 카드 갱신 (서버 응답 후 호출)
+  var dotsEl = document.getElementById('attendanceDots');
+  var numEl = document.getElementById('attendanceStreakNum');
+  var msgEl = document.getElementById('attendanceMsg');
+  if (!dotsEl || !numEl) return;
+  var s = _picoAttendanceState;
+  numEl.textContent = (s.streak || 0) + '/7';
+  var html = '';
+  for (var i = 1; i <= 7; i++) {
+    var filled = i <= s.streak;
+    var isToday = i === s.streak && s.claimedToday;
+    var bg = filled ? (isToday ? '#7a5e1c' : 'rgba(154,122,38,0.45)') : 'rgba(154,122,38,0.12)';
+    var border = filled ? '#7a5e1c' : 'rgba(154,122,38,0.25)';
+    var color = filled ? '#fcf7ea' : 'rgba(122,94,28,0.55)';
+    html += '<div style="flex:1;aspect-ratio:1;max-width:38px;display:flex;align-items:center;justify-content:center;background:' + bg + ';border:1.5px solid ' + border + ';border-radius:50%;font-size:11px;font-weight:700;color:' + color + ';">' + i + '</div>';
+  }
+  dotsEl.innerHTML = html;
+  if (msgEl) {
+    if (s.streak >= 7) msgEl.textContent = '오늘 +50 Orb 지급 완료';
+    else if (s.claimedToday) msgEl.textContent = '오늘 출석 완료 · ' + (7 - s.streak) + '일 남음';
+    else msgEl.textContent = '오늘 첫 진입 시 자동 출석';
+  }
+}
+
 function _picoAttendanceCheck(userId) {
   if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) return;
-  // KST 오늘 날짜 기준으로 오늘 이미 호출했는지 localStorage 캐시 (중복 호출 방지)
   var kst = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
   var lsKey = 'pico_attendance_' + kst;
-  if (localStorage.getItem(lsKey) === '1') return;
+  var alreadyChecked = localStorage.getItem(lsKey) === '1';
+
+  // 항상 GET 으로 현재 상태 먼저 가져와 카드 표시
+  fetch('https://fortuna.kkdmb7.workers.dev/me/attendance?user_id=' + encodeURIComponent(userId))
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (d && d.ok) {
+        _picoAttendanceState = { streak: d.streak||0, claimedToday: !!d.claimed_today };
+        _picoRenderAttendance();
+      }
+    }).catch(function(){});
+
+  if (alreadyChecked) return;
+  // 오늘 첫 진입 → POST 로 출석 기록
   fetch('https://fortuna.kkdmb7.workers.dev/me/attendance', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -4907,20 +4970,19 @@ function _picoAttendanceCheck(userId) {
   }).then(function(r) { return r.json(); }).then(function(d) {
     if (!d || !d.ok) return;
     try { localStorage.setItem(lsKey, '1'); } catch(e) {}
-    // 새로 출석한 경우만 토스트 (이미 오늘 출석한 경우는 silent)
+    _picoAttendanceState = { streak: d.streak||0, claimedToday: true };
+    _picoRenderAttendance();
     if (d.granted > 0) {
-      // 7일 도달 — 큰 축하
       var modal = document.createElement('div');
       modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(40,28,16,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
       modal.innerHTML = '<div style="background:linear-gradient(135deg,#fcf7ea,#fff);border-radius:18px;padding:32px 26px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(40,28,16,0.4);">'
-        + '<div style="font-size:48px;margin-bottom:10px;">🎁</div>'
-        + '<div style="font-family:\'Noto Serif KR\',serif;font-size:20px;font-weight:700;color:#7a5e1c;margin-bottom:10px;">7일 연속 출석!</div>'
-        + '<div style="font-size:14px;color:#3a2c1e;line-height:1.7;margin-bottom:18px;">축하합니다 — <strong style="color:#7a5e1c;">+50 Orb</strong>가 지급됐어요</div>'
+        + '<i class="pi pi-sparkle" style="font-size:36px;color:#7a5e1c;margin-bottom:12px;display:block;"></i>'
+        + '<div style="font-family:\'Noto Serif KR\',serif;font-size:20px;font-weight:700;color:#7a5e1c;margin-bottom:10px;">7일 연속 출석</div>'
+        + '<div style="font-size:14px;color:#3a2c1e;line-height:1.7;margin-bottom:18px;"><strong style="color:#7a5e1c;">+50 Orb</strong>가 즉시 지급됐어요</div>'
         + '<button onclick="this.parentNode.parentNode.remove()" style="width:100%;padding:13px;background:linear-gradient(135deg,#967032,#b89048);color:#fdf7e0;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">고마워요</button>'
         + '</div>';
       document.body.appendChild(modal);
     } else if (typeof d.streak === 'number' && d.streak > 0) {
-      // 일반 출석 토스트
       try {
         var t = document.getElementById('toast');
         if (t) {
@@ -4931,6 +4993,35 @@ function _picoAttendanceCheck(userId) {
       } catch(e) {}
     }
   }).catch(function(){});
+}
+
+// 마이페이지 친구 초대 — charge.html handleInviteCharge 와 동일 흐름
+function picoMypageInvite() {
+  if (!currentUser || !currentUser.id) { alert('카카오 로그인이 필요해요'); return; }
+  var link = 'https://picolab.kr/?ref=' + currentUser.id;
+  var msg = '포르투나 — 사주·점성술 AI 운세 상담\n친구 초대로 양쪽 50 Orb 무료 지급!\n' + link;
+  if (navigator.share) {
+    navigator.share({ title: '포르투나 — 친구 초대', text: msg, url: link }).catch(function(){});
+  } else if (window.Kakao && window.Kakao.Share) {
+    if (!Kakao.isInitialized()) { try { Kakao.init('2543c896dead8185e2edfa0976396f25'); } catch(e) {} }
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '포르투나 — AI 운세 상담',
+        description: '카카오 로그인만 하면 양쪽 50 Orb 즉시 지급. 사주·점성·자미두수 AI 분석 무료 시작',
+        imageUrl: 'https://picolab.kr/img/goddess/goddess-app.png',
+        link: { mobileWebUrl: link, webUrl: link }
+      },
+      buttons: [{ title: '무료로 시작 (+50 Orb)', link: { mobileWebUrl: link, webUrl: link } }]
+    });
+  } else {
+    navigator.clipboard.writeText(link).then(function() {
+      try {
+        var t = document.getElementById('toast');
+        if (t) { t.textContent = '초대 링크가 복사됐어요'; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 2500); }
+      } catch(e) {}
+    }).catch(function() { prompt('초대 링크:', link); });
+  }
 }
 
 function _picoProcessReferral(refereeUserId) {
