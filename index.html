@@ -4024,7 +4024,17 @@ async function openHistoryModal() {
 
   var allItems = [];
   var TYPE_ICON = { character:'<i class="pi pi-crystal"></i>', money:'<i class="pi pi-coin"></i>', love:'<i class="pi pi-heart"></i>', daeun:'<i class="pi pi-asc"></i>', year:'<i class="pi pi-sparkle"></i>', month:'<i class="pi pi-moon"></i>', yongsin:'<i class="pi pi-bolt"></i>', vedic_full:'<i class="pi pi-lotus"></i>', astro_full:'<i class="pi pi-star"></i>', ziwei_full:'<i class="pi pi-ziwei"></i>', triple:'<i class="pi pi-eye"></i>', career_deep:'<i class="pi pi-target"></i>', child_career:'<i class="pi pi-star"></i>', gunghap:'<i class="pi pi-heart"></i>', saju:'<i class="pi pi-temple"></i>', name_ai:'<i class="pi pi-sparkle"></i>', name_rec:'<i class="pi pi-crystal"></i>', name_child:'<i class="pi pi-sparkle"></i>' };
-  var TYPE_LABEL = { character:'기질 분석', money:'재물·직업 운', love:'연애·인연 운', daeun:'대운 흐름', year:'신년운', month:'이달 월운', yongsin:'용신 생활 가이드', vedic_full:'베딕 운명 분석', astro_full:'서양 점성술 분석', ziwei_full:'자미두수 분석', triple:'동서양 통합 분석', career_deep:'직업·사업 심층', child_career:'아이 진로 적성', name_ai:'이름 AI 심층분석', name_rec:'이름 추천', name_child:'아이 작명' };
+  // report.html 의 TYPE_CONFIG[type].title 과 일치시켜 이름 일관성 확보
+  var TYPE_LABEL = {
+    character:'타고난 기질 리포트', money:'재물/사업 리포트', love:'연애/결혼 리포트',
+    daeun:'대운 흐름 리포트', year:'올해 운세 리포트', month:'이번달 운세 리포트',
+    yongsin:'용신 생활 가이드',
+    vedic_full:'베딕 운명 심층 분석', astro_full:'서양 점성술 심층 분석',
+    ziwei_full:'자미두수 심층 분석', triple:'동서양 통합 분석',
+    career_deep:'직업·사업 심층 분석', child_career:'우리 아이 진로 적성',
+    wealth_lifetime:'내 인생 재물 곡선', monthly_calendar:'내 12개월 정밀 캘린더',
+    name_ai:'이름 AI 심층분석', name_rec:'이름 추천', name_child:'아이 작명'
+  };
 
   // 기존 analysis-history 조회
   try {
@@ -4042,7 +4052,7 @@ async function openHistoryModal() {
         allItems.push({
           _source: 'reports',
           id: r.id,
-          title: (TYPE_LABEL[r.report_type] || r.report_type) + ' 리포트',
+          title: TYPE_LABEL[r.report_type] || (r.report_type + ' 리포트'),
           type: r.report_type,
           created_at: r.created_at,
           _content: r.content
@@ -4075,7 +4085,8 @@ async function openHistoryModal() {
       +'<div><span style="font-size:16px;margin-right:6px;">'+icon+'</span><span style="font-size:14px;font-weight:700;color:var(--text);">'+r.title+'</span></div>'
       +'<span style="font-size:11px;color:var(--muted);">'+dateStr+'</span></div>';
     if (r._source === 'reports') {
-      (function(title, content){ item.onclick = function(){ openReportDetail(title, content); }; })(r.title, r._content);
+      // 원본 리포트 페이지로 이동 — 섹션 카드 형식·이름·메타 데이터 그대로
+      (function(type, id){ item.onclick = function(){ location.href = 'report.html?type=' + encodeURIComponent(type) + '&r=' + encodeURIComponent(id); }; })(r.type, r.id);
     } else {
       (function(id){ item.onclick = function(){ openHistoryDetail(id); }; })(r.id);
     }
