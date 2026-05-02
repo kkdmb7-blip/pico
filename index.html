@@ -4893,6 +4893,46 @@ var currentUser = null;
     }
   } catch(e) {}
 })();
+// ── 출석 체크 (매일 첫 진입 시 자동 + 7일 연속 시 +50 Orb 자동 지급) ──
+function _picoAttendanceCheck(userId) {
+  if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) return;
+  // KST 오늘 날짜 기준으로 오늘 이미 호출했는지 localStorage 캐시 (중복 호출 방지)
+  var kst = new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+  var lsKey = 'pico_attendance_' + kst;
+  if (localStorage.getItem(lsKey) === '1') return;
+  fetch('https://fortuna.kkdmb7.workers.dev/me/attendance', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    if (!d || !d.ok) return;
+    try { localStorage.setItem(lsKey, '1'); } catch(e) {}
+    // 새로 출석한 경우만 토스트 (이미 오늘 출석한 경우는 silent)
+    if (d.granted > 0) {
+      // 7일 도달 — 큰 축하
+      var modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(40,28,16,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+      modal.innerHTML = '<div style="background:linear-gradient(135deg,#fcf7ea,#fff);border-radius:18px;padding:32px 26px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(40,28,16,0.4);">'
+        + '<div style="font-size:48px;margin-bottom:10px;">🎁</div>'
+        + '<div style="font-family:\'Noto Serif KR\',serif;font-size:20px;font-weight:700;color:#7a5e1c;margin-bottom:10px;">7일 연속 출석!</div>'
+        + '<div style="font-size:14px;color:#3a2c1e;line-height:1.7;margin-bottom:18px;">축하합니다 — <strong style="color:#7a5e1c;">+50 Orb</strong>가 지급됐어요</div>'
+        + '<button onclick="this.parentNode.parentNode.remove()" style="width:100%;padding:13px;background:linear-gradient(135deg,#967032,#b89048);color:#fdf7e0;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">고마워요</button>'
+        + '</div>';
+      document.body.appendChild(modal);
+    } else if (typeof d.streak === 'number' && d.streak > 0) {
+      // 일반 출석 토스트
+      try {
+        var t = document.getElementById('toast');
+        if (t) {
+          t.textContent = '오늘 출석 ' + d.streak + '/7일 — ' + (d.days_until_reward||0) + '일 남으면 +50 Orb';
+          t.classList.add('show');
+          setTimeout(function(){ t.classList.remove('show'); }, 3500);
+        }
+      } catch(e) {}
+    }
+  }).catch(function(){});
+}
+
 function _picoProcessReferral(refereeUserId) {
   try {
     var refId = sessionStorage.getItem('pico_pending_ref');
@@ -4920,6 +4960,8 @@ function checkAuth() {
     if (stored) {
       currentUser = JSON.parse(stored);
       if (currentUser && currentUser.avatar) currentUser.avatar = currentUser.avatar.replace(/^http:\/\//,'https://');
+      // 기존 로그인 사용자도 매일 첫 진입 시 출석 체크 (UUID 형식인 경우만)
+      try { if (currentUser && currentUser.id) _picoAttendanceCheck(currentUser.id); } catch(e) {}
       // _v<6 이거나 kakao_ 접두어면 UUID 재검증 (v6: 프로필 초기화 후 ID 변경 대응)
       var needsUpgrade = currentUser.email && ((!currentUser._v || currentUser._v < 6) || (currentUser.id && currentUser.id.indexOf('kakao_') === 0));
       if (needsUpgrade) {
@@ -5177,6 +5219,8 @@ function handleKakaoCallback(code) {
         // 신규 가입 + 초대 링크 ref 있으면 referral 처리 → 양쪽 50 Orb
         try { _picoProcessReferral(userId); } catch(e) {}
       }
+      // 매일 첫 진입 시 출석 체크 — 7일 연속 시 +50 Orb 자동 지급
+      try { _picoAttendanceCheck(userId); } catch(e) {}
       syncProfilesFromServer(currentUser.id).then(function() {
         var existing = localStorage.getItem('pico_profile');
         if (!existing) openProfileModal();
