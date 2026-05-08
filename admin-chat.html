@@ -108,6 +108,7 @@ nav {
       <button class="mobile-back-btn" id="mobileBackBtn" onclick="closeChatMobile()">← 목록</button>
       <span id="chat-head-title">사용자를 선택하세요</span>
     </div>
+    <div id="authErrorBanner" style="display:none;background:#c94a3a;color:#fff;font-size:12px;padding:8px 14px;border-radius:8px;margin:8px;">인증 오류 — admin.html에서 비밀키 재입력 후 다시 시도하세요.</div>
     <div id="no-select">← 사용자를 선택하면 대화가 표시돼요</div>
     <div id="chat-msgs" style="display:none;"></div>
     <div id="chat-foot" style="display:none;">
@@ -218,10 +219,14 @@ async function loadChat(uid, scroll) {
     return '<div class="cm ' + m.sender + '">' + escHtml(m.content) + '<time>' + t + '</time></div>';
   }).join('');
   if (scroll) el.scrollTop = el.scrollHeight;
-  await fetch(WORKER_BASE + '/admin/support-messages', {
+  var patchRes = await fetch(WORKER_BASE + '/admin/support-messages', {
     method: 'PATCH', headers: _adminHeaders({'Content-Type':'application/json'}),
     body: JSON.stringify({ user_id: uid })
   });
+  if (patchRes.status === 401 || patchRes.status === 403) {
+    var banner = document.getElementById('authErrorBanner');
+    if (banner) banner.style.display = 'block';
+  }
 }
 
 async function sendReply() {
