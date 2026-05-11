@@ -5250,10 +5250,21 @@ function handleKakaoCallback(code) {
     }
 
     // resolve-user → chat_users UUID (memox와 완전 동일 엔드포인트)
+    // UTM 소스 전달: URL 파라미터 > localStorage 저장값 > 'picolab'
+    var _utmSource = (function() {
+      try {
+        var saved = sessionStorage.getItem('pico_utm_source');
+        if (saved) return saved;
+        var ref = document.referrer || '';
+        if (ref.indexOf('pf.kakao.com') !== -1) return 'kakao_channel';
+        if (ref.indexOf('t.co') !== -1 || ref.indexOf('twitter') !== -1) return 'twitter';
+        return 'picolab_direct';
+      } catch(e) { return 'picolab_direct'; }
+    })();
     return fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, name: name, kakao_id: profile.id })
+      body: JSON.stringify({ email: email, name: name, kakao_id: profile.id, source: _utmSource })
     })
     .then(function(r) { return r.json(); })
     .then(function(resolved) {
@@ -6816,7 +6827,24 @@ function _urlBase64ToUint8Array(b64) {
 })();
 
 // SW 등록 (페이지 로드 시)
-var APP_VERSION = '1.1.0';
+var APP_VERSION = '1.1.1';
+
+// ── 유입 경로 캡처 (최초 진입 시 sessionStorage 저장) ───────────────
+(function() {
+  try {
+    if (sessionStorage.getItem('pico_utm_source')) return; // 이미 저장됨
+    var p = new URLSearchParams(window.location.search);
+    var utm = p.get('utm_source');
+    var tab = p.get('tab');
+    var ref = p.get('ref');
+    var src = utm
+      || (ref ? 'referral' : null)
+      || (tab === 'report' ? 'pico_report' : null)
+      || (document.referrer && document.referrer.indexOf('pf.kakao.com') !== -1 ? 'kakao_channel' : null)
+      || 'picolab_direct';
+    sessionStorage.setItem('pico_utm_source', src);
+  } catch(e) {}
+})();
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js?v=' + APP_VERSION, { scope: '/' }).catch(function(e) {
     console.warn('[pico sw]', e);
