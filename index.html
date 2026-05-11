@@ -6460,7 +6460,24 @@ function urlBase64ToUint8Array(base64String) {
     try {
       var sb = getSb();
       if (!sb) return;
-      var res = await sb.from('orb_balance').select('balance').eq('user_id', userId).maybeSingle();
+      var resolvedId = userId;
+      if (typeof userId === 'string' && userId.indexOf('kakao_') === 0) {
+        try {
+          var rr = await fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kakao_id: userId.slice(6) })
+          });
+          var rd = await rr.json();
+          if (rd && rd.id) {
+            resolvedId = rd.id;
+            try {
+              var stored = JSON.parse(localStorage.getItem('pico_user') || '{}');
+              if (stored && stored.id === userId) { stored.id = resolvedId; localStorage.setItem('pico_user', JSON.stringify(stored)); }
+            } catch(e) {}
+          }
+        } catch(e) {}
+      }
+      var res = await sb.from('orb_balance').select('balance').eq('user_id', resolvedId).maybeSingle();
       var bal = (res.data && res.data.balance != null) ? res.data.balance : 0;
       el.innerHTML = '<i class="pi pi-sparkle"></i> ' + bal.toLocaleString() + ' Orb';
       el.style.display = 'block';
