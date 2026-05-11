@@ -6369,18 +6369,35 @@ function updateMypageTab() {
     try { var _mp = JSON.parse(localStorage.getItem('pico_profile')); profileName = _mp && _mp.name; } catch(e) {}
     if (nameEl) nameEl.textContent = (profileName || currentUser.name) + '님';
     if (avEl && currentUser.avatar) { avEl.src = currentUser.avatar; avEl.style.display = ''; }
-    // Orb 잔액 표시
-    (function(uid) {
+    // Orb 잔액 표시 — kakao_ 접두어면 UUID로 resolve 후 조회 (memox 잔액 연동)
+    (async function(uid) {
       try {
+        var resolvedUid = uid;
+        // 구버전 kakao_ 접두어 세션이면 UUID로 변환
+        if (typeof uid === 'string' && uid.indexOf('kakao_') === 0) {
+          try {
+            var rr = await fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ kakao_id: uid.slice(6), name: currentUser.name || '' })
+            });
+            var rd = await rr.json();
+            if (rd && rd.id) {
+              resolvedUid = rd.id;
+              // 다음 로그인부터는 UUID로 저장
+              try {
+                var stored = JSON.parse(localStorage.getItem('pico_user') || '{}');
+                if (stored && stored.id === uid) { stored.id = resolvedUid; localStorage.setItem('pico_user', JSON.stringify(stored)); }
+              } catch(e) {}
+            }
+          } catch(e) {}
+        }
         var sb = window.supabase && window.supabase.createClient('https://ymghmfkqctckxxysxkvy.supabase.co','sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x');
-        console.log('[updateMypageTab] uid:', uid, 'sb:', !!sb);
         if (!sb) return;
-        sb.from('orb_balance').select('balance').eq('user_id', uid).maybeSingle().then(function(res) {
-          console.log('[updateMypageTab] orb res:', res.data);
-          var badge = document.getElementById('mypageOrbBadge');
-          if (badge) badge.innerHTML = '<i class="pi pi-sparkle"></i> ' + ((res.data && res.data.balance != null) ? res.data.balance.toLocaleString() : '0') + ' Orb';
-        });
-      } catch(e) { console.error('[updateMypageTab] error:', e); }
+        var res = await sb.from('orb_balance').select('balance').eq('user_id', resolvedUid).maybeSingle();
+        var badge = document.getElementById('mypageOrbBadge');
+        if (badge) badge.innerHTML = '<i class="pi pi-sparkle"></i> ' + ((res.data && res.data.balance != null) ? res.data.balance.toLocaleString() : '0') + ' Orb';
+      } catch(e) { console.error('[updateMypageTab] orb error:', e); }
     })(currentUser.id);
     checkAdminAccess();
     setTimeout(function(){ if (typeof refreshPushBtnLabel === 'function') refreshPushBtnLabel(); }, 0);
