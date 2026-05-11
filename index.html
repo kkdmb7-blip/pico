@@ -6827,7 +6827,7 @@ function _urlBase64ToUint8Array(b64) {
 })();
 
 // SW 등록 (페이지 로드 시)
-var APP_VERSION = '1.1.1';
+var APP_VERSION = '1.1.2';
 
 // ── 유입 경로 캡처 (최초 진입 시 sessionStorage 저장) ───────────────
 (function() {
@@ -6837,10 +6837,17 @@ var APP_VERSION = '1.1.1';
     var utm = p.get('utm_source');
     var tab = p.get('tab');
     var ref = p.get('ref');
+    var _ref = document.referrer || '';
     var src = utm
       || (ref ? 'referral' : null)
       || (tab === 'report' ? 'pico_report' : null)
-      || (document.referrer && document.referrer.indexOf('pf.kakao.com') !== -1 ? 'kakao_channel' : null)
+      || (_ref.indexOf('cafe.naver.com') !== -1 ? 'naver_cafe' : null)
+      || (_ref.indexOf('cafe.daum.net') !== -1 || _ref.indexOf('cafe.kakao.com') !== -1 ? 'daum_cafe' : null)
+      || (_ref.indexOf('pf.kakao.com') !== -1 ? 'kakao_channel' : null)
+      || (_ref.indexOf('blog.naver.com') !== -1 ? 'naver_blog' : null)
+      || (_ref.indexOf('instagram.com') !== -1 ? 'instagram' : null)
+      || (_ref.indexOf('t.co') !== -1 || _ref.indexOf('twitter.com') !== -1 ? 'twitter' : null)
+      || (_ref.indexOf('band.us') !== -1 ? 'band' : null)
       || 'picolab_direct';
     sessionStorage.setItem('pico_utm_source', src);
   } catch(e) {}
