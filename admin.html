@@ -991,7 +991,7 @@ qs('gateSubmit').addEventListener('click', async () => {
     sessionStorage.setItem(SS_KEY, adminSecret);
     qs('gateView').style.display = 'none';
     qs('mainView').style.display = 'block';
-    loadToday(); loadStats(); loadDaily(); loadRecent(); loadAnalytics();
+    loadToday(); loadStats(); loadDaily(); loadRecent(); loadChatUnread(); loadAnalytics(); loadReportStats(); loadOrbUsers();
   } catch(e) {
     qs('gateError').textContent = '인증 실패: ' + e.message;
     adminSecret = '';
