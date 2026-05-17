@@ -5253,7 +5253,7 @@ function handleKakaoCallback(code) {
     // UTM 소스 전달: URL 파라미터 > localStorage 저장값 > 'picolab'
     var _utmSource = (function() {
       try {
-        var saved = sessionStorage.getItem('pico_utm_source');
+        var saved = localStorage.getItem('pico_utm_source');
         if (saved) return saved;
         var ref = document.referrer || '';
         if (ref.indexOf('pf.kakao.com') !== -1) return 'kakao_channel';
@@ -6846,10 +6846,10 @@ function _urlBase64ToUint8Array(b64) {
 // SW 등록 (페이지 로드 시)
 var APP_VERSION = '1.1.2';
 
-// ── 유입 경로 캡처 (최초 진입 시 sessionStorage 저장) ───────────────
+// ── 유입 경로 캡처 (최초 진입 시 localStorage 저장 — 카카오 리다이렉트 후에도 유지) ───────────────
 (function() {
   try {
-    if (sessionStorage.getItem('pico_utm_source')) return; // 이미 저장됨
+    if (localStorage.getItem('pico_utm_source')) return; // 이미 저장됨
     var p = new URLSearchParams(window.location.search);
     var utm = p.get('utm_source');
     var tab = p.get('tab');
@@ -6866,7 +6866,7 @@ var APP_VERSION = '1.1.2';
       || (_ref.indexOf('t.co') !== -1 || _ref.indexOf('twitter.com') !== -1 ? 'twitter' : null)
       || (_ref.indexOf('band.us') !== -1 ? 'band' : null)
       || 'picolab_direct';
-    sessionStorage.setItem('pico_utm_source', src);
+    localStorage.setItem('pico_utm_source', src);
   } catch(e) {}
 })();
 if ('serviceWorker' in navigator) {
