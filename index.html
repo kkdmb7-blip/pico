@@ -6846,18 +6846,21 @@ function _urlBase64ToUint8Array(b64) {
 // SW 등록 (페이지 로드 시)
 var APP_VERSION = '1.1.2';
 
-// ── 유입 경로 캡처 (최초 진입 시 localStorage 저장 — 카카오 리다이렉트 후에도 유지) ───────────────
+// ── 유입 경로 캡처 ─────────────────────────────────────────────────────
+// 우선순위: URL utm_source > URL ref/tab > referrer 감지(최초 1회) > 기존 저장값
 (function() {
   try {
-    if (localStorage.getItem('pico_utm_source')) return; // 이미 저장됨
     var p = new URLSearchParams(window.location.search);
     var utm = p.get('utm_source');
-    var tab = p.get('tab');
-    var ref = p.get('ref');
+    // 1. 명시적 UTM 파라미터 → 항상 덮어씀 (캠페인 링크 신뢰)
+    if (utm) { localStorage.setItem('pico_utm_source', utm); return; }
+    // 2. ref 파라미터(초대링크) → 항상 덮어씀
+    if (p.get('ref')) { localStorage.setItem('pico_utm_source', 'referral'); return; }
+    // 3. 이미 저장된 값 있으면 유지 (카카오 리다이렉트 후 재진입 보호)
+    if (localStorage.getItem('pico_utm_source')) return;
+    // 4. 최초 방문 — referrer 기반 감지
     var _ref = document.referrer || '';
-    var src = utm
-      || (ref ? 'referral' : null)
-      || (tab === 'report' ? 'pico_report' : null)
+    var src = (p.get('tab') === 'report' ? 'pico_report' : null)
       || (_ref.indexOf('cafe.naver.com') !== -1 ? 'naver_cafe' : null)
       || (_ref.indexOf('cafe.daum.net') !== -1 || _ref.indexOf('cafe.kakao.com') !== -1 ? 'daum_cafe' : null)
       || (_ref.indexOf('pf.kakao.com') !== -1 ? 'kakao_channel' : null)
