@@ -546,7 +546,7 @@ async function loadUser() {
       var resolveRes = await fetch('https://fortuna-silk.vercel.app/api/resolve-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: kakaoData.email, name: kakaoData.name })
+        body: JSON.stringify({ email: kakaoData.email, name: kakaoData.name, kakao_id: kakaoData.kakao_id || null, source: (function(){ try { return localStorage.getItem('pico_utm_source') || 'picolab_direct'; } catch(e){ return 'picolab_direct'; } })() })
       });
       var resolved = await resolveRes.json();
       if (resolved && resolved.id) {
