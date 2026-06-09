@@ -567,7 +567,14 @@ async function loadUser() {
     } catch(e) {}
   }
   if (!currentUserId) {
-    // 미로그인 → picolab 메인으로
+    // 결제 리다이렉트 복귀 중이면 메인으로 튕기지 않고 대기 (paymentId가 URL에 있으면 pending이 localStorage에 있음)
+    var _hasPaymentId = new URLSearchParams(window.location.search).get('paymentId');
+    if (_hasPaymentId) {
+      // pending이 이미 저장되어 있으므로 다음 방문 때 recoverPending()으로 복구됨
+      // 일단 picolab 메인으로 보내되 pending은 보존
+      location.href = 'https://picolab.kr';
+      return false;
+    }
     location.href = 'https://picolab.kr';
     return false;
   }
@@ -869,6 +876,8 @@ async function doPay(pack) {
   var paymentId = 'ORB-' + pack.id + '-' + Date.now();
   var packName = '포르투나 ' + totalOrb.toLocaleString() + ' Orb 충전';
 
+  // 모바일 리다이렉트 대비: requestPayment 직전에 pending 저장 (복귀 시 auth 실패해도 복구 가능)
+  savePending({ paymentId: paymentId, impUid: paymentId, packId: pack.id, totalOrb: totalOrb, ts: Date.now() });
   showLoading();
   try {
     var rsp = await PortOne.requestPayment({
@@ -956,8 +965,8 @@ async function recoverPending() {
   var pending = loadPending();
   if (!pending) return;
   if (!currentUserId) return;
-  // 10분 이상 지난 pending은 버림
-  if (Date.now() - (pending.ts || 0) > 10 * 60 * 1000) { clearPending(); return; }
+  // 24시간 이상 지난 pending은 버림 (모바일 리다이렉트 후 다음날 복귀해도 복구 가능)
+  if (Date.now() - (pending.ts || 0) > 24 * 60 * 60 * 1000) { clearPending(); return; }
   var pack = PACKS.find(function(p){ return p.id === pending.packId; });
   if (!pack) { clearPending(); return; }
   // orb_transactions에 이미 기록됐는지 확인 (중복 지급 방지)
