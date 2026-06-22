@@ -1436,8 +1436,8 @@
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 20px 16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div>
-        <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">5대 운세 교차 분석</div>
-        <h2 id="mainScoreTitle" style="font-size:20px;font-weight:700;margin:0;color:var(--text);"><span style="color:var(--gold);">오늘의 운세</span> 점수</h2>
+        <div data-i18n="score_label" style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">5대 운세 교차 분석</div>
+        <h2 id="mainScoreTitle" style="font-size:20px;font-weight:700;margin:0;color:var(--text);"><span data-i18n="score_today" style="color:var(--gold);">오늘의 운세</span> <span data-i18n="score_score">점수</span></h2>
       </div>
       <p id="scoreTodayDate" style="font-size:11px;color:var(--muted);margin:0;text-align:right;"></p>
     </div>
@@ -1456,7 +1456,7 @@
     <!-- 로딩 -->
     <div id="scoreLoadingRow" class="score-loading-row" style="display:none;">
       <div class="score-loading-spinner"></div>
-      <span>운세 점수 계산 중…</span>
+      <span data-i18n="score_loading">운세 점수 계산 중…</span>
     </div>
 
     <!-- 결과 -->
@@ -1466,10 +1466,10 @@
       <div class="score-summary-text" id="scoreSummaryText" style="margin-bottom:8px;font-size:12px;display:none;"></div>
       <div class="score-bottom-row" style="margin-top:0;">
         <div class="score-overall-chip">
-          <span>종합</span>
+          <span data-i18n="score_total">종합</span>
           <span class="score-overall-num" id="scoreOverallNum">–</span>
-          <span style="font-size:12px;color:var(--muted);">점</span>
-          <a class="score-detail-btn" id="scoreDetailLink" href="score.html" style="margin-left:10px;">자세히 보기 →</a>
+          <span data-i18n="score_unit" style="font-size:12px;color:var(--muted);">점</span>
+          <a class="score-detail-btn" data-i18n="score_detail_link" id="scoreDetailLink" href="score.html" style="margin-left:10px;">자세히 보기 →</a>
         </div>
       </div>
     </div>
@@ -1482,7 +1482,7 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <div>
         <div style="font-size:10px;letter-spacing:0.18em;color:rgba(123,94,167,0.85);font-weight:700;margin-bottom:3px;">RECOMMENDED PATH</div>
-        <div style="font-size:15px;font-weight:700;color:var(--text);">오늘 이렇게 활용해보세요</div>
+        <div data-i18n="journey_title" style="font-size:15px;font-weight:700;color:var(--text);">오늘 이렇게 활용해보세요</div>
       </div>
       <button id="picoJourneyDismiss" aria-label="숨기기" style="background:transparent;border:0;color:var(--muted);font-size:16px;cursor:pointer;padding:4px 6px;line-height:1;">×</button>
     </div>
@@ -1990,9 +1990,9 @@ window.shareLifeDays = function() {
   <div class="memox-banner" onclick="window.location.href='https://kkdmb7-blip.github.io/memox/'" >
     <div class="memox-banner-left">
       <div class="memox-banner-title"><i class="pi pi-sparkle"></i> AI 사주 상담</div>
-      <div class="memox-banner-desc">사주+베딕+기문+자미두수 융합 실시간 채팅</div>
+      <div data-i18n="memox_desc" class="memox-banner-desc">사주+베딕+기문+자미두수 융합 실시간 채팅</div>
     </div>
-    <div class="memox-banner-btn">상담 시작 →</div>
+    <div data-i18n="memox_btn" class="memox-banner-btn">상담 시작 →</div>
   </div>
 </div>
 <div style="text-align:center;padding:0 16px 14px;">
@@ -2046,12 +2046,12 @@ window.shareLifeDays = function() {
       onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
         <div>
-          <div style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;">이름 수리 · 작명</div>
-          <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;">내 이름은 <span style="color:var(--gold);">몇 점</span>일까?</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.5;">81수리 4격 · 음오행 · 용신 궁합 · 아이 작명</div>
+          <div data-i18n="name_label" style="font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;">이름 수리 · 작명</div>
+          <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;"><span data-i18n="name_title_prefix">내 이름은 </span><span style="color:var(--gold);"><span data-i18n="name_title_score">몇 점</span></span><span data-i18n="name_title_suffix">일까?</span></div>
+          <div data-i18n="name_sub" style="font-size:12px;color:var(--muted);line-height:1.5;">81수리 4격 · 음오행 · 용신 궁합 · 아이 작명</div>
         </div>
         <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-          <div style="font-size:10px;color:#3a8f4d;font-weight:700;background:rgba(58,143,77,0.1);border:1px solid rgba(58,143,77,0.3);border-radius:12px;padding:3px 10px;">진단 무료</div>
+          <div data-i18n="name_free" style="font-size:10px;color:#3a8f4d;font-weight:700;background:rgba(58,143,77,0.1);border:1px solid rgba(58,143,77,0.3);border-radius:12px;padding:3px 10px;">진단 무료</div>
           <div style="font-size:13px;color:var(--muted);">›</div>
         </div>
       </div>
@@ -2068,63 +2068,63 @@ window.shareLifeDays = function() {
 <!-- WHY PICOLAB -->
 <section class="section-why">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 16px 16px;">
-    <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;color:var(--muted);text-align:center;margin-bottom:8px;text-transform:uppercase;">PICO Lab의 6중 교차검증 시스템</div>
-    <h2 style="font-family:'Noto Serif KR',serif;font-size:clamp(16px,3.2vw,22px);font-weight:700;text-align:center;margin-bottom:6px;line-height:1.5;">5,000년 인류의 지혜를<br><span style="color:var(--gold);">AI가 함께 살펴봐요</span></h2>
-    <div style="font-size:11.5px;color:var(--muted);text-align:center;margin-bottom:16px;line-height:1.6;opacity:0.85;">결정은 천천히 · 안 따라도 괜찮아요 · 마음의 결을 알아두는 도구로</div>
+    <div data-i18n="why_sys_label" style="font-size:11px;font-weight:600;letter-spacing:1.5px;color:var(--muted);text-align:center;margin-bottom:8px;text-transform:uppercase;">PICO Lab의 6중 교차검증 시스템</div>
+    <h2 style="font-family:'Noto Serif KR',serif;font-size:clamp(16px,3.2vw,22px);font-weight:700;text-align:center;margin-bottom:6px;line-height:1.5;"><span data-i18n-html="why_sys_title">5,000년 인류의 지혜를<br><span style="color:var(--gold);">AI가 함께 살펴봐요</span></span></h2>
+    <div data-i18n="why_sys_sub" style="font-size:11.5px;color:var(--muted);text-align:center;margin-bottom:16px;line-height:1.6;opacity:0.85;">결정은 천천히 · 안 따라도 괜찮아요 · 마음의 결을 알아두는 도구로</div>
     <div class="why-grid">
       <div class="why-card" onclick="openSajuModal()" style="cursor:pointer;">
-        <h3>사주 (四柱)</h3>
-        <p>당신의 리더십 DNA</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:var(--gold);background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:4px 10px;">사주 분석</div>
+        <h3 data-i18n="why_saju_title">사주 (四柱)</h3>
+        <p data-i18n="why_saju_desc">당신의 리더십 DNA</p>
+        <div data-i18n="why_saju_btn" style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:var(--gold);background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:4px 10px;">사주 분석</div>
       </div>
       <div class="why-card" onclick="openBirthModal('astro')" style="cursor:pointer;">
-        <h3>서양 점성술</h3>
-        <p>당신의 우주 에너지</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#2e6ba8;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:8px;padding:4px 10px;">별자리 분석</div>
+        <h3 data-i18n="why_astro_title">서양 점성술</h3>
+        <p data-i18n="why_astro_desc">당신의 우주 에너지</p>
+        <div data-i18n="why_astro_btn" style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#2e6ba8;background:rgba(122,196,255,0.1);border:1px solid rgba(122,196,255,0.3);border-radius:8px;padding:4px 10px;">별자리 분석</div>
       </div>
       <div class="why-card" onclick="openBirthModal('vedic')" style="cursor:pointer;">
-        <h3>베딕 점성술</h3>
-        <p>카르마와 세부 운의 변화</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#7a4aa8;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;">베딕 분석</div>
+        <h3 data-i18n="why_vedic_title">베딕 점성술</h3>
+        <p data-i18n="why_vedic_desc">카르마와 세부 운의 변화</p>
+        <div data-i18n="why_vedic_btn" style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#7a4aa8;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;">베딕 분석</div>
       </div>
       <div class="why-card" onclick="openBirthModal('ziwei')" style="cursor:pointer;">
-        <h3>자미두수 紫微斗數</h3>
-        <p>당신의 내면 심리</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#2a8577;background:rgba(109,213,194,0.1);border:1px solid rgba(109,213,194,0.3);border-radius:8px;padding:4px 10px;">자미 분석</div>
+        <h3 data-i18n="why_ziwei_title">자미두수 紫微斗數</h3>
+        <p data-i18n="why_ziwei_desc">당신의 내면 심리</p>
+        <div data-i18n="why_ziwei_btn" style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#2a8577;background:rgba(109,213,194,0.1);border:1px solid rgba(109,213,194,0.3);border-radius:8px;padding:4px 10px;">자미 분석</div>
       </div>
       <div class="why-card" onclick="openQimenModal()" style="cursor:pointer;">
-        <h3>기문둔갑 奇門遁甲</h3>
-        <p>당신의 결정적 타이밍</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#3a8f4d;background:rgba(123,198,126,0.1);border:1px solid rgba(123,198,126,0.3);border-radius:8px;padding:4px 10px;">기문 포국</div>
+        <h3 data-i18n="why_qimen_title">기문둔갑 奇門遁甲</h3>
+        <p data-i18n="why_qimen_desc">당신의 결정적 타이밍</p>
+        <div data-i18n="why_qimen_btn" style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#3a8f4d;background:rgba(123,198,126,0.1);border:1px solid rgba(123,198,126,0.3);border-radius:8px;padding:4px 10px;">기문 포국</div>
       </div>
       <div class="why-card" onclick="openTarotIntro()" style="cursor:pointer;">
-        <h3>타로카드</h3>
-        <p>당신의 직관 신호</p>
-        <div style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#6a4aa0;background:rgba(106,74,160,0.1);border:1px solid rgba(106,74,160,0.35);border-radius:8px;padding:4px 10px;">카드 뽑기</div>
+        <h3 data-i18n="why_tarot_title">타로카드</h3>
+        <p data-i18n="why_tarot_desc">당신의 직관 신호</p>
+        <div data-i18n="why_tarot_btn" style="margin-top:10px;display:inline-block;font-size:11px;font-weight:600;color:#6a4aa0;background:rgba(106,74,160,0.1);border:1px solid rgba(106,74,160,0.35);border-radius:8px;padding:4px 10px;">카드 뽑기</div>
       </div>
       <div class="why-card why-card-full" onclick="openGunghapModal()" style="cursor:pointer;">
         <div class="why-card-body">
-          <h3>궁합 · 사주 기반</h3>
-          <p>천간합·일지·오행·계절 조화를 <b>규칙 기반 즉시 점수화</b> + AI 심층 분석 (80 Orb)</p>
+          <h3 data-i18n="why_gunghap_title">궁합 · 사주 기반</h3>
+          <p data-i18n="why_gunghap_desc">천간합·일지·오행·계절 조화를 <b>규칙 기반 즉시 점수화</b> + AI 심층 분석 (80 Orb)</p>
         </div>
-        <div class="why-card-link" style="background:rgba(184,82,110,0.14);border:1px solid rgba(184,82,110,0.35);border-radius:8px;padding:6px 12px;">궁합 보기</div>
+        <div data-i18n="why_gunghap_btn" class="why-card-link" style="background:rgba(184,82,110,0.14);border:1px solid rgba(184,82,110,0.35);border-radius:8px;padding:6px 12px;">궁합 보기</div>
       </div>
       <div class="why-card why-card-full" onclick="location.href='/gunghap2.html'" style="cursor:pointer;border-color:rgba(138,106,21,0.45);background:linear-gradient(135deg,var(--surface),rgba(138,106,21,0.06));">
         <div class="why-card-body">
-          <h3 style="color:#7a5800;">궁합 2.0 NEW</h3>
-          <p>두 사람 모두 직접 입력 · <b>사주·서양점성·베딕 3엔진</b> AI 종합 분석 (기본 무료 / 심층 300 Orb)</p>
+          <h3 data-i18n="why_gunghap2_title" style="color:#7a5800;">궁합 2.0 NEW</h3>
+          <p data-i18n="why_gunghap2_desc">두 사람 모두 직접 입력 · <b>사주·서양점성·베딕 3엔진</b> AI 종합 분석 (기본 무료 / 심층 300 Orb)</p>
         </div>
-        <div class="why-card-link" style="color:#7a5800;background:rgba(138,106,21,0.14);border:1.5px solid rgba(138,106,21,0.55);border-radius:8px;padding:6px 12px;">3엔진 분석</div>
+        <div data-i18n="why_gunghap2_btn" class="why-card-link" style="color:#7a5800;background:rgba(138,106,21,0.14);border:1.5px solid rgba(138,106,21,0.55);border-radius:8px;padding:6px 12px;">3엔진 분석</div>
       </div>
       <div class="why-card why-card-full" onclick="location.href='/vedic-match.html'" style="cursor:pointer;border-color:rgba(140,90,210,0.45);background:linear-gradient(135deg,var(--surface),rgba(140,90,210,0.06));">
         <div class="why-card-body">
-          <h3 style="color:#4a3280;"><i class="pi pi-sparkle"></i> 베딕 궁합 NEW</h3>
-          <p>인도 전통 <b>36굿 쿤달리 밀란</b> · 8쿠타 × 4.5점 정밀 점수 + 낙샤트라·도샤 체크 (심층 300 Orb)</p>
+          <h3 data-i18n="why_vedic_match_title" style="color:#4a3280;"><i class="pi pi-sparkle"></i> 베딕 궁합 NEW</h3>
+          <p data-i18n="why_vedic_match_desc">인도 전통 <b>36굿 쿤달리 밀란</b> · 8쿠타 × 4.5점 정밀 점수 + 낙샤트라·도샤 체크 (심층 300 Orb)</p>
         </div>
-        <div class="why-card-link" style="color:#4a3280;background:rgba(140,90,210,0.14);border:1.5px solid rgba(140,90,210,0.55);border-radius:8px;padding:6px 12px;">쿤달리 밀란</div>
+        <div data-i18n="why_vedic_match_btn" class="why-card-link" style="color:#4a3280;background:rgba(140,90,210,0.14);border:1.5px solid rgba(140,90,210,0.55);border-radius:8px;padding:6px 12px;">쿤달리 밀란</div>
       </div>
     </div>
-    <p class="why-tagline">6가지가 같은 방향을 가리킬 때,<br>그 결을 한 번 들여다볼 만합니다.</p>
+    <p data-i18n-html="why_tagline" class="why-tagline">6가지가 같은 방향을 가리킬 때,<br>그 결을 한 번 들여다볼 만합니다.</p>
   </div>
 </section>
 
@@ -2143,38 +2143,38 @@ window.shareLifeDays = function() {
   <!-- 1. 꼭 봐야 할 다섯 가지 -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 16px 16px;margin-bottom:10px;">
     <div style="margin-bottom:14px;">
-      <div style="font-size:15px;font-weight:800;color:var(--gold);margin-bottom:4px;font-family:'Noto Serif KR',serif;">나는 어떤 사람일까</div>
-      <div style="font-size:11px;color:var(--muted);">기질·재물·연애·대운·올해, 가장 궁금한 5가지</div>
+      <div data-i18n="rep_sec1_title" style="font-size:15px;font-weight:800;color:var(--gold);margin-bottom:4px;font-family:'Noto Serif KR',serif;">나는 어떤 사람일까</div>
+      <div data-i18n="rep_sec1_sub" style="font-size:11px;color:var(--muted);">기질·재물·연애·대운·올해, 가장 궁금한 5가지</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
       <div onclick="window.location.href='report.html?type=character'" style="background:linear-gradient(135deg,rgba(212,175,55,0.10),rgba(212,175,55,0.05));border:1px solid rgba(212,175,55,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(212,175,55,0.6)'" onmouseout="this.style.borderColor='rgba(212,175,55,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:var(--gold);"><i class="pi pi-crystal"></i></div>
-        <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:5px;">타고난 기질 분석</div>
-        <div style="font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:10px;">45종 정밀 데이터 기반 — 일간·격국·강약수치로 보는 본질 분석</div>
+        <div data-i18n="rep_character_title" style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:5px;">타고난 기질 분석</div>
+        <div data-i18n="rep_character_desc" style="font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:10px;">45종 정밀 데이터 기반 — 일간·격국·강약수치로 보는 본질 분석</div>
         <div class="orb-chip">490 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=money'" style="background:linear-gradient(135deg,rgba(14,143,138,0.10),rgba(14,143,138,0.05));border:1px solid rgba(109,213,194,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(109,213,194,0.6)'" onmouseout="this.style.borderColor='rgba(109,213,194,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#2a8577;"><i class="pi pi-coin"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#2a8577;margin-bottom:5px;">재물/사업 분석</div>
-        <div style="font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:10px;">정밀 재물운·대운교차 데이터로 보는 돈의 흐름과 직업 적성</div>
+        <div data-i18n="rep_money_title" style="font-size:13px;font-weight:700;color:#2a8577;margin-bottom:5px;">재물/사업 분석</div>
+        <div data-i18n="rep_money_desc" style="font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:10px;">정밀 재물운·대운교차 데이터로 보는 돈의 흐름과 직업 적성</div>
         <div class="orb-chip">690 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=love'" style="background:linear-gradient(135deg,rgba(255,138,176,0.12),rgba(194,24,91,0.06));border:1px solid rgba(255,138,176,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,138,176,0.6)'" onmouseout="this.style.borderColor='rgba(255,138,176,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#8b2447;"><i class="pi pi-heart"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#8b2447;margin-bottom:5px;">연애/결혼 분석</div>
-        <div style="font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:10px;">궁합·신살·특수패턴 정밀 분석으로 보는 연애와 인연</div>
+        <div data-i18n="rep_love_title" style="font-size:13px;font-weight:700;color:#8b2447;margin-bottom:5px;">연애/결혼 분석</div>
+        <div data-i18n="rep_love_desc" style="font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:10px;">궁합·신살·특수패턴 정밀 분석으로 보는 연애와 인연</div>
         <div class="orb-chip">690 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=daeun'" style="background:linear-gradient(135deg,rgba(180,143,255,0.12),rgba(106,58,160,0.06));border:1px solid rgba(180,143,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(180,143,255,0.6)'" onmouseout="this.style.borderColor='rgba(180,143,255,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#7a4aa8;"><i class="pi pi-asc"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#7a4aa8;margin-bottom:5px;">대운 흐름 분석</div>
-        <div style="font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:10px;">대운분리·세운교차·형충회합 정밀 데이터 기반 인생 흐름</div>
+        <div data-i18n="rep_daeun_title" style="font-size:13px;font-weight:700;color:#7a4aa8;margin-bottom:5px;">대운 흐름 분석</div>
+        <div data-i18n="rep_daeun_desc" style="font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:10px;">대운분리·세운교차·형충회합 정밀 데이터 기반 인생 흐름</div>
         <div class="orb-chip">790 Orb</div>
       </div>
       <div onclick="window.location.href='report.html?type=year'" style="background:linear-gradient(135deg,rgba(122,196,255,0.12),rgba(46,107,168,0.06));border:1px solid rgba(122,196,255,0.25);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(122,196,255,0.6)'" onmouseout="this.style.borderColor='rgba(122,196,255,0.25)'">
         <div style="font-size:20px;margin-bottom:6px;color:#2e6ba8;"><i class="pi pi-sparkle"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#2e6ba8;margin-bottom:5px;">올해 운세 상세</div>
-        <div style="font-size:10px;color:var(--muted);line-height:1.4;">세운확장·월운절기·운세종합점수 정밀 데이터 기반 올해 전략</div>
+        <div data-i18n="rep_year_title" style="font-size:13px;font-weight:700;color:#2e6ba8;margin-bottom:5px;">올해 운세 상세</div>
+        <div data-i18n="rep_year_desc" style="font-size:10px;color:var(--muted);line-height:1.4;">세운확장·월운절기·운세종합점수 정밀 데이터 기반 올해 전략</div>
         <div class="orb-chip" style="margin-top:8px;">490 Orb</div>
       </div>
     </div>
@@ -2587,18 +2587,18 @@ window.shareLifeDays = function() {
     <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--surface2);border:1px solid rgba(123,94,167,0.3);border-radius:14px;text-decoration:none;color:var(--text);transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(123,94,167,0.6)'" onmouseout="this.style.borderColor='rgba(123,94,167,0.3)'">
       <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(123,94,167,0.3),rgba(160,127,212,0.15));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;"><i class="pi pi-sparkle"></i></div>
       <div>
-        <div style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;margin-bottom:3px;">AI 운세 상담</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5;">사주·점성술·기문 기반의 AI 심층 분석</div>
+        <div data-i18n="consult_ai_title" style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;margin-bottom:3px;">AI 운세 상담</div>
+        <div data-i18n="consult_ai_desc" style="font-size:12px;color:var(--muted);line-height:1.5;">사주·점성술·기문 기반의 AI 심층 분석</div>
       </div>
-      <div style="font-size:11px;font-weight:600;color:#7a4aa8;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">무료</div>
+      <div data-i18n="consult_ai_badge" style="font-size:11px;font-weight:600;color:#7a4aa8;background:rgba(180,143,255,0.1);border:1px solid rgba(180,143,255,0.3);border-radius:8px;padding:4px 10px;flex-shrink:0;">무료</div>
     </a>
     <a href="counselor.html" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--surface2);border:1px solid rgba(194,120,78,0.3);border-radius:14px;text-decoration:none;color:var(--text);transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(194,120,78,0.6)'" onmouseout="this.style.borderColor='rgba(194,120,78,0.3)'">
       <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(194,120,78,0.25),rgba(232,168,124,0.1));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;"><i class="pi pi-person"></i></div>
       <div>
-        <div style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;margin-bottom:3px;">전문 상담사 연결</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5;">사주·타로 전문가에게 1:1 직접 상담</div>
+        <div data-i18n="consult_pro_title" style="font-family:'Noto Serif KR',serif;font-size:15px;font-weight:700;margin-bottom:3px;">전문 상담사 연결</div>
+        <div data-i18n="consult_pro_desc" style="font-size:12px;color:var(--muted);line-height:1.5;">사주·타로 전문가에게 1:1 직접 상담</div>
       </div>
-      <div style="font-size:11px;font-weight:600;color:#a16d1f;background:rgba(161,109,31,0.1);border:1px solid rgba(161,109,31,0.35);border-radius:8px;padding:4px 10px;flex-shrink:0;">1:1 상담</div>
+      <div data-i18n="consult_pro_badge" style="font-size:11px;font-weight:600;color:#a16d1f;background:rgba(161,109,31,0.1);border:1px solid rgba(161,109,31,0.35);border-radius:8px;padding:4px 10px;flex-shrink:0;">1:1 상담</div>
     </a>
   </div>
 </div>
@@ -2611,8 +2611,8 @@ window.shareLifeDays = function() {
   <!-- 비로그인 -->
   <div id="mypageGuest" style="display:none;">
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px 24px;text-align:center;">
-      <div style="font-size:15px;color:var(--muted);margin-bottom:8px;line-height:1.8;">카카오로 가볍게 시작하면<br>지난 분석과 프로필을 같이 챙겨드려요.</div>
-      <div style="font-size:11.5px;color:var(--muted);margin-bottom:20px;line-height:1.65;opacity:0.8;">로그인 없이 둘러봐도 괜찮고, 결정은 천천히 해도 돼요.</div>
+      <div data-i18n-html="myp_guest_title" style="font-size:15px;color:var(--muted);margin-bottom:8px;line-height:1.8;">카카오로 가볍게 시작하면<br>지난 분석과 프로필을 같이 챙겨드려요.</div>
+      <div data-i18n="myp_guest_sub" style="font-size:11.5px;color:var(--muted);margin-bottom:20px;line-height:1.65;opacity:0.8;">로그인 없이 둘러봐도 괜찮고, 결정은 천천히 해도 돼요.</div>
       <button onclick="kakaoLogin()" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:#FEE500;color:#191919;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">
         <img src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png" style="width:18px;height:18px;">카카오로 시작하기
       </button>
@@ -2624,11 +2624,11 @@ window.shareLifeDays = function() {
       <img id="mypageAvatar" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;display:none;">
       <div>
         <div id="mypageName" style="font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;margin-bottom:2px;"></div>
-        <div style="font-size:11px;color:var(--muted);">PICO Lab 회원</div>
+        <div data-i18n="myp_member" style="font-size:11px;color:var(--muted);">PICO Lab 회원</div>
       </div>
       <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
         <div id="mypageOrbBadge" style="font-size:12px;font-weight:700;color:var(--orb);background:var(--orb-bg);border:1px solid var(--orb-border);border-radius:20px;padding:5px 12px;white-space:nowrap;"><i class="pi pi-sparkle"></i> — Orb</div>
-        <button onclick="location.href='charge.html'" style="font-size:11px;font-weight:700;color:var(--gold-deep);background:rgba(154,122,38,0.10);border:1px solid rgba(154,122,38,0.32);border-radius:16px;padding:5px 11px;cursor:pointer;white-space:nowrap;">충전</button>
+        <button data-i18n="myp_charge" onclick="location.href='charge.html'" style="font-size:11px;font-weight:700;color:var(--gold-deep);background:rgba(154,122,38,0.10);border:1px solid rgba(154,122,38,0.32);border-radius:16px;padding:5px 11px;cursor:pointer;white-space:nowrap;">충전</button>
       </div>
     </div>
 
@@ -2642,7 +2642,7 @@ window.shareLifeDays = function() {
         <span id="attendanceStreakNum" style="font-size:12px;font-weight:800;color:var(--gold-deep);">—</span>
       </div>
       <div id="attendanceDots" style="display:flex;gap:6px;justify-content:space-between;"></div>
-      <div id="attendanceMsg" style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.5;">꾸준히 와도 좋고, 가끔 들러도 괜찮아요</div>
+      <div id="attendanceMsg" data-i18n="myp_attend_msg" style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.5;">꾸준히 와도 좋고, 가끔 들러도 괜찮아요</div>
     </div>
 
     <!-- 친구 초대 카드 (같이 살펴봐요) -->
@@ -2658,16 +2658,16 @@ window.shareLifeDays = function() {
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;">
       <button onclick="openProfilesModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span><i class="pi pi-people"></i> 프로필 관리</span><span style="color:var(--muted);">›</span>
+        <span><i class="pi pi-people"></i> <span data-i18n="myp_menu_profiles">프로필 관리</span></span><span style="color:var(--muted);">›</span>
       </button>
       <button onclick="openProfileModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span><i class="pi pi-person"></i> 내 프로필 설정</span><span style="color:var(--muted);">›</span>
+        <span><i class="pi pi-person"></i> <span data-i18n="myp_menu_myprofile">내 프로필 설정</span></span><span style="color:var(--muted);">›</span>
       </button>
       <button onclick="openHistoryModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span><i class="pi pi-scroll"></i> 지난 분석 보기</span><span style="color:var(--muted);">›</span>
+        <span><i class="pi pi-scroll"></i> <span data-i18n="myp_menu_history">지난 분석 보기</span></span><span style="color:var(--muted);">›</span>
       </button>
       <button id="btnPushToggle" onclick="togglePushSubscription()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span id="btnPushLabel"><i class="pi pi-bell"></i> 오늘의 명언 알림</span>
+        <span id="btnPushLabel"><i class="pi pi-bell"></i> <span data-i18n="myp_menu_push">오늘의 명언 알림</span></span>
         <span id="btnPushSwitch" style="display:inline-flex;align-items:center;gap:6px;">
           <span id="btnPushDot" style="width:36px;height:20px;border-radius:10px;background:#ccc;position:relative;transition:background 0.2s;flex-shrink:0;">
             <span style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);" id="btnPushKnob"></span>
@@ -2675,7 +2675,7 @@ window.shareLifeDays = function() {
         </span>
       </button>
       <button onclick="openHelpModal()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span><i class="pi pi-book"></i> 도움말 · FAQ</span><span style="color:var(--muted);">›</span>
+        <span><i class="pi pi-book"></i> <span data-i18n="myp_menu_faq">도움말 · FAQ</span></span><span style="color:var(--muted);">›</span>
       </button>
       <button id="btnAdminDash" onclick="goAdminDashboard()" style="display:none;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--gold-deep);font-size:14px;cursor:pointer;text-align:left;width:100%;font-weight:700;">
         <span><i class="pi pi-sparkle"></i> 관리자 대시보드</span><span style="color:var(--muted);">›</span>
@@ -2684,7 +2684,7 @@ window.shareLifeDays = function() {
         <span><i class="pi pi-chat"></i> 사용자 문의 답변 <span id="adminChatBadge" style="display:none;background:#c94a3a;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;">0</span></span><span style="color:var(--muted);">›</span>
       </button>
       <button onclick="logout()" style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:none;border:none;color:#b91c1c;font-size:14px;cursor:pointer;text-align:left;width:100%;">
-        <span>로그아웃</span><span style="color:var(--muted);">›</span>
+        <span data-i18n="myp_logout">로그아웃</span><span style="color:var(--muted);">›</span>
       </button>
     </div>
   </div>
@@ -2697,21 +2697,21 @@ window.shareLifeDays = function() {
 
     <!-- 입력 폼 -->
     <div id="sajuForm">
-      <h3><i class="pi pi-temple"></i>️ 만세력 보기</h3>
-      <p class="saju-modal-sub">생년월일을 입력하면 사주 8자를 바로 확인할 수 있어요</p>
+      <h3><i class="pi pi-temple"></i>️ <span data-i18n="saju_modal_title">만세력 보기</span></h3>
+      <p data-i18n="saju_modal_sub" class="saju-modal-sub">생년월일을 입력하면 사주 8자를 바로 확인할 수 있어요</p>
       <div class="modal-profile-row">
-        <button class="modal-profile-btn" onclick="fillSajuFromMine()">내 정보</button>
+        <button data-i18n="saju_my_info" class="modal-profile-btn" onclick="fillSajuFromMine()">내 정보</button>
         <select class="modal-profile-select" id="sajuProfileSelect" onchange="fillSajuFromSaved(this.value)">
-          <option value="">저장된 프로필</option>
+          <option data-i18n="saju_saved_profile" value="">저장된 프로필</option>
         </select>
-        <button class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:#a16d1f;color:#a16d1f;" onclick="clearSajuForm()">새로 입력</button>
+        <button data-i18n="saju_new_input" class="modal-profile-btn" style="background:rgba(232,184,109,0.1);border-color:#a16d1f;color:#a16d1f;" onclick="clearSajuForm()">새로 입력</button>
       </div>
       <div class="saju-form-group">
-        <label>이름 (선택)</label>
+        <label data-i18n="saju_name_label">이름 (선택)</label>
         <input type="text" id="sajuName" placeholder="이름 입력" style="width:100%;background:rgba(0,0,0,0.03);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:13px 12px;color:#1a120a;font-size:15px;outline:none;font-family:'Noto Serif KR',sans-serif;">
       </div>
       <div class="saju-form-group">
-        <label>생년월일</label>
+        <label data-i18n="saju_birth_label">생년월일</label>
         <div class="saju-date-row">
           <select id="sajuYear"><option value="">년</option></select>
           <select id="sajuMonth"><option value="">월</option></select>
@@ -3182,15 +3182,15 @@ window.shareLifeDays = function() {
 </div>
 
 <footer id="mainFooter">
-  <div>© 2026 PICO Lab · AI 운세 연구소</div>
+  <div data-i18n="footer_copy">© 2026 PICO Lab · AI 운세 연구소</div>
   <div style="margin-top:6px;">
-    <a href="terms.html" style="text-decoration:underline;">이용약관</a>
+    <a data-i18n="footer_terms" href="terms.html" style="text-decoration:underline;">이용약관</a>
     <span style="margin:0 8px;opacity:0.35;">·</span>
-    <a href="privacy.html" style="text-decoration:underline;">개인정보처리방침</a>
+    <a data-i18n="footer_privacy" href="privacy.html" style="text-decoration:underline;">개인정보처리방침</a>
     <span style="margin:0 8px;opacity:0.35;">·</span>
-    <a href="http://pf.kakao.com/_krjxjn" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(254,229,0,0.45);color:#7a6030;border-radius:8px;font-weight:600;font-size:12px;text-decoration:none;border:1px solid rgba(254,229,0,0.6);"><i class="pi pi-chat"></i> 카카오 채널 추가</a>
+    <a href="http://pf.kakao.com/_krjxjn" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(254,229,0,0.45);color:#7a6030;border-radius:8px;font-weight:600;font-size:12px;text-decoration:none;border:1px solid rgba(254,229,0,0.6);"><i class="pi pi-chat"></i> <span data-i18n="footer_kakao_ch">카카오 채널 추가</span></a>
   </div>
-  <div style="margin-top:8px;font-size:11px;opacity:0.65;">본 서비스의 운세 분석은 오락 및 참고 목적으로 제공됩니다.</div>
+  <div data-i18n="footer_disclaimer" style="margin-top:8px;font-size:11px;opacity:0.65;">본 서비스의 운세 분석은 오락 및 참고 목적으로 제공됩니다.</div>
 </footer>
 
 <!-- 하단 탭 네비게이션 -->
@@ -7371,6 +7371,102 @@ input,textarea,select{-webkit-user-select:text;user-select:text;}
       tab_consult_title: '상담',
       tab_consult_sub: 'AI 또는 전문 상담사와 깊은 운세 상담을 나눠보세요.',
       tab_mypage_title: '마이페이지',
+      // 점수
+      score_label: '5대 운세 교차 분석',
+      score_today: '오늘의 운세',
+      score_score: '점수',
+      score_loading: '운세 점수 계산 중…',
+      score_total: '종합',
+      score_unit: '점',
+      score_detail_link: '자세히 보기 →',
+      journey_title: '오늘 이렇게 활용해보세요',
+      // memox / 이름
+      memox_desc: '사주+베딕+기문+자미두수 융합 실시간 채팅',
+      memox_btn: '상담 시작 →',
+      name_label: '이름 수리 · 작명',
+      name_title_prefix: '내 이름은 ',
+      name_title_score: '몇 점',
+      name_title_suffix: '일까?',
+      name_sub: '81수리 4격 · 음오행 · 용신 궁합 · 아이 작명',
+      name_free: '진단 무료',
+      // why 섹션
+      why_sys_label: 'PICO Lab의 6중 교차검증 시스템',
+      why_sys_title: '5,000년 인류의 지혜를<br><span style="color:var(--gold);">AI가 함께 살펴봐요</span>',
+      why_sys_sub: '결정은 천천히 · 안 따라도 괜찮아요 · 마음의 결을 알아두는 도구로',
+      why_saju_title: '사주 (四柱)',
+      why_saju_desc: '당신의 리더십 DNA',
+      why_saju_btn: '사주 분석',
+      why_astro_title: '서양 점성술',
+      why_astro_desc: '당신의 우주 에너지',
+      why_astro_btn: '별자리 분석',
+      why_vedic_title: '베딕 점성술',
+      why_vedic_desc: '카르마와 세부 운의 변화',
+      why_vedic_btn: '베딕 분석',
+      why_ziwei_title: '자미두수 紫微斗數',
+      why_ziwei_desc: '당신의 내면 심리',
+      why_ziwei_btn: '자미 분석',
+      why_qimen_title: '기문둔갑 奇門遁甲',
+      why_qimen_desc: '당신의 결정적 타이밍',
+      why_qimen_btn: '기문 포국',
+      why_tarot_title: '타로카드',
+      why_tarot_desc: '당신의 직관 신호',
+      why_tarot_btn: '카드 뽑기',
+      why_gunghap_title: '궁합 · 사주 기반',
+      why_gunghap_desc: '천간합·일지·오행·계절 조화를 <b>규칙 기반 즉시 점수화</b> + AI 심층 분석 (80 Orb)',
+      why_gunghap_btn: '궁합 보기',
+      why_gunghap2_title: '궁합 2.0 NEW',
+      why_gunghap2_desc: '두 사람 모두 직접 입력 · <b>사주·서양점성·베딕 3엔진</b> AI 종합 분석 (기본 무료 / 심층 300 Orb)',
+      why_gunghap2_btn: '3엔진 분석',
+      why_vedic_match_title: '<i class="pi pi-sparkle"></i> 베딕 궁합 NEW',
+      why_vedic_match_desc: '인도 전통 <b>36굿 쿤달리 밀란</b> · 8쿠타 × 4.5점 정밀 점수 + 낙샤트라·도샤 체크 (심층 300 Orb)',
+      why_vedic_match_btn: '쿤달리 밀란',
+      why_tagline: '6가지가 같은 방향을 가리킬 때,<br>그 결을 한 번 들여다볼 만합니다.',
+      // 리포트 카드
+      rep_sec1_title: '나는 어떤 사람일까',
+      rep_sec1_sub: '기질·재물·연애·대운·올해, 가장 궁금한 5가지',
+      rep_character_title: '타고난 기질 분석',
+      rep_character_desc: '45종 정밀 데이터 기반 — 일간·격국·강약수치로 보는 본질 분석',
+      rep_money_title: '재물/사업 분석',
+      rep_money_desc: '정밀 재물운·대운교차 데이터로 보는 돈의 흐름과 직업 적성',
+      rep_love_title: '연애/결혼 분석',
+      rep_love_desc: '궁합·신살·특수패턴 정밀 분석으로 보는 연애와 인연',
+      rep_daeun_title: '대운 흐름 분석',
+      rep_daeun_desc: '대운분리·세운교차·형충회합 정밀 데이터 기반 인생 흐름',
+      rep_year_title: '올해 운세 상세',
+      rep_year_desc: '세운확장·월운절기·운세종합점수 정밀 데이터 기반 올해 전략',
+      // 사주 폼
+      saju_modal_title: '만세력 보기',
+      saju_modal_sub: '생년월일을 입력하면 사주 8자를 바로 확인할 수 있어요',
+      saju_my_info: '내 정보',
+      saju_saved_profile: '저장된 프로필',
+      saju_new_input: '새로 입력',
+      saju_name_label: '이름 (선택)',
+      saju_birth_label: '생년월일',
+      // 마이페이지
+      myp_guest_title: '카카오로 가볍게 시작하면<br>지난 분석과 프로필을 같이 챙겨드려요.',
+      myp_guest_sub: '로그인 없이 둘러봐도 괜찮고, 결정은 천천히 해도 돼요.',
+      myp_member: 'PICO Lab 회원',
+      myp_charge: '충전',
+      myp_attend_msg: '꾸준히 와도 좋고, 가끔 들러도 괜찮아요',
+      myp_menu_profiles: '프로필 관리',
+      myp_menu_myprofile: '내 프로필 설정',
+      myp_menu_history: '지난 분석 보기',
+      myp_menu_push: '오늘의 명언 알림',
+      myp_menu_faq: '도움말 · FAQ',
+      myp_logout: '로그아웃',
+      // 상담 탭
+      consult_ai_title: 'AI 운세 상담',
+      consult_ai_desc: '사주·점성술·기문 기반의 AI 심층 분석',
+      consult_ai_badge: '무료',
+      consult_pro_title: '전문 상담사 연결',
+      consult_pro_desc: '사주·타로 전문가에게 1:1 직접 상담',
+      consult_pro_badge: '1:1 상담',
+      // 푸터
+      footer_copy: '© 2026 PICO Lab · AI 운세 연구소',
+      footer_terms: '이용약관',
+      footer_privacy: '개인정보처리방침',
+      footer_kakao_ch: '카카오 채널 추가',
+      footer_disclaimer: '본 서비스의 운세 분석은 오락 및 참고 목적으로 제공됩니다.',
     },
     ja: {
       page_title: 'PICO Lab · AI 占いプラットフォーム',
@@ -7398,6 +7494,102 @@ input,textarea,select{-webkit-user-select:text;user-select:text;}
       tab_consult_title: '相談',
       tab_consult_sub: 'AIまたは専門家と深い占い相談をしてみましょう。',
       tab_mypage_title: 'マイページ',
+      // 점수
+      score_label: '5大運勢 交差分析',
+      score_today: '今日の運勢',
+      score_score: 'スコア',
+      score_loading: '運勢スコア計算中…',
+      score_total: '総合',
+      score_unit: '点',
+      score_detail_link: '詳しく見る →',
+      journey_title: '今日はこう活用してみて',
+      // memox / 이름
+      memox_desc: '四柱推命+西洋占星+奇門+紫微 融合リアルタイムチャット',
+      memox_btn: '相談を始める →',
+      name_label: '姓名判断 · 命名',
+      name_title_prefix: '私の名前は',
+      name_title_score: '何点',
+      name_title_suffix: '？',
+      name_sub: '81数理 4格 · 音五行 · 用神マッチ · 子どもの命名',
+      name_free: '診断無料',
+      // why 섹션
+      why_sys_label: 'PICO Lab の6重クロス検証システム',
+      why_sys_title: '5,000年の人類の知恵を<br><span style="color:var(--gold);">AIと一緒に読み解く</span>',
+      why_sys_sub: 'ゆっくり決めて · 従わなくても大丈夫 · 心の流れを知るツールとして',
+      why_saju_title: '四柱推命 (四柱)',
+      why_saju_desc: 'あなたのリーダーシップDNA',
+      why_saju_btn: '四柱分析',
+      why_astro_title: '西洋占星術',
+      why_astro_desc: 'あなたの宇宙エネルギー',
+      why_astro_btn: '星座分析',
+      why_vedic_title: 'ヴェーダ占星術',
+      why_vedic_desc: 'カルマと細かい運の変化',
+      why_vedic_btn: 'ヴェーダ分析',
+      why_ziwei_title: '紫微斗數',
+      why_ziwei_desc: 'あなたの内面心理',
+      why_ziwei_btn: '紫微分析',
+      why_qimen_title: '奇門遁甲',
+      why_qimen_desc: 'あなたの決定的タイミング',
+      why_qimen_btn: '奇門布局',
+      why_tarot_title: 'タロットカード',
+      why_tarot_desc: 'あなたの直感シグナル',
+      why_tarot_btn: 'カードを引く',
+      why_gunghap_title: '相性 · 四柱推命ベース',
+      why_gunghap_desc: '天干合·日支·五行·季節の調和を<b>ルールベースで即スコア化</b> + AI深層分析 (80 Orb)',
+      why_gunghap_btn: '相性を見る',
+      why_gunghap2_title: '相性 2.0 NEW',
+      why_gunghap2_desc: '二人で直接入力 · <b>四柱·西洋占星·ヴェーダ 3エンジン</b> AI総合分析 (基本無料 / 深層 300 Orb)',
+      why_gunghap2_btn: '3エンジン分析',
+      why_vedic_match_title: '<i class="pi pi-sparkle"></i> ヴェーダ相性 NEW',
+      why_vedic_match_desc: 'インド伝統の<b>36グナ クンダリー・ミラン</b> · 8クタ × 4.5点精密スコア + ナクシャトラ·ドーシャチェック (深層 300 Orb)',
+      why_vedic_match_btn: 'クンダリー・ミラン',
+      why_tagline: '6つが同じ方向を指すとき、<br>その流れを一度じっくり見てみましょう。',
+      // 리포트 카드
+      rep_sec1_title: '私はどんな人間だろう',
+      rep_sec1_sub: '気質·財運·恋愛·大運·今年、最も気になる5つ',
+      rep_character_title: '生まれつきの気質分析',
+      rep_character_desc: '45種の精密データ基盤 — 日干·格局·強弱で見る本質分析',
+      rep_money_title: '財運/事業分析',
+      rep_money_desc: '精密財運·大運交差データで見るお金の流れと職業適性',
+      rep_love_title: '恋愛/結婚分析',
+      rep_love_desc: '相性·神殺·特殊パターン精密分析で見る恋愛と縁',
+      rep_daeun_title: '大運の流れ分析',
+      rep_daeun_desc: '大運分離·歳運交差·刑冲会合精密データ基盤 人生の流れ',
+      rep_year_title: '今年の運勢詳細',
+      rep_year_desc: '歳運拡張·月運節気·運勢総合スコア 精密データ基盤 今年の戦略',
+      // 사주 폼
+      saju_modal_title: '万歳暦を見る',
+      saju_modal_sub: '生年月日を入力すると四柱の8文字をすぐ確認できます',
+      saju_my_info: '自分の情報',
+      saju_saved_profile: '保存されたプロフィール',
+      saju_new_input: '新規入力',
+      saju_name_label: '名前（任意）',
+      saju_birth_label: '生年月日',
+      // 마이페이지
+      myp_guest_title: 'カカオで気軽に始めると<br>過去の分析とプロフィールも一緒に管理できます。',
+      myp_guest_sub: 'ログインなしで見るのも大丈夫、決断はゆっくりで。',
+      myp_member: 'PICO Lab 会員',
+      myp_charge: 'チャージ',
+      myp_attend_msg: '毎日来ても、たまに来ても大丈夫です',
+      myp_menu_profiles: 'プロフィール管理',
+      myp_menu_myprofile: 'マイプロフィール設定',
+      myp_menu_history: '過去の分析を見る',
+      myp_menu_push: '今日の言葉の通知',
+      myp_menu_faq: 'ヘルプ · FAQ',
+      myp_logout: 'ログアウト',
+      // 상담 탭
+      consult_ai_title: 'AI占い相談',
+      consult_ai_desc: '四柱推命·占星術·奇門 ベースのAI深層分析',
+      consult_ai_badge: '無料',
+      consult_pro_title: '専門家に繋ぐ',
+      consult_pro_desc: '四柱推命·タロット専門家に1:1で直接相談',
+      consult_pro_badge: '1:1相談',
+      // 푸터
+      footer_copy: '© 2026 PICO Lab · AI 占い研究所',
+      footer_terms: '利用規約',
+      footer_privacy: 'プライバシーポリシー',
+      footer_kakao_ch: 'カカオチャンネル追加',
+      footer_disclaimer: '本サービスの占い分析は娯楽および参考目的で提供されます。',
     }
   };
 
