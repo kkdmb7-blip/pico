@@ -6,7 +6,7 @@
   <title>사주 분석 · FORTUNA</title>
   <meta name="theme-color" content="#f5efe4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -216,15 +216,15 @@
 <!-- ═══ 폼 ═══ -->
 <div id="S_form" style="display:none;max-width:440px;margin:0 auto;padding:28px 18px 40px">
   <h1 class="hanja" style="font-size:26px;font-weight:700;text-align:center;margin-bottom:6px">四柱 分析</h1>
-  <p style="text-align:center;font-size:13px;color:rgba(74,58,42,0.65);margin-bottom:28px">생년월일시를 입력하면 사주 8자를 바로 분석합니다</p>
+  <p id="saju_form_sub" style="text-align:center;font-size:13px;color:rgba(74,58,42,0.65);margin-bottom:28px">생년월일시를 입력하면 사주 8자를 바로 분석합니다</p>
 
   <div style="margin-bottom:16px">
-    <label class="f-label">이름 (선택)</label>
+    <label id="saju_label_name" class="f-label">이름 (선택)</label>
     <input id="f_name" type="text" placeholder="홍길동" class="f-select" style="appearance:auto">
   </div>
 
   <div style="margin-bottom:16px">
-    <label class="f-label">양력 / 음력</label>
+    <label id="saju_label_cal" class="f-label">양력 / 음력</label>
     <div style="display:flex;gap:8px">
       <button class="g-btn on" id="cal_solar" onclick="selCal('solar')">양력</button>
       <button class="g-btn"    id="cal_lunar" onclick="selCal('lunar')">음력</button>
@@ -232,7 +232,7 @@
   </div>
 
   <div style="margin-bottom:16px">
-    <label class="f-label">생년월일</label>
+    <label id="saju_label_birth" class="f-label">생년월일</label>
     <div style="display:flex;gap:6px">
       <select id="f_y" class="f-select" style="flex:1.4"></select>
       <select id="f_m" class="f-select" style="flex:1"></select>
@@ -241,7 +241,7 @@
   </div>
 
   <div style="margin-bottom:16px">
-    <label class="f-label">태어난 시간</label>
+    <label id="saju_label_time" class="f-label">태어난 시간</label>
     <div style="display:flex;gap:6px;align-items:center">
       <select id="f_hh" class="f-select" style="flex:1.1">
         <option value="unknown">시 모름</option>
@@ -264,7 +264,7 @@
   </div>
 
   <div style="margin-bottom:24px">
-    <label class="f-label">성별</label>
+    <label id="saju_label_gender" class="f-label">성별</label>
     <div style="display:flex;gap:8px">
       <button class="g-btn on" id="g_M" onclick="selGender('M')">남성 ♂</button>
       <button class="g-btn"    id="g_F" onclick="selGender('F')">여성 ♀</button>
@@ -278,7 +278,7 @@
 <!-- ═══ 로딩 ═══ -->
 <div id="S_load" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh">
   <div class="spin" style="margin-bottom:20px"></div>
-  <p style="font-size:13px;color:rgba(74,58,42,0.6)">사주를 분석하는 중...</p>
+  <p id="saju_loading_txt" style="font-size:13px;color:rgba(74,58,42,0.6)">사주를 분석하는 중...</p>
 </div>
 
 <!-- ═══ 결과 ═══ -->
@@ -290,7 +290,7 @@
   <!-- 사주 원국 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
     <button onclick="togAcc('acc_pillar')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
-      <span>🀄 사주 원국</span><span class="acc-icon open" id="ico_acc_pillar">▾</span>
+      <span>🀄 <span id="saju_sec_pillar">사주 원국</span></span><span class="acc-icon open" id="ico_acc_pillar">▾</span>
     </button>
     <div class="acc-body open" id="acc_pillar">
       <div style="padding:0 12px 14px">
@@ -303,7 +303,7 @@
   <!-- 오행 분포 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
     <button onclick="togAcc('acc_five')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
-      <span><i class="pi pi-yinyang"></i> 오행 분포</span><span class="acc-icon open" id="ico_acc_five">▾</span>
+      <span><i class="pi pi-yinyang"></i> <span id="saju_sec_five">오행 분포</span></span><span class="acc-icon open" id="ico_acc_five">▾</span>
     </button>
     <div class="acc-body open" id="acc_five">
       <div id="R_five" style="padding:0 16px 14px"></div>
@@ -313,7 +313,7 @@
   <!-- 격국 · 용신 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
     <button onclick="togAcc('acc_geok')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
-      <span><i class="pi pi-scale"></i> 격국 · 용신</span><span class="acc-icon open" id="ico_acc_geok">▾</span>
+      <span><i class="pi pi-scale"></i> <span id="saju_sec_geok">격국 · 용신</span></span><span class="acc-icon open" id="ico_acc_geok">▾</span>
     </button>
     <div class="acc-body open" id="acc_geok">
       <div id="R_geok" style="padding:0 12px 14px"></div>
@@ -323,7 +323,7 @@
   <!-- 대운 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
     <button onclick="togAcc('acc_luck')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
-      <span><i class="pi pi-wave"></i> 대운 흐름 <span style="font-size:11px;font-weight:400;opacity:0.75">10년 단위 운세 주기</span></span><span class="acc-icon open" id="ico_acc_luck">▾</span>
+      <span><i class="pi pi-wave"></i> <span id="saju_sec_luck">대운 흐름</span> <span id="saju_sec_luck_sub" style="font-size:11px;font-weight:400;opacity:0.75">10년 단위 운세 주기</span></span><span class="acc-icon open" id="ico_acc_luck">▾</span>
     </button>
     <div class="acc-body open" id="acc_luck">
       <div style="padding:0 12px 14px">
@@ -336,7 +336,7 @@
   <!-- 세운 · 월운 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
     <button onclick="togAcc('acc_yun')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
-      <span><i class="pi pi-calendar"></i> 세운 · 월운</span><span class="acc-icon open" id="ico_acc_yun">▾</span>
+      <span><i class="pi pi-calendar"></i> <span id="saju_sec_yun">세운 · 월운</span></span><span class="acc-icon open" id="ico_acc_yun">▾</span>
     </button>
     <div class="acc-body open" id="acc_yun">
       <div style="padding:0 12px 14px">
@@ -349,7 +349,7 @@
   <!-- 행운 정보 -->
   <div class="glass" style="margin-bottom:10px;overflow:hidden">
     <button onclick="togAcc('acc_johu')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:none;border:none;color:#1a120a;cursor:pointer;font-size:15px;font-weight:600;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif">
-      <span><i class="pi pi-clover"></i> 행운</span><span class="acc-icon open" id="ico_acc_johu">▾</span>
+      <span><i class="pi pi-clover"></i> <span id="saju_sec_johu">행운</span></span><span class="acc-icon open" id="ico_acc_johu">▾</span>
     </button>
     <div class="acc-body open" id="acc_johu">
       <div id="R_johu" style="padding:0 12px 14px"></div>
@@ -481,20 +481,102 @@
 <!-- 사주 공유 버튼 -->
 <div id="sajuShareBtnWrap" style="display:none;padding:0 20px 36px;flex-direction:column;align-items:center;gap:10px;max-width:440px;margin:0 auto;">
   <button id="sajuShareBtn" onclick="shareSajuKakao()" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(200,160,50,0.13),rgba(180,130,30,0.07));border:1px solid rgba(200,160,50,0.38);border-radius:14px;text-align:center;cursor:pointer;font-family:'Pretendard Variable',Pretendard,-apple-system,'Noto Sans KR',sans-serif;transition:all 0.3s;box-sizing:border-box;" onmouseover="this.style.borderColor='rgba(200,160,50,0.72)';this.style.background='linear-gradient(135deg,rgba(200,160,50,0.22),rgba(180,130,30,0.14))'" onmouseout="this.style.borderColor='rgba(200,160,50,0.38)';this.style.background='linear-gradient(135deg,rgba(200,160,50,0.13),rgba(180,130,30,0.07))'">
-    <div style="font-size:15px;font-weight:700;color:#9a6e10;margin-bottom:4px;"><i class="pi pi-chat"></i> 카카오톡 공유 →</div>
-    <div style="font-size:11px;color:rgba(154,110,16,0.65);">친구에게 내 사주 결과 보내기</div>
+    <div style="font-size:15px;font-weight:700;color:#9a6e10;margin-bottom:4px;"><i class="pi pi-chat"></i> <span id="saju_share_kakao_title">카카오톡 공유 →</span></div>
+    <div id="saju_share_kakao_desc" style="font-size:11px;color:rgba(154,110,16,0.65);">친구에게 내 사주 결과 보내기</div>
   </button>
   <a href="https://kkdmb7-blip.github.io/memox/" target="_blank" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(140,90,210,0.13),rgba(110,70,180,0.07));border:1px solid rgba(140,90,210,0.38);border-radius:14px;text-decoration:none;text-align:center;box-sizing:border-box;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(140,90,210,0.72)';this.style.background='linear-gradient(135deg,rgba(140,90,210,0.22),rgba(110,70,180,0.14))'" onmouseout="this.style.borderColor='rgba(140,90,210,0.38)';this.style.background='linear-gradient(135deg,rgba(140,90,210,0.13),rgba(110,70,180,0.07))'">
-    <div style="font-size:15px;font-weight:700;color:#7a3fc0;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 운세 상담 →</div>
-    <div style="font-size:11px;color:rgba(122,63,192,0.65);">대화로 풀어보는 나만의 운세</div>
+    <div style="font-size:15px;font-weight:700;color:#7a3fc0;margin-bottom:4px;"><i class="pi pi-sparkle"></i> <span id="saju_share_ai_title">AI 운세 상담 →</span></div>
+    <div id="saju_share_ai_desc" style="font-size:11px;color:rgba(122,63,192,0.65);">대화로 풀어보는 나만의 운세</div>
   </a>
   <a href="counselor.html" style="display:block;width:100%;padding:16px 20px;background:linear-gradient(135deg,rgba(60,120,200,0.13),rgba(40,100,180,0.07));border:1px solid rgba(60,120,200,0.38);border-radius:14px;text-decoration:none;text-align:center;box-sizing:border-box;transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(60,120,200,0.72)';this.style.background='linear-gradient(135deg,rgba(60,120,200,0.22),rgba(40,100,180,0.14))'" onmouseout="this.style.borderColor='rgba(60,120,200,0.38)';this.style.background='linear-gradient(135deg,rgba(60,120,200,0.13),rgba(40,100,180,0.07))'">
-    <div style="font-size:15px;font-weight:700;color:#1a5fa0;margin-bottom:4px;"><i class="pi pi-people"></i> 전문 상담사 연결 →</div>
-    <div style="font-size:11px;color:rgba(26,95,160,0.65);">사주 전문가와 1:1 깊은 상담</div>
+    <div style="font-size:15px;font-weight:700;color:#1a5fa0;margin-bottom:4px;"><i class="pi pi-people"></i> <span id="saju_share_pro_title">전문 상담사 연결 →</span></div>
+    <div id="saju_share_pro_desc" style="font-size:11px;color:rgba(26,95,160,0.65);">사주 전문가와 1:1 깊은 상담</div>
   </a>
 </div>
 
 <script>
+// ── i18n ──────────────────────────────────────────
+var SAJU_LANG = 'ko';
+try { SAJU_LANG = localStorage.getItem('pico_lang') || 'ko'; } catch(e) {}
+if (SAJU_LANG !== 'ja') SAJU_LANG = 'ko';
+
+var SAJU_I18N = {
+  ko: {
+    form_sub: '생년월일시를 입력하면 사주 8자를 바로 분석합니다',
+    label_name: '이름 (선택)', label_cal: '양력 / 음력',
+    label_birth: '생년월일', label_time: '태어난 시간', label_gender: '성별',
+    cal_solar: '양력', cal_lunar: '음력',
+    gender_m: '남성 ♂', gender_f: '여성 ♀',
+    submit_btn: '사주 분석하기',
+    loading: '사주를 분석하는 중...',
+    err_date: '생년월일을 모두 선택해주세요.',
+    sec_pillar: '사주 원국', sec_five: '오행 분포', sec_geok: '격국 · 용신',
+    sec_luck: '대운 흐름', sec_luck_sub: '10년 단위 운세 주기',
+    sec_yun: '세운 · 월운', sec_johu: '행운',
+    share_kakao_title: '카카오톡 공유 →', share_kakao_desc: '친구에게 내 사주 결과 보내기',
+    share_ai_title: 'AI 운세 상담 →', share_ai_desc: '대화로 풀어보는 나만의 운세',
+    share_pro_title: '전문 상담사 연결 →', share_pro_desc: '사주 전문가와 1:1 깊은 상담',
+    profile_solar: '양력', profile_age: '세', profile_age_man: '만 {n}세',
+    profile_name_empty: '이름 미입력',
+    labels_pillar: ['시주','일주','월주','년주'],
+    ilgan_label: '일간',
+  },
+  ja: {
+    form_sub: '生年月日時を入力すると四柱の8文字をすぐ分析します',
+    label_name: '名前（任意）', label_cal: '新暦 / 旧暦',
+    label_birth: '生年月日', label_time: '生まれた時間', label_gender: '性別',
+    cal_solar: '新暦', cal_lunar: '旧暦',
+    gender_m: '男性 ♂', gender_f: '女性 ♀',
+    submit_btn: '四柱を分析する',
+    loading: '四柱を分析中...',
+    err_date: '生年月日をすべて選択してください。',
+    sec_pillar: '四柱原局', sec_five: '五行分布', sec_geok: '格局 · 用神',
+    sec_luck: '大運の流れ', sec_luck_sub: '10年単位の運勢サイクル',
+    sec_yun: '歳運 · 月運', sec_johu: '吉方位',
+    share_kakao_title: 'カカオトーク共有 →', share_kakao_desc: '友達に私の四柱結果を送る',
+    share_ai_title: 'AI占い相談 →', share_ai_desc: '会話で解き明かす私だけの運勢',
+    share_pro_title: '専門家に繋ぐ →', share_pro_desc: '四柱推命の専門家と1:1の深い相談',
+    profile_solar: '新暦', profile_age: '歳', profile_age_man: '満{n}歳',
+    profile_name_empty: '名前未入力',
+    labels_pillar: ['時柱','日柱','月柱','年柱'],
+    ilgan_label: '日干',
+  }
+};
+
+function sT(key) { return (SAJU_I18N[SAJU_LANG] || SAJU_I18N.ko)[key] || ''; }
+
+(function applySajuI18n() {
+  var d = SAJU_I18N[SAJU_LANG] || SAJU_I18N.ko;
+  var set = function(id, val) { var el = document.getElementById(id); if (el && val) el.textContent = val; };
+  set('saju_form_sub', d.form_sub);
+  set('saju_label_name', d.label_name);
+  set('saju_label_cal', d.label_cal);
+  set('saju_label_birth', d.label_birth);
+  set('saju_label_time', d.label_time);
+  set('saju_label_gender', d.label_gender);
+  set('saju_loading_txt', d.loading);
+  set('saju_sec_pillar', d.sec_pillar);
+  set('saju_sec_five', d.sec_five);
+  set('saju_sec_geok', d.sec_geok);
+  set('saju_sec_luck', d.sec_luck);
+  set('saju_sec_luck_sub', d.sec_luck_sub);
+  set('saju_sec_yun', d.sec_yun);
+  set('saju_sec_johu', d.sec_johu);
+  set('saju_share_kakao_title', d.share_kakao_title);
+  set('saju_share_kakao_desc', d.share_kakao_desc);
+  set('saju_share_ai_title', d.share_ai_title);
+  set('saju_share_ai_desc', d.share_ai_desc);
+  set('saju_share_pro_title', d.share_pro_title);
+  set('saju_share_pro_desc', d.share_pro_desc);
+  var calS = document.getElementById('cal_solar'); if (calS) calS.textContent = d.cal_solar;
+  var calL = document.getElementById('cal_lunar'); if (calL) calL.textContent = d.cal_lunar;
+  var gM = document.getElementById('g_M'); if (gM) gM.textContent = d.gender_m;
+  var gF = document.getElementById('g_F'); if (gF) gF.textContent = d.gender_f;
+  var sb = document.getElementById('f_submit'); if (sb) sb.textContent = d.submit_btn;
+  var fh = document.getElementById('f_hh');
+  if (fh) { var uk = fh.querySelector('option[value="unknown"]'); if (uk) uk.textContent = SAJU_LANG === 'ja' ? '時間不明' : '시 모름'; }
+})();
+
 // ═══════════════════════════════════════════════════
 // 상수 테이블
 // ═══════════════════════════════════════════════════
@@ -639,7 +721,7 @@ function doSubmit() {
   const y=document.getElementById('f_y').value;
   const m=document.getElementById('f_m').value;
   const d=document.getElementById('f_d').value;
-  if(!y||!m||!d){alert('생년월일을 모두 선택해주세요.');return;}
+  if(!y||!m||!d){alert(sT('err_date'));return;}
   const hv=document.getElementById('f_hh').value;
   const mv=document.getElementById('f_mm').value;
   const hour=hv==='unknown'?'12':hv;
@@ -793,7 +875,7 @@ function renderProfile(data) {
 
   const namePart = pName
     ? `<span style="font-size:20px;font-weight:700">${pName}</span>`
-    : `<span style="font-size:13px;color:rgba(80,55,30,0.55)">이름 미입력</span>`;
+    : `<span style="font-size:13px;color:rgba(80,55,30,0.55)">${sT('profile_name_empty')}</span>`;
 
   document.getElementById('R_profile').innerHTML=`
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
@@ -802,8 +884,8 @@ function renderProfile(data) {
         <div style="margin-top:4px;font-size:12px;color:rgba(74,58,42,0.65)">양력 ${pBirth} · ${hTxt} · ${gTxt}성</div>
       </div>
       <div style="text-align:right">
-        <div style="font-size:24px;font-weight:700;line-height:1">${ageKor}<span style="font-size:12px;font-weight:400;color:rgba(74,58,42,0.65)">세</span></div>
-        <div style="font-size:11px;color:rgba(80,55,30,0.55)">만 ${ageMan}세</div>
+        <div style="font-size:24px;font-weight:700;line-height:1">${ageKor}<span style="font-size:12px;font-weight:400;color:rgba(74,58,42,0.65)">${sT('profile_age')}</span></div>
+        <div style="font-size:11px;color:rgba(80,55,30,0.55)">${sT('profile_age_man').replace('{n}', ageMan)}</div>
       </div>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
@@ -821,7 +903,7 @@ function renderProfile(data) {
 
 // ─── 사주 원국 4주 ────────────────────────────────
 function renderPillars(data, pls, dayP) {
-  const LABELS = ['시주','일주','월주','년주'];
+  const LABELS = sT('labels_pillar') || ['시주','일주','월주','년주'];
   let html = '';
 
   pls.forEach((pl,i) => {
