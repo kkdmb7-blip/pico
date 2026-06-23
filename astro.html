@@ -469,6 +469,8 @@ const _ascI  = () => ASTRO_LANG === 'ja' ? ASC_INTERP_JA  : ASC_INTERP;
 const _houseL = n => ASTRO_LANG === 'ja' ? (n + 'ハウス') : (n + '하우스');
 function applyAstroI18n() {
   if (ASTRO_LANG !== 'ja') return;
+  document.documentElement.lang = 'ja';
+  document.title = '西洋占星術 · FORTUNA';
   const _qs = (sel) => document.querySelector(sel);
   const _qsa = (sel) => document.querySelectorAll(sel);
   const h1 = _qs('.page-title');

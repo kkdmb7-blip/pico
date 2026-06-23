@@ -571,6 +571,8 @@ const _vDI = p => VEDIC_LANG === 'ja' ? (DASHA_INTERP_JA_V[p] || '') : (DASHA_IN
 const _vHL = n => VEDIC_LANG === 'ja' ? (n + 'ハウス') : (n + '하우스');
 function applyVedicI18n() {
   if (VEDIC_LANG !== 'ja') return;
+  document.documentElement.lang = 'ja';
+  document.title = 'ヴェーダ占星術 · FORTUNA';
   const _qs = s => document.querySelector(s);
   const _qsa = s => document.querySelectorAll(s);
   const h1 = _qs('.page-title');

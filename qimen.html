@@ -932,6 +932,8 @@ var EL_KR_JA = {목:'木(木)',화:'火(火)',토:'土(土)',금:'金(金)',수:
 
 function applyQimenI18n() {
   if (QIMEN_LANG !== 'ja') return;
+  document.documentElement.lang = 'ja';
+  document.title = '奇門遁甲 布局盤 · FORTUNA';
   var _qs = function(s){return document.querySelector(s);};
   var _qsa = function(s){return document.querySelectorAll(s);};
   var _st = function(sel,txt){var el=_qs(sel);if(el)el.textContent=txt;};

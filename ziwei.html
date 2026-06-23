@@ -478,6 +478,8 @@ var _zPn = function(n) { return ZIWEI_LANG === 'ja' ? (PALACE_JA[n] || n) : n; }
 var _zSn = function(n) { return ZIWEI_LANG === 'ja' ? (STAR_JA[n] || n) : n; };
 function applyZiweiI18n() {
   if (ZIWEI_LANG !== 'ja') return;
+  document.documentElement.lang = 'ja';
+  document.title = '紫微斗数 命盤 · FORTUNA';
   var _qs = function(s) { return document.querySelector(s); };
   var _qsa = function(s) { return document.querySelectorAll(s); };
   var h1 = _qs('.page-title');

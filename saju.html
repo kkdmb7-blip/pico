@@ -546,6 +546,7 @@ var SAJU_I18N = {
 function sT(key) { return (SAJU_I18N[SAJU_LANG] || SAJU_I18N.ko)[key] || ''; }
 
 (function applySajuI18n() {
+  if (SAJU_LANG === 'ja') { document.documentElement.lang = 'ja'; document.title = '四柱分析 · FORTUNA'; }
   var d = SAJU_I18N[SAJU_LANG] || SAJU_I18N.ko;
   var set = function(id, val) { var el = document.getElementById(id); if (el && val) el.textContent = val; };
   set('saju_form_sub', d.form_sub);

@@ -4795,6 +4795,8 @@ async function loadSharedReportById(reportId) {
 // ── 일본어 정적 UI 번역 ──
 function applyReportI18n() {
   if (REPORT_LANG !== 'ja') return;
+  document.documentElement.lang = 'ja';
+  document.title = 'AI 運勢レポート · FORTUNA';
   const _el = (id) => document.getElementById(id);
   const _setText = (id, t) => { const e = _el(id); if (e) e.textContent = t; };
   _setText('loadingTitle', '準備中...');
