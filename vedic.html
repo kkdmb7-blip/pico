@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>베딕 점성술 · FORTUNA</title>
 <meta name="theme-color" content="#f5efe4">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
@@ -481,6 +481,132 @@
 </main>
 
 <script>
+// ── i18n ──────────────────────────────────────────────────
+const VEDIC_LANG = localStorage.getItem('pico_lang') || 'ko';
+const RASHI_JA = {
+  '양자리':'牡羊座','황소자리':'牡牛座','쌍둥이자리':'双子座','게자리':'蟹座',
+  '사자자리':'獅子座','처녀자리':'乙女座','천칭자리':'天秤座','전갈자리':'蠍座',
+  '사수자리':'射手座','염소자리':'山羊座','물병자리':'水瓶座','물고기자리':'魚座'
+};
+const RASHI_JA_SHORT = {
+  '양자리':'牡羊','황소자리':'牡牛','쌍둥이자리':'双子','게자리':'蟹',
+  '사자자리':'獅子','처녀자리':'乙女','천칭자리':'天秤','전갈자리':'蠍',
+  '사수자리':'射手','염소자리':'山羊','물병자리':'水瓶','물고기자리':'魚'
+};
+const PLANET_JA_V = {
+  '태양':'太陽','달':'月','화성':'火星','수성':'水星','목성':'木星',
+  '금성':'金星','토성':'土星','라후':'ラーフ','케투':'ケートゥ'
+};
+const NAK_JA = {
+  '아쉬위니':'アシュヴィニー','바라니':'バラニー','크리티카':'クリッティカー',
+  '로히니':'ローヒニー','므리가쉬라':'ムリガシラー','아르드라':'アールドラー',
+  '푸나르바수':'プナルヴァス','푸쉬야':'プシュヤ','아쉬레샤':'アシュレーシャー',
+  '마가':'マガー','푸르바팔구니':'プールヴァパールグニー','우타라팔구니':'ウッタラパールグニー',
+  '하스타':'ハスタ','치트라':'チトラー','스바티':'スヴァーティー',
+  '비샤카':'ヴィシャーカー','아누라다':'アヌラーダー','지에쉬타':'ジェーシュター',
+  '물라':'ムーラ','푸르바아샤다':'プールヴァアーシャーダー','우타라아샤다':'ウッタラアーシャーダー',
+  '쉬라바나':'シュラヴァナー','다니쉬타':'ダニシュター','샤타비샤':'シャタビシャジャ',
+  '푸르바바드라파다':'プールヴァバードラパダー','우타라바드라파다':'ウッタラバードラパダー','레바티':'レーヴァティー'
+};
+const MOON_INTERP_JA_V = {
+  '양자리':    '感情が即座で強烈。素早く燃え上がり、直感的な勇気で恐れなく行動します。',
+  '황소자리':  '情緒的な安定を深く渇望します。変化にゆっくり適応し、一貫した献身的な感情を与えます。',
+  '쌍둥이자리':'感情が変化しやすく知的。対話とコミュニケーションで感情を解消し、多様な関係で活力を得ます。',
+  '게자리':    '感情が豊かで直感力が卓越。母性的な配慮と深い共感力で、月の自宮に位置します。',
+  '사자자리':  '温かく寛大な感情表現。認められ愛されるとき充満感を感じ、周囲を明るくする力があります。',
+  '처녀자리':  '感情を分析し実用的に処理します。繊細に配慮しますが心配が多く、完璧を追求します。',
+  '천칭자리':  '関係の中に感情的均衡を求めます。調和と美しさを通じて情緒的充足を得ます。',
+  '전갈자리':  '感情が深く強烈で隠し持ちがあります。一度信じると絶対的に献身し、直感力が鋭い。',
+  '사수자리':  '自由で楽観的な感情パターン。哲学的思索と冒険の中に情緒的な充満感を見出します。',
+  '염소자리':  '感情表現が節制されて責任感があります。信頼を築くのに時間がかかりますが深く献身します。',
+  '물병자리':  '感情より理性が先行します。独立心が強く、人類愛の感情で広い世界へ向かって開かれています。',
+  '물고기자리':'感情が海のように深く広い。共感力が卓越し、霊的世界と直感に敏感です。'
+};
+const DASHA_INTERP_JA_V = {
+  '케투':'内面化と霊的覚醒の時期（7年）。物質的な執着を手放し、真の本質を探求します。過去のカルマを精算し、直感が強まります。',
+  '금성':'愛、芸術、豊かさの黄金期（20年）。関係と美的感覚が花開く時期。豊かな物質と深い縁が訪れます。',
+  '태양':'自我確立とリーダーシップの時期（6年）。権威と認められることを通じて自身を示します。父親や権威者との関係が重要になります。',
+  '달':'感情と直感、家庭の時期（10年）。内なる欲求と家族関係が中心となります。女性性と母性エネルギーが強まります。',
+  '화성':'行動とエネルギー、挑戦の時期（7年）。決断力ある行動で目標を達成します。競争と葛藤を通じて成長します。',
+  '라후':'変化と熱望、グローバル化の時期（18年）。新しいものの中に機会を見出す変革の時。執着と欲望が強まりますが、新しい世界が開きます。',
+  '목성':'知恵と成長、幸運の時期（16年）。師に出会い、内面が拡大します。霊的・物質的豊かさが共に来る祝福の時期。',
+  '토성':'責任とカルマ精算の時期（19年）。忍耐と努力が実を結びます。遅いが必ず来る成熟と真の成功の過程。',
+  '수성':'コミュニケーションと学習、ビジネスの時期（17年）。知識とアイデアで成果を出します。知的能力と言語能力が花開きます。'
+};
+const NAK_INTERP_JA_V = {
+  '아쉬위니':       '馬の神アシュヴィニー・クマーラの星。癒し、速度、新しい始まりのエネルギー。開拓者的気質と素早い行動力が特徴。',
+  '바라니':         'ヤマ（死神）の星。変化とカルマを扱う力。強い意志力と創造・破壊の循環を理解します。',
+  '크리티카':       '火神アグニの星。浄化と判断力。鋭い批判能力と変革的エネルギーを持ちます。',
+  '로히니':         '創造神ブラフマーの星。豊穣、美、創造性。芸術的才能と物質的豊かさへの強い熱望があります。',
+  '므리가쉬라':     'ソーマ（月）の星。探求と旅。絶えず何かを求める知的好奇心と繊細な感受性。',
+  '아르드라':       'ルドラ（嵐）の星。変革と混沌の中の成長。苦痛を通じてより深い知恵を得る強靭な魂。',
+  '푸나르바수':     'アディティ（無限）の星。再生と回復。楽観的で寛大、どんな逆境からも立ち上がる力。',
+  '푸쉬야':         '土星と木星の星。養育と成長。他者を育む能力が卓越し、霊的献身が深い。',
+  '아쉬레샤':       'ナーガ（蛇）の星。直感と神秘的知識。深い洞察力と変革的癒しの力を持つ。',
+  '마가':           '祖先神の星。伝統、権威、カルマ。強いリーダーシップと祖先から受け継がれた王的資質。',
+  '푸르바팔구니':   'バガ（豊穣）の星。喜び、創造性、休息。芸術的才能とロマンチックな気質で人生の美を楽しむ。',
+  '우타라팔구니':   'アリヤマンの星。親切、支援、パートナーシップ。他者との協力を通じて輝き、関係に誠実。',
+  '하스타':         '月の星。手仕事、知恵、実用性。優れた手技と実用的知恵で何でも器用に処理します。',
+  '치트라':         'ヴィシュヴァカルマ（宇宙の建築家）の星。創造性と美。優れた審美眼と芸術的能力。',
+  '스바티':         'ヴァーユ（風）の星。独立性と自由。柔軟で開放的、知識と交流を通じて成長します。',
+  '비샤카':         'インドラ・アグニの星。目的と意志。目標に向かって執拗に進む強い推進力と競争心。',
+  '아누라다':       'ミトラ（友情）の星。友情、献身、霊的探求。忠実で人々と深い絆を形成します。',
+  '지에쉬타':       'インドラの星。保護、勇気、威厳。困難な状況でリーダー役を果たし、強い責任感を発揮。',
+  '물라':           'ニリルティ（破壊）の星。根源探求、変革。真実の根を掘り下げる執拗さと変革的エネルギー。',
+  '푸르바아샤다':   '水神アーパスの星。浄化、勝利、自信。不屈の精神で逆境を乗り越える力。',
+  '우타라아샤다':   'ヴィシュヴァデーヴァの星。最終的な勝利、忍耐。黙々と努力し、結局目標を達成する持久力。',
+  '쉬라바나':       'ヴィシュヌ（維持者）の星。学習、傾聴、繋がり。知識を吸収し人々を繋ぐ特別な能力。',
+  '다니쉬타':       'ヴァス（富）の星。富とリズム。音楽的才能と集団の中で輝く社交性、物質的繁栄の運気。',
+  '샤타비샤':       'ヴァルナ（水）の星。癒し、神秘、真実探求。独立的で神秘的、非伝統的な方法で世界を見る。',
+  '푸르바바드라파다':'アジャ・エーカパーダの星。炎、情熱、二極性。強烈な内なる炎で革新的変革をリードします。',
+  '우타라바드라파다':'アヒル・ブドゥニャの星。深み、知恵、慈悲。深い内なる知恵と宇宙の摂理を理解する魂。',
+  '레바티':         'プーシャン（旅人）の星。豊穣、完成、霊的旅。過去を完成させ新しい旅を始める転換点。'
+};
+const _vRn = s => VEDIC_LANG === 'ja' ? (RASHI_JA[s] || s) : s;
+const _vPn = p => VEDIC_LANG === 'ja' ? (PLANET_JA_V[p] || p) : p;
+const _vNk = n => VEDIC_LANG === 'ja' ? (NAK_JA[n] || n) : n;
+const _vMI = s => VEDIC_LANG === 'ja' ? (MOON_INTERP_JA_V[s] || '') : (MOON_INTERP[s] || '');
+const _vNI = n => VEDIC_LANG === 'ja' ? (NAK_INTERP_JA_V[n] || '') : (NAK_INTERP[n] || '');
+const _vDI = p => VEDIC_LANG === 'ja' ? (DASHA_INTERP_JA_V[p] || '') : (DASHA_INTERP[p] || '');
+const _vHL = n => VEDIC_LANG === 'ja' ? (n + 'ハウス') : (n + '하우스');
+function applyVedicI18n() {
+  if (VEDIC_LANG !== 'ja') return;
+  const _qs = s => document.querySelector(s);
+  const _qsa = s => document.querySelectorAll(s);
+  const h1 = _qs('.page-title');
+  if (h1) h1.innerHTML = 'ヴェーダ <em>占星術</em>';
+  const navBtn = _qs('nav .nav-btn');
+  if (navBtn) navBtn.textContent = 'AIヴェーダ相談';
+  const labels = _qsa('.section-label');
+  const jaLabels = [
+    'ラーシ・チャート（Rasi Chakra）', '核心3要素', '惑星配置（サイドリアル）',
+    'ダシャー・タイムライン（Vimshottari）· どの惑星の周期を生きているかを示します',
+    'ヨーガ（Yogas）· 特殊な惑星配置が生み出す吉凶パターン', '現代語解釈',
+    'マングリク・ドーシャ（Manglik Dosha）· 火星の結婚·関係への影響チェック',
+    'ウパーヤ（Upaya · 伝統的処方）· 弱い惑星を強化するインド伝統処方',
+    'アートマカーラカ · カーラカームシャ · 魂の惑星とこの世の霊的目的',
+    'サデ・サーティ（Sade Sati）· 土星7.5年大周期の現在位置',
+    'ハウス別惑星配置の意味 · 人生の各領域に惑星が与える影響',
+    'D9 ナヴァームシャ深化 · 結婚·霊的成熟·人生後半の実現',
+    'トランジット分析 · 現在の惑星位置が出生チャートに与える影響',
+    'AI深層分析 · ヴェーダ',
+    '高次ル未来の流れ · 木星·土星10年トランジット予測（月ラーシ基準）'
+  ];
+  labels.forEach((el, i) => { if (jaLabels[i]) el.innerHTML = jaLabels[i]; });
+  const tabs = _qsa('.interp-tab');
+  const tabJa = ['月ラーシ', 'ナクシャトラ', 'ダシャー'];
+  tabs.forEach((t, i) => {
+    if (!tabJa[i]) return;
+    if (i === 0) t.innerHTML = '<i class="pi pi-moon"></i> ' + tabJa[i];
+    else if (i === 1) t.innerHTML = '<i class="pi pi-star"></i> ' + tabJa[i];
+    else t.innerHTML = '⏳ ' + tabJa[i];
+  });
+  const ths = _qsa('.planet-table th');
+  const thJa = ['惑星', 'ラーシ', 'ハウス', 'D9', 'アシュタカヴァルガ'];
+  ths.forEach((th, i) => { if (thJa[i]) th.textContent = thJa[i]; });
+  const aiBtnSpan = _qs('#vedic-ai-btn');
+  if (aiBtnSpan) aiBtnSpan.innerHTML = '<i class="pi pi-sparkle"></i><span>AIヴェーダ深層分析</span>';
+}
 // ── 데이터 ────────────────────────────────────────────────
 const RASHI_SYM = {
   '양자리':'♈','황소자리':'♉','쌍둥이자리':'♊','게자리':'♋',
@@ -573,11 +699,14 @@ function showTab(tab) {
 
 function remainText(endDate) {
   const ms = new Date(endDate) - Date.now();
-  if (ms <= 0) return '종료됨';
+  const _ja = VEDIC_LANG === 'ja';
+  if (ms <= 0) return _ja ? '終了' : '종료됨';
   const days = Math.floor(ms / 86400000);
-  if (days > 365) return Math.floor(days / 365) + '년 ' + Math.floor((days % 365) / 30) + '개월 남음';
-  if (days > 30)  return Math.floor(days / 30) + '개월 남음';
-  return days + '일 남음';
+  if (days > 365) return _ja
+    ? Math.floor(days / 365) + '年 ' + Math.floor((days % 365) / 30) + 'ヶ月残り'
+    : Math.floor(days / 365) + '년 ' + Math.floor((days % 365) / 30) + '개월 남음';
+  if (days > 30) return _ja ? Math.floor(days / 30) + 'ヶ月残り' : Math.floor(days / 30) + '개월 남음';
+  return _ja ? days + '日残り' : days + '일 남음';
 }
 
 function nextDasha(currentPlanet) {
@@ -597,7 +726,7 @@ function renderRasiChart(d) {
     '사자자리','처녀자리','천칭자리','전갈자리',
     '사수자리','염소자리','물병자리','물고기자리'
   ];
-  const RASHI_NAME_SHORT = {
+  const RASHI_NAME_SHORT = VEDIC_LANG === 'ja' ? RASHI_JA_SHORT : {
     '양자리':'양','황소자리':'황소','쌍둥이자리':'쌍둥이','게자리':'게',
     '사자자리':'사자','처녀자리':'처녀','천칭자리':'천칭','전갈자리':'전갈',
     '사수자리':'사수','염소자리':'염소','물병자리':'물병','물고기자리':'물고기'
@@ -711,21 +840,22 @@ function renderRasiChart(d) {
 function renderBig3(d) {
   const grid = document.getElementById('big3-grid');
   grid.innerHTML = '';
+  const _ja = VEDIC_LANG === 'ja';
   const items = [
-    { icon:'<i class="pi pi-moon"></i>', role:'달 라시',   sign: d.moonSign,   sub: '감정·직관' },
-    { icon:'<i class="pi pi-star"></i>', role:'낙샤트라',  sign: d.nakshatra,  sub: '파다 ' + (d.nakshatraPada || '') + ' · 달의 별자리' },
-    { icon:'↑',  role:'상승궁(라그나)', sign: d.ascendant, sub: '외적 인상' },
+    { icon:'<i class="pi pi-moon"></i>', role: _ja ? '月ラーシ' : '달 라시',   sign: d.moonSign,   sub: _ja ? '感情·直感' : '감정·직관' },
+    { icon:'<i class="pi pi-star"></i>', role: _ja ? 'ナクシャトラ' : '낙샤트라', sign: d.nakshatra, sub: (_ja ? 'パーダ ' : '파다 ') + (d.nakshatraPada || '') + (_ja ? ' · 月の星座' : ' · 달의 별자리') },
+    { icon:'↑', role: _ja ? 'アセンダント(ラグナ)' : '상승궁(라그나)', sign: d.ascendant, sub: _ja ? '外的印象' : '외적 인상' },
   ];
   items.forEach(({ icon, role, sign, sub }) => {
-    // nakshatra doesn't have a RASHI element
     const ec = RASHI_EL[sign] ? elCls(sign) : 'el-풍';
     const card = document.createElement('div');
     card.className = 'big3-card ' + ec;
+    const displaySign = RASHI_EL[sign] ? _vRn(sign) : _vNk(sign);
     card.innerHTML =
       '<div class="big3-icon">' + icon + '</div>' +
       '<div class="big3-role">' + role + '</div>' +
       '<div class="big3-sym">' + (RASHI_SYM[sign] || '<i class="pi pi-sparkle"></i>') + '</div>' +
-      '<div class="big3-sign">' + sign + '</div>' +
+      '<div class="big3-sign">' + displaySign + '</div>' +
       '<div class="big3-sub">' + sub + '</div>';
     grid.appendChild(card);
   });
@@ -749,10 +879,10 @@ function renderPlanets(d) {
       '<div class="bindu-bar">' + Array.from({length:8},(_,i)=>`<div class="bindu ${i<avg?'on':'off'}"></div>`).join('') + ' <span style="font-size:11px;color:var(--muted);margin-left:2px">' + avg + '</span></div>' : '—';
     const tr = document.createElement('tr');
     tr.innerHTML =
-      '<td><span class="planet-name" title="' + (PLANET_ROLE_KO[name]||'') + '">' + (PLANET_ICON[name]||'') + ' ' + name + '</span></td>' +
-      '<td><span class="sign-chip ' + ec + '">' + sym(p.sign) + ' ' + p.sign + '</span></td>' +
-      '<td>' + (p.house != null ? p.house + '하우스' : '—') + '</td>' +
-      '<td class="col-d9"><span class="sign-chip ' + elCls(nav) + '" style="opacity:.8">' + sym(nav) + ' ' + nav + '</span></td>' +
+      '<td><span class="planet-name" title="' + (PLANET_ROLE_KO[name]||'') + '">' + (PLANET_ICON[name]||'') + ' ' + _vPn(name) + '</span></td>' +
+      '<td><span class="sign-chip ' + ec + '">' + sym(p.sign) + ' ' + _vRn(p.sign) + '</span></td>' +
+      '<td>' + (p.house != null ? _vHL(p.house) : '—') + '</td>' +
+      '<td class="col-d9"><span class="sign-chip ' + elCls(nav) + '" style="opacity:.8">' + sym(nav) + ' ' + _vRn(nav) + '</span></td>' +
       '<td>' + binduHtml + '</td>';
     tbody.appendChild(tr);
   });
@@ -774,12 +904,13 @@ function renderDasha(d) {
     const sandhiNote  = (sandhi && sandhi.mahaSandhi)
       ? '<div class="sandhi-note">마하다샤 종료 <b>' + sandhi.mahaRemainMonths + '개월</b> 남음 (~6개월 이내). ' + sandhi.mahaPlanet + ' 에너지를 정리하고 <b>' + sandhi.nextMaha + '</b> 주기를 준비하는 전환 구간이에요. 큰 결단·장기 계약은 다음 다샤 초기로 미루는 편이 좋음.</div>'
       : '';
+    const _jv = VEDIC_LANG === 'ja';
     mahaDiv.innerHTML =
-      '<div class="dasha-tag">마하다샤 (Mahadasha) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400">· 현재 운세 대주기</span></div>' +
-      '<div class="dasha-planet">' + maha.planet + ' 다샤' + sandhiBadge + '</div>' +
-      '<div class="dasha-date">~ ' + maha.endDate + ' 종료</div>' +
+      '<div class="dasha-tag">' + (_jv ? 'マハーダシャー (Mahadasha) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400">· 現在の運勢大周期</span>' : 'マハーダシャー (Mahadasha) <span style="font-size:11px;opacity:0.8;text-transform:none;font-weight:400">· 현재 운세 대주기</span>') + '</div>' +
+      '<div class="dasha-planet">' + _vPn(maha.planet) + (_jv ? ' ダシャー' : ' 다샤') + sandhiBadge + '</div>' +
+      '<div class="dasha-date">~ ' + maha.endDate + (_jv ? ' 終了' : ' 종료') + '</div>' +
       '<div class="dasha-remain">' + remainText(maha.endDate) + '</div>' +
-      (next ? '<div class="dasha-next">다음: ' + next.planet + ' 다샤 (' + next.years + '년) 예정</div>' : '') +
+      (next ? '<div class="dasha-next">' + (_jv ? '次：' : '다음: ') + _vPn(next.planet) + (_jv ? ' ダシャー（' : ' 다샤 (') + next.years + (_jv ? '年）予定' : '년) 예정') + '</div>' : '') +
       sandhiNote;
     wrap.appendChild(mahaDiv);
   }
@@ -794,8 +925,8 @@ function renderDasha(d) {
       ? '<div class="sandhi-note">안타르다샤 종료 <b>' + sandhi.antarRemainMonths + '개월</b> 남음. 단기 테마가 <b>' + sandhi.nextAntar + '</b> 으로 전환되는 구간 — 마무리와 인수인계의 시기.</div>'
       : '';
     antarDiv.innerHTML =
-      '<div class="dasha-tag">안타르다샤 (Antardasha) — 현재 하위 다샤</div>' +
-      '<div class="dasha-planet" style="font-size:18px;color:var(--accent)">' + antar.planet + antarSandhiBadge + '</div>' +
+      '<div class="dasha-tag">' + (VEDIC_LANG === 'ja' ? 'アンタルダシャー (Antardasha) — 現在の下位ダシャー' : '안타르다샤 (Antardasha) — 현재 하위 다샤') + '</div>' +
+      '<div class="dasha-planet" style="font-size:18px;color:var(--accent)">' + _vPn(antar.planet) + antarSandhiBadge + '</div>' +
       '<div class="dasha-date">' + antar.start + ' ~ ' + antar.end + '</div>' +
       '<div class="dasha-remain">' + remainText(antar.end) + '</div>' +
       antarSandhiNote;
@@ -807,7 +938,7 @@ function renderYogas(yogas) {
   const list = document.getElementById('yoga-list');
   list.innerHTML = '';
   if (!yogas || yogas.length === 0) {
-    list.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:8px">특수 요가가 감지되지 않았습니다.</div>';
+    list.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:8px">' + (VEDIC_LANG === 'ja' ? '特殊ヨーガが検出されませんでした。' : '특수 요가가 감지되지 않았습니다.') + '</div>';
     return;
   }
   yogas.forEach(y => {
@@ -825,13 +956,14 @@ function renderInterp(d) {
   const moonPanel = document.getElementById('panel-moon');
   const moonSign = d.moonSign || '';
   const ec = elCls(moonSign);
+  const _ja2 = VEDIC_LANG === 'ja';
   moonPanel.innerHTML =
     '<div class="interp-header">' +
       '<div class="interp-sym ' + ec + '">' + sym(moonSign) + '</div>' +
-      '<div><div class="interp-name">' + moonSign + '</div>' +
-      '<div class="interp-role">달 라시 · 감정·직관 패턴</div></div>' +
+      '<div><div class="interp-name">' + _vRn(moonSign) + '</div>' +
+      '<div class="interp-role">' + (_ja2 ? '月ラーシ · 感情·直感パターン' : '달 라시 · 감정·직관 패턴') + '</div></div>' +
     '</div>' +
-    '<div class="interp-text">' + (MOON_INTERP[moonSign] || '해당 라시 해석을 준비 중입니다.') + '</div>';
+    '<div class="interp-text">' + (_vMI(moonSign) || (_ja2 ? 'このラーシの解釈を準備中です。' : '해당 라시 해석을 준비 중입니다.')) + '</div>';
 
   // 낙샤트라
   const nakPanel = document.getElementById('panel-nak');
@@ -839,22 +971,22 @@ function renderInterp(d) {
   nakPanel.innerHTML =
     '<div class="interp-header">' +
       '<div class="interp-sym el-풍" style="font-size:24px"><i class="pi pi-star"></i></div>' +
-      '<div><div class="interp-name">' + nak + '</div>' +
-      '<div class="interp-role">낙샤트라 · 파다 ' + (d.nakshatraPada||'') + ' · 달의 별자리</div></div>' +
+      '<div><div class="interp-name">' + _vNk(nak) + '</div>' +
+      '<div class="interp-role">' + (_ja2 ? 'ナクシャトラ · パーダ ' : '낙샤트라 · 파다 ') + (d.nakshatraPada||'') + (_ja2 ? ' · 月の星座' : ' · 달의 별자리') + '</div></div>' +
     '</div>' +
-    '<div class="interp-text">' + (NAK_INTERP[nak] || '해당 낙샤트라 해석을 준비 중입니다.') + '</div>';
+    '<div class="interp-text">' + (_vNI(nak) || (_ja2 ? 'このナクシャトラの解釈を準備中です。' : '해당 낙샤트라 해석을 준비 중입니다.')) + '</div>';
 
   // 다샤
   const dashaPanel = document.getElementById('panel-dasha');
   const planet = d.currentDasha?.planet || '';
   dashaPanel.innerHTML =
     '<div class="dasha-interp">' +
-      '<div class="dasha-interp-title">' + planet + ' 마하다샤</div>' +
-      '<div class="dasha-interp-text">' + (DASHA_INTERP[planet] || '해당 다샤 해석을 준비 중입니다.') + '</div>' +
+      '<div class="dasha-interp-title">' + _vPn(planet) + (_ja2 ? ' マハーダシャー' : ' 마하다샤') + '</div>' +
+      '<div class="dasha-interp-text">' + (_vDI(planet) || (_ja2 ? 'このダシャーの解釈を準備中です。' : '해당 다샤 해석을 준비 중입니다.')) + '</div>' +
     '</div>' +
     (d.antardasha ? '<div class="dasha-interp" style="margin-top:10px;border-left-color:var(--accent);">' +
-      '<div class="dasha-interp-title" style="color:var(--accent)">안타르다샤: ' + d.antardasha.planet + '</div>' +
-      '<div class="dasha-interp-text" style="font-size:13px">' + (DASHA_INTERP[d.antardasha.planet] || '') + '</div>' +
+      '<div class="dasha-interp-title" style="color:var(--accent)">' + (_ja2 ? 'アンタルダシャー: ' : '안타르다샤: ') + _vPn(d.antardasha.planet) + '</div>' +
+      '<div class="dasha-interp-text" style="font-size:13px">' + _vDI(d.antardasha.planet) + '</div>' +
       '</div>' : '');
 }
 
@@ -1480,7 +1612,7 @@ async function requestVedicAI() {
 async function loadVedic(year, month, day, hour, gender) {
   const status = document.getElementById('status');
   status.className = 'status-msg visible';
-  status.innerHTML = '<span class="spinner"></span>베딕 차트 계산 중…';
+  status.innerHTML = '<span class="spinner"></span>' + (VEDIC_LANG === 'ja' ? 'ヴェーダチャート計算中…' : '베딕 차트 계산 중…');
 
   const _prof = (() => { try { return JSON.parse(localStorage.getItem('pico_profile')) || {}; } catch(e) { return {}; } })();
   const _lat = _prof.lat || 37.5665;
@@ -1565,6 +1697,7 @@ async function loadVedic(year, month, day, hour, gender) {
 
 // ── INIT ──────────────────────────────────────────────────
 (function() {
+  applyVedicI18n();
   const p = new URLSearchParams(location.search);
   const year  = parseInt(p.get('year'));
   const month = parseInt(p.get('month'));
@@ -1576,14 +1709,15 @@ async function loadVedic(year, month, day, hour, gender) {
   if (!year || !month || !day) {
     const s = document.getElementById('status');
     s.className = 'status-msg visible err';
-    s.textContent = 'URL에 생년월일 파라미터가 없습니다. (year, month, day 필수)';
+    s.textContent = VEDIC_LANG === 'ja' ? 'URLに生年月日パラメータがありません。(year, month, day 必須)' : 'URL에 생년월일 파라미터가 없습니다. (year, month, day 필수)';
     return;
   }
 
-  document.getElementById('page-sub').textContent =
-    year + '년 ' + month + '월 ' + day + '일 ' +
-    (hRaw && hRaw !== 'unknown' ? String(hour).padStart(2,'0') + '시' : '시간 미상') +
-    ' · 사이드리얼 계산';
+  document.getElementById('page-sub').textContent = VEDIC_LANG === 'ja'
+    ? year + '年 ' + month + '月 ' + day + '日 ' + (hRaw && hRaw !== 'unknown' ? String(hour).padStart(2,'0') + '時' : '時間不明') + ' · サイドリアル計算'
+    : year + '년 ' + month + '월 ' + day + '일 ' + (hRaw && hRaw !== 'unknown' ? String(hour).padStart(2,'0') + '시' : '시간 미상') + ' · 사이드리얼 계산';
+
+  document.getElementById('status').innerHTML = '<span class="spinner"></span>' + (VEDIC_LANG === 'ja' ? 'ヴェーダチャート計算中…' : '베딕 차트 계산 중…');
 
   loadVedic(year, month, day, hour, gender);
 })();
