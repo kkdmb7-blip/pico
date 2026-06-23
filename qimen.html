@@ -6,7 +6,7 @@
 <title>기문둔갑 포국반 · FORTUNA</title>
 <meta name="theme-color" content="#f5efe4">
 <meta name="description" content="기문둔갑 시가·일가 포국반. 날짜와 시각을 입력하면 9궁 포국 결과를 즉시 확인할 수 있습니다.">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <style>
@@ -908,6 +908,77 @@
 
 <script src="qimen_geokguk.js"></script>
 <script>
+// ── 일본어 국제화 (5단계-4) ──
+var QIMEN_LANG = localStorage.getItem('pico_lang') || 'ko';
+var GONG_DIR_JA = {1:'北',2:'南西',3:'東',4:'南東',5:'中央',6:'北西',7:'西',8:'北東',9:'南'};
+function _qGD(n) { return QIMEN_LANG==='ja'?(GONG_DIR_JA[n]||GONG_DIR[n]||''):(GONG_DIR[n]||''); }
+function _qBL(b) { if(QIMEN_LANG==='ja'){return b==='daegil'?'大吉':b==='gil'?'吉':b==='hyung'?'凶':b==='daehyung'?'大凶':'中';} return b==='daegil'?'대길':b==='gil'?'길':b==='hyung'?'흉':b==='daehyung'?'대흉':'중'; }
+function _qGH(g) { if(QIMEN_LANG!=='ja')return g; return({'대길':'大吉','길':'吉','보통':'普通','평':'普通','흉':'凶','대흉':'大凶'})[g]||g; }
+function _qDoorD(d){return QIMEN_LANG==='ja'?(DOOR_DETAIL_JA[d]||DOOR_DETAIL[d]||{kr:d,desc:'',badge:'jung'}):(DOOR_DETAIL[d]||{kr:d,desc:'',badge:'jung'});}
+function _qShenD(s){return QIMEN_LANG==='ja'?(SHEN_DETAIL_JA[s]||SHEN_DETAIL[s]||{kr:s,desc:'',badge:'jung'}):(SHEN_DETAIL[s]||{kr:s,desc:'',badge:'jung'});}
+function _qStarD(s){return QIMEN_LANG==='ja'?(STAR_DETAIL_JA[s]||STAR_DETAIL[s]||{kr:s,desc:'',badge:'jung'}):(STAR_DETAIL[s]||{kr:s,desc:'',badge:'jung'});}
+var DOOR_KR_JA = {'生':'生門（新たな始まり）','開':'開門（チャンス到来）','休':'休門（休息に最適）','景':'景門（注目される）','傷':'傷門（衝突注意）','杜':'杜門（潜伏に最適）','驚':'驚門（驚き注意）','死':'死門（停滞）'};
+var DOOR_KW_JA = {'生':'契約·署名·創業 最適','開':'旺盛な活動·投資·拡張','休':'安定·和解·養生 有利','景':'文書·学習·創作 有利','傷':'移動·衝突 注意','杜':'停滞·막힘 注意','驚':'緊張·驚き 注意','死':'重要な決断 保留推奨'};
+var YM_DOOR_SUMMARY_JA = {'生':'新しい始まりのエネルギーがあなたに集中しています。チャレンジに最適な時です。','開':'チャンスが開く流れです。積極的に動いてみましょう。','休':'充電と回復に最適な時です。無理せず余裕を持ちましょう。','景':'注目されやすいエネルギーです。表現して輝いてみましょう。','傷':'感情的な衝突が起きやすい流れです。言葉と行動に慎重に。','杜':'詰まる感じがするかもしれません。無理に押すより待ってみましょう。','驚':'予想外のことが起きるかもしれません。冷静に対応しましょう。','死':'エネルギーが停滞している流れです。大きな決断は先延ばしにした方が良いです。'};
+var YM_DOOR_ACTION_JA = {'生':'新プロジェクト開始、契約、引っ越し','開':'ミーティング、営業、投資、拡張','休':'休息、健康管理、瞑想','景':'発表、創作、書類作業','傷':'運動、エネルギー発散活動','杜':'内面整理、静かな計画立案','驚':'確認、再確認、バックアップ','死':'整理、締めくくり、不要なものを手放す'};
+var YM_DOOR_WARN_JA = {'傷':'口論·衝突注意。感情的な決断は避けましょう。','杜':'新しいこと始めるのは不向き。待ちましょう。','驚':'急な変動注意。重要な約束は再確認。','死':'大きな決断·契約は保留。エネルギーが低い時です。'};
+var DOOR_DIR_DESC_JA = {'生':'新たな始まりに良い方向','開':'チャンスが開く方向'};
+var DOOR_DETAIL_JA = {'開':{kr:'開門',desc:'始まり·出発 最吉',badge:'daegil'},'生':{kr:'生門',desc:'生産·創造 吉',badge:'gil'},'休':{kr:'休門',desc:'休息·充電 吉',badge:'gil'},'景':{kr:'景門',desc:'文書·訴訟 中',badge:'jung'},'傷':{kr:'傷門',desc:'負傷·争い 凶',badge:'hyung'},'杜':{kr:'杜門',desc:'隠遁·逃走 凶',badge:'hyung'},'驚':{kr:'驚門',desc:'驚き·変動 凶',badge:'hyung'},'死':{kr:'死門',desc:'死滅·損失 大凶',badge:'daehyung'}};
+var SHEN_DETAIL_JA = {'直符':{kr:'直符',desc:'貴人 大吉',badge:'daegil'},'値符':{kr:'直符',desc:'貴人 大吉',badge:'daegil'},'六合':{kr:'六合',desc:'協力·合意 吉',badge:'gil'},'太陰':{kr:'太陰',desc:'秘密·陰謀 中',badge:'jung'},'九天':{kr:'九天',desc:'遠距離·飛行 中',badge:'jung'},'螣蛇':{kr:'螣蛇',desc:'虚偽·噂 凶',badge:'hyung'},'騰蛇':{kr:'螣蛇',desc:'虚偽·噂 凶',badge:'hyung'},'九地':{kr:'九地',desc:'停滞·妨害 凶',badge:'hyung'},'玄武':{kr:'玄武',desc:'盗賊·損失 凶',badge:'hyung'},'白虎':{kr:'白虎',desc:'暴力·事故 大凶',badge:'daehyung'}};
+var STAR_DETAIL_JA = {'天輔':{kr:'天輔',desc:'文昌·知恵·試験 大吉',badge:'daegil'},'天心':{kr:'天心',desc:'医術·慈悲 吉星',badge:'gil'},'天任':{kr:'天任',desc:'安定·財物 吉星',badge:'gil'},'天禽':{kr:'天禽',desc:'中央·均衡 中',badge:'jung'},'天衝':{kr:'天衝',desc:'活動·決断 中',badge:'jung'},'天冲':{kr:'天冲',desc:'活動·決断 中',badge:'jung'},'天蓬':{kr:'天蓬',desc:'指導·盗賊 凶',badge:'hyung'},'天柱':{kr:'天柱',desc:'破壊·絶嗣 凶',badge:'hyung'},'天英':{kr:'天英',desc:'虚栄·消耗 凶',badge:'hyung'},'天芮':{kr:'天芮',desc:'疾病·障害 大凶',badge:'daehyung'}};
+var SIPSIN_EASY_JA = {'비견':'同等の仲間エネルギー','겁재':'競争·争い注意','식신':'表現·余裕','상관':'才能·噂注意','편재':'動く財物','정재':'安定財物','편관':'圧迫·試験','정관':'名誉·秩序','편인':'孤独·技術','정인':'貴人·助け'};
+var UNSEONG_EASY_JA = {'장생':'始まりに吉','목욕':'整理期','관대':'成長期','건록':'全盛期','제왕':'絶頂期','쇠':'衰退期','병':'気力弱い','사':'停滞期','묘':'締めくくり','절':'断絶','태':'懐胎期','양':'準備期'};
+var EL_KR_JA = {목:'木(木)',화:'火(火)',토:'土(土)',금:'金(金)',수:'水(水)'};
+
+function applyQimenI18n() {
+  if (QIMEN_LANG !== 'ja') return;
+  var _qs = function(s){return document.querySelector(s);};
+  var _qsa = function(s){return document.querySelectorAll(s);};
+  var _st = function(sel,txt){var el=_qs(sel);if(el)el.textContent=txt;};
+  var _sh = function(sel,html){var el=_qs(sel);if(el)el.innerHTML=html;};
+  _sh('.page-title','奇門遁甲 <em>布局盤</em>');
+  _st('.page-sub','日付と時刻を入力すると時家·日家の奇門遁甲布局をすぐに確認できます。');
+  var fLabels=_qsa('.form-group label'),fTexts=['年','月','日','時','分'];
+  fLabels.forEach(function(el,i){if(fTexts[i])el.textContent=fTexts[i];});
+  var fb=document.getElementById('btn-fetch');if(fb)fb.textContent='布局を見る';
+  var typeMap={wonmyong:'本命局',siga:'時家奇門',ilga:'日家奇門',wolga:'月家奇門',nyeonga:'年家奇門'};
+  Object.keys(typeMap).forEach(function(k){var el=document.getElementById('btn-'+k);if(el)el.textContent=typeMap[k];});
+  var wnLabel=document.getElementById('wonmyong-date-label');
+  if(wnLabel)wnLabel.innerHTML='<i class="pi pi-calendar"></i> 本命局';
+  var wnSub=_qs('#wonmyong-notice > div:last-child');
+  if(wnSub)wnSub.textContent='この盤は生まれた瞬間の固定されたエネルギーです。';
+  _st('.saju-bar-title','四柱八字');
+  _st('.grid-title','九宮布局 · 洛書配置');
+  _st('.taegil-section-title','擇日 適合度');
+  _qsa('.doorshen-section-title').forEach(function(el,i){var t=['八門 位置と意味','八神 位置と性質','九星 位置と吉凶'];if(t[i])el.textContent=t[i];});
+  _sh('.bestdir-title','吉方 · 凶方 <span style="font-size:11px;font-weight:400;opacity:0.82">生門·開門 / 死門·傷門·驚門 方位</span>');
+  _qsa('.zhifu-label').forEach(function(el,i){var t=['直符宮','直符星','直使門'];if(t[i])el.textContent=t[i];});
+  _st('.interp-section-title','布局解釈');
+  _st('.qm-warn-title','⚠️ 注意点');
+  var toggleBtn=document.getElementById('qm-detail-toggle');
+  if(toggleBtn)toggleBtn.textContent='▼ 奇門遁甲布局 詳細を見る';
+  var aiBtn=document.getElementById('qm-ai-btn');
+  if(aiBtn)aiBtn.innerHTML='<div><i class="pi pi-sparkle"></i> 無料 奇門解析を受け取る</div><div style="font-size:10px;font-weight:500;color:rgba(122,63,192,0.7);margin-top:3px;">Orb消費なし · 即時生成 · 無制限</div>';
+  var suggestWrap=document.getElementById('qimenReportSuggestWrap');
+  if(suggestWrap){
+    var divs=suggestWrap.querySelectorAll(':scope > div');
+    if(divs[0])divs[0].textContent='この布局で精密レポートを受け取る';
+    if(divs[1])divs[1].textContent='出生時点 九宮布局 + 四柱統合 — 生涯運命の青写真';
+    var links=suggestWrap.querySelectorAll('a');
+    if(links[0]){var lt=links[0].querySelector('div:first-child');if(lt)lt.innerHTML='奇門 本命局分析 <span style="font-size:9px;color:#9a5fd0;">NEW</span>';var ld=links[0].querySelector('div:last-child');if(ld)ld.textContent='出生時点 九宮布局で見た生涯運命 — 四柱が時間なら本命局は空間配置';}
+    if(links[1])links[1].innerHTML='<i class="pi pi-list"></i> すべてのレポートを見る →';
+  }
+  var kakaoBtn=document.getElementById('qimenKakaoBtn');
+  if(kakaoBtn)kakaoBtn.innerHTML='<div style="font-size:15px;font-weight:700;color:#9a6e10;margin-bottom:4px;"><i class="pi pi-chat"></i> カカオトーク 共有 →</div><div style="font-size:11px;color:rgba(154,110,16,0.65);">自分の奇門遁甲結果を友達に送る</div>';
+  var ac2=_qs('#qimenShareBtnWrap a:nth-child(2)');
+  if(ac2)ac2.innerHTML='<div style="font-size:15px;font-weight:700;color:#7a3fc0;margin-bottom:4px;"><i class="pi pi-sparkle"></i> AI 運勢相談 →</div><div style="font-size:11px;color:rgba(122,63,192,0.65);">対話で解き明かす自分だけの奇門の物語</div>';
+  var ac3=_qs('#qimenShareBtnWrap a:nth-child(3)');
+  if(ac3)ac3.innerHTML='<div style="font-size:15px;font-weight:700;color:#1a5fa0;margin-bottom:4px;"><i class="pi pi-person"></i> 専門家相談 →</div><div style="font-size:11px;color:rgba(26,95,160,0.65);">奇門遁甲の専門家と1:1の深い相談</div>';
+  _sh('.hourly-yun-title','今日の時間帯別運勢表 <span style="font-size:11px;font-weight:400;opacity:0.82">真太陽時基準</span>');
+  var yList=document.getElementById('hourlyYunList');
+  if(yList)yList.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;"><span class="spinner"></span>時間帯別運勢計算中…</div>';
+}
+
 // 낙서 배치: 행×열
 const LAKSHO = [[4,9,2],[3,5,7],[8,1,6]];
 
@@ -1010,7 +1081,7 @@ function setType(t, silent) {
       document.getElementById('inp-hour').value   = _wh;
       document.getElementById('inp-minute').value = _wmin;
       document.getElementById('wonmyong-date-label').innerHTML =
-        '<i class="pi pi-calendar"></i> 원명국 · ' + _wy + '.' + String(_wm).padStart(2,'0') + '.' + String(_wd).padStart(2,'0');
+        '<i class="pi pi-calendar"></i> ' + (QIMEN_LANG === 'ja' ? '本命局' : '원명국') + ' · ' + _wy + '.' + String(_wm).padStart(2,'0') + '.' + String(_wd).padStart(2,'0');
       notice.style.display = 'block';
     } else {
       notice.style.display = 'none';
@@ -1059,7 +1130,7 @@ function toggleQmDetail() {
   var wrap = document.getElementById('qm-detail-wrap');
   var btn  = document.getElementById('qm-detail-toggle');
   var isOpen = wrap.classList.toggle('open');
-  btn.textContent = isOpen ? '▲ 상세 보기 접기' : '▼ 기문둔갑 포국 상세 보기';
+  btn.textContent = isOpen ? (QIMEN_LANG === 'ja' ? '▲ 詳細を折りたたむ' : '▲ 상세 보기 접기') : (QIMEN_LANG === 'ja' ? '▼ 奇門遁甲布局 詳細を見る' : '▼ 기문둔갑 포국 상세 보기');
 }
 
 // ── 사주 8자 ─────────────────────────────────────────────
@@ -1081,7 +1152,12 @@ async function fetchSaju(year, month, day, hour, minute) {
     const pillars = data.summary?.pillars;
     if (!pillars) return;
 
-    const order = [
+    const order = QIMEN_LANG === 'ja' ? [
+      { label: '時柱', key: 'hour' },
+      { label: '日柱', key: 'day' },
+      { label: '月柱', key: 'month' },
+      { label: '年柱', key: 'year' },
+    ] : [
       { label: '시주', key: 'hour' },
       { label: '일주', key: 'day' },
       { label: '월주', key: 'month' },
@@ -1111,13 +1187,13 @@ async function doFetch() {
   const minute = parseInt(document.getElementById('inp-minute').value) || 0;
 
   if (!year || !month || !day) {
-    showStatus('연도, 월, 일을 입력해주세요.', true);
+    showStatus(QIMEN_LANG === 'ja' ? '年·月·日を入力してください。' : '연도, 월, 일을 입력해주세요.', true);
     return;
   }
 
   const fetchBtn = document.getElementById('btn-fetch');
   fetchBtn.disabled = true;
-  showStatus('포국 계산 중…', false);
+  showStatus(QIMEN_LANG === 'ja' ? '布局計算中…' : '포국 계산 중…', false);
   hideResults();
 
   // URL: wonmyong 유지 / API: wonmyong → siga
@@ -1135,7 +1211,7 @@ async function doFetch() {
     hideStatus();
     renderResult(data);
   } catch (e) {
-    showStatus('포국 계산 오류: ' + e.message, true);
+    showStatus((QIMEN_LANG === 'ja' ? '布局計算エラー: ' : '포국 계산 오류: ') + e.message, true);
     console.error(e);
   } finally {
     fetchBtn.disabled = false;
@@ -1179,26 +1255,26 @@ function renderSummaryCard(data) {
     updateSummaryPersonal(c.userDayEl, c.ymGong, c.currentData, null, null, null);
     // 접기 초기화
     document.getElementById('qm-detail-wrap').classList.remove('open');
-    document.getElementById('qm-detail-toggle').textContent = '▼ 기문둔갑 포국 상세 보기';
+    document.getElementById('qm-detail-toggle').textContent = QIMEN_LANG === 'ja' ? '▼ 奇門遁甲布局 詳細を見る' : '▼ 기문둔갑 포국 상세 보기';
     setVisible('qm-summary-card', true);
     return;
   }
 
   // 아직 안 왔으면 로딩 상태
   var badgeEl = document.getElementById('qm-headline-badge');
-  badgeEl.textContent = '분석 중';
+  badgeEl.textContent = QIMEN_LANG === 'ja' ? '分析中' : '분석 중';
   badgeEl.className = 'qm-headline-badge badge-보통';
-  document.getElementById('qm-headline-text').textContent = '맞춤 분석을 준비하고 있어요…';
+  document.getElementById('qm-headline-text').textContent = QIMEN_LANG === 'ja' ? 'カスタム分析を準備しています…' : '맞춤 분석을 준비하고 있어요…';
   var geokEl = document.getElementById('qm-headline-geok');
   geokEl.style.display = 'none';
 
   var recGrid = document.getElementById('qm-rec-grid');
   recGrid.innerHTML = '';
-  recGrid.appendChild(buildRecItem('<i class="pi pi-compass"></i>', '좋은 방향', '분석 중…', ''));
-  var timeItem = buildRecItem('⏰', '좋은 시간', '분석 중…', '');
+  recGrid.appendChild(buildRecItem('<i class="pi pi-compass"></i>', QIMEN_LANG === 'ja' ? '良い方向' : '좋은 방향', QIMEN_LANG === 'ja' ? '分析中…' : '분석 중…', ''));
+  var timeItem = buildRecItem('⏰', QIMEN_LANG === 'ja' ? '良い時間' : '좋은 시간', QIMEN_LANG === 'ja' ? '分析中…' : '분석 중…', '');
   timeItem.id = 'qm-rec-time';
   recGrid.appendChild(timeItem);
-  recGrid.appendChild(buildRecItem('<i class="pi pi-briefcase"></i>', '오늘 하면 좋은 일', '분석 중…', ''));
+  recGrid.appendChild(buildRecItem('<i class="pi pi-briefcase"></i>', QIMEN_LANG === 'ja' ? '今日の活動' : '오늘 하면 좋은 일', QIMEN_LANG === 'ja' ? '分析中…' : '분석 중…', ''));
 
   document.getElementById('qm-warn-box').classList.remove('visible');
 
@@ -1298,18 +1374,23 @@ function updateSummaryPersonal(userDayEl, ymGong, currentData, shichenList, grad
     else if (dm === '死') gilHyung = '대흉';
   }
   var badgeEl = document.getElementById('qm-headline-badge');
-  badgeEl.textContent = gilHyung;
+  badgeEl.textContent = _qGH(gilHyung);
   badgeEl.className = 'qm-headline-badge badge-' + gilHyung;
 
   // ── 2. 한줄 요약 (개인화) ──
   var summaryText = '';
   if (hasProfile && ymDoor && YM_DOOR_SUMMARY[ymDoor]) {
-    summaryText = YM_DOOR_SUMMARY[ymDoor];
+    summaryText = QIMEN_LANG === 'ja' ? (YM_DOOR_SUMMARY_JA[ymDoor] || YM_DOOR_SUMMARY[ymDoor]) : YM_DOOR_SUMMARY[ymDoor];
   } else if (matched.length) {
     summaryText = matched[0].요약;
   } else {
-    var 직사문명 = {'生':'생기','開':'왕성한 활동','休':'안정','景':'밝은 기운','傷':'주의','杜':'막힘','驚':'긴장','死':'침체'};
-    summaryText = (직사문명[data.직사문] || '보통') + '의 기운이 흐르는 때입니다.';
+    if (QIMEN_LANG === 'ja') {
+      var 직사문명JA = {'生':'生気','開':'旺盛な活動','休':'安定','景':'明るい気運','傷':'注意','杜':'停滞','驚':'緊張','死':'침체'};
+      summaryText = (직사문명JA[data.직사문] || '普通') + 'のエネルギーが流れています。';
+    } else {
+      var 직사문명 = {'生':'생기','開':'왕성한 활동','休':'안정','景':'밝은 기운','傷':'주의','杜':'막힘','驚':'긴장','死':'침체'};
+      summaryText = (직사문명[data.직사문] || '보통') + '의 기운이 흐르는 때입니다.';
+    }
   }
   document.getElementById('qm-headline-text').textContent = summaryText;
 
@@ -1330,15 +1411,14 @@ function updateSummaryPersonal(userDayEl, ymGong, currentData, shichenList, grad
   // 3-1. 좋은 방향 (개인화: 연명궁 방위 우선)
   var dirVal, dirSub;
   if (hasProfile && ymDir) {
-    dirVal = ymDir;
-    dirSub = '내 연명궁(' + ymGong + '궁)의 방위';
-    // 생문/개문 방향도 부가 표시
+    dirVal = QIMEN_LANG === 'ja' ? GONG_DIR_JA[ymDir] || ymDir : ymDir;
+    dirSub = QIMEN_LANG === 'ja' ? '自分の年命宮(' + ymGong + '宮)の方位' : '내 연명궁(' + ymGong + '궁)의 방위';
     var extraDirs = [];
     ['生', '開'].forEach(function(door) {
       Object.entries(data.palaces).forEach(function(entry) {
         var n = entry[0], p = entry[1];
         if (p.팔문 === door) {
-          extraDirs.push(DOOR_DIR_DESC[door] + ': ' + GONG_DIR[parseInt(n)] + '쪽');
+          extraDirs.push((QIMEN_LANG === 'ja' ? DOOR_DIR_DESC_JA[door] : DOOR_DIR_DESC[door]) + ': ' + _qGD(parseInt(n)) + (QIMEN_LANG === 'ja' ? '方' : '쪽'));
         }
       });
     });
@@ -1348,16 +1428,16 @@ function updateSummaryPersonal(userDayEl, ymGong, currentData, shichenList, grad
     ['生', '開'].forEach(function(door) {
       Object.entries(data.palaces).forEach(function(entry) {
         var n = entry[0], p = entry[1];
-        if (p.팔문 === door) dirLines.push({ desc: DOOR_DIR_DESC[door], dir: GONG_DIR[parseInt(n)] });
+        if (p.팔문 === door) dirLines.push({ desc: QIMEN_LANG === 'ja' ? DOOR_DIR_DESC_JA[door] : DOOR_DIR_DESC[door], dir: _qGD(parseInt(n)) });
       });
     });
     dirVal = dirLines.length ? dirLines.map(function(d) { return d.dir; }).join(', ') : '—';
-    dirSub = dirLines.length ? dirLines.map(function(d) { return d.desc + ': ' + d.dir + '쪽'; }).join('<br>') : '해당 없음';
+    dirSub = dirLines.length ? dirLines.map(function(d) { return d.desc + ': ' + d.dir + (QIMEN_LANG === 'ja' ? '方' : '쪽'); }).join('<br>') : (QIMEN_LANG === 'ja' ? '該当なし' : '해당 없음');
   }
-  recGrid.appendChild(buildRecItem('<i class="pi pi-compass"></i>', '나의 좋은 방향', dirVal, dirSub));
+  recGrid.appendChild(buildRecItem('<i class="pi pi-compass"></i>', QIMEN_LANG === 'ja' ? '自分の良い方向' : '나의 좋은 방향', dirVal, dirSub));
 
   // 3-2. 좋은 시간 (개인화 — 시간대별 운표 결과)
-  var timeItem = buildRecItem('⏰', '나의 좋은 시간', '—', '');
+  var timeItem = buildRecItem('⏰', QIMEN_LANG === 'ja' ? '自分の良い時間' : '나의 좋은 시간', '—', '');
   timeItem.id = 'qm-rec-time';
   recGrid.appendChild(timeItem);
   if (shichenList && gradeList && rangeList) {
@@ -1367,21 +1447,21 @@ function updateSummaryPersonal(userDayEl, ymGong, currentData, shichenList, grad
   // 3-3. 오늘 하면 좋은 일 (개인화: 연명궁 팔문 기반)
   var actVal;
   if (hasProfile && ymDoor && YM_DOOR_ACTION[ymDoor]) {
-    actVal = YM_DOOR_ACTION[ymDoor];
+    actVal = QIMEN_LANG === 'ja' ? (YM_DOOR_ACTION_JA[ymDoor] || YM_DOOR_ACTION[ymDoor]) : YM_DOOR_ACTION[ymDoor];
   } else if (matched.length && matched[0].추천행동) {
     var acts = matched[0].추천행동.split(',').map(function(a) { return a.trim(); });
     actVal = acts.slice(0, 2).join(', ');
   } else {
-    actVal = '정상적인 일과 진행';
+    actVal = QIMEN_LANG === 'ja' ? '通常の日課を進める' : '정상적인 일과 진행';
   }
-  recGrid.appendChild(buildRecItem('<i class="pi pi-briefcase"></i>', '나에게 좋은 활동', actVal, ''));
+  recGrid.appendChild(buildRecItem('<i class="pi pi-briefcase"></i>', QIMEN_LANG === 'ja' ? '自分に良い活動' : '나에게 좋은 활동', actVal, ''));
 
   // ── 4. 주의할 점 (개인화: 연명궁 흉문이면 경고) ──
   var warnBox = document.getElementById('qm-warn-box');
   var warnText = document.getElementById('qm-warn-text');
   var warnMsg = '';
   if (hasProfile && ymDoor && YM_DOOR_WARN[ymDoor]) {
-    warnMsg = YM_DOOR_WARN[ymDoor];
+    warnMsg = QIMEN_LANG === 'ja' ? (YM_DOOR_WARN_JA[ymDoor] || YM_DOOR_WARN[ymDoor]) : YM_DOOR_WARN[ymDoor];
   } else if (matched.length && matched[0].주의) {
     warnMsg = matched[0].주의.trim();
   }
@@ -1425,17 +1505,17 @@ function updateSummaryTimeFromHourly(shichenList, gradeList, rangeList) {
 
   var valText, subText;
   if (best.length === 0) {
-    valText = '특별히 좋은 시간 없음';
-    subText = '무난한 하루입니다';
+    valText = QIMEN_LANG === 'ja' ? '特に良い時間なし' : '특별히 좋은 시간 없음';
+    subText = QIMEN_LANG === 'ja' ? '無難な一日です' : '무난한 하루입니다';
   } else {
     valText = best.map(function(b) { return b.range; }).join(', ');
     subText = best.map(function(b) {
-      return (SHI_KR[b.shi] || b.shi) + ' (' + b.grade + ')';
+      return (SHI_KR[b.shi] || b.shi) + ' (' + _qGH(b.grade) + ')';
     }).join(', ');
   }
 
   timeEl.innerHTML = '<div class="qm-rec-icon">⏰</div>'
-    + '<div class="qm-rec-label">좋은 시간</div>'
+    + '<div class="qm-rec-label">' + (QIMEN_LANG === 'ja' ? '良い時間' : '좋은 시간') + '</div>'
     + '<div class="qm-rec-value">' + valText + '</div>'
     + '<div class="qm-rec-sub">' + subText + '</div>';
 }
@@ -1462,11 +1542,11 @@ function renderResult(data) {
   dunEl.className   = 'meta-value ' + (meta.음양둔 === '양둔' ? 'yang' : 'eum');
   var jieqiText = meta.절기;
   if (meta.다음절기 && meta.남은일수 != null) {
-    jieqiText += ' (' + meta.남은일수 + '일 후 ' + meta.다음절기 + ')';
+    jieqiText += QIMEN_LANG === 'ja' ? ' (' + meta.남은일수 + '日後 ' + meta.다음절기 + ')' : ' (' + meta.남은일수 + '일 후 ' + meta.다음절기 + ')';
   }
   document.getElementById('m-jieqi').textContent = jieqiText;
   document.getElementById('m-won').textContent   = meta.원;
-  document.getElementById('m-guk').textContent   = meta.국수 + '국';
+  document.getElementById('m-guk').textContent   = meta.국수 + (QIMEN_LANG === 'ja' ? '局' : '국');
   document.getElementById('m-ilju').textContent  = meta.일주;
 
   // 월주 / 년주 표시 (wolga/nyeonga 일 때)
@@ -1474,11 +1554,11 @@ function renderResult(data) {
   const ganzhiLabel = document.getElementById('m-ganzhi-label');
   const ganzhiVal   = document.getElementById('m-ganzhi');
   if (meta.월주) {
-    ganzhiLabel.textContent = '월주';
+    ganzhiLabel.textContent = QIMEN_LANG === 'ja' ? '月柱' : '월주';
     ganzhiVal.textContent   = meta.월주;
     ganzhiWrap.style.display = '';
   } else if (meta.년주) {
-    ganzhiLabel.textContent = '년주';
+    ganzhiLabel.textContent = QIMEN_LANG === 'ja' ? '年柱' : '년주';
     ganzhiVal.textContent   = meta.년주;
     ganzhiWrap.style.display = '';
   } else {
@@ -1509,7 +1589,7 @@ function renderResult(data) {
   renderBestDir(data);
 
   // 직부 정보
-  document.getElementById('zf-gong').textContent = data.직부궁 + '궁';
+  document.getElementById('zf-gong').textContent = data.직부궁 + (QIMEN_LANG === 'ja' ? '宮' : '궁');
   document.getElementById('zf-star').textContent = data.직부성 || '-';
   document.getElementById('zf-door').textContent = data.직사문 || '-';
   setVisible('zhifu-bar', true);
@@ -1533,13 +1613,13 @@ function buildCell(n, p, isZhifu) {
   // 궁 번호
   const numEl = document.createElement('div');
   numEl.className = 'palace-num';
-  numEl.textContent = n + '궁';
+  numEl.textContent = n + (QIMEN_LANG === 'ja' ? '宮' : '궁');
   cell.appendChild(numEl);
 
   // 방위 배지 (우상단)
   const dirEl = document.createElement('div');
   dirEl.className = 'palace-dir';
-  dirEl.textContent = GONG_DIR[n] || '';
+  dirEl.textContent = _qGD(n);
   cell.appendChild(dirEl);
 
   // 직부 표시
@@ -1631,18 +1711,16 @@ function renderDoorShenPanel(data) {
   shenGrid.innerHTML = '';
   if (starGrid) starGrid.innerHTML = '';
 
-  function badgeLabel(b) {
-    return b === 'daegil' ? '대길' : b === 'gil' ? '길' : b === 'hyung' ? '흉' : b === 'daehyung' ? '대흉' : '중';
-  }
+  function badgeLabel(b) { return _qBL(b); }
 
   // 팔문 8개
   Object.entries(data.palaces).forEach(function(entry) {
     var n = parseInt(entry[0]), p = entry[1];
-    if (!p.팔문 || n === 5) return; // 5궁(중앙) 제외
-    var d = DOOR_DETAIL[p.팔문] || { kr: p.팔문, desc: '', badge: 'jung' };
+    if (!p.팔문 || n === 5) return;
+    var d = _qDoorD(p.팔문);
     var item = document.createElement('div');
     item.className = 'doorshen-item';
-    item.innerHTML = '<div class="doorshen-dir">' + GONG_DIR[n] + '</div>'
+    item.innerHTML = '<div class="doorshen-dir">' + _qGD(n) + '</div>'
       + '<div><div class="doorshen-main">' + d.kr
       + '<span class="doorshen-badge ' + d.badge + '">' + badgeLabel(d.badge) + '</span>'
       + '</div><div class="doorshen-desc">' + d.desc + '</div></div>';
@@ -1653,10 +1731,10 @@ function renderDoorShenPanel(data) {
   Object.entries(data.palaces).forEach(function(entry) {
     var n = parseInt(entry[0]), p = entry[1];
     if (!p.팔신 || n === 5) return;
-    var s = SHEN_DETAIL[p.팔신] || { kr: p.팔신, desc: '', badge: 'jung' };
+    var s = _qShenD(p.팔신);
     var item = document.createElement('div');
     item.className = 'doorshen-item';
-    item.innerHTML = '<div class="doorshen-dir">' + GONG_DIR[n] + '</div>'
+    item.innerHTML = '<div class="doorshen-dir">' + _qGD(n) + '</div>'
       + '<div><div class="doorshen-main">' + s.kr
       + '<span class="doorshen-badge ' + s.badge + '">' + badgeLabel(s.badge) + '</span>'
       + '</div><div class="doorshen-desc">' + s.desc + '</div></div>';
@@ -1668,10 +1746,10 @@ function renderDoorShenPanel(data) {
     Object.entries(data.palaces).forEach(function(entry) {
       var n = parseInt(entry[0]), p = entry[1];
       if (!p.구성) return;
-      var st = STAR_DETAIL[p.구성] || { kr: p.구성, desc: '', badge: 'jung' };
+      var st = _qStarD(p.구성);
       var item = document.createElement('div');
       item.className = 'doorshen-item';
-      item.innerHTML = '<div class="doorshen-dir">' + GONG_DIR[n] + '</div>'
+      item.innerHTML = '<div class="doorshen-dir">' + _qGD(n) + '</div>'
         + '<div><div class="doorshen-main">' + st.kr
         + '<span class="doorshen-badge ' + st.badge + '">' + badgeLabel(st.badge) + '</span>'
         + '</div><div class="doorshen-desc">' + st.desc + '</div></div>';
@@ -1773,9 +1851,18 @@ function renderPersonalQimen(data) {
   var STEM_OHAENG_MAP = {'甲':'목','乙':'목','丙':'화','丁':'화','戊':'토','己':'토','庚':'금','辛':'금','壬':'수','癸':'수'};
   var SAENG = {목:'화',화:'토',토:'금',금:'수',수:'목'};
   var GEUK  = {목:'토',토:'수',수:'화',화:'금',금:'목'};
-  var EL_KR = {목:'목(木)',화:'화(火)',토:'토(土)',금:'금(金)',수:'수(水)'};
+  var EL_KR = QIMEN_LANG === 'ja' ? EL_KR_JA : {목:'목(木)',화:'화(火)',토:'토(土)',금:'금(金)',수:'수(水)'};
 
   function relRich(src, tgt) {
+    if (QIMEN_LANG === 'ja') {
+      if (!src || !tgt) return { tag: '中', badge: 'jung', label: '中間' };
+      if (src === tgt) return { tag: '同じ気運', badge: 'gil', label: '自分と同じ気運が集まる' };
+      if (SAENG[src] === tgt) return { tag: '私を助ける', badge: 'daegil', label: '私に力を与える気運' };
+      if (SAENG[tgt] === src) return { tag: '私の力が抜ける', badge: 'jung', label: '私の気運が流れ出る' };
+      if (GEUK[src] === tgt) return { tag: '私が支配', badge: 'gil', label: '私が制御·管理する気運' };
+      if (GEUK[tgt] === src) return { tag: '私を圧迫', badge: 'hyung', label: '私への負担·圧迫' };
+      return { tag: '中', badge: 'jung', label: '中間' };
+    }
     if (!src || !tgt) return { tag: '중', badge: 'jung', label: '중간' };
     if (src === tgt) return { tag: '같은 기운', badge: 'gil', label: '나와 같은 기운이 모인다' };
     if (SAENG[src] === tgt) return { tag: '나를 도움', badge: 'daegil', label: '나에게 힘을 주는 기운' };
@@ -1784,9 +1871,7 @@ function renderPersonalQimen(data) {
     if (GEUK[tgt] === src) return { tag: '나를 압박', badge: 'hyung', label: '나에게 부담·압박' };
     return { tag: '중', badge: 'jung', label: '중간' };
   }
-  function badgeLabel(b) {
-    return b === 'daegil' ? '대길' : b === 'gil' ? '길' : b === 'hyung' ? '흉' : b === 'daehyung' ? '대흉' : '중';
-  }
+  function badgeLabel(b) { return _qBL(b); }
   function row(title, value, sub, badge) {
     var b = badge || 'jung';
     return '<div class="doorshen-item" style="grid-column:1/-1;">'
@@ -1850,14 +1935,14 @@ function renderPersonalQimen(data) {
   }
 
   // 쉬운 풀이 매핑 (전문용어 → 일상 언어)
-  var SIPSIN_EASY = {
+  var SIPSIN_EASY = QIMEN_LANG === 'ja' ? SIPSIN_EASY_JA : {
     '비견':'동등한 동료 기운', '겁재':'경쟁·다툼 주의',
     '식신':'표현·여유', '상관':'재능·구설 주의',
     '편재':'움직이는 재물', '정재':'안정 재물',
     '편관':'압박·시험', '정관':'명예·질서',
     '편인':'고독·기술', '정인':'귀인·도움'
   };
-  var UNSEONG_EASY = {
+  var UNSEONG_EASY = QIMEN_LANG === 'ja' ? UNSEONG_EASY_JA : {
     '장생':'시작 좋음','목욕':'정리 시기','관대':'성장기','건록':'전성기',
     '제왕':'최고조','쇠':'한 풀 꺾임','병':'기력 약함','사':'정체기',
     '묘':'마무리','절':'단절','태':'잉태기','양':'준비기'
@@ -1865,47 +1950,46 @@ function renderPersonalQimen(data) {
 
   var html = '';
   // 1행: 일간 (간단)
-  var ijuLabel = ilju ? (dayStemHan + dayBranchHan + ' 일주') : (EL_KR[userDayEl] + ' 일간');
-  var ijuSub = '내 사주의 중심' + (gongmang ? ' · 비어있는 자리: ' + gongmang.join('·') : '');
-  html += row('내 사주', ijuLabel, ijuSub, 'jung');
+  var ijuLabel = ilju ? (dayStemHan + dayBranchHan + (QIMEN_LANG === 'ja' ? ' 日柱' : ' 일주')) : (EL_KR[userDayEl] + (QIMEN_LANG === 'ja' ? ' 日干' : ' 일간'));
+  var ijuSub = (QIMEN_LANG === 'ja' ? '自分の四柱の中心' : '내 사주의 중심') + (gongmang ? (QIMEN_LANG === 'ja' ? ' · 空亡: ' : ' · 비어있는 자리: ') + gongmang.join('·') : '');
+  html += row(QIMEN_LANG === 'ja' ? '自分の四柱' : '내 사주', ijuLabel, ijuSub, 'jung');
 
-  // 2행: 오늘의 핵심 자리 (직부궁 통합) — 직부성·직사문·천간을 한 줄로
+  // 2행: 오늘의 핵심 자리 (직부궁 통합)
   if (zfStar || zfDoor || zfStem) {
     var coreParts = [];
-    if (zfStar) coreParts.push(zfStar + '(' + (STAR_DETAIL[zfStar] ? STAR_DETAIL[zfStar].kr : '') + ')');
-    if (zfDoor) coreParts.push(zfDoor + '門(' + (DOOR_DETAIL[zfDoor] ? DOOR_DETAIL[zfDoor].kr : '') + ')');
+    if (zfStar) coreParts.push(zfStar + '(' + (_qStarD(zfStar).kr || '') + ')');
+    if (zfDoor) coreParts.push(zfDoor + '門(' + (_qDoorD(zfDoor).kr || '') + ')');
     var coreLabel = coreParts.join(' · ');
 
-    // 풀이 1줄: 직부궁 천간 십신 + 12운성 결합
     var coreSubs = [];
-    if (sipsinStem && SIPSIN_EASY[sipsinStem]) coreSubs.push('내 입장에서 ' + SIPSIN_EASY[sipsinStem]);
+    if (sipsinStem && SIPSIN_EASY[sipsinStem]) coreSubs.push((QIMEN_LANG === 'ja' ? '私の立場で ' : '내 입장에서 ') + SIPSIN_EASY[sipsinStem]);
     else if (zfStem && r3.label) coreSubs.push(r3.label);
-    if (zfUnseong && UNSEONG_EASY[zfUnseong]) coreSubs.push('내 기운은 ' + UNSEONG_EASY[zfUnseong] + ' 상태');
-    if (zfGongmang) coreSubs.push('비어있는 자리에 걸림(효력 약화)');
-    var coreSub = coreSubs.join(' / ') || '이 자리의 핵심 기운';
+    if (zfUnseong && UNSEONG_EASY[zfUnseong]) coreSubs.push((QIMEN_LANG === 'ja' ? '私の気運は ' : '내 기운은 ') + UNSEONG_EASY[zfUnseong] + (QIMEN_LANG === 'ja' ? ' 状態' : ' 상태'));
+    if (zfGongmang) coreSubs.push(QIMEN_LANG === 'ja' ? '空亡の位置（効力弱化）' : '비어있는 자리에 걸림(효력 약화)');
+    var coreSub = coreSubs.join(' / ') || (QIMEN_LANG === 'ja' ? 'この位置の核心気運' : '이 자리의 핵심 기운');
     var coreBadge = zfGongmang ? 'hyung'
       : sipsinStem ? (SIPSIN_BADGE[sipsinStem] || r3.badge)
       : (r3 && r3.badge) || 'jung';
-    html += row('오늘 핵심', coreLabel, coreSub, coreBadge);
+    html += row(QIMEN_LANG === 'ja' ? '今日の核心' : '오늘 핵심', coreLabel, coreSub, coreBadge);
   }
 
-  // 3행: 내 본명 자리 (연명궁) — 있을 때만
+  // 3행: 내 본명 자리 (연명궁)
   if (r4 || ymBranches.length) {
     var ymParts = [];
     if (ymStem) ymParts.push(ymStem + '(' + EL_KR[ymStemEl] + ')');
     if (ymBranches.length) ymParts.push(ymBranches.join('·'));
-    var ymLabel = ymParts.join(' · ') || '연명궁';
+    var ymLabel = ymParts.join(' · ') || (QIMEN_LANG === 'ja' ? '年命宮' : '연명궁');
 
     var ymSubs = [];
     if (sipsinYm && SIPSIN_EASY[sipsinYm]) ymSubs.push(SIPSIN_EASY[sipsinYm]);
     else if (r4 && r4.label) ymSubs.push(r4.label);
-    if (ymUnseong && UNSEONG_EASY[ymUnseong]) ymSubs.push(UNSEONG_EASY[ymUnseong] + ' 상태');
-    if (ymGongmang) ymSubs.push('본명 자리 약화');
-    var ymSub2 = ymSubs.join(' / ') || '내 본명 자리';
+    if (ymUnseong && UNSEONG_EASY[ymUnseong]) ymSubs.push(UNSEONG_EASY[ymUnseong] + (QIMEN_LANG === 'ja' ? ' 状態' : ' 상태'));
+    if (ymGongmang) ymSubs.push(QIMEN_LANG === 'ja' ? '本命宮の弱化' : '본명 자리 약화');
+    var ymSub2 = ymSubs.join(' / ') || (QIMEN_LANG === 'ja' ? '自分の本命位置' : '내 본명 자리');
     var ymBadge2 = ymGongmang ? 'hyung'
       : sipsinYm ? (SIPSIN_BADGE[sipsinYm] || (r4 && r4.badge))
       : (r4 && r4.badge) || 'jung';
-    html += row('내 본명', ymLabel, ymSub2, ymBadge2);
+    html += row(QIMEN_LANG === 'ja' ? '自分の本命' : '내 본명', ymLabel, ymSub2, ymBadge2);
   }
 
   // 종합 판정 (십신/12운성/공망 가중)
@@ -1937,12 +2021,20 @@ function renderPersonalQimen(data) {
   if (ymGongmang) score -= 1;
 
   var verdict, vbadge, vTitle;
-  if (score >= 6)      { verdict = '큰 결정·중요한 일 진행하기 좋은 흐름'; vbadge = 'daegil'; vTitle = '아주 좋음'; }
-  else if (score >= 3) { verdict = '평소 일정 진행 양호 · 적극적 행동 가능'; vbadge = 'gil'; vTitle = '좋음'; }
-  else if (score >= -2){ verdict = '평이한 흐름 · 평소처럼 진행하면 됨'; vbadge = 'jung'; vTitle = '보통'; }
-  else if (score >= -5){ verdict = '큰 결정·계약은 미루는 것이 좋음'; vbadge = 'hyung'; vTitle = '주의'; }
-  else                 { verdict = '휴식·정리에 집중하고 큰 일은 보류'; vbadge = 'daehyung'; vTitle = '많이 주의'; }
-  html += row('한 줄 결론', vTitle, verdict, vbadge);
+  if (QIMEN_LANG === 'ja') {
+    if (score >= 6)      { verdict = '大きな決断·重要な事を進めるのに良い流れ'; vbadge = 'daegil'; vTitle = 'とても良い'; }
+    else if (score >= 3) { verdict = '通常の予定進行良好 · 積極的な行動が可能'; vbadge = 'gil'; vTitle = '良い'; }
+    else if (score >= -2){ verdict = '平穏な流れ · 普段通りに進めれば良い'; vbadge = 'jung'; vTitle = '普通'; }
+    else if (score >= -5){ verdict = '大きな決断·契約は先延ばしにした方が良い'; vbadge = 'hyung'; vTitle = '注意'; }
+    else                 { verdict = '休息·整理に集中し大事は保留'; vbadge = 'daehyung'; vTitle = '要注意'; }
+  } else {
+    if (score >= 6)      { verdict = '큰 결정·중요한 일 진행하기 좋은 흐름'; vbadge = 'daegil'; vTitle = '아주 좋음'; }
+    else if (score >= 3) { verdict = '평소 일정 진행 양호 · 적극적 행동 가능'; vbadge = 'gil'; vTitle = '좋음'; }
+    else if (score >= -2){ verdict = '평이한 흐름 · 평소처럼 진행하면 됨'; vbadge = 'jung'; vTitle = '보통'; }
+    else if (score >= -5){ verdict = '큰 결정·계약은 미루는 것이 좋음'; vbadge = 'hyung'; vTitle = '주의'; }
+    else                 { verdict = '휴식·정리에 집중하고 큰 일은 보류'; vbadge = 'daehyung'; vTitle = '많이 주의'; }
+  }
+  html += row(QIMEN_LANG === 'ja' ? '一言結論' : '한 줄 결론', vTitle, verdict, vbadge);
 
   grid.innerHTML = html;
   wrap.style.display = '';
@@ -1953,7 +2045,7 @@ function renderPersonalQimen(data) {
   if (_aiBtn) {
     _aiBtn.style.display = '';
     _aiBtn.disabled = false;
-    _aiBtn.innerHTML = '<div><i class="pi pi-sparkle"></i> 무료 기문 해석 받기</div><div style="font-size:10px;font-weight:500;color:rgba(122,63,192,0.7);margin-top:3px;">Orb 차감 없음 · 즉시 생성 · 무제한</div>';
+    _aiBtn.innerHTML = QIMEN_LANG === 'ja' ? '<div><i class="pi pi-sparkle"></i> 無料 奇門解析を受け取る</div><div style="font-size:10px;font-weight:500;color:rgba(122,63,192,0.7);margin-top:3px;">Orb消費なし · 即時生成 · 無制限</div>' : '<div><i class="pi pi-sparkle"></i> 무료 기문 해석 받기</div><div style="font-size:10px;font-weight:500;color:rgba(122,63,192,0.7);margin-top:3px;">Orb 차감 없음 · 즉시 생성 · 무제한</div>';
   }
   if (_aiRes) { _aiRes.style.display = 'none'; _aiRes.innerHTML = ''; }
 
@@ -1975,17 +2067,16 @@ function runQimenReport() {
   var btn = document.getElementById('qm-ai-btn');
   var resBox = document.getElementById('qm-ai-result');
   var ctx = window._qimenAIContext;
-  if (!ctx) { alert('사주 프로필을 먼저 설정해 주세요.'); return; }
+  if (!ctx) { alert(QIMEN_LANG === 'ja' ? '四柱プロフィールを先に設定してください。' : '사주 프로필을 먼저 설정해 주세요.'); return; }
 
   btn.disabled = true;
-  btn.innerHTML = '<i class="pi pi-spinner pi-spin"></i> 해석 중…';
+  btn.innerHTML = '<i class="pi pi-spinner pi-spin"></i> ' + (QIMEN_LANG === 'ja' ? '解析中…' : '해석 중…');
 
-  // 무료 = 짧은 1단락 해석 (토큰 비용 최소화)
   resBox.style.display = '';
   resBox.innerHTML = '<div style="padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;">'
-    + '<div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;"><i class="pi pi-sparkle"></i> 짧은 기문 해석</div>'
-    + '<div id="qm-rpt-sec-0" style="font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;"><span style="color:var(--muted);">해석 중…</span></div>'
-    + '<div style="margin-top:14px;padding:10px;background:rgba(122,63,192,0.05);border:1px dashed rgba(122,63,192,0.3);border-radius:10px;font-size:11px;color:#7a3fc0;text-align:center;line-height:1.5;">더 깊은 5섹션 분석은 <a href="report.html?type=qimen_wonmyong" style="color:#7a3fc0;font-weight:700;text-decoration:underline;">기문 본명국 정밀 리포트</a> (590 Orb)</div>'
+    + '<div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;"><i class="pi pi-sparkle"></i> ' + (QIMEN_LANG === 'ja' ? '奇門 短解析' : '짧은 기문 해석') + '</div>'
+    + '<div id="qm-rpt-sec-0" style="font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;"><span style="color:var(--muted);">' + (QIMEN_LANG === 'ja' ? '解析中…' : '해석 중…') + '</span></div>'
+    + '<div style="margin-top:14px;padding:10px;background:rgba(122,63,192,0.05);border:1px dashed rgba(122,63,192,0.3);border-radius:10px;font-size:11px;color:#7a3fc0;text-align:center;line-height:1.5;">' + (QIMEN_LANG === 'ja' ? 'より深い5セクション分析は <a href="report.html?type=qimen_wonmyong" style="color:#7a3fc0;font-weight:700;text-decoration:underline;">奇門 本命局 精密レポート</a> (590 Orb)' : '더 깊은 5섹션 분석은 <a href="report.html?type=qimen_wonmyong" style="color:#7a3fc0;font-weight:700;text-decoration:underline;">기문 본명국 정밀 리포트</a> (590 Orb)') + '</div>'
     + '</div>';
 
   // 핵심 데이터만 — 짧고 명료하게
@@ -2104,8 +2195,8 @@ function runQimenAI() {
     btn.style.display = 'none';
   }).catch(function(err) {
     btn.disabled = false;
-    btn.innerHTML = '<i class="pi pi-sparkle"></i> AI 정밀 해석 받기 (재시도)';
-    alert('AI 해석 실패: ' + err.message);
+    btn.innerHTML = '<i class="pi pi-sparkle"></i> ' + (QIMEN_LANG === 'ja' ? 'AI 精密解析を受け取る（再試行）' : 'AI 정밀 해석 받기 (재시도)');
+    alert((QIMEN_LANG === 'ja' ? 'AI解析失敗: ' : 'AI 해석 실패: ') + err.message);
   });
 }
 
@@ -2135,7 +2226,7 @@ function renderTaegil(data) {
   // 적합도 계산
   var CATS = [
     {
-      icon: '<i class="pi pi-briefcase"></i>', label: '사업·계약',
+      icon: '<i class="pi pi-briefcase"></i>', label: QIMEN_LANG === 'ja' ? '事業·契約' : '사업·계약',
       score: (function() {
         var s = 0;
         if (hasDoor('生')) s += 2;
@@ -2146,7 +2237,7 @@ function renderTaegil(data) {
       })()
     },
     {
-      icon: '<i class="pi pi-rocket"></i>️', label: '이동·여행',
+      icon: '<i class="pi pi-rocket"></i>️', label: QIMEN_LANG === 'ja' ? '移動·旅行' : '이동·여행',
       score: (function() {
         var s = 0;
         if (hasDoor('開')) s += 2;
@@ -2157,7 +2248,7 @@ function renderTaegil(data) {
       })()
     },
     {
-      icon: '<i class="pi pi-heart"></i>', label: '연애·만남',
+      icon: '<i class="pi pi-heart"></i>', label: QIMEN_LANG === 'ja' ? '恋愛·出会い' : '연애·만남',
       score: (function() {
         var s = 0;
         if (samePalace('生', '六合')) s += 3;
@@ -2168,7 +2259,7 @@ function renderTaegil(data) {
       })()
     },
     {
-      icon: '<i class="pi pi-notepad"></i>', label: '시험·면접',
+      icon: '<i class="pi pi-notepad"></i>', label: QIMEN_LANG === 'ja' ? '試験·面接' : '시험·면접',
       score: (function() {
         var s = 0;
         if (hasStar('天輔')) s += 2;
@@ -2179,7 +2270,7 @@ function renderTaegil(data) {
       })()
     },
     {
-      icon: '<i class="pi pi-coin"></i>', label: '재물·투자',
+      icon: '<i class="pi pi-coin"></i>', label: QIMEN_LANG === 'ja' ? '財物·投資' : '재물·투자',
       score: (function() {
         var s = 0;
         if (samePalace('開', '直符') || samePalace('開', '値符')) s += 3;
@@ -2193,7 +2284,7 @@ function renderTaegil(data) {
   CATS.forEach(function(cat) {
     var stars = '★'.repeat(cat.score) + '☆'.repeat(5 - cat.score);
     var starColor = cat.score >= 4 ? '#7a5e1c' : cat.score >= 3 ? '#6a4ea0' : cat.score >= 2 ? 'var(--muted)' : '#a05a28';
-    var note = cat.score >= 4 ? '적합' : cat.score >= 3 ? '무난' : cat.score >= 2 ? '주의' : '비추';
+    var note = QIMEN_LANG === 'ja' ? (cat.score >= 4 ? '最適' : cat.score >= 3 ? '無難' : cat.score >= 2 ? '注意' : '不向き') : (cat.score >= 4 ? '적합' : cat.score >= 3 ? '무난' : cat.score >= 2 ? '주의' : '비추');
     var row = document.createElement('div');
     row.className = 'taegil-row';
     row.innerHTML = '<div class="taegil-icon">' + cat.icon + '</div>'
@@ -2216,7 +2307,7 @@ function renderBestDir(data) {
       if (p.팔문 === door) {
         const chip = document.createElement('div');
         chip.className = 'bestdir-chip';
-        chip.innerHTML = '<span class="bestdir-dir">' + GONG_DIR[parseInt(n)] + '</span>'
+        chip.innerHTML = '<span class="bestdir-dir">' + _qGD(parseInt(n)) + '</span>'
           + '<span class="bestdir-info">' + door + '門 · ' + (p.구성 || '') + '</span>';
         rows.appendChild(chip);
       }
@@ -2228,8 +2319,8 @@ function renderBestDir(data) {
     if (p.팔신 === '六合') {
       const chip = document.createElement('div');
       chip.className = 'bestdir-chip travel';
-      chip.innerHTML = '<span class="bestdir-dir">' + GONG_DIR[parseInt(n)] + '</span>'
-        + '<span class="bestdir-info">역마 · 六合</span>';
+      chip.innerHTML = '<span class="bestdir-dir">' + _qGD(parseInt(n)) + '</span>'
+        + '<span class="bestdir-info">' + (QIMEN_LANG === 'ja' ? '驛馬 · 六合' : '역마 · 六合') + '</span>';
       rows.appendChild(chip);
     }
   });
@@ -2240,7 +2331,7 @@ function renderBestDir(data) {
       if (p.팔문 === door && parseInt(n) !== 5) {
         const chip = document.createElement('div');
         chip.className = 'bestdir-chip bad';
-        chip.innerHTML = '<span class="bestdir-dir">' + GONG_DIR[parseInt(n)] + '</span>'
+        chip.innerHTML = '<span class="bestdir-dir">' + _qGD(parseInt(n)) + '</span>'
           + '<span class="bestdir-info" style="color:#b55400;">' + door + '門</span>';
         rows.appendChild(chip);
       }
@@ -2257,22 +2348,16 @@ function renderInterp(data) {
   rows.innerHTML = '';
   summary.textContent = '';
 
-  // 최적 방향: 生門/開門 궁 방위
   const 길방 = [];
   ['生', '開'].forEach(door => {
     Object.entries(data.palaces).forEach(([n, p]) => {
-      if (p.팔문 === door) 길방.push(GONG_DIR[parseInt(n)] + '(' + door + '門)');
+      if (p.팔문 === door) 길방.push(_qGD(parseInt(n)) + '(' + door + '門)');
     });
   });
 
-  // 최적 시간대: 직사문 기준 (한글 풀이)
-  const doorTimeMap = {
-    '生':'오전 5~7시, 오전 11~13시',
-    '開':'새벽 3~5시, 저녁 7~9시',
-    '休':'밤 11~새벽 1시, 새벽 1~3시',
-    '景':'오전 11~13시, 오후 1~3시',
-  };
-  const 최적시간 = doorTimeMap[data.직사문] || '좋은 문이 열린 시간대';
+  const doorTimeMapJA = {'生':'午前5~7時、午前11~13時','開':'深夜3~5時、夕方7~9時','休':'夜11時~深夜1時、深夜1~3時','景':'午前11~13時、午後1~3時'};
+  const doorTimeMap = {'生':'오전 5~7시, 오전 11~13시','開':'새벽 3~5시, 저녁 7~9시','休':'밤 11~새벽 1시, 새벽 1~3시','景':'오전 11~13시, 오후 1~3시'};
+  const 최적시간 = QIMEN_LANG === 'ja' ? (doorTimeMapJA[data.직사문] || '良い門が開いた時間帯') : (doorTimeMap[data.직사문] || '좋은 문이 열린 시간대');
 
   // 추천행동·주의사항 — 너무 많이 나열되지 않도록 핵심 2개씩만
   const 추천Set = new Set();
@@ -2293,15 +2378,17 @@ function renderInterp(data) {
 
   // 방향 한글 풀이 (生門 → "기운이 새로 시작")
   const 방향풀이 = 길방.length
-    ? 길방.map(d => d.replace('生門', '시작·새출발 좋은 곳').replace('開門', '활동·기회 열리는 곳')).join(' · ')
-    : '특별한 길방 없음';
+    ? (QIMEN_LANG === 'ja'
+        ? 길방.map(d => d.replace('生門', '始まり·新出発に良い場所').replace('開門', '活動·チャンスが開く場所')).join(' · ')
+        : 길방.map(d => d.replace('生門', '시작·새출발 좋은 곳').replace('開門', '활동·기회 열리는 곳')).join(' · '))
+    : (QIMEN_LANG === 'ja' ? '特別な吉方なし' : '특별한 길방 없음');
 
   const rowData = [];
-  if (격국텍스트) rowData.push({ key: '<i class="pi pi-bookmark"></i> 격국', val: 격국텍스트, html: true });
-  rowData.push({ key: '<i class="pi pi-compass"></i> 좋은 방향', val: 방향풀이 });
-  rowData.push({ key: '<i class="pi pi-clock"></i> 좋은 시간', val: 최적시간 });
-  if (추천Top.length) rowData.push({ key: '<i class="pi pi-check-circle"></i> 하면 좋은 일', val: 추천Top.join(', ') });
-  if (주의Top.length) rowData.push({ key: '<i class="pi pi-warning"></i> 조심할 것', val: 주의Top.join(' / ') });
+  if (격국텍스트) rowData.push({ key: '<i class="pi pi-bookmark"></i> ' + (QIMEN_LANG === 'ja' ? '格局' : '격국'), val: 격국텍스트, html: true });
+  rowData.push({ key: '<i class="pi pi-compass"></i> ' + (QIMEN_LANG === 'ja' ? '良い方向' : '좋은 방향'), val: 방향풀이 });
+  rowData.push({ key: '<i class="pi pi-clock"></i> ' + (QIMEN_LANG === 'ja' ? '良い時間' : '좋은 시간'), val: 최적시간 });
+  if (추천Top.length) rowData.push({ key: '<i class="pi pi-check-circle"></i> ' + (QIMEN_LANG === 'ja' ? '良い活動' : '하면 좋은 일'), val: 추천Top.join(', ') });
+  if (주의Top.length) rowData.push({ key: '<i class="pi pi-warning"></i> ' + (QIMEN_LANG === 'ja' ? '注意すること' : '조심할 것'), val: 주의Top.join(' / ') });
 
   rowData.forEach(r => {
     const row = document.createElement('div');
@@ -2322,9 +2409,10 @@ function renderInterp(data) {
     '生':'시작·새 출발에 좋은 흐름', '開':'활동·기회가 열리는 흐름', '休':'쉬어가는·재충전 흐름', '景':'문서·창작·발표에 좋은 흐름',
     '傷':'다툼·충돌 조심해야 할 흐름', '杜':'정체·막힘이 있는 흐름', '驚':'예상 못한 일이 생기는 흐름', '死':'침체·정리에 어울리는 흐름'
   };
-  summary.innerHTML = '<span style="font-size:13px;color:var(--muted);font-family:\'Noto Sans KR\',sans-serif;font-weight:700;letter-spacing:0.5px;"><i class="pi pi-notepad"></i> 한 줄 요약&nbsp;&nbsp;</span>'
+  const 직사문풀이JA = {'生':'始まり·新出発に良い流れ','開':'活動·チャンスが開く流れ','休':'休息·充電の流れ','景':'文書·創作·発表に良い流れ','傷':'争い·衝突に注意の流れ','杜':'停滞·詰まりのある流れ','驚':'予想外のことが起きる流れ','死':'침체·정리에 어울리는 흐름'};
+  summary.innerHTML = '<span style="font-size:13px;color:var(--muted);font-family:\'Noto Sans KR\',sans-serif;font-weight:700;letter-spacing:0.5px;"><i class="pi pi-notepad"></i>' + (QIMEN_LANG === 'ja' ? ' 一言要約　　' : ' 한 줄 요약&nbsp;&nbsp;') + '</span>'
     + (matched.length ? matched[0].요약
-      : (직사문풀이[data.직사문] || '평이한 흐름') + '입니다.');
+      : QIMEN_LANG === 'ja' ? ((직사문풀이JA[data.직사문] || '平穏な流れ') + 'です。') : ((직사문풀이[data.직사문] || '평이한 흐름') + '입니다.'));
 
   setVisible('interp-wrap', true);
 }
@@ -2348,6 +2436,8 @@ function renderInterp(data) {
     canvas.appendChild(s);
   }
 })();
+
+applyQimenI18n();
 
 // URL 파라미터 → 초기값 설정 및 자동 조회
 (function initFromUrl() {
@@ -2806,7 +2896,12 @@ function shareQimenKakao() {
     shi.range = tstToKst(shi.tstStart) + '~' + tstToKst(shi.tstEnd);
   });
 
-  var DOOR_KW = {
+  var DOOR_KW = QIMEN_LANG === 'ja' ? {
+    '生':'契約·署名·創業 最適','開':'旺盛な活動·投資·拡張',
+    '休':'安定·和解·養生 有利','景':'文書·学習·創作 有利',
+    '傷':'移動·衝突 注意','杜':'停滞·詰まり 注意',
+    '驚':'緊張·驚き 注意','死':'重要な決断 保留推奨',
+  } : {
     '生':'계약·서명·창업 최적','開':'왕성한 활동·투자·확장',
     '休':'안정·화해·양생 유리','景':'문서·공부·창작 유리',
     '傷':'이동·충돌 주의','杜':'막힘·정체 조심',
@@ -2983,11 +3078,11 @@ function shareQimenKakao() {
     var section = document.getElementById('hourlyYunSection');
     var titleEl = section.querySelector('.hourly-yun-title');
     if (userDayEl && ymGong) {
-      titleEl.innerHTML = '오늘의 시간대별 운표 '
-        + '<span style="font-size:11px;font-weight:400;opacity:0.82">진태양시 기준</span>'
+      titleEl.innerHTML = (QIMEN_LANG === 'ja' ? '今日の時間帯別運勢表 ' : '오늘의 시간대별 운표 ')
+        + '<span style="font-size:11px;font-weight:400;opacity:0.82">' + (QIMEN_LANG === 'ja' ? '真太陽時基準' : '진태양시 기준') + '</span>'
         + '<br><span style="font-size:11px;font-weight:700;color:var(--accent2);margin-top:4px;display:inline-block;">'
-        + '<i class="pi pi-sparkle"></i> ' + userDayStem + '(' + EL_HAN[userDayEl] + ') 일간 · '
-        + ymGong + '궁(' + (GONG_NAME[ymGong]||'') + ') 연명 맞춤</span>';
+        + '<i class="pi pi-sparkle"></i> ' + userDayStem + '(' + EL_HAN[userDayEl] + ') ' + (QIMEN_LANG === 'ja' ? '日干 · ' : '일간 · ')
+        + ymGong + (QIMEN_LANG === 'ja' ? '宮(' : '궁(') + (GONG_NAME[ymGong]||'') + (QIMEN_LANG === 'ja' ? ') 年命 맞춤</span>' : ') 연명 맞춤</span>');
     }
 
     // ── 렌더링 ──
@@ -3000,7 +3095,7 @@ function shareQimenKakao() {
       var isCurrent = (i === currentIdx);
       var isPast = (currentIdx === 0) ? (i > 0) : (i < currentIdx);
       var door = data && data.직사문 ? data.직사문 : null;
-      var keyword = door && DOOR_KW[door] ? DOOR_KW[door] : '정상적인 일과';
+      var keyword = door && DOOR_KW[door] ? DOOR_KW[door] : (QIMEN_LANG === 'ja' ? '通常の日課' : '정상적인 일과');
 
       // 개인화 분석
       var grade, personNote = '';
@@ -3014,7 +3109,7 @@ function shareQimenKakao() {
       } else {
         // 비로그인: 직사문 기반 단순 등급
         var DOOR_GRADE = {'生':'대길','開':'대길','休':'길','景':'길','傷':'흉','杜':'흉','驚':'흉','死':'대흉'};
-        grade = door && DOOR_GRADE[door] ? DOOR_GRADE[door] : '평';
+        grade = door && DOOR_GRADE[door] ? DOOR_GRADE[door] : (QIMEN_LANG === 'ja' ? '평' : '평');
       }
 
       _shiNames.push(shi.name);
@@ -3027,7 +3122,7 @@ function shareQimenKakao() {
       row.innerHTML =
         '<div class="yun-shi">' + shi.name + (isCurrent ? '<span class="yun-now-dot"></span>' : '') + '</div>' +
         '<div class="yun-range">' + shi.range + '</div>' +
-        '<div class="yun-grade yun-grade-' + grade + '">' + grade + '</div>' +
+        '<div class="yun-grade yun-grade-' + grade + '">' + _qGH(grade) + '</div>' +
         '<div class="yun-keyword">' + keyword +
           (door ? ' <span style="font-size:11px;color:var(--muted);">(' + door + '門)</span>' : '') +
           personNote +
@@ -3053,7 +3148,7 @@ function shareQimenKakao() {
     if (!userDayEl) {
       var tip = document.createElement('div');
       tip.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:var(--muted);';
-      tip.textContent = '프로필을 설정하면 연명궁·일간·시간 3중 맞춤 운표를 볼 수 있어요';
+      tip.textContent = QIMEN_LANG === 'ja' ? 'プロフィールを設定すると年命宮·日干·時間の3重カスタム運勢表を見ることができます' : '프로필을 설정하면 연명궁·일간·시간 3중 맞춤 운표를 볼 수 있어요';
       list.appendChild(tip);
     }
 
