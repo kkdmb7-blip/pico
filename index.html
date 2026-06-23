@@ -1223,9 +1223,9 @@
   <div style="background:linear-gradient(135deg,rgba(212,175,55,0.10),rgba(123,94,167,0.06));border:1px solid rgba(212,175,55,0.32);border-radius:18px;padding:18px 16px 14px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
       <i class="pi pi-sparkle" style="color:var(--gold);font-size:14px;"></i>
-      <div style="font-size:14px;font-weight:800;color:var(--gold);font-family:'Noto Serif KR',serif;letter-spacing:0.3px;">오늘 당신을 위한 리포트</div>
+      <div data-i18n="reco_title" style="font-size:14px;font-weight:800;color:var(--gold);font-family:'Noto Serif KR',serif;letter-spacing:0.3px;">오늘 당신을 위한 리포트</div>
     </div>
-    <div id="recoSubtitle" style="font-size:11px;color:var(--muted);margin-bottom:14px;letter-spacing:0.2px;">고민 없이 시작 — 지금 가장 잘 맞는 3가지를 골랐습니다</div>
+    <div id="recoSubtitle" data-i18n="reco_subtitle" style="font-size:11px;color:var(--muted);margin-bottom:14px;letter-spacing:0.2px;">고민 없이 시작 — 지금 가장 잘 맞는 3가지를 골랐습니다</div>
     <div id="todayRecoCards" style="display:flex;flex-direction:column;gap:8px;"></div>
   </div>
 </section>
@@ -1236,23 +1236,24 @@
     var profile = JSON.parse(localStorage.getItem('pico_profile') || 'null');
     if (!user || !profile) return; // 로그인+프로필 둘 다 있을 때만 노출
 
+    var _rl = localStorage.getItem('pico_lang') || 'ko';
     // 추천 POOL
     var POOL = {
-      qimen_today:    { icon:'pi-clock',     iconColor:'#9a3fc0', title:'오늘의 기문 운세',     desc:'오늘 24시간 길방·길시·하면 좋은 일',    orb:290 },
-      character:      { icon:'pi-crystal',   iconColor:'#a16d1f', title:'타고난 기질 분석',     desc:'45종 정밀 데이터로 보는 본질',          orb:490 },
-      money:          { icon:'pi-coin',      iconColor:'#2a8577', title:'재물·사업 분석',       desc:'재성·식상·대운으로 보는 돈의 흐름',     orb:690 },
-      love:           { icon:'pi-heart',     iconColor:'#8b2447', title:'연애·결혼 분석',       desc:'관성·배우자궁·신살 정밀 분석',          orb:690 },
-      daeun:          { icon:'pi-asc',       iconColor:'#7a4aa8', title:'대운 흐름 분석',       desc:'10년 단위 인생 흐름과 타이밍',          orb:790 },
-      year:           { icon:'pi-sparkle',   iconColor:'#2e6ba8', title:'올해 운세 상세',       desc:'세운확장·월운절기 정밀 데이터',         orb:490 },
-      summary:        { icon:'pi-sparkle',   iconColor:'#a16d1f', title:'사주 포인트 요약',     desc:'3분 진단 — 핵심만 빠르게',              orb:190 },
-      classic:        { icon:'pi-book',      iconColor:'#8b5a2b', title:'고전 명리 해석',       desc:'적천수·자평진전·납음·조후',             orb:590 },
-      qimen_taegil:   { icon:'pi-calendar',  iconColor:'#5a3fc0', title:'기문 택일 14일',       desc:'사업·계약·이사·면접 길일 추천',         orb:390 },
-      qimen_wonmyong: { icon:'pi-compass',   iconColor:'#7a3fc0', title:'기문 본명국 분석',     desc:'출생 9궁이 가리키는 평생 운명',         orb:590 },
-      hidden_talent:  { icon:'pi-sparkle',   iconColor:'#3a4a5a', title:'숨겨진 재능',           desc:'희신·잠재 십신의 미발현 능력',          orb:190 },
-      soulmate:       { icon:'pi-heart',     iconColor:'#7a3a4a', title:'운명의 상대방 유형',    desc:'관성·재성·일지로 보는 끌림 유형',       orb:390 },
-      timing:         { icon:'pi-calendar',  iconColor:'#2e6ba8', title:'인생 타이밍',           desc:'결정·이직·투자 최적 시기',              orb:490 },
-      wealth_timing:  { icon:'pi-chart',     iconColor:'#a16d1f', title:'재물 타이밍',           desc:'대운별·월별 재물 흐름',                 orb:490 },
-      life_mission:   { icon:'pi-send',      iconColor:'#3a5a48', title:'이번 생 미션',           desc:'격국·용신이 가리키는 인생 과제',        orb:390 }
+      qimen_today:    { icon:'pi-clock',     iconColor:'#9a3fc0', title:_rl==='ja'?'今日の奇門運勢':'오늘의 기문 운세',         desc:_rl==='ja'?'今日24時間の吉方·吉時·するべきこと':'오늘 24시간 길방·길시·하면 좋은 일',    orb:290 },
+      character:      { icon:'pi-crystal',   iconColor:'#a16d1f', title:_rl==='ja'?'生まれつきの気質分析':'타고난 기질 분석',   desc:_rl==='ja'?'45種の精密データで見る本質':'45종 정밀 데이터로 보는 본질',          orb:490 },
+      money:          { icon:'pi-coin',      iconColor:'#2a8577', title:_rl==='ja'?'財運·事業分析':'재물·사업 분석',           desc:_rl==='ja'?'財星·食傷·大運で見るお金の流れ':'재성·식상·대운으로 보는 돈의 흐름',     orb:690 },
+      love:           { icon:'pi-heart',     iconColor:'#8b2447', title:_rl==='ja'?'恋愛·結婚分析':'연애·결혼 분석',          desc:_rl==='ja'?'官星·配偶者宮·神殺の精密分析':'관성·배우자궁·신살 정밀 분석',          orb:690 },
+      daeun:          { icon:'pi-asc',       iconColor:'#7a4aa8', title:_rl==='ja'?'大運の流れ分析':'대운 흐름 분석',          desc:_rl==='ja'?'10年単位の人生の流れとタイミング':'10년 단위 인생 흐름과 타이밍',          orb:790 },
+      year:           { icon:'pi-sparkle',   iconColor:'#2e6ba8', title:_rl==='ja'?'今年の運勢詳細':'올해 운세 상세',          desc:_rl==='ja'?'歳運拡張·月運節気の精密データ':'세운확장·월운절기 정밀 데이터',         orb:490 },
+      summary:        { icon:'pi-sparkle',   iconColor:'#a16d1f', title:_rl==='ja'?'四柱ポイント要約':'사주 포인트 요약',       desc:_rl==='ja'?'3分診断 — 核心だけ素早く':'3분 진단 — 핵심만 빠르게',              orb:190 },
+      classic:        { icon:'pi-book',      iconColor:'#8b5a2b', title:_rl==='ja'?'古典命理解釈':'고전 명리 해석',            desc:_rl==='ja'?'滴天髓·子平真詮·納音·調候':'적천수·자평진전·납음·조후',             orb:590 },
+      qimen_taegil:   { icon:'pi-calendar',  iconColor:'#5a3fc0', title:_rl==='ja'?'奇門 14日の吉日':'기문 택일 14일',         desc:_rl==='ja'?'事業·契約·引越·面接の吉日推薦':'사업·계약·이사·면접 길일 추천',         orb:390 },
+      qimen_wonmyong: { icon:'pi-compass',   iconColor:'#7a3fc0', title:_rl==='ja'?'奇門本命局分析':'기문 본명국 분석',         desc:_rl==='ja'?'出生9宮が指す一生の運命':'출생 9궁이 가리키는 평생 운명',         orb:590 },
+      hidden_talent:  { icon:'pi-sparkle',   iconColor:'#3a4a5a', title:_rl==='ja'?'隠れた才能':'숨겨진 재능',                desc:_rl==='ja'?'喜神·潜在十神の未発現能力':'희신·잠재 십신의 미발현 능력',          orb:190 },
+      soulmate:       { icon:'pi-heart',     iconColor:'#7a3a4a', title:_rl==='ja'?'運命の相手のタイプ':'운명의 상대방 유형',  desc:_rl==='ja'?'官星·財星·日支で見る引力タイプ':'관성·재성·일지로 보는 끌림 유형',       orb:390 },
+      timing:         { icon:'pi-calendar',  iconColor:'#2e6ba8', title:_rl==='ja'?'人生のタイミング':'인생 타이밍',            desc:_rl==='ja'?'決断·転職·投資の最適時期':'결정·이직·투자 최적 시기',              orb:490 },
+      wealth_timing:  { icon:'pi-chart',     iconColor:'#a16d1f', title:_rl==='ja'?'財運タイミング':'재물 타이밍',              desc:_rl==='ja'?'大運別·月別の財運の流れ':'대운별·월별 재물 흐름',                 orb:490 },
+      life_mission:   { icon:'pi-send',      iconColor:'#3a5a48', title:_rl==='ja'?'今世のミッション':'이번 생 미션',           desc:_rl==='ja'?'格局·用神が指す人生の課題':'격국·용신이 가리키는 인생 과제',        orb:390 }
     };
 
     // 요일별 추천 (qimen_today 항상 + 분야 2개)
@@ -1268,20 +1269,29 @@
     };
 
     // 격국별 추천 매핑 (geokguk_zpjj 기반)
+    var _GR_JA = {
+      '양인격':'羊刃格 — 強い推進力と本質探求がカギです','건록격':'建禄格 — 安定した基盤で財運と職業を把握しましょう',
+      '식신격':'食神格 — 隠れた才能と表現力が財運の鍵です','상관격':'傷官格 — 創造性と今世のミッションを繋げましょう',
+      '정재격':'正財格 — 安定した財の構造と職業方向を確認を','편재격':'偏財格 — 流動的な財タイミングと事業適性が重要です',
+      '정관격':'正官格 — 名誉と大運の流れの中で決断タイミングを','편관격':'偏官格 — 強い意志を職業とタイミングに繋げて',
+      '정인격':'正印格 — 古典命理と五行バランスが本質を示します','편인격':'偏印格 — 直感と潜在才能、今世の課題を見てください',
+      '양신성상':'両神成象 — 二つの五行の流れと人生課題がカギ','종격':'従格 — 運命の方向と前世パターンが繋がっています',
+      '잡격':'雑格 — まず五行バランスと本質把握が先決です'
+    };
     var GEOKGUK_THEME = {
-      '양인격':   { recs:['character','career_deep','classic'],  reason:'양인격 — 강한 추진력과 본질 탐구가 핵심입니다' },
-      '건록격':   { recs:['character','money','career_deep'],    reason:'건록격 — 안정된 자기 기반으로 재물과 직업을 파악하세요' },
-      '식신격':   { recs:['hidden_talent','money','soulmate'],   reason:'식신격 — 숨겨진 재능과 표현력이 재물의 열쇠입니다' },
-      '상관격':   { recs:['hidden_talent','life_mission','soulmate'], reason:'상관격 — 창의성과 이번 생의 미션을 연결하세요' },
-      '정재격':   { recs:['money','wealth_timing','career_deep'], reason:'정재격 — 안정적 재물 구조와 직업 방향을 점검하세요' },
-      '편재격':   { recs:['money','timing','career_deep'],       reason:'편재격 — 유동적 재물 타이밍과 사업 적성이 중요합니다' },
-      '정관격':   { recs:['character','daeun','timing'],         reason:'정관격 — 명예와 대운 흐름 속 결정 타이밍을 파악하세요' },
-      '편관격':   { recs:['character','career_deep','timing'],   reason:'편관격 — 강한 의지를 직업과 타이밍으로 연결하세요' },
-      '정인격':   { recs:['classic','life_mission','balance'],   reason:'정인격 — 고전 명리와 오행 균형이 본질을 드러냅니다' },
-      '편인격':   { recs:['classic','hidden_talent','life_mission'], reason:'편인격 — 직관과 잠재 재능, 이번 생의 과제를 보세요' },
-      '양신성상': { recs:['classic','life_mission','balance'],   reason:'양신성상 — 두 오행의 흐름과 인생 과제가 핵심입니다' },
-      '종격':     { recs:['life_mission','pastlife','classic'],  reason:'종격 — 운명의 방향과 전생 패턴이 연결되어 있습니다' },
-      '잡격':     { recs:['character','balance','classic'],      reason:'잡기 격국 — 오행 균형과 본질 파악이 먼저입니다' }
+      '양인격':   { recs:['character','career_deep','classic'],  reason:_rl==='ja'?_GR_JA['양인격']:'양인격 — 강한 추진력과 본질 탐구가 핵심입니다' },
+      '건록격':   { recs:['character','money','career_deep'],    reason:_rl==='ja'?_GR_JA['건록격']:'건록격 — 안정된 자기 기반으로 재물과 직업을 파악하세요' },
+      '식신격':   { recs:['hidden_talent','money','soulmate'],   reason:_rl==='ja'?_GR_JA['식신격']:'식신격 — 숨겨진 재능과 표현력이 재물의 열쇠입니다' },
+      '상관격':   { recs:['hidden_talent','life_mission','soulmate'], reason:_rl==='ja'?_GR_JA['상관격']:'상관격 — 창의성과 이번 생의 미션을 연결하세요' },
+      '정재격':   { recs:['money','wealth_timing','career_deep'], reason:_rl==='ja'?_GR_JA['정재격']:'정재격 — 안정적 재물 구조와 직업 방향을 점검하세요' },
+      '편재격':   { recs:['money','timing','career_deep'],       reason:_rl==='ja'?_GR_JA['편재격']:'편재격 — 유동적 재물 타이밍과 사업 적성이 중요합니다' },
+      '정관격':   { recs:['character','daeun','timing'],         reason:_rl==='ja'?_GR_JA['정관격']:'정관격 — 명예와 대운 흐름 속 결정 타이밍을 파악하세요' },
+      '편관격':   { recs:['character','career_deep','timing'],   reason:_rl==='ja'?_GR_JA['편관격']:'편관격 — 강한 의지를 직업과 타이밍으로 연결하세요' },
+      '정인격':   { recs:['classic','life_mission','balance'],   reason:_rl==='ja'?_GR_JA['정인격']:'정인격 — 고전 명리와 오행 균형이 본질을 드러냅니다' },
+      '편인격':   { recs:['classic','hidden_talent','life_mission'], reason:_rl==='ja'?_GR_JA['편인격']:'편인격 — 직관과 잠재 재능, 이번 생의 과제를 보세요' },
+      '양신성상': { recs:['classic','life_mission','balance'],   reason:_rl==='ja'?_GR_JA['양신성상']:'양신성상 — 두 오행의 흐름과 인생 과제가 핵심입니다' },
+      '종격':     { recs:['life_mission','pastlife','classic'],  reason:_rl==='ja'?_GR_JA['종격']:'종격 — 운명의 방향과 전생 패턴이 연결되어 있습니다' },
+      '잡격':     { recs:['character','balance','classic'],      reason:_rl==='ja'?_GR_JA['잡격']:'잡기 격국 — 오행 균형과 본질 파악이 먼저입니다' }
     };
 
     function buildRecoCards(recs, reason) {
@@ -1444,7 +1454,8 @@
     <script>
       (function(){
         var d = new Date();
-        var days = ['일','월','화','수','목','금','토'];
+        var _l = localStorage.getItem('pico_lang') || 'ko';
+        var days = _l === 'ja' ? ['日','月','火','水','木','金','土'] : ['일','월','화','수','목','금','토'];
         document.getElementById('scoreTodayDate').textContent =
           (d.getMonth()+1) + '/' + d.getDate() + ' (' + days[d.getDay()] + ')';
       })();
@@ -1514,7 +1525,12 @@
     if(!hasProfile || dismissed){ wrap.style.display='none'; return; }
     var s = getJourneyState();
     if(s.step1 && s.step2 && s.step3){ wrap.style.display='none'; return; }
-    var steps = [
+    var _jl = localStorage.getItem('pico_lang') || 'ko';
+    var steps = _jl === 'ja' ? [
+      {k:'step1', title:'四柱推命 詳細分析', desc:'日柱·格局·用神まで生まれながらの構造を確認', href:'saju.html', flag:'pico_saju_viewed'},
+      {k:'step2', title:'AI 맞춤 레포트 생성', desc:'財運·恋愛·大運などの深い解釈', href:'index.html?tab=report', flag:'pico_report_viewed'},
+      {k:'step3', title:'AI相談師に質問', desc:'四柱推命ベースの1:1リアルタイムアドバイス', href:'https://kkdmb7-blip.github.io/memox/', flag:'pico_consult_viewed', external:true}
+    ] : [
       {k:'step1', title:'내 사주 상세 분석', desc:'일주·격국·용신까지 내 타고난 구조 보기', href:'saju.html', flag:'pico_saju_viewed'},
       {k:'step2', title:'AI 맞춤 리포트 생성', desc:'재물·연애·대운 등 깊이 있는 해석', href:'index.html?tab=report', flag:'pico_report_viewed'},
       {k:'step3', title:'AI 상담사에게 질문', desc:'내 사주 기반 1:1 실시간 조언', href:'https://kkdmb7-blip.github.io/memox/', flag:'pico_consult_viewed', external:true}
@@ -5773,6 +5789,7 @@ function _scoreColor(s) {
 }
 
 async function loadMiniScore() {
+  var _scoreLang = localStorage.getItem('pico_lang') || 'ko';
   var profile = null;
   try { profile = JSON.parse(localStorage.getItem('pico_profile')); } catch(e) {}
 
@@ -5781,22 +5798,39 @@ async function loadMiniScore() {
     prompt.style.display = '';
     document.getElementById('scoreLoadingRow').style.display = 'none';
     document.getElementById('scoreMiniResult').style.display = 'none';
-    // 로그인 없이 바로 체험 가능
-    prompt.innerHTML =
-      '<p style="margin-bottom:6px;font-size:13px;color:var(--text);font-weight:600;">생년월일만 있으면 오늘 결을 살짝 살펴봐요</p>' +
-      '<p style="margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.6;">로그인 없이 한 번만 둘러봐도 괜찮아요. 점치는 답이 아니라, 마음의 결을 알아두는 도구예요.</p>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px">' +
-        '<input type="number" id="quickYear" placeholder="출생년도" min="1930" max="2010"' +
-          ' style="width:110px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
-          'border-radius:8px;color:var(--text);font-family:\'Noto Serif KR\',sans-serif;font-size:14px;-webkit-appearance:none">' +
-        '<input type="number" id="quickMonth" placeholder="월" min="1" max="12"' +
-          ' style="width:64px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
-          'border-radius:8px;color:var(--text);font-family:\'Noto Serif KR\',sans-serif;font-size:14px;-webkit-appearance:none">' +
-        '<input type="number" id="quickDay" placeholder="일" min="1" max="31"' +
-          ' style="width:64px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
-          'border-radius:8px;color:var(--text);font-family:\'Noto Serif KR\',sans-serif;font-size:14px;-webkit-appearance:none">' +
-      '</div>' +
-      '<button class="btn-cta-hero" onclick="goScoreQuick()" style="font-size:13px;padding:10px 24px;">오늘 결 살펴보기 →</button>';
+    if (_scoreLang === 'ja') {
+      prompt.innerHTML =
+        '<p style="margin-bottom:6px;font-size:13px;color:var(--text);font-weight:600;">生年月日だけで今日の流れを確認できます</p>' +
+        '<p style="margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.6;">ログインなしで一度だけ覗いてみても大丈夫。答えを告げるものではなく、心の在り方を知るツールです。</p>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px">' +
+          '<input type="number" id="quickYear" placeholder="生年" min="1930" max="2010"' +
+            ' style="width:110px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
+            'border-radius:8px;color:var(--text);font-family:\'Noto Serif JP\',sans-serif;font-size:14px;-webkit-appearance:none">' +
+          '<input type="number" id="quickMonth" placeholder="月" min="1" max="12"' +
+            ' style="width:64px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
+            'border-radius:8px;color:var(--text);font-family:\'Noto Serif JP\',sans-serif;font-size:14px;-webkit-appearance:none">' +
+          '<input type="number" id="quickDay" placeholder="日" min="1" max="31"' +
+            ' style="width:64px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
+            'border-radius:8px;color:var(--text);font-family:\'Noto Serif JP\',sans-serif;font-size:14px;-webkit-appearance:none">' +
+        '</div>' +
+        '<button class="btn-cta-hero" onclick="goScoreQuick()" style="font-size:13px;padding:10px 24px;">今日の流れを確認 →</button>';
+    } else {
+      prompt.innerHTML =
+        '<p style="margin-bottom:6px;font-size:13px;color:var(--text);font-weight:600;">생년월일만 있으면 오늘 결을 살짝 살펴봐요</p>' +
+        '<p style="margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.6;">로그인 없이 한 번만 둘러봐도 괜찮아요. 점치는 답이 아니라, 마음의 결을 알아두는 도구예요.</p>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px">' +
+          '<input type="number" id="quickYear" placeholder="출생년도" min="1930" max="2010"' +
+            ' style="width:110px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
+            'border-radius:8px;color:var(--text);font-family:\'Noto Serif KR\',sans-serif;font-size:14px;-webkit-appearance:none">' +
+          '<input type="number" id="quickMonth" placeholder="월" min="1" max="12"' +
+            ' style="width:64px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
+            'border-radius:8px;color:var(--text);font-family:\'Noto Serif KR\',sans-serif;font-size:14px;-webkit-appearance:none">' +
+          '<input type="number" id="quickDay" placeholder="일" min="1" max="31"' +
+            ' style="width:64px;padding:9px 10px;background:var(--surface2);border:1px solid var(--border);' +
+            'border-radius:8px;color:var(--text);font-family:\'Noto Serif KR\',sans-serif;font-size:14px;-webkit-appearance:none">' +
+        '</div>' +
+        '<button class="btn-cta-hero" onclick="goScoreQuick()" style="font-size:13px;padding:10px 24px;">오늘 결 살펴보기 →</button>';
+    }
     return;
   }
 
@@ -5830,13 +5864,23 @@ async function loadMiniScore() {
   } catch(e) {}
 
   var domainOrder = ['money','love','health','wisdom','travel'];
-  var domainInfo  = {
+  var domainInfo  = _scoreLang === 'ja' ? {
+    money:{emoji:'<i class="pi pi-briefcase"></i>',label:'財運/事業'}, love:{emoji:'<i class="pi pi-heart"></i>️',label:'恋愛/対人'},
+    health:{emoji:'<i class="pi pi-rocket"></i>',label:'健康/活力'}, wisdom:{emoji:'<i class="pi pi-eye"></i>',label:'学業/創造'},
+    travel:{emoji:'<i class="pi pi-globe"></i>',label:'移動/変化'},
+  } : {
     money:{emoji:'<i class="pi pi-briefcase"></i>',label:'재물/사업'}, love:{emoji:'<i class="pi pi-heart"></i>️',label:'관계/연애'},
     health:{emoji:'<i class="pi pi-rocket"></i>',label:'건강/활력'}, wisdom:{emoji:'<i class="pi pi-eye"></i>',label:'학업/창의'},
     travel:{emoji:'<i class="pi pi-globe"></i>',label:'이동/변화'},
   };
 
-  var _domainDesc = {
+  var _domainDesc = _scoreLang === 'ja' ? {
+    money: { high:'財運・事業運が強い日です。投資や重要な決断に良い時期。', mid:'財運の流れは平穏です。大きな支出は慎重に検討を。', low:'財運が弱めです。安易な投資や支出は控えましょう。' },
+    love:  { high:'恋愛・対人運が良い日です。新しい出会いや告白に有利。', mid:'対人関係は無難です。誤解が生じないよう意思疎通を大切に。', low:'感情の波がありそうです。大切な会話は明日に回しても。' },
+    health:{ high:'体力と活力に満ちています。運動やアウトドアを積極的に。', mid:'健康状態は普通です。無理せず適度な休息を取りましょう。', low:'疲れが溜まりやすい日です。十分な睡眠と水分補給を。' },
+    wisdom:{ high:'集中力と創造力が高い日です。勉強・企画・発表に最適。', mid:'学業・業務の流れは平凡です。丁寧な確認を習慣に。', low:'集中力が散漫になりやすいです。複雑な判断は先送りを。' },
+    travel:{ high:'移動・変化運が良い日です。旅行・出張・新しい挑戦に吉。', mid:'移動は無難です。時間に余裕を持って行動しましょう。', low:'移動中に変数が生じやすいです。余裕を持って出発を。' }
+  } : {
     money: { high:'재물·사업 운이 강합니다. 투자나 중요한 결정에 좋은 시기입니다.', mid:'재물 흐름은 평이합니다. 큰 지출은 신중히 검토하세요.', low:'재물 운이 약합니다. 섣부른 투자나 지출을 삼가세요.' },
     love:  { high:'관계·연애 운이 좋습니다. 새로운 만남이나 고백에 유리한 날입니다.', mid:'관계는 무난합니다. 오해가 생기지 않도록 소통에 신경 쓰세요.', low:'감정 기복이 있을 수 있습니다. 중요한 대화는 내일로 미루세요.' },
     health:{ high:'체력과 활력이 넘칩니다. 운동이나 야외 활동을 적극 추천합니다.', mid:'건강은 보통입니다. 무리하지 말고 적당한 휴식을 취하세요.', low:'피로가 쌓이기 쉬운 날입니다. 충분한 수면과 수분 섭취를 권합니다.' },
@@ -7467,6 +7511,8 @@ input,textarea,select{-webkit-user-select:text;user-select:text;}
       footer_privacy: '개인정보처리방침',
       footer_kakao_ch: '카카오 채널 추가',
       footer_disclaimer: '본 서비스의 운세 분석은 오락 및 참고 목적으로 제공됩니다.',
+      reco_title: '오늘 당신을 위한 리포트',
+      reco_subtitle: '고민 없이 시작 — 지금 가장 잘 맞는 3가지를 골랐습니다',
     },
     ja: {
       page_title: 'PICO Lab · AI 占いプラットフォーム',
@@ -7590,6 +7636,8 @@ input,textarea,select{-webkit-user-select:text;user-select:text;}
       footer_privacy: 'プライバシーポリシー',
       footer_kakao_ch: 'カカオチャンネル追加',
       footer_disclaimer: '本サービスの占い分析は娯楽および参考目的で提供されます。',
+      reco_title: '今日あなたのためのレポート',
+      reco_subtitle: '迷わずスタート — 今最も合う3つを選びました',
     }
   };
 
@@ -7623,6 +7671,16 @@ input,textarea,select{-webkit-user-select:text;user-select:text;}
     // 토글 버튼 레이블
     var tb = document.getElementById('langToggleBtn');
     if (tb && dict.lang_toggle) tb.textContent = dict.lang_toggle;
+    // 날짜 요일 갱신
+    (function() {
+      var d = new Date();
+      var days = lang === 'ja' ? ['日','月','火','水','木','金','土'] : ['일','월','화','수','목','금','토'];
+      var el = document.getElementById('scoreTodayDate');
+      if (el) el.textContent = (d.getMonth()+1) + '/' + d.getDate() + ' (' + days[d.getDay()] + ')';
+    })();
+    // 동적 섹션 재렌더링 (언어 변경 시)
+    if (window._picoRenderJourney) window._picoRenderJourney();
+    if (typeof loadMiniScore === 'function') loadMiniScore();
   }
 
   window.picoToggleLang = function() {
