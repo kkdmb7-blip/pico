@@ -9,7 +9,7 @@
 <title>리포트 — PICOLAB</title>
 <meta name="theme-color" content="#f5efe4">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
@@ -991,6 +991,14 @@ function navBack() {
 const SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
 const SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 const CHAT_API = 'https://fortuna-silk.vercel.app/api/chat';
+const REPORT_LANG = localStorage.getItem('pico_lang') || 'ko';
+const _rpLocale = () => REPORT_LANG === 'ja' ? 'ja-JP' : 'ko-KR';
+const _regenNoteStr = (orb) => REPORT_LANG === 'ja'
+  ? `再生成時 ${(orb||0).toLocaleString()} Orb 追加消費`
+  : `다시 생성 시 ${(orb||0).toLocaleString()} Orb 추가 차감`;
+const _genLabel = () => REPORT_LANG === 'ja' ? '生成中...' : '생성 중...';
+const _retryLabel = () => REPORT_LANG === 'ja' ? '精度再検証中...' : '정확도 재검증 중...';
+const _createdLabel = () => REPORT_LANG === 'ja' ? '生成日：' : '생성일: ';
 
 // 리포트 버전 — 프롬프트/로직 변경 시 올리면 기존 캐시 자동 무효화
 const REPORT_VERSION = 13;
@@ -1155,6 +1163,62 @@ const TYPE_COLORS = {
   qimen_wonmyong:    { main:'#7a3fc0', soft:'rgba(122,63,192,0.13)', border:'rgba(122,63,192,0.38)' },
   qimen_today:       { main:'#9a3fc0', soft:'rgba(154,63,192,0.13)', border:'rgba(154,63,192,0.38)' },
   qimen_taegil:      { main:'#5a3fc0', soft:'rgba(90,63,192,0.13)',  border:'rgba(90,63,192,0.38)' }
+};
+
+// ── 일본어 TYPE_CONFIG 오버레이 ──
+const TYPE_CONFIG_JA = {
+  character:  { title: '生まれつきの気質レポート', desc: '45種精密計算データ（強弱·格局·滴天髓·子平真詮）基盤 本質分析' },
+  money:      { title: '財運/事業レポート', desc: '精密財運·大運交差·歳運拡張データ基盤 財物構造完全解読' },
+  love:       { title: '恋愛/結婚レポート', desc: '相性·神殺·特殊パターン精密データ＋ヴェーダ7ハウス交差分析' },
+  daeun:      { title: '大運の流れレポート', desc: '大運分離·歳運交差·刑沖会合精密データ＋ダシャー·紫微斗數交差' },
+  year:       { title: '今年の運勢レポート', desc: '歳運拡張·運勢総合スコア·月運節気精密データ基盤 今年詳細分析' },
+  month:      { title: '今月の運勢レポート', desc: '月運節気·歳運交差·刑沖会合精密データ基盤 今月分析' },
+  yongsin:    { title: '用神生活ガイド', desc: '用神再検証·調候·滴天髓·子平真詮精密データ基盤 開運戦略' },
+  vedic_full: { title: 'ヴェーダ運命深層分析', desc: '四柱45種精密データ＋ヴェーダ（ナクシャトラ·ラシ·ダシャー）交差運命解読' },
+  astro_full: { title: '西洋占星術深層分析', desc: '四柱精密データ＋出生チャート惑星配置·トランジット交差分析' },
+  ziwei_full: { title: '紫微斗數深層分析', desc: '四柱精密データ＋紫微斗數宮位（命宮·財帛·官禄·夫妻）交差分析' },
+  triple:     { title: '東西洋統合分析', desc: '45種精密データ＋4システム同時交差—最高精密度分析' },
+  career_deep:{ title: '職業·事業深層分析', desc: '格局·職業適性·十星分布精密データ＋3システム交差職業分析' },
+  child_career:{ title: 'お子さんの進路適性', desc: '五行·用神·格局で見る子どもの生まれつきの才能と最適進路方向' },
+  summary:    { title: '四柱ポイント要約', desc: '45種精密データから核心だけ抜いた3分四柱要約' },
+  balance:    { title: '五行バランスガイド', desc: '強弱数値·調候·通根精密データ基盤 五行バランス診断' },
+  sinsal:     { title: '神殺総まとめ', desc: '貴人·三災·羊刃·元嗔殺など全神殺一目まとめ' },
+  health:     { title: '健康·体質分析', desc: '五行健康マップ—体質·弱臓器·季節管理法精密分析' },
+  family:     { title: '家族·縁分析', desc: '十神宮位·元嗔殺·貴人データで見る家族縁構造' },
+  timing:     { title: '人生タイミングガイド', desc: '大運転換期·歳運交差·十二運星データ基盤 タイミング分析' },
+  wealth_lifetime: { title: '私の人生財運曲線', desc: '四柱大運8個＋紫微斗數財帛·四化総合—生涯財運流れ曲線チャート含む' },
+  monthly_calendar:{ title: '私の12ヶ月精密カレンダー', desc: '歳運月別精密データ＋12ヶ月運勢棒グラフ—毎月確認するカレンダーレポート' },
+  wealth_timing:   { title: '財運タイミング特化', desc: '財運·大運交差·運勢総合スコア基盤 財運タイミング分析' },
+  classic:    { title: '古典命理解釈', desc: '滴天髓·子平真詮·納音·調候古典原文基盤解釈' },
+  guide:      { title: 'この人の取扱説明書', desc: '親·配偶者·友人·同僚がこの人をどう対すれば良いか—日干·十神·格局データで関係マニュアル整理' },
+  pastlife:   { title: '前世分析', desc: '納音·日柱·神殺·格局基盤 前世アイデンティティ·生·カルマ·今生ミッション' },
+  soulmate:   { title: '運命の相手タイプ', desc: '官星·日柱·十神分布で読み解く"私の四柱が本当に惹かれる人"のプロフィール' },
+  saju_poem:  { title: '四柱一行詩', desc: '五行·日柱·格局のエネルギーを詩的言語で解き明かします' },
+  life_mission:{ title: '今生のミッション', desc: '格局·用神·十神構造で読み解く今生の核心課題' },
+  villain:    { title: '私の四柱ヴィラン気質', desc: '忌神·過多十神·極沖が作る私の中の暗いパターンとヴィラン気質' },
+  nemesis:    { title: '私を疲弊させる人タイプ', desc: '忌神·沖·刑·破構造で見る私のエネルギーを消耗させる人のタイプ' },
+  love_history:{ title: '恋愛黒歴史パターン', desc: '官星·財星·日支配偶者宮構造で見る繰り返される恋愛失敗パターン' },
+  era:        { title: '私が生まれるべきだった時代', desc: '日柱·納音·格局が指す この四柱が全盛期を誇ったはずの歴史時代' },
+  hidden_talent:{ title: '私の四柱の隠れた才能', desc: '喜神·用神·潜在五行が隠してあるまだ発現されていない能力' },
+  totem:      { title: '私の四柱守護動物', desc: '五行·日柱·納音が指す 私の守護動物とそのエネルギーの意味' },
+  vedic_nakshatra: { title: '私のナクシャトラの正体', desc: '27ナクシャトラの神話·象徴·気質で見る私の魂の星座' },
+  vedic_pada:      { title: 'ナクシャトラ パーダ4細分', desc: '同じナクシャトラでもパーダ(1~4)で変わる性向細分分析' },
+  vedic_dasha_life:{ title: '120年ダシャー人生地図', desc: 'ヴィムショッタリ·ダシャー120年全体ロードマップと各惑星期のテーマ' },
+  vedic_yoga:      { title: '私のチャートのヨーガ発見', desc: 'ラージャ/ダナ/パンチャマハプルシャ/グルチャンダラなどヨーガ組み合わせ深層分析' },
+  vedic_atmakaraka:{ title: '魂の惑星 Atmakaraka', desc: 'Jaimini占星術の魂の惑星（Atmakaraka）が指す今生の核心テーマ' },
+  vedic_karakamsha:{ title: 'カーラカームシャ霊的使命', desc: 'Navamsa（D9）内Atmakaraka位置で読む解脱·霊的完成の方向' },
+  vedic_sadesati:  { title: 'サーデー·サーティー土星7.5年診断', desc: '土星が月の星座前·上·後3ハウスを通る7.5年試練期分析' },
+  vedic_sandhi:    { title: 'ダシャー転換期警報', desc: 'マハ·アンタル·ダシャーSandhi（転換期）区間のエネルギー混乱と準備戦略' },
+  vedic_ashtakavarga:{ title: 'アシュタカヴァルガ 人生の強弱', desc: '7惑星のベネフィック点数（0~56点）で見る人生各領域の強弱' },
+  vedic_navamsa:   { title: 'ナバームサD9 結婚·運命', desc: 'D9ナバームサチャートで見る結婚相手·霊的成熟·潜在運命' },
+  vedic_moon:      { title: 'ラシ（月宮）感情の根源', desc: '月の星座（ラシ）で見る内面感情構造と無意識パターン' },
+  vedic_ascendant: { title: 'ラグナ ペルソナ', desc: '上昇宮（ラグナ）で見た外的ペルソナ·身体·世界が見る私' },
+  vedic_remedy:    { title: '惑星別開運（Upaya）', desc: '弱い惑星を強化するヴェーダ伝統開運法（マントラ·色·曜日·奉仕）' },
+  vedic_gemstone:  { title: '私の惑星宝石', desc: 'Atmakarakaと吉惑星が指すヴェーダ伝統宝石処方' },
+  vedic_muhurta:   { title: '7日吉時カレンダー', desc: '今週7日各日のTithi·Nakshatra·Muhurta 吉凶時間帯' },
+  qimen_wonmyong:  { title: '奇門本命局分析', desc: '出生時点の奇門布局で見た生涯運命—直符星·九星·八門本命' },
+  qimen_today:     { title: '今日の奇門精密運勢', desc: '今日24時間の9宮布局で見た吉方·吉時·しやすいこと' },
+  qimen_taegil:    { title: '奇門択日ガイド（14日）', desc: '今週~来週14日の流れで事業·契約·引越·面接の吉日推薦' }
 };
 
 function applyTypeTheme() {
@@ -1524,6 +1588,208 @@ const TYPE_SECTIONS = {
     { name:'피해야 할 날과 그 이유', chars: 400 }
   ]
 };
+
+// ── 일본어 섹션명 ──
+const TYPE_SECTIONS_JA = {
+  character: [
+    { name: '核心気質要約', chars: 300 },
+    { name: '日干と格局分析', chars: 600 },
+    { name: '強み·弱みと五行バランス', chars: 500 },
+    { name: 'ヴェーダ ナクシャトラで見たパターン', chars: 400 },
+    { name: '気質を活かす実践方向', chars: 400 }
+  ],
+  money: [
+    { name: '財運構造核心要約', chars: 300 },
+    { name: '財星·食傷分析', chars: 600 },
+    { name: '事業適性と職業方向', chars: 500 },
+    { name: '財運 大運·歳運の流れ', chars: 500 },
+    { name: '財運を育てる実践戦略', chars: 400 }
+  ],
+  love: [
+    { name: '恋愛パターン核心要約', chars: 300 },
+    { name: '官星·配偶者宮分析', chars: 600 },
+    { name: '理想のタイプと相性の良い相手', chars: 500 },
+    { name: '縁の時期（大運·歳運·ヴェーダ）', chars: 500 },
+    { name: '今の恋愛でするべきこと', chars: 400 }
+  ],
+  daeun: [
+    { name: '現在大運核心要約', chars: 300 },
+    { name: '大運天干·地支深層分析', chars: 600 },
+    { name: '大運別 財運·職業·関係の流れ', chars: 500 },
+    { name: 'ヴェーダ ダシャー交差分析', chars: 500 },
+    { name: 'この大運の戦略と次の大運の準備', chars: 400 }
+  ],
+  year: [
+    { name: '2026年核心要約', chars: 300 },
+    { name: '歳運天干·地支分析', chars: 500 },
+    { name: '分野別運勢（財運·職業·恋愛·健康）', chars: 600 },
+    { name: '月別主要な流れ', chars: 500 },
+    { name: '2026年実践戦略', chars: 400 }
+  ],
+  month: [
+    { name: '今月核心要約', chars: 250 },
+    { name: '月建天干·地支十神分析', chars: 500 },
+    { name: '分野別今月の流れ', chars: 500 },
+    { name: '今月の注意事項と機会', chars: 400 },
+    { name: '今月実践戦略', chars: 300 }
+  ],
+  yongsin: [
+    { name: '用神核心概要', chars: 300 },
+    { name: '色·方位活用法', chars: 400 },
+    { name: '食事·健康管理法', chars: 400 },
+    { name: '職業·環境構成', chars: 500 },
+    { name: '日柱別カスタム実践戦略', chars: 500 }
+  ],
+  vedic_full: [
+    { name: 'ナクシャトラ核心気質（四柱交差）', chars: 300 },
+    { name: 'ラシ·アセンダント深層分析', chars: 500 },
+    { name: 'ダシャーで見る現在の運気', chars: 500 },
+    { name: '四柱·ヴェーダ交差パターン', chars: 500 },
+    { name: 'ヴェーダ開運法と統合戦略', chars: 400 }
+  ],
+  astro_full: [
+    { name: '出生チャート核心要約（四柱交差）', chars: 300 },
+    { name: '主要惑星配置分析', chars: 500 },
+    { name: '四柱·西洋占星交差分析', chars: 500 },
+    { name: '金星·火星·土星で見る関係·職業', chars: 500 },
+    { name: '2026年トランジットと実践戦略', chars: 400 }
+  ],
+  ziwei_full: [
+    { name: '命宮主星気質（四柱交差）', chars: 300 },
+    { name: '財帛宮で見る財運構造', chars: 500 },
+    { name: '官禄宮で見る職業·事業', chars: 500 },
+    { name: '現在大限·流年の運気', chars: 500 },
+    { name: '夫妻·交友宮と関係戦略', chars: 400 }
+  ],
+  summary: [
+    { name: '私の四柱核心プロフィール', chars: 300 },
+    { name: '今年の運勢核心ポイント', chars: 300 },
+    { name: '今すぐ実践すること3つ', chars: 300 }
+  ],
+  balance: [
+    { name: '五行分布の現状', chars: 300 },
+    { name: '不足·過剰五行の影響', chars: 400 },
+    { name: '五行補完実践法', chars: 400 }
+  ],
+  sinsal: [
+    { name: '私の吉神総まとめ', chars: 400 },
+    { name: '注意神殺と解消法', chars: 400 },
+    { name: '今年の神殺影響と戦略', chars: 300 }
+  ],
+  health: [
+    { name: '体質構造と五行健康マップ', chars: 400 },
+    { name: '弱臓器と健康注意時期', chars: 400 },
+    { name: '体質別健康管理法', chars: 400 }
+  ],
+  family: [
+    { name: '親·目上の縁構造', chars: 400 },
+    { name: '配偶者·子どもの縁構造', chars: 400 },
+    { name: '家族関係改善戦略', chars: 300 }
+  ],
+  timing: [
+    { name: '現在の人生局面診断', chars: 300 },
+    { name: '今後3年の核心タイミング', chars: 400 },
+    { name: '大運転換期分析', chars: 400 },
+    { name: '今年月別タイミングポイント', chars: 400 },
+    { name: 'タイミング活用実践戦略', chars: 400 }
+  ],
+  wealth_lifetime: [
+    { name: '財運の器—生涯潜在力等級', chars: 350 },
+    { name: '財運が入ってくる通路', chars: 350 },
+    { name: '人生財運曲線と頂点·低点', chars: 450 },
+    { name: '注意時期と財運リスクシグナル', chars: 350 },
+    { name: '実践戦略—器を育て流れに乗る', chars: 400 }
+  ],
+  wealth_timing: [
+    { name: '財運エネルギー構造核心', chars: 300 },
+    { name: '大運別財運の流れ', chars: 400 },
+    { name: '今年の財運タイミング', chars: 400 },
+    { name: '月別財運ポイント', chars: 400 },
+    { name: '財運最大化実践戦略', chars: 400 }
+  ],
+  classic: [
+    { name: '滴天髓 日干論解釈', chars: 400 },
+    { name: '子平真詮 格局分析', chars: 500 },
+    { name: '調候·納音解釈', chars: 400 },
+    { name: '通根·日柱総合論', chars: 400 },
+    { name: '古典観点 人生方向', chars: 400 }
+  ],
+  guide: [
+    { name: 'この人の性格·スタイル要約', chars: 350 },
+    { name: '会話で注意すべきポイント', chars: 500 },
+    { name: 'ストレス·怒りの対処法', chars: 450 },
+    { name: '信頼を得て心を開かせる方法', chars: 450 },
+    { name: '絶対やってはいけないこと', chars: 400 }
+  ],
+  pastlife: [
+    { name: '前世のアイデンティティ', chars: 350 },
+    { name: '前世の生と死', chars: 450 },
+    { name: 'カルマと今生のミッション', chars: 450 },
+    { name: '今生に残る前世の痕跡', chars: 400 },
+    { name: '前世カルマを解消する方法', chars: 350 }
+  ],
+  soulmate: [
+    { name: '運命の相手 核心プロフィール', chars: 350 },
+    { name: '私の四柱が惹かれる相手の気質', chars: 450 },
+    { name: '繰り返される関係パターン', chars: 450 },
+    { name: '最適なパートナーの条件', chars: 400 },
+    { name: '縁を引き寄せる実践戦略', chars: 350 }
+  ],
+  life_mission: [
+    { name: '今生ミッション宣言', chars: 350 },
+    { name: 'ミッションの起源—なぜこの課題か', chars: 450 },
+    { name: '今生の核心挑戦3つ', chars: 450 },
+    { name: 'ミッションを妨げる内面パターン', chars: 400 },
+    { name: 'ミッション達成ロードマップ', chars: 400 }
+  ],
+  villain: [
+    { name: 'ヴィラン気質の核心', chars: 400 },
+    { name: '黒歴史パターン分析', chars: 500 },
+    { name: '私の中の暗い面', chars: 450 },
+    { name: 'ヴィラン気質が爆発する状況', chars: 400 },
+    { name: 'ヴィランをヒーローに—転換戦略', chars: 400 }
+  ],
+  nemesis: [
+    { name: '私を最も疲弊させるタイプ', chars: 400 },
+    { name: 'なぜその人が辛いのか', chars: 500 },
+    { name: '繰り返される衝突パターン', chars: 450 },
+    { name: '消耗を防ぐ関係戦略', chars: 400 },
+    { name: '私を成長させる関係への転換', chars: 400 }
+  ],
+  love_history: [
+    { name: '恋愛黒歴史 核心パターン', chars: 400 },
+    { name: '惹かれるのに毎回失敗する理由', chars: 500 },
+    { name: '私が繰り返す失敗', chars: 450 },
+    { name: '関係が壊れる決定的な瞬間', chars: 400 },
+    { name: '黒歴史を断ち切る実践戦略', chars: 400 }
+  ],
+  era: [
+    { name: '私が生まれるべきだった時代', chars: 450 },
+    { name: 'その時代でどんな人生を送ったか', chars: 500 },
+    { name: '現代に残るその時代の痕跡', chars: 400 },
+    { name: '現代でその時代のエネルギーを活用する法', chars: 400 },
+    { name: '今生で完成させるべき時代的課題', chars: 350 }
+  ],
+  hidden_talent: [
+    { name: '隠れた才能の核心', chars: 400 },
+    { name: 'なぜ今まで発現しなかったか', chars: 450 },
+    { name: '才能が隠れている四柱構造', chars: 450 },
+    { name: '才能が爆発する条件', chars: 400 },
+    { name: '今すぐ才能を引き出す方法', chars: 400 }
+  ],
+  totem: [
+    { name: '私の守護動物', chars: 400 },
+    { name: '守護動物が持つエネルギー', chars: 450 },
+    { name: '守護動物が守る領域', chars: 400 },
+    { name: '守護動物と私の関係', chars: 400 },
+    { name: '守護動物エネルギー活用法', chars: 350 }
+  ]
+};
+
+function _TS(t) {
+  var sec = (REPORT_LANG === 'ja' && TYPE_SECTIONS_JA[t]) ? TYPE_SECTIONS_JA[t] : TYPE_SECTIONS[t];
+  return sec || TYPE_SECTIONS.character || [];
+}
 
 const SECTION_FOCUS = {
   character: [
@@ -4526,13 +4792,54 @@ async function loadSharedReportById(reportId) {
   } catch(e) { return false; }
 }
 
+// ── 일본어 정적 UI 번역 ──
+function applyReportI18n() {
+  if (REPORT_LANG !== 'ja') return;
+  const _el = (id) => document.getElementById(id);
+  const _setText = (id, t) => { const e = _el(id); if (e) e.textContent = t; };
+  _setText('loadingTitle', '準備中...');
+  _setText('loadingDesc', '少々お待ちください');
+  const _sl = document.querySelector('.intro-section-label');
+  if (_sl) _sl.textContent = '含まれる内容';
+  const _bg = _el('btnGenerate');
+  if (_bg) _bg.innerHTML = '<i class="pi pi-sparkle"></i> レポートを生成する<span class="btn-intro-gen-sub" id="introOrbCost"></span>';
+  const _bib = document.querySelector('.btn-intro-back');
+  if (_bib) _bib.textContent = '戻る';
+  const _pt = document.querySelector('#statePersonality .pers-title');
+  if (_pt) _pt.textContent = 'より精密な分析のために';
+  const _ps = document.querySelector('#statePersonality .pers-subtitle');
+  if (_ps) _ps.textContent = '4つだけ答えてください';
+  const _pqs = document.querySelectorAll('#statePersonality .pers-q');
+  const _pqJa = [
+    { q: '集まりに行くと？', a: ['先に話しかける', '話しかけてもらうのを待つ'] },
+    { q: '新しいことを始めるとき？', a: ['まず計画を立てる', 'とりあえず始める'] },
+    { q: '決断するとき？', a: ['論理的に考える', '感覚・直感に従う'] },
+    { q: 'ストレスを感じたら？', a: ['人に会って発散', '一人の時間が必要'] }
+  ];
+  _pqs.forEach((pq, i) => {
+    const qText = pq.querySelector('.pers-q-text');
+    if (qText && _pqJa[i]) qText.textContent = _pqJa[i].q;
+    const btns = pq.querySelectorAll('.pers-btn');
+    btns.forEach((b, j) => { if (_pqJa[i] && _pqJa[i].a[j]) b.textContent = _pqJa[i].a[j]; });
+  });
+  _setText('btnStartAnalysis', '分析を開始する');
+  const _pb = document.querySelector('#statePersonality .pers-back');
+  if (_pb) _pb.textContent = '戻る';
+  const _db = document.querySelector('#stateDetail .detail-back');
+  if (_db) _db.textContent = '← 一覧へ';
+}
+
 // ── 초기화 ──
 (async function init() {
   try { localStorage.setItem('pico_report_viewed', '1'); } catch(e) {}
+  applyReportI18n();
   const params = new URLSearchParams(location.search);
   _type = params.get('type');
   _config = TYPE_CONFIG[_type];
   if (!_config) { setLoading('잘못된 접근', '리포트 타입이 올바르지 않아요'); return; }
+  if (REPORT_LANG === 'ja' && TYPE_CONFIG_JA[_type]) {
+    _config = Object.assign({}, _config, TYPE_CONFIG_JA[_type]);
+  }
 
   document.getElementById('navTitle').textContent = _config.title;
 
@@ -6810,7 +7117,7 @@ function renderIntro() {
   const secWrap = document.getElementById('introSections');
   secWrap.innerHTML = '';
   {
-    const sections = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
+    const sections = _TS(_type);
     sections.forEach((s, i) => {
       const el = document.createElement('div');
       el.className = 'intro-section-item';
@@ -7094,7 +7401,7 @@ function buildProfileStr() {
 // ── 섹션별 프롬프트 ──
 function buildSectionPrompt(secIdx, prevSections) {
   const profileStr = buildProfileStr();
-  const typeSections = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
+  const typeSections = _TS(_type);
   const secName = typeSections[secIdx].name;
   const charLimit = typeSections[secIdx].chars;
   const focus = _config.focus;
@@ -7211,11 +7518,11 @@ function renderReport(sections, createdAt) {
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  document.getElementById('reportMeta').textContent = `생성일: ${createdAt ? new Date(createdAt).toLocaleDateString('ko-KR') : ''}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${createdAt ? new Date(createdAt).toLocaleDateString(_rpLocale()) : ''}`;
 
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
-  const _sectionCount = (TYPE_SECTIONS[_type] || TYPE_SECTIONS.character).length;
+  const _sectionCount = (_TS(_type)).length;
   sections.slice(0, _sectionCount).forEach((text, i) => {
     const card = document.createElement('div');
     card.className = 'section-card';
@@ -7223,7 +7530,7 @@ function renderReport(sections, createdAt) {
     card.innerHTML = `
       <div class="section-header">
         <div class="section-num">${i+1}</div>
-        <div class="section-name">${(TYPE_SECTIONS[_type] || TYPE_SECTIONS.character)[i]?.name || ''}</div>
+        <div class="section-name">${(_TS(_type))[i]?.name || ''}</div>
       </div>
       <div class="section-body">${renderMarkdown(text)}</div>
       <div class="sec-expand-hint">탭하여 전체 보기 ↓</div>`;
@@ -7231,7 +7538,7 @@ function renderReport(sections, createdAt) {
   });
   { const _t = document.getElementById('secDensityToggle'); if (_t) _t.style.display = 'flex'; }
 
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -7341,7 +7648,7 @@ async function startCharacterGeneration() {
 async function generateCharacterReport() {
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = '생성 중...';
+  document.getElementById('reportMeta').textContent = _genLabel();
 
   // 성향 키워드 빌드
   const pk = [];
@@ -7527,9 +7834,9 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   const _savedData = await safeInsertReport(allTexts, getProfileKey());
   if (_savedData) _reportId = _savedData.id;
 
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -7537,10 +7844,10 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 async function generateMoneyReport() {
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = '생성 중...';
+  document.getElementById('reportMeta').textContent = _genLabel();
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
-  TYPE_SECTIONS.money.forEach((s, i) => {
+  _TS('money').forEach((s, i) => {
     const card = document.createElement('div');
     card.className = 'section-card'; card.id = `section-${i}`;
     card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
@@ -7614,9 +7921,9 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   await streamToSections(prompt2B, [3,4], '재물 구조 분석', ysFinal, wg, true);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -7624,10 +7931,10 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 async function generateLoveReport() {
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = '생성 중...';
+  document.getElementById('reportMeta').textContent = _genLabel();
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
-  TYPE_SECTIONS.love.forEach((s, i) => {
+  _TS('love').forEach((s, i) => {
     const card = document.createElement('div');
     card.className = 'section-card'; card.id = `section-${i}`;
     card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
@@ -7694,9 +8001,9 @@ ${buildAccuracyLayerBlock()}
   await streamToSections(prompt2B, [3,4], '연애 구조 분석', ysFinal, wg, true);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -7704,10 +8011,10 @@ ${buildAccuracyLayerBlock()}
 async function generateDaeunReport() {
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = '생성 중...';
+  document.getElementById('reportMeta').textContent = _genLabel();
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
-  TYPE_SECTIONS.daeun.forEach((s, i) => {
+  _TS('daeun').forEach((s, i) => {
     const card = document.createElement('div');
     card.className = 'section-card'; card.id = `section-${i}`;
     card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
@@ -7782,9 +8089,9 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   await streamToSections(prompt2B, [3,4], '대운 분석', ysFinal, wg, true);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -7793,10 +8100,10 @@ async function generateYearReport() {
   showState('report');
   const thisYear = new Date().getFullYear();
   document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = '생성 중...';
+  document.getElementById('reportMeta').textContent = _genLabel();
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
-  TYPE_SECTIONS.year.forEach((s, i) => {
+  _TS('year').forEach((s, i) => {
     const card = document.createElement('div');
     card.className = 'section-card'; card.id = `section-${i}`;
     card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
@@ -7865,9 +8172,9 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   await streamToSections(prompt2B, [3,4], `${thisYear}년 세운 분석`, ysFinal, wg, true);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -7877,10 +8184,10 @@ async function generateMonthReport() {
   const now = new Date();
   const thisYear = now.getFullYear(), thisMonth = now.getMonth()+1;
   document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = '생성 중...';
+  document.getElementById('reportMeta').textContent = _genLabel();
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
-  TYPE_SECTIONS.month.forEach((s, i) => {
+  _TS('month').forEach((s, i) => {
     const card = document.createElement('div');
     card.className = 'section-card'; card.id = `section-${i}`;
     card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
@@ -7977,9 +8284,9 @@ ${buildAccuracyLayerBlock()}
   await streamToSections(prompt2B, [3,4], `${monthStr} 월운 분석`, ysFinal, wg, true);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')} (${monthStr})`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())} (${monthStr})`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -7987,10 +8294,10 @@ ${buildAccuracyLayerBlock()}
 async function generateYongsinReport() {
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = '생성 중...';
+  document.getElementById('reportMeta').textContent = _genLabel();
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
-  TYPE_SECTIONS.yongsin.forEach((s, i) => {
+  _TS('yongsin').forEach((s, i) => {
     const card = document.createElement('div');
     card.className = 'section-card'; card.id = `section-${i}`;
     card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
@@ -8062,9 +8369,9 @@ ${buildAccuracyLayerBlock()}
 
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -8072,10 +8379,10 @@ ${buildAccuracyLayerBlock()}
 async function setupSectionsAndDeductOrb() {
   showState('report');
   document.getElementById('reportTitle').textContent = _config.title;
-  document.getElementById('reportMeta').textContent = '생성 중...';
+  document.getElementById('reportMeta').textContent = _genLabel();
   const wrap = document.getElementById('sectionsWrap');
   wrap.innerHTML = '';
-  (TYPE_SECTIONS[_type] || []).forEach((s, i) => {
+  (_TS(_type)).forEach((s, i) => {
     const card = document.createElement('div');
     card.className = 'section-card'; card.id = `section-${i}`;
     card.innerHTML = `<div class="section-header"><div class="section-num">${i+1}</div><div class="section-name">${s.name}</div></div><div class="section-loading" id="sloading-${i}"><div class="dot-spin"></div> 분석 중...</div><div class="section-body" id="sbody-${i}" style="display:none;"></div>`;
@@ -8164,9 +8471,9 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
   await streamToSections(prompt2B, [3,4], '베딕·사주 통합 분석', ysFinal, '', true);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -8218,7 +8525,7 @@ async function generateVedicPrecisionReport(cfg) {
   const vp = buildVedicPrecisionBlock(cfg.precisionOpts || {});
   const ysFinal = _yongsin || _sdFull?.yongshin?.primary || '미확인';
   const profileStr = `이름: ${_profile?.name||'사용자'} / 성별: ${_profile?.gender==='F'?'여성':'남성'} / 일주: ${_ilju||'미확인'} / 용신: ${ysFinal}`;
-  const sections = TYPE_SECTIONS[_type] || [];
+  const sections = _TS(_type);
   const theoryName = cfg.theoryName || '베딕 정밀 분석';
   // 베딕 공통 베이스라인 + 타입특화 룰
   const vedicSys = cfg.customSys ? `${VEDIC_BASE_SYS}\n\n${cfg.customSys}` : VEDIC_BASE_SYS;
@@ -8256,9 +8563,9 @@ ${secB}
   await streamToSections(prompt2B, [3,4], theoryName, ysFinal, '', true, vedicSys);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -8891,9 +9198,9 @@ ${buildAccuracyLayerBlock()}
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
   await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex';
   showConsultBanner();
 }
@@ -8979,9 +9286,9 @@ ${buildAccuracyLayerBlock()}
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
   await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex';
   showConsultBanner();
 }
@@ -9063,9 +9370,9 @@ ${buildAccuracyLayerBlock()}
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
   await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex';
   showConsultBanner();
 }
@@ -9116,9 +9423,9 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
   await streamToSections(prompt2B, [3,4], '서양 점성술·사주 통합 분석', ysFinal, '', true);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -9291,9 +9598,9 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
   await streamToSections(prompt2B, [3,4], '자미두수·사주 통합 분석', ysFinal, '', true);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -9351,9 +9658,9 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
   await streamToSections(prompt2B, [3,4], '동서양 통합 분석', ysFinal, '', true);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -9413,9 +9720,9 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
   await streamToSections(prompt2B, [3,4], '직업·사업 심층 분석', ysFinal, '', true);
   const allTexts = Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||'');
     await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -9476,9 +9783,9 @@ ${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
     await safeInsertReport(allTexts, getProfileKey());
   } catch(e) {}
 
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex';
   showConsultBanner();
 }
@@ -9498,9 +9805,9 @@ async function generateSummaryReport() {
     '\n\n총 400~600자. 섹션 번호(1. 2. 3.) 붙여 작성. 간결하고 임팩트 있게.';
   await streamToSections(prompt, [0,1,2], '사주 포인트 요약', ysFinal, '', true);
   const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9515,9 +9822,9 @@ async function generateBalanceReport() {
   const prompt = `${profileStr}\n\n${sb2}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 오행 분포 현황 — 오행 개수(${fiveCountStr})와 비율(${fivePctStr}), 신강/신약(${_singang||'미확인'})으로 본 이 사주의 에너지 구조. 가장 강한 오행과 가장 약한 오행이 만드는 체질적 특성.\n2. 부족·과잉 오행의 영향 — 부족한 오행이 성격·건강·재물·관계에 미치는 구체적 영향. 과잉된 오행이 만드는 편향과 약점. 용신(${ysFinal})이 이 불균형을 어떻게 보완하는지.\n3. 오행 보완 실천법 — 부족 오행을 보완하는 색상(옷·소품), 방위(집·사무실), 음식, 계절별 생활습관. 용신 오행 중심으로 지금 당장 실천할 구체적 방법 5가지.\n\n총 500~700자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt, [0,1,2], '오행 밸런스 분석', ysFinal, '', true);
   const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9531,9 +9838,9 @@ async function generateSinsalReport() {
   const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAccuracyLayerBlock()}\n\n섹션 구성:\n1. 나의 길신 총정리 — 이 사주에 존재하는 모든 길신(천을귀인, 문창귀인, 천덕귀인, 월덕귀인, 학당, 역마 등)을 빠짐없이 정리. 각 길신이 어느 기둥에 있고 실생활에서 어떻게 발현되는지 구체적으로.\n2. 주의 신살과 해소법 — 삼재, 양인살, 원진살, 귀문관살, 백호대살, 겁살, 화개살 등 주의 필요한 신살 총정리. 각 흉신의 실제 영향과 구체적인 해소·완화 방법.\n3. 올해 신살 영향과 전략 — 올해 세운 ${_sewun||''}에서 새로 활성화되거나 해소되는 신살. 올해 특히 주의할 신살과 활용할 길신. 신살 기반 올해 전략.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성. 【사주 정밀분석】 블록의 신살 데이터를 정확히 인용.`;
   await streamToSections(prompt, [0,1,2], '신살 종합 분석', ysFinal, '', true);
   const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9548,9 +9855,9 @@ async function generateHealthReport() {
   const prompt = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock()}\n${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}\n\n오행↔장기 매핑: 목(간·담·눈·근육), 화(심장·소장·혀·혈관), 토(비위·위장·입·살), 금(폐·대장·코·피부), 수(신장·방광·귀·뼈)\n\n섹션 구성:\n1. 체질 구조와 오행 건강 지도 — 오행 분포(${fivePctStr})와 신강/신약(${_singang||'미확인'})으로 본 체질 유형. 강한 오행이 지배하는 장기(과잉 주의)와 약한 오행이 취약한 장기(보강 필요)를 구체적으로 매핑.\n2. 취약 장기와 건강 주의 시기 — 오행 부족/과잉이 만드는 구체적 건강 위험과 증상. 현재 대운 ${_curDaeunBL||_daeun||'미확인'}과 올해 세운이 건강에 미치는 영향. 특히 조심할 계절과 시기.\n3. 체질 맞춤 건강 관리법 — 용신 오행(${ysFinal}) 기반 보강 음식·운동·생활습관. 부족 오행 보완 식단. 계절별 주의사항. 지금 당장 실천할 건강 전략 3가지.\n\n총 600~900자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt, [0,1,2], '건강·체질 분석', ysFinal, '', true);
   const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9564,9 +9871,9 @@ async function generateFamilyReport() {
   const prompt = `${profileStr}\n\n${sb2}\n${buildAccuracyLayerBlock()}\n\n사주 기둥: 년주(${pillars.year||'?'}) 월주(${pillars.month||'?'}) 일주(${pillars.day||'?'}) 시주(${pillars.hour||'?'})\n십신궁위 참고: 년주=조상·부모(아버지) 궁, 월주=부모(어머니)·형제 궁, 일지=배우자 궁, 시주=자녀 궁\n\n섹션 구성:\n1. 부모·윗사람 인연 구조 — 년주·월주의 십신과 관계로 본 부모와의 인연. 인성(어머니)·편재/정재(아버지) 위치와 강약. 부모로부터 받는 에너지와 갈등 패턴. 귀인이 년월에 있으면 부모 복.\n2. 배우자·자녀 인연 구조 — 일지(배우자궁)의 십신으로 본 배우자 기질과 궁합 패턴. 시주의 십신으로 본 자녀 인연과 자녀 성향. 원진살·귀문관살이 배우자·자녀궁에 있으면 구체적 영향.\n3. 가족 관계 개선 전략 — 약한 인연을 보완하는 구체적 방법. 갈등이 예상되는 관계의 소통 전략. 귀인 활용법. 용신(${ysFinal}) 기반 가족 관계 개운법 3가지.\n\n총 600~800자. 섹션 번호(1. 2. 3.) 붙여 작성.`;
   await streamToSections(prompt, [0,1,2], '가족·인연 분석', ysFinal, '', true);
   const allTexts=Array.from({length:3},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9588,9 +9895,9 @@ async function generateGuideReport() {
   await streamToSections(promptB, [3,4], '이 사람 사용설명서', ysFinal, '', true);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); const _data = await safeInsertReport(allTexts, getProfileKey()); if (_data) _reportId = _data.id;
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9661,9 +9968,9 @@ ${shinsalStr}
   await streamToSections(promptB, [3,4], '전생 분석', '', '', true, pastlifeSys);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9716,9 +10023,9 @@ ${genderNote}
   await streamToSections(soulmatePromptB, [3,4], '운명의 상대방 분석', ysFinal, '', true);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9779,9 +10086,9 @@ ${_geokguk||'이 격국'}의 구조를 하나의 이야기 구도로. 격국의 
   await streamToSections(poemPromptB, [3,4], '사주 시 창작', '', '', true, poemSys);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9844,9 +10151,9 @@ ${shinsalStr3}
   await streamToSections(missionPromptB, [3,4], '이번 생 미션 분석', ysFinal, '', true);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9897,9 +10204,9 @@ ${sb2}${buildAccuracyLayerBlock()}
   await streamToSections(promptB, [3,4], '빌런 기질 분석', ysFinal, '', true, villainSys);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -9948,9 +10255,9 @@ ${sb2}${buildAccuracyLayerBlock()}
   await streamToSections(promptB, [3,4], '에너지 소진 관계 분석', ysFinal, '', true);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -10011,9 +10318,9 @@ ${genderNote}
   await streamToSections(promptB, [3,4], '연애 흑역사 분석', ysFinal, '', true, loveHistSys);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -10063,9 +10370,9 @@ async function generateEraReport() {
   await streamToSections(promptB, [3,4], '시대 에너지 분석', ysFinal, '', true, eraSys);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -10117,9 +10424,9 @@ ${sb2}${buildAccuracyLayerBlock()}
   await streamToSections(promptB, [3,4], '숨겨진 재능 분석', ysFinal, '', true);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -10175,9 +10482,9 @@ async function generateTotemReport() {
   await streamToSections(promptB, [3,4], '수호 동물 분석', ysFinal, '', true, totemSys);
 
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -10193,9 +10500,9 @@ async function generateTimingReport() {
   const prompt2B = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['창업/비즈니스','대인관계/부부'])}\n${buildYongsinBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 올해 월별 타이밍 포인트 — 올해 12개월 중 에너지가 강한 달, 주의할 달, 결정에 좋은 달을 구체적으로. 월별 천간·지지와 일간의 관계 기반.\n5. 타이밍 활용 실전 전략 — 이직·전직 최적 시기, 투자·계약 적기, 연애·결혼 유리한 시기, 건강 주의 시기를 종합. 지금 당장 타이밍에 맞춰 실행할 액션 3가지.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '인생 타이밍 분석', ysFinal, '', true);
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -10808,9 +11115,9 @@ ${buildYongsinBlock()}${buildAccuracyLayerBlock()}
 
   const allTexts = Array.from({length:5}, (_,i) => document.getElementById(`sbody-${i}`)?.innerText || '');
   await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -10895,9 +11202,9 @@ ${buildYongsinBlock()}${buildOhangWarningBlock()}${buildAccuracyLayerBlock()}
 
   const allTexts = Array.from({length:5}, (_,i) => document.getElementById(`sbody-${i}`)?.innerText || '');
   await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent = `생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent = `${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML = _config.emoji + ' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display = 'flex'; showConsultBanner();
 }
 
@@ -10912,9 +11219,9 @@ async function generateWealthTimingReport() {
   const prompt2B = `${profileStr}\n\n${sb2}\n${db}\n올해 세운: ${_sewun||'미확인'}\n${buildAdviceBlock(['투자/재테크'])}\n${buildYongsinBlock()}${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 월별 재물 포인트 — 올해 12개월 중 재물 에너지가 활성화되는 달, 지출 주의 달, 투자 적기를 구체적으로. 월별 재성·식상 활성도 기반.\n5. 재물 극대화 실천 전략 — 이 사주 구조에 맞는 재물 전략(저축형/투자형/사업형). 용신(${ysFinal}) 기반 재물 개운법. 지금 당장 실행할 재물 액션 3가지와 절대 피해야 할 재물 패턴.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성. 구체적 금액·종목 예측 절대 금지.`;
   await streamToSections(prompt2B, [3,4], '재물 타이밍 분석', ysFinal, '', true);
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
@@ -10934,17 +11241,18 @@ async function generateClassicReport() {
   const prompt2B = `${profileStr}\n\n${sb2}\n${buildAccuracyLayerBlock()}\n\n섹션 구성:\n4. 통근·일주 종합론 — 일간의 통근(뿌리) 강약을 고전 관점에서 분석. 어느 기둥에 뿌리가 있고 얼마나 강한지. 일주(${_ilju||''}) 60갑자 특성을 고전 명리 관점으로 해석.\n5. 고전 관점 인생 방향 — 적천수·자평진전·조후·납음을 종합한 이 사주의 인생 방향과 처세 지침. 고전 명리가 권하는 삶의 자세와 주의점. 실생활 적용 방향 3가지.\n\n총 500~700자. 섹션 번호(4. 5.) 붙여 작성.`;
   await streamToSections(prompt2B, [3,4], '고전 명리 해석', ysFinal, '', true);
   const allTexts=Array.from({length:5},(_,i)=>document.getElementById(`sbody-${i}`)?.innerText||''); await safeInsertReport(allTexts, getProfileKey());
-  document.getElementById('reportMeta').textContent=`생성일: ${new Date().toLocaleDateString('ko-KR')}`;
+  document.getElementById('reportMeta').textContent=`${_createdLabel()}${new Date().toLocaleDateString(_rpLocale())}`;
   document.getElementById('reportBadge').innerHTML=_config.emoji+' AI REPORT';
-  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = `다시 생성 시 ${_config.orb.toLocaleString()} Orb 추가 차감`; }
+  { const _rn = document.getElementById('regenNote'); if (_rn) _rn.textContent = _regenNoteStr(_config.orb); }
   document.getElementById('reportActions').style.display='flex'; showConsultBanner();
 }
 
 // ── 응답을 섹션별 순차 호출로 표시 (1섹션 = 1 API 호출) ──
 async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isFirst, customSys) {
-  const typeSec = TYPE_SECTIONS[_type] || TYPE_SECTIONS.character;
+  const typeSec = _TS(_type);
+  const _langPrefix = REPORT_LANG === 'ja' ? '必ず全文を日本語で書いてください。\n\n' : '';
   // system prompt는 모든 섹션에서 동일 → 프롬프트 캐싱 히트
-  const sysPrompt = customSys || ((_type === 'guide')
+  const sysPrompt = _langPrefix + (customSys || ((_type === 'guide')
     ? `당신은 사주 기반 '관계 가이드' 작성자입니다.
 이 리포트는 당사자가 아니라 그를 가까이에서 대하는 사람(부모·배우자·연인·친구·동료)을 위한 관계 매뉴얼입니다.
 
@@ -11007,7 +11315,7 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
 - 본문 안에서 소항목 번호 쓸 때는 가), 나), 다) 형식 사용 (1. 2. 3. 사용 금지)
 - 분석 범위를 벗어난 미래 시점(다음 달, 내년 등) 예측·대비·언급 절대 금지
 - 【사주 정밀분석】 블록이 포함된 경우, 그 안의 문장은 서버에서 수리적으로 계산 완료된 확정 사실입니다. 수치·판정·결론을 절대 변경하지 마세요.
-- 프롬프트에 명시된 연도·기간·퍼센트 수치를 그대로 인용하세요. 새로운 연도나 기간을 만들어내거나 추측하지 마세요.${wg || ''}`);
+- 프롬프트에 명시된 연도·기간·퍼센트 수치를 그대로 인용하세요. 새로운 연도나 기간을 만들어내거나 추측하지 마세요.${wg || ''}`));
 
   // 환각 방지 가드 — 사주 기반 리포트만 (기문 등은 9궁 천간이 자유롭게 등장하므로 skip)
   const isQimenReport = (_type === 'qimen_wonmyong' || _type === 'qimen_today' || _type === 'qimen_taegil'
@@ -11028,7 +11336,9 @@ async function streamToSections(prompt, secIndices, theoryName, ysFinal, wg, isF
     const secNum = localIdx + 1;
     const secName = typeSec[localIdx]?.name || '';
     const secChars = typeSec[localIdx]?.chars || 400;
-    const sectionPrompt = prompt + `\n\n[작성 지시] 위 내용에서 섹션 ${secNum}번 "${secName}"만 작성하세요. 다른 섹션은 절대 쓰지 마세요. 분량: 약 ${secChars}자. 섹션 제목 반복 금지.`;
+    const sectionPrompt = prompt + (REPORT_LANG === 'ja'
+      ? `\n\n[作成指示] 上記の内容からセクション${secNum}番「${secName}」のみを必ず日本語で書いてください。他のセクションは絶対に書かないでください。分量：約${secChars}字。セクションタイトルの繰り返し禁止。`
+      : `\n\n[작성 지시] 위 내용에서 섹션 ${secNum}번 "${secName}"만 작성하세요. 다른 섹션은 절대 쓰지 마세요. 분량: 약 ${secChars}자. 섹션 제목 반복 금지.`);
     // 기문 리포트는 mode='raw' (chat.js 일진 자동 주입 우회) + 환각검증 skip
     await runSingleSection(secIdx, secName, secChars, sectionPrompt, finalSys, 0, isQimenReport ? 'raw' : 'saju', isQimenReport);
   }
@@ -11044,7 +11354,7 @@ async function runSingleSection(secIdx, secName, secChars, sectionPrompt, sysPro
   const sloadEl = document.getElementById(`sloading-${secIdx}`);
   if (sloadEl) {
     sloadEl.style.display = 'flex';
-    sloadEl.innerHTML = retryCount > 0 ? '<span class="spin"></span> 정확도 재검증 중...' : '<span class="spin"></span> 생성 중...';
+    sloadEl.innerHTML = retryCount > 0 ? `<span class="spin"></span> ${_retryLabel()}` : `<span class="spin"></span> ${_genLabel()}`;
   }
   try {
     // 환각 재시도일 경우 system_prompt에 강조 룰 추가 (사주 리포트만)
@@ -11386,7 +11696,64 @@ function showConsultBanner() {
     qimen_today:        { title:'오늘 결정 앞에서 한 호흡이 필요하다면', desc:'시간대·방향·활동을\n<em>기문둔갑 전문 상담사</em>가 개인 차트와 함께 짚어드려요.' },
     qimen_taegil:       { title:'14일 안 중요한 일정 앞에서 호흡이 필요하다면', desc:'사업·계약·이사 길일을\n<em>기문둔갑 전문 상담사</em>가 개인 사주와 함께 정리해드려요.' }
   };
-  const t = bannerTexts[_type] || { title: '리포트 내용이 궁금하신가요?', desc: 'AI 분석을 바탕으로 <em>전문 상담사</em>가 더 깊은 해석과<br>실질적인 조언을 1:1로 같이 살펴봐 드릴게요.' };
+  const bannerTextsJa = {
+    character:  { title: '自分の気質をもっと深く知りたいなら', desc: '生まれ持った気質と可能性を\n<em>専門鑑定士</em>が1:1で丁寧に読み解きます。' },
+    money:      { title: '財運の流れが気になるなら', desc: '投資の時期と事業の方向を\n<em>専門鑑定士</em>とゆっくり話し合いましょう。' },
+    love:       { title: '縁のことが気になって揺れているなら', desc: '縁の時期と相手との相性を\n<em>専門鑑定士</em>が1:1で丁寧に読み解きます。' },
+    daeun:      { title: '大運の流れをどう受け取るか悩んでいるなら', desc: '今の大運での心の流れを\n<em>専門鑑定士</em>と一緒に整理しましょう。' },
+    year:       { title: '今年をどう過ごすかゆっくり考えているなら', desc: '月ごとの流れと心の重さを\n<em>専門鑑定士</em>が1:1で丁寧に読み解きます。' },
+    month:      { title: '今月気になる部分があるなら', desc: 'この時期に集中すべきことを\n<em>専門鑑定士</em>と一緒に確認しましょう。' },
+    yongsin:    { title: '用神を日常にどう活かすか悩んでいるなら', desc: '色·方位·職業への活用法を\n<em>専門鑑定士</em>と生活の中で整理しましょう。' },
+    guide:      { title: 'この人との関係をもっと深く知りたいなら', desc: 'AIが示したガイドをもとに\n<em>専門鑑定士</em>が1:1で丁寧に読み解きます。' },
+    vedic_full: { title: 'ヴェーダのナクシャトラ·ダシャをより深く知りたいなら', desc: '<em>専門鑑定士</em>が惑星配置を\n物語として一緒に読み解きます。' },
+    astro_full: { title: '西洋占星術全般を一緒に見ていきたいなら', desc: '出生チャートのアスペクト·ハウスの意味を\n<em>専門鑑定士</em>が丁寧に読み解きます。' },
+    ziwei_full: { title: '紫微斗数12宮をより深く知りたいなら', desc: '本命宮·大限·流年の流れを\n<em>専門鑑定士</em>が1:1で丁寧に読み解きます。' },
+    triple:     { title: '東西洋3系統の交差をじっくり味わいたいなら', desc: '四柱·ヴェーダ·占星の共通点と違いを\n<em>専門鑑定士</em>が統合的視野で読み解きます。' },
+    career_deep:{ title: '職業·事業の決断を前に揺れているなら', desc: '適性·タイミング·リスクを\n<em>専門鑑定士</em>と落ち着いて整理しましょう。' },
+    child_career:{ title: 'お子さんの進路に親としてどう向き合うか悩んでいるなら', desc: 'AIレポートをもとに<em>専門鑑定士</em>が\nお子さんの気質·教育方針を一緒に読み解きます。' },
+    summary:    { title: '要約の先をもっと深く知りたいなら', desc: '要約の奥に隠れた詳細を\n<em>専門鑑定士</em>が一緒に解き明かします。' },
+    balance:    { title: '五行バランスの処方を日常にどう活かすか', desc: '色·方位·食事·職業の日常処方を\n<em>専門鑑定士</em>と一緒に整理しましょう。' },
+    sinsal:     { title: '神殺の意味が気になるなら', desc: '作用の強さと心の整え方を\n<em>専門鑑定士</em>が一緒に読み解きます。' },
+    health:     { title: '健康·体質の観点からもう一度見てみたいなら', desc: '五行体質·弱点管理法を\n<em>専門鑑定士</em>が生活の中で丁寧に読み解きます。' },
+    family:     { title: '家族関係が気になる部分があるなら', desc: '親·兄弟·子供の関係力学を\n<em>専門鑑定士</em>が1:1で丁寧に読み解きます。' },
+    timing:     { title: '大事な選択のタイミングをもう一度整理したいなら', desc: '引越·転職·結婚などの時期判断を\n<em>専門鑑定士</em>と一緒に確認しましょう。' },
+    wealth_timing:{ title: '財運のタイミングを前に揺れているなら', desc: '投資·契約·事業開始の時機を\n<em>専門鑑定士</em>と落ち着いて整理しましょう。' },
+    wealth_lifetime:{ title: '人生の財運曲線をより深く知りたいなら', desc: '曲線の山·谷と心の流れを\n<em>専門鑑定士</em>が1:1で丁寧に読み解きます。' },
+    classic:    { title: '古典命理を現代の日常にどう活かすか悩んでいるなら', desc: '滴天髄·窮通宝鑑の観点を\n<em>専門鑑定士</em>が日常の言葉で解き明かします。' },
+    pastlife:   { title: '前世のカルマをこの人生でどう受け取るか', desc: 'AIが読み取ったカルマミッションをもとに\n<em>専門鑑定士</em>と落ち着いて整理しましょう。' },
+    soulmate:   { title: '運命の相手タイプをより深く知りたいなら', desc: 'AIが分析したパートナー像をもとに\n<em>専門鑑定士</em>が出逢いの流れを読み解きます。' },
+    saju_poem:  { title: '自分の命式の詩をもう一度味わいたいなら', desc: '詩的分析の奥にある具体的な文脈を\n<em>専門鑑定士</em>が日常の言葉で解き明かします。' },
+    life_mission:{ title: 'この人生のミッション、どこから始めるか迷っているなら', desc: 'AIが導き出したミッションをもとに\n<em>専門鑑定士</em>が今できる一歩を一緒に示します。' },
+    villain:    { title: '自分の暗い面をどう受け取るか悩んでいるなら', desc: 'AIが読み取ったパターンをもとに\n<em>専門鑑定士</em>が心の流れを一緒に整理します。' },
+    nemesis:    { title: 'エネルギーを消耗する関係に悩んでいるなら', desc: '消耗のタイプと構造を\n<em>専門鑑定士</em>と落ち着いて整理しましょう。' },
+    love_history:{ title: '恋愛の黒歴史が気になるなら', desc: 'AIが分析したパターンをもとに\n<em>専門鑑定士</em>が一緒に読み解きます。' },
+    era:        { title: '私の時代エネルギーを現代にどう活かすか', desc: 'その時代のエネルギーを現在の日常に活かす法を\n<em>専門鑑定士</em>と一緒に整理しましょう。' },
+    hidden_talent:{ title: '隠れた才能をどう引き出すかゆっくり考えているなら', desc: 'AIが見つけた才能をもとに\n<em>専門鑑定士</em>が一歩を一緒に示します。' },
+    totem:      { title: '守護動物の流れをより深く知りたいなら', desc: '守護動物のエネルギーを人生に活かす法を\n<em>専門鑑定士</em>と一緒に整理しましょう。' },
+    vedic_nakshatra:  { title:'ナクシャトラ解釈をより深く聞きたいなら', desc:'AIが読んだナクシャトラの気質をもとに\n<em>専門鑑定士</em>が神話·ダシャ·実践まで1:1で読み解きます。' },
+    vedic_pada:       { title:'パーダ細分分析をもう一度確認したいなら', desc:'同じナクシャトラの中の4つの顔のうち自分のパーダを\n<em>専門鑑定士</em>がD9まで繋げて解説します。' },
+    vedic_dasha_life: { title:'ダシャの人生マップをゆっくり整理したいなら', desc:'120年のダシャの流れと各惑星期のテーマを\n<em>専門鑑定士</em>と落ち着いて確認しましょう。' },
+    vedic_yoga:       { title:'ヨーガの組み合わせをより深く見ていきたいなら', desc:'ラージャ·ダナ·パンチャマハープルシャ·ヨーガを\n<em>専門鑑定士</em>が活性時期·開運まで一緒に確認します。' },
+    vedic_atmakaraka: { title:'魂の惑星をより深く理解したいなら', desc:'AtmakarakaのテーマをJaiminiの観点から\n<em>専門鑑定士</em>と人生への活かし方まで整理しましょう。' },
+    vedic_karakamsha: { title:'霊的使命の方向が気になるなら', desc:'Karakamshaが指す解脱の方向を\n<em>専門鑑定士</em>が実践の言葉で一緒に解き明かします。' },
+    vedic_sadesati:   { title:'サデサティの時期、気持ちが重くなっているなら', desc:'現在のフェーズと試練のテーマを\n<em>専門鑑定士</em>と伝統的な対処法と一緒に確認しましょう。' },
+    vedic_sandhi:     { title:'ダシャの転換期に大きな決断を前にしているなら', desc:'Sandhi期の揺れと機会を\n<em>専門鑑定士</em>と落ち着いて整理しましょう。' },
+    vedic_ashtakavarga:{ title:'人生の各領域の強弱をより深く知りたいなら', desc:'Ashtakavargaスコアの解釈と弱点補強を\n<em>専門鑑定士</em>が一緒に確認します。' },
+    vedic_navamsa:    { title:'D9 結婚·運命をより深く知りたいなら', desc:'ナヴァムシャが指す結婚·霊的成熟を\n<em>専門鑑定士</em>が1:1で丁寧に読み解きます。' },
+    vedic_moon:       { title:'感情の根源が気になるなら', desc:'ラーシ（月宮）分析をもとに\n<em>専門鑑定士</em>が感情安定の流れを一緒に読み解きます。' },
+    vedic_ascendant:  { title:'ラグナ·ペルソナの流れが知りたいなら', desc:'外的ペルソナを人生に活かす法を\n<em>専門鑑定士</em>が日常の言葉で解き明かします。' },
+    vedic_remedy:     { title:'開運の実践、どこから始めるか整理したいなら', desc:'AIが見つけた弱い惑星の開運法を\n<em>専門鑑定士</em>が40日ルーティンで一緒に示します。' },
+    vedic_gemstone:   { title:'宝石の処方をもう一度確認したいなら', desc:'ナヴァラトナ宝石の選択と浄化·着用法を\n<em>専門鑑定士</em>が1:1で丁寧に読み解きます。' },
+    vedic_muhurta:    { title:'今週の吉時に決断の一呼吸が必要なら', desc:'契約·旅行·新出発の最適な時間を\n<em>専門鑑定士</em>が個人チャートと一緒に確認します。' },
+    qimen_wonmyong:   { title:'本命局が指す人生の方向をより深く', desc:'9宮布局が一生どう作用するか\n<em>奇門遁甲専門鑑定士</em>が1:1で丁寧に読み解きます。' },
+    qimen_today:      { title:'今日の決断を前に一呼吸必要なら', desc:'時間帯·方向·活動を\n<em>奇門遁甲専門鑑定士</em>が個人チャートと一緒に確認します。' },
+    qimen_taegil:     { title:'14日以内に重要な予定を前に一呼吸必要なら', desc:'事業·契約·引越の吉日を\n<em>奇門遁甲専門鑑定士</em>が個人命式と一緒に整理します。' }
+  };
+  const _bt = REPORT_LANG === 'ja' ? bannerTextsJa : bannerTexts;
+  const _defaultBanner = REPORT_LANG === 'ja'
+    ? { title: 'レポートの内容をもっと深く知りたいですか？', desc: 'AI分析をもとに<em>専門鑑定士</em>がより深い解釈と<br>実質的なアドバイスを1:1でお伝えします。' }
+    : { title: '리포트 내용이 궁금하신가요?', desc: 'AI 분석을 바탕으로 <em>전문 상담사</em>가 더 깊은 해석과<br>실질적인 조언을 1:1로 같이 살펴봐 드릴게요.' };
+  const t = _bt[_type] || _defaultBanner;
   document.getElementById('consultTitle').textContent = t.title;
   document.getElementById('consultDesc').innerHTML = t.desc.replace(/\n/g, '<br>');
   document.getElementById('consultBanner').style.display = 'block';
