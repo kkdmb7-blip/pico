@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>서양 점성술 출생 차트 · FORTUNA</title>
 <meta name="theme-color" content="#f5efe4">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <link rel="stylesheet" href="pico-icons.css">
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
@@ -388,6 +388,138 @@
 </main>
 
 <script>
+// ── i18n ──────────────────────────────────────────────────
+const ASTRO_LANG = localStorage.getItem('pico_lang') || 'ko';
+const SIGN_JA = {
+  Aries:'牡羊座', Taurus:'牡牛座', Gemini:'双子座', Cancer:'蟹座',
+  Leo:'獅子座', Virgo:'乙女座', Libra:'天秤座', Scorpio:'蠍座',
+  Sagittarius:'射手座', Capricorn:'山羊座', Aquarius:'水瓶座', Pisces:'魚座'
+};
+const PLANET_JA = {
+  Sun:'太陽', Moon:'月', Mercury:'水星', Venus:'金星', Mars:'火星',
+  Jupiter:'木星', Saturn:'土星', Uranus:'天王星', Neptune:'海王星',
+  Ascendant:'アセンダント', Midheaven:'MC(中天)'
+};
+const ASPECT_JA = {
+  Conjunction:'コンジャンクション', Sextile:'セクスタイル', Square:'スクエア',
+  Trine:'トライン', Opposition:'オポジション'
+};
+const BIG3_DESC_JA = { '태양궁':'私の本質·核心自己', '달궁':'感情·無意識パターン', '상승궁':'他者から見た第一印象' };
+const PLANET_ROLE_JA = {
+  Sun:'自己·アイデンティティ·生命力', Moon:'感情·本能·母', Mercury:'思考·コミュニケーション·移動',
+  Venus:'愛·美·財', Mars:'行動·欲求·情熱', Jupiter:'拡大·幸運·知恵',
+  Saturn:'責任·制限·カルマ', Uranus:'革新·変化·自由', Neptune:'直感·理想·幻想',
+  Ascendant:'第一印象·外的態度', Midheaven:'社会的目標·名声'
+};
+const ASPECT_DESC_JA = {
+  Conjunction:'強烈な結合·融合', Sextile:'穏やかな機会', Square:'緊張·成長の課題',
+  Trine:'才能·自然な流れ', Opposition:'均衡要求·統合の課題'
+};
+const SUN_INTERP_JA = {
+  Aries:'開拓者の気質。エネルギーに満ちた先駆者で、挑戦を好み行動が早い。瞬時の判断力が卓越し、主導権を握ることを好みます。',
+  Taurus:'安定を求める現実主義者。忍耐強く、感覚的な喜びを大切にします。一度決めたら揺るがない意志を持ちます。',
+  Gemini:'知的好奇心の象徴。多才でコミュニケーションを楽しむ社交家。二つのことを同時にこなすマルチタスク能力が強みです。',
+  Cancer:'深い感受性を持つ保護者。家族と親密な関係を大切にします。強い直感力と共感力で周囲を包み込みます。',
+  Leo:'生まれながらのリーダー。創造的でカリスマ溢れ、舞台の中心を楽しみます。寛大で温かい心で人を導く力があります。',
+  Virgo:'緻密な分析家。完璧主義的傾向で実用的、奉仕精神が強い。細部を見逃さない鋭い観察力を持ちます。',
+  Libra:'調和を求める外交官。公平さと美しさに敏感で、関係を重視します。バランスの取れた判断力で仲裁者役を得意とします。',
+  Scorpio:'深みのある探求者。強烈な集中力と洞察力で本質を見抜きます。表面の奥を見る力で秘密と心理に強いです。',
+  Sagittarius:'自由を愛する哲学者。楽観的で冒険を楽しみ、広い視野を持ちます。真実へ向かう飽くなき探求心が人生の原動力。',
+  Capricorn:'責任感の強い戦略家。目標に向かって黙々と進む忍耐と野心を持ちます。時を経るほど輝く成熟したエネルギー。',
+  Aquarius:'革新を夢見る人道主義者。独立的で未来志向の思考で時代を先取り。集団の利益のために自らを捧げます。',
+  Pisces:'境界なき感受性。共感力が高く創造的で直感が強い。芸術と霊性の分野で特別な才能を発揮します。'
+};
+const MOON_INTERP_JA = {
+  Aries:'感情が即座で強烈。素早く燃え上がり素早く冷める情熱型。怒っても早く回復する回復力が強みです。',
+  Taurus:'情緒的な安定を渇望します。変化にゆっくり適応し、一貫した愛情を与えます。安定した環境で最も豊かな感情を体験します。',
+  Gemini:'感情が変化しやすく知的。対話で感情を解消するタイプ。感情を言語化する能力が高く、言葉や文章で表現するとき癒されます。',
+  Cancer:'感情が非常に豊かで直感的。傷つきやすいが深く愛します。家と家族に情緒的な安らぎを求める傾向が強い。',
+  Leo:'温かく寛大な感情表現。認められると情緒的充足感を感じます。愛する人に惜しみなく与える黄金のような心を持ちます。',
+  Virgo:'感情を分析し実用的に処理します。心配が多いが細やかに配慮します。役立つ行動で愛を表現する奉仕型の感情パターン。',
+  Libra:'関係の中に感情的均衡を求めます。葛藤を避けようとする傾向が強い。パートナーシップと調和に深い情緒的満足感を得ます。',
+  Scorpio:'感情が深く強烈。疑い深いが一度信じると絶対的に献身します。感情の深奥まで探ることを恐れません。',
+  Sagittarius:'自由で楽観的な感情パターン。束縛されると不快感を感じます。旅と新しい体験の中で感情的活力を充電します。',
+  Capricorn:'感情表現が節制されて実用的。信頼を築くのに時間がかかります。内面深くに温かい責任感と献身を秘めています。',
+  Aquarius:'感情より理性が先行します。独立心が強く、集団より個人空間を好みます。人類愛の感情でより広い世界へ向かって開かれています。',
+  Pisces:'感情が海のように深く広い。共感力が卓越しているが境界設定が難しい。夢と想像の世界で豊かな感情的栄養を得ます。'
+};
+const ASC_INTERP_JA = {
+  Aries:'第一印象が強くエネルギッシュ。直接的で自信があって見えます。どんな状況でも主導権を握るリーダーイメージ。',
+  Taurus:'落ち着いて信頼感のある外見。余裕があって穏やかな雰囲気。初対面の人に安心感と頼もしさを与えます。',
+  Gemini:'活発で知的な印象。表情が豊かで話が速い。初対面でもすぐ仲良くなれる親しみやすい雰囲気。',
+  Cancer:'柔らかく温かな第一印象。母性的または保護者のようなイメージ。相手を落ち着かせる居心地よい雰囲気が特徴。',
+  Leo:'堂々として華やかな存在感。どこでも注目を集める雰囲気を放ちます。自然に視線を引く王者のカリスマ。',
+  Virgo:'清潔感があり知的な印象。几帳面で慎重に見えます。洗練された分析的イメージで専門家の信頼感を与えます。',
+  Libra:'優雅で魅力的な外見。人々を安心させる雰囲気。美と均衡に対する感覚が外見にも現れます。',
+  Scorpio:'神秘的で強烈な瞳。深みがあり、容易に本音を見せません。最初は距離感があるように見えるが魅力が強い。',
+  Sagittarius:'率直で開放的な印象。活動的で自由に見えます。笑顔が多く楽観的なエネルギーが周囲を明るくします。',
+  Capricorn:'成熟して慎重な外見。責任感があってプロフェッショナルなイメージ。実年齢より成熟して見え、信頼感ある印象。',
+  Aquarius:'ユニークで個性的な印象。人と違う自分だけのスタイル。先を行く人のように見え、容易に規定されません。',
+  Pisces:'夢幻的で神秘的な雰囲気。芸術的で感受性がありそう。柔らかく流動的なイメージで夢見るような印象。'
+};
+const _sn = s => ASTRO_LANG === 'ja' ? (SIGN_JA[s] || s) : (SIGN_KO[s] || s);
+const _pn = p => ASTRO_LANG === 'ja' ? (PLANET_JA[p] || p) : (PLANET_KO[p] || p);
+const _an = a => ASTRO_LANG === 'ja' ? (ASPECT_JA[a] || a) : (ASPECT_KO[a] || a);
+const _b3desc = r => ASTRO_LANG === 'ja' ? (BIG3_DESC_JA[r] || '') : (BIG3_DESC[r] || '');
+const _prole = p => ASTRO_LANG === 'ja' ? (PLANET_ROLE_JA[p] || '') : (PLANET_ROLE[p] || '');
+const _adesc = t => ASTRO_LANG === 'ja' ? (ASPECT_DESC_JA[t] || '') : (ASPECT_DESC_KO[t] || '');
+const _sunI  = () => ASTRO_LANG === 'ja' ? SUN_INTERP_JA  : SUN_INTERP;
+const _moonI = () => ASTRO_LANG === 'ja' ? MOON_INTERP_JA : MOON_INTERP;
+const _ascI  = () => ASTRO_LANG === 'ja' ? ASC_INTERP_JA  : ASC_INTERP;
+const _houseL = n => ASTRO_LANG === 'ja' ? (n + 'ハウス') : (n + '하우스');
+function applyAstroI18n() {
+  if (ASTRO_LANG !== 'ja') return;
+  const _qs = (sel) => document.querySelector(sel);
+  const _qsa = (sel) => document.querySelectorAll(sel);
+  const h1 = _qs('.page-title');
+  if (h1) h1.innerHTML = '西洋 <em>占星術</em> 出生チャート';
+  const sl = _qs('.section-label');
+  _qsa('.section-label').forEach((el, i) => {
+    const texts = ['核心3要素', '全惑星配置', '主要アスペクト', '現代語解釈'];
+    if (texts[i]) el.textContent = texts[i];
+  });
+  const ths = _qsa('.planet-table th');
+  const thTexts = ['惑星', '星座', '度数', 'ハウス'];
+  ths.forEach((th, i) => { if (thTexts[i]) th.textContent = thTexts[i]; });
+  const tabs = _qsa('.interp-tab');
+  const tabTexts = ['太陽宮', '月宮', 'アセンダント', 'アスペクト'];
+  tabs.forEach((t, i) => {
+    if (!tabTexts[i]) return;
+    const icon = t.querySelector('i') || (t.textContent.startsWith('↑') ? null : null);
+    if (i === 0) t.innerHTML = '<i class="pi pi-sun"></i> ' + tabTexts[i];
+    else if (i === 1) t.innerHTML = '<i class="pi pi-moon"></i> ' + tabTexts[i];
+    else if (i === 2) t.innerHTML = '↑ ' + tabTexts[i];
+    else t.innerHTML = '<i class="pi pi-bolt"></i> ' + tabTexts[i];
+  });
+  const navBtn = _qs('nav .nav-btn');
+  if (navBtn) navBtn.textContent = 'AI占星相談';
+  const hookTitle = _qs('#astroReportHook div');
+  if (hookTitle) hookTitle.innerHTML = '<i class="pi pi-star"></i> 星が語る私の運命 →';
+  const hookSub = _qs('#astroReportHook a > div:last-child');
+  if (hookSub) hookSub.textContent = 'AIが読み解く私だけの占星術深層レポート';
+  const suggestTitle = _qs('#astroReportSuggestWrap > div:first-child');
+  if (suggestTitle) suggestTitle.textContent = 'このチャートで精密レポートを受ける';
+  const suggestSub = _qs('#astroReportSuggestWrap > div:nth-child(2)');
+  if (suggestSub) suggestSub.textContent = '惑星配置 + 四柱精密データ交差 — 東西洋統合分析';
+  const reportLinks = _qsa('#astroReportSuggestWrap a');
+  if (reportLinks[0]) {
+    const t1 = reportLinks[0].querySelector('div:nth-child(2) > div');
+    if (t1) t1.textContent = '西洋占星術深層分析';
+    const s1 = reportLinks[0].querySelector('div:nth-child(2) > div:last-child');
+    if (s1) s1.textContent = '四柱精密データ + 惑星配置·トランジット交差分析';
+  }
+  if (reportLinks[1]) {
+    const t2 = reportLinks[1].querySelector('div:nth-child(2) > div');
+    if (t2) t2.textContent = '東西洋統合分析';
+  }
+  const allReportsLink = _qs('#astroReportSuggestWrap > a:last-child');
+  if (allReportsLink) allReportsLink.innerHTML = '<i class="pi pi-list"></i> 全レポートを見る →';
+  const kakaoBtn = _qs('#astroShareBtnWrap button');
+  if (kakaoBtn) { kakaoBtn.querySelector('div')?.innerHTML && (kakaoBtn.querySelector('div').innerHTML = '<i class="pi pi-chat"></i> カカオトークで共有 →'); }
+  const shareLinks = _qsa('#astroShareBtnWrap a');
+  if (shareLinks[0]) shareLinks[0].querySelector('div')?.innerHTML && (shareLinks[0].querySelector('div').innerHTML = '<i class="pi pi-sparkle"></i> AI占星相談 →');
+  if (shareLinks[1]) shareLinks[1].querySelector('div')?.innerHTML && (shareLinks[1].querySelector('div').innerHTML = '<i class="pi pi-person"></i> 専門鑑定士に相談 →');
+}
 // ── 데이터 ────────────────────────────────────────────────
 const SIGN_KO = {
   Aries:'양자리', Taurus:'황소자리', Gemini:'쌍둥이자리', Cancer:'게자리',
@@ -530,24 +662,28 @@ const ASPECT_DESC_KO = {
 function renderBig3(planets) {
   const get = name => planets.find(p => p.name === name);
   const sun = get('Sun'), moon = get('Moon'), asc = get('Ascendant');
+  const _rn = ASTRO_LANG === 'ja'
+    ? ['太陽宮', '月宮', 'アセンダント']
+    : ['태양궁', '달궁', '상승궁'];
+  const _rk = ['태양궁', '달궁', '상승궁'];
   const items = [
-    { icon:'<i class="pi pi-sun"></i>', role:'태양궁', p: sun },
-    { icon:'<i class="pi pi-moon"></i>', role:'달궁',   p: moon },
-    { icon:'↑',  role:'상승궁', p: asc },
+    { icon:'<i class="pi pi-sun"></i>', role:_rk[0], displayRole:_rn[0], p: sun },
+    { icon:'<i class="pi pi-moon"></i>', role:_rk[1], displayRole:_rn[1], p: moon },
+    { icon:'↑', role:_rk[2], displayRole:_rn[2], p: asc },
   ];
   const grid = document.getElementById('big3-grid');
   grid.innerHTML = '';
-  items.forEach(({ icon, role, p }) => {
+  items.forEach(({ icon, role, displayRole, p }) => {
     if (!p) return;
     const ec = elClass(p.sign);
     const card = el('div', 'big3-card ' + ec);
     card.innerHTML =
       '<div class="big3-icon">' + icon + '</div>' +
-      '<div class="big3-role">' + role + '</div>' +
+      '<div class="big3-role">' + displayRole + '</div>' +
       '<div class="big3-sym">' + (SIGN_SYM[p.sign] || '') + '</div>' +
-      '<div class="big3-sign">' + (SIGN_KO[p.sign] || p.sign) + '</div>' +
+      '<div class="big3-sign">' + _sn(p.sign) + '</div>' +
       '<div class="big3-deg">' + p.normDegree.toFixed(1) + '°</div>' +
-      '<div style="font-size:10px;color:var(--muted);margin-top:2px">' + (BIG3_DESC[role] || '') + '</div>';
+      '<div style="font-size:10px;color:var(--muted);margin-top:2px">' + _b3desc(role) + '</div>';
     grid.appendChild(card);
   });
 }
@@ -562,10 +698,10 @@ function renderPlanets(planets) {
     const ec = elClass(p.sign);
     const tr = el('tr');
     tr.innerHTML =
-      '<td><span class="planet-name" title="' + (PLANET_ROLE[name]||'') + '">' + (PLANET_ICON[name] || '') + ' ' + (PLANET_KO[name] || name) + (p.isRetro === 'true' ? ' <span class="retro-badge">Rx</span>' : '') + '</span></td>' +
-      '<td><span class="sign-chip ' + ec + '">' + (SIGN_SYM[p.sign]||'') + ' ' + (SIGN_KO[p.sign]||p.sign) + '</span></td>' +
+      '<td><span class="planet-name" title="' + _prole(name) + '">' + (PLANET_ICON[name] || '') + ' ' + _pn(name) + (p.isRetro === 'true' ? ' <span class="retro-badge">Rx</span>' : '') + '</span></td>' +
+      '<td><span class="sign-chip ' + ec + '">' + (SIGN_SYM[p.sign]||'') + ' ' + _sn(p.sign) + '</span></td>' +
       '<td>' + p.normDegree.toFixed(2) + '°</td>' +
-      '<td>' + (p.house != null ? p.house + '하우스' : '—') + '</td>';
+      '<td>' + (p.house != null ? _houseL(p.house) : '—') + '</td>';
     tbody.appendChild(tr);
   });
 }
@@ -579,12 +715,12 @@ function renderAspects(aspects) {
     const benefic = a.isBenefic;
     const row = el('div', 'aspect-row ' + (benefic ? 'aspect-benefic' : 'aspect-malefic'));
     row.innerHTML =
-      '<span class="aspect-type ' + (benefic ? 'asp-好' : 'asp-凶') + '" title="' + (ASPECT_DESC_KO[a.type]||'') + '">' + (ASPECT_KO[a.type] || a.type) + '</span>' +
-      '<span class="aspect-planets" title="' + (ASPECT_DESC_KO[a.type]||'') + '">' + (PLANET_KO[a.planet1]||a.planet1) + ' × ' + (PLANET_KO[a.planet2]||a.planet2) + '</span>' +
+      '<span class="aspect-type ' + (benefic ? 'asp-好' : 'asp-凶') + '" title="' + _adesc(a.type) + '">' + _an(a.type) + '</span>' +
+      '<span class="aspect-planets" title="' + _adesc(a.type) + '">' + _pn(a.planet1) + ' × ' + _pn(a.planet2) + '</span>' +
       '<span class="aspect-orb">orb ' + a.orb + '°</span>';
     list.appendChild(row);
   });
-  if (sorted.length === 0) list.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:12px">분석된 어스펙트가 없습니다.</div>';
+  if (sorted.length === 0) list.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:12px">' + (ASTRO_LANG === 'ja' ? '分析されたアスペクトがありません。' : '분석된 어스펙트가 없습니다.') + '</div>';
 }
 
 function renderInterpPanel(id, sign, title, interps) {
@@ -593,25 +729,25 @@ function renderInterpPanel(id, sign, title, interps) {
   panel.innerHTML =
     '<div class="interp-header">' +
       '<div class="interp-sign-sym ' + ec + '">' + (SIGN_SYM[sign]||'<i class="pi pi-sparkle"></i>') + '</div>' +
-      '<div><div class="interp-sign-name">' + (SIGN_KO[sign]||sign) + '</div>' +
+      '<div><div class="interp-sign-name">' + _sn(sign) + '</div>' +
       '<div class="interp-sign-role">' + title + '</div></div>' +
     '</div>' +
-    '<div class="interp-text">' + (interps[sign] || '해당 별자리 해석을 준비 중입니다.') + '</div>';
+    '<div class="interp-text">' + (interps[sign] || (ASTRO_LANG === 'ja' ? 'この星座の解釈を準備中です。' : '해당 별자리 해석을 준비 중입니다.')) + '</div>';
 }
 
 function renderInterpAspects(aspects, planets) {
   const panel = document.getElementById('interp-asp');
   const sorted = [...aspects].sort((a,b) => a.orb - b.orb).slice(0,6);
   if (sorted.length === 0) {
-    panel.innerHTML = '<div style="color:var(--muted);font-size:14px">주요 어스펙트가 없습니다.</div>';
+    panel.innerHTML = '<div style="color:var(--muted);font-size:14px">' + (ASTRO_LANG === 'ja' ? '主要アスペクトがありません。' : '주요 어스펙트가 없습니다.') + '</div>';
     return;
   }
   const rows = sorted.map(a => {
     const benefic = a.isBenefic;
     const text = getAspectInterp(a.planet1, a.planet2, a.type);
     return '<div class="interp-asp-row" style="border-color:' + (benefic ? '#00C853' : '#FF6D00') + '">' +
-      '<div class="interp-asp-title">' + (ASPECT_KO[a.type]||a.type) + ' — ' +
-      (PLANET_KO[a.planet1]||a.planet1) + ' × ' + (PLANET_KO[a.planet2]||a.planet2) +
+      '<div class="interp-asp-title">' + _an(a.type) + ' — ' +
+      _pn(a.planet1) + ' × ' + _pn(a.planet2) +
       ' (orb ' + a.orb + '°)</div>' +
       '<div>' + text + '</div></div>';
   });
@@ -622,7 +758,7 @@ function renderInterpAspects(aspects, planets) {
 async function loadChart(year, month, day, hour, min) {
   const status = document.getElementById('status');
   status.className = 'status-msg visible';
-  status.innerHTML = '<span class="spinner"></span>출생 차트 계산 중…';
+  status.innerHTML = '<span class="spinner"></span>' + (ASTRO_LANG === 'ja' ? '出生チャート計算中…' : '출생 차트 계산 중…');
 
   const _prof = (() => { try { return JSON.parse(localStorage.getItem('pico_profile')) || {}; } catch(e) { return {}; } })();
   const _lat = _prof.lat || 37.5665;
@@ -641,7 +777,7 @@ async function loadChart(year, month, day, hour, min) {
       fetch('https://fortuna.kkdmb7.workers.dev/astro/aspects', opts)
     ]);
 
-    if (planetsRes.status === 'rejected' || !planetsRes.value.ok) throw new Error('행성 데이터 로드 실패');
+    if (planetsRes.status === 'rejected' || !planetsRes.value.ok) throw new Error(ASTRO_LANG === 'ja' ? '惑星データ読み込み失敗' : '행성 데이터 로드 실패');
     const planets = await planetsRes.value.json();
 
     let aspects = [];
@@ -662,9 +798,9 @@ async function loadChart(year, month, day, hour, min) {
     // interpretations
     const get = name => (planets.find(p => p.name === name) || {}).sign || '';
     const sunSign = get('Sun'), moonSign = get('Moon'), ascSign = get('Ascendant');
-    renderInterpPanel('interp-sun', sunSign, '태양궁 · 핵심 성격', SUN_INTERP);
-    renderInterpPanel('interp-moon', moonSign, '달궁 · 감정 패턴', MOON_INTERP);
-    renderInterpPanel('interp-asc', ascSign, '상승궁 · 외적 인상', ASC_INTERP);
+    renderInterpPanel('interp-sun', sunSign, ASTRO_LANG === 'ja' ? '太陽宮 · 核心性格' : '태양궁 · 핵심 성격', _sunI());
+    renderInterpPanel('interp-moon', moonSign, ASTRO_LANG === 'ja' ? '月宮 · 感情パターン' : '달궁 · 감정 패턴', _moonI());
+    renderInterpPanel('interp-asc', ascSign, ASTRO_LANG === 'ja' ? 'アセンダント · 外的印象' : '상승궁 · 외적 인상', _ascI());
     renderInterpAspects(aspects, planets);
     setVisible('card-interp', true);
 
@@ -958,6 +1094,7 @@ function closeAstroShareModal() {
 
 // ── INIT ──────────────────────────────────────────────────
 (function() {
+  applyAstroI18n();
   const p = new URLSearchParams(location.search);
   const year   = parseInt(p.get('year'));
   const month  = parseInt(p.get('month'));
@@ -969,14 +1106,21 @@ function closeAstroShareModal() {
   if (!year || !month || !day) {
     const s = document.getElementById('status');
     s.className = 'status-msg visible err';
-    s.textContent = 'URL에 생년월일 파라미터가 없습니다. (year, month, day 필수)';
+    s.textContent = ASTRO_LANG === 'ja' ? 'URLに生年月日パラメータがありません。(year, month, day 必須)' : 'URL에 생년월일 파라미터가 없습니다. (year, month, day 필수)';
     return;
   }
 
-  document.getElementById('page-sub').textContent =
-    year + '년 ' + month + '월 ' + day + '일 ' +
-    (hourRaw && hourRaw !== 'unknown' ? String(hour).padStart(2,'0') + ':' + String(min).padStart(2,'0') : '시간 미상') +
-    ' 출생 차트';
+  if (ASTRO_LANG === 'ja') {
+    document.getElementById('page-sub').textContent =
+      year + '年 ' + month + '月 ' + day + '日 ' +
+      (hourRaw && hourRaw !== 'unknown' ? String(hour).padStart(2,'0') + ':' + String(min).padStart(2,'0') : '時間不明') +
+      ' 出生チャート';
+  } else {
+    document.getElementById('page-sub').textContent =
+      year + '년 ' + month + '월 ' + day + '일 ' +
+      (hourRaw && hourRaw !== 'unknown' ? String(hour).padStart(2,'0') + ':' + String(min).padStart(2,'0') : '시간 미상') +
+      ' 출생 차트';
+  }
 
   loadChart(year, month, day, hour, min);
 })();
