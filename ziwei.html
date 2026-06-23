@@ -6,7 +6,7 @@
   <title>자미두수 명반 | 피코랩</title>
   <meta name="theme-color" content="#f5efe4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
   <style>
@@ -428,6 +428,80 @@
 </main>
 
 <script>
+// ── i18n ──────────────────────────────────────────────────
+var ZIWEI_LANG = localStorage.getItem('pico_lang') || 'ko';
+var PALACE_JA = {
+  '명궁':'命宮','재백궁':'財帛宮','관록궁':'官禄宮','부처궁':'夫妻宮',
+  '자녀궁':'子女宮','노복궁':'奴僕宮','전택궁':'田宅宮','복덕궁':'福徳宮',
+  '부모궁':'父母宮','형제궁':'兄弟宮','질액궁':'疾厄宮','천이궁':'遷移宮',
+  '재백':'財帛','관록':'官禄','부처':'夫妻'
+};
+var STAR_JA = {
+  '자미':'紫微','천기':'天機','태양':'太陽','무곡':'武曲','천동':'天同',
+  '염정':'廉貞','천부':'天府','태음':'太陰','탐랑':'貪狼','거문':'巨門',
+  '천상':'天相','천량':'天梁','칠살':'七殺','파군':'破軍',
+  '문창':'文昌','문곡':'文曲','좌보':'左輔','우필':'右弼',
+  '천마':'天馬','록존':'禄存','경양':'擎羊','타라':'陀羅',
+  '화성':'火星','영성':'鈴星','지공':'地空','지겁':'地劫'
+};
+var SOUL_INTERP_JA = {
+  '자미':'帝王の星。独立心強くリーダーシップ卓越。周囲の助けを得ながら人生の大きな絵を描くタイプ。',
+  '천기':'知略の星。変化に敏感で分析力に優れる。企画·戦略·アドバイザーの役割で輝く。',
+  '태양':'光の星。社会的名誉と公共性を重視。対人関係が広く外向的でリーダーとして慕われる。',
+  '무곡':'財物の星。決断力と実行力が強い。金銭的成就を目指す、武人·実業家の気質。',
+  '천동':'福禄の星。楽観的で感性豊か。安定と安らぎを追求し、芸術的感受性が高い。',
+  '염정':'官禄の星。欲望と原則の間のバランス。政治·法律·芸術分野で頭角を現す。',
+  '천부':'財庫の星。安定した資産蓄積能力。慎重で保守的だが内実が強い。',
+  '태음':'月の星。感性的·直感的。女性性と母性、不動産·財物との縁が深い。',
+  '탐랑':'欲望の星。多才で魅力的。芸術·社交·異性の縁が強く、晩年に花開くタイプ。',
+  '거문':'暗星。口舌·弁舌が強い。学問·宗教·カウンセリング分野で卓越。遅咲きの成功。',
+  '천상':'人徳の星。誠実で責任感が強い。補佐役に向いており組織内で信頼が厚い。',
+  '천량':'寿星。老練で知恵があり。医療·法律·教育分野に適する。年を重ねるほど輝く。',
+  '칠살':'将軍の星。突破力と推進力が卓越。逆境を突き抜ける力。強い変化と改革。',
+  '파군':'改革の星。革新的で型を破る力。既存のものを壊し新たに建てる創造的破壊者。'
+};
+var PALACE_JA_BASE = {
+  '명궁':'自身のエネルギーとアイデンティティが前面に出る時期。独立と自我確立の運。',
+  '재백궁':'財運が集中する時期。収入·投資·資産の変化が大きく現れる。',
+  '관록궁':'キャリアと社会的成就が浮上する時期。昇進·創業·転職の機会。',
+  '부처궁':'縁とパートナーシップの変化。結婚·別れ·共同事業など対人関係が核心。',
+  '자녀궁':'創造·表現·子供関連の運。新プロジェクト開始や後進育成。',
+  '노복궁':'人脈と協力者の運。良い同僚に出会うか、裏切りに注意する時期。',
+  '전택궁':'不動産·家庭·環境の変化。引越·売買·家族関係の変化。',
+  '복덕궁':'内面の充足と霊的成長。趣味·旅行·精神的安定が重要な時期。',
+  '부모궁':'目上の方·社会関係·書類の運。契約·試験·公共機関との縁。',
+  '형제궁':'兄弟·友人·同僚との関係変化。協力と競争が共存する時期。',
+  '질액궁':'健康管理と体力点検が必要な時期。精神·身体バランスに集中。',
+  '천이궁':'移動と変化の運。海外·出張·環境変化で新たな機会を得る。'
+};
+var _zPn = function(n) { return ZIWEI_LANG === 'ja' ? (PALACE_JA[n] || n) : n; };
+var _zSn = function(n) { return ZIWEI_LANG === 'ja' ? (STAR_JA[n] || n) : n; };
+function applyZiweiI18n() {
+  if (ZIWEI_LANG !== 'ja') return;
+  var _qs = function(s) { return document.querySelector(s); };
+  var _qsa = function(s) { return document.querySelectorAll(s); };
+  var h1 = _qs('.page-title');
+  if (h1) h1.innerHTML = '紫微斗数 <em>命盤</em>';
+  var navBtn = _qs('nav .nav-btn');
+  if (navBtn) navBtn.textContent = 'AI運勢相談';
+  var secTitles = _qsa('.section-title');
+  var stJa = ['12宮命盤配置', '現在の運勢', '命盤解釈'];
+  secTitles.forEach(function(el, i) { if (stJa[i]) el.textContent = stJa[i]; });
+  var heroLabels = _qsa('.hero-badge-label');
+  var hlJa = ['命主星', '身主星', '五行局'];
+  heroLabels.forEach(function(el, i) { if (hlJa[i]) el.textContent = hlJa[i]; });
+  var fcLabels = _qsa('.fortune-card-label');
+  if (fcLabels[0]) fcLabels[0].textContent = '現在の大限 大限';
+  if (fcLabels[1]) fcLabels[1].textContent = '今年の流年宮 流年';
+  var hookTitle = _qs('#ziweiReportHook div div');
+  if (hookTitle) hookTitle.innerHTML = '<i class="pi pi-ziwei"></i> 命盤に隠された運命の鍵 →';
+  var hookSub = _qs('#ziweiReportHook div a > div:last-child');
+  if (hookSub) hookSub.textContent = 'AIが解き明かす紫微斗数深層レポート';
+  var suggestTitle = _qs('#ziweiReportSuggestWrap > div:first-child');
+  if (suggestTitle) suggestTitle.textContent = 'この命盤で精密レポートを受ける';
+  var suggestSub = _qs('#ziweiReportSuggestWrap > div:nth-child(2)');
+  if (suggestSub) suggestSub.textContent = '12宮 + 四柱精密データ交差 — 命宮·財帛·官禄·夫妻深層';
+}
 // ── 별 배경 ──────────────────────────────────────────────
 (function() {
   for (var i = 0; i < 60; i++) {
@@ -466,6 +540,9 @@ var SOUL_INTERP = {
 
 // 대한 흐름 해석
 function decadeInterp(palaceName, stars) {
+  if (ZIWEI_LANG === 'ja') {
+    return PALACE_JA_BASE[palaceName] || '変化と成長の気が満ちる時期です。';
+  }
   var base = {
     '명궁': '자신의 에너지와 정체성이 전면에 드러나는 시기. 독립과 자아 확립의 운.',
     '재백궁': '재물 운이 집중되는 시기. 수입·투자·자산 변화가 크게 나타남.',
@@ -486,6 +563,20 @@ function decadeInterp(palaceName, stars) {
 // 궁별 한줄 해석
 function palaceInterp(name, stars) {
   var major = stars[0] || '';
+  if (ZIWEI_LANG === 'ja') {
+    var majorJa = _zSn(major);
+    var interpsJa = {
+      '재백궁': major ? (majorJa + 'が財帛宮を守り財物の流れを主導。') : '',
+      '관록궁': major ? (majorJa + 'の気でキャリアの方向が決まる。') : '',
+      '부처궁': major ? ('異性の縁とパートナーシップに' + majorJa + 'のエネルギーが流れる。') : ''
+    };
+    var baseJa = {
+      '재백궁': '財物の流れと収入構造を示します。',
+      '관록궁': '職業·事業·社会的成就の方向を示します。',
+      '부처궁': '異性の縁とパートナーシップの質を示します。'
+    };
+    return (interpsJa[name] || '') + (baseJa[name] || '');
+  }
   var interps = {
     '재백궁': major ? (major + '이(가) 재백궁을 지키며 재물 흐름을 주도. ') : '' ,
     '관록궁': major ? (major + '의 기운으로 커리어의 방향이 결정됨. ') : '',
@@ -500,6 +591,7 @@ function palaceInterp(name, stars) {
 }
 
 // ── 메인 로직 ─────────────────────────────────────────────
+applyZiweiI18n();
 var p = new URLSearchParams(location.search);
 var year   = p.get('year');
 var month  = p.get('month');
@@ -517,7 +609,7 @@ document.getElementById('consultBtn').href =
 if (!year || !month || !day) {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('error').style.display = 'block';
-  document.getElementById('errorMsg').textContent = 'URL 파라미터(year, month, day)가 필요합니다.';
+  document.getElementById('errorMsg').textContent = ZIWEI_LANG === 'ja' ? 'URLパラメータ（year, month, day）が必要です。' : 'URL 파라미터(year, month, day)가 필요합니다.';
 } else {
   var apiUrl = 'https://fortuna.kkdmb7.workers.dev/ziwei?year=' + year +
     '&month=' + month + '&day=' + day + '&hour=' + hour +
@@ -532,7 +624,7 @@ if (!year || !month || !day) {
     .catch(function(e) {
       document.getElementById('loading').style.display = 'none';
       document.getElementById('error').style.display = 'block';
-      document.getElementById('errorMsg').textContent = '오류: ' + e.message;
+      document.getElementById('errorMsg').textContent = (ZIWEI_LANG === 'ja' ? 'エラー: ' : '오류: ') + e.message;
     });
 }
 
@@ -553,19 +645,19 @@ function render(d) {
       (pal.isSelf ? ' is-self' : '') +
       (pal.isBody ? ' is-body' : '');
 
-    var selfBadge = pal.isSelf ? '<span class="badge-self">★명</span>' : '';
-    var bodyBadge = pal.isBody ? '<span class="badge-body">◎신</span>' : '';
+    var selfBadge = pal.isSelf ? '<span class="badge-self">' + (ZIWEI_LANG === 'ja' ? '★命' : '★명') + '</span>' : '';
+    var bodyBadge = pal.isBody ? '<span class="badge-body">' + (ZIWEI_LANG === 'ja' ? '◎身' : '◎신') + '</span>' : '';
 
     var majorHTML = (pal.majorStars || []).map(function(s) {
-      return '<span class="star-tag major">' + s + '</span>';
+      return '<span class="star-tag major">' + _zSn(s) + '</span>';
     }).join('');
     var minorHTML = (pal.minorStars || []).slice(0, 3).map(function(s) {
-      return '<span class="star-tag">' + s + '</span>';
+      return '<span class="star-tag">' + _zSn(s) + '</span>';
     }).join('');
 
     cell.innerHTML =
       '<div class="palace-header">' +
-        '<div class="palace-name">' + (pal.name || '') + '</div>' +
+        '<div class="palace-name">' + _zPn(pal.name || '') + '</div>' +
         '<div class="palace-badges">' + selfBadge + bodyBadge + '</div>' +
       '</div>' +
       '<div class="palace-stem-branch">' + (pal.heavenlyStem || '') + (pal.earthlyBranch || '') + '</div>' +
@@ -578,12 +670,12 @@ function render(d) {
   // 현재 대한
   var dec = d.currentDecade;
   if (dec) {
-    document.getElementById('decadeName').textContent = dec.name || '—';
+    document.getElementById('decadeName').textContent = _zPn(dec.name || '') || '—';
     document.getElementById('decadeAge').textContent  = dec.ageRange || '';
     var decStars = document.getElementById('decadeStars');
     (dec.stars || []).forEach(function(s) {
       var t = document.createElement('span');
-      t.className = 'star-tag major'; t.textContent = s;
+      t.className = 'star-tag major'; t.textContent = _zSn(s);
       decStars.appendChild(t);
     });
   }
@@ -591,9 +683,9 @@ function render(d) {
   // 유년
   var yr = d.currentYear;
   if (yr) {
-    document.getElementById('yearPalace').textContent = yr.palace || '—';
+    document.getElementById('yearPalace').textContent = _zPn(yr.palace) || '—';
     document.getElementById('yearStem').textContent   =
-      (yr.heavenlyStem || '') + (yr.earthlyBranch || '') + ' ' + (yr.year || '') + '년';
+      (yr.heavenlyStem || '') + (yr.earthlyBranch || '') + ' ' + (yr.year || '') + (ZIWEI_LANG === 'ja' ? '年' : '년');
   }
 
   // 해석 카드
@@ -603,13 +695,19 @@ function render(d) {
   var soul = d.soulPalace || (d.palaces || []).find(function(p) { return p.isSelf; });
   var soulStar = soul && soul.majorStars && soul.majorStars[0];
   var soulText = soulStar
-    ? (SOUL_INTERP[soulStar] || soulStar + '이(가) 명궁에 위치. 강한 개성과 운명의 별.')
-    : '명궁 정보를 확인 중입니다.';
-  addInterp(interps, '<i class="pi pi-sun"></i>', '명궁 · ' + (soulStar || '주성'), soulText);
+    ? (ZIWEI_LANG === 'ja'
+        ? (SOUL_INTERP_JA[soulStar] || _zSn(soulStar) + 'が命宮に位置。強い個性と運命の星。')
+        : (SOUL_INTERP[soulStar] || soulStar + '이(가) 명궁에 위치. 강한 개성과 운명의 별.'))
+    : (ZIWEI_LANG === 'ja' ? '命宮情報を確認中です。' : '명궁 정보를 확인 중입니다.');
+  addInterp(interps, '<i class="pi pi-sun"></i>',
+    ZIWEI_LANG === 'ja' ? ('命宮 · ' + (_zSn(soulStar) || '主星')) : ('명궁 · ' + (soulStar || '주성')),
+    soulText);
 
   // 대한 흐름 해석
   if (dec && dec.name) {
-    addInterp(interps, '<i class="pi pi-wave"></i>', '현재 대한 흐름', decadeInterp(dec.name, dec.stars || []));
+    addInterp(interps, '<i class="pi pi-wave"></i>',
+      ZIWEI_LANG === 'ja' ? '現在の大限の流れ' : '현재 대한 흐름',
+      decadeInterp(dec.name, dec.stars || []));
   }
 
   // 재백·관록·부처 요약
@@ -620,9 +718,15 @@ function render(d) {
   var gwanrok = findPal('관록궁') || findPal('관록');
   var bucheo  = findPal('부처궁') || findPal('부처');
 
-  if (jaebaek) addInterp(interps, '<i class="pi pi-coin"></i>', '재백궁 (재물)', palaceInterp('재백궁', jaebaek.majorStars || []) || ((jaebaek.majorStars || []).join(', ') || '별 없음') + ' — 재물의 흐름을 주관합니다.');
-  if (gwanrok) addInterp(interps, '<i class="pi pi-trophy"></i>', '관록궁 (직업)', palaceInterp('관록궁', gwanrok.majorStars || []) || ((gwanrok.majorStars || []).join(', ') || '별 없음') + ' — 사회적 성취와 직업의 방향.');
-  if (bucheo)  addInterp(interps, '<i class="pi pi-heart"></i>', '부처궁 (인연)', palaceInterp('부처궁', bucheo.majorStars || [])  || ((bucheo.majorStars || []).join(', ')  || '별 없음') + ' — 이성 인연과 파트너십.');
+  if (jaebaek) addInterp(interps, '<i class="pi pi-coin"></i>',
+    ZIWEI_LANG === 'ja' ? '財帛宮（財物）' : '재백궁 (재물)',
+    palaceInterp('재백궁', jaebaek.majorStars || []) || ((jaebaek.majorStars || []).map(_zSn).join(', ') || (ZIWEI_LANG === 'ja' ? '星なし' : '별 없음')) + (ZIWEI_LANG === 'ja' ? ' — 財物の流れを主管します。' : ' — 재물의 흐름을 주관합니다.'));
+  if (gwanrok) addInterp(interps, '<i class="pi pi-trophy"></i>',
+    ZIWEI_LANG === 'ja' ? '官禄宮（職業）' : '관록궁 (직업)',
+    palaceInterp('관록궁', gwanrok.majorStars || []) || ((gwanrok.majorStars || []).map(_zSn).join(', ') || (ZIWEI_LANG === 'ja' ? '星なし' : '별 없음')) + (ZIWEI_LANG === 'ja' ? ' — 社会的成就と職業の方向。' : ' — 사회적 성취와 직업의 방향.'));
+  if (bucheo)  addInterp(interps, '<i class="pi pi-heart"></i>',
+    ZIWEI_LANG === 'ja' ? '夫妻宮（縁）' : '부처궁 (인연)',
+    palaceInterp('부처궁', bucheo.majorStars || [])  || ((bucheo.majorStars || []).map(_zSn).join(', ')  || (ZIWEI_LANG === 'ja' ? '星なし' : '별 없음')) + (ZIWEI_LANG === 'ja' ? ' — 異性の縁とパートナーシップ。' : ' — 이성 인연과 파트너십.'));
 
   // ── 격국 뱃지 + 사화 교차 시각화 (무료 페이지 가치 ↑) ─────────
   renderZiweiPatternBadges(d);
@@ -653,8 +757,8 @@ function renderZiweiPatternBadges(d) {
   function escAttr(s) { return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
   var html = '<div style="font-family:\'Noto Serif KR\',serif;font-size:14px;font-weight:700;color:#5a3f87;margin-bottom:10px;display:flex;align-items:center;gap:6px;">'
-    + '<i class="pi pi-sparkle" style="font-size:14px;"></i> 검출된 격국 · 사화 패턴'
-    + '<span style="font-size:10px;font-weight:500;color:rgba(90,63,135,0.55);margin-left:auto;">자미두수전서 표준</span>'
+    + '<i class="pi pi-sparkle" style="font-size:14px;"></i> ' + (ZIWEI_LANG === 'ja' ? '検出された格局・四化パターン' : '검출된 격국 · 사화 패턴')
+    + '<span style="font-size:10px;font-weight:500;color:rgba(90,63,135,0.55);margin-left:auto;">' + (ZIWEI_LANG === 'ja' ? '紫微斗数全書 標準' : '자미두수전서 표준') + '</span>'
     + '</div>';
 
   if (patterns.length) {
@@ -687,7 +791,7 @@ function renderZiweiPatternBadges(d) {
     html += '</div>';
   }
 
-  html += '<div style="margin-top:10px;font-size:10.5px;color:rgba(74,49,115,0.55);line-height:1.5;">길격은 보라/금 · 흉격은 적색 · 호버하면 자미두수전서 본문 · 자세한 풀이는 <a href="report.html?type=ziwei_full" style="color:#7a5e1c;font-weight:700;">자미두수 심층 리포트</a> 에서</div>';
+  html += '<div style="margin-top:10px;font-size:10.5px;color:rgba(74,49,115,0.55);line-height:1.5;">' + (ZIWEI_LANG === 'ja' ? '吉格は紫/金 · 凶格は赤 · ホバーで原文 · 詳細は <a href="report.html?type=ziwei_full" style="color:#7a5e1c;font-weight:700;">紫微斗数 深層レポート</a> で' : '길격은 보라/금 · 흉격은 적색 · 호버하면 자미두수전서 본문 · 자세한 풀이는 <a href="report.html?type=ziwei_full" style="color:#7a5e1c;font-weight:700;">자미두수 심층 리포트</a> 에서') + '</div>';
 
   section.innerHTML = html;
   container.parentNode.insertBefore(section, container.nextSibling);
@@ -756,17 +860,17 @@ async function renderSajuZiweiCross(d) {
   section.style.cssText = 'margin:18px 0 0;padding:16px 18px;background:linear-gradient(135deg,rgba(154,122,38,0.10),rgba(123,94,167,0.08));border:1.5px solid rgba(154,122,38,0.42);border-radius:14px;';
 
   var html = '<div style="font-family:\'Noto Serif KR\',serif;font-size:14px;font-weight:700;color:#7a5e1c;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'
-    + '<i class="pi pi-check-circle" style="font-size:14px;"></i> 사주 ↔ 자미두수 양학파 합치'
-    + '<span style="font-size:10px;font-weight:500;color:rgba(122,94,28,0.55);margin-left:auto;">신뢰도 보강</span>'
+    + '<i class="pi pi-check-circle" style="font-size:14px;"></i> ' + (ZIWEI_LANG === 'ja' ? '四柱 ↔ 紫微斗数 両学派一致' : '사주 ↔ 자미두수 양학파 합치')
+    + '<span style="font-size:10px;font-weight:500;color:rgba(122,94,28,0.55);margin-left:auto;">' + (ZIWEI_LANG === 'ja' ? '信頼度補強' : '신뢰도 보강') + '</span>'
     + '</div>';
-  html += '<div style="font-size:11.5px;color:rgba(74,49,12,0.78);line-height:1.6;margin-bottom:10px;">사주의 <b>' + geokKor + '</b>과 자미두수 패턴이 같은 방향을 가리켜요. 두 학파가 합치하면 그 결은 한 번 들여다볼 만해요.</div>';
+  html += '<div style="font-size:11.5px;color:rgba(74,49,12,0.78);line-height:1.6;margin-bottom:10px;">' + (ZIWEI_LANG === 'ja' ? '四柱の <b>' + geokKor + '</b> と紫微斗数パターンが同じ方向を示しています。両学派が一致すると、その傾向は注目する価値があります。' : '사주의 <b>' + geokKor + '</b>과 자미두수 패턴이 같은 방향을 가리켜요. 두 학파가 합치하면 그 결은 한 번 들여다볼 만해요.') + '</div>';
   hits.forEach(function(h) {
     html += '<div style="margin-bottom:8px;padding:9px 12px;background:rgba(255,255,255,0.5);border:1px solid rgba(154,122,38,0.25);border-radius:10px;">'
       + '<div style="font-size:12px;font-weight:700;color:#5a3f87;margin-bottom:3px;">' + h.theme + '</div>'
-      + '<div style="font-size:11px;color:rgba(60,40,8,0.75);line-height:1.55;">' + h.signal + ' <span style="color:rgba(60,40,8,0.55);">(자미: ' + h.ziwei.join(' · ') + ')</span></div>'
+      + '<div style="font-size:11px;color:rgba(60,40,8,0.75);line-height:1.55;">' + h.signal + ' <span style="color:rgba(60,40,8,0.55);">(' + (ZIWEI_LANG === 'ja' ? '紫微: ' : '자미: ') + h.ziwei.join(' · ') + ')</span></div>'
       + '</div>';
   });
-  html += '<div style="margin-top:6px;font-size:10.5px;color:rgba(74,49,12,0.55);line-height:1.5;">합치는 점치는 답이 아니라, 결의 방향을 알아두는 신호예요. 결정은 천천히, 안 따라도 괜찮아요.</div>';
+  html += '<div style="margin-top:6px;font-size:10.5px;color:rgba(74,49,12,0.55);line-height:1.5;">' + (ZIWEI_LANG === 'ja' ? '一致は占いの答えではなく、傾向の方向を知るシグナルです。決断はゆっくり、従わなくても大丈夫です。' : '합치는 점치는 답이 아니라, 결의 방향을 알아두는 신호예요. 결정은 천천히, 안 따라도 괜찮아요.') + '</div>';
 
   section.innerHTML = html;
   container.parentNode.insertBefore(section, container.nextSibling);
