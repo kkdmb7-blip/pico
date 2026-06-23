@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <link rel="stylesheet" href="pico-icons.css">
 <style>
@@ -442,6 +442,9 @@ var currentUserName = '';
 var currentUserEmail = '';
 var _chargeReturnUrl = (function(){ try { return new URLSearchParams(location.search).get('ret') || ''; } catch(e){ return ''; } })();
 
+var _CHARGE_LANG = 'ko';
+try { _CHARGE_LANG = localStorage.getItem('pico_lang') || 'ko'; } catch(e) {}
+
 // 충전 팩 정의
 var PACKS = [
   {
@@ -450,71 +453,71 @@ var PACKS = [
     icon: '<i class="pi pi-gift"></i>',
     orb: 500,
     bonus: 500,
-    label: '첫 충전 1+1',
-    desc: '500+500 = 1,000 Orb 지급',
+    label: _CHARGE_LANG === 'ja' ? '初回 1+1' : '첫 충전 1+1',
+    desc: _CHARGE_LANG === 'ja' ? '500+500 = 1,000 Orb 付与' : '500+500 = 1,000 Orb 지급',
     price: 5500,
     priceLabel: '₩5,500',
-    perLabel: '개당 약 5.5원',
+    perLabel: _CHARGE_LANG === 'ja' ? '1個あたり約5.5円' : '개당 약 5.5원',
   },
   {
     id: 'pack_950',
     icon: '<i class="pi pi-gem"></i>',
     orb: 950,
     label: null,
-    desc: '채팅 약 47회',
+    desc: _CHARGE_LANG === 'ja' ? 'チャット約47回' : '채팅 약 47회',
     price: 9900,
     priceLabel: '₩9,900',
-    perLabel: '개당 약 10.4원',
+    perLabel: _CHARGE_LANG === 'ja' ? '1個あたり約10.4円' : '개당 약 10.4원',
   },
   {
     id: 'pack_1650',
     icon: '<i class="pi pi-gem"></i>',
     orb: 1650,
     label: 'BEST',
-    desc: '채팅 약 82회',
+    desc: _CHARGE_LANG === 'ja' ? 'チャット約82回' : '채팅 약 82회',
     price: 16500,
     priceLabel: '₩16,500',
-    perLabel: '개당 약 10.0원',
+    perLabel: _CHARGE_LANG === 'ja' ? '1個あたり約10.0円' : '개당 약 10.0원',
   },
   {
     id: 'pack_2200',
     icon: '<i class="pi pi-gem"></i>',
     orb: 2200,
     label: null,
-    desc: '채팅 약 110회',
+    desc: _CHARGE_LANG === 'ja' ? 'チャット約110回' : '채팅 약 110회',
     price: 22000,
     priceLabel: '₩22,000',
-    perLabel: '개당 약 10.0원',
+    perLabel: _CHARGE_LANG === 'ja' ? '1個あたり約10.0円' : '개당 약 10.0원',
   },
   {
     id: 'pack_3300',
     icon: '<i class="pi pi-gem"></i>',
     orb: 3300,
     label: null,
-    desc: '채팅 약 165회',
+    desc: _CHARGE_LANG === 'ja' ? 'チャット約165回' : '채팅 약 165회',
     price: 33000,
     priceLabel: '₩33,000',
-    perLabel: '개당 약 10.0원',
+    perLabel: _CHARGE_LANG === 'ja' ? '1個あたり約10.0円' : '개당 약 10.0원',
   },
   {
     id: 'pack_5500',
     icon: '<i class="pi pi-star"></i>',
     orb: 5500,
     label: 'SALE',
-    desc: '리포트 약 11개 · 채팅 약 275회',
+    desc: _CHARGE_LANG === 'ja' ? 'レポート約11個 · チャット約275回' : '리포트 약 11개 · 채팅 약 275회',
     price: 49900,
     priceLabel: '₩49,900',
-    perLabel: '개당 약 9.1원 (10% 할인)',
+    perLabel: _CHARGE_LANG === 'ja' ? '1個あたり約9.1円 (10%割引)' : '개당 약 9.1원 (10% 할인)',
   },
   {
     id: 'pack_10000',
     icon: '<i class="pi pi-crown"></i>',
     orb: 10000,
     label: 'SUPER',
-    desc: '리포트 약 20개 이상',
+    desc: _CHARGE_LANG === 'ja' ? 'レポート約20個以上' : '리포트 약 20개 이상',
     price: 79900,
     priceLabel: '₩79,900',
-    perLabel: '개당 약 8.0원 (20% 할인)',
+    perLabel: _CHARGE_LANG === 'ja' ? '1個あたり約8.0円 (20%割引)' : '개당 약 8.0원 (20% 할인)',
   },
 ];
 
@@ -1273,5 +1276,141 @@ input,textarea,select{-webkit-user-select:text;user-select:text;}
   <div style="margin-top:8px;font-size:10px;color:#9a8a70;">© 2026 FORTUNA · picolab.kr</div>
 </footer>
 <script src="share-invite.js"></script>
+<script>
+(function(){
+  if (_CHARGE_LANG !== 'ja') return;
+  document.documentElement.lang = 'ja';
+  document.title = 'Orb チャージ · FORTUNA';
+  document.body.style.fontFamily = "'Noto Sans JP','Noto Serif JP',-apple-system,sans-serif";
+  var _qs = function(s) { return document.querySelector(s); };
+  var _st = function(el, t) { if (el) el.textContent = t; };
+  var _si = function(el, h) { if (el) el.innerHTML = h; };
+
+  // 네비게이션
+  _st(_qs('.nav-page-title'), 'Orb チャージ');
+
+  // 히어로
+  _si(_qs('.hero-title'), 'Orb<span style="font-size:0.65em;font-weight:400;opacity:0.6;margin-left:3px;">(オーブ)</span>をチャージしましょう');
+  _si(_qs('.hero-sub'), 'AIチャット1回に20 Orbが使われます<br>チャージしたOrbは有効期限なし');
+
+  // 탭 버튼
+  _st(document.getElementById('tabBtnPack'), '一回チャージ');
+  var subTab = document.getElementById('tabBtnSub');
+  if (subTab) subTab.textContent = '月額サブスク（準備中）';
+
+  // 첫 충전 배너
+  var firstBanner = document.getElementById('firstChargeBanner');
+  if (firstBanner) {
+    var fb1 = firstBanner.querySelector('[style*="font-weight:800"]');
+    var fb2 = firstBanner.querySelector('[style*="font-size:13px"]');
+    if (fb1) fb1.textContent = '初回チャージ限定 1+1イベント';
+    if (fb2) fb2.innerHTML = '500 Orb チャージで 1,000 Orbをプレゼント<br>初回チャージ限定の特別特典です';
+  }
+
+  // 친구 초대 배너
+  var invBanner = document.getElementById('inviteBanner');
+  if (invBanner) {
+    var ib1 = invBanner.querySelector('[style*="font-weight:800"]');
+    var ib2 = invBanner.querySelector('[style*="font-size:12px"]');
+    if (ib1) ib1.textContent = '友達と一緒に · 両方 +50 Orb';
+    if (ib2) ib2.innerHTML = 'ひとりの人が浮かんだら、気軽に勧めてみて。<strong>お二人に50 Orb</strong>をプレゼント';
+  }
+
+  // TWA 인라인 안내
+  var twaN = document.getElementById('twaInlineNotice');
+  if (twaN) {
+    var tn1 = twaN.querySelector('[style*="font-size:15px"]');
+    var tn2 = twaN.querySelector('[style*="font-size:13px"]');
+    if (tn1) tn1.textContent = 'ウェブサイトでチャージしてください';
+    if (tn2) tn2.innerHTML = 'アプリではOrbのチャージはできません。<br><strong style="color:#7a5e1c;">picolab.kr</strong>でチャージ後、アプリでそのままご利用いただけます。';
+  }
+
+  // TWA 전체 차단 오버레이
+  var twaBl = document.getElementById('twaBlocker');
+  if (twaBl) {
+    var tb1 = twaBl.querySelector('[style*="font-size:20px"]');
+    var tb2 = twaBl.querySelector('[style*="font-size:14px"]');
+    var tbA = twaBl.querySelector('a');
+    if (tb1) tb1.textContent = 'アプリではチャージできません';
+    if (tb2) tb2.innerHTML = 'Orbのチャージはウェブブラウザからのみ可能です。<br>ChromeなどのブラウザでPICO Lab（picolab.kr）に<br>アクセスすると同じアカウントで自動ログインされます。';
+    if (tbA) tbA.textContent = '戻る';
+  }
+
+  // 섹션 레이블
+  document.querySelectorAll('.section-label').forEach(function(el) {
+    var t = el.textContent.trim();
+    if (t === '충전 팩 선택') el.textContent = 'チャージパック選択';
+    else if (t === '이용 안내') el.textContent = 'ご利用案内';
+    else if (t === '구독 안내') el.textContent = 'サブスク案内';
+  });
+
+  // 이용 안내 항목
+  document.querySelectorAll('.how-item span').forEach(function(el) {
+    var t = el.innerHTML;
+    if (t.indexOf('AI 채팅') >= 0) el.innerHTML = 'AIチャット<strong>1回あたり20 Orb</strong>消費';
+    else if (t.indexOf('만료 없음') >= 0) el.innerHTML = 'チャージしたOrbは<strong>有効期限なし</strong>';
+    else if (t.indexOf('KG이니시스') >= 0 && !el.closest('#tabContentSub')) el.innerHTML = '決済は<strong>KG이니시스</strong>で安全処理';
+    else if (t.indexOf('picolab.kr') >= 0 && !el.closest('#tabContentSub')) el.innerHTML = 'お問い合わせ: <strong>picolab.kr</strong>';
+  });
+
+  // 구독 안내 항목
+  document.querySelectorAll('#tabContentSub .how-item span').forEach(function(el) {
+    var t = el.innerHTML;
+    if (t.indexOf('즉시 지급') >= 0) el.innerHTML = '毎月自動決済後にOrb<strong>即時付与</strong>';
+    else if (t.indexOf('자동 갱신') >= 0) el.innerHTML = '契約日基準<strong>1ヶ月後</strong>自動更新';
+    else if (t.indexOf('구독 취소') >= 0) el.innerHTML = 'いつでも<strong>サブスク解約</strong>可、残りOrb保持';
+    else if (t.indexOf('KG이니시스') >= 0) el.innerHTML = '決済は<strong>KG이니시스</strong>で安全処理';
+  });
+
+  // 구독 플랜
+  var subTags = document.querySelectorAll('.sub-tagline');
+  subTags.forEach(function(el) {
+    var t = el.textContent.trim();
+    if (t.indexOf('5,000 Orb') >= 0) el.textContent = '毎月5,000 Orb 自動付与';
+    else if (t.indexOf('12,000 Orb') >= 0) el.textContent = '毎月12,000 Orb 自動付与';
+  });
+  document.querySelectorAll('.sub-perk').forEach(function(el) {
+    var t = el.textContent.trim();
+    if (t === '채팅 250회') el.textContent = 'チャット250回';
+    else if (t === '리포트 10개') el.textContent = 'レポート10個';
+    else if (t === '채팅 600회') el.textContent = 'チャット600回';
+    else if (t === '리포트 24개') el.textContent = 'レポート24個';
+  });
+  document.querySelectorAll('.sub-price-note').forEach(function(el) {
+    var t = el.textContent.trim();
+    if (t.indexOf('1.98원') >= 0) el.textContent = '1個あたり約1.98円';
+    else if (t.indexOf('1.66원') >= 0) el.textContent = '1個あたり約1.66円';
+  });
+
+  // 결제 처리 로딩
+  var loadingText = _qs('.loading-overlay div:last-child');
+  if (loadingText) loadingText.textContent = '決済処理中です · しばらくお待ちを';
+
+  // 결제 오류 모달
+  _st(document.getElementById('ceTitle'), 'Orbの反映が少し遅れています');
+  _st(document.getElementById('ceDesc'), '決済は完了しました。Orbの反映のみ遅れているため、下のボタンから再試行してください。');
+  _st(document.getElementById('ceRetryBtn'), '再試行');
+  _st(document.getElementById('ceCopyBtn'), '決済番号をコピーしてサポートに連絡');
+  _st(document.getElementById('ceCloseBtn'), 'あとで');
+
+  // 비즈 풋터
+  document.querySelectorAll('.biz-footer .biz-row .lbl').forEach(function(el) {
+    var t = el.textContent.trim();
+    if (t === '상호명') el.textContent = '会社名';
+    else if (t === '대표자') el.textContent = '代表者';
+    else if (t === '사업자등록번호') el.textContent = '事業者登録番号';
+    else if (t === '통신판매업') el.textContent = '通信販売業';
+    else if (t === '주소') el.textContent = '住所';
+    else if (t === '이메일') el.textContent = 'メール';
+    else if (t === '고객센터') el.textContent = 'サポート';
+    else if (t === '호스팅 서비스') el.textContent = 'ホスティング';
+  });
+  document.querySelectorAll('.biz-footer .biz-links a').forEach(function(el) {
+    var t = el.textContent.trim();
+    if (t === '이용약관') el.textContent = '利用規約';
+    else if (t === '개인정보처리방침') el.textContent = 'プライバシーポリシー';
+  });
+})();
+</script>
 </body>
 </html>

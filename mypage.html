@@ -6,7 +6,7 @@
 <title>마이페이지 · FORTUNA</title>
 <meta name="theme-color" content="#f5efe4">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <link rel="stylesheet" href="pico-icons.css">
 <style>
@@ -422,10 +422,14 @@ async function fetchSubscription() {
     var r = await fetch('https://fortuna-silk.vercel.app/api/subscription?user_id=' + encodeURIComponent(currentUser.id));
     var sub = await r.json();
     if (!sub) return;
-    var PLAN_LABELS = { monthly_5000: 'Basic — 5,000 Orb/월 · ₩9,900', monthly_12000: 'Pro — 12,000 Orb/월 · ₩19,900' };
-    var next = sub.next_billing_at ? new Date(sub.next_billing_at).toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric'}) : '-';
+    var _myl = localStorage.getItem('pico_lang') || 'ko';
+    var PLAN_LABELS = _myl === 'ja'
+      ? { monthly_5000: 'Basic — 5,000 Orb/月 · ₩9,900', monthly_12000: 'Pro — 12,000 Orb/月 · ₩19,900' }
+      : { monthly_5000: 'Basic — 5,000 Orb/월 · ₩9,900', monthly_12000: 'Pro — 12,000 Orb/월 · ₩19,900' };
+    var _locale = _myl === 'ja' ? 'ja-JP' : 'ko-KR';
+    var next = sub.next_billing_at ? new Date(sub.next_billing_at).toLocaleDateString(_locale, {year:'numeric',month:'long',day:'numeric'}) : '-';
     document.getElementById('subCardPlan').textContent = PLAN_LABELS[sub.plan] || sub.plan;
-    document.getElementById('subCardNext').textContent = '다음 결제일: ' + next;
+    document.getElementById('subCardNext').textContent = (_myl === 'ja' ? '次回請求日: ' : '다음 결제일: ') + next;
     document.getElementById('subCard').style.display = 'block';
   } catch(e) {}
 }
@@ -449,11 +453,12 @@ function renderProfiles() {
   section.style.display = 'block';
 
   profiles.forEach(function(p) {
-    var name = p.name || '이름없음';
+    var _rpl = localStorage.getItem('pico_lang') || 'ko';
+    var name = p.name || (_rpl === 'ja' ? '名前なし' : '이름없음');
     var date = '';
     if (p.year) date = p.year + '.' + String(p.month).padStart(2,'0') + '.' + String(p.day).padStart(2,'0');
     else if (p.birth_date) date = p.birth_date.replace(/-/g,'.');
-    var gender = (p.gender === 'M' || p.gender === 'male') ? '남성' : '여성';
+    var gender = (p.gender === 'M' || p.gender === 'male') ? (_rpl === 'ja' ? '男性' : '남성') : (_rpl === 'ja' ? '女性' : '여성');
 
     var item = document.createElement('div');
     item.className = 'profile-item';
@@ -461,7 +466,7 @@ function renderProfiles() {
       + '<div class="profile-item-name">' + name + '</div>'
       + '<div class="profile-item-sub">' + date + ' · ' + gender + '</div>'
       + '</div>'
-      + (p._isMe ? '<span class="profile-badge">내 정보</span>' : '');
+      + (p._isMe ? '<span class="profile-badge">' + (_rpl === 'ja' ? '自分の情報' : '내 정보') + '</span>' : '');
     list.appendChild(item);
   });
 }
@@ -486,5 +491,64 @@ body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-se
 input,textarea,select{-webkit-user-select:text;user-select:text;}
 </style>
 <script src="share-invite.js"></script>
+<script>
+(function(){
+  var MYPAGE_LANG = 'ko';
+  try { MYPAGE_LANG = localStorage.getItem('pico_lang') || 'ko'; } catch(e) {}
+  if (MYPAGE_LANG !== 'ja') return;
+  document.documentElement.lang = 'ja';
+  document.title = 'マイページ · FORTUNA';
+  document.body.style.fontFamily = "'Noto Sans JP','Noto Serif JP',-apple-system,sans-serif";
+  var _id = function(id) { return document.getElementById(id); };
+  var _qs = function(s) { return document.querySelector(s); };
+  var _st = function(el, t) { if (el) el.textContent = t; };
+  var _si = function(el, h) { if (el) el.innerHTML = h; };
+
+  _st(_qs('.back-btn'), '← 戻る');
+  _st(_qs('#loginPrompt p'), 'ログイン後にマイページをご利用いただけます。');
+  _si(_qs('.kakao-btn'), '<svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 1C4.134 1 1 3.582 1 6.757c0 1.904 1.178 3.584 2.98 4.624L3.2 14.2a.25.25 0 00.363.28l3.49-2.29c.31.03.622.047.947.047 3.866 0 7-2.582 7-5.48C15 3.582 11.866 1 8 1z" fill="#191919"/></svg> カカオでログイン');
+  _si(_qs('.orb-label'), '<i class="pi pi-sparkle"></i> Orb 残高');
+  _si(_qs('.orb-charge-btn'), '<i class="pi pi-sparkle"></i> Orb チャージ');
+
+  // 출석 카드
+  var ac = _id('mp_attendanceCard');
+  if (ac) {
+    var acTitle = ac.querySelector('span[style*="font-weight:700"]');
+    if (acTitle) acTitle.textContent = '7日連続 · 50 Orb';
+  }
+  _st(_id('mp_attendanceMsg'), '毎日来ても、たまに来ても大丈夫です');
+
+  // 친구 초대 배너
+  var inv = _qs('[onclick="mp_invite()"]');
+  if (inv) {
+    var invT = inv.querySelector('[style*="font-weight:800"]');
+    var invS = inv.querySelector('[style*="10.5px"]');
+    if (invT) invT.textContent = '友達と一緒に · 両方 +50 Orb';
+    if (invS) invS.textContent = 'ひとりの人が浮かんだら、気軽に';
+  }
+
+  // 구독 카드
+  var subC = _id('subCard');
+  if (subC) {
+    var subT = subC.querySelector('[style*="font-weight:800"]');
+    var subBtn = subC.querySelector('button');
+    if (subT) subT.textContent = '月額サブスク中';
+    if (subBtn) subBtn.textContent = '管理';
+  }
+
+  // 섹션 타이틀
+  document.querySelectorAll('.section-title').forEach(function(el) {
+    var t = el.textContent.trim();
+    if (t === '저장된 프로필') el.textContent = '保存済みプロフィール';
+    else if (t === '관리자') el.textContent = '管理者';
+  });
+
+  // 관리자 버튼
+  var adminBtn = _qs('#adminSection button');
+  if (adminBtn) adminBtn.textContent = 'フィードバック ダッシュボード';
+
+  _st(_qs('.logout-btn'), 'ログアウト');
+})();
+</script>
 </body>
 </html>
