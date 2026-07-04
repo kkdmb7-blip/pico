@@ -403,7 +403,7 @@ td.reasons span {
   <h2>Orb 잔액 관리</h2>
   <div class="card" style="padding:14px 12px;">
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-      <input id="orbSearch" type="text" placeholder="이름 또는 앞8자리 검색..." style="flex:1;min-width:140px;padding:8px 12px;border:1px solid var(--border-soft);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);outline:none;" oninput="filterOrbTable()">
+      <input id="orbSearch" type="text" placeholder="이름 / 이메일 / 앞8자리 검색..." style="flex:1;min-width:140px;padding:8px 12px;border:1px solid var(--border-soft);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text);outline:none;" oninput="filterOrbTable()">
       <button onclick="loadOrbUsers()" style="padding:8px 14px;background:rgba(154,122,38,0.13);border:1px solid rgba(154,122,38,0.35);border-radius:8px;font-size:12px;font-weight:700;color:var(--gold-deep);cursor:pointer;">새로고침</button>
     </div>
     <div style="overflow-x:auto;">
@@ -1058,7 +1058,7 @@ function orbSort(col) {
   });
   const q = (document.getElementById('orbSearch')?.value || '').toLowerCase();
   const filtered = q ? orbAllRows.filter(r =>
-    (r.name||'').toLowerCase().includes(q) || (r.uid_short||'').toLowerCase().includes(q)
+    (r.name||'').toLowerCase().includes(q) || (r.uid_short||'').toLowerCase().includes(q) || (r.email||'').toLowerCase().includes(q)
   ) : orbAllRows;
   renderOrbTable(filtered);
 }
@@ -1081,7 +1081,7 @@ async function loadOrbUsers() {
 function filterOrbTable() {
   const q = (document.getElementById('orbSearch')?.value || '').toLowerCase();
   const filtered = q ? orbAllRows.filter(r =>
-    (r.name||'').toLowerCase().includes(q) || (r.uid_short||'').toLowerCase().includes(q)
+    (r.name||'').toLowerCase().includes(q) || (r.uid_short||'').toLowerCase().includes(q) || (r.email||'').toLowerCase().includes(q)
   ) : orbAllRows;
   renderOrbTable(filtered);
 }
