@@ -3736,6 +3736,10 @@ function hideDetail() { showState('intro'); }
 
 // ── 마크다운 인라인 렌더러 ──
 function renderMarkdown(text) {
+  // AI가 생성한 텍스트라, 프롬프트에 넣은 사용자 이름(profileStr)을 AI가 그대로 인용해서
+  // 되돌려주는 경우가 흔함 — 마크다운 변환 전에 먼저 HTML 이스케이프해서 이름에 스크립트를
+  // 심어 AI 응답을 통해 우회 실행되는 걸 막음
+  text = escapeHtml(text);
   // # 헤더 → 굵은 금색 텍스트
   text = text.replace(/^#{1,3}\s+(.+)$/gm,
     '<div style="font-size:14px;font-weight:700;color:var(--gold);margin:12px 0 4px;">$1</div>');
