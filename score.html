@@ -644,6 +644,12 @@ function showToast(msg) {
 // ── 공유 카드 ────────────────────────────────────────────
 var _ssmCanvas = null;
 
+// 사용자가 직접 입력한 이름(profile.name)을 HTML에 그대로 꽂으면 <img onerror=...> 같은 걸
+// 이름으로 넣어 스크립트를 실행시킬 수 있음(XSS) — 화면에 넣기 직전 반드시 이스케이프
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function openScoreShareCard() {
   if (!_scoreResult) return;
   _ssmCanvas = null;
@@ -701,7 +707,7 @@ function openScoreShareCard() {
       '<div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,#9a7a26,transparent);margin:0 auto;"></div>' +
     '</div>' +
     '<div style="position:relative;z-index:1;text-align:center;margin-bottom:36px;">' +
-      (name ? '<div style="font-size:13px;color:#5a4830;margin-bottom:6px;">'+name+'</div>' : '') +
+      (name ? '<div style="font-size:13px;color:#5a4830;margin-bottom:6px;">'+escapeHtml(name)+'</div>' : '') +
       '<div style="font-size:11px;letter-spacing:0.2em;color:#6a4f0c;margin-bottom:14px;">'+today+' 운세 점수</div>' +
       '<div style="font-family:\'Playfair Display\',\'Noto Serif KR\',serif;font-size:88px;font-weight:700;color:'+overallColor+';line-height:1;">'+overall+'</div>' +
       '<div style="font-size:13px;color:#5a4830;margin-top:6px;">/ 100점</div>' +
