@@ -5142,19 +5142,19 @@ async function openSharedGunghap(sharedId) {
     var detailEl = document.getElementById('ghResDetail');
     var aiEl = document.getElementById('ghResultAI');
 
-    if (namesEl) namesEl.innerHTML = (personA.name || '나') + ' <i class="pi pi-heart" style="color:#c24a8a"></i> ' + (personB.name || '상대방');
+    if (namesEl) namesEl.innerHTML = escapeHtml(personA.name || '나') + ' <i class="pi pi-heart" style="color:#c24a8a"></i> ' + escapeHtml(personB.name || '상대방');
     if (scoreEl) scoreEl.textContent = scoreTotal;
     var commentMap = scoreTotal >= 80 ? '천생연분' : scoreTotal >= 60 ? '좋은 궁합' : scoreTotal >= 40 ? '노력하면 빛나는 인연' : '서로 다른 방향';
     if (commentEl) commentEl.textContent = commentMap;
     if (barEl) { barEl.style.width = '0%'; setTimeout(function(){ barEl.style.width = scoreTotal + '%'; }, 100); }
     if (cardsEl) cardsEl.innerHTML = ''
       + '<div style="background:rgba(139,36,71,0.06);border:1px solid rgba(139,36,71,0.2);border-radius:10px;padding:10px;text-align:center;">'
-      +   '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:3px;">' + (personA.name || '나') + '</div>'
+      +   '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:3px;">' + escapeHtml(personA.name || '나') + '</div>'
       +   '<div style="font-size:14px;font-weight:700;color:#8b2447;">' + (personA.ilju || '?') + '</div>'
       +   '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-top:2px;">' + (personA.ohaeng || '?') + ' · ' + (personA.strength || '?') + '</div>'
       + '</div>'
       + '<div style="background:rgba(139,36,71,0.06);border:1px solid rgba(139,36,71,0.2);border-radius:10px;padding:10px;text-align:center;">'
-      +   '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:3px;">' + (personB.name || '상대방') + '</div>'
+      +   '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:3px;">' + escapeHtml(personB.name || '상대방') + '</div>'
       +   '<div style="font-size:14px;font-weight:700;color:#8b2447;">' + (personB.ilju || '?') + '</div>'
       +   '<div style="font-size:10px;color:rgba(0,0,0,0.5);margin-top:2px;">' + (personB.ohaeng || '?') + ' · ' + (personB.strength || '?') + '</div>'
       + '</div>';
@@ -5352,7 +5352,7 @@ function updateAuthUI() {
     try { var pp = JSON.parse(localStorage.getItem('pico_profile')); profileName = pp && pp.name; } catch(e) {}
     var _displayName = profileName || currentUser.name;
     if (titleEl && _displayName) {
-      titleEl.innerHTML = _displayName + '님의 <span style="color:var(--gold);">오늘의 운세</span> 점수';
+      titleEl.innerHTML = escapeHtml(_displayName) + '님의 <span style="color:var(--gold);">오늘의 운세</span> 점수';
     }
     var _ctn = document.getElementById('cosmicTitleName');
     if (_ctn && _displayName) _ctn.textContent = _displayName + '님의';
@@ -5364,7 +5364,7 @@ function updateAuthUI() {
     if (heroEl) heroEl.style.display = '';
     if (heroInputEl) heroInputEl.style.display = '';
     if (p && p.name) {
-      if (titleEl) titleEl.innerHTML = p.name + '님의 <span style="color:var(--gold);">오늘의 운세</span> 점수';
+      if (titleEl) titleEl.innerHTML = escapeHtml(p.name) + '님의 <span style="color:var(--gold);">오늘의 운세</span> 점수';
       var _ctn2 = document.getElementById('cosmicTitleName');
       if (_ctn2) _ctn2.textContent = p.name + '님의';
     }
