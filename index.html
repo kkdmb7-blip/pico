@@ -3766,7 +3766,9 @@ async function requestGunghapAI() {
   if (!myYS) { var SM={목:'화',화:'토',토:'금',금:'수',수:'목'},PM={목:'수',화:'목',토:'화',금:'토',수:'금'}; myYS = strA==='신강'?SM[ohaengA]:PM[ohaengA]; }
   if (!pYS)  { var SM2={목:'화',화:'토',토:'금',금:'수',수:'목'},PM2={목:'수',화:'목',토:'화',금:'토',수:'금'}; pYS = strB==='신강'?SM2[ohaengB]:PM2[ohaengB]; }
 
-  function boldPink(s) { return (s||'').replace(/^#{1,4}\s+.+$/gm,'').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#8b2447;">$1</strong>').trim(); }
+  // AI가 생성한 궁합 분석 텍스트라, 프롬프트에 반복해서 들어간 이름(myName/pNameDisp)을
+  // AI가 그대로 인용해서 되돌려주는 경우가 흔함 — 변환 전에 먼저 이스케이프
+  function boldPink(s) { return escapeHtml(s||'').replace(/^#{1,4}\s+.+$/gm,'').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#8b2447;">$1</strong>').trim(); }
   function showChunk(id, title, html) {
     var el = document.getElementById(id);
     var processed = (html||'').replace(/\*\*(.+?)\*\*/g,'<strong style="color:#8b2447;">$1</strong>');

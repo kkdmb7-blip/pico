@@ -1429,7 +1429,9 @@ function showVedicToast(msg) {
 }
 
 function renderVedicMd(text) {
-  return text
+  // AI 응답을 이스케이프 없이 그대로 HTML에 꽂으면 안 되므로 변환 전에 먼저 이스케이프
+  return String(text || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n/g, '<br>');
 }
