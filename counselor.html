@@ -355,6 +355,16 @@ function loadFromLocal() {
   } catch(e) {}
 }
 
+// 이 데이터는 Supabase에 공개 anon key로 저장되는 값이라(RLS 구성에 따라 편집 권한 없는
+// 사람도 직접 API를 호출해 값을 바꿀 수 있는 경우가 있음), 화면에 HTML로 꽂기 전
+// 반드시 이스케이프해서 스크립트 삽입을 막음
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function safeUrl(u) {
+  return /^https?:\/\//i.test(u || '') ? u : '#';
+}
+
 function applyData(data) {
   document.getElementById('dName').textContent = data.name;
   document.getElementById('dTitle').textContent = data.title;
@@ -362,14 +372,14 @@ function applyData(data) {
 
   var cats = data.categories.split(',').map(function(c) { return c.trim(); }).filter(Boolean);
   var tagsEl = document.getElementById('dCategories');
-  tagsEl.innerHTML = cats.map(function(c) { return '<span class="tag">' + c + '</span>'; }).join('');
+  tagsEl.innerHTML = cats.map(function(c) { return '<span class="tag">' + escapeHtml(c) + '</span>'; }).join('');
 
   document.getElementById('dMethod').textContent = data.method;
   document.getElementById('dMethodSub').textContent = data.methodSub;
   document.getElementById('dPriceLabel').textContent = data.priceLabel;
   document.getElementById('dPriceValue').textContent = data.priceValue;
-  document.getElementById('dKakaoLink').href = data.kakaoUrl;
-  document.getElementById('dNotice').innerHTML = data.notice.replace(/\n/g, '<br>');
+  document.getElementById('dKakaoLink').href = safeUrl(data.kakaoUrl);
+  document.getElementById('dNotice').innerHTML = escapeHtml(data.notice).replace(/\n/g, '<br>');
 }
 
 function getCurrentData() {
