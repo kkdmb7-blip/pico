@@ -4705,6 +4705,9 @@ function openSajuModal() {
   document.getElementById('sajuDay').value = '';
   document.getElementById('sajuProfileSelect').value = '';
   _populateProfileSelect('sajuProfileSelect');
+  // 이름·생년월일은 매번 비워지는데 성별만 이전 선택이 남아있으면, 다른 사람 사주를 볼 때
+  // 깜빡하고 잘못된 성별로 제출할 위험이 있어 다른 입력값들과 함께 기본값으로 리셋
+  selectGender('M');
 }
 function closeSajuModal() {
   document.getElementById('sajuOverlay').classList.remove('open');
@@ -4773,6 +4776,9 @@ function openQimenModal() {
 
   document.getElementById('qimenProfileSelect').value = '';
   _populateProfileSelect('qimenProfileSelect');
+  // 생년월일은 매번 오늘 날짜로 리셋되는데 성별만 이전 선택이 남아있으면, 다른 사람 기문을 볼 때
+  // 깜빡하고 잘못된 성별로 제출할 위험이 있어 다른 입력값들과 함께 기본값으로 리셋
+  selectQimenGender('M');
   document.getElementById('qimenOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   history.pushState({ modal: 'qimen' }, '');
@@ -4868,6 +4874,9 @@ function openBirthModal(mode) {
   document.getElementById('birthDay').value = '';
   document.getElementById('birthProfileSelect').value = '';
   _populateProfileSelect('birthProfileSelect');
+  // 이전에 다른 사람(예: 여성) 정보로 열었던 성별 선택이 이름·생년월일은 다 지워지는데 성별만
+  // 남아있으면, 다음 사람 걸 깜빡하고 그대로 제출할 위험이 있어 다른 입력값들과 함께 기본값으로 리셋
+  selectBirthGender('M');
 }
 
 function closeBirthModal() {
