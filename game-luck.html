@@ -455,7 +455,12 @@ document.getElementById('gameDate').textContent = formatDateKo();
   } catch(e) {}
 })();
 
+let _luckPicked = false;
 function pickOrb(idx, el) {
+  // 애니메이션 진행 중(800ms) 다른 구슬을 연달아 누르면 두 번의 계산이 겹쳐서
+  // 결과가 뒤섞일 수 있어, 한 번 선택하면 그 사이 추가 선택은 막음
+  if (_luckPicked) return;
+  _luckPicked = true;
   // 애니메이션
   const allOrbs = document.querySelectorAll('.orb');
   allOrbs.forEach((o,i) => {
