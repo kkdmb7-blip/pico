@@ -416,6 +416,18 @@ function closeEdit() {
   document.getElementById('editOverlay').style.display = 'none';
 }
 
+// admin.html과 동일한 방식(sessionStorage 'pico_admin_secret') — 이미 admin.html에서
+// 인증하고 온 세션이면 다시 안 물어봄. 없으면 여기서 한 번 입력받아 저장.
+function _adminSecret() {
+  try {
+    var s = sessionStorage.getItem('pico_admin_secret');
+    if (s) return s;
+    s = (prompt('저장하려면 관리자 비밀키가 필요해요') || '').trim();
+    if (s) sessionStorage.setItem('pico_admin_secret', s);
+    return s;
+  } catch(e) { return ''; }
+}
+
 function saveProfile() {
   var data = {
     name: document.getElementById('eName').value.trim(),
@@ -433,41 +445,27 @@ function saveProfile() {
   // 화면 반영
   applyData(data);
 
-  // localStorage 저장
+  // localStorage 저장 (오프라인/서버 실패 대비 로컬 폴백)
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 
-  // Supabase 저장 시도
-  var cats = data.categories.split(',').map(function(c) { return c.trim(); }).filter(Boolean);
-  var body = {
-    user_id: '9461f1dd-7f9a-420c-826f-35bce88a75d7',
-    name: data.name,
-    title: data.title,
-    intro: data.intro,
-    categories: cats,
-    method: data.method,
-    method_sub: data.methodSub,
-    price_label: data.priceLabel,
-    price_value: data.priceValue,
-    kakao_url: data.kakaoUrl,
-    notice: data.notice,
-    updated_at: new Date().toISOString()
-  };
-
-  fetch(SB_URL + '/rest/v1/counselor_profiles?user_id=eq.9461f1dd-7f9a-420c-826f-35bce88a75d7', {
+  // 서버 저장 — 예전엔 클라이언트가 공개 anon key로 Supabase에 직접 썼는데, 그 테이블
+  // 쓰기 권한(RLS)이 사실상 전체 공개라 아무나 프로필을 바꿀 수 있었음. 이제 관리자 비밀키로
+  // 인증된 Worker 엔드포인트(service_role)를 통해서만 저장되도록 함
+  var secret = _adminSecret();
+  if (!secret) { closeEdit(); showToast('비밀키 입력이 취소돼 서버에는 저장되지 않았어요'); return; }
+  fetch('https://fortuna.kkdmb7.workers.dev/admin/counselor-profile', {
     method: 'PATCH',
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify(body)
+    headers: { 'Authorization': 'Bearer ' + secret, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(function(r) {
+    if (r.status === 403) { sessionStorage.removeItem('pico_admin_secret'); showToast('비밀키가 올바르지 않아요. 다시 시도해주세요'); return; }
+    if (!r.ok) { showToast('서버 저장에 실패했어요 (이 기기에는 저장됨)'); return; }
+    showToast('저장되었습니다');
   }).catch(function() {
-    // DB 없으면 localStorage만으로 동작
+    showToast('서버 저장에 실패했어요 (이 기기에는 저장됨)');
   });
 
   closeEdit();
-  showToast('저장되었습니다');
 }
 
 function showToast(msg) {
