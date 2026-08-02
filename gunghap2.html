@@ -771,7 +771,11 @@ function renderPremium(d) {
 
   function setAnalysis(id, text) {
     var el = document.getElementById(id);
-    if (el) el.innerHTML = (text || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    if (!el) return;
+    // AI 분석 텍스트 안에 입력 이름 등이 그대로 인용될 수 있어서, HTML로 꽂기 전
+    // 먼저 이스케이프한 뒤에 **굵게** 표시만 <strong>으로 변환
+    var esc = (text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el.innerHTML = esc.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   }
   setAnalysis('textSaju', d.saju_analysis);
   setAnalysis('textAstro', d.astro_analysis);

@@ -363,7 +363,10 @@ function showMatchToast(msg) {
 }
 
 function renderMd(text) {
-  return text
+  // AI 분석 텍스트 안에 입력 이름 등이 그대로 인용될 수 있어서, HTML로 꽂기 전
+  // 먼저 이스케이프한 뒤에 **굵게**/줄바꿈만 태그로 변환
+  return String(text || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n/g, '<br>');
 }
