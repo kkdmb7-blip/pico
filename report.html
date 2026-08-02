@@ -5183,6 +5183,12 @@ function submitChild() {
   proceedAfterProfile();
 }
 
+// 사용자가 직접 입력하는 이름(_profile.name)을 HTML에 그대로 꽂으면 <img onerror=...> 같은 걸
+// 이름으로 넣어 스크립트를 실행시킬 수 있어서(XSS), 화면에 넣기 직전 반드시 이스케이프
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 // ── 오행 시각화 + DB 미리보기 카드 (전 타입 공통) ──
 function renderCharVisual() {
   if (!_ohaeng) return;
@@ -5293,7 +5299,7 @@ function renderCharVisual() {
     const sfM = window.SajuFormula;
     const iljuStemM = (_ilju||'')[0];
     const metaphorM = (sfM && sfM.STEM_METAPHOR && sfM.STEM_METAPHOR[iljuStemM]) || '특별한 기운';
-    const nameKwM = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + _profile.name + '</span>님 사주는' : '당신의 사주는';
+    const nameKwM = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + escapeHtml(_profile.name) + '</span>님 사주는' : '당신의 사주는';
 
     const ctxM = sfM.fromSajuData(_sdFull, ohList);
     const patScoredM = sfM.scoreMoneyPatterns(ctxM);
@@ -5395,7 +5401,7 @@ function renderCharVisual() {
     const sfL = window.SajuFormula;
     const iljuStemL = (_ilju||'')[0];
     const metaphorL = (sfL && sfL.STEM_METAPHOR && sfL.STEM_METAPHOR[iljuStemL]) || '특별한 기운';
-    const nameKwL = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + _profile.name + '</span>님은' : '당신은';
+    const nameKwL = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + escapeHtml(_profile.name) + '</span>님은' : '당신은';
 
     const ctxL = sfL.fromSajuData(_sdFull, ohList);
     const styleScoredL = sfL.scoreLoveStyles(ctxL);
@@ -5809,7 +5815,7 @@ function renderCharVisual() {
     const sfH = window.SajuFormula;
     const iljuStemH = (_ilju||'')[0];
     const metaphorH = (sfH && sfH.STEM_METAPHOR && sfH.STEM_METAPHOR[iljuStemH]) || '특별한 기운';
-    const nameKwH = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + _profile.name + '</span>님은' : '당신은';
+    const nameKwH = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + escapeHtml(_profile.name) + '</span>님은' : '당신은';
 
     const ctxH = sfH.fromSajuData(_sdFull, ohList);
     // 8축 기질 점수 → TOP-heavy(빅버블용) + 정규화(레이더용)
@@ -5920,7 +5926,7 @@ function renderCharVisual() {
     const sfC = window.SajuFormula;
     const iljuStemC = (_ilju||'')[0];
     const metaphorC = (sfC && sfC.STEM_METAPHOR[iljuStemC]) || '특별한 기운';
-    const nameKwC = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + _profile.name + '</span>님 안의' : '아이 안의';
+    const nameKwC = (_profile && _profile.name) ? '<span style="color:#b89048;font-weight:900;">' + escapeHtml(_profile.name) + '</span>님 안의' : '아이 안의';
 
     // 사주 컨텍스트: 오행% + 십신 카운트 + 일간 오행
     const ctxC = sfC.fromSajuData(_sdFull, ohList);
@@ -6917,7 +6923,7 @@ function renderCharVisual() {
         <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;background:rgba(155,120,0,0.10);color:#7a5c00;border:1px solid rgba(155,120,0,0.22);"><i class="pi pi-person"></i> 내 사주 미리보기</div>
         ${badges}
       </div>
-      <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:4px;">${name ? name + ' 님의 ' : ''}${{character:'오행 기질 구조', money:'재물 오행 구조', love:'연애 오행 구조', daeun:'대운 오행 흐름', year:'올해 오행 에너지', month:'이번달 오행 구조', yongsin:'용신 오행 에너지', health:'체질 오행 분포', wealth_timing:'재물 타이밍 구조', timing:'인생 타이밍 구조', career_deep:'직업·사업 오행 구조', child_career:'재능 오행 구조', family:'육친 오행 구조', classic:'고전 사주 원국', guide:'상대방 오행 기질', summary:'내 사주 핵심 요약', balance:'오행 밸런스', sinsal:'신살 구조', triple:'동서양 통합 분석', astro_full:'사주·서양 교차 구조', vedic_full:'사주·베딕 교차 구조', ziwei_full:'사주·자미 교차 구조', villain:'빌런 기질 구조', nemesis:'소진 관계 구조', love_history:'연애 흑역사 구조', era:'시대 에너지 구조', hidden_talent:'숨겨진 재능 구조', totem:'수호 동물 에너지'}[_type] || '오행 에너지 구조'}</div>
+      <div style="font-size:17px;font-weight:800;color:#2a1a0a;margin-bottom:4px;">${name ? escapeHtml(name) + ' 님의 ' : ''}${{character:'오행 기질 구조', money:'재물 오행 구조', love:'연애 오행 구조', daeun:'대운 오행 흐름', year:'올해 오행 에너지', month:'이번달 오행 구조', yongsin:'용신 오행 에너지', health:'체질 오행 분포', wealth_timing:'재물 타이밍 구조', timing:'인생 타이밍 구조', career_deep:'직업·사업 오행 구조', child_career:'재능 오행 구조', family:'육친 오행 구조', classic:'고전 사주 원국', guide:'상대방 오행 기질', summary:'내 사주 핵심 요약', balance:'오행 밸런스', sinsal:'신살 구조', triple:'동서양 통합 분석', astro_full:'사주·서양 교차 구조', vedic_full:'사주·베딕 교차 구조', ziwei_full:'사주·자미 교차 구조', villain:'빌런 기질 구조', nemesis:'소진 관계 구조', love_history:'연애 흑역사 구조', era:'시대 에너지 구조', hidden_talent:'숨겨진 재능 구조', totem:'수호 동물 에너지'}[_type] || '오행 에너지 구조'}</div>
     </div>
 
     <!-- 타입별 시각화 -->
@@ -7002,7 +7008,7 @@ function renderIntro() {
       }
       const dt = prev.created_at ? new Date(prev.created_at) : null;
       const dtTxt = dt ? (dt.getFullYear() + '.' + String(dt.getMonth()+1).padStart(2,'0') + '.' + String(dt.getDate()).padStart(2,'0')) : '';
-      const whoTxt = (_profile && _profile.name) ? _profile.name + '님' : '';
+      const whoTxt = (_profile && _profile.name) ? escapeHtml(_profile.name) + '님' : '';
       resumeEl.style.cssText = 'margin:0 auto 18px;padding:14px 16px;max-width:420px;background:linear-gradient(135deg,rgba(212,175,55,0.14),rgba(123,94,167,0.10));border:1px solid rgba(212,175,55,0.42);border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;';
       resumeEl.innerHTML =
         '<div style="flex:1;min-width:0;text-align:left;">' +
@@ -7047,7 +7053,7 @@ function renderIntro() {
       + '<div style="font-size:10px;font-weight:800;color:#7a5210;letter-spacing:3px;opacity:0.78;margin-bottom:10px;">✦ ' + subjLabel + ' ✦</div>'
       // 이름 (큰 골드)
       + '<div style="font-size:24px;font-weight:900;color:#5a3a00;letter-spacing:-0.5px;line-height:1.15;text-shadow:0 1px 0 rgba(255,250,210,0.8),0 2px 8px rgba(184,144,72,0.35);">'
-      +   (_profile.name || '이 사람')
+      +   escapeHtml(_profile.name || '이 사람')
       +   relTxt
       + '</div>'
       // 디바이더

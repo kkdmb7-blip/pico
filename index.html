@@ -3353,6 +3353,12 @@ function selectGhPartnerGender(g) {
   });
 }
 
+// 궁합(myName/pNameDisp 등)은 사용자가 직접 입력하는 이름이라, HTML로 그대로 꽂으면
+// <img onerror=...> 같은 걸 이름으로 넣어 스크립트를 실행시킬 수 있음(XSS) — 렌더 전 반드시 이스케이프
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function openGunghapModal() {
   _ghPartnerGender = '';
   selectGhPartnerGender('');
@@ -3384,7 +3390,7 @@ function openGunghapModal() {
   if (infoEl) {
     if (_ghMyProfile) {
       var gTxt = _ghMyProfile.gender === 'female' ? '여성' : '남성';
-      infoEl.innerHTML = '<span style="color:#1a120a;font-weight:600;">' + (_ghMyProfile.name || '나') + '</span>'
+      infoEl.innerHTML = '<span style="color:#1a120a;font-weight:600;">' + escapeHtml(_ghMyProfile.name || '나') + '</span>'
         + '&nbsp;&nbsp;<span style="color:rgba(0,0,0,0.5);">' + _ghMyProfile.year + '년 ' + _ghMyProfile.month + '월 ' + _ghMyProfile.day + '일 · ' + gTxt + '</span>';
     } else {
       infoEl.innerHTML = '<span style="color:#b91c1c;">프로필을 먼저 설정해주세요 (사주 분석 메뉴에서 입력)</span>';
@@ -3544,7 +3550,7 @@ function _sajuMiniCard(saju, label, name, gender) {
   var fp=saju.fivePct;
   return '<div style="background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);border-radius:10px;padding:10px 8px;">'
     +'<div style="font-size:11px;color:rgba(0,0,0,0.7);font-weight:600;margin-bottom:3px;">'+label+'</div>'
-    +'<div style="font-size:12px;font-weight:700;color:#1a120a;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(name||label)
+    +'<div style="font-size:12px;font-weight:700;color:#1a120a;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escapeHtml(name||label)
     +(gText?' <span style="font-size:10px;color:rgba(0,0,0,0.7);">'+gText+'</span>':'')+' <span style="font-size:10px;color:rgba(0,0,0,0.7);">'+saju.zodiac+'띠</span></div>'
     +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;">'+cols+'</div>'
     +'<div style="margin-top:6px;font-size:10px;color:rgba(0,0,0,0.72);line-height:1.5;">'+saju.dayEl+' · '+saju.strength+'<br>목'+fp.목+'·화'+fp.화+'·토'+fp.토+'·금'+fp.금+'·수'+fp.수+'</div>'
@@ -3696,7 +3702,7 @@ async function submitGunghap() {
   var commentEl = document.getElementById('ghResComment');
   var detailEl  = document.getElementById('ghResDetail');
 
-  if (namesEl) namesEl.innerHTML = myName + ' <i class="pi pi-heart" style="color:#c24a8a"></i> ' + pNameDisp;
+  if (namesEl) namesEl.innerHTML = escapeHtml(myName) + ' <i class="pi pi-heart" style="color:#c24a8a"></i> ' + escapeHtml(pNameDisp);
   if (cardsEl) cardsEl.innerHTML = _sajuMiniCard(mySaju,'나',myName,myGender) + _sajuMiniCard(pSaju,'상대방',pNameDisp,_ghPartnerGender);
   if (aiEl)    { aiEl.innerHTML = ''; aiEl.style.display = 'none'; }
   if (scoreEl) scoreEl.textContent = score.total;
@@ -3817,7 +3823,7 @@ async function requestGunghapAI() {
   // ── DB 1: 오행 궁합 (즉시) ──
   var ohText = ctx.ohaeng_text;
   if (ohText && ohText.텍스트) {
-    showChunk('chunk-db1', '<i class="pi pi-fire"></i> 오행 궁합 · ' + myName + '의 ' + ohaengA + ' × ' + pNameDisp + '의 ' + ohaengB, ohText.텍스트.replace(/\n/g, '<br>'));
+    showChunk('chunk-db1', '<i class="pi pi-fire"></i> 오행 궁합 · ' + escapeHtml(myName) + '의 ' + ohaengA + ' × ' + escapeHtml(pNameDisp) + '의 ' + ohaengB, ohText.텍스트.replace(/\n/g, '<br>'));
   } else {
     showChunk('chunk-db1', '<i class="pi pi-fire"></i> 오행 궁합', ohaengA + ' × ' + ohaengB);
   }
@@ -3888,7 +3894,7 @@ async function requestGunghapAI() {
 
   // ── DB 2: 체질 궁합 (즉시) ──
   if (ctx.singang_text && ctx.singang_text.텍스트) {
-    showChunk('chunk-db2', '<i class="pi pi-scale"></i>️ 체질 궁합 · ' + myName + ' ' + strKeyA + ' × ' + pNameDisp + ' ' + strKeyB, ctx.singang_text.텍스트.replace(/\n/g,'<br>'));
+    showChunk('chunk-db2', '<i class="pi pi-scale"></i>️ 체질 궁합 · ' + escapeHtml(myName) + ' ' + strKeyA + ' × ' + escapeHtml(pNameDisp) + ' ' + strKeyB, ctx.singang_text.텍스트.replace(/\n/g,'<br>'));
   } else {
     showChunk('chunk-db2', '<i class="pi pi-scale"></i>️ 체질 궁합', strKeyA + ' × ' + strKeyB + ' 조합');
   }
@@ -3929,7 +3935,7 @@ async function requestGunghapAI() {
       throw new Error(e1.error||r1.status);
     }
     var d1 = await r1.json();
-    showChunk('chunk-ai1', '<i class="pi pi-heart"></i> ' + myName + ' & ' + pNameDisp + '의 연애 스타일', boldPink(d1.reply));
+    showChunk('chunk-ai1', '<i class="pi pi-heart"></i> ' + escapeHtml(myName) + ' & ' + escapeHtml(pNameDisp) + '의 연애 스타일', boldPink(d1.reply));
   } catch(e) {
     showError('chunk-ai1','<i class="pi pi-heart"></i> 연애 스타일'); showError('chunk-ai2','⏰ 지금 이 시기');
     aiBtn.disabled=false; aiBtn.textContent='AI 분석 시작';
@@ -4108,7 +4114,7 @@ async function openHistoryModal() {
     item.onmouseover = function(){ this.style.borderColor='var(--accent)'; };
     item.onmouseout = function(){ this.style.borderColor='var(--border)'; };
     item.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;">'
-      +'<div><span style="font-size:16px;margin-right:6px;">'+icon+'</span><span style="font-size:14px;font-weight:700;color:var(--text);">'+r.title+'</span></div>'
+      +'<div><span style="font-size:16px;margin-right:6px;">'+icon+'</span><span style="font-size:14px;font-weight:700;color:var(--text);">'+escapeHtml(r.title)+'</span></div>'
       +'<span style="font-size:11px;color:var(--muted);">'+dateStr+'</span></div>';
     if (r._source === 'reports') {
       // 원본 리포트 페이지로 이동 — 섹션 카드 형식·이름·메타 데이터 그대로
