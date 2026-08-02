@@ -277,6 +277,9 @@ nav{ position:sticky; top:0; z-index:100; background:rgba(244,237,224,0.92); bac
 var SB_URL = 'https://ymghmfkqctckxxysxkvy.supabase.co';
 var SB_KEY = 'sb_publishable_3-9zobXqx6Nv36LzmNMBpA_fohZqA5x';
 var sbH = { apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' };
+// saju_diary(자유텍스트 개인 일기)는 더 이상 공개 anon key로 직접 건드리지 않고,
+// fortuna-worker의 인증된 /diary 엔드포인트를 통해서만 읽고 씀
+var DIARY_API = 'https://fortuna.kkdmb7.workers.dev/diary';
 
 // ── 사주 상수 ────────────────────────────────────────────────
 var MONTH_STEM_BASE = [2,4,6,8,0];
@@ -414,15 +417,10 @@ async function loadSameIlganMoods() {
   var t = getTodayKST();
   var ds = dateStr(t.y, t.m, t.d);
   try {
-    // 같은 출생 일간 유저 목록 조회
-    var subR = await fetch(SB_URL+'/rest/v1/pico_push_subscriptions?ilgan=eq.'+encodeURIComponent(_birthIlgan)+'&select=user_id', {headers:sbH});
-    var subs = await subR.json();
-    if (!Array.isArray(subs) || subs.length === 0) return;
-    var ids = subs.map(function(s){return s.user_id;}).filter(Boolean);
-
-    // 오늘 해당 유저들의 기분 조회
-    var moodR = await fetch(SB_URL+'/rest/v1/saju_diary?date=eq.'+ds+'&user_id=in.('+ids.join(',')+')'+'&select=mood', {headers:sbH});
-    var entries = await moodR.json();
+    // 같은 출생 일간 유저들의 오늘 기분 집계 (서버에서 user_id 노출 없이 집계만 받음)
+    var moodR = await fetch(DIARY_API+'?action=same_ilgan&ilgan='+encodeURIComponent(_birthIlgan)+'&date='+ds);
+    var moodData = await moodR.json();
+    var entries = (moodData && moodData.moods) || [];
     if (!Array.isArray(entries) || entries.length === 0) return;
 
     var mc={good:0,normal:0,bad:0,energetic:0,tired:0};
@@ -449,8 +447,9 @@ async function loadTodayDiary() {
   var t = getTodayKST();
   var ds = dateStr(t.y, t.m, t.d);
   try {
-    var r = await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=eq.'+ds+'&select=*', { headers:sbH });
-    var rows = await r.json();
+    var r = await fetch(DIARY_API+'?user_id='+encodeURIComponent(_user.id)+'&date='+ds);
+    var data = await r.json();
+    var rows = (data && data.rows) || [];
     if (Array.isArray(rows) && rows.length > 0) { showCompletedState(rows[0]); return; }
   } catch(e) {}
   document.getElementById('completedState').style.display = 'none';
@@ -506,17 +505,15 @@ async function submitDiary(skipMemo) {
 
   showStep(4);
 
-  // Supabase 저장
+  // 저장 (서버가 하루 1건 upsert로 delete+insert 처리)
   try {
-    var delRes = await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=eq.'+ds, { method:'DELETE', headers:sbH });
-    console.log('[diary] DELETE status:', delRes.status);
-    var insRes = await fetch(SB_URL+'/rest/v1/saju_diary', {
+    var insRes = await fetch(DIARY_API, {
       method:'POST',
-      headers:Object.assign({},sbH,{Prefer:'return=representation'}),
-      body:JSON.stringify({ user_id:_user.id, date:ds, mood:_currentMood, events:_selectedEvents, memo:memo||null, ilgan:p.stem, ai_feedback:null })
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ user_id:_user.id, date:ds, mood:_currentMood, events:_selectedEvents, memo:memo||null, ilgan:p.stem })
     });
     var insBody = await insRes.json();
-    console.log('[diary] INSERT status:', insRes.status, insBody);
+    console.log('[diary] SAVE status:', insRes.status, insBody);
   } catch(e) { console.warn('[diary save]',e); }
 
   // localStorage 캐시 (홈 CTA용)
@@ -555,8 +552,8 @@ async function submitDiary(skipMemo) {
 
   // 피드백 Supabase 업데이트
   if (feedback) {
-    await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=eq.'+ds, {
-      method:'PATCH', headers:Object.assign({},sbH,{Prefer:'return=minimal'}),
+    await fetch(DIARY_API+'?user_id='+encodeURIComponent(_user.id)+'&date='+ds, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ ai_feedback:feedback })
     }).catch(function(){});
   }
@@ -570,7 +567,7 @@ async function submitDiary(skipMemo) {
 async function resetTodayDiary() {
   if (!_user) return;
   var t = getTodayKST(); var ds = dateStr(t.y,t.m,t.d);
-  await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=eq.'+ds,{ method:'DELETE',headers:sbH }).catch(function(){});
+  await fetch(DIARY_API+'?user_id='+encodeURIComponent(_user.id)+'&date='+ds,{ method:'DELETE' }).catch(function(){});
   try { localStorage.removeItem('pico_diary_'+ds); } catch(e) {}
   _currentMood=null; _selectedEvents=[];
   document.querySelectorAll('.mood-btn,.event-btn').forEach(function(b){ b.classList.remove('selected'); });
@@ -589,8 +586,9 @@ async function loadCalendar() {
   var sd = dateStr(_calY,_calM,1), ed = dateStr(_calY,_calM,lastDay);
   _calDiaries = {};
   try {
-    var r = await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=gte.'+sd+'&date=lte.'+ed+'&select=date,mood',{ headers:sbH });
-    var rows = await r.json();
+    var r = await fetch(DIARY_API+'?user_id='+encodeURIComponent(_user.id)+'&from='+sd+'&to='+ed+'&fields=date,mood');
+    var data = await r.json();
+    var rows = (data && data.rows) || [];
     if (Array.isArray(rows)) rows.forEach(function(row){ _calDiaries[row.date]=row; });
   } catch(e) {}
   renderCalendar();
@@ -630,8 +628,9 @@ function calMove(dir) {
 async function showDetail(ds) {
   if (!_user) return;
   try {
-    var r = await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=eq.'+ds+'&select=*',{ headers:sbH });
-    var rows = await r.json();
+    var r = await fetch(DIARY_API+'?user_id='+encodeURIComponent(_user.id)+'&date='+ds);
+    var data = await r.json();
+    var rows = (data && data.rows) || [];
     if (!Array.isArray(rows)||rows.length===0) return;
     var row = rows[0];
     var pts = ds.split('-'), y2=parseInt(pts[0]),m2=parseInt(pts[1]),d2=parseInt(pts[2]);
@@ -656,8 +655,9 @@ async function loadMonthlyStats() {
   var lastDay = new Date(_calY,_calM,0).getDate();
   var sd = dateStr(_calY,_calM,1), ed = dateStr(_calY,_calM,lastDay);
   try {
-    var r = await fetch(SB_URL+'/rest/v1/saju_diary?user_id=eq.'+encodeURIComponent(_user.id)+'&date=gte.'+sd+'&date=lte.'+ed+'&select=date,mood,ilgan',{ headers:sbH });
-    var rows = await r.json();
+    var r = await fetch(DIARY_API+'?user_id='+encodeURIComponent(_user.id)+'&from='+sd+'&to='+ed+'&fields=date,mood,ilgan');
+    var data = await r.json();
+    var rows = (data && data.rows) || [];
     if (!Array.isArray(rows)||rows.length===0) {
       document.getElementById('statsTotalDays').textContent='이번 달 기록 없음';
       document.getElementById('moodChart').innerHTML='<div class="empty-state"><div class="ei"><i class="pi pi-book"></i></div><p>아직 기록이 없어.<br>오늘부터 써봐!</p></div>';
