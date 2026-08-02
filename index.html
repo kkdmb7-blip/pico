@@ -5585,7 +5585,7 @@ function renderProfilesModal() {
       var timeLabel = (p.birth_time && p.birth_time !== 'unknown') ? ' · ' + p.birth_time : ' · 시간모름';
       div.innerHTML =
         '<div style="min-width:0;flex:1;">'
-          + '<div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (p.name || '이름없음') + '</div>'
+          + '<div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(p.name || '이름없음') + '</div>'
           + '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + bdate + ' · ' + gender + timeLabel + '</div>'
         + '</div>'
         + '<div style="display:flex;gap:4px;flex-shrink:0;">'
