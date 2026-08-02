@@ -438,6 +438,12 @@ function goToSubManage() {
   location.href = 'charge.html#sub';
 }
 
+// 저장된 프로필 이름은 사용자가 직접 입력한 값이라, HTML로 그대로 꽂으면
+// <img onerror=...> 같은 걸 이름으로 넣어 스크립트를 실행시킬 수 있음(XSS) — 렌더 전 반드시 이스케이프
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function renderProfiles() {
   var profiles = [];
   try {
@@ -463,7 +469,7 @@ function renderProfiles() {
     var item = document.createElement('div');
     item.className = 'profile-item';
     item.innerHTML = '<div>'
-      + '<div class="profile-item-name">' + name + '</div>'
+      + '<div class="profile-item-name">' + escapeHtml(name) + '</div>'
       + '<div class="profile-item-sub">' + date + ' · ' + gender + '</div>'
       + '</div>'
       + (p._isMe ? '<span class="profile-badge">' + (_rpl === 'ja' ? '自分の情報' : '내 정보') + '</span>' : '');
