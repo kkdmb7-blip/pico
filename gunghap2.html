@@ -80,6 +80,7 @@ nav{display:flex;align-items:center;padding:14px 16px 10px;gap:8px;border-bottom
 .type-label{font-size:11px;font-weight:700;letter-spacing:0.12em;margin-bottom:10px;opacity:.65;}
 .type-name{font-size:36px;font-weight:900;line-height:1.2;margin-bottom:14px;font-family:'Noto Serif KR',serif;}
 .type-summary{font-size:15px;line-height:1.7;color:var(--text2);max-width:340px;margin:0 auto;word-break:keep-all;}
+.type-reason{font-size:12.5px;line-height:1.6;color:var(--gold-deep,#9a7a26);max-width:320px;margin:8px auto 0;word-break:keep-all;background:rgba(154,122,38,0.08);border-radius:10px;padding:8px 12px;}
 /* type colors */
 .type-destiny .type-name{color:#8a6a15;}
 .type-flame .type-name{color:#7a2418;}
@@ -249,6 +250,7 @@ nav{display:flex;align-items:center;padding:14px 16px 10px;gap:8px;border-bottom
       <div class="type-label" id="typeLabel">궁합 유형</div>
       <div class="type-name" id="typeName"></div>
       <p class="type-summary" id="typeSummary"></p>
+      <p class="type-reason" id="typeReason" style="display:none;"></p>
     </div>
 
     <div class="engine-bars">
@@ -621,7 +623,10 @@ function buildDataSummary(a, b, sA, sB, aA, aB, vA, vB) {
 }
 
 async function analyzeCompatibility(a, b, sA, sB, aA, aB, vA, vB) {
-  var sysPrompt = '당신은 동서양 운명 궁합 전문가입니다. 두 사람의 사주·서양점성·베딕 데이터를 정밀 분석해 JSON만 반환하세요. 코드블록(\`\`\`) 없이 순수 JSON만.\n\n반환 형식:\n{"saju_score":정수0~100,"astro_score":정수0~100,"vedic_score":정수0~100,"total_score":세점수평균정수,"type":"운명의 실|불꽃 인연|상생의 파트너|카르마 연결|대립과 성장|수련의 인연","summary":"두 사람의 궁합을 소름 돋도록 구체적으로 50자 이내 한 문장"}\n\n점수 기준: 90이상=운명의 실, 80~89=불꽃 인연, 70~79=상생의 파트너, 60~69=카르마 연결, 50~59=대립과 성장, 49이하=수련의 인연\n\n사주: 일간합·충·오행균형·용신 관계 분석\n서양점성: 태양·달·금성·화성 각도 및 원소 궁합\n베딕: 나크샤트라 쿠타(Kuta) 8항목 종합';
+  // summary는 감성적 한 줄, reason은 무료구간에서부터 "왜 이 점수인지" 구체적 근거를 하나 보여줘서
+  // 유료 전환 전에 신뢰를 얻기 위한 필드 — 두루뭉술한 총평만 있으면 결제 전 신뢰가 약하다는
+  // 경쟁 궁합앱 벤치마킹 결과를 반영(일간합/충, 각도 등 실제 근거 하나를 콕 짚어 제시).
+  var sysPrompt = '당신은 동서양 운명 궁합 전문가입니다. 두 사람의 사주·서양점성·베딕 데이터를 정밀 분석해 JSON만 반환하세요. 코드블록(\`\`\`) 없이 순수 JSON만.\n\n반환 형식:\n{"saju_score":정수0~100,"astro_score":정수0~100,"vedic_score":정수0~100,"total_score":세점수평균정수,"type":"운명의 실|불꽃 인연|상생의 파트너|카르마 연결|대립과 성장|수련의 인연","summary":"두 사람의 궁합을 소름 돋도록 구체적으로 50자 이내 한 문장","reason":"이 점수·유형이 나온 구체적 근거 하나를 콕 짚어서 40자 이내로. 예: 일간 갑-기 합이 있어 서로 끌리는 힘이 강해요 / 화성이 90도로 부딪혀 티키타카 다툼이 잦아요. 실제 데이터에 없는 근거는 절대 만들지 말 것"}\n\n점수 기준: 90이상=운명의 실, 80~89=불꽃 인연, 70~79=상생의 파트너, 60~69=카르마 연결, 50~59=대립과 성장, 49이하=수련의 인연\n\n사주: 일간합·충·오행균형·용신 관계 분석\n서양점성: 태양·달·금성·화성 각도 및 원소 궁합\n베딕: 나크샤트라 쿠타(Kuta) 8항목 종합';
   var userMsg = buildDataSummary(a, b, sA, sB, aA, aB, vA, vB);
 
   var res = await fetch(CHAT_URL, {
@@ -658,6 +663,12 @@ function renderFreeResult(r) {
   document.getElementById('typeLabel').textContent = '궁합 유형';
   document.getElementById('typeName').textContent = type;
   document.getElementById('typeSummary').textContent = r.summary || '';
+  { var _reasonEl = document.getElementById('typeReason');
+    if (_reasonEl) {
+      if (r.reason) { _reasonEl.textContent = '✦ ' + r.reason; _reasonEl.style.display = 'block'; }
+      else { _reasonEl.style.display = 'none'; }
+    }
+  }
   setTimeout(function() {
     setBar('barSaju', 'valSaju', r.saju_score || 0);
     setBar('barAstro', 'valAstro', r.astro_score || 0);
